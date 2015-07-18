@@ -52,5 +52,5 @@ func == <F: Equatable> (left: Doc<F>, right: Doc<F>) -> Bool {
 }
 
 func == (left: Pretty, right: Pretty) -> Bool {
-	return true
+	return left.out == right.out
 }
