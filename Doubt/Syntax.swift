@@ -25,11 +25,6 @@ struct Fix: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConv
 	}
 }
 
-func == (left: Fix, right: Fix) -> Bool {
-	return left.out == right.out
-}
-
-
 enum Syntax<Payload>: AlgebraicType, CustomDebugStringConvertible, CustomDocConvertible {
 	case Apply(Payload, [Payload])
 	case Abstract([Payload], Payload)
@@ -103,25 +98,6 @@ enum Syntax<Payload>: AlgebraicType, CustomDebugStringConvertible, CustomDocConv
 				Pretty.Wrap(.Text("{"), Pretty.Vertical(vs.map(Pretty.init)), .Text("}"))
 			])
 		}
-	}
-}
-
-func == <F: Equatable> (left: Syntax<F>, right: Syntax<F>) -> Bool {
-	switch (left, right) {
-	case let (.Apply(a, aa), .Apply(b, bb)):
-		return a == b && aa == bb
-	case let (.Abstract(p1, b1), .Abstract(p2, b2)):
-		return p1 == p2 && b1 == b2
-	case let (.Assign(n1, v1), .Assign(n2, v2)):
-		return n1 == n2 && v1 == v2
-	case let (.Variable(n1), .Variable(n2)):
-		return n1 == n2
-	case let (.Literal(l1), .Literal(l2)):
-		return l1 == l2
-	case let (.Group(n1, v1), .Group(n2, v2)):
-		return n1 == n2 && v1 == v2
-	default:
-		return false
 	}
 }
 

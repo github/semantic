@@ -24,17 +24,6 @@ enum Diff: CustomDocConvertible, Equatable {
 	}
 }
 
-func == (left: Diff, right: Diff) -> Bool {
-	switch (left, right) {
-	case let (.Patch(a1, b1), .Patch(a2, b2)):
-		return a1 == a2 && b1 == b2
-	case let (.Copy(a), .Copy(b)):
-		return a() == b()
-	default:
-		return false
-	}
-}
-
 
 func diff(a: Syntax<Fix>, _ b: Syntax<Fix>) -> Diff {
 	switch (a, b) {

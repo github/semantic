@@ -43,25 +43,6 @@ enum Doc<Payload>: AlgebraicType, CustomStringConvertible {
 	}
 }
 
-func == <F: Equatable> (left: Doc<F>, right: Doc<F>) -> Bool {
-	switch (left, right) {
-	case (.Empty, .Empty):
-		return true
-	case let (.Text(a), .Text(b)):
-		return a == b
-	case let (.Horizontal(a), .Horizontal(b)):
-		return a == b
-	case let (.Vertical(a), .Vertical(b)):
-		return a == b
-	case let (.Wrap(a1, b1, c1), .Wrap(a2, b2, c2)):
-		return a1 == a2 && b1 == b2 && c1 == c2
-	case let (.Join(s1, e1), .Join(s2, e2)):
-		return s1 == s2 && e1 == e2
-	default:
-		return false
-	}
-}
-
 
 struct Pretty: CustomStringConvertible, Equatable, FixpointType {
 	init<T>(_ value: T) {
@@ -99,10 +80,6 @@ struct Pretty: CustomStringConvertible, Equatable, FixpointType {
 	static func Join(separator: Pretty, _ elements: [Pretty]) -> Pretty {
 		return Pretty(.Join(separator, elements))
 	}
-}
-
-func == (left: Pretty, right: Pretty) -> Bool {
-	return true
 }
 
 
