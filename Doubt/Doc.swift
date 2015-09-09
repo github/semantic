@@ -32,13 +32,13 @@ enum Doc<Payload>: AlgebraicType, CustomStringConvertible {
 		case let .Text(s):
 			return s
 		case let .Horizontal(a):
-			return "".join(lazy(a).map { String($0) })
+			return a.lazy.map { String($0) }.joinWithSeparator("")
 		case let .Vertical(a):
-			return "\n".join(lazy(a).map { String($0) })
+			return a.lazy.map { String($0) }.joinWithSeparator("\n")
 		case let .Wrap(open, body, close):
 			return "\(String(open))\(String(body))\(String(close))"
 		case let .Join(separator, elements):
-			return String(separator).join(elements.map { String($0) })
+			return elements.map { String($0) }.joinWithSeparator(String(separator))
 		}
 	}
 }

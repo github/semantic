@@ -55,10 +55,10 @@ enum Syntax<Payload>: AlgebraicType, CustomDebugStringConvertible, CustomDocConv
 	var debugDescription: String {
 		switch self {
 		case let .Apply(f, vs):
-			let s = ", ".join(vs.map { String($0) })
+			let s = vs.map { String($0) }.joinWithSeparator(", ")
 			return ".Apply(\(f), [ \(s) ])"
 		case let .Abstract(parameters, body):
-			let s = ", ".join(parameters.map { String($0) })
+			let s = parameters.map { String($0) }.joinWithSeparator(", ")
 			return ".Abstract([ \(s) ], \(body))"
 		case let .Assign(n, v):
 			return ".Assign(\(n), \(v))"
@@ -67,7 +67,7 @@ enum Syntax<Payload>: AlgebraicType, CustomDebugStringConvertible, CustomDocConv
 		case let .Literal(s):
 			return ".Literal(\(s))"
 		case let .Group(n, vs):
-			let s = ", ".join(vs.map { String($0) })
+			let s = vs.map { String($0) }.joinWithSeparator(", ")
 			return ".Group(\(n), [ \(s) ])"
 		}
 	}
