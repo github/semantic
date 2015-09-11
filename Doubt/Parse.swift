@@ -1,6 +1,6 @@
 public struct State<T> {
-	let rest: String
-	let value: T
+	public let rest: String
+	public let value: T
 }
 
 public prefix func ^(string: String)(_ input: String) -> State<String>? {
