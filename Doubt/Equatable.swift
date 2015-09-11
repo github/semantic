@@ -1,8 +1,8 @@
-func == (left: Fix, right: Fix) -> Bool {
+public func == (left: Fix, right: Fix) -> Bool {
 	return left.out == right.out
 }
 
-func == <F: Equatable> (left: Syntax<F>, right: Syntax<F>) -> Bool {
+public func == <F: Equatable> (left: Syntax<F>, right: Syntax<F>) -> Bool {
 	switch (left, right) {
 	case let (.Apply(a, aa), .Apply(b, bb)):
 		return a == b && aa == bb
@@ -32,7 +32,7 @@ func == (left: Diff, right: Diff) -> Bool {
 	}
 }
 
-func == <F: Equatable> (left: Doc<F>, right: Doc<F>) -> Bool {
+public func == <F: Equatable> (left: Doc<F>, right: Doc<F>) -> Bool {
 	switch (left, right) {
 	case (.Empty, .Empty):
 		return true
@@ -51,6 +51,6 @@ func == <F: Equatable> (left: Doc<F>, right: Doc<F>) -> Bool {
 	}
 }
 
-func == (left: Pretty, right: Pretty) -> Bool {
+public func == (left: Pretty, right: Pretty) -> Bool {
 	return left.out == right.out
 }

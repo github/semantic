@@ -1,4 +1,4 @@
-enum Doc<Payload>: AlgebraicType, CustomStringConvertible {
+public enum Doc<Payload>: AlgebraicType, CustomStringConvertible {
 	case Empty
 	case Text(String)
 	case Horizontal([Payload])
@@ -6,7 +6,7 @@ enum Doc<Payload>: AlgebraicType, CustomStringConvertible {
 	case Wrap(Payload, Payload, Payload)
 	case Join(Payload, [Payload])
 
-	func map<Other>(@noescape transform: Payload -> Other) -> Doc<Other> {
+	public func map<Other>(@noescape transform: Payload -> Other) -> Doc<Other> {
 		switch self {
 		case .Empty:
 			return .Empty
@@ -23,9 +23,9 @@ enum Doc<Payload>: AlgebraicType, CustomStringConvertible {
 		}
 	}
 
-	typealias Recur = Payload
+	public typealias Recur = Payload
 
-	var description: String {
+	public var description: String {
 		switch self {
 		case .Empty:
 			return ""
@@ -44,51 +44,51 @@ enum Doc<Payload>: AlgebraicType, CustomStringConvertible {
 }
 
 
-struct Pretty: CustomStringConvertible, Equatable, FixpointType {
-	init<T>(_ value: T) {
+public struct Pretty: CustomStringConvertible, Equatable, FixpointType {
+	public init<T>(_ value: T) {
 		self.init((value as? CustomDocConvertible)?.doc ?? .Text(String(value)))
 	}
 
-	init(_ doc: Doc<Pretty>) {
+	public init(_ doc: Doc<Pretty>) {
 		self.init { doc }
 	}
 
-	init(_ doc: () -> Doc<Pretty>) {
+	public init(_ doc: () -> Doc<Pretty>) {
 		self.doc = doc
 	}
 
 	let doc: () -> Doc<Pretty>
-	var out: Doc<Pretty> {
+	public var out: Doc<Pretty> {
 		return doc()
 	}
 
-	var description: String {
+	public var description: String {
 		return out.description
 	}
 
 
-	static let Empty = Pretty(Doc<Pretty>.Empty)
-	static let Text = Doc<Pretty>.Text >>> Pretty.init
-	static let Horizontal = Doc<Pretty>.Horizontal >>> Pretty.init
-	static let Vertical = Doc<Pretty>.Vertical >>> Pretty.init
-	static let Wrap = Doc<Pretty>.Wrap >>> Pretty.init
+	public static let Empty = Pretty(Doc<Pretty>.Empty)
+	public static let Text = Doc<Pretty>.Text >>> Pretty.init
+	public static let Horizontal = Doc<Pretty>.Horizontal >>> Pretty.init
+	public static let Vertical = Doc<Pretty>.Vertical >>> Pretty.init
+	public static let Wrap = Doc<Pretty>.Wrap >>> Pretty.init
 
-	static func Wrap(open: Pretty, _ body: Pretty, _ close: Pretty) -> Pretty {
+	public static func Wrap(open: Pretty, _ body: Pretty, _ close: Pretty) -> Pretty {
 		return Pretty(.Wrap(open, body, close))
 	}
 
-	static func Join(separator: Pretty, _ elements: [Pretty]) -> Pretty {
+	public static func Join(separator: Pretty, _ elements: [Pretty]) -> Pretty {
 		return Pretty(.Join(separator, elements))
 	}
 }
 
 
-protocol CustomDocConvertible: CustomStringConvertible {
+public protocol CustomDocConvertible: CustomStringConvertible {
 	var doc: Doc<Pretty> { get }
 }
 
 extension CustomDocConvertible {
-	var description: String {
+	public var description: String {
 		return doc.description
 	}
 }

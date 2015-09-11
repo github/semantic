@@ -1,31 +1,31 @@
-struct Fix: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, Equatable, FixpointType {
-	init(_ roll: () -> Syntax<Fix>) {
+public struct Fix: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, Equatable, FixpointType {
+	public init(_ roll: () -> Syntax<Fix>) {
 		self.roll = roll
 	}
-	init(_ out: Syntax<Fix>) {
+	public init(_ out: Syntax<Fix>) {
 		self.init { out }
 	}
 
 	let roll: () -> Syntax<Fix>
 
-	var out: Syntax<Fix> {
+	public var out: Syntax<Fix> {
 		return roll()
 	}
 
-	var debugDescription: String {
+	public var debugDescription: String {
 		return cata { String(reflecting: $0) } (self)
 	}
 
-	var doc: Doc<Pretty> {
+	public var doc: Doc<Pretty> {
 		return cata { (syntax: Syntax<Doc<Pretty>>) in syntax.doc } (self)
 	}
 
-	var description: String {
+	public var description: String {
 		return cata { String($0) } (self)
 	}
 }
 
-enum Syntax<Payload>: AlgebraicType, CustomDebugStringConvertible, CustomDocConvertible {
+public enum Syntax<Payload>: AlgebraicType, CustomDebugStringConvertible, CustomDocConvertible {
 	case Apply(Payload, [Payload])
 	case Abstract([Payload], Payload)
 	case Assign(String, Payload)
@@ -33,7 +33,7 @@ enum Syntax<Payload>: AlgebraicType, CustomDebugStringConvertible, CustomDocConv
 	case Literal(String)
 	case Group(Payload, [Payload])
 
-	func map<T>(@noescape transform: Payload -> T) -> Syntax<T> {
+	public func map<T>(@noescape transform: Payload -> T) -> Syntax<T> {
 		switch self {
 		case let .Apply(f, args):
 			return .Apply(transform(f), args.map(transform))
@@ -50,9 +50,9 @@ enum Syntax<Payload>: AlgebraicType, CustomDebugStringConvertible, CustomDocConv
 		}
 	}
 
-	typealias Recur = Payload
+	public typealias Recur = Payload
 
-	var debugDescription: String {
+	public var debugDescription: String {
 		switch self {
 		case let .Apply(f, vs):
 			let s = vs.map { String($0) }.joinWithSeparator(", ")
@@ -72,7 +72,7 @@ enum Syntax<Payload>: AlgebraicType, CustomDebugStringConvertible, CustomDocConv
 		}
 	}
 
-	var doc: Doc<Pretty> {
+	public var doc: Doc<Pretty> {
 		switch self {
 		case let .Apply(f, vs):
 			return .Horizontal([
