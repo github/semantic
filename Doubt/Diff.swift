@@ -26,6 +26,7 @@ public enum Diff: CustomDocConvertible, Equatable {
 	public init(_ a: Fix, _ b: Fix) {
 		switch (a.out, b.out) {
 		case let (.Apply(a, aa), .Apply(b, bb)):
+			// fixme: SES
 			self = .Copy(.Apply(Diff(a, b), Array(zip(aa, bb).lazy.map(Diff.init))))
 
 		case let (.Abstract(p1, b1), .Abstract(p2, b2)):
