@@ -1,8 +1,8 @@
-enum Diff: CustomDocConvertible, Equatable {
+public enum Diff: CustomDocConvertible, Equatable {
 	case Patch(Syntax<Fix>, Syntax<Fix>)
 	case Copy(() -> Syntax<Diff>)
 
-	var doc: Doc<Pretty> {
+	public var doc: Doc<Pretty> {
 		switch self {
 		case let .Patch(a, b):
 			return .Horizontal([
@@ -14,7 +14,7 @@ enum Diff: CustomDocConvertible, Equatable {
 		}
 	}
 
-	var description: String {
+	public var description: String {
 		switch self {
 		case let .Patch(a, b):
 			return ".Patch(\(a), \(b))"
@@ -25,7 +25,7 @@ enum Diff: CustomDocConvertible, Equatable {
 }
 
 
-func diff(a: Syntax<Fix>, _ b: Syntax<Fix>) -> Diff {
+public func diff(a: Syntax<Fix>, _ b: Syntax<Fix>) -> Diff {
 	switch (a, b) {
 	case let (.Apply(a, aa), .Apply(b, bb)):
 		return .Copy({ .Apply(diff(a.out, b.out), Array(zip(aa, bb).lazy.map { ($0.out, $1.out) }.map(diff))) })
