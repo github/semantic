@@ -1,5 +1,3 @@
-//  Copyright © 2015 Rob Rix. All rights reserved.
+final class DoubtTests: XCTestCase {}
 
 import XCTest
-
-final class DoubtTests: XCTestCase {}
