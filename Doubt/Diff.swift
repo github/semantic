@@ -6,8 +6,8 @@ public enum Diff: CustomDocConvertible, Equatable {
 		switch self {
 		case let .Patch(a, b):
 			return .Horizontal([
-				.Wrap(Pretty.Text("{-"), Pretty(a.doc), Pretty.Text("-}")),
-				.Wrap(Pretty.Text("{+"), Pretty(b.doc), Pretty.Text("+}"))
+				.Wrap(Pretty.Text("{-"), Pretty(a), Pretty.Text("-}")),
+				.Wrap(Pretty.Text("{+"), Pretty(b), Pretty.Text("+}"))
 			])
 		case let .Copy(a):
 			return a.doc
