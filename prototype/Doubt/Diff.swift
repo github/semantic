@@ -1,4 +1,4 @@
-public enum Diff: CustomDocConvertible, Equatable {
+public enum Diff: CustomDebugStringConvertible, CustomDocConvertible, Equatable {
 	case Empty
 	case Patch(Fix, Fix)
 	indirect case Copy(Syntax<Diff>)
@@ -17,7 +17,7 @@ public enum Diff: CustomDocConvertible, Equatable {
 		}
 	}
 
-	public var description: String {
+	public var debugDescription: String {
 		switch self {
 		case .Empty:
 			return ".Empty"
