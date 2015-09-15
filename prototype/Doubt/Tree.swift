@@ -1,5 +1,3 @@
-//  Copyright © 2015 GitHub. All rights reserved.
-
 public enum Tree<A>: CustomStringConvertible {
 	case Leaf(A)
 	case Branch([Tree])
