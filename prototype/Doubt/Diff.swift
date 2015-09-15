@@ -22,9 +22,9 @@ public enum Diff: CustomDebugStringConvertible, CustomDocConvertible, Equatable 
 		case .Empty:
 			return ".Empty"
 		case let .Patch(a, b):
-			return ".Patch(\(a), \(b))"
+			return ".Patch(\(String(reflecting: a)), \(String(reflecting: b)))"
 		case let .Copy(a):
-			return ".Copy(\(a))"
+			return ".Copy(\(String(reflecting: a)))"
 		}
 	}
 
