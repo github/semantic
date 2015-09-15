@@ -9,8 +9,8 @@ public enum Diff: CustomDebugStringConvertible, CustomDocConvertible, Equatable 
 			return .Empty
 		case let .Patch(a, b):
 			return .Horizontal([
-				.Wrap(Doc.Text("{-"), Doc(a), Doc.Text("-}")),
-				.Wrap(Doc.Text("{+"), Doc(b), Doc.Text("+}"))
+				.Wrap(.Text("{-"), Doc(a), .Text("-}")),
+				.Wrap(.Text("{+"), Doc(b), .Text("+}"))
 			])
 		case let .Copy(a):
 			return a.doc

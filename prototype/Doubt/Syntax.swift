@@ -77,13 +77,13 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		case let .Apply(f, vs):
 			return .Horizontal([
 				Doc(f),
-				Doc.Wrap(Doc.Text("("), Doc.Join(Doc.Text(", "), vs.map(Doc.init)), Doc.Text(")"))
+				.Wrap(.Text("("), .Join(.Text(", "), vs.map(Doc.init)), .Text(")"))
 			])
 		case let .Abstract(parameters, body):
 			return .Horizontal([
-				Doc.Text("λ"),
-				Doc.Join(Doc.Text(", "), parameters.map(Doc.init)),
-				Doc.Text("."),
+				.Text("λ"),
+				.Join(.Text(", "), parameters.map(Doc.init)),
+				.Text("."),
 				Doc(body)
 			])
 		case let .Assign(n, v):
@@ -95,7 +95,7 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		case let .Group(n, vs):
 			return .Horizontal([
 				Doc(n),
-				Doc.Wrap(.Text("{"), Doc.Vertical(vs.map(Doc.init)), .Text("}"))
+				.Wrap(.Text("{"), .Vertical(vs.map(Doc.init)), .Text("}"))
 			])
 		}
 	}
