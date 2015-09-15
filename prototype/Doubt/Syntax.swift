@@ -19,10 +19,6 @@ public enum Fix: CustomDebugStringConvertible, CustomDocConvertible, CustomStrin
 	public var doc: Doc {
 		return cata { (syntax: Syntax<Doc>) in syntax.doc } (self)
 	}
-
-	public var description: String {
-		return cata { String($0) } (self)
-	}
 }
 
 public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible {
