@@ -106,8 +106,8 @@
 				D4AAE53E1B5AE2D0004E581F /* StringLiteralConvertible.swift */,
 				D4AAE53F1B5AE2D0004E581F /* Syntax.swift */,
 				D4AAE54B1B5AE42D004E581F /* Equatable.swift */,
-				D4AAE5001B5AE22E004E581F /* Supporting Files */,
 				D405389D1BA8833B00A5DD59 /* Tree.swift */,
+				D4AAE5001B5AE22E004E581F /* Supporting Files */,
 			);
 			path = Doubt;
 			sourceTree = "<group>";
