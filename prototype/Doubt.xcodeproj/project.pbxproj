@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D405389E1BA8833B00A5DD59 /* Tree.swift in Sources */ = {isa = PBXBuildFile; fileRef = D405389D1BA8833B00A5DD59 /* Tree.swift */; };
 		D4AAE50E1B5AE22E004E581F /* Doubt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4AAE4FD1B5AE22E004E581F /* Doubt.framework */; };
 		D4AAE5131B5AE22E004E581F /* DoubtTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE5121B5AE22E004E581F /* DoubtTests.swift */; };
 		D4AAE5401B5AE2D0004E581F /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE5351B5AE2D0004E581F /* Array.swift */; };
@@ -34,7 +33,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		D405389D1BA8833B00A5DD59 /* Tree.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tree.swift; sourceTree = "<group>"; };
 		D443F4D61BA3157700049A57 /* Doubt.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Doubt.playground; sourceTree = "<group>"; };
 		D4AAE4FD1B5AE22E004E581F /* Doubt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Doubt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4AAE5011B5AE22E004E581F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -106,7 +104,6 @@
 				D4AAE53E1B5AE2D0004E581F /* StringLiteralConvertible.swift */,
 				D4AAE53F1B5AE2D0004E581F /* Syntax.swift */,
 				D4AAE54B1B5AE42D004E581F /* Equatable.swift */,
-				D405389D1BA8833B00A5DD59 /* Tree.swift */,
 				D4AAE5001B5AE22E004E581F /* Supporting Files */,
 			);
 			path = Doubt;
@@ -241,7 +238,6 @@
 				D4AAE5481B5AE2D0004E581F /* String.swift in Sources */,
 				D4AAE5411B5AE2D0004E581F /* Diff.swift in Sources */,
 				D4AAE5401B5AE2D0004E581F /* Array.swift in Sources */,
-				D405389E1BA8833B00A5DD59 /* Tree.swift in Sources */,
 				D4AAE54C1B5AE42D004E581F /* Equatable.swift in Sources */,
 				D4AAE54A1B5AE2D0004E581F /* Syntax.swift in Sources */,
 				D4AAE5421B5AE2D0004E581F /* Doc.swift in Sources */,
