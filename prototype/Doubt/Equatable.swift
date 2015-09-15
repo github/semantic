@@ -1,5 +1,13 @@
 public func == (left: Fix, right: Fix) -> Bool {
-	return left.out == right.out
+	switch (left, right) {
+	case (.Empty, .Empty):
+		return true
+	case let (.Roll(s), .Roll(t)):
+		return s == t
+
+	default:
+		return false
+	}
 }
 
 public func == <F: Equatable> (left: Syntax<F>, right: Syntax<F>) -> Bool {
@@ -32,7 +40,7 @@ public func == (left: Diff, right: Diff) -> Bool {
 	}
 }
 
-public func == <F: Equatable> (left: Doc<F>, right: Doc<F>) -> Bool {
+public func == (left: Doc, right: Doc) -> Bool {
 	switch (left, right) {
 	case (.Empty, .Empty):
 		return true
@@ -49,8 +57,4 @@ public func == <F: Equatable> (left: Doc<F>, right: Doc<F>) -> Bool {
 	default:
 		return false
 	}
-}
-
-public func == (left: Pretty, right: Pretty) -> Bool {
-	return left.out == right.out
 }
