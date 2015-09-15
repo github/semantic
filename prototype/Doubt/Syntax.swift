@@ -16,8 +16,8 @@ public enum Fix: CustomDebugStringConvertible, CustomDocConvertible, CustomStrin
 		return cata { String(reflecting: $0) } (self)
 	}
 
-	public var doc: Doc<Pretty> {
-		return cata { (syntax: Syntax<Doc<Pretty>>) in syntax.doc } (self)
+	public var doc: Doc {
+		return cata { (syntax: Syntax<Doc>) in syntax.doc } (self)
 	}
 
 	public var description: String {
@@ -72,30 +72,30 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		}
 	}
 
-	public var doc: Doc<Pretty> {
+	public var doc: Doc {
 		switch self {
 		case let .Apply(f, vs):
 			return .Horizontal([
-				Pretty(f),
-				Pretty.Wrap(Pretty.Text("("), Pretty.Join(Pretty.Text(", "), vs.map(Pretty.init)), Pretty.Text(")"))
+				Doc(f),
+				Doc.Wrap(Doc.Text("("), Doc.Join(Doc.Text(", "), vs.map(Doc.init)), Doc.Text(")"))
 			])
 		case let .Abstract(parameters, body):
 			return .Horizontal([
-				Pretty.Text("λ"),
-				Pretty.Join(Pretty.Text(", "), parameters.map(Pretty.init)),
-				Pretty.Text("."),
-				Pretty(body)
+				Doc.Text("λ"),
+				Doc.Join(Doc.Text(", "), parameters.map(Doc.init)),
+				Doc.Text("."),
+				Doc(body)
 			])
 		case let .Assign(n, v):
-			return .Horizontal([ .Text(n), .Text("="), Pretty(v) ])
+			return .Horizontal([ .Text(n), .Text("="), Doc(v) ])
 		case let .Variable(n):
 			return .Text(n)
 		case let .Literal(s):
 			return .Text(s)
 		case let .Group(n, vs):
 			return .Horizontal([
-				Pretty(n),
-				Pretty.Wrap(.Text("{"), Pretty.Vertical(vs.map(Pretty.init)), .Text("}"))
+				Doc(n),
+				Doc.Wrap(.Text("{"), Doc.Vertical(vs.map(Doc.init)), .Text("}"))
 			])
 		}
 	}

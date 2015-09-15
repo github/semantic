@@ -2,12 +2,12 @@ public enum Diff: CustomDocConvertible, Equatable {
 	case Patch(Fix, Fix)
 	indirect case Copy(Syntax<Diff>)
 
-	public var doc: Doc<Pretty> {
+	public var doc: Doc {
 		switch self {
 		case let .Patch(a, b):
 			return .Horizontal([
-				.Wrap(Pretty.Text("{-"), Pretty(a), Pretty.Text("-}")),
-				.Wrap(Pretty.Text("{+"), Pretty(b), Pretty.Text("+}"))
+				.Wrap(Doc.Text("{-"), Doc(a), Doc.Text("-}")),
+				.Wrap(Doc.Text("{+"), Doc(b), Doc.Text("+}"))
 			])
 		case let .Copy(a):
 			return a.doc
