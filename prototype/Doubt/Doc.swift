@@ -1,4 +1,4 @@
-public enum Doc<Payload>: AlgebraicType, CustomStringConvertible {
+public enum Doc<Payload>: CustomStringConvertible {
 	case Empty
 	case Text(String)
 	case Horizontal([Payload])
@@ -44,7 +44,7 @@ public enum Doc<Payload>: AlgebraicType, CustomStringConvertible {
 }
 
 
-public struct Pretty: CustomStringConvertible, Equatable, FixpointType {
+public struct Pretty: CustomStringConvertible, Equatable {
 	public init<T>(_ value: T) {
 		self.init((value as? CustomDocConvertible)?.doc ?? .Text(String(value)))
 	}

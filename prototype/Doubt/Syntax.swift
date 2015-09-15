@@ -1,4 +1,4 @@
-public struct Fix: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, Equatable, FixpointType {
+public struct Fix: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, Equatable {
 	public init(_ roll: () -> Syntax<Fix>) {
 		self.roll = roll
 	}
@@ -25,7 +25,7 @@ public struct Fix: CustomDebugStringConvertible, CustomDocConvertible, CustomStr
 	}
 }
 
-public enum Syntax<Payload>: AlgebraicType, CustomDebugStringConvertible, CustomDocConvertible {
+public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Apply(Payload, [Payload])
 	case Abstract([Payload], Payload)
 	case Assign(String, Payload)
@@ -103,5 +103,5 @@ public enum Syntax<Payload>: AlgebraicType, CustomDebugStringConvertible, Custom
 
 
 func cata<T>(f: Syntax<T> -> T)(_ term: Fix) -> T {
-	return (Fix.out >>> { $0.map(cata(f)) } >>> f)(term)
+	return ({ $0.out } >>> { $0.map(cata(f)) } >>> f)(term)
 }
