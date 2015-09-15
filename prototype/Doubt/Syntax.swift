@@ -1,15 +1,15 @@
-public struct Fix: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, Equatable {
-	public init(_ roll: () -> Syntax<Fix>) {
-		self.roll = roll
-	}
+public enum Fix: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, Equatable {
 	public init(_ out: Syntax<Fix>) {
-		self.init { out }
+		self = .Roll(out)
 	}
 
-	let roll: () -> Syntax<Fix>
+	indirect case Roll(Syntax<Fix>)
 
 	public var out: Syntax<Fix> {
-		return roll()
+		switch self {
+		case let .Roll(s):
+			return s
+		}
 	}
 
 	public var debugDescription: String {
