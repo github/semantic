@@ -3,21 +3,25 @@ public enum Fix: CustomDebugStringConvertible, CustomDocConvertible, CustomStrin
 		self = .Roll(out)
 	}
 
+	case Empty
 	indirect case Roll(Syntax<Fix>)
 
-	public var out: Syntax<Fix> {
+	public var debugDescription: String {
 		switch self {
+		case .Empty:
+			return ".Empty"
 		case let .Roll(s):
-			return s
+			return s.debugDescription
 		}
 	}
 
-	public var debugDescription: String {
-		return cata { String(reflecting: $0) } (self)
-	}
-
 	public var doc: Doc {
-		return cata { (syntax: Syntax<Doc>) in syntax.doc } (self)
+		switch self {
+		case .Empty:
+			return .Empty
+		case let .Roll(s):
+			return s.doc
+		}
 	}
 }
 
@@ -51,10 +55,10 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 	public var debugDescription: String {
 		switch self {
 		case let .Apply(f, vs):
-			let s = vs.map { String($0) }.joinWithSeparator(", ")
+			let s = vs.map { String(reflecting: $0) }.joinWithSeparator(", ")
 			return ".Apply(\(f), [ \(s) ])"
 		case let .Abstract(parameters, body):
-			let s = parameters.map { String($0) }.joinWithSeparator(", ")
+			let s = parameters.map { String(reflecting: $0) }.joinWithSeparator(", ")
 			return ".Abstract([ \(s) ], \(body))"
 		case let .Assign(n, v):
 			return ".Assign(\(n), \(v))"
@@ -63,8 +67,8 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		case let .Literal(s):
 			return ".Literal(\(s))"
 		case let .Group(n, vs):
-			let s = vs.map { String($0) }.joinWithSeparator(", ")
-			return ".Group(\(n), [ \(s) ])"
+			let s = vs.map { String(reflecting: $0) }.joinWithSeparator(", ")
+			return ".Group(\(String(reflecting: n)), [ \(s) ])"
 		}
 	}
 
@@ -95,9 +99,4 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 			])
 		}
 	}
-}
-
-
-func cata<T>(f: Syntax<T> -> T)(_ term: Fix) -> T {
-	return ({ $0.out } >>> { $0.map(cata(f)) } >>> f)(term)
 }
