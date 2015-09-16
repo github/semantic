@@ -1,6 +1,6 @@
 public enum Stream<A>: SequenceType {
 	case Nil
-	case Cons(A, Memo<Stream>)
+	indirect case Cons(A, Memo<Stream>)
 
 	public init<S: SequenceType where S.Generator.Element == A>(sequence: S) {
 		self = Stream(generator: sequence.generate())
