@@ -56,10 +56,10 @@ public enum Diff: CustomDebugStringConvertible, CustomDocConvertible, Equatable 
 			switch (a, b) {
 			case let (.Apply(a, aa), .Apply(b, bb)):
 				// fixme: SES
-				self = .Copy(.Apply(Diff(a, b), Array(zip(aa, bb).lazy.map(Diff.init))))
+				self = .Copy(.Apply(Diff(a, b), Diff.diff(aa, bb)))
 
 			case let (.Abstract(p1, b1), .Abstract(p2, b2)):
-				self = .Copy(.Abstract(Array(zip(p1, p2).lazy.map(Diff.init)), Diff(b1, b2)))
+				self = .Copy(.Abstract(Diff.diff(p1, p2), Diff(b1, b2)))
 
 			case let (.Assign(n1, v1), .Assign(n2, v2)) where n1 == n2:
 				self = .Copy(.Assign(n2, Diff(v1, v2)))
@@ -71,7 +71,7 @@ public enum Diff: CustomDebugStringConvertible, CustomDocConvertible, Equatable 
 				self = .Copy(.Literal(v2))
 
 			case let (.Group(n1, v1), .Group(n2, v2)):
-				self = .Copy(.Group(Diff(n1, n2), Array(zip(v1, v2).lazy.map(Diff.init))))
+				self = .Copy(.Group(Diff(n1, n2), Diff.diff(v1, v2)))
 
 			default:
 				self = .Patch(Fix(a), Fix(b))
