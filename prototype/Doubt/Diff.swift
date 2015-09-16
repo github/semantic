@@ -63,7 +63,7 @@ public enum Diff: CustomDebugStringConvertible, CustomDocConvertible, Equatable 
 		}
 	}
 
-	public static func diff<C1: CollectionType, C2: CollectionType where C1.Index : RandomAccessIndexType, C1.Generator.Element == Diff, C2.Index : RandomAccessIndexType, C2.Generator.Element == Diff>(a: C1, _ b: C2) -> [Diff] {
+	public static func diff<C1: CollectionType, C2: CollectionType where C1.Index : RandomAccessIndexType, C1.Generator.Element == Fix, C2.Index : RandomAccessIndexType, C2.Generator.Element == Fix>(a: C1, _ b: C2) -> [Diff] {
 		return []
 	}
 }
