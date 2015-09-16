@@ -7,10 +7,6 @@ public struct Memo<A> {
 		self.init(.Evaluated(evaluated))
 	}
 
-	public init(@autoclosure(escaping) _ unevaluated: () -> A) {
-		self.init(.Unevaluated(unevaluated))
-	}
-
 	private init(_ thunk: Thunk<A>) {
 		_value = MutableBox(thunk)
 	}
