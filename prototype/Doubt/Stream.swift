@@ -1,4 +1,4 @@
-public enum Stream<A> {
+public enum Stream<A>: SequenceType {
 	case Nil
 	case Cons(A, () -> Stream)
 
@@ -38,5 +38,15 @@ public enum Stream<A> {
 
 	public func map<B>(transform: A -> B) -> Stream<B> {
 		return uncons.map { first, rest in Stream<B>.Cons(transform(first), { rest.map(transform) }) } ?? Stream<B>.Nil
+	}
+
+
+	public func generate() -> AnyGenerator<A> {
+		var current = self
+		return anyGenerator {
+			let next = current.first
+			current = current.rest
+			return next
+		}
 	}
 }
