@@ -3,6 +3,14 @@ public enum Diff: CustomDebugStringConvertible, CustomDocConvertible, Equatable 
 	case Patch(Fix, Fix)
 	indirect case Copy(Syntax<Diff>)
 
+	public static func Insert(term: Fix) -> Diff {
+		return .Patch(.Empty, term)
+	}
+
+	public static func Delete(term: Fix) -> Diff {
+		return .Patch(term, .Empty)
+	}
+
 	public var doc: Doc {
 		switch self {
 		case .Empty:
