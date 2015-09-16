@@ -30,4 +30,8 @@ public enum Stream<A> {
 	public var rest: Stream {
 		return uncons?.rest ?? .Nil
 	}
+
+	public var isEmpty: Bool {
+		return uncons == nil
+	}
 }
