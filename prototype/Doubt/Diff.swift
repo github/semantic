@@ -83,7 +83,23 @@ public enum Diff: CustomDebugStringConvertible, CustomDocConvertible, Equatable 
 	}
 
 	public static func diff<C1: CollectionType, C2: CollectionType where C1.Index : RandomAccessIndexType, C1.Generator.Element == Fix, C2.Index : RandomAccessIndexType, C2.Generator.Element == Fix>(a: C1, _ b: C2) -> [Diff] {
-		return []
+		var (aa, bb) = (Stream(sequence: a), Stream(sequence: b))
+		var diffs: [Diff] = []
+		repeat {
+			if aa.isEmpty {
+				diffs += bb.lazy.map(Diff.Insert)
+				break
+			} else if bb.isEmpty {
+				diffs += aa.lazy.map(Diff.Delete)
+				break
+			} else {
+				diffs.append(Diff(aa.first!, bb.first!))
+			}
+
+			aa = aa.rest
+			bb = bb.rest
+		} while !aa.isEmpty || !bb.isEmpty
+		return diffs
 	}
 }
 
