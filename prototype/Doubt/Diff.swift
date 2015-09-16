@@ -1,4 +1,4 @@
-public enum Diff: CustomDebugStringConvertible, CustomDocConvertible, Equatable {
+public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible {
 	case Empty
 	case Patch(Fix, Fix)
 	indirect case Copy(Syntax<Diff>)
