@@ -1,6 +1,6 @@
 public enum Stream<A>: SequenceType {
 	case Nil
-	case Cons(A, () -> Stream)
+	case Cons(A, Memo<Stream>)
 
 	public init<S: SequenceType where S.Generator.Element == A>(sequence: S) {
 		self = Stream(generator: sequence.generate())
@@ -11,13 +11,13 @@ public enum Stream<A>: SequenceType {
 	}
 
 	public init(_ f: () -> A?) {
-		self = f().map { Stream.Cons($0, { Stream(f) }) } ?? Stream.Nil
+		self = f().map { Stream.Cons($0, Memo { Stream(f) }) } ?? Stream.Nil
 	}
 
 	public var uncons: (first: A, rest: Stream)? {
 		switch self {
 		case let .Cons(first, rest):
-			return (first, rest())
+			return (first, rest.value)
 		default:
 			return nil
 		}
@@ -37,7 +37,7 @@ public enum Stream<A>: SequenceType {
 
 
 	public func map<B>(transform: A -> B) -> Stream<B> {
-		return uncons.map { first, rest in Stream<B>.Cons(transform(first), { rest.map(transform) }) } ?? Stream<B>.Nil
+		return uncons.map { first, rest in Stream<B>.Cons(transform(first), Memo { rest.map(transform) }) } ?? Stream<B>.Nil
 	}
 
 
