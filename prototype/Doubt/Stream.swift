@@ -34,4 +34,9 @@ public enum Stream<A> {
 	public var isEmpty: Bool {
 		return uncons == nil
 	}
+
+
+	public func map<B>(transform: A -> B) -> Stream<B> {
+		return uncons.map { first, rest in Stream<B>.Cons(transform(first), { rest.map(transform) }) } ?? Stream<B>.Nil
+	}
 }
