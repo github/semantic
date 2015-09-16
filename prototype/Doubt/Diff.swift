@@ -28,6 +28,17 @@ public enum Diff: CustomDebugStringConvertible, CustomDocConvertible, Equatable 
 		}
 	}
 
+	public var magnitude: Int {
+		switch self {
+		case .Empty:
+			return 0
+		case .Patch:
+			return 1
+		case let .Copy(s):
+			return s.map { $0.magnitude }.reduce(0, combine: +)
+		}
+	}
+
 	public init(_ a: Fix, _ b: Fix) {
 		switch (a, b) {
 		case (.Empty, .Empty):
