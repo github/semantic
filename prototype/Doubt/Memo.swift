@@ -16,6 +16,11 @@ public struct Memo<A> {
 	}
 
 	private var _value: MutableBox<Thunk<A>>
+
+
+	public func map<B>(transform: A -> B) -> Memo<B> {
+		return Memo<B> { transform(self.value) }
+	}
 }
 
 private final class MutableBox<A> {
