@@ -65,10 +65,10 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 
 
 	public func generate() -> AnyGenerator<A> {
-		var current = self
+		var current = Memo(evaluated: self)
 		return anyGenerator {
-			let next = current.first
-			current = current.rest
+			let next = current.value.first
+			current = current.value.rest
 			return next
 		}
 	}
