@@ -1,4 +1,4 @@
-public enum Stream<A>: SequenceType {
+public enum Stream<A>: NilLiteralConvertible, SequenceType {
 	case Nil
 	indirect case Cons(A, Memo<Stream>)
 
@@ -38,6 +38,11 @@ public enum Stream<A>: SequenceType {
 
 	public func map<B>(transform: A -> B) -> Stream<B> {
 		return uncons.map { first, rest in Stream<B>.Cons(transform(first), Memo { rest.map(transform) }) } ?? Stream<B>.Nil
+	}
+
+
+	public init(nilLiteral: ()) {
+		self = .Nil
 	}
 
 
