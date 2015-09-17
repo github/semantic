@@ -42,9 +42,7 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 
 	public func map<B>(transform: A -> B) -> Stream<B> {
 		return analysis(
-			ifCons: { first, rest in
-				.Cons(transform(first), rest.map { $0.map(transform) })
-			},
+			ifCons: { .Cons(transform($0), $1.map { $0.map(transform) }) },
 			ifNil: { nil })
 	}
 
