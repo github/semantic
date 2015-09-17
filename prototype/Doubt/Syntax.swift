@@ -50,6 +50,28 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		}
 	}
 
+	public func reduce<T>(var initial: T, @noescape combine: (T, Payload) throws -> T) rethrows -> T {
+		switch self {
+		case let .Apply(x, xs):
+			initial = try combine(initial, x)
+			return try xs.reduce(initial, combine: combine)
+
+		case let .Abstract(xs, x):
+			initial = try xs.reduce(initial, combine: combine)
+			return try combine(initial, x)
+
+		case let .Assign(_, x):
+			return try combine(initial, x)
+
+		case let .Group(x, xs):
+			initial = try combine(initial, x)
+			return try xs.reduce(initial, combine: combine)
+
+		default:
+			return initial
+		}
+	}
+
 	public typealias Recur = Payload
 
 	public var debugDescription: String {
