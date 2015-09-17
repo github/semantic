@@ -41,6 +41,16 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 	}
 
 
+	public func concat(other: Stream) -> Stream {
+		switch self {
+		case .Nil:
+			return other
+		case let .Cons(first, rest):
+			return .Cons(first, rest.map { $0.concat(other) })
+		}
+	}
+
+
 	public init(nilLiteral: ()) {
 		self = .Nil
 	}
