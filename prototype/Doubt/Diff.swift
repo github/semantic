@@ -83,22 +83,23 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	}
 
 	public static func diff<C1: CollectionType, C2: CollectionType where C1.Index : RandomAccessIndexType, C1.Generator.Element == Fix, C2.Index : RandomAccessIndexType, C2.Generator.Element == Fix>(a: C1, _ b: C2) -> [Diff] {
-		var (aa, bb) = (Stream(sequence: a), Stream(sequence: b))
-		var diffs: [Diff] = []
-		repeat {
-			if aa.isEmpty {
-				diffs += bb.lazy.map(Diff.Insert)
-				break
-			} else if bb.isEmpty {
-				diffs += aa.lazy.map(Diff.Delete)
-				break
-			} else {
-				diffs.append(Diff(aa.first!, bb.first!))
-			}
+		func magnitude(diffs: Stream<Diff>) -> Int {
+			return diffs.map { $0.magnitude }.reduce(0, combine: +)
+		}
 
-			aa = aa.rest
-			bb = bb.rest
-		} while !aa.isEmpty || !bb.isEmpty
-		return diffs
+		func diff(a: Stream<Fix>, _ b: Stream<Fix>) -> Stream<Diff> {
+			switch (a, b) {
+			case (.Nil, .Nil):
+				return .Nil
+			case (.Nil, .Cons):
+				return b.map(Diff.Insert)
+			case (.Cons, .Nil):
+				return a.map(Diff.Delete)
+			case let (.Cons(x, xs), .Cons(y, ys)):
+				return .Cons(Diff(x, y), Memo { diff(xs.value, ys.value) })
+			}
+		}
+
+		return Array(diff(Stream(sequence: a), Stream(sequence: b)))
 	}
 }
