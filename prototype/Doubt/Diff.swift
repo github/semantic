@@ -111,7 +111,12 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			case (.Cons, .Nil):
 				return a.map(Diff.Delete)
 			case let (.Cons(x, xs), .Cons(y, ys)):
-				return .Cons(Diff(x, y), Memo { diff(xs.value, ys.value) })
+				let here = Stream.Cons(Diff(x, y), Memo { diff(xs.value, ys.value) })
+				let insert = Stream.Cons(Diff.Insert(y), Memo { diff(a, ys.value) })
+				let delete = Stream.Cons(Diff.Delete(x), Memo { diff(xs.value, b) })
+				return min(here, insert, delete) {
+					magnitude($0) < magnitude($1)
+				}
 			}
 		}
 
