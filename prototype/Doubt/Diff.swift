@@ -102,4 +102,3 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		return diffs
 	}
 }
-
