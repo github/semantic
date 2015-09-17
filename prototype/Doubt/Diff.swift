@@ -96,6 +96,12 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			return diffs.map { $0.magnitude }.reduce(0, combine: +)
 		}
 
+		func min<A>(a: A, _ rest: A..., _ isLessThan: (A, A) -> Bool) -> A {
+			return rest.reduce(a, combine: {
+				isLessThan($0, $1) ? $0 : $1
+			})
+		}
+
 		func diff(a: Stream<Fix>, _ b: Stream<Fix>) -> Stream<Diff> {
 			switch (a, b) {
 			case (.Nil, .Nil):
