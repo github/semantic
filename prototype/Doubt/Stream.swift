@@ -31,8 +31,8 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 		return uncons?.first
 	}
 
-	public var rest: Stream {
-		return uncons?.rest.value ?? .Nil
+	public var rest: Memo<Stream> {
+		return analysis(ifCons: { $1 }, ifNil: { Memo(evaluated: .Nil) })
 	}
 
 	public var isEmpty: Bool {
