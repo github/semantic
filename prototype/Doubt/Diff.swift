@@ -11,6 +11,15 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		return .Patch(term, .Empty)
 	}
 
+	public init(_ term: Fix) {
+		switch term {
+		case .Empty:
+			self = .Empty
+		case let .Roll(s):
+			self = .Copy(s.map(Diff.init))
+		}
+	}
+
 	public var doc: Doc {
 		switch self {
 		case .Empty:
