@@ -14,6 +14,10 @@ final class DiffTests: XCTestCase {
 	func testSESCanInsertAtHead() {
 		XCTAssertEqual(Diff.diff([ a, b, c ], [ d, a, b, c ]), [ Diff.Insert(d), Diff(a), Diff(b), Diff(c) ])
 	}
+
+	func testSESCanDeleteAtHead() {
+		XCTAssertEqual(Diff.diff([ d, a, b, c ], [ a, b, c ]), [ Diff.Delete(d), Diff(a), Diff(b), Diff(c) ])
+	}
 }
 
 private let a = Fix(.Literal("a"))
