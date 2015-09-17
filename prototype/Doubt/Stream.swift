@@ -24,12 +24,6 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 	}
 
 	public var uncons: (first: A, rest: Memo<Stream>)? {
-		switch self {
-		case let .Cons(first, rest):
-			return (first, rest.value)
-		default:
-			return nil
-		}
 		return analysis(ifCons: { $0 }, ifNil: { nil })
 	}
 
