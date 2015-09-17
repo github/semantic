@@ -14,6 +14,15 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 		self = f().map { Stream.Cons($0, Memo { Stream(f) }) } ?? Stream.Nil
 	}
 
+	public func analysis<B>(@noescape ifCons ifCons: (A, Memo<Stream>) -> B, @noescape ifNil: () -> B) -> B {
+		switch self {
+		case let .Cons(first, rest):
+			return ifCons(first, rest)
+		case .Nil:
+			return ifNil()
+		}
+	}
+
 	public var uncons: (first: A, rest: Memo<Stream>)? {
 		switch self {
 		case let .Cons(first, rest):
