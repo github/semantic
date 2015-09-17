@@ -29,7 +29,7 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 	}
 
 	public var rest: Stream {
-		return uncons?.rest ?? .Nil
+		return uncons?.rest.value ?? .Nil
 	}
 
 	public var isEmpty: Bool {
