@@ -14,13 +14,14 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 		self = f().map { Stream.Cons($0, Memo { Stream(f) }) } ?? Stream.Nil
 	}
 
-	public var uncons: (first: A, rest: Stream)? {
+	public var uncons: (first: A, rest: Memo<Stream>)? {
 		switch self {
 		case let .Cons(first, rest):
 			return (first, rest.value)
 		default:
 			return nil
 		}
+		return analysis(ifCons: { $0 }, ifNil: { nil })
 	}
 
 	public var first: A? {
