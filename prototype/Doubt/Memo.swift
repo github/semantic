@@ -21,6 +21,10 @@ public struct Memo<A> {
 	public func map<B>(transform: A -> B) -> Memo<B> {
 		return Memo<B> { transform(self.value) }
 	}
+
+	public func flatMap<B>(transform: A -> Memo<B>) -> Memo<B> {
+		return Memo<B> { transform(self.value).value }
+	}
 }
 
 private final class MutableBox<A> {
