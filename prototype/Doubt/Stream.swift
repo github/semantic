@@ -46,6 +46,11 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 			ifNil: const(nil))
 	}
 
+	public func flatMap<B>(transform: A -> Stream<B>) -> Stream<B> {
+		return analysis(
+			ifCons: { transform($0).concat($1.map { $0.flatMap(transform) }) },
+			ifNil: const(nil))
+	}
 
 	public func concat(other: Memo<Stream>) -> Stream {
 		return analysis(
