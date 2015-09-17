@@ -10,10 +10,16 @@ final class DiffTests: XCTestCase {
 	func testSESOverNonEmptyAndEmptyCollectionsIsDeletions() {
 		XCTAssertEqual(Diff.diff([ a, b ], []), [ Diff.Patch(a, .Empty), Diff.Patch(b, .Empty) ])
 	}
+
+	func testSESCanInsertAtHead() {
+		XCTAssertEqual(Diff.diff([ a, b, c ], [ d, a, b, c ]), [ Diff.Insert(d), Diff(a), Diff(b), Diff(c) ])
+	}
 }
 
 private let a = Fix(.Literal("a"))
 private let b = Fix(.Literal("b"))
+private let c = Fix(.Literal("c"))
+private let d = Fix(.Literal("d"))
 
 import Doubt
 import XCTest
