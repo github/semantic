@@ -47,10 +47,14 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 	}
 
 
-	public func concat(other: Stream) -> Stream {
+	public func concat(other: Memo<Stream>) -> Stream {
 		return analysis(
-			ifCons: { .Cons($0, $1.map { $0.concat(other) }) },
-			ifNil: const(other))
+			ifCons: { .Cons($0, $1.map { $0.concat(other.value) }) },
+			ifNil: { other.value })
+	}
+
+	public func concat(other: Stream) -> Stream {
+		return concat(Memo(evaluated: other))
 	}
 
 
