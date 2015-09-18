@@ -35,6 +35,7 @@ public func never<T>(_: String) -> State<T>? {
 
 //// Matches a single character that is not matched by `parser`.
 public func not<T>(parser: String -> State<T>?)(_ input: String) -> State<String>? {
+	if input.isEmpty { return nil }
 	return parser(input).map(const(nil)) ?? State(rest: input.from(1), value: input.to(1))
 }
 
