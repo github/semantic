@@ -10,6 +10,10 @@ final class SwiftTests: XCTestCase {
 	func testQuotedMatchesQuotedStrings() {
 		XCTAssertEqual(full(Swift.Parsers.quoted)("'value'"), "'value'")
 	}
+
+	func testBranchesStartWithAnIdentifier() {
+		XCTAssertEqual(full(Swift.Parsers.branch)("(a b=c)"), .Branch("a", [ .KeyValue("b", "c") ]))
+	}
 }
 
 
