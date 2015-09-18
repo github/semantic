@@ -27,6 +27,11 @@ public func never<T>(_: String) -> State<T>? {
 	return nil
 }
 
+//// Matches a single character that is not matched by `parser`.
+public func not<T>(parser: String -> State<T>?)(_ input: String) -> State<String>? {
+	return parser(input).map(const(nil)) ?? State(rest: input.from(1), value: input.to(1))
+}
+
 
 public func parseWhile(predicate: Character -> Bool)(_ input: String) -> State<String>? {
 	return input.characters.count > 0 && predicate(input.characters[input.startIndex])
