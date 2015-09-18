@@ -10,8 +10,8 @@ enum Swift: Equatable {
 		static let quoted = join(^"'", join((concat <^> not(^"'")*), ^"'"))
 
 		static let keyValue = KeyValue <^> (word <* ^"=" <*> (quoted <|> (concat <^> not(ws <|> ^")")*)))
-		static let branch = Branch <^> (^"(" *> ws* *> word <*> sexpr* <* ws* <* ^")")
-		static let sexpr: String -> State<Swift>? = never <* ws*
+		static let branch: String -> State<Swift>? = Branch <^> (^"(" *> ws* *> word <* ws* <*> sexpr* <* ws* <* ^")")
+		static let sexpr = delay { (branch <|> keyValue) <* ws* }
 	}
 }
 
