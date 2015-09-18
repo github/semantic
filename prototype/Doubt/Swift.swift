@@ -6,7 +6,7 @@ enum Swift: Equatable {
 		static let alphabetic = ^"abcdefghijklmnopqrstuvwxyz".characters
 		static let ws = ^" \t\n".characters
 
-		static let word = concat <^> alphabetic+
+		static let word = concat <^> (alphabetic <|> ^"_")+
 		static let quoted = join(^"'", join((concat <^> not(^"'")*), ^"'"))
 
 		static let keyValue = KeyValue <^> (word <* ^"=" <*> (quoted <|> (concat <^> not(ws <|> ^")")*)))
