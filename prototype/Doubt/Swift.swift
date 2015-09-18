@@ -1,7 +1,3 @@
-func never<T>(_: String) -> State<T>? {
-	return nil
-}
-
 enum Swift: Equatable {
 	case KeyValue(String, String)
 	case Branch(String, [Swift])

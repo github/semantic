@@ -21,6 +21,13 @@ public prefix func ^<S where S: SequenceType, S.Generator.Element == Character>(
 	return ^strings.map { String($0) }
 }
 
+
+/// A convenience for use while developing parsers.
+public func never<T>(_: String) -> State<T>? {
+	return nil
+}
+
+
 public func parseWhile(predicate: Character -> Bool)(_ input: String) -> State<String>? {
 	return input.characters.count > 0 && predicate(input.characters[input.startIndex])
 		? parseWhile(predicate)(input.from(1)).map { State(rest: $0.rest, value: input.to(1) + $0.value) } ?? State(rest: input.from(1), value: input.to(1))
