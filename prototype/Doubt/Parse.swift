@@ -22,6 +22,12 @@ public prefix func ^<S where S: SequenceType, S.Generator.Element == Character>(
 }
 
 
+/// Parse the full string with parser or fail.
+public func full<A>(parser: String -> State<A>?)(_ input: String) -> A? {
+	return parser(input).flatMap { $0.rest.isEmpty ? $0.value : nil }
+}
+
+
 /// A convenience for use while developing parsers.
 public func never<T>(_: String) -> State<T>? {
 	return nil
