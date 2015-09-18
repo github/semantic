@@ -4,7 +4,7 @@ enum Swift: Equatable {
 	case Branch(String, [Swift])
 
 	struct Parsers {
-		static let alphabetic = ^"abcdefghijklmnopqrstuvwxyz".characters
+		static let alphabetic = ^"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".characters
 		static let ws = ^" \t\n".characters
 
 		static let word = concat <^> (alphabetic <|> ^"_")+
