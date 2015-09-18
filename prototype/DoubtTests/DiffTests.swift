@@ -28,10 +28,10 @@ final class DiffTests: XCTestCase {
 	}
 }
 
-private let a = Fix(.Literal("a"))
-private let b = Fix(.Literal("b"))
-private let c = Fix(.Literal("c"))
-private let d = Fix(.Literal("d"))
+private let a = Term(.Literal("a"))
+private let b = Term(.Literal("b"))
+private let c = Term(.Literal("c"))
+private let d = Term(.Literal("d"))
 
 import Doubt
 import XCTest

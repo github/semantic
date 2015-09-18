@@ -1,10 +1,10 @@
-public enum Fix: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, Equatable {
-	public init(_ out: Syntax<Fix>) {
+public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, Equatable {
+	public init(_ out: Syntax<Term>) {
 		self = .Roll(out)
 	}
 
 	case Empty
-	indirect case Roll(Syntax<Fix>)
+	indirect case Roll(Syntax<Term>)
 
 	public var debugDescription: String {
 		switch self {
