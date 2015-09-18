@@ -1,9 +1,18 @@
-let atom = Syntax<Term>.Variable <^> ^("abcdefghijklmnopqrstuvwxyz".characters.map { String($0) })
 let alphabetic = ^"abcdefghijklmnopqrstuvwxyz".characters
 let word = { $0.joinWithSeparator("") } <^> alphabetic*
 let ws = ^" \t\n".characters
 
-let sexpr: String -> State<Term>? = fix { sexpr in
-	let list = Syntax<Term>.Apply <^> (ws* *> ^"(" *> ws* *> sexpr <*> sexpr* <* ^")")
-	return Term.init <^> (atom <|> list) <* ws*
+func never<T>(_: String) -> State<T>? {
+	return nil
+}
+
+enum Swift {
+	case KeyValue(String, String)
+	case Branch(String, [Swift])
+
+	struct Parsers {
+		static let keyValue = KeyValue <^> (word <* ^"=" <*> word)
+		static let branch = Branch <^> (^"(" *> ws* *> word <*> sexpr* <* ^")")
+		static let sexpr: String -> State<Swift>? = never
+	}
 }
