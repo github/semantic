@@ -8,7 +8,7 @@ final class SwiftTests: XCTestCase {
 	}
 
 	func testQuotedMatchesQuotedStrings() {
-		XCTAssertEqual(full (Swift.Parsers.quoted)("'value'"), "'value'")
+		XCTAssertEqual(full(Swift.Parsers.quoted)("'value'"), "'value'")
 	}
 }
 
