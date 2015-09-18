@@ -17,6 +17,10 @@ public prefix func ^(strings: [String])(_ input: String) -> State<String>? {
 		}
 }
 
+public prefix func ^<S where S: SequenceType, S.Generator.Element == Character>(strings: S) -> String -> State<String>? {
+	return ^strings.map { String($0) }
+}
+
 public func parseWhile(predicate: Character -> Bool)(_ input: String) -> State<String>? {
 	return input.characters.count > 0 && predicate(input.characters[input.startIndex])
 		? parseWhile(predicate)(input.from(1)).map { State(rest: $0.rest, value: input.to(1) + $0.value) } ?? State(rest: input.from(1), value: input.to(1))
