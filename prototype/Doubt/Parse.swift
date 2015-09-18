@@ -40,6 +40,12 @@ public func not<T>(parser: String -> State<T>?)(_ input: String) -> State<String
 }
 
 
+/// Delays evaluation of a parser.
+public func delay<A>(thunk: () -> String -> State<A>?) -> String -> State<A>? {
+	return { thunk()($0) }
+}
+
+
 public func parseWhile(predicate: Character -> Bool)(_ input: String) -> State<String>? {
 	return input.characters.count > 0 && predicate(input.characters[input.startIndex])
 		? parseWhile(predicate)(input.from(1)).map { State(rest: $0.rest, value: input.to(1) + $0.value) } ?? State(rest: input.from(1), value: input.to(1))
