@@ -15,10 +15,5 @@ let sexpr: String -> State<Term>? = fix { sexpr in
 }
 
 
-func fix<T, U>(f: (T -> U) -> T -> U) -> T -> U {
-	return { f(fix(f))($0) }
-}
-
-
-import Doubt
+@testable import Doubt
 import XCTest
