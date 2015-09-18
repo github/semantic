@@ -14,6 +14,10 @@ final class SwiftTests: XCTestCase {
 	func testBranchesStartWithAnIdentifier() {
 		XCTAssertEqual(full(Swift.Parsers.branch)("(a b=c)"), .Branch("a", [ .KeyValue("b", "c") ]))
 	}
+
+	func testBranchesDoNotRequireChildren() {
+		XCTAssertEqual(full(Swift.Parsers.branch)("(return_stmt)"), .Branch("return_stmt", []))
+	}
 }
 
 
