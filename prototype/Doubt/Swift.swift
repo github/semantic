@@ -9,7 +9,7 @@ enum Swift: Equatable {
 		static let word = { $0.joinWithSeparator("") } <^> alphabetic+
 		static let quoted = join(^"'", join((concat <^> not(^"'")*), ^"'"))
 
-		static let keyValue = KeyValue <^> (word <* ^"=" <*> (quoted <|> word))
+		static let keyValue = KeyValue <^> (word <* ^"=" <*> (quoted <|> (concat <^> not(ws <|> ^")")*)))
 		static let branch = Branch <^> (^"(" *> ws* *> word <*> sexpr* <* ws* <* ^")")
 		static let sexpr: String -> State<Swift>? = never <* ws*
 	}
