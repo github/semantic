@@ -67,6 +67,8 @@ func == (left: Swift, right: Swift) -> Bool {
 		return k1 == k2 && v1 == v2
 	case let (.Branch(n1, b1), .Branch(n2, b2)):
 		return n1 == n2 && b1 == b2
+	case let (.Symbol(s, u), .Symbol(t, v)):
+		return s == t && u == v
 	default:
 		return false
 	}
