@@ -1,4 +1,5 @@
 enum Swift: Equatable {
+	case Atom(String)
 	case KeyValue(String, String)
 	case Branch(String, [Swift])
 
@@ -12,7 +13,7 @@ enum Swift: Equatable {
 
 		static let keyValue = KeyValue <^> (word <* ^"=" <*> (quoted <|> atom))
 		static let branch: String -> State<Swift>? = Branch <^> (^"(" *> ws* *> word <* ws* <*> sexpr* <* ws* <* ^")")
-		static let sexpr = delay { (branch <|> keyValue) <* ws* }
+		static let sexpr = delay { (branch <|> (Swift.Atom <^> atom) <|> keyValue) <* ws* }
 	}
 }
 
