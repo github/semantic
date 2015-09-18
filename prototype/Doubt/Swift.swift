@@ -9,7 +9,7 @@ enum Swift: Equatable {
 		static let ws = ^" \t\n".characters
 
 		static let word = concat <^> (alphabetic <|> ^"_")+
-		static let atom = concat <^> not(ws <|> ^")")*
+		static let atom = concat <^> not(ws <|> ^")")+
 		static let quoted = join(^"'", join((concat <^> not(^"'")*), ^"'"))
 
 		static let symbol = Swift.Symbol <^> (join(^"\"", join((concat <^> not(^"\"")*), ^"\"")) <*> (^"<" *> interpolate(concat <^> alphabetic+, ^"," <* ws*) <* ^">"))
