@@ -12,7 +12,7 @@ enum Swift {
 
 	struct Parsers {
 		static let keyValue = KeyValue <^> (word <* ^"=" <*> word)
-		static let branch = Branch <^> (^"(" *> ws* *> word <*> sexpr* <* ^")")
-		static let sexpr: String -> State<Swift>? = never
+		static let branch = Branch <^> (^"(" *> ws* *> word <*> sexpr* <* ws* <* ^")")
+		static let sexpr: String -> State<Swift>? = never <* ws*
 	}
 }
