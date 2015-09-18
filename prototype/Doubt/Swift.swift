@@ -16,6 +16,8 @@ enum Swift: Equatable {
 		static let keyValue = KeyValue <^> (word <* ^"=" <*> (quoted <|> atom))
 		static let branch: String -> State<Swift>? = Branch <^> (^"(" *> ws* *> word <* ws* <*> sexpr* <* ws* <* ^")")
 		static let sexpr = delay { (branch <|> symbol <|> keyValue <|> (Swift.Atom <^> atom)) <* ws* }
+
+		static let root = ws* *> sexpr*
 	}
 }
 
