@@ -7,9 +7,10 @@ enum Swift: Equatable {
 		static let ws = ^" \t\n".characters
 
 		static let word = concat <^> (alphabetic <|> ^"_")+
+		static let atom = concat <^> not(ws <|> ^")")*
 		static let quoted = join(^"'", join((concat <^> not(^"'")*), ^"'"))
 
-		static let keyValue = KeyValue <^> (word <* ^"=" <*> (quoted <|> (concat <^> not(ws <|> ^")")*)))
+		static let keyValue = KeyValue <^> (word <* ^"=" <*> (quoted <|> atom))
 		static let branch: String -> State<Swift>? = Branch <^> (^"(" *> ws* *> word <* ws* <*> sexpr* <* ws* <* ^")")
 		static let sexpr = delay { (branch <|> keyValue) <* ws* }
 	}
