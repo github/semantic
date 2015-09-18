@@ -6,12 +6,12 @@ final class DoubtTests: XCTestCase {
 	}
 }
 
-let atom = Syntax<Fix>.Variable <^> ^("abcdefghijklmnopqrstuvwxyz".characters.map { String($0) })
+let atom = Syntax<Term>.Variable <^> ^("abcdefghijklmnopqrstuvwxyz".characters.map { String($0) })
 let ws = ^(" \t\n".characters.map { String($0) })
 
-let sexpr: String -> State<Fix>? = fix { sexpr in
-	let list = Syntax<Fix>.Apply <^> (ws* *> ^"(" *> ws* *> sexpr <*> sexpr* <* ^")")
-	return Fix.init <^> (atom <|> list) <* ws*
+let sexpr: String -> State<Term>? = fix { sexpr in
+	let list = Syntax<Term>.Apply <^> (ws* *> ^"(" *> ws* *> sexpr <*> sexpr* <* ^")")
+	return Term.init <^> (atom <|> list) <* ws*
 }
 
 

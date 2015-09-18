@@ -1,4 +1,4 @@
-public func == (left: Fix, right: Fix) -> Bool {
+public func == (left: Term, right: Term) -> Bool {
 	switch (left, right) {
 	case (.Empty, .Empty):
 		return true

@@ -1,17 +1,17 @@
 public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible {
 	case Empty
-	case Patch(Fix, Fix)
+	case Patch(Term, Term)
 	indirect case Copy(Syntax<Diff>)
 
-	public static func Insert(term: Fix) -> Diff {
+	public static func Insert(term: Term) -> Diff {
 		return .Patch(.Empty, term)
 	}
 
-	public static func Delete(term: Fix) -> Diff {
+	public static func Delete(term: Term) -> Diff {
 		return .Patch(term, .Empty)
 	}
 
-	public init(_ term: Fix) {
+	public init(_ term: Term) {
 		switch term {
 		case .Empty:
 			self = .Empty
@@ -56,7 +56,7 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		}
 	}
 
-	public init(_ a: Fix, _ b: Fix) {
+	public init(_ a: Term, _ b: Term) {
 		switch (a, b) {
 		case (.Empty, .Empty):
 			self = .Empty
@@ -83,7 +83,7 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 				self = .Copy(.Group(Diff(n1, n2), Diff.diff(v1, v2)))
 
 			default:
-				self = .Patch(Fix(a), Fix(b))
+				self = .Patch(Term(a), Term(b))
 			}
 
 		default:
@@ -91,7 +91,7 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		}
 	}
 
-	public static func diff<C1: CollectionType, C2: CollectionType where C1.Index : RandomAccessIndexType, C1.Generator.Element == Fix, C2.Index : RandomAccessIndexType, C2.Generator.Element == Fix>(a: C1, _ b: C2) -> [Diff] {
+	public static func diff<C1: CollectionType, C2: CollectionType where C1.Index : RandomAccessIndexType, C1.Generator.Element == Term, C2.Index : RandomAccessIndexType, C2.Generator.Element == Term>(a: C1, _ b: C2) -> [Diff] {
 		func magnitude(diffs: Stream<Diff>) -> Int {
 			return diffs.map { $0.magnitude }.reduce(0, combine: +)
 		}
@@ -102,7 +102,7 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			})
 		}
 
-		func diff(a: Stream<Fix>, _ b: Stream<Fix>) -> Stream<Diff> {
+		func diff(a: Stream<Term>, _ b: Stream<Term>) -> Stream<Diff> {
 			switch (a, b) {
 			case (.Nil, .Nil):
 				return .Nil
