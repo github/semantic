@@ -1,10 +1,14 @@
 public enum JSON {
+	public typealias ArrayType = [Doubt.JSON]
+	public typealias DictionaryType = [Swift.String:Doubt.JSON]
+
 	case Number(Double)
 	case Boolean(Bool)
 	case String(Swift.String)
-	case Array([Doubt.JSON])
-	case Dictionary([Swift.String:Doubt.JSON])
+	case Array(ArrayType)
+	case Dictionary(DictionaryType)
 	case Null
+
 
 	public var number: Double? {
 		if case let .Number(d) = self { return d }
@@ -21,12 +25,12 @@ public enum JSON {
 		return nil
 	}
 
-	public var array: [Doubt.JSON]? {
+	public var array: ArrayType? {
 		if case let .Array(a) = self { return a }
 		return nil
 	}
 
-	public var dictionary: [Swift.String:Doubt.JSON]? {
+	public var dictionary: DictionaryType? {
 		if case let .Dictionary(d) = self { return d }
 		return nil
 	}
@@ -41,8 +45,8 @@ public enum JSON {
 	public static let number: Prism<Doubt.JSON, Double> = Prism(forward: { $0.number }, backward: { .Number($0) })
 	public static let boolean: Prism<Doubt.JSON, Bool> = Prism(forward: { $0.boolean }, backward: { .Boolean($0) })
 	public static let string: Prism<Doubt.JSON, Swift.String> = Prism(forward: { $0.string }, backward: { .String($0) })
-	public static let array: Prism<Doubt.JSON, [Doubt.JSON]> = Prism(forward: { $0.array }, backward: { .Array($0) })
-	public static let dictionary: Prism<Doubt.JSON, [Swift.String:Doubt.JSON]> = Prism(forward: { $0.dictionary }, backward: { .Dictionary($0) })
+	public static let array: Prism<Doubt.JSON, ArrayType> = Prism(forward: { $0.array }, backward: { .Array($0) })
+	public static let dictionary: Prism<Doubt.JSON, DictionaryType> = Prism(forward: { $0.dictionary }, backward: { .Dictionary($0) })
 }
 
 private func toJSON(object: AnyObject) -> JSON? {
