@@ -13,6 +13,16 @@
 		D432D4731BA9C55300F3FABC /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4721BA9C55300F3FABC /* Stream.swift */; };
 		D432D4751BA9D6A400F3FABC /* Memo.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4741BA9D6A400F3FABC /* Memo.swift */; };
 		D432D4771BA9FE6A00F3FABC /* Comparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4761BA9FE6A00F3FABC /* Comparable.swift */; };
+		D4413FD51BB052ED00E3C3C1 /* SourceKittenFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */; };
+		D4413FD71BB0531E00E3C3C1 /* SwiftXPC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */; };
+		D4413FD91BB0534000E3C3C1 /* SWXMLHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */; };
+		D4413FDB1BB0536700E3C3C1 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FDA1BB0536700E3C3C1 /* Result.framework */; };
+		D4413FDD1BB0559400E3C3C1 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FDA1BB0536700E3C3C1 /* Result.framework */; };
+		D4413FDE1BB0559400E3C3C1 /* SwiftXPC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */; };
+		D4413FE51BB055A600E3C3C1 /* SourceKittenFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */; };
+		D4413FE61BB055A800E3C3C1 /* SWXMLHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */; };
+		D4413FE81BB055AE00E3C3C1 /* Commandant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FE71BB055AE00E3C3C1 /* Commandant.framework */; };
+		D4413FE91BB055B500E3C3C1 /* Commandant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FE71BB055AE00E3C3C1 /* Commandant.framework */; };
 		D4AAE50E1B5AE22E004E581F /* Doubt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4AAE4FD1B5AE22E004E581F /* Doubt.framework */; };
 		D4AAE5401B5AE2D0004E581F /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE5351B5AE2D0004E581F /* Array.swift */; };
 		D4AAE5411B5AE2D0004E581F /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE5361B5AE2D0004E581F /* Diff.swift */; };
@@ -43,6 +53,11 @@
 		D432D4721BA9C55300F3FABC /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
 		D432D4741BA9D6A400F3FABC /* Memo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Memo.swift; sourceTree = "<group>"; };
 		D432D4761BA9FE6A00F3FABC /* Comparable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comparable.swift; sourceTree = "<group>"; };
+		D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SourceKittenFramework.framework; path = ../External/SourceKitten/build/Debug/SourceKittenFramework.framework; sourceTree = "<group>"; };
+		D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftXPC.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/Doubt-fdxdigwapqqdrjfcsvjosyndzrgg/Build/Products/Debug/SwiftXPC.framework"; sourceTree = "<group>"; };
+		D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SWXMLHash.framework; path = ../External/SourceKitten/Carthage/Checkouts/SWXMLHash/build/Debug/SWXMLHash.framework; sourceTree = "<group>"; };
+		D4413FDA1BB0536700E3C3C1 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Result.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/Doubt-fdxdigwapqqdrjfcsvjosyndzrgg/Build/Products/Debug/Result.framework"; sourceTree = "<group>"; };
+		D4413FE71BB055AE00E3C3C1 /* Commandant.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Commandant.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/Doubt-fdxdigwapqqdrjfcsvjosyndzrgg/Build/Products/Debug/Commandant.framework"; sourceTree = "<group>"; };
 		D4AAE4FD1B5AE22E004E581F /* Doubt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Doubt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4AAE5011B5AE22E004E581F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4AAE50D1B5AE22E004E581F /* DoubtTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DoubtTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -64,6 +79,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4413FE81BB055AE00E3C3C1 /* Commandant.framework in Frameworks */,
+				D4413FDB1BB0536700E3C3C1 /* Result.framework in Frameworks */,
+				D4413FD91BB0534000E3C3C1 /* SWXMLHash.framework in Frameworks */,
+				D4413FD71BB0531E00E3C3C1 /* SwiftXPC.framework in Frameworks */,
+				D4413FD51BB052ED00E3C3C1 /* SourceKittenFramework.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,7 +91,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4413FE91BB055B500E3C3C1 /* Commandant.framework in Frameworks */,
+				D4413FDD1BB0559400E3C3C1 /* Result.framework in Frameworks */,
+				D4413FDE1BB0559400E3C3C1 /* SwiftXPC.framework in Frameworks */,
 				D4AAE50E1B5AE22E004E581F /* Doubt.framework in Frameworks */,
+				D4413FE61BB055A800E3C3C1 /* SWXMLHash.framework in Frameworks */,
+				D4413FE51BB055A600E3C3C1 /* SourceKittenFramework.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,6 +146,11 @@
 		D4AAE5001B5AE22E004E581F /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				D4413FE71BB055AE00E3C3C1 /* Commandant.framework */,
+				D4413FDA1BB0536700E3C3C1 /* Result.framework */,
+				D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */,
+				D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */,
+				D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */,
 				D4AAE5011B5AE22E004E581F /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -413,6 +443,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
+					"$(PROJECT_DIR)/External/SourceKitten/Carthage/Checkouts/SWXMLHash/build/Debug",
+					"$(PROJECT_DIR)/External/SourceKitten/build/Debug",
 				);
 				INFOPLIST_FILE = DoubtTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
@@ -429,6 +461,8 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
+					"$(PROJECT_DIR)/External/SourceKitten/Carthage/Checkouts/SWXMLHash/build/Debug",
+					"$(PROJECT_DIR)/External/SourceKitten/build/Debug",
 				);
 				INFOPLIST_FILE = DoubtTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";

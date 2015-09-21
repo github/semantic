@@ -1,0 +1,3 @@
+[submodule "prototype/External/SourceKitten"]
+	path = prototype/External/SourceKitten
+	url = https://github.com/jpsim/SourceKitten.git

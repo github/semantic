@@ -4,4 +4,19 @@
    <FileRef
       location = "group:Doubt.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:External/SourceKitten/sourcekitten.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:External/SourceKitten/Carthage/Checkouts/Commandant/Commandant.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:External/SourceKitten/Carthage/Checkouts/Result/Result.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:External/SourceKitten/Carthage/Checkouts/SwiftXPC/SwiftXPC.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:External/SourceKitten/Carthage/Checkouts/SWXMLHash/SWXMLHash.xcodeproj">
+   </FileRef>
 </Workspace>
