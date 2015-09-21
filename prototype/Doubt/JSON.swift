@@ -73,6 +73,29 @@ extension Prism where To : DictionaryType {
 	}
 }
 
+protocol ArrayType {
+	typealias Element
+
+	init(array: [Element])
+	var array: [Element] { get }
+}
+
+extension Array : ArrayType {
+	init(array: [Element]) {
+		self = array
+	}
+
+	var array: [Element] {
+		return self
+	}
+}
+
+extension Prism where To : ArrayType {
+	subscript (index: Int) -> Prism<From, To.Element> {
+		return self >>> Prism<To, To.Element>(forward: { $0.array[index] }, backward: { To(array: [ $0 ]) })
+	}
+}
+
 private func toJSON(object: AnyObject) -> JSON? {
 	struct E: ErrorType {}
 	func die<T>() throws -> T {
