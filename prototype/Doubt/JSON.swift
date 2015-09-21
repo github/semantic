@@ -64,6 +64,12 @@ extension JSON: JSONConvertible {
 	}
 }
 
+extension JSONConvertible {
+	static var JSONConverter: Prism<Self, Doubt.JSON> {
+		return Prism(forward: { $0.JSON }, backward: { Self(JSON: $0) })
+	}
+}
+
 extension Prism where To : JSONConvertible {
 	public var number: Prism<From, Double> {
 		return self >>> Prism<To, Double>(forward: { $0.JSON.number }, backward: { To(JSON: .Number($0)) })
