@@ -61,7 +61,7 @@ public func == (left: Doc, right: Doc) -> Bool {
 	}
 }
 
-func == (left: Swift, right: Swift) -> Bool {
+func == (left: SwiftAST, right: SwiftAST) -> Bool {
 	switch (left, right) {
 	case let (.KeyValue(k1, v1), .KeyValue(k2, v2)):
 		return k1 == k2 && v1 == v2

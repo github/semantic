@@ -1,8 +1,8 @@
-enum Swift: Equatable {
+enum SwiftAST: Equatable {
 	case Atom(String)
 	case Symbol(String, [String])
 	case KeyValue(String, String)
-	case Branch(String, [Swift])
+	case Branch(String, [SwiftAST])
 
 	struct Parsers {
 		static let alphabetic = ^"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".characters
@@ -12,10 +12,10 @@ enum Swift: Equatable {
 		static let atom = concat <^> not(ws <|> ^")")+
 		static let quoted = join(^"'", join((concat <^> not(^"'")*), ^"'"))
 
-		static let symbol = Swift.Symbol <^> (join(^"\"", join((concat <^> not(^"\"")*), ^"\"")) <*> (^"<" *> interpolate(concat <^> alphabetic+, ^"," <* ws*) <* ^">"))
+		static let symbol = SwiftAST.Symbol <^> (join(^"\"", join((concat <^> not(^"\"")*), ^"\"")) <*> (^"<" *> interpolate(concat <^> alphabetic+, ^"," <* ws*) <* ^">"))
 		static let keyValue = KeyValue <^> (word <* ^"=" <*> (quoted <|> atom))
-		static let branch: String -> State<Swift>? = Branch <^> (^"(" *> ws* *> word <* ws* <*> sexpr* <* ws* <* ^")")
-		static let sexpr = delay { (branch <|> symbol <|> keyValue <|> (Swift.Atom <^> atom)) <* ws* }
+		static let branch: String -> State<SwiftAST>? = Branch <^> (^"(" *> ws* *> word <* ws* <*> sexpr* <* ws* <* ^")")
+		static let sexpr = delay { (branch <|> symbol <|> keyValue <|> (SwiftAST.Atom <^> atom)) <* ws* }
 
 		static let root = ws* *> sexpr*
 	}
