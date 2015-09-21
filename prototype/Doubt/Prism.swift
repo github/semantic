@@ -17,3 +17,56 @@ extension Dictionary {
 public func >>> <From, Part, To> (left: Prism<From, Part>, right: Prism<Part, To>) -> Prism<From, To> {
 	return Prism(forward: { left.forward($0).flatMap(right.forward) }, backward: right.backward >>> left.backward)
 }
+
+
+protocol DictionaryType {
+	typealias Key : Hashable
+	typealias Value
+
+	init(dictionary: [Key:Value])
+	var dictionary: [Key:Value] { get }
+}
+
+extension Dictionary: DictionaryType {
+	init(dictionary: [Key:Value]) {
+		self = dictionary
+	}
+
+	var dictionary: [Key:Value] {
+		return self
+	}
+}
+
+extension Prism where To : DictionaryType {
+	subscript (key: To.Key) -> Prism<From, To.Value> {
+		return self >>> Prism<To, To.Value>(forward: { $0.dictionary[key] }, backward: { To(dictionary: [key: $0]) })
+	}
+}
+
+protocol ArrayType {
+	typealias Element
+
+	init(array: [Element])
+	var array: [Element] { get }
+}
+
+extension Array : ArrayType {
+	init(array: [Element]) {
+		self = array
+	}
+
+	var array: [Element] {
+		return self
+	}
+}
+
+extension Prism where To : ArrayType {
+	subscript (index: Int) -> Prism<From, To.Element> {
+		return self >>> Prism<To, To.Element>(
+			forward: {
+				let array = $0.array
+				return array.count > index ? array[index] : nil
+			},
+			backward: { To(array: [ $0 ]) })
+	}
+}
