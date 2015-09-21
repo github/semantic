@@ -92,7 +92,12 @@ extension Array : ArrayType {
 
 extension Prism where To : ArrayType {
 	subscript (index: Int) -> Prism<From, To.Element> {
-		return self >>> Prism<To, To.Element>(forward: { $0.array[index] }, backward: { To(array: [ $0 ]) })
+		return self >>> Prism<To, To.Element>(
+			forward: {
+				let array = $0.array
+				return array.count > index ? array[index] : nil
+			},
+			backward: { To(array: [ $0 ]) })
 	}
 }
 
