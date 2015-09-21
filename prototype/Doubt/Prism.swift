@@ -39,3 +39,16 @@ extension Prism where To : ArrayConvertible {
 		return map(transform(Prism<To.Element, To.Element>(forward: { $0 }, backward: { $0 })))
 	}
 }
+
+public func &&& <From, A, B> (left: Prism<From, A>, right: Prism<From, B>) -> Prism<From, (A, B)> {
+	return Prism(
+		forward: {
+			if let a = left.forward($0), b = right.forward($0) {
+				return (a, b)
+			}
+			return nil
+		},
+		backward: {
+			(left.backward($0), right.backward($1)).1
+		})
+}
