@@ -45,7 +45,7 @@ enum JSON {
 	static let dictionary: Prism<Doubt.JSON, [Swift.String:Doubt.JSON]> = Prism(forward: { $0.dictionary }, backward: { .Dictionary($0) })
 }
 
-func toJSON(object: AnyObject) -> JSON? {
+private func toJSON(object: AnyObject) -> JSON? {
 	struct E: ErrorType {}
 	func die<T>() throws -> T {
 		throw E()
@@ -70,7 +70,7 @@ func toJSON(object: AnyObject) -> JSON? {
 	} catch { return nil }
 }
 
-func toAnyObject(json: JSON) -> AnyObject {
+private func toAnyObject(json: JSON) -> AnyObject {
 	switch json {
 	case let .Number(n):
 		return n
