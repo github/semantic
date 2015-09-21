@@ -81,3 +81,12 @@ public struct Iso<Here, There> {
 	public let forward: Here -> There
 	public let backward: There -> Here
 }
+
+
+extension Prism where To : ArrayType {
+	public func map<A>(transform: Iso<To.Element, A>) -> Prism<From, [A]> {
+		return Prism<From, [A]>(
+			forward: { self.forward($0)?.array.map(transform.forward) },
+			backward: { self.backward(To(array: $0.map(transform.backward))) })
+	}
+}
