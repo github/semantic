@@ -43,39 +43,39 @@ public enum JSON {
 	public static let JSON: Prism<AnyObject, Doubt.JSON> = Prism(forward: toJSON, backward: toAnyObject)
 }
 
-protocol JSONConvertible {
+public protocol JSONConvertible {
 	init(JSON: Doubt.JSON)
 	var JSON: Doubt.JSON { get }
 }
 
 extension JSON: JSONConvertible {
-	init(JSON: Doubt.JSON) {
+	public init(JSON: Doubt.JSON) {
 		self = JSON
 	}
 
-	var JSON: Doubt.JSON {
+	public var JSON: Doubt.JSON {
 		return self
 	}
 }
 
 extension Prism where To : JSONConvertible {
-	var number: Prism<From, Double> {
+	public var number: Prism<From, Double> {
 		return self >>> Prism<To, Double>(forward: { $0.JSON.number }, backward: { To(JSON: .Number($0)) })
 	}
 
-	var boolean: Prism<From, Bool> {
+	public var boolean: Prism<From, Bool> {
 		return self >>> Prism<To, Bool>(forward: { $0.JSON.boolean }, backward: { To(JSON: .Boolean($0)) })
 	}
 
-	var string: Prism<From, Swift.String> {
+	public var string: Prism<From, Swift.String> {
 		return self >>> Prism<To, Swift.String>(forward: { $0.JSON.string }, backward: { To(JSON: .String($0)) })
 	}
 
-	var array: Prism<From, [Doubt.JSON]> {
+	public var array: Prism<From, [Doubt.JSON]> {
 		return self >>> Prism<To, [Doubt.JSON]>(forward: { $0.JSON.array }, backward: { To(JSON: .Array($0)) })
 	}
 
-	var dictionary: Prism<From, [String:Doubt.JSON]> {
+	public var dictionary: Prism<From, [String:Doubt.JSON]> {
 		return self >>> Prism<To, [String:Doubt.JSON]>(forward: { $0.JSON.dictionary }, backward: { To(JSON: .Dictionary($0)) })
 	}
 }
