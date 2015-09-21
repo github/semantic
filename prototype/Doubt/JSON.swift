@@ -1,4 +1,4 @@
-enum JSON {
+public enum JSON {
 	case Number(Double)
 	case Boolean(Bool)
 	case String(Swift.String)
@@ -6,43 +6,43 @@ enum JSON {
 	case Dictionary([Swift.String:Doubt.JSON])
 	case Null
 
-	var number: Double? {
+	public var number: Double? {
 		if case let .Number(d) = self { return d }
 		return nil
 	}
 
-	var boolean: Bool? {
+	public var boolean: Bool? {
 		if case let .Boolean(b) = self { return b }
 		return nil
 	}
 
-	var string: Swift.String? {
+	public var string: Swift.String? {
 		if case let .String(s) = self { return s }
 		return nil
 	}
 
-	var array: [Doubt.JSON]? {
+	public var array: [Doubt.JSON]? {
 		if case let .Array(a) = self { return a }
 		return nil
 	}
 
-	var dictionary: [Swift.String:Doubt.JSON]? {
+	public var dictionary: [Swift.String:Doubt.JSON]? {
 		if case let .Dictionary(d) = self { return d }
 		return nil
 	}
 
-	var isNull: Bool {
+	public var isNull: Bool {
 		if case .Null = self { return true }
 		return false
 	}
 
-	static let JSON: Prism<AnyObject, Doubt.JSON> = Prism(forward: toJSON, backward: toAnyObject)
+	public static let JSON: Prism<AnyObject, Doubt.JSON> = Prism(forward: toJSON, backward: toAnyObject)
 
-	static let number: Prism<Doubt.JSON, Double> = Prism(forward: { $0.number }, backward: { .Number($0) })
-	static let boolean: Prism<Doubt.JSON, Bool> = Prism(forward: { $0.boolean }, backward: { .Boolean($0) })
-	static let string: Prism<Doubt.JSON, Swift.String> = Prism(forward: { $0.string }, backward: { .String($0) })
-	static let array: Prism<Doubt.JSON, [Doubt.JSON]> = Prism(forward: { $0.array }, backward: { .Array($0) })
-	static let dictionary: Prism<Doubt.JSON, [Swift.String:Doubt.JSON]> = Prism(forward: { $0.dictionary }, backward: { .Dictionary($0) })
+	public static let number: Prism<Doubt.JSON, Double> = Prism(forward: { $0.number }, backward: { .Number($0) })
+	public static let boolean: Prism<Doubt.JSON, Bool> = Prism(forward: { $0.boolean }, backward: { .Boolean($0) })
+	public static let string: Prism<Doubt.JSON, Swift.String> = Prism(forward: { $0.string }, backward: { .String($0) })
+	public static let array: Prism<Doubt.JSON, [Doubt.JSON]> = Prism(forward: { $0.array }, backward: { .Array($0) })
+	public static let dictionary: Prism<Doubt.JSON, [Swift.String:Doubt.JSON]> = Prism(forward: { $0.dictionary }, backward: { .Dictionary($0) })
 }
 
 private func toJSON(object: AnyObject) -> JSON? {
