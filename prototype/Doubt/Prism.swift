@@ -48,7 +48,7 @@ public struct Iso<Here, There> {
 }
 
 
-extension Prism where To : ArrayType {
+extension Prism where To : ArrayConvertible {
 	public func map<A>(transform: Iso<To.Element, A>) -> Prism<From, [A]> {
 		return Prism<From, [A]>(
 			forward: { self.forward($0)?.array.map(transform.forward) },
