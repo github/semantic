@@ -70,3 +70,14 @@ extension Prism where To : ArrayType {
 			backward: { To(array: [ $0 ]) })
 	}
 }
+
+
+public struct Iso<Here, There> {
+	public init(forward: Here -> There, backward: There -> Here) {
+		self.forward = forward
+		self.backward = backward
+	}
+
+	public let forward: Here -> There
+	public let backward: There -> Here
+}
