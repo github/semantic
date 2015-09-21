@@ -1,4 +1,4 @@
-public protocol DictionaryType {
+public protocol DictionaryConvertible {
 	typealias Key : Hashable
 	typealias Value
 
@@ -6,7 +6,7 @@ public protocol DictionaryType {
 	var dictionary: [Key:Value] { get }
 }
 
-extension Dictionary: DictionaryType {
+extension Dictionary: DictionaryConvertible {
 	public init(dictionary: [Key:Value]) {
 		self = dictionary
 	}

@@ -1,11 +1,11 @@
-public protocol ArrayType {
+public protocol ArrayConvertible {
 	typealias Element
 
 	init(array: [Element])
 	var array: [Element] { get }
 }
 
-extension Array : ArrayType {
+extension Array : ArrayConvertible {
 	public init(array: [Element]) {
 		self = array
 	}
