@@ -72,23 +72,23 @@ extension JSONConvertible {
 
 extension Prism where To : JSONConvertible {
 	public var number: Prism<From, Double> {
-		return self >>> Prism<To, Double>(forward: { $0.JSON.number }, backward: { To(JSON: .Number($0)) })
+		return self >>> To.JSONConverter >>> Doubt.JSON.number
 	}
 
 	public var boolean: Prism<From, Bool> {
-		return self >>> Prism<To, Bool>(forward: { $0.JSON.boolean }, backward: { To(JSON: .Boolean($0)) })
+		return self >>> To.JSONConverter >>> Doubt.JSON.boolean
 	}
 
 	public var string: Prism<From, Swift.String> {
-		return self >>> Prism<To, Swift.String>(forward: { $0.JSON.string }, backward: { To(JSON: .String($0)) })
+		return self >>> To.JSONConverter >>> Doubt.JSON.string
 	}
 
 	public var array: Prism<From, [Doubt.JSON]> {
-		return self >>> Prism<To, [Doubt.JSON]>(forward: { $0.JSON.array }, backward: { To(JSON: .Array($0)) })
+		return self >>> To.JSONConverter >>> Doubt.JSON.array
 	}
 
 	public var dictionary: Prism<From, [String:Doubt.JSON]> {
-		return self >>> Prism<To, [String:Doubt.JSON]>(forward: { $0.JSON.dictionary }, backward: { To(JSON: .Dictionary($0)) })
+		return self >>> To.JSONConverter >>> Doubt.JSON.dictionary
 	}
 }
 
