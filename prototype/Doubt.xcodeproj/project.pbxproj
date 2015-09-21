@@ -23,6 +23,7 @@
 		D4413FE61BB055A800E3C3C1 /* SWXMLHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */; };
 		D4413FE81BB055AE00E3C3C1 /* Commandant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FE71BB055AE00E3C3C1 /* Commandant.framework */; };
 		D4413FE91BB055B500E3C3C1 /* Commandant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FE71BB055AE00E3C3C1 /* Commandant.framework */; };
+		D4413FED1BB0652300E3C3C1 /* Prism.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4413FEC1BB0652300E3C3C1 /* Prism.swift */; };
 		D4413FEF1BB06D4C00E3C3C1 /* Dictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4413FEE1BB06D4C00E3C3C1 /* Dictionary.swift */; };
 		D4AAE50E1B5AE22E004E581F /* Doubt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4AAE4FD1B5AE22E004E581F /* Doubt.framework */; };
 		D4AAE5401B5AE2D0004E581F /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE5351B5AE2D0004E581F /* Array.swift */; };
@@ -59,6 +60,7 @@
 		D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SWXMLHash.framework; path = ../External/SourceKitten/Carthage/Checkouts/SWXMLHash/build/Debug/SWXMLHash.framework; sourceTree = "<group>"; };
 		D4413FDA1BB0536700E3C3C1 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Result.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/Doubt-fdxdigwapqqdrjfcsvjosyndzrgg/Build/Products/Debug/Result.framework"; sourceTree = "<group>"; };
 		D4413FE71BB055AE00E3C3C1 /* Commandant.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Commandant.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/Doubt-fdxdigwapqqdrjfcsvjosyndzrgg/Build/Products/Debug/Commandant.framework"; sourceTree = "<group>"; };
+		D4413FEC1BB0652300E3C3C1 /* Prism.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Prism.swift; sourceTree = "<group>"; };
 		D4413FEE1BB06D4C00E3C3C1 /* Dictionary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dictionary.swift; sourceTree = "<group>"; };
 		D4AAE4FD1B5AE22E004E581F /* Doubt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Doubt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4AAE5011B5AE22E004E581F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -140,6 +142,7 @@
 				D432D4721BA9C55300F3FABC /* Stream.swift */,
 				D432D4741BA9D6A400F3FABC /* Memo.swift */,
 				D40024EB1BAC62BA00A110B8 /* Swift.swift */,
+				D4413FEC1BB0652300E3C3C1 /* Prism.swift */,
 				D4413FEE1BB06D4C00E3C3C1 /* Dictionary.swift */,
 				D4AAE5001B5AE22E004E581F /* Supporting Files */,
 			);
@@ -286,6 +289,7 @@
 				D432D4731BA9C55300F3FABC /* Stream.swift in Sources */,
 				D4AAE5421B5AE2D0004E581F /* Doc.swift in Sources */,
 				D432D4771BA9FE6A00F3FABC /* Comparable.swift in Sources */,
+				D4413FED1BB0652300E3C3C1 /* Prism.swift in Sources */,
 				D4AAE5461B5AE2D0004E581F /* Parse.swift in Sources */,
 				D432D4751BA9D6A400F3FABC /* Memo.swift in Sources */,
 				D4AAE5491B5AE2D0004E581F /* StringLiteralConvertible.swift in Sources */,
