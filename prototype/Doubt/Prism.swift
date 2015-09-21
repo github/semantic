@@ -1,6 +1,6 @@
 public struct Prism<From, To> {
-	let forward: From -> To?
-	let backward: To -> From
+	public let forward: From -> To?
+	public let backward: To -> From
 }
 
 extension Dictionary {
