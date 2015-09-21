@@ -41,6 +41,12 @@ public enum JSON {
 	}
 
 	public static let JSON: Prism<AnyObject, Doubt.JSON> = Prism(forward: toJSON, backward: toAnyObject)
+
+	public static let number: Prism<Doubt.JSON, Double> = Prism(forward: { $0.number }, backward: { .Number($0) })
+	public static let boolean: Prism<Doubt.JSON, Bool> = Prism(forward: { $0.boolean }, backward: { .Boolean($0) })
+	public static let string: Prism<Doubt.JSON, Swift.String> = Prism(forward: { $0.string }, backward: { .String($0) })
+	public static let array: Prism<Doubt.JSON, ArrayType> = Prism(forward: { $0.array }, backward: { .Array($0) })
+	public static let dictionary: Prism<Doubt.JSON, DictionaryType> = Prism(forward: { $0.dictionary }, backward: { .Dictionary($0) })
 }
 
 public protocol JSONConvertible {
