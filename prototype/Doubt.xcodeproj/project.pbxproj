@@ -443,8 +443,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
-					"$(PROJECT_DIR)/External/SourceKitten/Carthage/Checkouts/SWXMLHash/build/Debug",
-					"$(PROJECT_DIR)/External/SourceKitten/build/Debug",
 				);
 				INFOPLIST_FILE = DoubtTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
@@ -461,8 +459,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 					"$(inherited)",
-					"$(PROJECT_DIR)/External/SourceKitten/Carthage/Checkouts/SWXMLHash/build/Debug",
-					"$(PROJECT_DIR)/External/SourceKitten/build/Debug",
 				);
 				INFOPLIST_FILE = DoubtTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
