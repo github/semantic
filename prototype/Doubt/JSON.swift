@@ -49,6 +49,30 @@ public enum JSON {
 	public static let dictionary: Prism<Doubt.JSON, DictionaryType> = Prism(forward: { $0.dictionary }, backward: { .Dictionary($0) })
 }
 
+protocol DictionaryType {
+	typealias Key : Hashable
+	typealias Value
+
+	init(dictionary: [Key:Value])
+	var dictionary: [Key:Value] { get }
+}
+
+extension Dictionary: DictionaryType {
+	init(dictionary: [Key:Value]) {
+		self = dictionary
+	}
+
+	var dictionary: [Key:Value] {
+		return self
+	}
+}
+
+extension Prism where To : DictionaryType {
+	subscript (key: To.Key) -> Prism<From, To.Value> {
+		return self >>> Prism<To, To.Value>(forward: { $0.dictionary[key] }, backward: { To(dictionary: [key: $0]) })
+	}
+}
+
 private func toJSON(object: AnyObject) -> JSON? {
 	struct E: ErrorType {}
 	func die<T>() throws -> T {
