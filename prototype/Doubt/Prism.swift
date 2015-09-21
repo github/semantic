@@ -19,7 +19,7 @@ public func >>> <From, Part, To> (left: Prism<From, Part>, right: Prism<Part, To
 }
 
 
-protocol DictionaryType {
+public protocol DictionaryType {
 	typealias Key : Hashable
 	typealias Value
 
@@ -28,22 +28,22 @@ protocol DictionaryType {
 }
 
 extension Dictionary: DictionaryType {
-	init(dictionary: [Key:Value]) {
+	public init(dictionary: [Key:Value]) {
 		self = dictionary
 	}
 
-	var dictionary: [Key:Value] {
+	public var dictionary: [Key:Value] {
 		return self
 	}
 }
 
 extension Prism where To : DictionaryType {
-	subscript (key: To.Key) -> Prism<From, To.Value> {
+	public subscript (key: To.Key) -> Prism<From, To.Value> {
 		return self >>> Prism<To, To.Value>(forward: { $0.dictionary[key] }, backward: { To(dictionary: [key: $0]) })
 	}
 }
 
-protocol ArrayType {
+public protocol ArrayType {
 	typealias Element
 
 	init(array: [Element])
@@ -51,17 +51,17 @@ protocol ArrayType {
 }
 
 extension Array : ArrayType {
-	init(array: [Element]) {
+	public init(array: [Element]) {
 		self = array
 	}
 
-	var array: [Element] {
+	public var array: [Element] {
 		return self
 	}
 }
 
 extension Prism where To : ArrayType {
-	subscript (index: Int) -> Prism<From, To.Element> {
+	public subscript (index: Int) -> Prism<From, To.Element> {
 		return self >>> Prism<To, To.Element>(
 			forward: {
 				let array = $0.array
