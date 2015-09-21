@@ -1,4 +1,9 @@
 public struct Prism<From, To> {
+	public init(forward: From -> To?, backward: To -> From) {
+		self.forward = forward
+		self.backward = backward
+	}
+
 	public let forward: From -> To?
 	public let backward: To -> From
 }
