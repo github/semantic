@@ -34,4 +34,8 @@ extension Prism where To : ArrayConvertible {
 			forward: { self.forward($0)?.array.flatMap(transform.forward) },
 			backward: { self.backward(To(array: $0.map(transform.backward))) })
 	}
+
+	public func map<A>(transform: Prism<To.Element, To.Element> -> Prism<To.Element, A>) -> Prism<From, [A]> {
+		return map(transform(Prism<To.Element, To.Element>(forward: { $0 }, backward: { $0 })))
+	}
 }
