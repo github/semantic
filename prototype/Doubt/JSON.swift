@@ -2,8 +2,8 @@ enum JSON {
 	case Number(Double)
 	case Boolean(Bool)
 	case String(Swift.String)
-	case Array([JSON])
-	case Dictionary([Swift.String:JSON])
+	case Array([Doubt.JSON])
+	case Dictionary([Swift.String:Doubt.JSON])
 	case Null
 
 	var number: Double? {
@@ -21,12 +21,12 @@ enum JSON {
 		return nil
 	}
 
-	var array: [JSON]? {
+	var array: [Doubt.JSON]? {
 		if case let .Array(a) = self { return a }
 		return nil
 	}
 
-	var dictionary: [Swift.String:JSON]? {
+	var dictionary: [Swift.String:Doubt.JSON]? {
 		if case let .Dictionary(d) = self { return d }
 		return nil
 	}
@@ -36,15 +36,13 @@ enum JSON {
 		return false
 	}
 
-	enum Prisms {
-		static let JSON: Prism<AnyObject, Doubt.JSON> = Prism(forward: toJSON, backward: toAnyObject)
+	static let JSON: Prism<AnyObject, Doubt.JSON> = Prism(forward: toJSON, backward: toAnyObject)
 
-		static let number: Prism<Doubt.JSON, Double> = Prism(forward: { $0.number }, backward: { .Number($0) })
-		static let boolean: Prism<Doubt.JSON, Bool> = Prism(forward: { $0.boolean }, backward: { .Boolean($0) })
-		static let string: Prism<Doubt.JSON, Swift.String> = Prism(forward: { $0.string }, backward: { .String($0) })
-		static let array: Prism<Doubt.JSON, [Doubt.JSON]> = Prism(forward: { $0.array }, backward: { .Array($0) })
-		static let dictionary: Prism<Doubt.JSON, [Swift.String:Doubt.JSON]> = Prism(forward: { $0.dictionary }, backward: { .Dictionary($0) })
-	}
+	static let number: Prism<Doubt.JSON, Double> = Prism(forward: { $0.number }, backward: { .Number($0) })
+	static let boolean: Prism<Doubt.JSON, Bool> = Prism(forward: { $0.boolean }, backward: { .Boolean($0) })
+	static let string: Prism<Doubt.JSON, Swift.String> = Prism(forward: { $0.string }, backward: { .String($0) })
+	static let array: Prism<Doubt.JSON, [Doubt.JSON]> = Prism(forward: { $0.array }, backward: { .Array($0) })
+	static let dictionary: Prism<Doubt.JSON, [Swift.String:Doubt.JSON]> = Prism(forward: { $0.dictionary }, backward: { .Dictionary($0) })
 }
 
 func toJSON(object: AnyObject) -> JSON? {
