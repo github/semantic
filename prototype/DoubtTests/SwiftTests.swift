@@ -1,6 +1,7 @@
 final class SwiftTests: XCTestCase {
 	func testParsingAFile() {
-		guard let file = File(path: __FILE__) else {
+		let path = __FILE__
+		guard let file = File(path: path) else {
 			XCTFail("Could not make a File from \(__FILE__)")
 			return
 		}
