@@ -19,6 +19,28 @@ final class SwiftTests: XCTestCase {
 	}
 }
 
+extension Term {
+	init(path: String, JSON: Doubt.JSON) {
+		switch JSON.dictionary?["key.substructure"] {
+		case let .Some(.Array(a)):
+			self = .Roll(.Group(.Roll(.Literal(path)), a.map(Term.init)))
+		default:
+			self = .Empty
+		}
+	}
+
+	init(JSON: Doubt.JSON) {
+		switch JSON.dictionary {
+		case let .Some(d) where d["key.name"] != nil && d["key.substructure"] != nil:
+			let name = d["key.name"]?.string ?? ""
+			let substructure = d["key.substructure"]?.array ?? []
+			self = .Roll(.Group(.Roll(.Literal(name)), substructure.map(Term.init)))
+		default:
+			self = .Empty
+		}
+	}
+}
+
 
 @testable import Doubt
 import SourceKittenFramework
