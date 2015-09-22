@@ -13,6 +13,9 @@ final class SwiftTests: XCTestCase {
 		let prism: Prism<AnyObject, [(String, [String])]> = JSON.JSON.dictionary["key.substructure"].array.map {
 			$0.dictionary["key.name"].string &&& $0.dictionary["key.substructure"].array.map { $0.dictionary["key.name"].string }
 		}
+
+		print(JSON(object: dictionary).map { Term(path: path, JSON: $0) })
+
 		let focus = prism.forward(dictionary)
 		XCTAssertEqual(focus?[0].0, "SwiftTests")
 		XCTAssertEqual(focus?[0].1 ?? [], ["testParsingAFile()"])
