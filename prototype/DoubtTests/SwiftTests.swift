@@ -7,7 +7,8 @@ final class SwiftTests: XCTestCase {
 		}
 
 		let structure = Structure(file: file)
-		print(toAnyObject(structure.dictionary))
+		let dictionary = toAnyObject(structure.dictionary)
+		print(dictionary)
 
 		let prism: Prism<AnyObject, [(String, [String])]> = JSON.JSON.dictionary["key.substructure"].array.map {
 			$0.dictionary["key.name"].string &&& $0.dictionary["key.substructure"].array.map { $0.dictionary["key.name"].string }
