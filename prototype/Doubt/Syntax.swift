@@ -23,6 +23,14 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 			return s.doc
 		}
 	}
+
+
+	public static let Apply = Syntax.Apply >>> Term.init
+	public static let Abstract = Syntax.Abstract >>> Term.init
+	public static let Assign = Syntax.Assign >>> Term.init
+	public static let Variable = Syntax.Variable >>> Term.init
+	public static let Literal = Syntax.Literal >>> Term.init
+	public static let Group = Syntax.Group >>> Term.init
 }
 
 public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible {
