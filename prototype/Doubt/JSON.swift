@@ -40,6 +40,11 @@ public enum JSON {
 		return false
 	}
 
+	init?(object: AnyObject) {
+		guard let result = Doubt.JSON.JSON.forward(object) else { return nil }
+		self = result
+	}
+
 	public static let JSON: Prism<AnyObject, Doubt.JSON> = Prism(forward: toJSON, backward: toAnyObject)
 
 	public static let number: Prism<Doubt.JSON, Double> = Prism(forward: { $0.number }, backward: { .Number($0) })
