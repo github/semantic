@@ -27,7 +27,7 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 
 public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Apply(Payload, [Payload])
-	case Abstract([Payload], Payload)
+	case Abstract([Payload], [Payload])
 	case Assign(String, Payload)
 	case Variable(String)
 	case Literal(String)
@@ -38,7 +38,7 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		case let .Apply(f, args):
 			return .Apply(transform(f), args.map(transform))
 		case let .Abstract(parameters, body):
-			return .Abstract(parameters.map(transform), transform(body))
+			return .Abstract(parameters.map(transform), body.map(transform))
 		case let .Assign(n, v):
 			return .Assign(n, transform(v))
 		case let .Variable(n):
@@ -58,7 +58,7 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 
 		case let .Abstract(xs, x):
 			initial = try xs.reduce(initial, combine: combine)
-			return try combine(initial, x)
+			return try x.reduce(initial, combine: combine)
 
 		case let .Assign(_, x):
 			return try combine(initial, x)
