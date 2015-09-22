@@ -15,10 +15,6 @@ final class SwiftTests: XCTestCase {
 		}
 
 		print(JSON(object: dictionary).map { Term(path: path, JSON: $0) })
-
-		let focus = prism.forward(dictionary)
-		XCTAssertEqual(focus?[0].0, "SwiftTests")
-		XCTAssertEqual(focus?[0].1 ?? [], ["testParsingAFile()"])
 	}
 }
 
