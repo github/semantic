@@ -7,7 +7,7 @@ public enum Doc: CustomStringConvertible, Equatable {
 	indirect case Join(Doc, [Doc])
 
 	public init<T>(_ value: T) {
-		self.init((value as? CustomDocConvertible)?.doc ?? .Text(String(value)))
+		self = (value as? CustomDocConvertible)?.doc ?? .Text(String(value))
 	}
 
 	public var description: String {
