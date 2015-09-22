@@ -114,7 +114,7 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 				.Text("λ"),
 				.Join(.Text(", "), parameters.map(Doc.init)),
 				.Text("."),
-				Doc(body)
+				.Vertical(body.map(Doc.init))
 			])
 		case let .Assign(n, v):
 			return .Horizontal([ .Text(n), .Text("="), Doc(v) ])
