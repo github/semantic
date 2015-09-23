@@ -36,7 +36,7 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 	// MARK: JSON representation.
 
 	/// Constructs a Term representing the `JSON` in a file at `path`.
-	init(path: String, JSON: Doubt.JSON) {
+	public init(path: String, JSON: Doubt.JSON) {
 		switch JSON.dictionary?["key.substructure"] {
 		case let .Some(.Array(a)):
 			self = .Roll(.Group(.Roll(.Literal(path)), a.map(Term.init)))
@@ -46,7 +46,7 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 	}
 
 	/// Constructs a Term representing `JSON`.
-	init(JSON: Doubt.JSON) {
+	public init(JSON: Doubt.JSON) {
 		switch JSON.dictionary {
 		case let .Some(d) where d["key.name"] != nil && d["key.substructure"] != nil:
 			let name = d["key.name"]?.string ?? ""
