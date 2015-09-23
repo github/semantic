@@ -38,6 +38,12 @@
 		D4C2B1331BB33D080096F92A /* SwiftXPC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */; };
 		D4C2B1341BB33D080096F92A /* SourceKittenFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */; };
 		D4C2B1351BB33D1D0096F92A /* BoundsCheckedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435B7521BB31BBC000902F6 /* BoundsCheckedArray.swift */; };
+		D4C2B13F1BB3474C0096F92A /* Commandant.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FE71BB055AE00E3C3C1 /* Commandant.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D4C2B1401BB3474C0096F92A /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FDA1BB0536700E3C3C1 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D4C2B1411BB3474C0096F92A /* SWXMLHash.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D4C2B1421BB3474C0096F92A /* SwiftXPC.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D4C2B1431BB3474C0096F92A /* SourceKittenFramework.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		D4C2B1441BB347500096F92A /* Doubt.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D4AAE4FD1B5AE22E004E581F /* Doubt.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +56,25 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		D4C2B1381BB346C80096F92A /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D4C2B1441BB347500096F92A /* Doubt.framework in Copy Frameworks */,
+				D4C2B13F1BB3474C0096F92A /* Commandant.framework in Copy Frameworks */,
+				D4C2B1401BB3474C0096F92A /* Result.framework in Copy Frameworks */,
+				D4C2B1411BB3474C0096F92A /* SWXMLHash.framework in Copy Frameworks */,
+				D4C2B1421BB3474C0096F92A /* SwiftXPC.framework in Copy Frameworks */,
+				D4C2B1431BB3474C0096F92A /* SourceKittenFramework.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		D40024ED1BAC819000A110B8 /* SwiftTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTests.swift; sourceTree = "<group>"; };
 		D432D4701BA9AC0B00F3FABC /* DiffTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiffTests.swift; sourceTree = "<group>"; };
@@ -59,11 +84,11 @@
 		D435B7471BB31949000902F6 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D435B7521BB31BBC000902F6 /* BoundsCheckedArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BoundsCheckedArray.swift; sourceTree = "<group>"; };
 		D435B7581BB32117000902F6 /* doubt-swift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "doubt-swift.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SourceKittenFramework.framework; path = ../External/SourceKitten/build/Debug/SourceKittenFramework.framework; sourceTree = "<group>"; };
-		D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftXPC.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/Doubt-fdxdigwapqqdrjfcsvjosyndzrgg/Build/Products/Debug/SwiftXPC.framework"; sourceTree = "<group>"; };
-		D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SWXMLHash.framework; path = ../External/SourceKitten/Carthage/Checkouts/SWXMLHash/build/Debug/SWXMLHash.framework; sourceTree = "<group>"; };
-		D4413FDA1BB0536700E3C3C1 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Result.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/Doubt-fdxdigwapqqdrjfcsvjosyndzrgg/Build/Products/Debug/Result.framework"; sourceTree = "<group>"; };
-		D4413FE71BB055AE00E3C3C1 /* Commandant.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Commandant.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/Doubt-fdxdigwapqqdrjfcsvjosyndzrgg/Build/Products/Debug/Commandant.framework"; sourceTree = "<group>"; };
+		D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SourceKittenFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwiftXPC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SWXMLHash.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4413FDA1BB0536700E3C3C1 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4413FE71BB055AE00E3C3C1 /* Commandant.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Commandant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4413FEE1BB06D4C00E3C3C1 /* Dictionary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dictionary.swift; sourceTree = "<group>"; };
 		D4413FF01BB08FDC00E3C3C1 /* JSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSON.swift; sourceTree = "<group>"; };
 		D4AAE4FD1B5AE22E004E581F /* Doubt.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Doubt.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -214,6 +239,7 @@
 				D435B7541BB32117000902F6 /* Sources */,
 				D435B7551BB32117000902F6 /* Frameworks */,
 				D435B7561BB32117000902F6 /* Resources */,
+				D4C2B1381BB346C80096F92A /* Copy Frameworks */,
 			);
 			buildRules = (
 			);
