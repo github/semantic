@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D40024EC1BAC62BA00A110B8 /* Swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40024EB1BAC62BA00A110B8 /* Swift.swift */; };
 		D40024EE1BAC819000A110B8 /* SwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40024ED1BAC819000A110B8 /* SwiftTests.swift */; };
 		D432D4711BA9AC0B00F3FABC /* DiffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4701BA9AC0B00F3FABC /* DiffTests.swift */; };
 		D432D4731BA9C55300F3FABC /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4721BA9C55300F3FABC /* Stream.swift */; };
@@ -49,7 +48,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		D40024EB1BAC62BA00A110B8 /* Swift.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Swift.swift; sourceTree = "<group>"; };
 		D40024ED1BAC819000A110B8 /* SwiftTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTests.swift; sourceTree = "<group>"; };
 		D432D4701BA9AC0B00F3FABC /* DiffTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiffTests.swift; sourceTree = "<group>"; };
 		D432D4721BA9C55300F3FABC /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
@@ -141,7 +139,6 @@
 				D432D4761BA9FE6A00F3FABC /* Comparable.swift */,
 				D432D4721BA9C55300F3FABC /* Stream.swift */,
 				D432D4741BA9D6A400F3FABC /* Memo.swift */,
-				D40024EB1BAC62BA00A110B8 /* Swift.swift */,
 				D4413FEE1BB06D4C00E3C3C1 /* Dictionary.swift */,
 				D4413FF01BB08FDC00E3C3C1 /* JSON.swift */,
 				D4AAE5001B5AE22E004E581F /* Supporting Files */,
@@ -293,7 +290,6 @@
 				D432D4751BA9D6A400F3FABC /* Memo.swift in Sources */,
 				D4AAE5491B5AE2D0004E581F /* StringLiteralConvertible.swift in Sources */,
 				D4413FF11BB08FDC00E3C3C1 /* JSON.swift in Sources */,
-				D40024EC1BAC62BA00A110B8 /* Swift.swift in Sources */,
 				D4AAE5451B5AE2D0004E581F /* Operators.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

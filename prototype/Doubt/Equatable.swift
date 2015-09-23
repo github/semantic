@@ -60,18 +60,3 @@ public func == (left: Doc, right: Doc) -> Bool {
 		return false
 	}
 }
-
-func == (left: SwiftAST, right: SwiftAST) -> Bool {
-	switch (left, right) {
-	case let (.KeyValue(k1, v1), .KeyValue(k2, v2)):
-		return k1 == k2 && v1 == v2
-	case let (.Branch(n1, b1), .Branch(n2, b2)):
-		return n1 == n2 && b1 == b2
-	case let (.Atom(a), .Atom(b)):
-		return a == b
-	case let (.Symbol(s, u), .Symbol(t, v)):
-		return s == t && u == v
-	default:
-		return false
-	}
-}
