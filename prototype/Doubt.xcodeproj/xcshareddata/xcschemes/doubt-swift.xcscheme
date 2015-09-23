@@ -14,8 +14,8 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "D435B7441BB31949000902F6"
-               BuildableName = "doubt-swift"
+               BlueprintIdentifier = "D435B7571BB32117000902F6"
+               BuildableName = "doubt-swift.app"
                BlueprintName = "doubt-swift"
                ReferencedContainer = "container:Doubt.xcodeproj">
             </BuildableReference>
@@ -32,8 +32,8 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D435B7441BB31949000902F6"
-            BuildableName = "doubt-swift"
+            BlueprintIdentifier = "D435B7571BB32117000902F6"
+            BuildableName = "doubt-swift.app"
             BlueprintName = "doubt-swift"
             ReferencedContainer = "container:Doubt.xcodeproj">
          </BuildableReference>
@@ -55,12 +55,22 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D435B7441BB31949000902F6"
-            BuildableName = "doubt-swift"
+            BlueprintIdentifier = "D435B7571BB32117000902F6"
+            BuildableName = "doubt-swift.app"
             BlueprintName = "doubt-swift"
             ReferencedContainer = "container:Doubt.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+         <CommandLineArgument
+            argument = "hello"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "world"
+            isEnabled = "YES">
+         </CommandLineArgument>
+      </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -74,8 +84,8 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "D435B7441BB31949000902F6"
-            BuildableName = "doubt-swift"
+            BlueprintIdentifier = "D435B7571BB32117000902F6"
+            BuildableName = "doubt-swift.app"
             BlueprintName = "doubt-swift"
             ReferencedContainer = "container:Doubt.xcodeproj">
          </BuildableReference>
