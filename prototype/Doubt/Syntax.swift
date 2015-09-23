@@ -55,25 +55,54 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 
 	/// Constructs a Term representing `JSON`.
 	public init?(JSON: Doubt.JSON) {
+		enum Key: String {
+			case Name = "key.name"
+			case Substructure = "key.substructure"
+		}
 		struct E: ErrorType {}
 		func die<A>() throws -> A {
 			throw E()
 		}
 		do {
-			switch JSON.dictionary {
-			case let .Some(d) where d["key.name"] != nil && d["key.substructure"] != nil:
+			switch JSON {
+			case let .Dictionary(d) where d["key.name"] != nil:
 				let name = d["key.name"]?.string ?? ""
 				let substructure = d["key.substructure"]?.array ?? []
-				switch d["key.kind"]?.string {
-				case .Some("source.lang.swift.decl.class"), .Some("source.lang.swift.decl.extension"):
+				let kind = d["key.kind"]?.string
+				switch kind {
+				case
+					.Some("source.lang.swift.decl.class"),
+					.Some("source.lang.swift.decl.extension"),
+					.Some("source.lang.swift.decl.enum"),
+					.Some("source.lang.swift.decl.struct"):
 					self = .Group(.Literal(name), try substructure.map { try Term(JSON: $0) ?? die() })
 
-				case .Some("source.lang.swift.decl.function.method.instance"), .Some("source.lang.swift.decl.function.free"):
+				case .Some("source.lang.swift.decl.enumelement"):
+					fallthrough
+				case
+					.Some("source.lang.swift.decl.function.method.instance"),
+					.Some("source.lang.swift.decl.function.free"):
 					self = .Assign(name, .Abstract([], try substructure.map { try Term(JSON: $0) ?? die() }))
+
+				case
+					.Some("source.lang.swift.decl.var.instance"),
+					.Some("source.lang.swift.decl.var.static"):
+					self = .Variable(name)
 
 				default:
 					return nil
 				}
+
+			case let .Dictionary(d) where d["key.kind"]?.string == "source.lang.swift.decl.enumcase" && d["key.substructure"]?.array?.count == 1:
+				let substructure = d["key.substructure"]?.array ?? []
+				self = try Term(JSON: substructure[0]) ?? die()
+
+			case let .Dictionary(d) where d["key.kind"]?.string == "source.lang.swift.syntaxtype.comment.mark":
+				self = .Empty
+
+			case .Null:
+				self = .Empty
+
 			default:
 				return nil
 			}
