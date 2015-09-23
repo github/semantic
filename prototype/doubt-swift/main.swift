@@ -13,7 +13,7 @@ extension Term {
 			.map(Structure.init)
 			.map({ $0.dictionary })
 			.map(toAnyObject)
-			.flatMap({ JSON(object: $0).map { Term(path: path, JSON: $0) } }) else { return nil }
+			.flatMap({ JSON(object: $0).flatMap { Term(path: path, JSON: $0) } }) else { return nil }
 		self = term
 	}
 }

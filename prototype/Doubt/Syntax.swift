@@ -36,33 +36,49 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 	// MARK: JSON representation.
 
 	/// Constructs a Term representing the `JSON` in a file at `path`.
-	public init(path: String, JSON: Doubt.JSON) {
-		switch JSON.dictionary?["key.substructure"] {
-		case let .Some(.Array(a)):
-			self = .Roll(.Group(.Roll(.Literal(path)), a.map(Term.init)))
-		default:
-			self = .Empty
+	public init?(path: String, JSON: Doubt.JSON) {
+		struct E: ErrorType {}
+		func die<A>() throws -> A {
+			throw E()
+		}
+		do {
+			switch JSON.dictionary?["key.substructure"] {
+			case let .Some(.Array(a)):
+				self = .Roll(.Group(.Roll(.Literal(path)), try a.map { try Term(JSON: $0) ?? die() }))
+			default:
+				return nil
+			}
+		} catch _ {
+			return nil
 		}
 	}
 
 	/// Constructs a Term representing `JSON`.
-	public init(JSON: Doubt.JSON) {
-		switch JSON.dictionary {
-		case let .Some(d) where d["key.name"] != nil && d["key.substructure"] != nil:
-			let name = d["key.name"]?.string ?? ""
-			let substructure = d["key.substructure"]?.array ?? []
-			switch d["key.kind"]?.string {
-			case .Some("source.lang.swift.decl.class"), .Some("source.lang.swift.decl.extension"):
-				self = .Group(.Literal(name), substructure.map(Term.init))
+	public init?(JSON: Doubt.JSON) {
+		struct E: ErrorType {}
+		func die<A>() throws -> A {
+			throw E()
+		}
+		do {
+			switch JSON.dictionary {
+			case let .Some(d) where d["key.name"] != nil && d["key.substructure"] != nil:
+				let name = d["key.name"]?.string ?? ""
+				let substructure = d["key.substructure"]?.array ?? []
+				switch d["key.kind"]?.string {
+				case .Some("source.lang.swift.decl.class"), .Some("source.lang.swift.decl.extension"):
+					self = .Group(.Literal(name), try substructure.map { try Term(JSON: $0) ?? die() })
 
-			case .Some("source.lang.swift.decl.function.method.instance"), .Some("source.lang.swift.decl.function.free"):
-				self = .Assign(name, .Abstract([], substructure.map(Term.init)))
+				case .Some("source.lang.swift.decl.function.method.instance"), .Some("source.lang.swift.decl.function.free"):
+					self = .Assign(name, .Abstract([], try substructure.map { try Term(JSON: $0) ?? die() }))
 
+				default:
+					return nil
+				}
 			default:
-				self = .Empty
+				return nil
 			}
-		default:
-			self = .Empty
+		} catch _ {
+			return nil
 		}
 	}
 }
