@@ -40,7 +40,7 @@ public enum JSON {
 		return false
 	}
 
-	init?(object: AnyObject) {
+	public init?(object: AnyObject) {
 		struct E: ErrorType {}
 		func die<T>() throws -> T {
 			throw E()
