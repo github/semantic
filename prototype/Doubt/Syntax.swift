@@ -25,12 +25,12 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 	}
 
 
-	public static let Apply = Syntax.Apply >>> Term.init
-	public static let Abstract = Syntax.Abstract >>> Term.init
-	public static let Assign = Syntax.Assign >>> Term.init
-	public static let Variable = Syntax.Variable >>> Term.init
-	public static let Literal = Syntax.Literal >>> Term.init
-	public static let Group = Syntax.Group >>> Term.init
+	public static let Apply = Syntax.Apply >>> Roll
+	public static let Abstract = Syntax.Abstract >>> Roll
+	public static let Assign = Syntax.Assign >>> Roll
+	public static let Variable = Syntax.Variable >>> Roll
+	public static let Literal = Syntax.Literal >>> Roll
+	public static let Group = Syntax.Group >>> Roll
 }
 
 public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible {
