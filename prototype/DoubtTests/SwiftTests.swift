@@ -30,10 +30,10 @@ extension Term {
 			let substructure = d["key.substructure"]?.array ?? []
 			switch d["key.kind"]?.string {
 			case .Some("source.lang.swift.decl.class"), .Some("source.lang.swift.decl.extension"):
-				self = .Group((.Literal(name), substructure.map(Term.init)))
+				self = .Group(.Literal(name), substructure.map(Term.init))
 
 			case .Some("source.lang.swift.decl.function.method.instance"), .Some("source.lang.swift.decl.function.free"):
-				self = .Assign((name, .Abstract(([], substructure.map(Term.init)))))
+				self = .Assign(name, .Abstract([], substructure.map(Term.init)))
 
 			default:
 				self = .Empty
