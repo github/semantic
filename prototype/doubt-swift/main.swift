@@ -19,5 +19,5 @@ extension Term {
 }
 
 if let a = arguments[1].flatMap(Term.init), b = arguments[2].flatMap(Term.init) {
-	print(Diff(a, b))
+	print(String(reflecting: Diff(a, b)))
 }
