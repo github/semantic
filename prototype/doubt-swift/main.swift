@@ -14,7 +14,6 @@ extension Term {
 	}
 }
 
-if let a = arguments[1].map(Term.init), b = arguments[2].map(Term.init) {
-	print(a)
-	print(b)
+if let a = arguments[1].flatMap(Term.init), b = arguments[2].flatMap(Term.init) {
+	print(Diff(a, b))
 }
