@@ -12,6 +12,13 @@
 		D432D4731BA9C55300F3FABC /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4721BA9C55300F3FABC /* Stream.swift */; };
 		D432D4751BA9D6A400F3FABC /* Memo.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4741BA9D6A400F3FABC /* Memo.swift */; };
 		D432D4771BA9FE6A00F3FABC /* Comparable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4761BA9FE6A00F3FABC /* Comparable.swift */; };
+		D435B7481BB31949000902F6 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435B7471BB31949000902F6 /* main.swift */; };
+		D435B74C1BB31951000902F6 /* Commandant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FE71BB055AE00E3C3C1 /* Commandant.framework */; };
+		D435B74D1BB31951000902F6 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FDA1BB0536700E3C3C1 /* Result.framework */; };
+		D435B74E1BB31951000902F6 /* SWXMLHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */; };
+		D435B74F1BB31951000902F6 /* SwiftXPC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */; };
+		D435B7501BB31951000902F6 /* SourceKittenFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */; };
+		D435B7511BB31958000902F6 /* Doubt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4AAE4FD1B5AE22E004E581F /* Doubt.framework */; };
 		D4413FDD1BB0559400E3C3C1 /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FDA1BB0536700E3C3C1 /* Result.framework */; };
 		D4413FDE1BB0559400E3C3C1 /* SwiftXPC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */; };
 		D4413FE51BB055A600E3C3C1 /* SourceKittenFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */; };
@@ -42,12 +49,26 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		D435B7431BB31949000902F6 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		D40024ED1BAC819000A110B8 /* SwiftTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTests.swift; sourceTree = "<group>"; };
 		D432D4701BA9AC0B00F3FABC /* DiffTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiffTests.swift; sourceTree = "<group>"; };
 		D432D4721BA9C55300F3FABC /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
 		D432D4741BA9D6A400F3FABC /* Memo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Memo.swift; sourceTree = "<group>"; };
 		D432D4761BA9FE6A00F3FABC /* Comparable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comparable.swift; sourceTree = "<group>"; };
+		D435B7451BB31949000902F6 /* doubt-swift */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "doubt-swift"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D435B7471BB31949000902F6 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SourceKittenFramework.framework; path = ../External/SourceKitten/build/Debug/SourceKittenFramework.framework; sourceTree = "<group>"; };
 		D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftXPC.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/Doubt-fdxdigwapqqdrjfcsvjosyndzrgg/Build/Products/Debug/SwiftXPC.framework"; sourceTree = "<group>"; };
 		D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SWXMLHash.framework; path = ../External/SourceKitten/Carthage/Checkouts/SWXMLHash/build/Debug/SWXMLHash.framework; sourceTree = "<group>"; };
@@ -72,6 +93,19 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		D435B7421BB31949000902F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D435B7511BB31958000902F6 /* Doubt.framework in Frameworks */,
+				D435B74C1BB31951000902F6 /* Commandant.framework in Frameworks */,
+				D435B74D1BB31951000902F6 /* Result.framework in Frameworks */,
+				D435B74E1BB31951000902F6 /* SWXMLHash.framework in Frameworks */,
+				D435B74F1BB31951000902F6 /* SwiftXPC.framework in Frameworks */,
+				D435B7501BB31951000902F6 /* SourceKittenFramework.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D4AAE4F91B5AE22E004E581F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -95,11 +129,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		D435B7461BB31949000902F6 /* doubt-swift */ = {
+			isa = PBXGroup;
+			children = (
+				D435B7471BB31949000902F6 /* main.swift */,
+			);
+			path = "doubt-swift";
+			sourceTree = "<group>";
+		};
 		D4AAE4F31B5AE22E004E581F = {
 			isa = PBXGroup;
 			children = (
 				D4AAE4FF1B5AE22E004E581F /* Doubt */,
 				D4AAE5111B5AE22E004E581F /* DoubtTests */,
+				D435B7461BB31949000902F6 /* doubt-swift */,
 				D4AAE4FE1B5AE22E004E581F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -109,6 +152,7 @@
 			children = (
 				D4AAE4FD1B5AE22E004E581F /* Doubt.framework */,
 				D4AAE50D1B5AE22E004E581F /* DoubtTests.xctest */,
+				D435B7451BB31949000902F6 /* doubt-swift */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -172,6 +216,23 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		D435B7441BB31949000902F6 /* doubt-swift */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D435B7491BB31949000902F6 /* Build configuration list for PBXNativeTarget "doubt-swift" */;
+			buildPhases = (
+				D435B7411BB31949000902F6 /* Sources */,
+				D435B7421BB31949000902F6 /* Frameworks */,
+				D435B7431BB31949000902F6 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "doubt-swift";
+			productName = "doubt-swift";
+			productReference = D435B7451BB31949000902F6 /* doubt-swift */;
+			productType = "com.apple.product-type.tool";
+		};
 		D4AAE4FC1B5AE22E004E581F /* Doubt */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D4AAE5171B5AE22E004E581F /* Build configuration list for PBXNativeTarget "Doubt" */;
@@ -218,6 +279,9 @@
 				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = GitHub;
 				TargetAttributes = {
+					D435B7441BB31949000902F6 = {
+						CreatedOnToolsVersion = 7.1;
+					};
 					D4AAE4FC1B5AE22E004E581F = {
 						CreatedOnToolsVersion = 7.0;
 					};
@@ -240,6 +304,7 @@
 			targets = (
 				D4AAE4FC1B5AE22E004E581F /* Doubt */,
 				D4AAE50C1B5AE22E004E581F /* DoubtTests */,
+				D435B7441BB31949000902F6 /* doubt-swift */,
 			);
 		};
 /* End PBXProject section */
@@ -262,6 +327,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		D435B7411BB31949000902F6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D435B7481BB31949000902F6 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D4AAE4F81B5AE22E004E581F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -304,6 +377,35 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		D435B74A1BB31949000902F6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/External/SourceKitten/Carthage/Checkouts/SWXMLHash/build/Debug",
+					"$(PROJECT_DIR)/External/SourceKitten/build/Debug",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D435B74B1BB31949000902F6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/External/SourceKitten/Carthage/Checkouts/SWXMLHash/build/Debug",
+					"$(PROJECT_DIR)/External/SourceKitten/build/Debug",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		D4AAE5151B5AE22E004E581F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -464,6 +566,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		D435B7491BB31949000902F6 /* Build configuration list for PBXNativeTarget "doubt-swift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D435B74A1BB31949000902F6 /* Debug */,
+				D435B74B1BB31949000902F6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		D4AAE4F71B5AE22E004E581F /* Build configuration list for PBXProject "Doubt" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
