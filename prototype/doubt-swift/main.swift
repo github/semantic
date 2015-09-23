@@ -5,6 +5,10 @@ let arguments = BoundsCheckedArray(array: Process.arguments)
 
 extension Term {
 	init?(path: String) {
+		guard path != "/dev/null" else {
+			self = .Empty
+			return
+		}
 		guard let term = File(path: path)
 			.map(Structure.init)
 			.map({ $0.dictionary })
