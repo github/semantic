@@ -1,5 +1,5 @@
 public enum Vertex<Element> {
-	case XY(Element, Memo<Vertex>, Memo<Vertex>)
+	indirect case XY(Element, Memo<Vertex>, Memo<Vertex>)
 	case End
 
 
