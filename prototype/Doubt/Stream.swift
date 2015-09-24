@@ -63,6 +63,13 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 	}
 
 
+	public func fold<Result>(initial: Result, combine: (A, Memo<Result>) -> Result) -> Result {
+		return analysis(
+			ifCons: { combine($0, $1.map { $0.fold(initial, combine: combine) }) },
+			ifNil: const(initial))
+	}
+
+
 	public init(nilLiteral: ()) {
 		self = .Nil
 	}
