@@ -2,6 +2,14 @@ public enum Vertex<Element> {
 	indirect case XY(Element, Memo<Vertex>, Memo<Vertex>)
 	case End
 
+	public var element: Element? {
+		switch self {
+		case let .XY(a, _, _):
+			return a
+		case .End:
+			return nil
+		}
+	}
 
 	public var right: Memo<Vertex> {
 		switch self {
