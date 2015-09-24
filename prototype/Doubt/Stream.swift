@@ -32,7 +32,7 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 	}
 
 	public var rest: Memo<Stream> {
-		return analysis(ifCons: { $1 }, ifNil: { Memo(.Nil) })
+		return analysis(ifCons: { $1 }, ifNil: { Memo(evaluated: .Nil) })
 	}
 
 	public var isEmpty: Bool {
@@ -59,7 +59,7 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 	}
 
 	public func concat(other: Stream) -> Stream {
-		return concat(Memo(other))
+		return concat(Memo(evaluated: other))
 	}
 
 
@@ -76,7 +76,7 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 
 
 	public func generate() -> AnyGenerator<A> {
-		var current = Memo(self)
+		var current = Memo(evaluated: self)
 		return anyGenerator {
 			let next = current.value.first
 			current = current.value.rest
