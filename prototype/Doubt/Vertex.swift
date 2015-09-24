@@ -1,28 +1,37 @@
 public enum Vertex<Element> {
-	case X(Element, Memo<Vertex>)
-	case Y(Element, Memo<Vertex>)
-	case XY(Element, Memo<Vertex>, Memo<Vertex>, Memo<Vertex>)
-	case End(Element)
+	case XY(Element, Memo<Vertex>, Memo<Vertex>)
+	case End
 
-	public var row: Stream<Element> {
+
+	public var right: Memo<Vertex> {
 		switch self {
-		case let .X(x, xs):
-			return .Cons(x, xs.map { $0.row })
-		case let .XY(x, xs, _, _):
-			return .Cons(x, xs.map { $0.row })
-		default:
-			return .Nil
+		case let .XY(_, xs, _):
+			return xs
+		case .End:
+			return Memo(evaluated: .End)
 		}
 	}
 
-	public var column: Stream<Element> {
+	public var down: Memo<Vertex> {
 		switch self {
-		case let .Y(y, ys):
-			return .Cons(y, ys.map { $0.column })
-		case let .XY(y, _, ys, _):
-			return .Cons(y, ys.map { $0.column })
-		default:
-			return .Nil
+		case let .XY(_, _, ys):
+			return ys
+		case .End:
+			return Memo(evaluated: .End)
+		}
+	}
+
+	public var diagonal: Memo<Vertex> {
+		return right.flatMap { $0.down }
+	}
+
+
+	public func map<Other>(transform: Element -> Other) -> Vertex<Other> {
+		switch self {
+		case let .XY(xy, xs, ys):
+			return .XY(transform(xy), xs.map { $0.map(transform) }, ys.map { $0.map(transform) })
+		case .End:
+			return .End
 		}
 	}
 }
