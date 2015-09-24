@@ -8,7 +8,7 @@ public enum Vertex<Element> {
 		case let .XY(_, xs, _):
 			return xs
 		case .End:
-			return Memo(evaluated: .End)
+			return Memo(.End)
 		}
 	}
 
@@ -17,14 +17,14 @@ public enum Vertex<Element> {
 		case let .XY(_, _, ys):
 			return ys
 		case .End:
-			return Memo(evaluated: .End)
+			return Memo(.End)
 		}
 	}
 
 	public var diagonal: Memo<Vertex> {
 		return right.flatMap { $0.down }
 	}
-	
+
 
 	public init<A, B>(rows: Stream<A>, columns: Stream<B>, combine: (A, B) -> Element) {
 		self = columns

@@ -3,7 +3,7 @@ public struct Memo<A> {
 		self.init(.Unevaluated(unevaluted))
 	}
 
-	public init(evaluated: A) {
+	public init(_ evaluated: A) {
 		self.init(.Evaluated(evaluated))
 	}
 
