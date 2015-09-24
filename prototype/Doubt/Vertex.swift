@@ -24,6 +24,18 @@ public enum Vertex<Element> {
 	public var diagonal: Memo<Vertex> {
 		return right.flatMap { $0.down }
 	}
+	
+
+	public init<A, B>(rows: Stream<A>, columns: Stream<B>, combine: (A, B) -> Element) {
+		self = columns
+			.map { b in rows.map { a in (a, b) } }
+			.fold(Vertex<(A, B)>.End) {
+				$0.fold(($1, .End)) {
+					($1.flatMap { row, _ in row }.flatMap { $0.right }, .XY($0, $1.map { _, column in column }, $1.flatMap { row, _ in row }))
+				}.1
+			}
+			.map(combine)
+	}
 
 
 	public func map<Other>(transform: Element -> Other) -> Vertex<Other> {
