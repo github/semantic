@@ -12,30 +12,21 @@ public enum Vertex<Element> {
 	}
 
 	public var element: Element? {
-		switch self {
-		case let .XY(a, _, _):
-			return a
-		case .End:
-			return nil
-		}
+		return analysis(
+			ifXY: { x, _, _ in x },
+			ifEnd: const(nil))
 	}
 
 	public var right: Memo<Vertex> {
-		switch self {
-		case let .XY(_, xs, _):
-			return xs
-		case .End:
-			return Memo(evaluated: .End)
-		}
+		return analysis(
+			ifXY: { _, xs, _ in xs },
+			ifEnd: const(Memo(evaluated: .End)))
 	}
 
 	public var down: Memo<Vertex> {
-		switch self {
-		case let .XY(_, _, ys):
-			return ys
-		case .End:
-			return Memo(evaluated: .End)
-		}
+		return analysis(
+			ifXY: { _, _, ys in ys },
+			ifEnd: const(Memo(evaluated: .End)))
 	}
 
 	public var diagonal: Memo<Vertex> {
