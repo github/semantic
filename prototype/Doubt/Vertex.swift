@@ -2,6 +2,15 @@ public enum Vertex<Element> {
 	indirect case XY(Element, Memo<Vertex>, Memo<Vertex>)
 	case End
 
+	public func analysis<Result>(@noescape ifXY ifXY: (Element, Memo<Vertex>, Memo<Vertex>) -> Result, @noescape ifEnd: () -> Result) -> Result {
+		switch self {
+		case let .XY(a, x, y):
+			return ifXY(a, x, y)
+		case .End:
+			return ifEnd()
+		}
+	}
+
 	public var element: Element? {
 		switch self {
 		case let .XY(a, _, _):
