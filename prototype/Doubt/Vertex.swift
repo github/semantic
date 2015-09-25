@@ -1,4 +1,4 @@
-public enum Vertex<Element> {
+public enum Vertex<Element>: CustomDebugStringConvertible {
 	indirect case XY(Element, Memo<Vertex>, Memo<Vertex>)
 	case End
 
@@ -87,5 +87,12 @@ public enum Vertex<Element> {
 		case .End:
 			return .End
 		}
+	}
+
+
+	public var debugDescription: String {
+		return rowMajor.map {
+			$0.map { String(reflecting: $0) }.joinWithSeparator("\t")
+		}.joinWithSeparator("\n")
 	}
 }
