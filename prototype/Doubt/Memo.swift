@@ -1,4 +1,4 @@
-public struct Memo<A> {
+public struct Memo<A>: CustomDebugStringConvertible, CustomStringConvertible {
 	public init(unevaluted: () -> A) {
 		self.init(.Unevaluated(unevaluted))
 	}
@@ -24,6 +24,15 @@ public struct Memo<A> {
 
 	public func flatMap<B>(transform: A -> Memo<B>) -> Memo<B> {
 		return Memo<B> { transform(self.value).value }
+	}
+
+
+	public var description: String {
+		return String(value)
+	}
+
+	public var debugDescription: String {
+		return String(reflecting: value)
 	}
 }
 
