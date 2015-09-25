@@ -34,6 +34,22 @@ public enum Vertex<Element> {
 	}
 
 
+	public var row: Stream<Element> {
+		return Stream.unfold(Memo(evaluated: self)) {
+			$0.value.analysis(
+				ifXY: { here, across, _ in .Some(here, across) },
+				ifEnd: const(nil))
+		}
+	}
+
+	public var column: Stream<Element> {
+		return Stream.unfold(Memo(evaluated: self)) {
+			$0.value.analysis(
+				ifXY: { here, _, down in .Some(here, down) },
+				ifEnd: const(nil))
+		}
+	}
+
 	public init<S1: SequenceType, S2: SequenceType>(rows: S1, columns: S2, combine: (S1.Generator.Element, S2.Generator.Element) -> Element) {
 		let rows = Stream(sequence: rows)
 		let columns = Stream(sequence: columns)
