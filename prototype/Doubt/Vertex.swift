@@ -32,7 +32,7 @@ public enum Vertex<Element> {
 	public var diagonal: Memo<Vertex> {
 		return right.flatMap { $0.down }
 	}
-	
+
 
 	public init<S1: SequenceType, S2: SequenceType>(rows: S1, columns: S2, combine: (S1.Generator.Element, S2.Generator.Element) -> Element) {
 		let rows = Stream(sequence: rows)
