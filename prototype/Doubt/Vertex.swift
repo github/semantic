@@ -71,13 +71,12 @@ public enum Vertex<Element> {
 		let rows = Stream(sequence: rows)
 		let columns = Stream(sequence: columns)
 		self = columns
-			.map { b in rows.map { a in (a, b) } }
-			.fold(Vertex<(S1.Generator.Element, S2.Generator.Element)>.End) {
+			.map { b in rows.map { a in combine(a, b) } }
+			.fold(Vertex.End) {
 				$0.fold(($1, .End)) {
 					($1.flatMap { row, _ in row }.flatMap { $0.right }, .XY($0, $1.map { _, column in column }, $1.flatMap { row, _ in row }))
 				}.1
 			}
-			.map(combine)
 	}
 
 
