@@ -70,8 +70,8 @@ public enum Vertex<Element>: CustomDebugStringConvertible, CustomStringConvertib
 	public init<S1: SequenceType, S2: SequenceType>(rows: S1, columns: S2, combine: (S1.Generator.Element, S2.Generator.Element) -> Element) {
 		let rows = Stream(sequence: rows)
 		let columns = Stream(sequence: columns)
-		self = columns
-			.map { b in rows.map { a in combine(a, b) } }
+		self = rows
+			.map { a in columns.map { b in combine(a, b) } }
 			.fold(Vertex.End) {
 				$0.fold(($1, .End)) {
 					($1.flatMap { row, _ in row }.flatMap { $0.right }, .XY($0, $1.map { _, column in column }, $1.flatMap { row, _ in row }))
