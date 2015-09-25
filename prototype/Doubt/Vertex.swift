@@ -70,12 +70,19 @@ public enum Vertex<Element>: CustomDebugStringConvertible, CustomStringConvertib
 	public init<S1: SequenceType, S2: SequenceType>(rows: S1, columns: S2, combine: (S1.Generator.Element, S2.Generator.Element) -> Element) {
 		let rows = Stream(sequence: rows)
 		let columns = Stream(sequence: columns)
+		func across(vertex: Vertex<Element>) -> Stream<Memo<Vertex<Element>>> {
+			return Stream.unfold(Memo(evaluated: vertex)) { vertex in
+				vertex.value.analysis(
+					ifXY: { _, xs, _ in .Some(vertex, xs) },
+					ifEnd: const(.Some(vertex, vertex)))
+			}
+		}
 		self = rows
 			.map { a in columns.map { b in combine(a, b) } }
-			.fold(Vertex.End) {
-				$0.fold(($1, .End)) {
-					($1.flatMap { row, _ in row }.flatMap { $0.right }, .XY($0, $1.map { _, column in column }, $1.flatMap { row, _ in row }))
-				}.1
+			.fold(.End) {
+				$0.zipWith(across($1.value)).fold(.End) {
+					.XY($0.0, $1, $0.1)
+				}
 			}
 	}
 
