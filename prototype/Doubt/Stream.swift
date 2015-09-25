@@ -69,6 +69,10 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 			ifNil: const(initial))
 	}
 
+	public static func unfold<State>(state: State, _ unspool: State -> (A, State)?) -> Stream {
+		return unspool(state).map { value, next in .Cons(value, Memo { self.unfold(next, unspool) }) } ?? .Nil
+	}
+
 
 	public init(nilLiteral: ()) {
 		self = .Nil
