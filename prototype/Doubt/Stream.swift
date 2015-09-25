@@ -74,6 +74,14 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 	}
 
 
+	public func zipWith<S: SequenceType>(sequence: S) -> Stream<(A, S.Generator.Element)> {
+		return Stream<(A, S.Generator.Element)>.unfold((self, Stream<S.Generator.Element>(sequence: sequence))) {
+			guard let (x, xs) = $0.uncons, (y, ys) = $1.uncons else { return nil }
+			return ((x, y), (xs.value, ys.value))
+		}
+	}
+
+
 	public init(nilLiteral: ()) {
 		self = .Nil
 	}
