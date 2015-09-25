@@ -50,6 +50,23 @@ public enum Vertex<Element> {
 		}
 	}
 
+	public var rowMajor: Stream<Stream<Element>> {
+		return Stream.unfold(Memo(evaluated: self), { (state: Memo<Vertex>) -> (Stream<Element>, Memo<Vertex>)? in
+			state.value.analysis(
+				ifXY: { _, _, down in (state.value.row, down) },
+				ifEnd: const(nil))
+		})
+	}
+
+	public var columnMajor: Stream<Stream<Element>> {
+		return Stream.unfold(Memo(evaluated: self), { (state: Memo<Vertex>) -> (Stream<Element>, Memo<Vertex>)? in
+			state.value.analysis(
+				ifXY: { _, across, _ in (state.value.column, across) },
+				ifEnd: const(nil))
+		})
+	}
+
+
 	public init<S1: SequenceType, S2: SequenceType>(rows: S1, columns: S2, combine: (S1.Generator.Element, S2.Generator.Element) -> Element) {
 		let rows = Stream(sequence: rows)
 		let columns = Stream(sequence: columns)
