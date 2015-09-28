@@ -118,18 +118,18 @@ func fits(w: Int, _ x: Doc) -> Bool {
 	}
 }
 
+func pretty(w: Int, _ doc: DOC) -> String {
+	return best(w, 0, doc).description
+}
+
 
 public protocol CustomDocConvertible: CustomStringConvertible {
 	var doc: DOC { get }
 }
 
 extension CustomDocConvertible {
-	private func pretty(w: Int) -> String {
-		return best(w, 0, doc).description
-	}
-
 	public var description: String {
-		return pretty(70)
+		return pretty(70, doc)
 	}
 }
 
