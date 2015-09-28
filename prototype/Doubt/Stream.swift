@@ -85,7 +85,7 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 	public func take(n: Int) -> Stream {
 		return Stream.unfold((Memo(evaluated: self), n)) { stream, n in
 			guard let (x, xs) = stream.value.uncons else { return nil }
-			return n >= 0
+			return n > 0
 				? (x, (xs, n - 1))
 				: nil
 		}
