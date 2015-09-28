@@ -17,6 +17,35 @@ public prefix func ^(strings: [String])(_ input: String) -> State<String>? {
 		}
 }
 
+public prefix func ^<S where S: SequenceType, S.Generator.Element == Character>(strings: S) -> String -> State<String>? {
+	return ^strings.map { String($0) }
+}
+
+
+/// Parse the full string with parser or fail.
+public func full<A>(parser: String -> State<A>?)(_ input: String) -> A? {
+	return parser(input).flatMap { $0.rest.isEmpty ? $0.value : nil }
+}
+
+
+/// A convenience for use while developing parsers.
+public func never<T>(_: String) -> State<T>? {
+	return nil
+}
+
+//// Matches a single character that is not matched by `parser`.
+public func not<T>(parser: String -> State<T>?)(_ input: String) -> State<String>? {
+	if input.isEmpty { return nil }
+	return parser(input).map(const(nil)) ?? State(rest: input.from(1), value: input.to(1))
+}
+
+
+/// Delays evaluation of a parser.
+public func delay<A>(thunk: () -> String -> State<A>?) -> String -> State<A>? {
+	return { thunk()($0) }
+}
+
+
 public func parseWhile(predicate: Character -> Bool)(_ input: String) -> State<String>? {
 	return input.characters.count > 0 && predicate(input.characters[input.startIndex])
 		? parseWhile(predicate)(input.from(1)).map { State(rest: $0.rest, value: input.to(1) + $0.value) } ?? State(rest: input.from(1), value: input.to(1))

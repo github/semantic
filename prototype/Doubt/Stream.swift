@@ -63,6 +63,35 @@ public enum Stream<A>: NilLiteralConvertible, SequenceType {
 	}
 
 
+	public func fold<Result>(initial: Result, combine: (A, Memo<Result>) -> Result) -> Result {
+		return analysis(
+			ifCons: { combine($0, $1.map { $0.fold(initial, combine: combine) }) },
+			ifNil: const(initial))
+	}
+
+	public static func unfold<State>(state: State, _ unspool: State -> (A, State)?) -> Stream {
+		return unspool(state).map { value, next in .Cons(value, Memo { self.unfold(next, unspool) }) } ?? .Nil
+	}
+
+
+	public func zipWith<S: SequenceType>(sequence: S) -> Stream<(A, S.Generator.Element)> {
+		return Stream<(A, S.Generator.Element)>.unfold((self, Stream<S.Generator.Element>(sequence: sequence))) {
+			guard let (x, xs) = $0.uncons, (y, ys) = $1.uncons else { return nil }
+			return ((x, y), (xs.value, ys.value))
+		}
+	}
+
+
+	public func take(n: Int) -> Stream {
+		return Stream.unfold((Memo(evaluated: self), n)) { stream, n in
+			guard let (x, xs) = stream.value.uncons else { return nil }
+			return n > 0
+				? (x, (xs, n - 1))
+				: nil
+		}
+	}
+
+
 	public init(nilLiteral: ()) {
 		self = .Nil
 	}
