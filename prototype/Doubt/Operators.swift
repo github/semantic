@@ -33,6 +33,21 @@ infix operator &&& {
 	precedence 120
 }
 
+infix operator <> {
+	associativity right
+	precedence 140
+}
+
+infix operator <+> {
+	associativity right
+	precedence 140
+}
+
+infix operator </> {
+	associativity right
+	precedence 140
+}
+
 prefix operator ^ {}
 
 postfix operator * {}
