@@ -31,6 +31,15 @@ final class VertexTests: XCTestCase {
 		}()
 		XCTAssert(actual == expected, "\(String(reflecting: actual)) != \(String(reflecting: expected))")
 	}
+
+	func testFib() {
+		XCTAssertEqual(Array(fib.take(7)), [ 1, 1, 2, 3, 5, 8, 13 ])
+	}
+}
+
+
+private let fib: Stream<Int> = Stream.unfold((0, 1)) { x, y in
+	(y, (y, x + y))
 }
 
 
