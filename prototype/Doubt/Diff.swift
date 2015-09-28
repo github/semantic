@@ -91,8 +91,9 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	}
 
 	public static func diff<C1: CollectionType, C2: CollectionType where C1.Index : RandomAccessIndexType, C1.Generator.Element == Term, C2.Index : RandomAccessIndexType, C2.Generator.Element == Term>(a: C1, _ b: C2) -> [Diff] {
-		func magnitude(diffs: Stream<Diff>) -> Int {
-			return diffs.map { $0.magnitude }.reduce(0, combine: +)
+		func magnitude(diffs: Stream<(Diff, Int)>) -> Int {
+//			return diffs.first?.magnitude ?? 0
+			return diffs.map { $1 }.reduce(0, combine: +)
 		}
 
 		func min<A>(a: A, _ rest: A..., _ isLessThan: (A, A) -> Bool) -> A {
@@ -101,24 +102,25 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			})
 		}
 
-		func diff(a: Stream<Term>, _ b: Stream<Term>) -> Stream<Diff> {
+		func diff(a: Stream<Term>, _ b: Stream<Term>) -> Stream<(Diff, Int)> {
 			switch (a, b) {
 			case (.Nil, .Nil):
 				return .Nil
 			case (.Nil, .Cons):
-				return b.map(Diff.Insert)
+				return b.map { (Diff.Insert($0), 1) }
 			case (.Cons, .Nil):
-				return a.map(Diff.Delete)
+				return a.map { (Diff.Delete($0), 1) }
 			case let (.Cons(x, xs), .Cons(y, ys)):
-				let here = Stream.Cons(Diff(x, y), Memo { diff(xs.value, ys.value) })
-				let insert = Stream.Cons(Diff.Insert(y), Memo { diff(a, ys.value) })
-				let delete = Stream.Cons(Diff.Delete(x), Memo { diff(xs.value, b) })
+				let copy = Diff(x, y)
+				let here = Stream.Cons((copy, copy.magnitude), Memo { diff(xs.value, ys.value) })
+				let insert = Stream.Cons((Diff.Insert(y), 1), Memo { diff(a, ys.value) })
+				let delete = Stream.Cons((Diff.Delete(x), 1), Memo { diff(xs.value, b) })
 				return min(here, insert, delete) {
 					magnitude($0) < magnitude($1)
 				}
 			}
 		}
 
-		return Array(diff(Stream(sequence: a), Stream(sequence: b)))
+		return Array(diff(Stream(sequence: a), Stream(sequence: b)).map { $0.0 })
 	}
 }
