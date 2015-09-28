@@ -91,34 +91,47 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	}
 
 	public static func diff<C1: CollectionType, C2: CollectionType where C1.Index : RandomAccessIndexType, C1.Generator.Element == Term, C2.Index : RandomAccessIndexType, C2.Generator.Element == Term>(a: C1, _ b: C2) -> [Diff] {
-		func magnitude(diffs: Stream<Diff>) -> Int {
-			return diffs.map { $0.magnitude }.reduce(0, combine: +)
+		func magnitude(diffs: Stream<(Diff, Int)>) -> Int {
+			return diffs.first?.1 ?? 0
+			// fixme; this should actually consider the rest of the diff, but we aren’t memoizing that correctly.
+//			return diffs.map { $1 }.fold(0, combine: { $0 + $1.value })
 		}
 
 		func min<A>(a: A, _ rest: A..., _ isLessThan: (A, A) -> Bool) -> A {
-			return rest.reduce(a, combine: {
-				isLessThan($0, $1) ? $0 : $1
-			})
+			return rest.reduce(a) { isLessThan($0, $1) ? $0 : $1 }
 		}
 
-		func diff(a: Stream<Term>, _ b: Stream<Term>) -> Stream<Diff> {
-			switch (a, b) {
-			case (.Nil, .Nil):
+		let graph = Vertex<(Term, Term, Diff, Int)>(rows: Stream(sequence: a), columns: Stream(sequence: b)) {
+			let diff = Diff($0, $1)
+			return ($0, $1, diff, diff.magnitude)
+		}
+
+		func diff(vertex: Vertex<(Term, Term, Diff, Int)>) -> Stream<(Diff, Int)> {
+			switch vertex {
+			case .End:
 				return .Nil
-			case (.Nil, .Cons):
-				return b.map(Diff.Insert)
-			case (.Cons, .Nil):
-				return a.map(Diff.Delete)
-			case let (.Cons(x, xs), .Cons(y, ys)):
-				let here = Stream.Cons(Diff(x, y), Memo { diff(xs.value, ys.value) })
-				let insert = Stream.Cons(Diff.Insert(y), Memo { diff(a, ys.value) })
-				let delete = Stream.Cons(Diff.Delete(x), Memo { diff(xs.value, b) })
-				return min(here, insert, delete) {
-					magnitude($0) < magnitude($1)
+
+			case let .XY((a, b, copy, copyCost), x, y):
+				let right = x.value
+				let down = y.value
+				switch (right, down) {
+				case (.End, .End):
+					return .Cons((copy, copyCost), Memo(evaluated: .Nil))
+				case (.End, .XY):
+					return vertex.row.map { (Diff.Delete($0.0), 1) }
+				case (.XY, .End):
+					return vertex.column.map { (Diff.Insert($0.0), 1) }
+				case (.XY, .XY):
+					let copy = Stream.Cons((copy, copyCost), vertex.diagonal.map(diff))
+					let insert = Stream.Cons((Diff.Insert(b), 1), x.map(diff))
+					let delete = Stream.Cons((Diff.Delete(a), 1), y.map(diff))
+					return min(copy, insert, delete) {
+						magnitude($0) < magnitude($1)
+					}
 				}
 			}
 		}
 
-		return Array(diff(Stream(sequence: a), Stream(sequence: b)))
+		return Array(diff(graph).map { $0.0 })
 	}
 }
