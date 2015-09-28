@@ -11,6 +11,10 @@ public enum Vertex<Element>: CustomDebugStringConvertible, CustomStringConvertib
 		}
 	}
 
+	public var isEmpty: Bool {
+		return analysis(ifXY: const(false), ifEnd: const(true))
+	}
+
 	public var element: Element? {
 		return analysis(
 			ifXY: { x, _, _ in x },
