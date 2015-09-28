@@ -15,7 +15,7 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 		}
 	}
 
-	public var doc: Doc {
+	public var doc: DOC {
 		switch self {
 		case .Empty:
 			return .Empty
@@ -182,31 +182,31 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		}
 	}
 
-	public var doc: Doc {
+	public var doc: DOC {
 		switch self {
 		case let .Apply(f, vs):
-			return .Horizontal([
-				Doc(f),
-				.Wrap(.Text("("), .Join(.Text(", "), vs.map(Doc.init)), .Text(")"))
+			return .spread([
+				DOC(f),
+				.bracket("(", .join(", ", vs.map(DOC.init)), ")")
 			])
 		case let .Abstract(parameters, body):
-			return .Horizontal([
+			return .folddoc([
 				.Text("λ"),
-				.Join(.Text(", "), parameters.map(Doc.init)),
+				.join(", ", parameters.map(DOC.init)),
 				.Text("."),
-				.Vertical(body.map(Doc.init))
-			])
+				.stack(body.map(DOC.init))
+			], combine: <>)
 		case let .Assign(n, v):
-			return .Horizontal([ .Text(n), .Text("="), Doc(v) ])
+			return .spread([ .Text(n), .Text("="), DOC(v) ])
 		case let .Variable(n):
 			return .Text(n)
 		case let .Literal(s):
 			return .Text(s)
 		case let .Group(n, vs):
-			return .Horizontal([
-				Doc(n),
-				.Wrap(.Text("{"), .Vertical(vs.map(Doc.init)), .Text("}"))
-			])
+			return .folddoc([
+				DOC(n),
+				.bracket("{", .stack(vs.map(DOC.init)), "}")
+			], combine: <>)
 		}
 	}
 }
