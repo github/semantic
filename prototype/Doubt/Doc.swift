@@ -77,6 +77,10 @@ public enum DOC {
 			return .Text(" ")
 		}
 	}
+
+	public func pretty(width: Int) -> String {
+		return best(width, 0, self).description
+	}
 }
 
 func best(w: Int, _ k: Int, _ x: DOC) -> Doc {
@@ -118,10 +122,6 @@ func fits(w: Int, _ x: Doc) -> Bool {
 	}
 }
 
-func pretty(w: Int, _ doc: DOC) -> String {
-	return best(w, 0, doc).description
-}
-
 
 public protocol CustomDocConvertible: CustomStringConvertible {
 	var doc: DOC { get }
@@ -129,7 +129,7 @@ public protocol CustomDocConvertible: CustomStringConvertible {
 
 extension CustomDocConvertible {
 	public var description: String {
-		return pretty(70, doc)
+		return doc.pretty(70)
 	}
 }
 
