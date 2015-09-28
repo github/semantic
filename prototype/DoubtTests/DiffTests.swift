@@ -26,6 +26,11 @@ final class DiffTests: XCTestCase {
 	func testSESCanDeleteInMiddle() {
 		XCTAssertEqual(Diff.diff([ a, d, b, c ], [ a, b, c ]), [ Diff(a), Diff.Delete(d), Diff(b), Diff(c) ])
 	}
+
+	func testSESOfLongerSequences() {
+		// fixme: this is awfully slow for such a short sequence
+		XCTAssertEqual(Diff.diff([ a, b, c, a, b, b, a ], [ c, b, a, b, a, c ]), [ Diff.Patch(a, c), Diff(b), Diff.Delete(c), Diff(a), Diff.Delete(b), Diff(b), Diff(a), Diff.Insert(c) ])
+	}
 }
 
 private let a = Term(.Literal("a"))
