@@ -66,7 +66,7 @@ public func == <A: Equatable> (left: Vertex<A>, right: Vertex<A>) -> Bool {
 	case (.End, .End):
 		return true
 	case let (.XY(a, x1, y1), .XY(b, x2, y2)):
-		return a == b && x1.value == y1.value && x2.value == y2.value
+		return a == b && x1.value == x2.value && y1.value == y2.value
 	default:
 		return false
 	}
