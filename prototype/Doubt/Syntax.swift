@@ -185,10 +185,7 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 	public var doc: DOC {
 		switch self {
 		case let .Apply(f, vs):
-			return .spread([
-				DOC(f),
-				.bracket("(", .join(", ", vs.map(DOC.init)), ")")
-			])
+			return DOC(f) <> .bracket("(", .join(", ", vs.map(DOC.init)), ")")
 		case let .Abstract(parameters, body):
 			return .folddoc([
 				.Text("λ"),
@@ -203,10 +200,7 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		case let .Literal(s):
 			return .Text(s)
 		case let .Group(n, vs):
-			return .folddoc([
-				DOC(n),
-				.bracket("{", .stack(vs.map(DOC.init)), "}")
-			], combine: <>)
+			return DOC(n) <> .bracket("{", .stack(vs.map(DOC.init)), "}")
 		}
 	}
 }
