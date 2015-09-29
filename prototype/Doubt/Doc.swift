@@ -68,10 +68,6 @@ public enum Doc: CustomDocConvertible, Equatable {
 		return group(Concat(Text(l), Concat(Nest(2, Concat(Line, x)), Concat(Line, Text(r)))))
 	}
 
-	public static func stack<C: CollectionType where C.Generator.Element == Doc>(docs: C) -> Doc {
-		return docs.fold(</>)
-	}
-
 	public var flattened: Doc {
 		switch self {
 		case .Empty, .Text:
@@ -117,6 +113,10 @@ extension SequenceType where Generator.Element == Doc {
 
 	public func spread() -> Doc {
 		return fold(<+>)
+	}
+
+	public func stack() -> Doc {
+		return fold(</>)
 	}
 
 	public func joinWithSeparator(separator: String) -> Doc {
