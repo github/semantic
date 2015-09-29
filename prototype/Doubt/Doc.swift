@@ -89,12 +89,12 @@ public enum DOC {
 	}
 
 	public func pretty(width: Int) -> String {
-		return best(width, 0, self).description
+		return best(width).description
 	}
-}
 
-func best(w: Int, _ k: Int, _ x: DOC) -> Doc {
-	return be(w, k, Stream<(Int, DOC)>.pure((0, x)))
+	public func best(width: Int, minus: Int = 0) -> Doc {
+		return be(width, minus, .pure((0, self)))
+	}
 }
 
 func be(w: Int, _ k: Int, _ z: Stream<(Int, DOC)>) -> Doc {
