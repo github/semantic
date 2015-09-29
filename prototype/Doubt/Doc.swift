@@ -116,8 +116,8 @@ public enum DOC {
 	}
 }
 
-func better(w: Int, _ k: Int, _ x: Doc, _ y: Doc) -> Doc {
-	return x.fits(w - k)
+func better(width: Int, _ placed: Int, _ x: Doc, _ y: Doc) -> Doc {
+	return x.fits(width - placed)
 		? x
 		: y
 }
