@@ -189,7 +189,7 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		case let .Abstract(parameters, body):
 			return .foldDoc([
 				.Text("λ"),
-				.join(", ", parameters.map(Doc.init)),
+				.join(",", parameters.map(Doc.init)),
 				.Text("."),
 				.stack(body.map(Doc.init))
 			], combine: <>)
