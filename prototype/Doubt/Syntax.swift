@@ -185,28 +185,20 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 	public var doc: Doc {
 		switch self {
 		case let .Apply(f, vs):
-			return .Horizontal([
-				Doc(f),
-				.Wrap(.Text("("), .Join(.Text(", "), vs.map(Doc.init)), .Text(")"))
-			])
+			return Doc(f) <> vs.map(Doc.init).joinWithSeparator(",").bracket("(", ")")
 		case let .Abstract(parameters, body):
-			return .Horizontal([
-				.Text("λ"),
-				.Join(.Text(", "), parameters.map(Doc.init)),
-				.Text("."),
-				.Vertical(body.map(Doc.init))
-			])
+			return .Text("λ")
+				<> parameters.map(Doc.init).joinWithSeparator(",")
+				<> .Text(".")
+				<> body.map(Doc.init).stack()
 		case let .Assign(n, v):
-			return .Horizontal([ .Text(n), .Text("="), Doc(v) ])
+			return .Text(n) <+> .Text("=") <+> Doc(v)
 		case let .Variable(n):
 			return .Text(n)
 		case let .Literal(s):
 			return .Text(s)
 		case let .Group(n, vs):
-			return .Horizontal([
-				Doc(n),
-				.Wrap(.Text("{"), .Vertical(vs.map(Doc.init)), .Text("}"))
-			])
+			return Doc(n) <> vs.map(Doc.init).stack().bracket("{", "}")
 		}
 	}
 }

@@ -44,18 +44,16 @@ public func == (left: Diff, right: Diff) -> Bool {
 
 public func == (left: Doc, right: Doc) -> Bool {
 	switch (left, right) {
-	case (.Empty, .Empty):
+	case (.Empty, .Empty), (.Line, .Line):
 		return true
 	case let (.Text(a), .Text(b)):
 		return a == b
-	case let (.Horizontal(a), .Horizontal(b)):
-		return a == b
-	case let (.Vertical(a), .Vertical(b)):
-		return a == b
-	case let (.Wrap(a1, b1, c1), .Wrap(a2, b2, c2)):
-		return a1 == a2 && b1 == b2 && c1 == c2
-	case let (.Join(s1, e1), .Join(s2, e2)):
-		return s1 == s2 && e1 == e2
+	case let (.Nest(i, a), .Nest(j, b)):
+		return i == j && a == b
+	case let (.Concat(l1, r1), .Concat(l2, r2)):
+		return l1 == l2 && r1 == r2
+	case let (.Union(l1, r1), .Union(l2, r2)):
+		return l1 == l2 && r1 == r2
 	default:
 		return false
 	}
