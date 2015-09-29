@@ -55,7 +55,7 @@ public func == (left: Layout, right: Layout) -> Bool {
 	}
 }
 
-public func == (left: DOC, right: DOC) -> Bool {
+public func == (left: Doc, right: Doc) -> Bool {
 	switch (left, right) {
 	case (.Empty, .Empty), (.Line, .Line):
 		return true

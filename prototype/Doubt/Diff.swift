@@ -20,13 +20,13 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		}
 	}
 
-	public var doc: DOC {
+	public var doc: Doc {
 		switch self {
 		case .Empty:
 			return .Empty
 		case let .Patch(a, b):
-			return .bracket("{-", DOC(a), "-}")
-				<> .bracket("{+", DOC(b), "+}")
+			return .bracket("{-", Doc(a), "-}")
+				<> .bracket("{+", Doc(b), "+}")
 		case let .Copy(a):
 			return a.doc
 		}

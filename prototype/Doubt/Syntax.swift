@@ -15,7 +15,7 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 		}
 	}
 
-	public var doc: DOC {
+	public var doc: Doc {
 		switch self {
 		case .Empty:
 			return .Empty
@@ -182,25 +182,25 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		}
 	}
 
-	public var doc: DOC {
+	public var doc: Doc {
 		switch self {
 		case let .Apply(f, vs):
-			return DOC(f) <> .bracket("(", .join(", ", vs.map(DOC.init)), ")")
+			return Doc(f) <> .bracket("(", .join(", ", vs.map(Doc.init)), ")")
 		case let .Abstract(parameters, body):
-			return .folddoc([
+			return .foldDoc([
 				.Text("λ"),
-				.join(", ", parameters.map(DOC.init)),
+				.join(", ", parameters.map(Doc.init)),
 				.Text("."),
-				.stack(body.map(DOC.init))
+				.stack(body.map(Doc.init))
 			], combine: <>)
 		case let .Assign(n, v):
-			return .spread([ .Text(n), .Text("="), DOC(v) ])
+			return .spread([ .Text(n), .Text("="), Doc(v) ])
 		case let .Variable(n):
 			return .Text(n)
 		case let .Literal(s):
 			return .Text(s)
 		case let .Group(n, vs):
-			return DOC(n) <> .bracket("{", .stack(vs.map(DOC.init)), "}")
+			return Doc(n) <> .bracket("{", .stack(vs.map(Doc.init)), "}")
 		}
 	}
 }

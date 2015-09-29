@@ -3,7 +3,7 @@ public enum Layout: CustomStringConvertible, Equatable {
 	indirect case Text(String, Layout)
 	indirect case Line(Int, Layout)
 
-	public init(width: Int, placed: Int, alternatives: Stream<(Int, DOC)>) {
+	public init(width: Int, placed: Int, alternatives: Stream<(Int, Doc)>) {
 		switch alternatives {
 		case .Nil:
 			self = .Empty
@@ -48,29 +48,29 @@ public enum Layout: CustomStringConvertible, Equatable {
 	}
 }
 
-public enum DOC: CustomDocConvertible, Equatable {
+public enum Doc: CustomDocConvertible, Equatable {
 	case Empty
-	indirect case Concat(DOC, DOC)
-	indirect case Union(DOC, DOC)
+	indirect case Concat(Doc, Doc)
+	indirect case Union(Doc, Doc)
 	case Text(String)
-	indirect case Nest(Int, DOC)
+	indirect case Nest(Int, Doc)
 	case Line
 
 	public init<T>(_ value: T) {
 		self = (value as? CustomDocConvertible)?.doc ?? .Text(String(value))
 	}
 
-	public static func group(doc: DOC) -> DOC {
+	public static func group(doc: Doc) -> Doc {
 		return Union(doc.flattened, doc)
 	}
 
-	public static func bracket(l: String, _ x: DOC, _ r: String) -> DOC {
+	public static func bracket(l: String, _ x: Doc, _ r: String) -> Doc {
 		return group(Concat(Text(l), Concat(Nest(2, Concat(Line, x)), Concat(Line, Text(r)))))
 	}
 
-	public static func folddoc<C: CollectionType where C.Generator.Element == DOC>(docs: C, combine: (DOC, DOC) -> DOC) -> DOC {
-		func fold(docs: Stream<DOC>) -> DOC {
-			switch docs {
+	public static func foldDoc<C: CollectionType where C.Generator.Element == Doc>(Docs: C, combine: (Doc, Doc) -> Doc) -> Doc {
+		func fold(Docs: Stream<Doc>) -> Doc {
+			switch Docs {
 			case .Nil:
 				return .Empty
 			case let .Cons(x, rest) where rest.value.isEmpty:
@@ -79,24 +79,24 @@ public enum DOC: CustomDocConvertible, Equatable {
 				return combine(x, fold(rest.value))
 			}
 		}
-		return fold(Stream(sequence: docs))
+		return fold(Stream(sequence: Docs))
 	}
 
-	public static func spread<C: CollectionType where C.Generator.Element == DOC>(docs: C) -> DOC {
-		return folddoc(docs, combine: <+>)
+	public static func spread<C: CollectionType where C.Generator.Element == Doc>(Docs: C) -> Doc {
+		return foldDoc(Docs, combine: <+>)
 	}
 
-	public static func stack<C: CollectionType where C.Generator.Element == DOC>(docs: C) -> DOC {
-		return folddoc(docs, combine: </>)
+	public static func stack<C: CollectionType where C.Generator.Element == Doc>(Docs: C) -> Doc {
+		return foldDoc(Docs, combine: </>)
 	}
 
-	public static func join<C: CollectionType where C.Generator.Element == DOC>(separator: String, _ docs: C) -> DOC {
-		return folddoc(docs) {
+	public static func join<C: CollectionType where C.Generator.Element == Doc>(separator: String, _ Docs: C) -> Doc {
+		return foldDoc(Docs) {
 			$0 <> Text(separator) <+> $1
 		}
 	}
 
-	public var flattened: DOC {
+	public var flattened: Doc {
 		switch self {
 		case .Empty, .Text:
 			return self
@@ -104,8 +104,8 @@ public enum DOC: CustomDocConvertible, Equatable {
 			return .Concat(a.flattened, b.flattened)
 		case let .Union(a, _):
 			return a.flattened
-		case let .Nest(_, doc):
-			return doc.flattened
+		case let .Nest(_, Doc):
+			return Doc.flattened
 		case .Line:
 			return .Text(" ")
 		}
@@ -119,13 +119,13 @@ public enum DOC: CustomDocConvertible, Equatable {
 		return Layout(width: width, placed: placed, alternatives: .pure((0, self)))
 	}
 
-	public var doc: DOC {
+	public var doc: Doc {
 		return self
 	}
 }
 
 public protocol CustomDocConvertible: CustomStringConvertible {
-	var doc: DOC { get }
+	var doc: Doc { get }
 }
 
 extension CustomDocConvertible {
@@ -135,15 +135,15 @@ extension CustomDocConvertible {
 }
 
 
-public func <> (left: DOC, right: DOC) -> DOC {
+public func <> (left: Doc, right: Doc) -> Doc {
 	return .Concat(left, right)
 }
 
 
-public func <+> (left: DOC, right: DOC) -> DOC {
+public func <+> (left: Doc, right: Doc) -> Doc {
 	return left <> .Text(" ") <> right
 }
 
-public func </> (left: DOC, right: DOC) -> DOC {
+public func </> (left: Doc, right: Doc) -> Doc {
 	return left <> .Line <> right
 }
