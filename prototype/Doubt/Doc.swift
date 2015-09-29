@@ -18,7 +18,7 @@ public enum Doc: CustomStringConvertible, Equatable {
 		case let .Cons((i, .Line), rest):
 			self = .Line(i, Doc(width: width, placed: i, alternatives: rest.value))
 		case let .Cons((i, .Union(x, y)), z):
-			self = better(width, placed, Doc(width: width, placed: placed, alternatives: .Cons((i, x), z)), Doc(width: width, placed: placed, alternatives: .Cons((i, y), z)))
+			self = .better(width, placed, Doc(width: width, placed: placed, alternatives: .Cons((i, x), z)), Doc(width: width, placed: placed, alternatives: .Cons((i, y), z)))
 		}
 	}
 
@@ -41,6 +41,12 @@ public enum Doc: CustomStringConvertible, Equatable {
 		case let .Text(s, x):
 			return x.fits(width - Int(s.characters.count))
 		}
+	}
+
+	public static func better(width: Int, _ placed: Int, _ x: Doc, _ y: Doc) -> Doc {
+		return x.fits(width - placed)
+			? x
+			: y
 	}
 }
 
@@ -115,13 +121,6 @@ public enum DOC {
 		return Doc(width: width, placed: placed, alternatives: .pure((0, self)))
 	}
 }
-
-func better(width: Int, _ placed: Int, _ x: Doc, _ y: Doc) -> Doc {
-	return x.fits(width - placed)
-		? x
-		: y
-}
-
 
 public protocol CustomDocConvertible: CustomStringConvertible {
 	var doc: DOC { get }
