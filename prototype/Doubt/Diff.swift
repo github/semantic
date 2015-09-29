@@ -46,6 +46,10 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	}
 
 	public init(_ a: Term, _ b: Term) {
+		if a == b {
+			self = Diff(b)
+			return
+		}
 		switch (a.syntax, b.syntax) {
 		case (.Empty, .Empty):
 			self = .Copy(.Empty)
