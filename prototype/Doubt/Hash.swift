@@ -3,6 +3,14 @@ public enum Hash: Hashable {
 	case String(Swift.String)
 	case Int(Swift.Int)
 
+	public static func Case(label: Swift.String, _ hashes: Hash...) -> Hash {
+		return .Sequence([ .String(label) ] + hashes)
+	}
+
+	public static func Case(index: Swift.Int, _ hashes: Hash...) -> Hash {
+		return .Sequence([ .Int(index) ] + hashes)
+	}
+
 	public init<A: AlgebraicHashable>(_ hashable: A) {
 		self = hashable.hash
 	}
