@@ -1,67 +1,3 @@
-private enum Layout: CustomStringConvertible, Equatable {
-	case Empty
-	indirect case Text(String, Layout)
-	indirect case Line(Int, Layout)
-
-	init(width: Int, placed: Int, alternatives: Stream<(Int, Doc)>) {
-		switch alternatives {
-		case .Nil:
-			self = .Empty
-		case let .Cons((_, .Empty), rest):
-			self = Layout(width: width, placed: placed, alternatives: rest.value)
-		case let .Cons((i, .Concat(x, y)), rest):
-			self = Layout(width: width, placed: placed, alternatives: .Cons((i, x), Memo(evaluated: .Cons((i, y), rest))))
-		case let .Cons((i, .Nest(j, x)), rest):
-			self = Layout(width: width, placed: placed, alternatives: .Cons((i + j, x), rest))
-		case let .Cons((_, .Text(s)), rest):
-			self = .Text(s, Layout(width: width, placed: placed + Int(s.characters.count), alternatives: rest.value))
-		case let .Cons((i, .Line), rest):
-			self = .Line(i, Layout(width: width, placed: i, alternatives: rest.value))
-		case let .Cons((i, .Union(x, y)), z):
-			self = .better(width, placed, Layout(width: width, placed: placed, alternatives: .Cons((i, x), z)), Layout(width: width, placed: placed, alternatives: .Cons((i, y), z)))
-		}
-	}
-
-	var description: String {
-		switch self {
-		case .Empty:
-			return ""
-		case let .Text(s, doc):
-			return s + doc.description
-		case let .Line(n, doc):
-			return "\n" + String(count: n, repeatedValue: " " as Character) + doc.description
-		}
-	}
-
-	func fits(width: Int) -> Bool {
-		guard width >= 0 else { return false }
-		switch self {
-		case .Empty, .Line:
-			return true
-		case let .Text(s, x):
-			return x.fits(width - Int(s.characters.count))
-		}
-	}
-
-	static func better(width: Int, _ placed: Int, _ x: Layout, _ y: Layout) -> Layout {
-		return x.fits(width - placed) ? x : y
-	}
-}
-
-private func == (left: Layout, right: Layout) -> Bool {
-	switch (left, right) {
-	case (.Empty, .Empty):
-		return true
-	case let (.Text(a, x), .Text(b, y)):
-		return a == b && x == y
-	case let (.Line(i, x), .Line(j, y)):
-		return i == j && x == y
-	default:
-		return false
-	}
-}
-
-
 public enum Doc: CustomDocConvertible, Equatable {
 	case Empty
 	indirect case Concat(Doc, Doc)
@@ -165,4 +101,68 @@ public func <+> (left: Doc, right: Doc) -> Doc {
 
 public func </> (left: Doc, right: Doc) -> Doc {
 	return left <> .Line <> right
+}
+
+
+private enum Layout: CustomStringConvertible, Equatable {
+	case Empty
+	indirect case Text(String, Layout)
+	indirect case Line(Int, Layout)
+
+	init(width: Int, placed: Int, alternatives: Stream<(Int, Doc)>) {
+		switch alternatives {
+		case .Nil:
+			self = .Empty
+		case let .Cons((_, .Empty), rest):
+			self = Layout(width: width, placed: placed, alternatives: rest.value)
+		case let .Cons((i, .Concat(x, y)), rest):
+			self = Layout(width: width, placed: placed, alternatives: .Cons((i, x), Memo(evaluated: .Cons((i, y), rest))))
+		case let .Cons((i, .Nest(j, x)), rest):
+			self = Layout(width: width, placed: placed, alternatives: .Cons((i + j, x), rest))
+		case let .Cons((_, .Text(s)), rest):
+			self = .Text(s, Layout(width: width, placed: placed + Int(s.characters.count), alternatives: rest.value))
+		case let .Cons((i, .Line), rest):
+			self = .Line(i, Layout(width: width, placed: i, alternatives: rest.value))
+		case let .Cons((i, .Union(x, y)), z):
+			self = .better(width, placed, Layout(width: width, placed: placed, alternatives: .Cons((i, x), z)), Layout(width: width, placed: placed, alternatives: .Cons((i, y), z)))
+		}
+	}
+
+	var description: String {
+		switch self {
+		case .Empty:
+			return ""
+		case let .Text(s, doc):
+			return s + doc.description
+		case let .Line(n, doc):
+			return "\n" + String(count: n, repeatedValue: " " as Character) + doc.description
+		}
+	}
+
+	func fits(width: Int) -> Bool {
+		guard width >= 0 else { return false }
+		switch self {
+		case .Empty, .Line:
+			return true
+		case let .Text(s, x):
+			return x.fits(width - Int(s.characters.count))
+		}
+	}
+
+	static func better(width: Int, _ placed: Int, _ x: Layout, _ y: Layout) -> Layout {
+		return x.fits(width - placed) ? x : y
+	}
+}
+
+private func == (left: Layout, right: Layout) -> Bool {
+	switch (left, right) {
+	case (.Empty, .Empty):
+		return true
+	case let (.Text(a, x), .Text(b, y)):
+		return a == b && x == y
+	case let (.Line(i, x), .Line(j, y)):
+		return i == j && x == y
+	default:
+		return false
+	}
 }
