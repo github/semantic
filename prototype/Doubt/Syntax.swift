@@ -187,12 +187,10 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		case let .Apply(f, vs):
 			return Doc(f) <> .bracket("(", vs.map(Doc.init).joinWithSeparator(","), ")")
 		case let .Abstract(parameters, body):
-			return [
-				.Text("λ"),
-				parameters.map(Doc.init).joinWithSeparator(","),
-				.Text("."),
-				body.map(Doc.init).stack()
-			].fold(<>)
+			return .Text("λ")
+				<> parameters.map(Doc.init).joinWithSeparator(",")
+				<> .Text(".")
+				<> body.map(Doc.init).stack()
 		case let .Assign(n, v):
 			return [ .Text(n), .Text("="), Doc(v) ].spread()
 		case let .Variable(n):
