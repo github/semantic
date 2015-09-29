@@ -68,6 +68,13 @@ public enum Doc: CustomDocConvertible, Equatable {
 		return group(Concat(Text(l), Concat(Nest(2, Concat(Line, x)), Concat(Line, Text(r)))))
 	}
 
+	public func bracket(left: String, _ right: String) -> Doc {
+		return .group(Text(left)
+			<> Nest(2, Line <> self)
+			<> Line
+			<> Text(right))
+	}
+
 	public var flattened: Doc {
 		switch self {
 		case .Empty, .Text:
