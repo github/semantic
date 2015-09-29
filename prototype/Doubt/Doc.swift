@@ -60,19 +60,15 @@ public enum Doc: CustomDocConvertible, Equatable {
 		self = (value as? CustomDocConvertible)?.doc ?? .Text(String(value))
 	}
 
-	public static func group(doc: Doc) -> Doc {
-		return Union(doc.flattened, doc)
-	}
-
 	public func group() -> Doc {
 		return Union(self.flattened, self)
 	}
 
 	public func bracket(left: String, _ right: String) -> Doc {
-		return .group(Text(left)
+		return (Text(left)
 			<> Nest(2, Line <> self)
 			<> Line
-			<> Text(right))
+			<> Text(right)).group()
 	}
 
 	public var flattened: Doc {
