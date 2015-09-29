@@ -12,6 +12,8 @@ public func == (left: Term, right: Term) -> Bool {
 
 public func == <F: Equatable> (left: Syntax<F>, right: Syntax<F>) -> Bool {
 	switch (left, right) {
+	case (.Empty, .Empty):
+		return true
 	case let (.Apply(a, aa), .Apply(b, bb)):
 		return a == b && aa == bb
 	case let (.Abstract(p1, b1), .Abstract(p2, b2)):
