@@ -3,6 +3,14 @@ public enum Hash: Hashable {
 	case String(Swift.String)
 	case Int(Swift.Int)
 
+	public init<A: AlgebraicHashable>(_ hashable: A) {
+		self = hashable.hash
+	}
+
+	public init<A: Hashable>(_ hashable: A) {
+		self = .Int(hashable.hashValue)
+	}
+
 
 	public var hashValue: Swift.Int {
 		switch self {
