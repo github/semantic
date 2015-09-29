@@ -51,9 +51,6 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			return
 		}
 		switch (a.syntax, b.syntax) {
-		case (.Empty, .Empty):
-			self = .Copy(.Empty)
-
 		case let (.Apply(a, aa), .Apply(b, bb)):
 			self = .Copy(.Apply(Diff(a, b), Diff.diff(aa, bb)))
 
