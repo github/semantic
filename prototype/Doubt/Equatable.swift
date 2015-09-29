@@ -42,19 +42,6 @@ public func == (left: Diff, right: Diff) -> Bool {
 	}
 }
 
-public func == (left: Layout, right: Layout) -> Bool {
-	switch (left, right) {
-	case (.Empty, .Empty):
-		return true
-	case let (.Text(a, x), .Text(b, y)):
-		return a == b && x == y
-	case let (.Line(i, x), .Line(j, y)):
-		return i == j && x == y
-	default:
-		return false
-	}
-}
-
 public func == (left: Doc, right: Doc) -> Bool {
 	switch (left, right) {
 	case (.Empty, .Empty), (.Line, .Line):

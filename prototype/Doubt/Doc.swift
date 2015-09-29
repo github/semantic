@@ -1,9 +1,9 @@
-public enum Layout: CustomStringConvertible, Equatable {
+private enum Layout: CustomStringConvertible, Equatable {
 	case Empty
 	indirect case Text(String, Layout)
 	indirect case Line(Int, Layout)
 
-	public init(width: Int, placed: Int, alternatives: Stream<(Int, Doc)>) {
+	init(width: Int, placed: Int, alternatives: Stream<(Int, Doc)>) {
 		switch alternatives {
 		case .Nil:
 			self = .Empty
@@ -22,7 +22,7 @@ public enum Layout: CustomStringConvertible, Equatable {
 		}
 	}
 
-	public var description: String {
+	var description: String {
 		switch self {
 		case .Empty:
 			return ""
@@ -33,7 +33,7 @@ public enum Layout: CustomStringConvertible, Equatable {
 		}
 	}
 
-	public func fits(width: Int) -> Bool {
+	func fits(width: Int) -> Bool {
 		guard width >= 0 else { return false }
 		switch self {
 		case .Empty, .Line:
@@ -43,10 +43,24 @@ public enum Layout: CustomStringConvertible, Equatable {
 		}
 	}
 
-	public static func better(width: Int, _ placed: Int, _ x: Layout, _ y: Layout) -> Layout {
+	static func better(width: Int, _ placed: Int, _ x: Layout, _ y: Layout) -> Layout {
 		return x.fits(width - placed) ? x : y
 	}
 }
+
+private func == (left: Layout, right: Layout) -> Bool {
+	switch (left, right) {
+	case (.Empty, .Empty):
+		return true
+	case let (.Text(a, x), .Text(b, y)):
+		return a == b && x == y
+	case let (.Line(i, x), .Line(j, y)):
+		return i == j && x == y
+	default:
+		return false
+	}
+}
+
 
 public enum Doc: CustomDocConvertible, Equatable {
 	case Empty
@@ -90,7 +104,7 @@ public enum Doc: CustomDocConvertible, Equatable {
 		return best(width).description
 	}
 
-	public func best(width: Int, placed: Int = 0) -> Layout {
+	private func best(width: Int, placed: Int = 0) -> Layout {
 		return Layout(width: width, placed: placed, alternatives: .pure((0, self)))
 	}
 
