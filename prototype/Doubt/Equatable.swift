@@ -55,6 +55,23 @@ public func == (left: Layout, right: Layout) -> Bool {
 	}
 }
 
+public func == (left: DOC, right: DOC) -> Bool {
+	switch (left, right) {
+	case (.Empty, .Empty), (.Line, .Line):
+		return true
+	case let (.Text(a), .Text(b)):
+		return a == b
+	case let (.Nest(i, a), .Nest(j, b)):
+		return i == j && a == b
+	case let (.Concat(l1, r1), .Concat(l2, r2)):
+		return l1 == l2 && r1 == r2
+	case let (.Union(l1, r1), .Union(l2, r2)):
+		return l1 == l2 && r1 == r2
+	default:
+		return false
+	}
+}
+
 public func == <A: Equatable> (left: Vertex<A>, right: Vertex<A>) -> Bool {
 	switch (left, right) {
 	case (.End, .End):
