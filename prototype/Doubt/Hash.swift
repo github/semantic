@@ -39,3 +39,13 @@ public func == (left: Hash, right: Hash) -> Bool {
 	}
 }
 
+public protocol AlgebraicHashable: Hashable {
+	var hash: Hash { get }
+}
+
+extension AlgebraicHashable {
+	public var hashValue: Int {
+		return hash.hashValue
+	}
+}
+
