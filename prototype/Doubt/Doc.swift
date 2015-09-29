@@ -92,8 +92,8 @@ public enum DOC {
 		return best(width).description
 	}
 
-	public func best(width: Int, minus: Int = 0) -> Doc {
-		return be(width, minus, .pure((0, self)))
+	public func best(width: Int, placed: Int = 0) -> Doc {
+		return be(width, placed, .pure((0, self)))
 	}
 }
 
