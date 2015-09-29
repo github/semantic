@@ -124,6 +124,11 @@ extension SequenceType where Generator.Element == Doc {
 		}
 		return fold(Stream(sequence: self))
 	}
+	public func joinWithSeparator(separator: String) -> Doc {
+		return fold {
+			$0 <> .Text(separator) <+> $1
+		}
+	}
 }
 
 public protocol CustomDocConvertible: CustomStringConvertible {
