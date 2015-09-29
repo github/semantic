@@ -44,9 +44,7 @@ public enum Doc: CustomStringConvertible, Equatable {
 	}
 
 	public static func better(width: Int, _ placed: Int, _ x: Doc, _ y: Doc) -> Doc {
-		return x.fits(width - placed)
-			? x
-			: y
+		return x.fits(width - placed) ? x : y
 	}
 }
 
