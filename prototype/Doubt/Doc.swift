@@ -48,7 +48,7 @@ public enum Layout: CustomStringConvertible, Equatable {
 	}
 }
 
-public enum DOC {
+public enum DOC: Equatable {
 	case Empty
 	indirect case Concat(DOC, DOC)
 	indirect case Union(DOC, DOC)
@@ -117,6 +117,10 @@ public enum DOC {
 
 	public func best(width: Int, placed: Int = 0) -> Layout {
 		return Layout(width: width, placed: placed, alternatives: .pure((0, self)))
+	}
+
+	public var doc: DOC {
+		return self
 	}
 }
 
