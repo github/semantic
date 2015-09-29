@@ -30,7 +30,7 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 	public static var Empty: Term {
 		return Term(.Empty)
 	}
-	
+
 	public static let Apply: (Term, [Term]) -> Term = Syntax.Apply >>> Roll
 	public static let Abstract: ([Term], [Term]) -> Term = Syntax.Abstract >>> Roll
 	public static let Assign: (String, Term) -> Term = Syntax.Assign >>> Roll
