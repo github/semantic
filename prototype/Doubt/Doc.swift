@@ -48,7 +48,7 @@ public enum Layout: CustomStringConvertible, Equatable {
 	}
 }
 
-public enum DOC: Equatable {
+public enum DOC: CustomDocConvertible, Equatable {
 	case Empty
 	indirect case Concat(DOC, DOC)
 	indirect case Union(DOC, DOC)
