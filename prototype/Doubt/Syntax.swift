@@ -1,4 +1,4 @@
-public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, Equatable {
+public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, AlgebraicHashable {
 	public init(_ out: Syntax<Term>) {
 		self = .Roll(out)
 	}
@@ -24,6 +24,11 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 		case let .Roll(s):
 			return s.doc
 		}
+	}
+
+
+	public var hash: Hash {
+		return syntax.hash
 	}
 
 
