@@ -25,8 +25,8 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		case .Empty:
 			return .Empty
 		case let .Patch(a, b):
-			return .bracket("{-", Doc(a), "-}")
-				<> .bracket("{+", Doc(b), "+}")
+			return Doc(a).bracket("{-", "-}")
+				<> Doc(b).bracket("{+", "+}")
 		case let .Copy(a):
 			return a.doc
 		}

@@ -185,7 +185,7 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 	public var doc: Doc {
 		switch self {
 		case let .Apply(f, vs):
-			return Doc(f) <> .bracket("(", vs.map(Doc.init).joinWithSeparator(","), ")")
+			return Doc(f) <> vs.map(Doc.init).joinWithSeparator(",").bracket("(", ")")
 		case let .Abstract(parameters, body):
 			return .Text("λ")
 				<> parameters.map(Doc.init).joinWithSeparator(",")
@@ -198,7 +198,7 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		case let .Literal(s):
 			return .Text(s)
 		case let .Group(n, vs):
-			return Doc(n) <> .bracket("{", vs.map(Doc.init).stack(), "}")
+			return Doc(n) <> vs.map(Doc.init).stack().bracket("{", "}")
 		}
 	}
 }

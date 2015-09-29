@@ -64,10 +64,6 @@ public enum Doc: CustomDocConvertible, Equatable {
 		return Union(doc.flattened, doc)
 	}
 
-	public static func bracket(l: String, _ x: Doc, _ r: String) -> Doc {
-		return group(Concat(Text(l), Concat(Nest(2, Concat(Line, x)), Concat(Line, Text(r)))))
-	}
-
 	public func bracket(left: String, _ right: String) -> Doc {
 		return .group(Text(left)
 			<> Nest(2, Line <> self)
