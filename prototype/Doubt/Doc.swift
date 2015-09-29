@@ -68,30 +68,16 @@ public enum Doc: CustomDocConvertible, Equatable {
 		return group(Concat(Text(l), Concat(Nest(2, Concat(Line, x)), Concat(Line, Text(r)))))
 	}
 
-	public static func foldDoc<C: CollectionType where C.Generator.Element == Doc>(Docs: C, combine: (Doc, Doc) -> Doc) -> Doc {
-		func fold(Docs: Stream<Doc>) -> Doc {
-			switch Docs {
-			case .Nil:
-				return .Empty
-			case let .Cons(x, rest) where rest.value.isEmpty:
-				return x
-			case let .Cons(x, rest):
-				return combine(x, fold(rest.value))
-			}
-		}
-		return fold(Stream(sequence: Docs))
-	}
-
 	public static func spread<C: CollectionType where C.Generator.Element == Doc>(docs: C) -> Doc {
-		return foldDoc(docs, combine: <+>)
+		return docs.fold(<+>)
 	}
 
 	public static func stack<C: CollectionType where C.Generator.Element == Doc>(docs: C) -> Doc {
-		return foldDoc(docs, combine: </>)
+		return docs.fold(</>)
 	}
 
 	public static func join<C: CollectionType where C.Generator.Element == Doc>(separator: String, _ docs: C) -> Doc {
-		return foldDoc(docs) {
+		return docs.fold {
 			$0 <> Text(separator) <+> $1
 		}
 	}
