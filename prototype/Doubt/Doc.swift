@@ -3,6 +3,25 @@ public enum Doc: CustomStringConvertible, Equatable {
 	indirect case Text(String, Doc)
 	indirect case Line(Int, Doc)
 
+	public init(width: Int, placed: Int, alternatives: Stream<(Int, DOC)>) {
+		switch alternatives {
+		case .Nil:
+			self = .Empty
+		case let .Cons((_, .Empty), rest):
+			self = Doc(width: width, placed: placed, alternatives: rest.value)
+		case let .Cons((i, .Concat(x, y)), rest):
+			self = Doc(width: width, placed: placed, alternatives: .Cons((i, x), Memo(evaluated: .Cons((i, y), rest))))
+		case let .Cons((i, .Nest(j, x)), rest):
+			self = Doc(width: width, placed: placed, alternatives: .Cons((i + j, x), rest))
+		case let .Cons((_, .Text(s)), rest):
+			self = .Text(s, Doc(width: width, placed: placed + Int(s.characters.count), alternatives: rest.value))
+		case let .Cons((i, .Line), rest):
+			self = .Line(i, Doc(width: width, placed: i, alternatives: rest.value))
+		case let .Cons((i, .Union(x, y)), z):
+			self = better(width, placed, Doc(width: width, placed: placed, alternatives: .Cons((i, x), z)), Doc(width: width, placed: placed, alternatives: .Cons((i, y), z)))
+		}
+	}
+
 	public var description: String {
 		switch self {
 		case .Empty:
@@ -93,26 +112,7 @@ public enum DOC {
 	}
 
 	public func best(width: Int, placed: Int = 0) -> Doc {
-		return be(width, placed, .pure((0, self)))
-	}
-}
-
-func be(width: Int, _ placed: Int, _ z: Stream<(Int, DOC)>) -> Doc {
-	switch z {
-	case .Nil:
-		return .Empty
-	case let .Cons((_, .Empty), z):
-		return be(width, placed, z.value)
-	case let .Cons((i, .Concat(x, y)), z):
-		return be(width, placed, .Cons((i, x), Memo(evaluated: .Cons((i, y), z))))
-	case let .Cons((i, .Nest(j, x)), z):
-		return be(width, placed, .Cons((i + j, x), z))
-	case let .Cons((_, .Text(s)), z):
-		return .Text(s, be(width, placed + Int(s.characters.count), z.value))
-	case let .Cons((i, .Line), z):
-		return .Line(i, be(width, i, z.value))
-	case let .Cons((i, .Union(x, y)), z):
-		return better(width, placed, be(width, placed, .Cons((i, x), z)), be(width, placed, .Cons((i, y), z)))
+		return Doc(width: width, placed: placed, alternatives: .pure((0, self)))
 	}
 }
 
