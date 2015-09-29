@@ -13,6 +13,16 @@ public enum Doc: CustomStringConvertible, Equatable {
 			return "\n" + String(count: n, repeatedValue: " " as Character) + doc.description
 		}
 	}
+
+	public func fits(width: Int) -> Bool {
+		guard width >= 0 else { return false }
+		switch self {
+		case .Empty, .Line:
+			return true
+		case let .Text(s, x):
+			return x.fits(width - Int(s.characters.count))
+		}
+	}
 }
 
 public enum DOC {
@@ -107,19 +117,9 @@ func be(w: Int, _ k: Int, _ z: Stream<(Int, DOC)>) -> Doc {
 }
 
 func better(w: Int, _ k: Int, _ x: Doc, _ y: Doc) -> Doc {
-	return fits(w - k, x)
+	return x.fits(w - k)
 		? x
 		: y
-}
-
-func fits(w: Int, _ x: Doc) -> Bool {
-	guard w >= 0 else { return false }
-	switch x {
-	case .Empty, .Line:
-		return true
-	case let .Text(s, x):
-		return fits(w - Int(s.characters.count), x)
-	}
 }
 
 
