@@ -180,7 +180,8 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 			return ".Apply(\(f), [ \(s) ])"
 		case let .Abstract(parameters, body):
 			let s = parameters.map { String(reflecting: $0) }.joinWithSeparator(", ")
-			return ".Abstract([ \(s) ], \(body))"
+			let b = body.map { String(reflecting: $0) }.joinWithSeparator("\n")
+			return ".Abstract([ \(s) ], \(b))"
 		case let .Assign(n, v):
 			return ".Assign(\(n), \(v))"
 		case let .Variable(n):
