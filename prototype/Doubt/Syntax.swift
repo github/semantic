@@ -3,13 +3,17 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 		self = .Roll(out)
 	}
 
-	case Empty
 	indirect case Roll(Syntax<Term>)
+
+	public var syntax: Syntax<Term> {
+		switch self {
+		case let .Roll(syntax):
+			return syntax
+		}
+	}
 
 	public var debugDescription: String {
 		switch self {
-		case .Empty:
-			return ".Empty"
 		case let .Roll(s):
 			return s.debugDescription
 		}
@@ -17,13 +21,15 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 
 	public var doc: Doc {
 		switch self {
-		case .Empty:
-			return .Empty
 		case let .Roll(s):
 			return s.doc
 		}
 	}
 
+
+	public static var Empty: Term {
+		return Term(.Empty)
+	}
 
 	public static let Apply: (Term, [Term]) -> Term = Syntax.Apply >>> Roll
 	public static let Abstract: ([Term], [Term]) -> Term = Syntax.Abstract >>> Roll
@@ -114,6 +120,7 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 
 
 public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible {
+	case Empty
 	case Apply(Payload, [Payload])
 	case Abstract([Payload], [Payload])
 	case Assign(String, Payload)
@@ -123,6 +130,8 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 
 	public func map<T>(@noescape transform: Payload -> T) -> Syntax<T> {
 		switch self {
+		case .Empty:
+			return .Empty
 		case let .Apply(f, args):
 			return .Apply(transform(f), args.map(transform))
 		case let .Abstract(parameters, body):
@@ -164,6 +173,8 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 
 	public var debugDescription: String {
 		switch self {
+		case .Empty:
+			return ".Empty"
 		case let .Apply(f, vs):
 			let s = vs.map { String(reflecting: $0) }.joinWithSeparator(", ")
 			return ".Apply(\(f), [ \(s) ])"
@@ -184,6 +195,8 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 
 	public var doc: Doc {
 		switch self {
+		case .Empty:
+			return .Empty
 		case let .Apply(f, vs):
 			return Doc(f) <> vs.map(Doc.init).joinWithSeparator(",").bracket("(", ")")
 		case let .Abstract(parameters, body):
