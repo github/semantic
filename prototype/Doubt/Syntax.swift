@@ -216,3 +216,24 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		}
 	}
 }
+
+extension Syntax where Payload: AlgebraicHashable {
+	public var hash: Hash {
+		switch self {
+		case .Empty:
+			return .Case("Empty")
+		case let .Apply(f, vs):
+			return .Case("Apply", .Sequence([ f.hash ] + vs.map { $0.hash }))
+		case let .Abstract(parameters, body):
+			return .Case("Abstract", .Sequence(parameters.map { $0.hash }), .Sequence(body.map { $0.hash }))
+		case let .Assign(name, value):
+			return .Case("Assign", .String(name), value.hash)
+		case let .Variable(n):
+			return .Case("Variable", .String(n))
+		case let .Literal(s):
+			return .Case("Literal", .String(s))
+		case let .Group(n, vs):
+			return .Case("Group", n.hash, .Sequence(vs.map { $0.hash }))
+		}
+	}
+}
