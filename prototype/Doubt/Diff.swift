@@ -4,11 +4,11 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	indirect case Copy(Syntax<Diff>)
 
 	public static func Insert(term: Term) -> Diff {
-		return .Patch(Term(.Empty), term)
+		return .Patch(.Empty, term)
 	}
 
 	public static func Delete(term: Term) -> Diff {
-		return .Patch(term, Term(.Empty))
+		return .Patch(term, .Empty)
 	}
 
 	public init(_ term: Term) {
