@@ -192,7 +192,7 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 				<> .Text(".")
 				<> body.map(Doc.init).stack()
 		case let .Assign(n, v):
-			return [ .Text(n), .Text("="), Doc(v) ].spread()
+			return .Text(n) <+> .Text("=") <+> Doc(v)
 		case let .Variable(n):
 			return .Text(n)
 		case let .Literal(s):
