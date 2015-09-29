@@ -57,3 +57,14 @@ extension AlgebraicHashable {
 	}
 }
 
+extension RawRepresentable where RawValue: Hashable {
+	public var hash: Hash {
+		return Hash(rawValue)
+	}
+}
+
+extension RawRepresentable where RawValue: AlgebraicHashable {
+	public var hash: Hash {
+		return Hash(rawValue)
+	}
+}
