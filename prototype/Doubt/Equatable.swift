@@ -42,7 +42,7 @@ public func == (left: Diff, right: Diff) -> Bool {
 	}
 }
 
-public func == (left: Doc, right: Doc) -> Bool {
+public func == (left: Layout, right: Layout) -> Bool {
 	switch (left, right) {
 	case (.Empty, .Empty):
 		return true

@@ -1,24 +1,24 @@
-public enum Doc: CustomStringConvertible, Equatable {
+public enum Layout: CustomStringConvertible, Equatable {
 	case Empty
-	indirect case Text(String, Doc)
-	indirect case Line(Int, Doc)
+	indirect case Text(String, Layout)
+	indirect case Line(Int, Layout)
 
 	public init(width: Int, placed: Int, alternatives: Stream<(Int, DOC)>) {
 		switch alternatives {
 		case .Nil:
 			self = .Empty
 		case let .Cons((_, .Empty), rest):
-			self = Doc(width: width, placed: placed, alternatives: rest.value)
+			self = Layout(width: width, placed: placed, alternatives: rest.value)
 		case let .Cons((i, .Concat(x, y)), rest):
-			self = Doc(width: width, placed: placed, alternatives: .Cons((i, x), Memo(evaluated: .Cons((i, y), rest))))
+			self = Layout(width: width, placed: placed, alternatives: .Cons((i, x), Memo(evaluated: .Cons((i, y), rest))))
 		case let .Cons((i, .Nest(j, x)), rest):
-			self = Doc(width: width, placed: placed, alternatives: .Cons((i + j, x), rest))
+			self = Layout(width: width, placed: placed, alternatives: .Cons((i + j, x), rest))
 		case let .Cons((_, .Text(s)), rest):
-			self = .Text(s, Doc(width: width, placed: placed + Int(s.characters.count), alternatives: rest.value))
+			self = .Text(s, Layout(width: width, placed: placed + Int(s.characters.count), alternatives: rest.value))
 		case let .Cons((i, .Line), rest):
-			self = .Line(i, Doc(width: width, placed: i, alternatives: rest.value))
+			self = .Line(i, Layout(width: width, placed: i, alternatives: rest.value))
 		case let .Cons((i, .Union(x, y)), z):
-			self = .better(width, placed, Doc(width: width, placed: placed, alternatives: .Cons((i, x), z)), Doc(width: width, placed: placed, alternatives: .Cons((i, y), z)))
+			self = .better(width, placed, Layout(width: width, placed: placed, alternatives: .Cons((i, x), z)), Layout(width: width, placed: placed, alternatives: .Cons((i, y), z)))
 		}
 	}
 
@@ -43,7 +43,7 @@ public enum Doc: CustomStringConvertible, Equatable {
 		}
 	}
 
-	public static func better(width: Int, _ placed: Int, _ x: Doc, _ y: Doc) -> Doc {
+	public static func better(width: Int, _ placed: Int, _ x: Layout, _ y: Layout) -> Layout {
 		return x.fits(width - placed) ? x : y
 	}
 }
@@ -115,8 +115,8 @@ public enum DOC {
 		return best(width).description
 	}
 
-	public func best(width: Int, placed: Int = 0) -> Doc {
-		return Doc(width: width, placed: placed, alternatives: .pure((0, self)))
+	public func best(width: Int, placed: Int = 0) -> Layout {
+		return Layout(width: width, placed: placed, alternatives: .pure((0, self)))
 	}
 }
 
