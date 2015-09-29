@@ -97,22 +97,22 @@ public enum DOC {
 	}
 }
 
-func be(w: Int, _ k: Int, _ z: Stream<(Int, DOC)>) -> Doc {
+func be(width: Int, _ placed: Int, _ z: Stream<(Int, DOC)>) -> Doc {
 	switch z {
 	case .Nil:
 		return .Empty
 	case let .Cons((_, .Empty), z):
-		return be(w, k, z.value)
+		return be(width, placed, z.value)
 	case let .Cons((i, .Concat(x, y)), z):
-		return be(w, k, .Cons((i, x), Memo(evaluated: .Cons((i, y), z))))
+		return be(width, placed, .Cons((i, x), Memo(evaluated: .Cons((i, y), z))))
 	case let .Cons((i, .Nest(j, x)), z):
-		return be(w, k, .Cons((i + j, x), z))
+		return be(width, placed, .Cons((i + j, x), z))
 	case let .Cons((_, .Text(s)), z):
-		return .Text(s, be(w, k + Int(s.characters.count), z.value))
+		return .Text(s, be(width, placed + Int(s.characters.count), z.value))
 	case let .Cons((i, .Line), z):
-		return .Line(i, be(w, i, z.value))
+		return .Line(i, be(width, i, z.value))
 	case let .Cons((i, .Union(x, y)), z):
-		return better(w, k, be(w, k, .Cons((i, x), z)), be(w, k, .Cons((i, y), z)))
+		return better(width, placed, be(width, placed, .Cons((i, x), z)), be(width, placed, .Cons((i, y), z)))
 	}
 }
 
