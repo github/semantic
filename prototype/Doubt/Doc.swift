@@ -82,16 +82,16 @@ public enum Doc: CustomDocConvertible, Equatable {
 		return fold(Stream(sequence: Docs))
 	}
 
-	public static func spread<C: CollectionType where C.Generator.Element == Doc>(Docs: C) -> Doc {
-		return foldDoc(Docs, combine: <+>)
+	public static func spread<C: CollectionType where C.Generator.Element == Doc>(docs: C) -> Doc {
+		return foldDoc(docs, combine: <+>)
 	}
 
-	public static func stack<C: CollectionType where C.Generator.Element == Doc>(Docs: C) -> Doc {
-		return foldDoc(Docs, combine: </>)
+	public static func stack<C: CollectionType where C.Generator.Element == Doc>(docs: C) -> Doc {
+		return foldDoc(docs, combine: </>)
 	}
 
-	public static func join<C: CollectionType where C.Generator.Element == Doc>(separator: String, _ Docs: C) -> Doc {
-		return foldDoc(Docs) {
+	public static func join<C: CollectionType where C.Generator.Element == Doc>(separator: String, _ docs: C) -> Doc {
+		return foldDoc(docs) {
 			$0 <> Text(separator) <+> $1
 		}
 	}
