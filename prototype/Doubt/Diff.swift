@@ -1,5 +1,4 @@
 public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible {
-	case Empty
 	case Patch(Term, Term)
 	indirect case Copy(Syntax<Diff>)
 
@@ -20,8 +19,6 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 
 	public var doc: Doc {
 		switch self {
-		case .Empty:
-			return .Empty
 		case let .Patch(a, b):
 			return Doc(a).bracket("{-", "-}")
 				<> Doc(b).bracket("{+", "+}")
@@ -32,8 +29,6 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 
 	public var debugDescription: String {
 		switch self {
-		case .Empty:
-			return ".Empty"
 		case let .Patch(a, b):
 			return ".Patch(\(String(reflecting: a)), \(String(reflecting: b)))"
 		case let .Copy(a):
@@ -43,8 +38,6 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 
 	public var magnitude: Int {
 		switch self {
-		case .Empty:
-			return 0
 		case .Patch:
 			return 1
 		case let .Copy(s):
