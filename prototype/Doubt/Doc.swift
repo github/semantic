@@ -76,12 +76,6 @@ public enum Doc: CustomDocConvertible, Equatable {
 		return docs.fold(</>)
 	}
 
-	public static func join<C: CollectionType where C.Generator.Element == Doc>(separator: String, _ docs: C) -> Doc {
-		return docs.fold {
-			$0 <> Text(separator) <+> $1
-		}
-	}
-
 	public var flattened: Doc {
 		switch self {
 		case .Empty, .Text:

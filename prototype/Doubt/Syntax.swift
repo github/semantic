@@ -185,11 +185,11 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 	public var doc: Doc {
 		switch self {
 		case let .Apply(f, vs):
-			return Doc(f) <> .bracket("(", .join(", ", vs.map(Doc.init)), ")")
+			return Doc(f) <> .bracket("(", vs.map(Doc.init).joinWithSeparator(","), ")")
 		case let .Abstract(parameters, body):
 			return [
 				.Text("λ"),
-				.join(",", parameters.map(Doc.init)),
+				parameters.map(Doc.init).joinWithSeparator(","),
 				.Text("."),
 				.stack(body.map(Doc.init))
 			].fold(<>)
