@@ -68,10 +68,6 @@ public enum Doc: CustomDocConvertible, Equatable {
 		return group(Concat(Text(l), Concat(Nest(2, Concat(Line, x)), Concat(Line, Text(r)))))
 	}
 
-	public static func spread<C: CollectionType where C.Generator.Element == Doc>(docs: C) -> Doc {
-		return docs.fold(<+>)
-	}
-
 	public static func stack<C: CollectionType where C.Generator.Element == Doc>(docs: C) -> Doc {
 		return docs.fold(</>)
 	}
@@ -118,6 +114,11 @@ extension SequenceType where Generator.Element == Doc {
 		}
 		return fold(Stream(sequence: self))
 	}
+
+	public func spread() -> Doc {
+		return fold(<+>)
+	}
+
 	public func joinWithSeparator(separator: String) -> Doc {
 		return fold {
 			$0 <> .Text(separator) <+> $1
