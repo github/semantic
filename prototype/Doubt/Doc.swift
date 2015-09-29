@@ -124,6 +124,22 @@ public enum Doc: CustomDocConvertible, Equatable {
 	}
 }
 
+extension SequenceType where Generator.Element == Doc {
+	public func fold(combine: (Doc, Doc) -> Doc) -> Doc {
+		func fold(docs: Stream<Doc>) -> Doc {
+			switch docs {
+			case .Nil:
+				return .Empty
+			case let .Cons(x, rest) where rest.value.isEmpty:
+				return x
+			case let .Cons(x, rest):
+				return combine(x, fold(rest.value))
+			}
+		}
+		return fold(Stream(sequence: self))
+	}
+}
+
 public protocol CustomDocConvertible: CustomStringConvertible {
 	var doc: Doc { get }
 }
