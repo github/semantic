@@ -1,13 +1,5 @@
 public func == (left: Term, right: Term) -> Bool {
-	switch (left, right) {
-	case (.Empty, .Empty):
-		return true
-	case let (.Roll(s), .Roll(t)):
-		return s == t
-
-	default:
-		return false
-	}
+	return left.syntax == right.syntax
 }
 
 public func == <F: Equatable> (left: Syntax<F>, right: Syntax<F>) -> Bool {

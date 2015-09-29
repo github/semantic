@@ -4,17 +4,15 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	indirect case Copy(Syntax<Diff>)
 
 	public static func Insert(term: Term) -> Diff {
-		return .Patch(.Empty, term)
+		return .Patch(Term(.Empty), term)
 	}
 
 	public static func Delete(term: Term) -> Diff {
-		return .Patch(term, .Empty)
+		return .Patch(term, Term(.Empty))
 	}
 
 	public init(_ term: Term) {
 		switch term {
-		case .Empty:
-			self = .Empty
 		case let .Roll(s):
 			self = .Copy(s.map(Diff.init))
 		}
@@ -55,36 +53,27 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	}
 
 	public init(_ a: Term, _ b: Term) {
-		switch (a, b) {
-		case (.Empty, .Empty):
-			self = .Empty
+		switch (a.syntax, b.syntax) {
+		case let (.Apply(a, aa), .Apply(b, bb)):
+			self = .Copy(.Apply(Diff(a, b), Diff.diff(aa, bb)))
 
-		case let (.Roll(a), .Roll(b)):
-			switch (a, b) {
-			case let (.Apply(a, aa), .Apply(b, bb)):
-				self = .Copy(.Apply(Diff(a, b), Diff.diff(aa, bb)))
+		case let (.Abstract(p1, b1), .Abstract(p2, b2)):
+			self = .Copy(.Abstract(Diff.diff(p1, p2), Diff.diff(b1, b2)))
 
-			case let (.Abstract(p1, b1), .Abstract(p2, b2)):
-				self = .Copy(.Abstract(Diff.diff(p1, p2), Diff.diff(b1, b2)))
+		case let (.Assign(n1, v1), .Assign(n2, v2)) where n1 == n2:
+			self = .Copy(.Assign(n2, Diff(v1, v2)))
 
-			case let (.Assign(n1, v1), .Assign(n2, v2)) where n1 == n2:
-				self = .Copy(.Assign(n2, Diff(v1, v2)))
+		case let (.Variable(n1), .Variable(n2)) where n1 == n2:
+			self = .Copy(.Variable(n2))
 
-			case let (.Variable(n1), .Variable(n2)) where n1 == n2:
-				self = .Copy(.Variable(n2))
+		case let (.Literal(v1), .Literal(v2)) where v1 == v2:
+			self = .Copy(.Literal(v2))
 
-			case let (.Literal(v1), .Literal(v2)) where v1 == v2:
-				self = .Copy(.Literal(v2))
-
-			case let (.Group(n1, v1), .Group(n2, v2)):
-				self = .Copy(.Group(Diff(n1, n2), Diff.diff(v1, v2)))
-
-			default:
-				self = .Patch(Term(a), Term(b))
-			}
+		case let (.Group(n1, v1), .Group(n2, v2)):
+			self = .Copy(.Group(Diff(n1, n2), Diff.diff(v1, v2)))
 
 		default:
-			self = Patch(a, b)
+			self = .Patch(a, b)
 		}
 	}
 

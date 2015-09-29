@@ -3,13 +3,17 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 		self = .Roll(out)
 	}
 
-	case Empty
 	indirect case Roll(Syntax<Term>)
+
+	public var syntax: Syntax<Term> {
+		switch self {
+		case let .Roll(syntax):
+			return syntax
+		}
+	}
 
 	public var debugDescription: String {
 		switch self {
-		case .Empty:
-			return ".Empty"
 		case let .Roll(s):
 			return s.debugDescription
 		}
@@ -17,8 +21,6 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 
 	public var doc: Doc {
 		switch self {
-		case .Empty:
-			return .Empty
 		case let .Roll(s):
 			return s.doc
 		}
