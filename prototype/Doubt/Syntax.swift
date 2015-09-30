@@ -216,17 +216,17 @@ extension Syntax where Recur: AlgebraicHashable {
 	public var hash: Hash {
 		switch self {
 		case .Empty:
-			return .Case("Empty")
+			return Hash("Empty")
 		case let .Apply(f, vs):
-			return .Case("Apply", .Sequence([ f.hash ] + vs.map { $0.hash }))
+			return Hash("Apply", .Sequence([ f.hash ] + vs.map { $0.hash }))
 		case let .Abstract(parameters, body):
-			return .Case("Abstract", .Sequence(parameters.map { $0.hash }), .Sequence(body.map { $0.hash }))
+			return Hash("Abstract", .Sequence(parameters.map { $0.hash }), .Sequence(body.map { $0.hash }))
 		case let .Assign(name, value):
-			return .Case("Assign", Hash(name), value.hash)
+			return Hash("Assign", Hash(name), value.hash)
 		case let .Leaf(n):
-			return .Case("Leaf", Hash(n))
+			return Hash("Leaf", Hash(n))
 		case let .Group(n, vs):
-			return .Case("Group", n.hash, .Sequence(vs.map { $0.hash }))
+			return Hash("Group", n.hash, .Sequence(vs.map { $0.hash }))
 		}
 	}
 }

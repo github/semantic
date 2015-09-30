@@ -3,12 +3,8 @@ public enum Hash: Hashable {
 	case Label(String)
 	case Raw(Int)
 
-	public static func Case(label: String, _ hashes: Hash...) -> Hash {
-		return .Sequence([ .Label(label) ] + hashes)
-	}
-
-	public static func Case(index: Int, _ hashes: Hash...) -> Hash {
-		return .Sequence([ .Raw(index) ] + hashes)
+	public init(_ label: String, _ hashes: Hash...) {
+		self = .Sequence([ Hash(label) ] + hashes)
 	}
 
 	public init(_ string: String) {
