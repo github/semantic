@@ -44,7 +44,6 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 
 	/// Constructs a Term representing the `JSON` in a file at `path`.
 	public init?(path: String, JSON: Doubt.JSON) {
-		struct E: ErrorType {}
 		func die<A>() throws -> A {
 			throw E()
 		}
@@ -66,7 +65,6 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 			case Name = "key.name"
 			case Substructure = "key.substructure"
 		}
-		struct E: ErrorType {}
 		func die<A>() throws -> A {
 			throw E()
 		}
@@ -182,3 +180,5 @@ extension Syntax where Recur: Hashable, A: Hashable {
 		}
 	}
 }
+
+private struct E: ErrorType {}
