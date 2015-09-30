@@ -1,13 +1,13 @@
 public enum Hash: Hashable {
 	case Sequence([Hash])
 	case String(Swift.String)
-	case Raw(Swift.Int)
+	case Raw(Int)
 
 	public static func Case(label: Swift.String, _ hashes: Hash...) -> Hash {
 		return .Sequence([ .String(label) ] + hashes)
 	}
 
-	public static func Case(index: Swift.Int, _ hashes: Hash...) -> Hash {
+	public static func Case(index: Int, _ hashes: Hash...) -> Hash {
 		return .Sequence([ .Raw(index) ] + hashes)
 	}
 
@@ -20,7 +20,7 @@ public enum Hash: Hashable {
 	}
 
 
-	public var hashValue: Swift.Int {
+	public var hashValue: Int {
 		switch self {
 		case let .Sequence(s):
 			// Bob Jenkins’ one-at-a-time hash: https://en.wikipedia.org/wiki/Jenkins_hash_function
