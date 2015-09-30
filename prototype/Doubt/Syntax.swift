@@ -124,16 +124,16 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 }
 
 
-public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible {
+public enum Syntax<Recur>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Empty
-	case Apply(Payload, [Payload])
-	case Abstract([Payload], [Payload])
-	case Assign(String, Payload)
+	case Apply(Recur, [Recur])
+	case Abstract([Recur], [Recur])
+	case Assign(String, Recur)
 	case Variable(String)
 	case Literal(String)
-	case Group(Payload, [Payload])
+	case Group(Recur, [Recur])
 
-	public func map<T>(@noescape transform: Payload -> T) -> Syntax<T> {
+	public func map<T>(@noescape transform: Recur -> T) -> Syntax<T> {
 		switch self {
 		case .Empty:
 			return .Empty
@@ -152,7 +152,7 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		}
 	}
 
-	public func reduce<T>(var initial: T, @noescape combine: (T, Payload) throws -> T) rethrows -> T {
+	public func reduce<T>(var initial: T, @noescape combine: (T, Recur) throws -> T) rethrows -> T {
 		switch self {
 		case let .Apply(x, xs):
 			initial = try combine(initial, x)
@@ -220,7 +220,7 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 	}
 }
 
-extension Syntax where Payload: AlgebraicHashable {
+extension Syntax where Recur: AlgebraicHashable {
 	public var hash: Hash {
 		switch self {
 		case .Empty:
