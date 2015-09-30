@@ -178,7 +178,7 @@ extension Syntax where Recur: AlgebraicHashable {
 		case let .Leaf(n):
 			return Hash("Leaf", Hash(n))
 		case let .Branch(vs):
-			return Hash("Branch", .Sequence(vs.map { $0.hash }))
+			return Hash("Branch", .Sequence(vs.map(Hash.init)))
 		}
 	}
 }
