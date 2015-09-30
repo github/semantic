@@ -1,4 +1,4 @@
-public enum Category: Equatable {
+public enum Category: AlgebraicHashable {
 	case Tag(String)
 
 
@@ -7,6 +7,10 @@ public enum Category: Equatable {
 		case let .Tag(s):
 			return s
 		}
+	}
+
+	public var hash: Hash {
+		return Hash("Tag", Hash(tag))
 	}
 }
 
