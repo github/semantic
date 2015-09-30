@@ -1,16 +1,16 @@
 public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible {
-	case Patch(Term<String>, Term<String>)
-	indirect case Copy(Syntax<Diff, String>)
+	case Patch(Term<Info>, Term<Info>)
+	indirect case Copy(Syntax<Diff, Info>)
 
-	public static func Insert(term: Term<String>) -> Diff {
+	public static func Insert(term: Term<Info>) -> Diff {
 		return .Patch(.Empty, term)
 	}
 
-	public static func Delete(term: Term<String>) -> Diff {
+	public static func Delete(term: Term<Info>) -> Diff {
 		return .Patch(term, .Empty)
 	}
 
-	public init(_ term: Term<String>) {
+	public init(_ term: Term<Info>) {
 		switch term {
 		case let .Roll(s):
 			self = .Copy(s.map(Diff.init))
@@ -45,7 +45,7 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		}
 	}
 
-	public init(_ a: Term<String>, _ b: Term<String>) {
+	public init(_ a: Term<Info>, _ b: Term<Info>) {
 		if a == b {
 			self = Diff(b)
 			return
@@ -62,7 +62,7 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		}
 	}
 
-	public static func diff<C1: CollectionType, C2: CollectionType where C1.Index : RandomAccessIndexType, C1.Generator.Element == Term<String>, C2.Index : RandomAccessIndexType, C2.Generator.Element == Term<String>>(a: C1, _ b: C2) -> [Diff] {
+	public static func diff<C1: CollectionType, C2: CollectionType where C1.Index : RandomAccessIndexType, C1.Generator.Element == Term<Info>, C2.Index : RandomAccessIndexType, C2.Generator.Element == Term<Info>>(a: C1, _ b: C2) -> [Diff] {
 		func magnitude(diffs: Stream<(Diff, Int)>) -> Int {
 //			return diffs.first?.magnitude ?? 0
 			return diffs.map { $1 }.reduce(0, combine: +)
@@ -74,7 +74,7 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			})
 		}
 
-		func diff(a: Stream<Term<String>>, _ b: Stream<Term<String>>) -> Stream<(Diff, Int)> {
+		func diff(a: Stream<Term<Info>>, _ b: Stream<Term<Info>>) -> Stream<(Diff, Int)> {
 			switch (a, b) {
 			case (.Nil, .Nil):
 				return .Nil
