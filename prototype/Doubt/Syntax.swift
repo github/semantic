@@ -170,7 +170,7 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 	}
 }
 
-extension Syntax where Recur: AlgebraicHashable {
+extension Syntax where Recur: Hashable {
 	public var hash: Hash {
 		switch self {
 		case .Empty:
