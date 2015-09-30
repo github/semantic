@@ -174,8 +174,6 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 		}
 	}
 
-	public typealias Recur = Payload
-
 	public var debugDescription: String {
 		switch self {
 		case .Empty:
