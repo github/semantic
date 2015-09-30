@@ -1,5 +1,12 @@
 public enum Info: Equatable {
 	case Literal(String, Set<Category>)
+
+	public var categories: Set<Category> {
+		switch self {
+		case let .Literal(_, c):
+			return c
+		}
+	}
 }
 
 
