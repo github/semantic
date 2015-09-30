@@ -1,14 +1,18 @@
 public enum Hash: Hashable {
 	case Sequence([Hash])
-	case String(Swift.String)
-	case Int(Swift.Int)
+	case Label(String)
+	case Raw(Int)
 
-	public static func Case(label: Swift.String, _ hashes: Hash...) -> Hash {
-		return .Sequence([ .String(label) ] + hashes)
+	public init(_ label: String, _ hashes: Hash...) {
+		self = .Sequence([ Hash(label) ] + hashes)
 	}
 
-	public static func Case(index: Swift.Int, _ hashes: Hash...) -> Hash {
-		return .Sequence([ .Int(index) ] + hashes)
+	public init(_ string: String) {
+		self = .Label(string)
+	}
+
+	public init(_ raw: Int) {
+		self = .Raw(raw)
 	}
 
 	public init<A: AlgebraicHashable>(_ hashable: A) {
@@ -16,11 +20,11 @@ public enum Hash: Hashable {
 	}
 
 	public init<A: Hashable>(_ hashable: A) {
-		self = .Int(hashable.hashValue)
+		self = .Raw(hashable.hashValue)
 	}
 
 
-	public var hashValue: Swift.Int {
+	public var hashValue: Int {
 		switch self {
 		case let .Sequence(s):
 			// Bob Jenkins’ one-at-a-time hash: https://en.wikipedia.org/wiki/Jenkins_hash_function
@@ -34,9 +38,9 @@ public enum Hash: Hashable {
 			hash ^= hash >> 11
 			hash += hash << 15
 			return hash
-		case let .String(s):
+		case let .Label(s):
 			return s.hashValue
-		case let .Int(i):
+		case let .Raw(i):
 			return i.hashValue
 		}
 	}
@@ -46,18 +50,20 @@ public func == (left: Hash, right: Hash) -> Bool {
 	switch (left, right) {
 	case let (.Sequence(a), .Sequence(b)):
 		return a == b
-	case let (.String(a), .String(b)):
+	case let (.Label(a), .Label(b)):
 		return a == b
-	case let (.Int(a), .Int(b)):
+	case let (.Raw(a), .Raw(b)):
 		return a == b
 	default:
 		return false
 	}
 }
 
-public protocol AlgebraicHashable: Hashable {
+public protocol CustomHashConvertible {
 	var hash: Hash { get }
 }
+
+public protocol AlgebraicHashable: CustomHashConvertible, Hashable {}
 
 extension AlgebraicHashable {
 	public var hashValue: Int {

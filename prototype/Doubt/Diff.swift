@@ -1,6 +1,6 @@
 public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible {
 	case Patch(Term, Term)
-	indirect case Copy(Syntax<Diff>)
+	indirect case Copy(Syntax<Diff, String>)
 
 	public static func Insert(term: Term) -> Diff {
 		return .Patch(.Empty, term)
@@ -51,23 +51,11 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			return
 		}
 		switch (a.syntax, b.syntax) {
-		case let (.Apply(a, aa), .Apply(b, bb)):
-			self = .Copy(.Apply(Diff(a, b), Diff.diff(aa, bb)))
+		case let (.Leaf(v1), .Leaf(v2)) where v1 == v2:
+			self = .Copy(.Leaf(v2))
 
-		case let (.Abstract(p1, b1), .Abstract(p2, b2)):
-			self = .Copy(.Abstract(Diff.diff(p1, p2), Diff.diff(b1, b2)))
-
-		case let (.Assign(n1, v1), .Assign(n2, v2)) where n1 == n2:
-			self = .Copy(.Assign(n2, Diff(v1, v2)))
-
-		case let (.Variable(n1), .Variable(n2)) where n1 == n2:
-			self = .Copy(.Variable(n2))
-
-		case let (.Literal(v1), .Literal(v2)) where v1 == v2:
-			self = .Copy(.Literal(v2))
-
-		case let (.Group(n1, v1), .Group(n2, v2)):
-			self = .Copy(.Group(Diff(n1, n2), Diff.diff(v1, v2)))
+		case let (.Branch(v1), .Branch(v2)):
+			self = .Copy(.Branch(Diff.diff(v1, v2)))
 
 		default:
 			self = .Patch(a, b)
