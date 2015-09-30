@@ -1,9 +1,9 @@
 public enum Hash: Hashable {
 	case Sequence([Hash])
-	case Label(Swift.String)
+	case Label(String)
 	case Raw(Int)
 
-	public static func Case(label: Swift.String, _ hashes: Hash...) -> Hash {
+	public static func Case(label: String, _ hashes: Hash...) -> Hash {
 		return .Sequence([ .Label(label) ] + hashes)
 	}
 
