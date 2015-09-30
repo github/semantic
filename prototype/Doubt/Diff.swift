@@ -1,6 +1,6 @@
 public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible {
 	case Patch(Term, Term)
-	indirect case Copy(Syntax<Diff>)
+	indirect case Copy(Syntax<Diff, String>)
 
 	public static func Insert(term: Term) -> Diff {
 		return .Patch(.Empty, term)

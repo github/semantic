@@ -2,7 +2,7 @@ public func == (left: Term, right: Term) -> Bool {
 	return left.syntax == right.syntax
 }
 
-public func == <F: Equatable> (left: Syntax<F>, right: Syntax<F>) -> Bool {
+public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F, A>) -> Bool {
 	switch (left, right) {
 	case (.Empty, .Empty):
 		return true

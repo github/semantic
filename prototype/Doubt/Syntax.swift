@@ -1,11 +1,11 @@
 public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, AlgebraicHashable {
-	public init(_ out: Syntax<Term>) {
+	public init(_ out: Syntax<Term, String>) {
 		self = .Roll(out)
 	}
 
-	indirect case Roll(Syntax<Term>)
+	indirect case Roll(Syntax<Term, String>)
 
-	public var syntax: Syntax<Term> {
+	public var syntax: Syntax<Term, String> {
 		switch self {
 		case let .Roll(syntax):
 			return syntax
@@ -124,7 +124,7 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 }
 
 
-public enum Syntax<Recur>: CustomDebugStringConvertible, CustomDocConvertible {
+public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Empty
 	case Apply(Recur, [Recur])
 	case Abstract([Recur], [Recur])
@@ -133,7 +133,7 @@ public enum Syntax<Recur>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Literal(String)
 	case Group(Recur, [Recur])
 
-	public func map<T>(@noescape transform: Recur -> T) -> Syntax<T> {
+	public func map<T>(@noescape transform: Recur -> T) -> Syntax<T, A> {
 		switch self {
 		case .Empty:
 			return .Empty
