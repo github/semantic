@@ -1,5 +1,5 @@
 public enum Info: Equatable {
-	case Literal(String, [Category])
+	case Literal(String, Set<Category>)
 }
 
 
