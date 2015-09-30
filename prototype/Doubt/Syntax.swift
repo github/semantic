@@ -32,11 +32,11 @@ public enum Term<A>: CustomDebugStringConvertible, CustomDocConvertible, CustomS
 	}
 
 	public static func Leaf(a: A) -> Term {
-		return Roll(.Leaf(a))
+		return Term(.Leaf(a))
 	}
 
 	public static func Branch(terms: [Term]) -> Term {
-		return Roll(.Branch(terms))
+		return Term(.Branch(terms))
 	}
 }
 
