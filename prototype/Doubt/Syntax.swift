@@ -1,4 +1,4 @@
-public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, Equatable {
+public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, AlgebraicHashable {
 	public init(_ out: Syntax<Term>) {
 		self = .Roll(out)
 	}
@@ -24,6 +24,11 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 		case let .Roll(s):
 			return s.doc
 		}
+	}
+
+
+	public var hash: Hash {
+		return syntax.hash
 	}
 
 
@@ -180,7 +185,8 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 			return ".Apply(\(f), [ \(s) ])"
 		case let .Abstract(parameters, body):
 			let s = parameters.map { String(reflecting: $0) }.joinWithSeparator(", ")
-			return ".Abstract([ \(s) ], \(body))"
+			let b = body.map { String(reflecting: $0) }.joinWithSeparator("\n")
+			return ".Abstract([ \(s) ], \(b))"
 		case let .Assign(n, v):
 			return ".Assign(\(n), \(v))"
 		case let .Variable(n):
@@ -212,6 +218,27 @@ public enum Syntax<Payload>: CustomDebugStringConvertible, CustomDocConvertible 
 			return .Text(s)
 		case let .Group(n, vs):
 			return Doc(n) <> vs.map(Doc.init).stack().bracket("{", "}")
+		}
+	}
+}
+
+extension Syntax where Payload: AlgebraicHashable {
+	public var hash: Hash {
+		switch self {
+		case .Empty:
+			return .Case("Empty")
+		case let .Apply(f, vs):
+			return .Case("Apply", .Sequence([ f.hash ] + vs.map { $0.hash }))
+		case let .Abstract(parameters, body):
+			return .Case("Abstract", .Sequence(parameters.map { $0.hash }), .Sequence(body.map { $0.hash }))
+		case let .Assign(name, value):
+			return .Case("Assign", .String(name), value.hash)
+		case let .Variable(n):
+			return .Case("Variable", .String(n))
+		case let .Literal(s):
+			return .Case("Literal", .String(s))
+		case let .Group(n, vs):
+			return .Case("Group", n.hash, .Sequence(vs.map { $0.hash }))
 		}
 	}
 }
