@@ -1,5 +1,5 @@
-public func == (left: Term, right: Term) -> Bool {
-	return left.syntax == right.syntax
+public func == <A: Equatable> (left: Term<A>, right: Term<A>) -> Bool {
+	return equals(left.syntax, right.syntax, ==)
 }
 
 private func equals<F, A: Equatable>(left: Syntax<F, A>, _ right: Syntax<F, A>, _ recur: (F, F) -> Bool) -> Bool {

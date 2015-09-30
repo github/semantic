@@ -1,11 +1,11 @@
-public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, AlgebraicHashable {
-	public init(_ out: Syntax<Term, String>) {
+public enum Term<A>: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible {
+	public init(_ out: Syntax<Term, A>) {
 		self = .Roll(out)
 	}
 
-	indirect case Roll(Syntax<Term, String>)
+	indirect case Roll(Syntax<Term, A>)
 
-	public var syntax: Syntax<Term, String> {
+	public var syntax: Syntax<Term, A> {
 		switch self {
 		case let .Roll(syntax):
 			return syntax
@@ -27,45 +27,33 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 	}
 
 
-	public var hash: Hash {
-		return syntax.hash
-	}
-
-
 	public static var Empty: Term {
-		return Term(.Empty)
+		return Term(Syntax<Term, A>.Empty)
 	}
 
-	public static let Leaf = Syntax.Leaf >>> Roll
-	public static let Branch: [Term] -> Term = Syntax.Branch >>> Roll
-
-
-	// MARK: JSON representation.
-
-	/// Constructs a Term representing the `JSON` in a file at `path`.
-	public init?(path: String, JSON: Doubt.JSON) {
-		func die<A>() throws -> A {
-			throw E()
-		}
-		do {
-			switch JSON.dictionary?["key.substructure"] {
-			case let .Some(.Array(a)):
-				self = .Roll(.Branch(try a.map { try Term(JSON: $0) ?? die() }))
-			default:
-				return nil
-			}
-		} catch _ {
-			return nil
-		}
+	public static func Leaf(a: A) -> Term {
+		return Roll(.Leaf(a))
 	}
 
+	public static func Branch(terms: [Term]) -> Term {
+		return Roll(.Branch(terms))
+	}
+}
+
+public protocol StringConvertible {
+	init(string: String)
+}
+
+extension String: StringConvertible {
+	public init(string: String) {
+		self = string
+	}
+}
+
+extension Term where A: StringConvertible {
 	/// Constructs a Term representing `JSON`.
 	public init?(JSON: Doubt.JSON) {
-		enum Key: String {
-			case Name = "key.name"
-			case Substructure = "key.substructure"
-		}
-		func die<A>() throws -> A {
+		func die<B>() throws -> B {
 			throw E()
 		}
 		do {
@@ -80,19 +68,19 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 					.Some("source.lang.swift.decl.extension"),
 					.Some("source.lang.swift.decl.enum"),
 					.Some("source.lang.swift.decl.struct"):
-					self = .Branch([ .Leaf(name), .Branch(try substructure.map { try Term(JSON: $0) ?? die() }) ])
+					self = .Branch([ .Leaf(A(string: name)), .Branch(try substructure.map { try Term(JSON: $0) ?? die() }) ])
 
 				case .Some("source.lang.swift.decl.enumelement"):
 					fallthrough
 				case
 					.Some("source.lang.swift.decl.function.method.instance"),
 					.Some("source.lang.swift.decl.function.free"):
-					self = .Branch([ .Leaf(name), .Branch(try substructure.map { try Term(JSON: $0) ?? die() }) ])
+					self = .Branch([ .Leaf(A(string: name)), .Branch(try substructure.map { try Term(JSON: $0) ?? die() }) ])
 
 				case
 					.Some("source.lang.swift.decl.var.instance"),
 					.Some("source.lang.swift.decl.var.static"):
-					self = .Leaf(name)
+					self = .Leaf(A(string: name))
 
 				default:
 					return nil
@@ -108,6 +96,23 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 			case .Null:
 				self = .Empty
 
+			default:
+				return nil
+			}
+		} catch _ {
+			return nil
+		}
+	}
+
+	/// Constructs a Term representing the `JSON` in a file at `path`.
+	public init?(path: String, JSON: Doubt.JSON) {
+		func die<B>() throws -> B {
+			throw E()
+		}
+		do {
+			switch JSON.dictionary?["key.substructure"] {
+			case let .Some(.Array(a)):
+				self = .Roll(.Branch(try a.map { try Term(JSON: $0) ?? die() }))
 			default:
 				return nil
 			}

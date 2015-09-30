@@ -1,16 +1,16 @@
 public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible {
-	case Patch(Term, Term)
+	case Patch(Term<String>, Term<String>)
 	indirect case Copy(Syntax<Diff, String>)
 
-	public static func Insert(term: Term) -> Diff {
+	public static func Insert(term: Term<String>) -> Diff {
 		return .Patch(.Empty, term)
 	}
 
-	public static func Delete(term: Term) -> Diff {
+	public static func Delete(term: Term<String>) -> Diff {
 		return .Patch(term, .Empty)
 	}
 
-	public init(_ term: Term) {
+	public init(_ term: Term<String>) {
 		switch term {
 		case let .Roll(s):
 			self = .Copy(s.map(Diff.init))
@@ -45,7 +45,7 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		}
 	}
 
-	public init(_ a: Term, _ b: Term) {
+	public init(_ a: Term<String>, _ b: Term<String>) {
 		if a == b {
 			self = Diff(b)
 			return
@@ -62,7 +62,7 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		}
 	}
 
-	public static func diff<C1: CollectionType, C2: CollectionType where C1.Index : RandomAccessIndexType, C1.Generator.Element == Term, C2.Index : RandomAccessIndexType, C2.Generator.Element == Term>(a: C1, _ b: C2) -> [Diff] {
+	public static func diff<C1: CollectionType, C2: CollectionType where C1.Index : RandomAccessIndexType, C1.Generator.Element == Term<String>, C2.Index : RandomAccessIndexType, C2.Generator.Element == Term<String>>(a: C1, _ b: C2) -> [Diff] {
 		func magnitude(diffs: Stream<(Diff, Int)>) -> Int {
 //			return diffs.first?.magnitude ?? 0
 			return diffs.map { $1 }.reduce(0, combine: +)
@@ -74,7 +74,7 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			})
 		}
 
-		func diff(a: Stream<Term>, _ b: Stream<Term>) -> Stream<(Diff, Int)> {
+		func diff(a: Stream<Term<String>>, _ b: Stream<Term<String>>) -> Stream<(Diff, Int)> {
 			switch (a, b) {
 			case (.Nil, .Nil):
 				return .Nil
