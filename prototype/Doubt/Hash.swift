@@ -15,6 +15,10 @@ public enum Hash: Hashable {
 		self = .Label(string)
 	}
 
+	public init(_ raw: Int) {
+		self = .Raw(raw)
+	}
+
 	public init<A: AlgebraicHashable>(_ hashable: A) {
 		self = hashable.hash
 	}
