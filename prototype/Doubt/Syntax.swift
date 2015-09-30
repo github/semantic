@@ -28,7 +28,7 @@ public enum Term<A>: CustomDebugStringConvertible, CustomDocConvertible, CustomS
 
 
 	public static var Empty: Term {
-		return Term(Syntax<Term, A>.Empty)
+		return Term(.Empty)
 	}
 
 	public static func Leaf(a: A) -> Term {
