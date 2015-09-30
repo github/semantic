@@ -13,17 +13,11 @@ public enum Term<A>: CustomDebugStringConvertible, CustomDocConvertible, CustomS
 	}
 
 	public var debugDescription: String {
-		switch self {
-		case let .Roll(s):
-			return s.debugDescription
-		}
+		return syntax.debugDescription
 	}
 
 	public var doc: Doc {
-		switch self {
-		case let .Roll(s):
-			return s.doc
-		}
+		return syntax.doc
 	}
 
 
