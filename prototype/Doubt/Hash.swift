@@ -59,9 +59,11 @@ public func == (left: Hash, right: Hash) -> Bool {
 	}
 }
 
-public protocol AlgebraicHashable: Hashable {
+public protocol CustomHashConvertible {
 	var hash: Hash { get }
 }
+
+public protocol AlgebraicHashable: CustomHashConvertible, Hashable {}
 
 extension AlgebraicHashable {
 	public var hashValue: Int {
