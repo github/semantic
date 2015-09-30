@@ -2,17 +2,21 @@ public func == (left: Term, right: Term) -> Bool {
 	return left.syntax == right.syntax
 }
 
-public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F, A>) -> Bool {
+private func equals<F, A: Equatable>(left: Syntax<F, A>, _ right: Syntax<F, A>, _ recur: (F, F) -> Bool) -> Bool {
 	switch (left, right) {
 	case (.Empty, .Empty):
 		return true
 	case let (.Leaf(l1), .Leaf(l2)):
 		return l1 == l2
 	case let (.Branch(v1), .Branch(v2)):
-		return v1 == v2
+		return v1.count == v2.count && zip(v1, v2).reduce(true) { $0 && recur($1.0, $1.1) }
 	default:
 		return false
 	}
+}
+
+public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F, A>) -> Bool {
+	return equals(left, right, ==)
 }
 
 public func == (left: Diff, right: Diff) -> Bool {
