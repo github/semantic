@@ -9,7 +9,7 @@ final class SwiftTests: XCTestCase {
 		let structure = Structure(file: file)
 		let dictionary = toAnyObject(structure.dictionary)
 
-		print(JSON(object: dictionary).map { Term(path: path, JSON: $0) })
+//		print(JSON(object: dictionary).map { Term<String>(path: path, JSON: $0) })
 	}
 }
 
