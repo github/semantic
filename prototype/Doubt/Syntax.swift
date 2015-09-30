@@ -39,8 +39,7 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 	public static let Apply: (Term, [Term]) -> Term = Syntax.Apply >>> Roll
 	public static let Abstract: ([Term], [Term]) -> Term = Syntax.Abstract >>> Roll
 	public static let Assign: (String, Term) -> Term = Syntax.Assign >>> Roll
-	public static let Variable = Syntax.Variable >>> Roll
-	public static let Literal = Syntax.Literal >>> Roll
+	public static let Leaf = Syntax.Leaf >>> Roll
 	public static let Group: (Term, [Term]) -> Term = Syntax.Group >>> Roll
 
 
@@ -55,7 +54,7 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 		do {
 			switch JSON.dictionary?["key.substructure"] {
 			case let .Some(.Array(a)):
-				self = .Roll(.Group(.Roll(.Literal(path)), try a.map { try Term(JSON: $0) ?? die() }))
+				self = .Roll(.Group(.Roll(.Leaf(path)), try a.map { try Term(JSON: $0) ?? die() }))
 			default:
 				return nil
 			}
@@ -86,7 +85,7 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 					.Some("source.lang.swift.decl.extension"),
 					.Some("source.lang.swift.decl.enum"),
 					.Some("source.lang.swift.decl.struct"):
-					self = .Group(.Literal(name), try substructure.map { try Term(JSON: $0) ?? die() })
+					self = .Group(.Leaf(name), try substructure.map { try Term(JSON: $0) ?? die() })
 
 				case .Some("source.lang.swift.decl.enumelement"):
 					fallthrough
@@ -98,7 +97,7 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 				case
 					.Some("source.lang.swift.decl.var.instance"),
 					.Some("source.lang.swift.decl.var.static"):
-					self = .Variable(name)
+					self = .Leaf(name)
 
 				default:
 					return nil
@@ -126,11 +125,10 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 
 public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Empty
+	case Leaf(String)
 	case Apply(Recur, [Recur])
 	case Abstract([Recur], [Recur])
 	case Assign(String, Recur)
-	case Variable(String)
-	case Literal(String)
 	case Group(Recur, [Recur])
 
 	public func map<T>(@noescape transform: Recur -> T) -> Syntax<T, A> {
@@ -143,10 +141,8 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 			return .Abstract(parameters.map(transform), body.map(transform))
 		case let .Assign(n, v):
 			return .Assign(n, transform(v))
-		case let .Variable(n):
-			return .Variable(n)
-		case let .Literal(v):
-			return .Literal(v)
+		case let .Leaf(n):
+			return .Leaf(n)
 		case let .Group(n, v):
 			return .Group(transform(n), v.map(transform))
 		}
@@ -187,10 +183,8 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 			return ".Abstract([ \(s) ], \(b))"
 		case let .Assign(n, v):
 			return ".Assign(\(n), \(v))"
-		case let .Variable(n):
-			return ".Variable(\(n))"
-		case let .Literal(s):
-			return ".Literal(\(s))"
+		case let .Leaf(n):
+			return ".Leaf(\(n))"
 		case let .Group(n, vs):
 			let s = vs.map { String(reflecting: $0) }.joinWithSeparator(", ")
 			return ".Group(\(String(reflecting: n)), [ \(s) ])"
@@ -210,10 +204,8 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 				<> body.map(Doc.init).stack()
 		case let .Assign(n, v):
 			return .Text(n) <+> .Text("=") <+> Doc(v)
-		case let .Variable(n):
+		case let .Leaf(n):
 			return .Text(n)
-		case let .Literal(s):
-			return .Text(s)
 		case let .Group(n, vs):
 			return Doc(n) <> vs.map(Doc.init).stack().bracket("{", "}")
 		}
@@ -231,10 +223,8 @@ extension Syntax where Recur: AlgebraicHashable {
 			return .Case("Abstract", .Sequence(parameters.map { $0.hash }), .Sequence(body.map { $0.hash }))
 		case let .Assign(name, value):
 			return .Case("Assign", .String(name), value.hash)
-		case let .Variable(n):
-			return .Case("Variable", .String(n))
-		case let .Literal(s):
-			return .Case("Literal", .String(s))
+		case let .Leaf(n):
+			return .Case("Leaf", .String(n))
 		case let .Group(n, vs):
 			return .Case("Group", n.hash, .Sequence(vs.map { $0.hash }))
 		}

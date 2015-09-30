@@ -12,9 +12,7 @@ public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F
 		return p1 == p2 && b1 == b2
 	case let (.Assign(n1, v1), .Assign(n2, v2)):
 		return n1 == n2 && v1 == v2
-	case let (.Variable(n1), .Variable(n2)):
-		return n1 == n2
-	case let (.Literal(l1), .Literal(l2)):
+	case let (.Leaf(l1), .Leaf(l2)):
 		return l1 == l2
 	case let (.Group(n1, v1), .Group(n2, v2)):
 		return n1 == n2 && v1 == v2

@@ -60,11 +60,8 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		case let (.Assign(n1, v1), .Assign(n2, v2)) where n1 == n2:
 			self = .Copy(.Assign(n2, Diff(v1, v2)))
 
-		case let (.Variable(n1), .Variable(n2)) where n1 == n2:
-			self = .Copy(.Variable(n2))
-
-		case let (.Literal(v1), .Literal(v2)) where v1 == v2:
-			self = .Copy(.Literal(v2))
+		case let (.Leaf(v1), .Leaf(v2)) where v1 == v2:
+			self = .Copy(.Leaf(v2))
 
 		case let (.Group(n1, v1), .Group(n2, v2)):
 			self = .Copy(.Group(Diff(n1, n2), Diff.diff(v1, v2)))
