@@ -34,89 +34,6 @@ public enum Term<A>: CustomDebugStringConvertible, CustomDocConvertible, CustomS
 	}
 }
 
-public protocol StringConvertible {
-	init(string: String)
-}
-
-extension String: StringConvertible {
-	public init(string: String) {
-		self = string
-	}
-}
-
-extension Term where A: StringConvertible {
-	/// Constructs a Term representing `JSON`.
-	public init?(JSON: Doubt.JSON) {
-		func die<B>() throws -> B {
-			throw E()
-		}
-		do {
-			switch JSON {
-			case let .Dictionary(d) where d["key.name"] != nil:
-				let name = d["key.name"]?.string ?? ""
-				let substructure = d["key.substructure"]?.array ?? []
-				let kind = d["key.kind"]?.string
-				switch kind {
-				case
-					.Some("source.lang.swift.decl.class"),
-					.Some("source.lang.swift.decl.extension"),
-					.Some("source.lang.swift.decl.enum"),
-					.Some("source.lang.swift.decl.struct"):
-					self = .Branch([ .Leaf(A(string: name)), .Branch(try substructure.map { try Term(JSON: $0) ?? die() }) ])
-
-				case .Some("source.lang.swift.decl.enumelement"):
-					fallthrough
-				case
-					.Some("source.lang.swift.decl.function.method.instance"),
-					.Some("source.lang.swift.decl.function.free"):
-					self = .Branch([ .Leaf(A(string: name)), .Branch(try substructure.map { try Term(JSON: $0) ?? die() }) ])
-
-				case
-					.Some("source.lang.swift.decl.var.instance"),
-					.Some("source.lang.swift.decl.var.static"):
-					self = .Leaf(A(string: name))
-
-				default:
-					return nil
-				}
-
-			case let .Dictionary(d) where d["key.kind"]?.string == "source.lang.swift.decl.enumcase" && d["key.substructure"]?.array?.count == 1:
-				let substructure = d["key.substructure"]?.array ?? []
-				self = try Term(JSON: substructure[0]) ?? die()
-
-			case let .Dictionary(d) where d["key.kind"]?.string == "source.lang.swift.syntaxtype.comment.mark":
-				self = .Empty
-
-			case .Null:
-				self = .Empty
-
-			default:
-				return nil
-			}
-		} catch _ {
-			return nil
-		}
-	}
-
-	/// Constructs a Term representing the `JSON` in a file at `path`.
-	public init?(path: String, JSON: Doubt.JSON) {
-		func die<B>() throws -> B {
-			throw E()
-		}
-		do {
-			switch JSON.dictionary?["key.substructure"] {
-			case let .Some(.Array(a)):
-				self = .Roll(.Branch(try a.map { try Term(JSON: $0) ?? die() }))
-			default:
-				return nil
-			}
-		} catch _ {
-			return nil
-		}
-	}
-}
-
-
 public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Empty
 	case Leaf(A)
@@ -179,5 +96,3 @@ extension Syntax where Recur: Hashable, A: Hashable {
 		}
 	}
 }
-
-private struct E: ErrorType {}
