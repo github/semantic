@@ -222,9 +222,9 @@ extension Syntax where Recur: AlgebraicHashable {
 		case let .Abstract(parameters, body):
 			return .Case("Abstract", .Sequence(parameters.map { $0.hash }), .Sequence(body.map { $0.hash }))
 		case let .Assign(name, value):
-			return .Case("Assign", .String(name), value.hash)
+			return .Case("Assign", Hash(name), value.hash)
 		case let .Leaf(n):
-			return .Case("Leaf", .String(n))
+			return .Case("Leaf", Hash(n))
 		case let .Group(n, vs):
 			return .Case("Group", n.hash, .Sequence(vs.map { $0.hash }))
 		}

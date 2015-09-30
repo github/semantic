@@ -1,14 +1,18 @@
 public enum Hash: Hashable {
 	case Sequence([Hash])
-	case String(Swift.String)
+	case Label(Swift.String)
 	case Raw(Int)
 
 	public static func Case(label: Swift.String, _ hashes: Hash...) -> Hash {
-		return .Sequence([ .String(label) ] + hashes)
+		return .Sequence([ .Label(label) ] + hashes)
 	}
 
 	public static func Case(index: Int, _ hashes: Hash...) -> Hash {
 		return .Sequence([ .Raw(index) ] + hashes)
+	}
+
+	public init(_ string: String) {
+		self = .Label(string)
 	}
 
 	public init<A: AlgebraicHashable>(_ hashable: A) {
@@ -34,7 +38,7 @@ public enum Hash: Hashable {
 			hash ^= hash >> 11
 			hash += hash << 15
 			return hash
-		case let .String(s):
+		case let .Label(s):
 			return s.hashValue
 		case let .Raw(i):
 			return i.hashValue
@@ -46,7 +50,7 @@ public func == (left: Hash, right: Hash) -> Bool {
 	switch (left, right) {
 	case let (.Sequence(a), .Sequence(b)):
 		return a == b
-	case let (.String(a), .String(b)):
+	case let (.Label(a), .Label(b)):
 		return a == b
 	case let (.Raw(a), .Raw(b)):
 		return a == b
