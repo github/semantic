@@ -1,5 +1,13 @@
 public enum Category: Equatable {
 	case Tag(String)
+
+
+	public var tag: String {
+		switch self {
+		case let .Tag(s):
+			return s
+		}
+	}
 }
 
 public func == (left: Category, right: Category) -> Bool {
