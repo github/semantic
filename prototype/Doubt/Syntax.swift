@@ -122,7 +122,7 @@ public enum Term: CustomDebugStringConvertible, CustomDocConvertible, CustomStri
 
 public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Empty
-	case Leaf(String)
+	case Leaf(A)
 	case Branch([Recur])
 
 	public func map<T>(@noescape transform: Recur -> T) -> Syntax<T, A> {
@@ -163,14 +163,14 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 		case .Empty:
 			return .Empty
 		case let .Leaf(n):
-			return .Text(n)
+			return Doc(n)
 		case let .Branch(vs):
 			return vs.map(Doc.init).stack().bracket("{", "}")
 		}
 	}
 }
 
-extension Syntax where Recur: Hashable {
+extension Syntax where Recur: Hashable, A: Hashable {
 	public var hash: Hash {
 		switch self {
 		case .Empty:
