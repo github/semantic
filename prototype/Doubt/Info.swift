@@ -1,3 +1,4 @@
+/// Source info & categorization for nodes in a syntax tree.
 public enum Info: AlgebraicHashable {
 	case Literal(String, Set<Category>)
 

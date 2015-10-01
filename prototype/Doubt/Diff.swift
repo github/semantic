@@ -1,3 +1,4 @@
+/// A domain-specific language for diffing specific domain languages.
 public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible, AlgebraicHashable {
 	/// Replace a term with another term.
 	case Patch(Term<Info>, Term<Info>)

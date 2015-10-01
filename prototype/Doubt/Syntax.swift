@@ -1,3 +1,6 @@
+/// A term in a syntax tree.
+///
+/// This is a fixpoint of Syntax, essentially enabling it to recur through Term instances.
 public enum Term<A: Equatable>: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, Equatable {
 	public init(_ out: Syntax<Term, A>) {
 		self = .Roll(out)
@@ -34,6 +37,7 @@ public enum Term<A: Equatable>: CustomDebugStringConvertible, CustomDocConvertib
 	}
 }
 
+/// A node in a syntax tree. Expressed algebraically to enable representation of both normal syntax trees and their diffs.
 public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Empty
 	case Leaf(A)

@@ -1,7 +1,15 @@
+/// An algebraic representation of a non-cryptographic hash.
 public enum Hash: AlgebraicHashable {
+	/// An ordered sequence of sub-hashes to mix.
 	case Ordered([Hash])
+
+	/// An unordered collection of sub-hashes to mix. These will be mixed with an associative, commutative operation.
 	case Unordered([Hash])
+
+	/// A label, e.g. for an enum case or a dictionary key.
 	case Label(String)
+
+	/// The embedding of a raw hash value into an algebraic hash.
 	case Raw(Int)
 
 	public init(_ label: String, _ hashes: Hash...) {

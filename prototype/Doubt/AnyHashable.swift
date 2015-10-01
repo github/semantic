@@ -1,3 +1,4 @@
+/// A Hashable instance for any type for which you can provide an equality function and a hash function.
 public enum AnyHashable<A>: Hashable {
 	public init(_ value: A, equals: (A, A) -> Bool, hash: A -> Int) {
 		self = .External(.External(value, equals), hash)
