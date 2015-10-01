@@ -84,15 +84,21 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 	}
 }
 
-extension Syntax where Recur: Hashable, A: Hashable {
-	public var hash: Hash {
+extension Syntax where A: Hashable {
+	public func hash(recur: Recur -> Hash) -> Hash {
 		switch self {
 		case .Empty:
 			return Hash("Empty")
 		case let .Leaf(n):
 			return Hash("Leaf", Hash(n))
 		case let .Branch(vs):
-			return Hash("Branch", .Sequence(vs.map(Hash.init)))
+			return Hash("Branch", .Sequence(vs.map(recur)))
 		}
+	}
+}
+
+extension Syntax where Recur: Hashable, A: Hashable {
+	public var hash: Hash {
+		return hash(Hash.init)
 	}
 }
