@@ -102,6 +102,11 @@ extension Syntax where A: Equatable {
 	}
 }
 
+public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F, A>) -> Bool {
+	return Syntax.equals(==)(left, right)
+}
+
+
 extension Term where A: Hashable {
 	public var hash: Hash {
 		return syntax.hash { $0.hash }
