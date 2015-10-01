@@ -9,7 +9,7 @@ private func equals<F, A: Equatable>(left: Syntax<F, A>, _ right: Syntax<F, A>, 
 	case let (.Leaf(l1), .Leaf(l2)):
 		return l1 == l2
 	case let (.Branch(v1), .Branch(v2)):
-		return v1.count == v2.count && zip(v1, v2).reduce(true) { $0 && recur($1.0, $1.1) }
+		return recur(v1, v2)
 	default:
 		return false
 	}
