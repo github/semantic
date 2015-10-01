@@ -1,4 +1,4 @@
-public enum Hash: Hashable {
+public enum Hash: AlgebraicHashable {
 	case Ordered([Hash])
 	case Unordered([Hash])
 	case Label(String)
@@ -24,6 +24,10 @@ public enum Hash: Hashable {
 		self = .Raw(hashable.hashValue)
 	}
 
+
+	public var hash: Hash {
+		return self
+	}
 
 	public var hashValue: Int {
 		switch self {
