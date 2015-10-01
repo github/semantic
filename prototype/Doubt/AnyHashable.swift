@@ -1,4 +1,8 @@
 public enum AnyHashable<A>: Hashable {
+	public init(_ value: A, equals: (A, A) -> Bool, hash: A -> Int) {
+		self = .External(.External(value, equals), hash)
+	}
+
 	case External(AnyEquatable<A>, A -> Int)
 
 	public var value: A {
