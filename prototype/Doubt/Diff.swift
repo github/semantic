@@ -31,8 +31,8 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		case let .Copy(a):
 			return a.doc
 		case let .ByKey(a, b):
-			return a.keys.sort().map { Doc($0) <> Doc(":") <+> Doc(a[$0]!) }.stack().bracket("{-", "-}")
-				<> b.keys.sort().map { Doc($0) <> Doc(":") <+> Doc(b[$0]!) }.stack().bracket("{+", "+}")
+			return a.keys.sort().map { Doc($0) <> Doc(":") <+> Doc(a[$0]!) }.joinWithSeparator(",").bracket("{-", "-}")
+				<> b.keys.sort().map { Doc($0) <> Doc(":") <+> Doc(b[$0]!) }.joinWithSeparator(",").bracket("{+", "+}")
 		}
 	}
 

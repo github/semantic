@@ -79,7 +79,7 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 		case let .Leaf(n):
 			return Doc(n)
 		case let .Branch(vs):
-			return vs.map(Doc.init).stack().bracket("{", "}")
+			return vs.map(Doc.init).joinWithSeparator(",").bracket("{", "}")
 		}
 	}
 }
