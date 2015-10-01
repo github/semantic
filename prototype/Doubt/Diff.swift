@@ -1,5 +1,8 @@
 public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible, AlgebraicHashable {
+	/// Replace a term with another term.
 	case Patch(Term<Info>, Term<Info>)
+
+	/// Copy a syntax node, recursively diffing its branches.
 	indirect case Copy(Syntax<Diff, Info>)
 
 	public static func Insert(term: Term<Info>) -> Diff {
