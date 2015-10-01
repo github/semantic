@@ -1,10 +1,17 @@
-public enum Info: Equatable {
+public enum Info: AlgebraicHashable {
 	case Literal(String, Set<Category>)
 
 	public var categories: Set<Category> {
 		switch self {
 		case let .Literal(_, c):
 			return c
+		}
+	}
+
+	public var hash: Hash {
+		switch self {
+		case let .Literal(source, categories):
+			return Hash("Literal", Hash(source), Hash(categories))
 		}
 	}
 }
