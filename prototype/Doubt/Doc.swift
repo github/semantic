@@ -49,6 +49,25 @@ public enum Doc: CustomDocConvertible, Equatable {
 	}
 }
 
+
+public func == (left: Doc, right: Doc) -> Bool {
+	switch (left, right) {
+	case (.Empty, .Empty), (.Line, .Line):
+		return true
+	case let (.Text(a), .Text(b)):
+		return a == b
+	case let (.Nest(i, a), .Nest(j, b)):
+		return i == j && a == b
+	case let (.Concat(l1, r1), .Concat(l2, r2)):
+		return l1 == l2 && r1 == r2
+	case let (.Union(l1, r1), .Union(l2, r2)):
+		return l1 == l2 && r1 == r2
+	default:
+		return false
+	}
+}
+
+
 extension SequenceType where Generator.Element == Doc {
 	public func fold(combine: (Doc, Doc) -> Doc) -> Doc {
 		func fold(docs: Stream<Doc>) -> Doc {
