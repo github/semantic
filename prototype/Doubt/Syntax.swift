@@ -84,6 +84,12 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 	}
 }
 
+extension Term where A: Hashable {
+	public var hash: Hash {
+		return syntax.hash { $0.hash }
+	}
+}
+
 extension Syntax where A: Hashable {
 	public func hash(recur: Recur -> Hash) -> Hash {
 		switch self {
