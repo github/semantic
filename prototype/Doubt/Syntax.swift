@@ -1,4 +1,4 @@
-public enum Term<A>: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible {
+public enum Term<A: Equatable>: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, Equatable {
 	public init(_ out: Syntax<Term, A>) {
 		self = .Roll(out)
 	}
