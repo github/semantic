@@ -37,6 +37,11 @@ public enum Term<A: Equatable>: CustomDebugStringConvertible, CustomDocConvertib
 	}
 }
 
+public func == <A: Equatable> (left: Term<A>, right: Term<A>) -> Bool {
+	return Syntax.equals(==)(left.syntax, right.syntax)
+}
+
+
 /// A node in a syntax tree. Expressed algebraically to enable representation of both normal syntax trees and their diffs.
 public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Empty

@@ -34,7 +34,6 @@
 		D4AAE5481B5AE2D0004E581F /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE53D1B5AE2D0004E581F /* String.swift */; };
 		D4AAE5491B5AE2D0004E581F /* StringLiteralConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE53E1B5AE2D0004E581F /* StringLiteralConvertible.swift */; };
 		D4AAE54A1B5AE2D0004E581F /* Syntax.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE53F1B5AE2D0004E581F /* Syntax.swift */; };
-		D4AAE54C1B5AE42D004E581F /* Equatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE54B1B5AE42D004E581F /* Equatable.swift */; };
 		D4C2B12E1BB33CEC0096F92A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435B7471BB31949000902F6 /* main.swift */; };
 		D4C2B12F1BB33D050096F92A /* Doubt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4AAE4FD1B5AE22E004E581F /* Doubt.framework */; };
 		D4C2B1301BB33D080096F92A /* Commandant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FE71BB055AE00E3C3C1 /* Commandant.framework */; };
@@ -115,7 +114,6 @@
 		D4AAE53D1B5AE2D0004E581F /* String.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		D4AAE53E1B5AE2D0004E581F /* StringLiteralConvertible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringLiteralConvertible.swift; sourceTree = "<group>"; };
 		D4AAE53F1B5AE2D0004E581F /* Syntax.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Syntax.swift; sourceTree = "<group>"; };
-		D4AAE54B1B5AE42D004E581F /* Equatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Equatable.swift; sourceTree = "<group>"; };
 		D4D7F3161BBB22E500AAB0C0 /* Hash.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hash.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -197,7 +195,6 @@
 				D4AAE53D1B5AE2D0004E581F /* String.swift */,
 				D4AAE53E1B5AE2D0004E581F /* StringLiteralConvertible.swift */,
 				D4AAE53F1B5AE2D0004E581F /* Syntax.swift */,
-				D4AAE54B1B5AE42D004E581F /* Equatable.swift */,
 				D432D4721BA9C55300F3FABC /* Stream.swift */,
 				D432D4741BA9D6A400F3FABC /* Memo.swift */,
 				D4413FEE1BB06D4C00E3C3C1 /* Dictionary.swift */,
@@ -390,7 +387,6 @@
 				D4D7F3171BBB22E500AAB0C0 /* Hash.swift in Sources */,
 				D45A36C91BBC667D00BE3DDE /* Category.swift in Sources */,
 				D4AAE5401B5AE2D0004E581F /* Array.swift in Sources */,
-				D4AAE54C1B5AE42D004E581F /* Equatable.swift in Sources */,
 				D4A71DC51BB45B850051416D /* Vertex.swift in Sources */,
 				D4AAE54A1B5AE2D0004E581F /* Syntax.swift in Sources */,
 				D432D4731BA9C55300F3FABC /* Stream.swift in Sources */,
