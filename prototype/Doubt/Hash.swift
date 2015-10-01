@@ -1,5 +1,6 @@
 public enum Hash: Hashable {
 	case Ordered([Hash])
+	case Unordered([Hash])
 	case Label(String)
 	case Raw(Int)
 
@@ -38,6 +39,8 @@ public enum Hash: Hashable {
 			hash ^= hash >> 11
 			hash += hash << 15
 			return hash
+		case let .Unordered(s):
+			return s.lazy.map { $0.hashValue }.reduce(0, combine: +)
 		case let .Label(s):
 			return s.hashValue
 		case let .Raw(i):
@@ -49,6 +52,8 @@ public enum Hash: Hashable {
 public func == (left: Hash, right: Hash) -> Bool {
 	switch (left, right) {
 	case let (.Ordered(a), .Ordered(b)):
+		return a == b
+	case let (.Unordered(a), .Unordered(b)):
 		return a == b
 	case let (.Label(a), .Label(b)):
 		return a == b
