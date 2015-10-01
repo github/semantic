@@ -98,7 +98,7 @@ extension Syntax where A: Hashable {
 		case let .Leaf(n):
 			return Hash("Leaf", Hash(n))
 		case let .Branch(vs):
-			return Hash("Branch", .Sequence(vs.map(recur)))
+			return Hash("Branch", .Ordered(vs.map(recur)))
 		}
 	}
 }
