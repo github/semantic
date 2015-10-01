@@ -87,6 +87,21 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 	}
 }
 
+extension Syntax where A: Equatable {
+	public static func equals(recur: (Recur, Recur) -> Bool)(_ left: Syntax<Recur, A>, _ right: Syntax<Recur, A>) -> Bool {
+		switch (left, right) {
+		case (.Empty, .Empty):
+			return true
+		case let (.Leaf(l1), .Leaf(l2)):
+			return l1 == l2
+		case let (.Branch(v1), .Branch(v2)):
+			return recur(v1, v2)
+		default:
+			return false
+		}
+	}
+}
+
 extension Term where A: Hashable {
 	public var hash: Hash {
 		return syntax.hash { $0.hash }
