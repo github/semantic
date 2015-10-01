@@ -49,11 +49,14 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	}
 
 	public var magnitude: Int {
+		func magnitude(syntax: Syntax<Diff, Info>) -> Int {
+			return syntax.map { $0.magnitude }.reduce(0, combine: +)
+		}
 		switch self {
 		case .Patch:
 			return 1
 		case let .Copy(s):
-			return s.map { $0.magnitude }.reduce(0, combine: +)
+			return magnitude(s)
 		}
 	}
 
