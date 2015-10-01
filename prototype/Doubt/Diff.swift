@@ -1,4 +1,4 @@
-public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible {
+public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible, AlgebraicHashable {
 	case Patch(Term<Info>, Term<Info>)
 	indirect case Copy(Syntax<Diff, Info>)
 
@@ -33,6 +33,15 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			return ".Patch(\(String(reflecting: a)), \(String(reflecting: b)))"
 		case let .Copy(a):
 			return ".Copy(\(String(reflecting: a)))"
+		}
+	}
+
+	public var hash: Hash {
+		switch self {
+		case let .Patch(a, b):
+			return Hash("Patch", a.hash, b.hash)
+		case let .Copy(syntax):
+			return Hash("Copy", syntax.hash)
 		}
 	}
 
