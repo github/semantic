@@ -5,6 +5,9 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	/// Copy a syntax node, recursively diffing its branches.
 	indirect case Copy(Syntax<Diff, Info>)
 
+	/// Insert, remove, and patch terms by some assigned identity.
+	indirect case ByKey([String:Term<Info>], [String:Term<Info>])
+
 	public static func Insert(term: Term<Info>) -> Diff {
 		return .Patch(.Empty, term)
 	}
@@ -27,6 +30,9 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 				<> Doc(b).bracket("{+", "+}")
 		case let .Copy(a):
 			return a.doc
+		case let .ByKey(a, b):
+			return a.keys.sort().map { Doc($0) <> Doc(":") <+> Doc(a[$0]!) }.stack().bracket("{-", "-}")
+				<> b.keys.sort().map { Doc($0) <> Doc(":") <+> Doc(b[$0]!) }.stack().bracket("{+", "+}")
 		}
 	}
 
@@ -36,6 +42,8 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			return ".Patch(\(String(reflecting: a)), \(String(reflecting: b)))"
 		case let .Copy(a):
 			return ".Copy(\(String(reflecting: a)))"
+		case let .ByKey(a, b):
+			return ".ByKey(\(String(reflecting: a)), \(String(reflecting: b)))"
 		}
 	}
 
@@ -45,6 +53,8 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			return Hash("Patch", a.hash, b.hash)
 		case let .Copy(syntax):
 			return Hash("Copy", syntax.hash)
+		case let .ByKey(a, b):
+			return Hash("ByKey", .Unordered(a.map { Hash($0, $1.hash) }), .Unordered(b.map { Hash($0, $1.hash) }))
 		}
 	}
 
@@ -57,6 +67,13 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			return 1
 		case let .Copy(s):
 			return magnitude(s)
+		case let .ByKey(a, b):
+			let deleted = Set(a.keys).subtract(b.keys)
+			let inserted = Set(b.keys).subtract(a.keys)
+			let diffed = Set(a.keys).intersect(b.keys).map {
+				Diff(a[$0]!, b[$0]!).magnitude
+			}
+			return deleted.count + inserted.count + diffed.reduce(0, combine: +)
 		}
 	}
 
@@ -119,6 +136,8 @@ public func == (left: Diff, right: Diff) -> Bool {
 		return a1 == a2 && b1 == b2
 	case let (.Copy(a), .Copy(b)):
 		return a == b
+	case let (.ByKey(a1, b1), .ByKey(a2, b2)):
+		return a1 == a2 && b1 == b2
 	default:
 		return false
 	}
