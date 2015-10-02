@@ -10,4 +10,14 @@ public enum Algorithm<Recur, A> {
 	///
 	/// When run, the enclosed function will be applied to the resulting `Diff`.
 	case Recursive(Term, Term, Diff -> Recur)
+
+
+	// MARK: Functor
+
+	public func map<Other>(transform: Recur -> Other) -> Algorithm<Other, A> {
+		switch self {
+		case let .Recursive(a, b, f):
+			return .Recursive(a, b, f >>> transform)
+		}
+	}
 }
