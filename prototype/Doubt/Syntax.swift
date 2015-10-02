@@ -32,21 +32,21 @@ public func == <A: Equatable> (left: Term<A>, right: Term<A>) -> Bool {
 /// A node in a syntax tree. Expressed algebraically to enable representation of both normal syntax trees and their diffs.
 public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Leaf(A)
-	case Branch(Recur)
+	case Branch([Recur])
 
 	public func map<T>(@noescape transform: Recur -> T) -> Syntax<T, A> {
 		switch self {
 		case let .Leaf(n):
 			return .Leaf(n)
 		case let .Branch(x):
-			return .Branch(transform(x))
+			return .Branch(x.map(transform))
 		}
 	}
 
 	public func reduce<T>(initial: T, @noescape combine: (T, Recur) throws -> T) rethrows -> T {
 		switch self {
 		case let .Branch(x):
-			return try combine(initial, x)
+			return try x.reduce(initial, combine: combine)
 
 		default:
 			return initial
@@ -67,7 +67,7 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 		case let .Leaf(n):
 			return Doc(n)
 		case let .Branch(x):
-			return Doc(x)
+			return x.map(Doc.init).joinWithSeparator(", ").bracket("[", "]")
 		}
 	}
 }
@@ -81,7 +81,7 @@ extension Syntax {
 		case let (.Leaf(l1), .Leaf(l2)):
 			return ifLeaf(l1, l2)
 		case let (.Branch(v1), .Branch(v2)):
-			return ifRecur(v1, v2)
+			return v1.count == v2.count && zip(v1, v2).lazy.map(ifRecur).reduce(true) { $0 && $1 }
 		default:
 			return false
 		}
@@ -105,7 +105,7 @@ extension Syntax {
 		case let .Leaf(n):
 			return Hash("Leaf", ifLeaf(n))
 		case let .Branch(x):
-			return Hash("Branch", ifRecur(x))
+			return Hash("Branch", .Ordered(x.map(ifRecur)))
 		}
 	}
 }

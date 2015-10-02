@@ -106,7 +106,7 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			self = .Copy(.Leaf(v2))
 
 		case let (.Branch(v1), .Branch(v2)):
-			self = .Copy(.Branch(Diff(v1, v2)))
+			self = .Copy(.Branch(Diff.diff(v1, v2)))
 
 		default:
 			self = .Patch(a, b)
