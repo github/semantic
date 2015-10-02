@@ -4,6 +4,8 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	case Patch(Term<Info>, Term<Info>)
 
 	/// Copy a syntax node, recursively diffing its branches.
+	///
+	/// This represents a node in the syntax which is unchanged, but whose child nodes (if any) may have been changed; thus, its children are themselves represented by `Syntax` instantiated to `Diff`, rather than `Term`.
 	indirect case Copy(Syntax<Diff, Info>)
 
 	/// Insert, remove, and patch terms by some assigned identity.
@@ -69,6 +71,9 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		}
 	}
 
+	/// The magnitude, or cost, of a diff. This is, roughly speaking, a count of all the patches involved.
+	///
+	/// This is used to compute an optimal path through the edit graph.
 	public var magnitude: Int {
 		func magnitude(syntax: Syntax<Diff, Info>) -> Int {
 			return syntax.map { $0.magnitude }.reduce(0, combine: +)
