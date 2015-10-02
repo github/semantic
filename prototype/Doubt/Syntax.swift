@@ -72,6 +72,9 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 	}
 }
 
+
+// MARK: - Equality
+
 extension Syntax where A: Equatable {
 	public static func equals(ifRecur ifRecur: (Recur, Recur) -> Bool)(_ left: Syntax<Recur, A>, _ right: Syntax<Recur, A>) -> Bool {
 		switch (left, right) {
