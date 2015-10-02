@@ -30,3 +30,19 @@ public enum Free<A, B> {
 		}
 	}
 }
+
+
+// MARK: - Equality
+
+extension Free {
+	public static func equals(ifPure ifPure: (B, B) -> Bool, ifRoll: (A, A) -> Bool)(_ left: Free, _ right: Free) -> Bool {
+		switch (left, right) {
+		case let (.Pure(a), .Pure(b)):
+			return ifPure(a, b)
+		case let (.Roll(a), .Roll(b)):
+			return Syntax.equals(ifLeaf: ifRoll, ifRecur: equals(ifPure: ifPure, ifRoll: ifRoll))(a, b)
+		default:
+			return false
+		}
+	}
+}
