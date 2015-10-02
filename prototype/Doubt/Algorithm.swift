@@ -6,8 +6,8 @@ public enum Algorithm<Recur, A> {
 	/// The type of `Diff`s which `Algorithm`s produce.
 	public typealias Diff = Free<A, Patch<A>>
 
-	/// Indicates that diffing should recur into the enclosed `Term`.
+	/// Indicates that diffing should compare the enclosed `Term`s.
 	///
 	/// When run, the enclosed function will be applied to the resulting `Diff`.
-	case Recursive(Term, Diff -> Recur)
+	case Recursive(Term, Term, Diff -> Recur)
 }
