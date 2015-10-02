@@ -65,3 +65,12 @@ extension Free {
 public func == <A: Equatable, B: Equatable> (left: Free<A, B>, right: Free<A, B>) -> Bool {
 	return Free.equals(ifPure: ==, ifRoll: ==)(left, right)
 }
+
+
+// MARK: - Hashing
+
+extension Free {
+	public func hash(ifPure ifPure: B -> Hash, ifRoll: A -> Hash) -> Hash {
+		return analysis(ifPure: ifPure, ifRoll: { $0.hash(ifLeaf: ifRoll, ifRecur: { $0.hash(ifPure: ifPure, ifRoll: ifRoll) }) })
+	}
+}
