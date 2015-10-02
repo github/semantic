@@ -24,3 +24,7 @@ extension Fix {
 		}
 	}
 }
+
+public func == <A: Equatable> (left: Fix<A>, right: Fix<A>) -> Bool {
+	return Fix.equals(==)(left, right)
+}
