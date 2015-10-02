@@ -25,12 +25,7 @@ public enum Free<A, B> {
 	// MARK: Functor
 
 	public func map<C>(@noescape transform: B -> C) -> Free<A, C> {
-		switch self {
-		case let .Pure(b):
-			return .Pure(transform(b))
-		case let .Roll(s):
-			return .Roll(s.map { $0.map(transform) })
-		}
+		return analysis(ifPure: { .Pure(transform($0)) }, ifRoll: { .Roll($0.map { $0.map(transform) }) })
 	}
 
 
