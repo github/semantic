@@ -100,18 +100,18 @@ extension Term where A: Hashable {
 }
 
 extension Syntax where A: Hashable {
-	public func hash(recur: Recur -> Hash) -> Hash {
+	public func hash(ifRecur ifRecur: Recur -> Hash) -> Hash {
 		switch self {
 		case let .Leaf(n):
 			return Hash("Leaf", Hash(n))
 		case let .Branch(x):
-			return Hash("Branch", recur(x))
+			return Hash("Branch", ifRecur(x))
 		}
 	}
 }
 
 extension Syntax where Recur: Hashable, A: Hashable {
 	public var hash: Hash {
-		return hash(Hash.init)
+		return hash(ifRecur: Hash.init)
 	}
 }
