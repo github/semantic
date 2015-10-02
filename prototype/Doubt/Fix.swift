@@ -25,3 +25,12 @@ extension Fix {
 public func == <A: Equatable> (left: Fix<A>, right: Fix<A>) -> Bool {
 	return Fix.equals(==)(left, right)
 }
+
+
+// MARK: - Hashing
+
+extension Fix {
+	public func hash(param: A -> Hash) -> Hash {
+		return out.hash(ifLeaf: param, ifRecur: { $0.hash(param) })
+	}
+}
