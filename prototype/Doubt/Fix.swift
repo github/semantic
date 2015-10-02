@@ -18,10 +18,7 @@ public enum Fix<A> {
 
 extension Fix {
 	public static func equals(param: (A, A) -> Bool)(_ left: Fix, _ right: Fix) -> Bool {
-		switch (left, right) {
-		case let (.In(a), .In(b)):
-			return Syntax.equals(ifLeaf: param, ifRecur: equals(param))(a, b)
-		}
+		return Syntax.equals(ifLeaf: param, ifRecur: equals(param))(left.out, right.out)
 	}
 }
 
