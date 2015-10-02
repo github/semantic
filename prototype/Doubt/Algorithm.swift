@@ -35,6 +35,7 @@ extension Algorithm {
 		switch self {
 		case let .Recursive(a, b, f):
 			if Fix.equals(equals)(a, b) { return f(copy(b)) }
+
 			switch (a.out, b.out) {
 			default:
 				return f(Diff.Pure(.Replace(a, b)))
