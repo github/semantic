@@ -43,6 +43,7 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 		}
 	}
 
+	// fixme: 🔥
 	public func reduce<T>(initial: T, @noescape combine: (T, Recur) throws -> T) rethrows -> T {
 		switch self {
 		case let .Branch(x):
