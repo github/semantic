@@ -9,7 +9,7 @@ private func equals<F, A: Equatable>(left: Syntax<F, A>, _ right: Syntax<F, A>, 
 	case let (.Leaf(l1), .Leaf(l2)):
 		return l1 == l2
 	case let (.Branch(v1), .Branch(v2)):
-		return v1.count == v2.count && zip(v1, v2).reduce(true) { $0 && recur($1.0, $1.1) }
+		return recur(v1, v2)
 	default:
 		return false
 	}
@@ -17,17 +17,6 @@ private func equals<F, A: Equatable>(left: Syntax<F, A>, _ right: Syntax<F, A>, 
 
 public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F, A>) -> Bool {
 	return equals(left, right, ==)
-}
-
-public func == (left: Diff, right: Diff) -> Bool {
-	switch (left, right) {
-	case let (.Patch(a1, b1), .Patch(a2, b2)):
-		return a1 == a2 && b1 == b2
-	case let (.Copy(a), .Copy(b)):
-		return a == b
-	default:
-		return false
-	}
 }
 
 public func == (left: Doc, right: Doc) -> Bool {

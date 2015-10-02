@@ -1,10 +1,19 @@
-public enum Hash: Hashable {
-	case Sequence([Hash])
+/// An algebraic representation of a non-cryptographic hash.
+public enum Hash: AlgebraicHashable {
+	/// An ordered sequence of sub-hashes to mix.
+	case Ordered([Hash])
+
+	/// An unordered collection of sub-hashes to mix. These will be mixed with an associative, commutative operation.
+	case Unordered([Hash])
+
+	/// A label, e.g. for an enum case or a dictionary key.
 	case Label(String)
+
+	/// The embedding of a raw hash value into an algebraic hash.
 	case Raw(Int)
 
 	public init(_ label: String, _ hashes: Hash...) {
-		self = .Sequence([ Hash(label) ] + hashes)
+		self = .Ordered([ Hash(label) ] + hashes)
 	}
 
 	public init(_ string: String) {
@@ -24,9 +33,13 @@ public enum Hash: Hashable {
 	}
 
 
+	public var hash: Hash {
+		return self
+	}
+
 	public var hashValue: Int {
 		switch self {
-		case let .Sequence(s):
+		case let .Ordered(s):
 			// Bob Jenkins’ one-at-a-time hash: https://en.wikipedia.org/wiki/Jenkins_hash_function
 			var hash = 0
 			for each in s {
@@ -38,6 +51,8 @@ public enum Hash: Hashable {
 			hash ^= hash >> 11
 			hash += hash << 15
 			return hash
+		case let .Unordered(s):
+			return s.lazy.map { $0.hashValue }.reduce(0, combine: +)
 		case let .Label(s):
 			return s.hashValue
 		case let .Raw(i):
@@ -48,7 +63,9 @@ public enum Hash: Hashable {
 
 public func == (left: Hash, right: Hash) -> Bool {
 	switch (left, right) {
-	case let (.Sequence(a), .Sequence(b)):
+	case let (.Ordered(a), .Ordered(b)):
+		return a == b
+	case let (.Unordered(a), .Unordered(b)):
 		return a == b
 	case let (.Label(a), .Label(b)):
 		return a == b

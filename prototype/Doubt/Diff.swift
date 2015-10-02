@@ -1,6 +1,18 @@
-public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible {
+/// A domain-specific language for diffing specific domain languages.
+public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible, AlgebraicHashable {
+	/// Replace a term with another term.
 	case Patch(Term<Info>, Term<Info>)
+
+	/// Copy a syntax node, recursively diffing its branches.
+	///
+	/// This represents a node in the syntax which is unchanged, but whose child nodes (if any) may have been changed; thus, its children are themselves represented by `Syntax` instantiated to `Diff`, rather than `Term`.
 	indirect case Copy(Syntax<Diff, Info>)
+
+	/// Insert, remove, and patch terms by some assigned identity.
+	indirect case ByKey([String:Term<Info>], [String:Term<Info>])
+
+	/// Insert, remove, and patch terms by index. This computes the SES (or some approximation thereof).
+	indirect case ByIndex([Term<Info>], [Term<Info>])
 
 	public static func Insert(term: Term<Info>) -> Diff {
 		return .Patch(.Empty, term)
@@ -24,6 +36,12 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 				<> Doc(b).bracket("{+", "+}")
 		case let .Copy(a):
 			return a.doc
+		case let .ByKey(a, b):
+			return a.keys.sort().map { Doc($0) <> Doc(":") <+> Doc(a[$0]!) }.joinWithSeparator(",").bracket("{-", "-}")
+				<> b.keys.sort().map { Doc($0) <> Doc(":") <+> Doc(b[$0]!) }.joinWithSeparator(",").bracket("{+", "+}")
+		case let .ByIndex(a, b):
+			return a.map(Doc.init).joinWithSeparator(",").bracket("{-", "-}")
+				<> b.map(Doc.init).joinWithSeparator(",").bracket("{+", "+}")
 		}
 	}
 
@@ -33,15 +51,48 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			return ".Patch(\(String(reflecting: a)), \(String(reflecting: b)))"
 		case let .Copy(a):
 			return ".Copy(\(String(reflecting: a)))"
+		case let .ByKey(a, b):
+			return ".ByKey(\(String(reflecting: a)), \(String(reflecting: b)))"
+		case let .ByIndex(a, b):
+			return ".ByIndex(\(String(reflecting: a)), \(String(reflecting: b)))"
 		}
 	}
 
+	public var hash: Hash {
+		switch self {
+		case let .Patch(a, b):
+			return Hash("Patch", a.hash, b.hash)
+		case let .Copy(syntax):
+			return Hash("Copy", syntax.hash)
+		case let .ByKey(a, b):
+			return Hash("ByKey", .Unordered(a.map { Hash($0, $1.hash) }), .Unordered(b.map { Hash($0, $1.hash) }))
+		case let .ByIndex(a, b):
+			return Hash("ByIndex", .Ordered(a.map { $0.hash }), .Ordered(b.map { $0.hash }))
+		}
+	}
+
+	/// The magnitude, or cost, of a diff. This is, roughly speaking, a count of all the patches involved.
+	///
+	/// This is used to compute an optimal path through the edit graph.
 	public var magnitude: Int {
+		func magnitude(syntax: Syntax<Diff, Info>) -> Int {
+			return syntax.map { $0.magnitude }.reduce(0, combine: +)
+		}
 		switch self {
 		case .Patch:
 			return 1
 		case let .Copy(s):
-			return s.map { $0.magnitude }.reduce(0, combine: +)
+			return magnitude(s)
+		case let .ByKey(a, b):
+			let deleted = Set(a.keys).subtract(b.keys)
+			let inserted = Set(b.keys).subtract(a.keys)
+			let diffed = Set(a.keys).intersect(b.keys).map {
+				Diff(a[$0]!, b[$0]!).magnitude
+			}
+			return deleted.count + inserted.count + diffed.reduce(0, combine: +)
+		case let .ByIndex(a, b):
+			// fixme: SES 😞
+			return 0
 		}
 	}
 
@@ -55,7 +106,7 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 			self = .Copy(.Leaf(v2))
 
 		case let (.Branch(v1), .Branch(v2)):
-			self = .Copy(.Branch(Diff.diff(v1, v2)))
+			self = .Copy(.Branch(Diff(v1, v2)))
 
 		default:
 			self = .Patch(a, b)
@@ -94,5 +145,21 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		}
 
 		return Array(diff(Stream(sequence: a), Stream(sequence: b)).map { $0.0 })
+	}
+}
+
+
+public func == (left: Diff, right: Diff) -> Bool {
+	switch (left, right) {
+	case let (.Patch(a1, b1), .Patch(a2, b2)):
+		return a1 == a2 && b1 == b2
+	case let (.Copy(a), .Copy(b)):
+		return a == b
+	case let (.ByKey(a1, b1), .ByKey(a2, b2)):
+		return a1 == a2 && b1 == b2
+	case let (.ByIndex(a1, b1), .ByIndex(a2, b2)):
+		return a1 == a2 && b1 == b2
+	default:
+		return false
 	}
 }
