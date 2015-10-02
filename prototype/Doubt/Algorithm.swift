@@ -28,6 +28,7 @@ public enum Algorithm<Recur, A> {
 extension Algorithm {
 	/// Evaluates the encoded algorithm, returning its result.
 	public func evaluate(equals: (A, A) -> Bool) -> Recur {
+		/// Deep-copies a `Term` into a `Diff` without changes.
 		func copy(b: Term) -> Diff {
 			return Diff.Roll(b.out.map(copy))
 		}
