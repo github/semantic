@@ -12,6 +12,15 @@ public enum Free<A, B> {
 	/// A recursive instantiation of `Syntax`, unrolling another iteration of the recursive type.
 	indirect case Roll(Syntax<Free, A>)
 
+	public func analysis<C>(@noescape ifPure ifPure: B -> C, ifRoll: Syntax<Free, A> -> C) -> C {
+		switch self {
+		case let .Pure(b):
+			return ifPure(b)
+		case let .Roll(s):
+			return ifRoll(s)
+		}
+	}
+
 	public func map<C>(@noescape transform: B -> C) -> Free<A, C> {
 		switch self {
 		case let .Pure(b):
