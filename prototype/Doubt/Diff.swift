@@ -1,7 +1,7 @@
 /// A domain-specific language for diffing specific domain languages.
 public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible, AlgebraicHashable {
 	/// Replace a term with another term.
-	case Patch(Term<Info>, Term<Info>)
+	case Patch(Term<Info>?, Term<Info>?)
 
 	/// Copy a syntax node, recursively diffing its branches.
 	///
@@ -15,11 +15,11 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	indirect case ByIndex([Term<Info>], [Term<Info>])
 
 	public static func Insert(term: Term<Info>) -> Diff {
-		return .Patch(.Empty, term)
+		return .Patch(nil, term)
 	}
 
 	public static func Delete(term: Term<Info>) -> Diff {
-		return .Patch(term, .Empty)
+		return .Patch(term, nil)
 	}
 
 	public init(_ term: Term<Info>) {
@@ -32,8 +32,8 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	public var doc: Doc {
 		switch self {
 		case let .Patch(a, b):
-			return Doc(a).bracket("{-", "-}")
-				<> Doc(b).bracket("{+", "+}")
+			return (a.map { Doc($0).bracket("{-", "-}") } ?? Doc.Empty)
+				<> (b.map { Doc($0).bracket("{+", "+}") } ?? Doc.Empty)
 		case let .Copy(a):
 			return a.doc
 		case let .ByKey(a, b):
@@ -61,7 +61,7 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	public var hash: Hash {
 		switch self {
 		case let .Patch(a, b):
-			return Hash("Patch", a.hash, b.hash)
+			return Hash("Patch", a?.hash ?? Hash.Empty, b?.hash ?? Hash.Empty)
 		case let .Copy(syntax):
 			return Hash("Copy", syntax.hash)
 		case let .ByKey(a, b):
