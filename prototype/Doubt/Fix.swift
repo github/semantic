@@ -34,3 +34,9 @@ extension Fix {
 		return out.hash(ifLeaf: param, ifRecur: { $0.hash(param) })
 	}
 }
+
+extension Fix where A: Hashable {
+	var hash: Hash {
+		return hash(Hash.init)
+	}
+}
