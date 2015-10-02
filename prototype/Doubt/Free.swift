@@ -12,7 +12,7 @@ public enum Free<A, B> {
 	/// A recursive instantiation of `Syntax`, unrolling another iteration of the recursive type.
 	indirect case Roll(Syntax<Free, A>)
 
-	public func analysis<C>(@noescape ifPure ifPure: B -> C, ifRoll: Syntax<Free, A> -> C) -> C {
+	public func analysis<C>(@noescape ifPure ifPure: B -> C, @noescape ifRoll: Syntax<Free, A> -> C) -> C {
 		switch self {
 		case let .Pure(b):
 			return ifPure(b)
