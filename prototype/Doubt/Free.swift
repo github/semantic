@@ -17,4 +17,13 @@ public enum Free<A, B> {
 			return .Roll(s.map { $0.map(transform) })
 		}
 	}
+
+	public func flatMap<C>(@noescape transform: B -> Free<A, C>) -> Free<A, C> {
+		switch self {
+		case let .Pure(b):
+			return transform(b)
+		case let .Roll(s):
+			return .Roll(s.map { $0.flatMap(transform) })
+		}
+	}
 }
