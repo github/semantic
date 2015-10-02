@@ -95,15 +95,15 @@ public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F
 
 extension Term where A: Hashable {
 	public var hash: Hash {
-		return syntax.hash { $0.hash }
+		return syntax.hash(ifLeaf: Hash.init, ifRecur: { $0.hash })
 	}
 }
 
-extension Syntax where A: Hashable {
-	public func hash(ifRecur ifRecur: Recur -> Hash) -> Hash {
+extension Syntax {
+	public func hash(ifLeaf ifLeaf: A -> Hash, ifRecur: Recur -> Hash) -> Hash {
 		switch self {
 		case let .Leaf(n):
-			return Hash("Leaf", Hash(n))
+			return Hash("Leaf", ifLeaf(n))
 		case let .Branch(x):
 			return Hash("Branch", ifRecur(x))
 		}
@@ -112,6 +112,6 @@ extension Syntax where A: Hashable {
 
 extension Syntax where Recur: Hashable, A: Hashable {
 	public var hash: Hash {
-		return hash(ifRecur: Hash.init)
+		return hash(ifLeaf: Hash.init, ifRecur: Hash.init)
 	}
 }
