@@ -21,6 +21,9 @@ public enum Free<A, B> {
 		}
 	}
 
+
+	// MARK: Functor
+
 	public func map<C>(@noescape transform: B -> C) -> Free<A, C> {
 		switch self {
 		case let .Pure(b):
@@ -29,6 +32,9 @@ public enum Free<A, B> {
 			return .Roll(s.map { $0.map(transform) })
 		}
 	}
+
+
+	// MARK: Monad
 
 	public func flatMap<C>(@noescape transform: B -> Free<A, C>) -> Free<A, C> {
 		switch self {
