@@ -12,6 +12,11 @@ public enum Hash: AlgebraicHashable {
 	/// The embedding of a raw hash value into an algebraic hash.
 	case Raw(Int)
 
+	/// The empty hash.
+	///
+	/// This is the right and left unit for Unordered.
+	case Empty
+
 	public init(_ label: String, _ hashes: Hash...) {
 		self = .Ordered([ Hash(label) ] + hashes)
 	}
@@ -57,6 +62,8 @@ public enum Hash: AlgebraicHashable {
 			return s.hashValue
 		case let .Raw(i):
 			return i.hashValue
+		case .Empty:
+			return 0
 		}
 	}
 }
@@ -71,6 +78,8 @@ public func == (left: Hash, right: Hash) -> Bool {
 		return a == b
 	case let (.Raw(a), .Raw(b)):
 		return a == b
+	case (.Empty, .Empty):
+		return true
 	default:
 		return false
 	}
