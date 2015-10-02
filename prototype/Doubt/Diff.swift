@@ -105,8 +105,8 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		case let (.Leaf(v1), .Leaf(v2)) where v1 == v2:
 			self = .Copy(.Leaf(v2))
 
-		case let (.Branch(v1), .Branch(v2)):
-			self = .Copy(.Branch(Diff.diff(v1, v2)))
+		case let (.Indexed(v1), .Indexed(v2)):
+			self = .Copy(.Indexed(Diff.diff(v1, v2)))
 
 		default:
 			self = .Patch(a, b)
