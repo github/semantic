@@ -22,19 +22,6 @@ public enum Term<A: Equatable>: CustomDebugStringConvertible, CustomDocConvertib
 	public var doc: Doc {
 		return syntax.doc
 	}
-
-
-	public static var Empty: Term {
-		return Term(.Empty)
-	}
-
-	public static func Leaf(a: A) -> Term {
-		return Term(.Leaf(a))
-	}
-
-	public static func Branch(term: Term) -> Term {
-		return Term(.Branch(term))
-	}
 }
 
 public func == <A: Equatable> (left: Term<A>, right: Term<A>) -> Bool {
