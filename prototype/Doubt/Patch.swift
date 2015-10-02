@@ -9,3 +9,13 @@ public enum Patch<A> {
 		}
 	}
 }
+
+
+// MARK: - Equality
+
+extension Patch {
+	public static func equals(param: (A, A) -> Bool)(_ left: Patch, _ right: Patch) -> Bool {
+		return Optional.equals(Fix.equals(param))(left.state.before, right.state.before)
+			&& Optional.equals(Fix.equals(param))(left.state.after, right.state.after)
+	}
+}
