@@ -64,3 +64,10 @@ extension Free {
 		return analysis(ifPure: ifPure, ifRoll: { $0.hash(ifLeaf: ifRoll, ifRecur: { $0.hash(ifPure: ifPure, ifRoll: ifRoll) }) })
 	}
 }
+
+
+extension Free where A: Hashable, B: Hashable {
+	var hash: Hash {
+		return hash(ifPure: Hash.init, ifRoll: Hash.init)
+	}
+}
