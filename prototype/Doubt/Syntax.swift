@@ -37,6 +37,11 @@ public enum Term<A: Equatable>: CustomDebugStringConvertible, CustomDocConvertib
 	}
 }
 
+public func == <A: Equatable> (left: Term<A>, right: Term<A>) -> Bool {
+	return Syntax.equals(==)(left.syntax, right.syntax)
+}
+
+
 /// A node in a syntax tree. Expressed algebraically to enable representation of both normal syntax trees and their diffs.
 public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Empty
@@ -86,6 +91,26 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 		}
 	}
 }
+
+extension Syntax where A: Equatable {
+	public static func equals(recur: (Recur, Recur) -> Bool)(_ left: Syntax<Recur, A>, _ right: Syntax<Recur, A>) -> Bool {
+		switch (left, right) {
+		case (.Empty, .Empty):
+			return true
+		case let (.Leaf(l1), .Leaf(l2)):
+			return l1 == l2
+		case let (.Branch(v1), .Branch(v2)):
+			return recur(v1, v2)
+		default:
+			return false
+		}
+	}
+}
+
+public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F, A>) -> Bool {
+	return Syntax.equals(==)(left, right)
+}
+
 
 extension Term where A: Hashable {
 	public var hash: Hash {

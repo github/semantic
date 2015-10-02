@@ -113,3 +113,15 @@ public enum Vertex<Element>: CustomDebugStringConvertible, CustomStringConvertib
 			}.joinWithSeparator("\n")
 	}
 }
+
+
+public func == <A: Equatable> (left: Vertex<A>, right: Vertex<A>) -> Bool {
+	switch (left, right) {
+	case (.End, .End):
+		return true
+	case let (.XY(a, x1, y1), .XY(b, x2, y2)):
+		return a == b && x1.value == x2.value && y1.value == y2.value
+	default:
+		return false
+	}
+}
