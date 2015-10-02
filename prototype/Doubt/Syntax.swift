@@ -31,14 +31,11 @@ public func == <A: Equatable> (left: Term<A>, right: Term<A>) -> Bool {
 
 /// A node in a syntax tree. Expressed algebraically to enable representation of both normal syntax trees and their diffs.
 public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible {
-	case Empty
 	case Leaf(A)
 	case Branch(Recur)
 
 	public func map<T>(@noescape transform: Recur -> T) -> Syntax<T, A> {
 		switch self {
-		case .Empty:
-			return .Empty
 		case let .Leaf(n):
 			return .Leaf(n)
 		case let .Branch(x):
@@ -58,8 +55,6 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 
 	public var debugDescription: String {
 		switch self {
-		case .Empty:
-			return ".Empty"
 		case let .Leaf(n):
 			return ".Leaf(\(n))"
 		case let .Branch(x):
@@ -69,8 +64,6 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 
 	public var doc: Doc {
 		switch self {
-		case .Empty:
-			return .Empty
 		case let .Leaf(n):
 			return Doc(n)
 		case let .Branch(x):
@@ -82,8 +75,6 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 extension Syntax where A: Equatable {
 	public static func equals(recur: (Recur, Recur) -> Bool)(_ left: Syntax<Recur, A>, _ right: Syntax<Recur, A>) -> Bool {
 		switch (left, right) {
-		case (.Empty, .Empty):
-			return true
 		case let (.Leaf(l1), .Leaf(l2)):
 			return l1 == l2
 		case let (.Branch(v1), .Branch(v2)):
@@ -108,8 +99,6 @@ extension Term where A: Hashable {
 extension Syntax where A: Hashable {
 	public func hash(recur: Recur -> Hash) -> Hash {
 		switch self {
-		case .Empty:
-			return Hash("Empty")
 		case let .Leaf(n):
 			return Hash("Leaf", Hash(n))
 		case let .Branch(x):

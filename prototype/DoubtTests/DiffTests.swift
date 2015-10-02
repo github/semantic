@@ -4,11 +4,11 @@ final class DiffTests: XCTestCase {
 	}
 
 	func testSESOverEmptyAndNonEmptyCollectionsIsInsertions() {
-		XCTAssertEqual(Diff.diff([], [ a, b ]), [ Diff.Patch(.Empty, a), Diff.Patch(.Empty, b) ])
+		XCTAssertEqual(Diff.diff([], [ a, b ]), [ Diff.Patch(nil, a), Diff.Patch(nil, b) ])
 	}
 
 	func testSESOverNonEmptyAndEmptyCollectionsIsDeletions() {
-		XCTAssertEqual(Diff.diff([ a, b ], []), [ Diff.Patch(a, .Empty), Diff.Patch(b, .Empty) ])
+		XCTAssertEqual(Diff.diff([ a, b ], []), [ Diff.Patch(a, nil), Diff.Patch(b, nil) ])
 	}
 
 	func testSESCanInsertAtHead() {
