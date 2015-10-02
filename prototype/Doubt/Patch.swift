@@ -19,3 +19,15 @@ extension Patch {
 			&& Optional.equals(Fix.equals(param))(left.state.after, right.state.after)
 	}
 }
+
+
+// MARK: - Hashing
+
+extension Patch {
+	public func hash(param: A -> Hash) -> Hash {
+		return Hash.Ordered([
+			state.before.map { $0.hash(param) } ?? Hash.Empty,
+			state.after.map { $0.hash(param) } ?? Hash.Empty
+		])
+	}
+}
