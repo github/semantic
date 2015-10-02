@@ -13,11 +13,11 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 	indirect case ByIndex([Term<Info>], [Term<Info>])
 
 	public static func Insert(term: Term<Info>) -> Diff {
-		return .Patch(.Empty, term)
+		return .Patch(nil, term)
 	}
 
 	public static func Delete(term: Term<Info>) -> Diff {
-		return .Patch(term, .Empty)
+		return .Patch(term, nil)
 	}
 
 	public init(_ term: Term<Info>) {
