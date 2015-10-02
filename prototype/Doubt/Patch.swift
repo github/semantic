@@ -2,6 +2,14 @@
 public enum Patch<A> {
 	case Replace(Fix<A>?, Fix<A>?)
 
+	public static func Insert(term: Fix<A>) -> Patch {
+		return .Replace(nil, term)
+	}
+
+	public static func Delete(term: Fix<A>) -> Patch {
+		return .Replace(term, nil)
+	}
+
 	public var state: (before: Fix<A>?, after: Fix<A>?) {
 		switch self {
 		case let .Replace(a, b):
