@@ -9,7 +9,7 @@ public enum Free<A, B> {
 	/// The injection of a value of type `B` into the `Syntax` tree.
 	case Pure(B)
 
-	/// A recursive instantiation of `Syntax`, unrolling another loop of the recursive type.
+	/// A recursive instantiation of `Syntax`, unrolling another iteration of the recursive type.
 	indirect case Roll(Syntax<Free, A>)
 
 	public func map<C>(@noescape transform: B -> C) -> Free<A, C> {
