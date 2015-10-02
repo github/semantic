@@ -59,7 +59,7 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 		case let .Leaf(n):
 			return ".Leaf(\(n))"
 		case let .Indexed(x):
-			return ".Branch(\(String(reflecting: x)))"
+			return ".Indexed(\(String(reflecting: x)))"
 		}
 	}
 
