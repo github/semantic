@@ -25,7 +25,7 @@ public enum Term<A: Equatable>: CustomDebugStringConvertible, CustomDocConvertib
 }
 
 public func == <A: Equatable> (left: Term<A>, right: Term<A>) -> Bool {
-	return Syntax.equals(==)(left.syntax, right.syntax)
+	return Syntax.equals(ifRecur: ==)(left.syntax, right.syntax)
 }
 
 
@@ -73,7 +73,7 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 }
 
 extension Syntax where A: Equatable {
-	public static func equals(ifRecur: (Recur, Recur) -> Bool)(_ left: Syntax<Recur, A>, _ right: Syntax<Recur, A>) -> Bool {
+	public static func equals(ifRecur ifRecur: (Recur, Recur) -> Bool)(_ left: Syntax<Recur, A>, _ right: Syntax<Recur, A>) -> Bool {
 		switch (left, right) {
 		case let (.Leaf(l1), .Leaf(l2)):
 			return l1 == l2
@@ -86,7 +86,7 @@ extension Syntax where A: Equatable {
 }
 
 public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F, A>) -> Bool {
-	return Syntax.equals(==)(left, right)
+	return Syntax.equals(ifRecur: ==)(left, right)
 }
 
 
