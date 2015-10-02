@@ -69,6 +69,9 @@ public enum Diff: Comparable, CustomDebugStringConvertible, CustomDocConvertible
 		}
 	}
 
+	/// The magnitude, or cost, of a diff. This is, roughly speaking, a count of all the patches involved.
+	///
+	/// This is used to compute an optimal path through the edit graph.
 	public var magnitude: Int {
 		func magnitude(syntax: Syntax<Diff, Info>) -> Int {
 			return syntax.map { $0.magnitude }.reduce(0, combine: +)
