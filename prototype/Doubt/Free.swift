@@ -6,7 +6,10 @@
 ///
 /// In Doubt, this allows us to represent diffs as values of the `Free` monad obtained from `Syntax`, injecting `Patch` into the tree; or otherwise put, a diff is a tree of mutually-recursive `Free.Roll`/`Syntax` nodes with `Pure` nodes injecting the actual changes.
 public enum Free<A, B> {
+	/// The injection of a value of type `B` into the `Syntax` tree.
 	case Pure(B)
+
+	/// A recursive instantiation of `Syntax`, unrolling another loop of the recursive type.
 	indirect case Roll(Syntax<Free, A>)
 
 	public func map<C>(@noescape transform: B -> C) -> Free<A, C> {
