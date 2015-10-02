@@ -8,4 +8,13 @@
 public enum Free<A, B> {
 	case Pure(B)
 	indirect case Roll(Syntax<Free, A>)
+
+	public func map<C>(@noescape transform: B -> C) -> Free<A, C> {
+		switch self {
+		case let .Pure(b):
+			return .Pure(transform(b))
+		case let .Roll(s):
+			return .Roll(s.map { $0.map(transform) })
+		}
+	}
 }
