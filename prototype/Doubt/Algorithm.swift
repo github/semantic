@@ -21,3 +21,23 @@ public enum Algorithm<Recur, A> {
 		}
 	}
 }
+
+
+// MARK: - Running
+
+extension Algorithm {
+	/// Evaluates the encoded algorithm, returning its result.
+	public func evaluate(equals: (A, A) -> Bool) -> Recur {
+		func copy(b: Term) -> Diff {
+			return Diff.Roll(b.out.map(copy))
+		}
+		switch self {
+		case let .Recursive(a, b, f):
+			if Fix.equals(equals)(a, b) { return f(copy(b)) }
+			switch (a.out, b.out) {
+			default:
+				return f(Diff.Pure(.Replace(a, b)))
+			}
+		}
+	}
+}
