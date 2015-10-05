@@ -1,7 +1,5 @@
 struct Matrix<A> {
 	init(width: Int, height: Int, compute: (Int, Int) -> A) {
-		self.width = width
-		self.height = height
 		var values: [Memo<A>] = []
 		values.reserveCapacity(width * height)
 
@@ -11,7 +9,7 @@ struct Matrix<A> {
 			}
 		}
 
-		self.values = values
+		self.init(width: width, height: height, values: values)
 	}
 
 	let width: Int
@@ -22,5 +20,14 @@ struct Matrix<A> {
 	subscript (i: Int, j: Int) -> Memo<A>? {
 		guard i < width && j < height else { return nil }
 		return values[i + j * height]
+	}
+
+
+	// MARK: Implementation details
+
+	private init(width: Int, height: Int, values: [Memo<A>]) {
+		self.width = width
+		self.height = height
+		self.values = values
 	}
 }
