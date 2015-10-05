@@ -60,7 +60,12 @@ extension Algorithm {
 ///
 /// As with `Free`, this is “free” in the sense of “unconstrained,” i.e. “the monad induced by `Algorithm` without extra assumptions.”
 public enum FreeAlgorithm<A, B> {
+	/// The injection of a value of type `B` into an `Algorithm`.
+	///
+	/// Equally, a way to return a result or throw an error during computation, as determined by the type which `B` is instantiated to, and the specific context in which it is being evaluated.
 	case Pure(B)
+
+	/// A recursive instantiation of `Algorithm`, unrolling another iteration of the recursive type.
 	case Roll(Algorithm<FreeAlgorithm, A>)
 
 	public func analysis<C>(@noescape ifPure ifPure: B -> C, @noescape ifRoll: Algorithm<FreeAlgorithm, A> -> C) -> C {
@@ -86,6 +91,8 @@ public enum FreeAlgorithm<A, B> {
 		return analysis(ifPure: transform, ifRoll: { .Roll($0.map { $0.flatMap(transform) }) })
 	}
 
+
+	/// Evaluates the encoded algorithm, returning its result.
 	public func evaluate(equals: (A, A) -> Bool) -> B {
 		switch self {
 		case let .Pure(b):
