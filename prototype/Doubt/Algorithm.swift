@@ -109,6 +109,17 @@ extension Free: FreeConvertible {
 	public var free: Free { return self }
 }
 
+extension FreeAlgorithm where B: FreeConvertible, B.RollType == A, B.PureType == Patch<A> {
+	public init(_ a: Fix<A>, _ b: Fix<A>) {
+		switch (a.out, b.out) {
+		case let (.Keyed(a), .Keyed(b)):
+			self = .Roll(.ByKey(a, b, Syntax.Keyed >>> Free.Roll >>> B.init >>> FreeAlgorithm.Pure))
+		default:
+			self = .Roll(.Recursive(a, b, B.init >>> FreeAlgorithm.Pure))
+		}
+	}
+}
+
 
 func diff<A>(a: Fix<A>, _ b: Fix<A>) -> FreeAlgorithm<A, Free<A, Patch<A>>> {
 	switch (a.out, b.out) {
