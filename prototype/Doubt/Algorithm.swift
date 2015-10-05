@@ -1,4 +1,4 @@
-/// A language of diffing algorithms.
+/// An operation of diffing over terms or collections of terms.
 public enum Algorithm<Recur, A> {
 	/// The type of `Term`s over which `Algorithm`s operate.
 	public typealias Term = Fix<A>
