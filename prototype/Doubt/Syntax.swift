@@ -25,7 +25,7 @@ public enum Term<A: Equatable>: CustomDebugStringConvertible, CustomDocConvertib
 }
 
 public func == <A: Equatable> (left: Term<A>, right: Term<A>) -> Bool {
-	return Syntax.equals(==)(left.syntax, right.syntax)
+	return Syntax.equals(ifLeaf: ==, ifRecur: ==)(left.syntax, right.syntax)
 }
 
 
@@ -72,13 +72,16 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 	}
 }
 
-extension Syntax where A: Equatable {
-	public static func equals(recur: (Recur, Recur) -> Bool)(_ left: Syntax<Recur, A>, _ right: Syntax<Recur, A>) -> Bool {
+
+// MARK: - Equality
+
+extension Syntax {
+	public static func equals(ifLeaf ifLeaf: (A, A) -> Bool, ifRecur: (Recur, Recur) -> Bool)(_ left: Syntax<Recur, A>, _ right: Syntax<Recur, A>) -> Bool {
 		switch (left, right) {
 		case let (.Leaf(l1), .Leaf(l2)):
-			return l1 == l2
+			return ifLeaf(l1, l2)
 		case let (.Branch(v1), .Branch(v2)):
-			return recur(v1, v2)
+			return ifRecur(v1, v2)
 		default:
 			return false
 		}
@@ -86,29 +89,29 @@ extension Syntax where A: Equatable {
 }
 
 public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F, A>) -> Bool {
-	return Syntax.equals(==)(left, right)
+	return Syntax.equals(ifLeaf: ==, ifRecur: ==)(left, right)
 }
 
 
 extension Term where A: Hashable {
 	public var hash: Hash {
-		return syntax.hash { $0.hash }
+		return syntax.hash(ifLeaf: Hash.init, ifRecur: { $0.hash })
 	}
 }
 
-extension Syntax where A: Hashable {
-	public func hash(recur: Recur -> Hash) -> Hash {
+extension Syntax {
+	public func hash(ifLeaf ifLeaf: A -> Hash, ifRecur: Recur -> Hash) -> Hash {
 		switch self {
 		case let .Leaf(n):
-			return Hash("Leaf", Hash(n))
+			return Hash("Leaf", ifLeaf(n))
 		case let .Branch(x):
-			return Hash("Branch", recur(x))
+			return Hash("Branch", ifRecur(x))
 		}
 	}
 }
 
 extension Syntax where Recur: Hashable, A: Hashable {
 	public var hash: Hash {
-		return hash(Hash.init)
+		return hash(ifLeaf: Hash.init, ifRecur: Hash.init)
 	}
 }

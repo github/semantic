@@ -8,12 +8,20 @@ func const<A, B>(a: A)(_ b: B) -> A {
 }
 
 
-infix operator >>> {
-	associativity right
-	precedence 170
-}
-
 func >>> <T, U, V> (f: T -> U, g: U -> V) -> T -> V {
 	return { g(f($0)) }
 }
 
+
+extension Optional {
+	static func equals(param: (Wrapped, Wrapped) -> Bool)(_ left: Wrapped?, _ right: Wrapped?) -> Bool {
+		switch (left, right) {
+		case let (.Some(a), .Some(b)):
+			return param(a, b)
+		case (.None, .None):
+			return true
+		default:
+			return false
+		}
+	}
+}

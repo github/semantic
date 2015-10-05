@@ -48,6 +48,11 @@ infix operator </> {
 	precedence 140
 }
 
+infix operator >>> {
+	associativity right
+	precedence 170
+}
+
 prefix operator ^ {}
 
 postfix operator * {}
