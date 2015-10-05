@@ -77,4 +77,14 @@ public enum FreeAlgorithm<A, B> {
 	public func flatMap<C>(transform: B -> FreeAlgorithm<A, C>) -> FreeAlgorithm<A, C> {
 		return analysis(ifPure: transform, ifRoll: { .Roll($0.map { $0.flatMap(transform) }) })
 	}
+
+	public func evaluate(equals: (A, A) -> Bool) -> B {
+		switch self {
+		case let .Pure(b):
+			return b
+
+		case let .Roll(r):
+			return r.evaluate(equals).evaluate(equals)
+		}
+	}
 }
