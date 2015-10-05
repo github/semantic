@@ -14,7 +14,7 @@ public enum Algorithm<Recur, A> {
 	/// Represents a diff to be performed on a collection of terms identified by keys.
 	case ByKey([String:Term], [String:Term], [String:Diff] -> Recur)
 	// fixme: SES 😰
-//	case ByIndex([Term], [Term], [Diff] -> Recur)
+	case ByIndex([Term], [Term], [Diff] -> Recur)
 
 
 	// MARK: Functor
@@ -25,6 +25,8 @@ public enum Algorithm<Recur, A> {
 			return .Recursive(a, b, f >>> transform)
 		case let .ByKey(a, b, f):
 			return .ByKey(a, b, f >>> transform)
+		case let .ByIndex(a, b, f):
+			return .ByIndex(a, b, f >>> transform)
 		}
 	}
 }
@@ -51,6 +53,9 @@ extension Algorithm {
 			let inserted = Set(b.keys).subtract(a.keys).map { ($0, Diff.Pure(Patch.Insert(b[$0]!))) }
 			let patched = Set(a.keys).intersect(b.keys).map { ($0, Diff.Pure(Patch.Replace(a[$0]!, b[$0]!))) }
 			return f(Dictionary(elements: deleted + inserted + patched))
+
+		case let .ByIndex(_, _, f):
+			return f([])
 		}
 	}
 }
