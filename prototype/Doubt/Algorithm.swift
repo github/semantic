@@ -108,12 +108,28 @@ public enum FreeAlgorithm<A, B> {
 
 	/// Evaluates the encoded algorithm, returning its result.
 	public func evaluate(equals: (A, A) -> Bool) -> B {
+		/// Deep-copies a `Term` into a `Diff` without changes.
+		func copy(b: Term) -> Diff {
+			return Diff.Roll(b.out.map(copy))
+		}
+
 		switch self {
 		case let .Pure(b):
 			return b
 
-		case let .Roll(r):
-			return r.evaluate(equals).evaluate(equals)
+		case let .Roll(.Recursive(a, b, f)):
+			return f(Fix.equals(equals)(a, b)
+				? copy(b)
+				: Diff.Pure(.Replace(a, b))).evaluate(equals)
+
+		case let .Roll(.ByKey(a, b, f)):
+			let deleted = Set(a.keys).subtract(b.keys).map { ($0, Diff.Pure(Patch.Delete(a[$0]!))) }
+			let inserted = Set(b.keys).subtract(a.keys).map { ($0, Diff.Pure(Patch.Insert(b[$0]!))) }
+			let patched = Set(a.keys).intersect(b.keys).map { ($0, Diff.Pure(Patch.Replace(a[$0]!, b[$0]!))) }
+			return f(Dictionary(elements: deleted + inserted + patched)).evaluate(equals)
+
+		case let .Roll(.ByIndex(a, b, f)):
+			return f([]).evaluate(equals)
 		}
 	}
 }
