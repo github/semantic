@@ -33,35 +33,6 @@ public enum Algorithm<Recur, A> {
 }
 
 
-// MARK: - Running
-
-extension Algorithm {
-	/// Evaluates the encoded algorithm, returning its result.
-	public func evaluate(equals: (A, A) -> Bool) -> Recur {
-		/// Deep-copies a `Term` into a `Diff` without changes.
-		func copy(b: Term) -> Diff {
-			return Diff.Roll(b.out.map(copy))
-		}
-
-		switch self {
-		case let .Recursive(a, b, f):
-			return f(Fix.equals(equals)(a, b)
-				? copy(b)
-				: Diff.Pure(.Replace(a, b)))
-
-		case let .ByKey(a, b, f):
-			let deleted = Set(a.keys).subtract(b.keys).map { ($0, Diff.Pure(Patch.Delete(a[$0]!))) }
-			let inserted = Set(b.keys).subtract(a.keys).map { ($0, Diff.Pure(Patch.Insert(b[$0]!))) }
-			let patched = Set(a.keys).intersect(b.keys).map { ($0, Diff.Pure(Patch.Replace(a[$0]!, b[$0]!))) }
-			return f(Dictionary(elements: deleted + inserted + patched))
-
-		case let .ByIndex(_, _, f):
-			return f([])
-		}
-	}
-}
-
-
 /// The free monad over `Algorithm`, implementing the language of diffing.
 ///
 /// As with `Free`, this is “free” in the sense of “unconstrained,” i.e. “the monad induced by `Algorithm` without extra assumptions.”
