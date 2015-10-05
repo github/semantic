@@ -23,6 +23,13 @@ struct Matrix<A> {
 	}
 
 
+	// MARK: Functor
+
+	func map<Other>(transform: A -> Other) -> Matrix<Other> {
+		return Matrix<Other>(width: width, height: height, values: values.map { $0.map(transform) })
+	}
+
+
 	// MARK: Implementation details
 
 	private init(width: Int, height: Int, values: [Memo<A>]) {
