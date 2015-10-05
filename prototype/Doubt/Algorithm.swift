@@ -88,3 +88,9 @@ public enum FreeAlgorithm<A, B> {
 		}
 	}
 }
+
+extension FreeAlgorithm where A: Equatable {
+	public func evaluate() -> B {
+		return evaluate(==)
+	}
+}
