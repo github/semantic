@@ -13,7 +13,8 @@ public enum Algorithm<Recur, A> {
 
 	/// Represents a diff to be performed on a collection of terms identified by keys.
 	case ByKey([String:Term], [String:Term], [String:Diff] -> Recur)
-	// fixme: SES 😰
+
+	/// Represents a diff to be performed over an array of terms by index.
 	case ByIndex([Term], [Term], [Diff] -> Recur)
 
 
