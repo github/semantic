@@ -95,6 +95,20 @@ extension FreeAlgorithm where A: Equatable {
 	}
 }
 
+/// A hack to work around the unavailability of same-type requirements.
+public protocol FreeConvertible {
+	typealias RollType
+	typealias PureType
+
+	init(free: Free<RollType, PureType>)
+	var free: Free<RollType, PureType> { get }
+}
+
+extension Free: FreeConvertible {
+	public init(free: Free<A, B>) { self = free }
+	public var free: Free { return self }
+}
+
 
 func diff<A>(a: Fix<A>, _ b: Fix<A>) -> FreeAlgorithm<A, Free<A, Patch<A>>> {
 	switch (a.out, b.out) {
