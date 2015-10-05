@@ -133,7 +133,7 @@ extension FreeAlgorithm where B: FreeConvertible, B.RollType == A, B.PureType ==
 	public init(_ a: Fix<A>, _ b: Fix<A>) {
 		switch (a.out, b.out) {
 		case let (.Keyed(a), .Keyed(b)):
-			self = .Roll(.ByKey(a, b, Syntax.Keyed >>> Free.Roll >>> B.init >>> FreeAlgorithm.Pure))
+			self = .Roll(.ByKey(a, b, Syntax.Keyed >>> Free.Roll >>> B.init >>> Pure))
 		default:
 			self = .Roll(.Recursive(a, b, B.init >>> FreeAlgorithm.Pure))
 		}
