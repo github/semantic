@@ -40,12 +40,9 @@ extension Algorithm {
 
 		switch self {
 		case let .Recursive(a, b, f):
-			if Fix.equals(equals)(a, b) { return f(copy(b)) }
-
-			switch (a.out, b.out) {
-			default:
-				return f(Diff.Pure(.Replace(a, b)))
-			}
+			return f(Fix.equals(equals)(a, b)
+				? copy(b)
+				: Diff.Pure(.Replace(a, b)))
 
 		case let .ByKey(a, b, f):
 			let deleted = Set(a.keys).subtract(b.keys).map { ($0, Diff.Pure(Patch.Delete(a[$0]!))) }
