@@ -37,6 +37,7 @@ extension Algorithm {
 		func copy(b: Term) -> Diff {
 			return Diff.Roll(b.out.map(copy))
 		}
+
 		switch self {
 		case let .Recursive(a, b, f):
 			if Fix.equals(equals)(a, b) { return f(copy(b)) }
