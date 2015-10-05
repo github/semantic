@@ -94,3 +94,14 @@ extension FreeAlgorithm where A: Equatable {
 		return evaluate(==)
 	}
 }
+
+
+func diff<A>(a: Fix<A>, _ b: Fix<A>) -> FreeAlgorithm<A, Free<A, Patch<A>>> {
+	switch (a.out, b.out) {
+	case let (.Keyed(a), .Keyed(b)):
+		return .Roll(.ByKey(a, b, Syntax.Keyed >>> Free.Roll >>> FreeAlgorithm.Pure))
+
+	default:
+		return .Roll(.Recursive(a, b, FreeAlgorithm.Pure))
+	}
+}
