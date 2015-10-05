@@ -56,9 +56,11 @@ extension Algorithm {
 }
 
 
-/// The free monad over `Algorithm`.
+/// The free monad over `Algorithm`, implementing the language of diffing.
 ///
 /// As with `Free`, this is “free” in the sense of “unconstrained,” i.e. “the monad induced by `Algorithm` without extra assumptions.”
+///
+/// Where `Algorithm` models a single diffing strategy, `FreeAlgorithm` models the recursive selection of diffing strategies at each node. Thus, a value in `FreeAlgorithm` models an algorithm for constructing a value in the type `B` from the resulting diffs. By this means, diffing can be adapted not just to the specific grammar, but to specific trees produced by that grammar, and even the values of type `A` encapsulated at each node.
 public enum FreeAlgorithm<A, B> {
 	/// The injection of a value of type `B` into an `Algorithm`.
 	///
