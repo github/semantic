@@ -100,6 +100,10 @@ public enum FreeAlgorithm<A, B> {
 			return f(Dictionary(elements: deleted + inserted + patched)).evaluate(equals)
 
 		case let .Roll(.ByIndex(a, b, f)):
+			let pairs = Matrix(width: a.count, height: b.count) { i, j in
+				(a[i], b[j])
+			}
+
 			return f([]).evaluate(equals)
 		}
 	}
