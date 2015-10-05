@@ -69,4 +69,8 @@ public enum FreeAlgorithm<A, B> {
 			return ifRoll(a)
 		}
 	}
+
+	public func map<Other>(transform: B -> Other) -> FreeAlgorithm<A, Other> {
+		return analysis(ifPure: transform >>> FreeAlgorithm<A, Other>.Pure, ifRoll: { .Roll($0.map { $0.map(transform) }) })
+	}
 }
