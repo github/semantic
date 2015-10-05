@@ -52,3 +52,21 @@ extension Algorithm {
 		}
 	}
 }
+
+
+/// The free monad over `Algorithm`.
+///
+/// As with `Free`, this is “free” in the sense of “unconstrained,” i.e. “the monad induced by `Algorithm` without extra assumptions.”
+public enum FreeAlgorithm<A, B> {
+	case Pure(B)
+	case Roll(Algorithm<FreeAlgorithm, A>)
+
+	public func analysis<C>(@noescape ifPure ifPure: B -> C, @noescape ifRoll: Algorithm<FreeAlgorithm, A> -> C) -> C {
+		switch self {
+		case let .Pure(b):
+			return ifPure(b)
+		case let .Roll(a):
+			return ifRoll(a)
+		}
+	}
+}
