@@ -72,9 +72,15 @@ public enum FreeAlgorithm<A, B> {
 		}
 	}
 
+
+	// MARK: Functor
+
 	public func map<Other>(transform: B -> Other) -> FreeAlgorithm<A, Other> {
 		return analysis(ifPure: transform >>> FreeAlgorithm<A, Other>.Pure, ifRoll: { .Roll($0.map { $0.map(transform) }) })
 	}
+
+
+	// MARK: Monad
 
 	public func flatMap<C>(transform: B -> FreeAlgorithm<A, C>) -> FreeAlgorithm<A, C> {
 		return analysis(ifPure: transform, ifRoll: { .Roll($0.map { $0.flatMap(transform) }) })
