@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D40024EE1BAC819000A110B8 /* SwiftTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40024ED1BAC819000A110B8 /* SwiftTests.swift */; };
+		D40B89C41BC319070078E098 /* Matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B89C31BC319070078E098 /* Matrix.swift */; settings = {ASSET_TAGS = (); }; };
 		D432D4711BA9AC0B00F3FABC /* DiffTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4701BA9AC0B00F3FABC /* DiffTests.swift */; };
 		D432D4731BA9C55300F3FABC /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4721BA9C55300F3FABC /* Stream.swift */; };
 		D432D4751BA9D6A400F3FABC /* Memo.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4741BA9D6A400F3FABC /* Memo.swift */; };
@@ -86,6 +87,7 @@
 
 /* Begin PBXFileReference section */
 		D40024ED1BAC819000A110B8 /* SwiftTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTests.swift; sourceTree = "<group>"; };
+		D40B89C31BC319070078E098 /* Matrix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Matrix.swift; sourceTree = "<group>"; };
 		D432D4701BA9AC0B00F3FABC /* DiffTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DiffTests.swift; sourceTree = "<group>"; };
 		D432D4721BA9C55300F3FABC /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
 		D432D4741BA9D6A400F3FABC /* Memo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Memo.swift; sourceTree = "<group>"; };
@@ -208,6 +210,7 @@
 				D4413FEE1BB06D4C00E3C3C1 /* Dictionary.swift */,
 				D4413FF01BB08FDC00E3C3C1 /* JSON.swift */,
 				D4A71DC41BB45B850051416D /* Vertex.swift */,
+				D40B89C31BC319070078E098 /* Matrix.swift */,
 				D4D7F3161BBB22E500AAB0C0 /* Hash.swift */,
 				D45A36C81BBC667D00BE3DDE /* Category.swift */,
 				D45A36CC1BBC75DF00BE3DDE /* Info.swift */,
@@ -412,6 +415,7 @@
 				D4AAE5461B5AE2D0004E581F /* Parse.swift in Sources */,
 				D49FCBC81BBF2C4300C5E9C3 /* Algorithm.swift in Sources */,
 				D432D4751BA9D6A400F3FABC /* Memo.swift in Sources */,
+				D40B89C41BC319070078E098 /* Matrix.swift in Sources */,
 				D4AAE5491B5AE2D0004E581F /* StringLiteralConvertible.swift in Sources */,
 				D4413FF11BB08FDC00E3C3C1 /* JSON.swift in Sources */,
 				D4AAE5451B5AE2D0004E581F /* Operators.swift in Sources */,
