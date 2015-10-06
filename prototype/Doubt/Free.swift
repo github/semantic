@@ -21,6 +21,12 @@ public enum Free<A, B> {
 		}
 	}
 
+	public func iter(transform: Syntax<B, A> -> B) -> B {
+		return analysis(
+			ifPure: id,
+			ifRoll: { transform($0.map { Free.iter($0)(transform) }) })
+	}
+
 
 	// MARK: Functor
 
@@ -70,11 +76,4 @@ extension Free where A: Hashable, B: Hashable {
 	public var hash: Hash {
 		return hash(ifPure: Hash.init, ifRoll: Hash.init)
 	}
-}
-
-
-public func iter<A, B>(transform: Syntax<B, A> -> B)(_ free: Free<A, B>) -> B {
-	return free.analysis(
-		ifPure: id,
-		ifRoll: { transform($0.map(iter(transform))) })
 }
