@@ -36,7 +36,7 @@ extension Fix {
 }
 
 extension Fix where A: Hashable {
-	var hash: Hash {
+	public var hash: Hash {
 		return hash(Hash.init)
 	}
 }
