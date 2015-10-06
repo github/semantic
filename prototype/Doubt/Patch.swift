@@ -1,5 +1,5 @@
 /// A patch to some part of a `Syntax` tree.
-public enum Patch<A> {
+public enum Patch<A>: CustomDebugStringConvertible {
 	case Replace(Fix<A>, Fix<A>)
 	case Insert(Fix<A>)
 	case Delete(Fix<A>)
@@ -12,6 +12,20 @@ public enum Patch<A> {
 			return (nil, b)
 		case let .Delete(a):
 			return (a, nil)
+		}
+	}
+
+
+	// MARK: CustomDebugStringConvertible
+
+	public var debugDescription: String {
+		switch self {
+		case let .Replace(a, b):
+			return ".Replace(\(String(reflecting: a)), \(String(reflecting: b)))"
+		case let .Insert(b):
+			return ".Insert(\(String(reflecting: b)))"
+		case let .Delete(a):
+			return ".Delete(\(String(reflecting: a)))"
 		}
 	}
 }
