@@ -5,7 +5,7 @@
 /// `Syntax` is a non-recursive type parameterized by the type of its child nodes. Instantiating it to `Free` makes it recursive through the `Roll` case, and allows it to wrap values of type `B` through the `Pure` case.
 ///
 /// In Doubt, this allows us to represent diffs as values of the `Free` monad obtained from `Syntax`, injecting `Patch` into the tree; or otherwise put, a diff is a tree of mutually-recursive `Free.Roll`/`Syntax` nodes with `Pure` nodes injecting the actual changes.
-public enum Free<A, B> {
+public enum Free<A, B>: CustomDebugStringConvertible {
 	/// The injection of a value of type `B` into the `Syntax` tree.
 	case Pure(B)
 
@@ -65,6 +65,18 @@ public enum Free<A, B> {
 
 	public func flatMap<C>(@noescape transform: B -> Free<A, C>) -> Free<A, C> {
 		return analysis(ifPure: transform, ifRoll: { .Roll($0.map { $0.flatMap(transform) }) })
+	}
+
+
+	// MARK: CustomDebugStringConvertible
+
+	public var debugDescription: String {
+		switch self {
+		case let .Pure(b):
+			return ".Pure(\(String(reflecting: b)))"
+		case let .Roll(s):
+			return ".Roll(\(String(reflecting: s)))"
+		}
 	}
 }
 
