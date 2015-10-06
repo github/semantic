@@ -35,6 +35,9 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 	case Indexed([Recur])
 	case Keyed([String:Recur])
 
+
+	// MARK: Functor
+
 	public func map<T>(@noescape transform: Recur -> T) -> Syntax<T, A> {
 		switch self {
 		case let .Leaf(n):
