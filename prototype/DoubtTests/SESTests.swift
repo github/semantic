@@ -1,4 +1,4 @@
-final class DiffTests: XCTestCase {
+final class SESTests: XCTestCase {
 	func testSESOverEmptyCollectionsIsEmpty() {
 		assert(SES([], []), ==, [])
 	}
