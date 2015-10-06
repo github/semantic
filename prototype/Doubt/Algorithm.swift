@@ -122,6 +122,10 @@ public enum FreeAlgorithm<A, B> {
 				return .Cons((diff, cost(diff) + (rest.value.first?.1 ?? 0)), rest)
 			}
 
+			func costOfStream(stream: Memo<Stream<(Diff, Int)>>) -> Int {
+				return stream.value.first?.1 ?? 0
+			}
+
 			var matrix: Matrix<Stream<(Diff, Int)>>!
 			matrix = Matrix(width: a.count, height: b.count) { i, j in
 				let right = matrix[i + 1, j]
