@@ -38,6 +38,9 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 		let diagonal = matrix[i + 1, j + 1]
 
 		let diff = recur(a[i], b[j])
+		func copy(term: Term) -> Diff {
+			return Diff.Roll(term.out.map(copy))
+		}
 
 		if let right = right, down = down, diagonal = diagonal {
 			let costs = (right: costOfStream(right), down: costOfStream(down), diagonal: costOfStream(diagonal))
