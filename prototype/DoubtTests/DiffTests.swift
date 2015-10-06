@@ -34,6 +34,7 @@ final class DiffTests: XCTestCase {
 }
 
 private typealias Term = Fix<Info>
+private typealias Diff = Free<Info, Patch<Info>>
 
 private let a = Term.In(.Leaf(.Literal("a", [])))
 private let b = Term.In(.Leaf(.Literal("b", [])))
