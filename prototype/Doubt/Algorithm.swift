@@ -117,13 +117,13 @@ public enum FreeAlgorithm<A, B> {
 				}
 			}
 
-			var matrix: Matrix<Stream<Diff>>!
+			var matrix: Matrix<Stream<(Diff, Int)>>!
 			matrix = Matrix(width: a.count, height: b.count) { i, j in
 				let right = matrix[i + 1, j]
 				let down = matrix[i, j + 1]
 				let diagonal = matrix[i + 1, j + 1]
 
-				let here = Diff.Pure(Patch.Replace(a[i], b[j]))
+				let here = (Diff.Pure(Patch.Replace(a[i], b[j])), 1)
 
 				if let right = right, down = down, diagonal = diagonal {
 					// nominate the best edge to continue along
@@ -144,7 +144,7 @@ public enum FreeAlgorithm<A, B> {
 				return Stream.Cons(here, Memo(evaluated: Stream.Nil))
 			}
 
-			return f(Array(matrix[0, 0]!.value)).evaluate(equals)
+			return f(Array(matrix[0, 0]!.value.map { diff, _ in diff })).evaluate(equals)
 		}
 	}
 }
