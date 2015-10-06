@@ -188,6 +188,7 @@ extension Free: FreeConvertible {
 }
 
 extension FreeAlgorithm where B: FreeConvertible, B.RollType == A, B.PureType == Patch<A> {
+	/// `FreeAlgorithm<A, Diff>`s can be constructed from a pair of `Term`s using `ByKey` when `Keyed`, `ByIndex` when `Indexed`, and `Recursive` otherwise.
 	public init(_ a: Fix<A>, _ b: Fix<A>) {
 		switch (a.out, b.out) {
 		case let (.Keyed(a), .Keyed(b)):
