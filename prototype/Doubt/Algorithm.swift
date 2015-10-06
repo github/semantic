@@ -132,6 +132,7 @@ public enum FreeAlgorithm<A, B> {
 				let down = matrix[i, j + 1]
 				let diagonal = matrix[i + 1, j + 1]
 
+				// fixme: this should recur.
 				let diff = Diff.Pure(Patch.Replace(a[i], b[j]))
 
 				if let right = right, down = down, diagonal = diagonal {
