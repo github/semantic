@@ -44,12 +44,9 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 		let down = matrix[i, j + 1]
 		let diagonal = matrix[i + 1, j + 1]
 
-		func copy(term: Term) -> Diff {
-			return Diff.Roll(term.out.map(copy))
-		}
 		let recur = {
 			Term.equals(equals)($0, $1)
-				? copy($1)
+				? Diff($1)
 				: recur($0, $1)
 		}
 
