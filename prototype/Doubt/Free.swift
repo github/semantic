@@ -67,7 +67,7 @@ extension Free {
 
 
 extension Free where A: Hashable, B: Hashable {
-	var hash: Hash {
+	public var hash: Hash {
 		return hash(ifPure: Hash.init, ifRoll: Hash.init)
 	}
 }
