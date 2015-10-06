@@ -31,7 +31,6 @@
 		D4A71DC71BB4AC9E0051416D /* VertexTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A71DC61BB4AC9E0051416D /* VertexTests.swift */; settings = {ASSET_TAGS = (); }; };
 		D4AAE50E1B5AE22E004E581F /* Doubt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4AAE4FD1B5AE22E004E581F /* Doubt.framework */; };
 		D4AAE5401B5AE2D0004E581F /* Array.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE5351B5AE2D0004E581F /* Array.swift */; };
-		D4AAE5411B5AE2D0004E581F /* Diff.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE5361B5AE2D0004E581F /* Diff.swift */; };
 		D4AAE5421B5AE2D0004E581F /* Doc.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE5371B5AE2D0004E581F /* Doc.swift */; };
 		D4AAE5451B5AE2D0004E581F /* Operators.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE53A1B5AE2D0004E581F /* Operators.swift */; };
 		D4AAE5461B5AE2D0004E581F /* Parse.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE53B1B5AE2D0004E581F /* Parse.swift */; };
@@ -116,7 +115,6 @@
 		D4AAE50D1B5AE22E004E581F /* DoubtTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DoubtTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4AAE5141B5AE22E004E581F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D4AAE5351B5AE2D0004E581F /* Array.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Array.swift; sourceTree = "<group>"; };
-		D4AAE5361B5AE2D0004E581F /* Diff.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Diff.swift; sourceTree = "<group>"; };
 		D4AAE5371B5AE2D0004E581F /* Doc.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Doc.swift; sourceTree = "<group>"; };
 		D4AAE53A1B5AE2D0004E581F /* Operators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Operators.swift; sourceTree = "<group>"; };
 		D4AAE53B1B5AE2D0004E581F /* Parse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parse.swift; sourceTree = "<group>"; };
@@ -197,7 +195,6 @@
 			isa = PBXGroup;
 			children = (
 				D4AAE5351B5AE2D0004E581F /* Array.swift */,
-				D4AAE5361B5AE2D0004E581F /* Diff.swift */,
 				D4AAE5371B5AE2D0004E581F /* Doc.swift */,
 				D4AAE53A1B5AE2D0004E581F /* Operators.swift */,
 				D4AAE53B1B5AE2D0004E581F /* Parse.swift */,
@@ -398,7 +395,6 @@
 				D4AAE5471B5AE2D0004E581F /* Prelude.swift in Sources */,
 				D4413FEF1BB06D4C00E3C3C1 /* Dictionary.swift in Sources */,
 				D4AAE5481B5AE2D0004E581F /* String.swift in Sources */,
-				D4AAE5411B5AE2D0004E581F /* Diff.swift in Sources */,
 				D4D7F3171BBB22E500AAB0C0 /* Hash.swift in Sources */,
 				D45A36C91BBC667D00BE3DDE /* Category.swift in Sources */,
 				D4AAE5401B5AE2D0004E581F /* Array.swift in Sources */,
