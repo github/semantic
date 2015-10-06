@@ -29,7 +29,7 @@ final class DiffTests: XCTestCase {
 
 	func testSESOfLongerSequences() {
 		// fixme: this is awfully slow for such a short sequence
-		XCTAssertEqual(Diff.diff([ a, b, c, a, b, b, a ], [ c, b, a, b, a, c ]), [ Diff.Patch(a, c), Diff(b), Diff.Delete(c), Diff(a), Diff.Delete(b), Diff(b), Diff(a), Diff.Insert(c) ])
+		assert(SES([ a, b, c, a, b, b, a ], [ c, b, a, b, a, c ]), ==, [ Diff.Pure(.Replace(a, c)), roll(b), delete(c), roll(a), delete(b), roll(b), roll(a), insert(c) ])
 	}
 }
 
