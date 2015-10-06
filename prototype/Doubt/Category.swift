@@ -1,4 +1,4 @@
-public enum Category: AlgebraicHashable {
+public enum Category: AlgebraicHashable, CustomDebugStringConvertible {
 	case Tag(String)
 
 
@@ -11,6 +11,16 @@ public enum Category: AlgebraicHashable {
 
 	public var hash: Hash {
 		return Hash("Tag", Hash(tag))
+	}
+
+
+	// MARK: CustomDebugStringConvertible
+
+	public var debugDescription: String {
+		switch self {
+		case let .Tag(s):
+			return ".Tag(\(s))"
+		}
 	}
 }
 
