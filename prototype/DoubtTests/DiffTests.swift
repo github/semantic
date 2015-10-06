@@ -35,10 +35,11 @@ final class DiffTests: XCTestCase {
 
 private typealias Term = Fix<Info>
 
-private let a: Term<Info> = Term(.Leaf(.Literal("a", [])))
-private let b: Term<Info> = Term(.Leaf(.Literal("b", [])))
-private let c: Term<Info> = Term(.Leaf(.Literal("c", [])))
-private let d: Term<Info> = Term(.Leaf(.Literal("d", [])))
+private let a = Term.In(.Leaf(.Literal("a", [])))
+private let b = Term.In(.Leaf(.Literal("b", [])))
+private let c = Term.In(.Leaf(.Literal("c", [])))
+private let d = Term.In(.Leaf(.Literal("d", [])))
+
 
 import Doubt
 import XCTest
