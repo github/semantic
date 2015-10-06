@@ -1,34 +1,3 @@
-/// A term in a syntax tree.
-///
-/// This is a fixpoint of Syntax, essentially enabling it to recur through Term instances.
-public enum Term<A: Equatable>: CustomDebugStringConvertible, CustomDocConvertible, CustomStringConvertible, Equatable {
-	public init(_ out: Syntax<Term, A>) {
-		self = .Roll(out)
-	}
-
-	indirect case Roll(Syntax<Term, A>)
-
-	public var syntax: Syntax<Term, A> {
-		switch self {
-		case let .Roll(syntax):
-			return syntax
-		}
-	}
-
-	public var debugDescription: String {
-		return syntax.debugDescription
-	}
-
-	public var doc: Doc {
-		return syntax.doc
-	}
-}
-
-public func == <A: Equatable> (left: Term<A>, right: Term<A>) -> Bool {
-	return Syntax.equals(ifLeaf: ==, ifRecur: ==)(left.syntax, right.syntax)
-}
-
-
 /// A node in a syntax tree. Expressed algebraically to enable representation of both normal syntax trees and their diffs.
 public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Leaf(A)
@@ -108,12 +77,6 @@ public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F
 	return Syntax.equals(ifLeaf: ==, ifRecur: ==)(left, right)
 }
 
-
-extension Term where A: Hashable {
-	public var hash: Hash {
-		return syntax.hash(ifLeaf: Hash.init, ifRecur: { $0.hash })
-	}
-}
 
 extension Syntax {
 	public func hash(ifLeaf ifLeaf: A -> Hash, ifRecur: Recur -> Hash) -> Hash {
