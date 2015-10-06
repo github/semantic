@@ -96,6 +96,7 @@ public enum FreeAlgorithm<A, B> {
 		case let .Roll(.ByKey(a, b, f)):
 			let deleted = Set(a.keys).subtract(b.keys).map { ($0, Diff.Pure(Patch.Delete(a[$0]!))) }
 			let inserted = Set(b.keys).subtract(a.keys).map { ($0, Diff.Pure(Patch.Insert(b[$0]!))) }
+			// fixme: this should recur
 			let patched = Set(a.keys).intersect(b.keys).map { ($0, Diff.Pure(Patch.Replace(a[$0]!, b[$0]!))) }
 			return f(Dictionary(elements: deleted + inserted + patched)).evaluate(equals)
 
