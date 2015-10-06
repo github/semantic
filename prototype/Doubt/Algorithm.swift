@@ -136,7 +136,8 @@ public enum FreeAlgorithm<A, B> {
 
 				if let right = right, down = down, diagonal = diagonal {
 					// nominate the best edge to continue along
-					return cons(diff, rest: Memo(evaluated: .Nil))
+					let best: Memo<Stream<(Diff, Int)>> = Memo(evaluated: .Nil)
+					return cons(diff, rest: best)
 				}
 
 				// right extent of the edit graph; can only move down
