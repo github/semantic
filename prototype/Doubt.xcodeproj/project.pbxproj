@@ -52,6 +52,7 @@
 		D4C2B1431BB3474C0096F92A /* SourceKittenFramework.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D4C2B1441BB347500096F92A /* Doubt.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D4AAE4FD1B5AE22E004E581F /* Doubt.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D4D7F3171BBB22E500AAB0C0 /* Hash.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D7F3161BBB22E500AAB0C0 /* Hash.swift */; settings = {ASSET_TAGS = (); }; };
+		D4DF96ED1BC46B630040F41F /* SES.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DF96EC1BC46B630040F41F /* SES.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -121,6 +122,7 @@
 		D4AAE53E1B5AE2D0004E581F /* StringLiteralConvertible.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringLiteralConvertible.swift; sourceTree = "<group>"; };
 		D4AAE53F1B5AE2D0004E581F /* Syntax.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Syntax.swift; sourceTree = "<group>"; };
 		D4D7F3161BBB22E500AAB0C0 /* Hash.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hash.swift; sourceTree = "<group>"; };
+		D4DF96EC1BC46B630040F41F /* SES.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SES.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -215,6 +217,7 @@
 				D49FCBC31BBEF98E00C5E9C3 /* Free.swift */,
 				D49FCBC51BBF214300C5E9C3 /* Patch.swift */,
 				D49FCBC71BBF2C4300C5E9C3 /* Algorithm.swift */,
+				D4DF96EC1BC46B630040F41F /* SES.swift */,
 				D4AAE5001B5AE22E004E581F /* Supporting Files */,
 			);
 			path = Doubt;
@@ -395,6 +398,7 @@
 				D4AAE5481B5AE2D0004E581F /* String.swift in Sources */,
 				D4D7F3171BBB22E500AAB0C0 /* Hash.swift in Sources */,
 				D45A36C91BBC667D00BE3DDE /* Category.swift in Sources */,
+				D4DF96ED1BC46B630040F41F /* SES.swift in Sources */,
 				D4AAE5401B5AE2D0004E581F /* Array.swift in Sources */,
 				D49FCBC21BBEF2C600C5E9C3 /* Fix.swift in Sources */,
 				D49FCBC41BBEF98E00C5E9C3 /* Free.swift in Sources */,
