@@ -117,7 +117,14 @@ public enum FreeAlgorithm<A, B> {
 				}
 			}
 
-			return f([]).evaluate(equals)
+			var matrix: Matrix<Stream<Diff>>!
+			matrix = Matrix(width: a.count, height: b.count) { i, j in
+				let here = Diff.Pure(Patch.Replace(a[i], b[j]))
+				// bottom-right corner of the edit graph
+				return Stream.Cons(here, Memo(evaluated: Stream.Nil))
+			}
+
+			return f(Array(matrix[0, 0]!.value)).evaluate(equals)
 		}
 	}
 }
