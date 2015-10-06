@@ -34,6 +34,12 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 	// A matrix whose values are streams representing paths through the edit graph, carrying both the diff & the cost of the remainder of the path.
 	var matrix: Matrix<Stream<(Diff, Int)>>!
 	matrix = Matrix(width: a.count + 1, height: b.count + 1) { i, j in
+		// Some explanation is warranted:
+		//
+		// 1. `matrix` captures itself during construction, because each vertex in the edit graph depends on other vertices. This is safe, because a) `Matrix` populates its fields lazily, and b) vertices only depend on those vertices downwards and rightwards of them.
+		//
+		// 2. `matrix` is sized bigger than `a.count` x `b.count`. This is safe, because a) we only get a[i]/b[j] when right/down are non-nil (respectively), and b) right/down are found by looking up elements (i + 1, j) & (i, j + 1) in the matrix, which returns `nil` when out of bounds. So we only access a[i] and b[j] when i and j are in bounds.
+
 		let right = matrix[i + 1, j]
 		let down = matrix[i, j + 1]
 		let diagonal = matrix[i + 1, j + 1]
