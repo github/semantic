@@ -33,6 +33,8 @@ final class DiffTests: XCTestCase {
 	}
 }
 
+private typealias Term = Fix<Info>
+
 private let a: Term<Info> = Term(.Leaf(.Literal("a", [])))
 private let b: Term<Info> = Term(.Leaf(.Literal("b", [])))
 private let c: Term<Info> = Term(.Leaf(.Literal("c", [])))
