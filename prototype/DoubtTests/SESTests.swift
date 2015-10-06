@@ -27,6 +27,10 @@ final class SESTests: XCTestCase {
 		assert(SES([ a, d, b, c ], [ a, b, c ]), ==, [ roll(a), delete(d), roll(b), roll(c) ])
 	}
 
+	func testInsertsAtEnd() {
+		assert(SES([ a, b, c ], [ a, b, c, d ]), ==, [ roll(a), roll(b), roll(c), insert(d) ])
+	}
+
 	func testDeletesAtEnd() {
 		assert(SES([ a, b, c, d ], [ a, b, c ]), ==, [ roll(a), roll(b), roll(c), delete(d) ])
 	}
