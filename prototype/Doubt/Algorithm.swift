@@ -40,10 +40,10 @@ public enum Algorithm<Recur, A> {
 /// Where `Algorithm` models a single diffing strategy, `FreeAlgorithm` models the recursive selection of diffing strategies at each node. Thus, a value in `FreeAlgorithm` models an algorithm for constructing a value in the type `B` from the resulting diffs. By this means, diffing can be adapted not just to the specific grammar, but to specific trees produced by that grammar, and even the values of type `A` encapsulated at each node.
 public enum FreeAlgorithm<A, B> {
 	/// The type of `Term`s over which `FreeAlgorithm`s operate.
-	typealias Term = Algorithm<FreeAlgorithm, A>.Term
+	public typealias Term = Algorithm<FreeAlgorithm, A>.Term
 
 	/// The type of `Diff`s which `FreeAlgorithm`s produce.
-	typealias Diff = Algorithm<FreeAlgorithm, A>.Diff
+	public typealias Diff = Algorithm<FreeAlgorithm, A>.Diff
 
 	/// The injection of a value of type `B` into an `Algorithm`.
 	///
