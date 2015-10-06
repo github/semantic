@@ -51,26 +51,27 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 			let costs = (right: costOfStream(right), down: costOfStream(down), diagonal: costOfStream(diagonal))
 			// nominate the best edge to continue along
 			let best: Memo<Stream<(Diff, Int)>>
+			let diff: Diff
 			if costs.diagonal < costs.down {
-				best = costs.diagonal < costs.right
-					? diagonal
-					: right
+				(best, diff) = costs.diagonal < costs.right
+					? (diagonal, recur(a[i], b[j]))
+					: (right, Diff.Pure(Patch.Delete(a[i])))
 			} else {
-				best = costs.down < costs.right
-					? down
-					: right
+				(best, diff) = costs.down < costs.right
+					? (down, Diff.Pure(Patch.Insert(b[j])))
+					: (right, Diff.Pure(Patch.Delete(a[i])))
 			}
 			return cons(diff, rest: best)
 		}
 
 		// right extent of the edit graph; can only move down
 		if let down = down {
-			return cons(diff, rest: down)
+			return cons(Diff.Pure(Patch.Insert(b[j])), rest: down)
 		}
 
 		// bottom extent of the edit graph; can only move right
 		if let right = right {
-			return cons(diff, rest: right)
+			return cons(Diff.Pure(Patch.Delete(a[i])), rest: right)
 		}
 
 		// bottom-right corner of the edit graph
