@@ -136,7 +136,16 @@ public enum FreeAlgorithm<A, B> {
 
 				if let right = right, down = down, diagonal = diagonal {
 					// nominate the best edge to continue along
-					let best: Memo<Stream<(Diff, Int)>> = Memo(evaluated: .Nil)
+					let best: Memo<Stream<(Diff, Int)>>
+					if costOfStream(diagonal) < costOfStream(down) {
+						best = costOfStream(diagonal) < costOfStream(right)
+							? diagonal
+							: right
+					} else {
+						best = costOfStream(down) < costOfStream(right)
+							? down
+							: right
+					}
 					return cons(diff, rest: best)
 				}
 
