@@ -118,8 +118,8 @@ public enum FreeAlgorithm<A, B> {
 				}
 			}
 
-			let sum: Stream<(Diff, Int)> -> Int = {
-				return $0.first?.1 ?? 0
+			let cons: (Diff, Memo<Stream<(Diff, Int)>>) -> Stream<(Diff, Int)> = {
+				return .Cons(($0, cost($0) + ($1.value.first?.1 ?? 0)), $1)
 			}
 
 			var matrix: Matrix<Stream<(Diff, Int)>>!
