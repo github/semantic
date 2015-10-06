@@ -77,7 +77,6 @@ public enum FreeAlgorithm<A, B> {
 	}
 
 
-	// fixme: move this to the extension where B: FreeConvertible.
 	/// Evaluates the encoded algorithm, returning its result.
 	public func evaluate(equals: (A, A) -> Bool, recur: (Term, Term) -> Diff) -> B {
 		/// Deep-copies a `Term` into a `Diff` without changes.
