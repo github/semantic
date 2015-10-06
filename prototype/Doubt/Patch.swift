@@ -1,19 +1,17 @@
 /// A patch to some part of a `Syntax` tree.
 public enum Patch<A> {
-	case Replace(Fix<A>?, Fix<A>?)
-
-	public static func Insert(term: Fix<A>) -> Patch {
-		return .Replace(nil, term)
-	}
-
-	public static func Delete(term: Fix<A>) -> Patch {
-		return .Replace(term, nil)
-	}
+	case Replace(Fix<A>, Fix<A>)
+	case Insert(Fix<A>)
+	case Delete(Fix<A>)
 
 	public var state: (before: Fix<A>?, after: Fix<A>?) {
 		switch self {
 		case let .Replace(a, b):
 			return (a, b)
+		case let .Insert(b):
+			return (nil, b)
+		case let .Delete(a):
+			return (a, nil)
 		}
 	}
 }
