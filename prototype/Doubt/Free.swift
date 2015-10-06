@@ -21,6 +21,30 @@ public enum Free<A, B> {
 		}
 	}
 
+	/// Reduce the receiver by iteration.
+	///
+	/// `Pure` values are simply unpacked. `Roll` values are mapped recursively, and then have `transform` applied to them.
+	///
+	/// This forms a _catamorphism_ (from the Greek “cata”, “downwards”; compare “catastrophe”), a generalization of folds over regular trees (and datatypes isomorphic to them). It operates at the leaves first, and then branches near the periphery, recursively collapsing values by whatever is computed by `transform`. Catamorphisms are themselves an example of _recursion schemes_, which characterize specific well-behaved patterns of recursion. This gives `iterate` some useful properties for computations performed over trees.
+	///
+	/// Due to the character of recursion captured by catamorphisms, `iterate` ensures that computation will not only halt, but will further be linear in the size of the receiver. (Nesting a call to `iterate` will therefore result in O(n²) complexity.) This guarantee is achieved by careful composition of calls to `map` with recursive calls to `iterate`, only calling `transform` once the recursive call has completed. `transform` is itself non-recursive, receiving a `Syntax` whose recurrences have already been flattened to `B`.
+	///
+	/// The linearity of `iterate` in the size of the receiver makes it trivial to compute said size, by counting leaves as 1 and summing branches’ children:
+	///
+	///		func size<A, B>(free: Free<A, B>) -> Int {
+	///			return free.iterate { flattenedSyntax in
+	///				switch flattenedSyntax {
+	///				case .Leaf:
+	///					return 1
+	///				case let .Indexed(children):
+	///					return children.reduce(0, combine: +)
+	///				case let .Keyed(children):
+	///					return children.lazy.map { $1 }.reduce(0, combine: +)
+	///				}
+	///			}
+	///		}
+	///
+	/// While not every function on a given `Free` can be computed using `iterate`, these guarantees of termination and complexity, as well as the brevity and focus on the operation being performed n times, make it a desirable scaffolding for any function which can.
 	public func iterate(transform: Syntax<B, A> -> B) -> B {
 		return analysis(
 			ifPure: id,
