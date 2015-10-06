@@ -1,6 +1,6 @@
 final class DiffTests: XCTestCase {
 	func testSESOverEmptyCollectionsIsEmpty() {
-		XCTAssertEqual(Diff.diff([], []), [])
+		assert(SES([], []), ==, [])
 	}
 
 	func testSESOverEmptyAndNonEmptyCollectionsIsInsertions() {
