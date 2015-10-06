@@ -1,3 +1,6 @@
+/// A two-dimensional matrix of memoized values.
+///
+/// These values are populated by a function from the coordinates of a given cell to the matrix’s element type.
 struct Matrix<A> {
 	init(width: Int, height: Int, compute: (Int, Int) -> A) {
 		var values: [Memo<A>] = []
