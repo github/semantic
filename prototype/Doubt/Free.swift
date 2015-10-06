@@ -21,10 +21,10 @@ public enum Free<A, B> {
 		}
 	}
 
-	public func iter(transform: Syntax<B, A> -> B) -> B {
+	public func iterate(transform: Syntax<B, A> -> B) -> B {
 		return analysis(
 			ifPure: id,
-			ifRoll: { transform($0.map { $0.iter(transform) }) })
+			ifRoll: { transform($0.map { $0.iterate(transform) }) })
 	}
 
 
