@@ -119,7 +119,13 @@ public enum FreeAlgorithm<A, B> {
 
 			var matrix: Matrix<Stream<Diff>>!
 			matrix = Matrix(width: a.count, height: b.count) { i, j in
+				let right = matrix[i + 1, j]
 				let here = Diff.Pure(Patch.Replace(a[i], b[j]))
+				// bottom extent of the edit graph; can only move right
+				if let right = right {
+					return Stream.Cons(here, right)
+				}
+
 				// bottom-right corner of the edit graph
 				return Stream.Cons(here, Memo(evaluated: Stream.Nil))
 			}
