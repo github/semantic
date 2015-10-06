@@ -21,7 +21,7 @@ public enum Info: AlgebraicHashable, CustomDebugStringConvertible {
 		case let .Literal(s, c):
 			return c.isEmpty
 				? s
-				: s + " (" + c.map { $0.tag }.joinWithSeparator(", ") + ")"
+				: s + " (" + c.map { String(reflecting: $0) }.joinWithSeparator(", ") + ")"
 		}
 	}
 }
