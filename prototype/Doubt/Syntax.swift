@@ -18,20 +18,6 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 		}
 	}
 
-	// fixme: 🔥
-	public func reduce<T>(initial: T, @noescape combine: (T, Recur) throws -> T) rethrows -> T {
-		switch self {
-		case let .Indexed(x):
-			return try x.reduce(initial, combine: combine)
-
-		case let .Keyed(d):
-			return try d.lazy.map { $1 }.reduce(initial, combine: combine)
-
-		default:
-			return initial
-		}
-	}
-
 	public var debugDescription: String {
 		switch self {
 		case let .Leaf(n):
