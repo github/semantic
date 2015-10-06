@@ -48,7 +48,7 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 			return Diff.Roll(term.out.map(copy))
 		}
 		let recur = {
-			Fix.equals(equals)($0, $1)
+			Term.equals(equals)($0, $1)
 				? copy($1)
 				: recur($0, $1)
 		}
