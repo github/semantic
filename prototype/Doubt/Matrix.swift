@@ -24,7 +24,7 @@ public struct Matrix<A> {
 
 	public subscript (i: Int, j: Int) -> Memo<A>? {
 		guard i < width && j < height else { return nil }
-		return values[i + j * height]
+		return values[i + j * width]
 	}
 
 
