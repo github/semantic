@@ -118,6 +118,15 @@ public enum FreeAlgorithm<A, B> {
 				}
 			}
 
+			let sum: Stream<(Diff, Int)> -> Int = {
+				switch $0 {
+				case .Nil:
+					return 0
+				case let .Cons((_, i), _):
+					return i
+				}
+			}
+
 			var matrix: Matrix<Stream<(Diff, Int)>>!
 			matrix = Matrix(width: a.count, height: b.count) { i, j in
 				let right = matrix[i + 1, j]
