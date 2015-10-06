@@ -138,16 +138,16 @@ public enum FreeAlgorithm<A, B> {
 
 				// right extent of the edit graph; can only move down
 				if let down = down {
-					return Stream.Cons(here, down)
+					return cons(diff, down)
 				}
 
 				// bottom extent of the edit graph; can only move right
 				if let right = right {
-					return Stream.Cons(here, right)
+					return cons(diff, right)
 				}
 
 				// bottom-right corner of the edit graph
-				return Stream.Cons(here, Memo(evaluated: Stream.Nil))
+				return cons(diff, Memo(evaluated: Stream.Nil))
 			}
 
 			return f(Array(matrix[0, 0]!.value.map { diff, _ in diff })).evaluate(equals)
