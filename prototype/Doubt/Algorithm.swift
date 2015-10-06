@@ -191,14 +191,15 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 		let diff = recur(a[i], b[j])
 
 		if let right = right, down = down, diagonal = diagonal {
+			let costs = (right: costOfStream(right), down: costOfStream(down), diagonal: costOfStream(diagonal))
 			// nominate the best edge to continue along
 			let best: Memo<Stream<(Diff, Int)>>
-			if costOfStream(diagonal) < costOfStream(down) {
-				best = costOfStream(diagonal) < costOfStream(right)
+			if costs.diagonal < costs.down {
+				best = costs.diagonal < costs.right
 					? diagonal
 					: right
 			} else {
-				best = costOfStream(down) < costOfStream(right)
+				best = costs.down < costs.right
 					? down
 					: right
 			}
