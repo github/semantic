@@ -101,8 +101,17 @@ public enum FreeAlgorithm<A, B> {
 			return f(Dictionary(elements: deleted + inserted + patched)).evaluate(equals)
 
 		case let .Roll(.ByIndex(a, b, f)):
-			let pairs = Matrix(width: a.count, height: b.count) { i, j in
-				(a[i], b[j])
+			let cost: Diff -> Int = { diff in
+				diff.map(const(1)).iterate { syntax in
+					switch syntax {
+					case .Leaf:
+						return 0
+					case let .Indexed(costs):
+						return costs.reduce(0, combine: +)
+					case let .Keyed(costs):
+						return costs.lazy.map { $1 }.reduce(0, combine: +)
+					}
+				}
 			}
 
 			return f([]).evaluate(equals)
