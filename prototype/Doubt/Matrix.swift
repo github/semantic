@@ -10,7 +10,7 @@ public struct Matrix<A> {
 
 		for i in 0..<width {
 			for j in 0..<height {
-				values[i + j * height] = Memo<A> { compute(i, j) }
+				values.append(Memo<A> { compute(i, j) })
 			}
 		}
 
