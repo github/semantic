@@ -101,68 +101,7 @@ public enum FreeAlgorithm<A, B> {
 			return f(Dictionary(elements: deleted + inserted + patched)).evaluate(equals, recur: recur)
 
 		case let .Roll(.ByIndex(a, b, f)):
-			if a.isEmpty { return f(b.map { Diff.Pure(Patch.Insert($0)) }).evaluate(equals, recur: recur) }
-			if b.isEmpty { return f(a.map { Diff.Pure(Patch.Delete($0)) }).evaluate(equals, recur: recur) }
-
-			func cost(diff: Diff) -> Int {
-				return diff.map(const(1)).iterate { syntax in
-					switch syntax {
-					case .Leaf:
-						return 0
-					case let .Indexed(costs):
-						return costs.reduce(0, combine: +)
-					case let .Keyed(costs):
-						return costs.lazy.map { $1 }.reduce(0, combine: +)
-					}
-				}
-			}
-
-			func cons(diff: Diff, rest: Memo<Stream<(Diff, Int)>>) -> Stream<(Diff, Int)> {
-				return .Cons((diff, cost(diff) + costOfStream(rest)), rest)
-			}
-
-			func costOfStream(stream: Memo<Stream<(Diff, Int)>>) -> Int {
-				return stream.value.first?.1 ?? 0
-			}
-
-			var matrix: Matrix<Stream<(Diff, Int)>>!
-			matrix = Matrix(width: a.count, height: b.count) { i, j in
-				let right = matrix[i + 1, j]
-				let down = matrix[i, j + 1]
-				let diagonal = matrix[i + 1, j + 1]
-
-				let diff = recur(a[i], b[j])
-
-				if let right = right, down = down, diagonal = diagonal {
-					// nominate the best edge to continue along
-					let best: Memo<Stream<(Diff, Int)>>
-					if costOfStream(diagonal) < costOfStream(down) {
-						best = costOfStream(diagonal) < costOfStream(right)
-							? diagonal
-							: right
-					} else {
-						best = costOfStream(down) < costOfStream(right)
-							? down
-							: right
-					}
-					return cons(diff, rest: best)
-				}
-
-				// right extent of the edit graph; can only move down
-				if let down = down {
-					return cons(diff, rest: down)
-				}
-
-				// bottom extent of the edit graph; can only move right
-				if let right = right {
-					return cons(diff, rest: right)
-				}
-
-				// bottom-right corner of the edit graph
-				return cons(diff, rest: Memo(evaluated: Stream.Nil))
-			}
-
-			return f(Array(matrix[0, 0]!.value.map { diff, _ in diff })).evaluate(equals, recur: recur)
+			return f(SES(a, b, equals: equals, recur: recur)).evaluate(equals, recur: recur)
 		}
 	}
 }
