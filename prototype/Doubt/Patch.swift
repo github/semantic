@@ -16,6 +16,17 @@ public enum Patch<A>: CustomDebugStringConvertible {
 	}
 
 
+	/// The cost of a patch to the diff.
+	public var cost: Int {
+		switch self {
+		case .Replace:
+			return 2
+		default:
+			return 1
+		}
+	}
+
+
 	// MARK: CustomDebugStringConvertible
 
 	public var debugDescription: String {
