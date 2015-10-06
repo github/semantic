@@ -1,6 +1,8 @@
 /// A two-dimensional matrix of memoized values.
 ///
 /// These values are populated by a function from the coordinates of a given cell to the matrix’s element type.
+///
+/// Values are retrieved by subscripting with row/column indices. Out-of-bound indices produce `nil` values, rather than asserting.
 struct Matrix<A> {
 	init(width: Int, height: Int, compute: (Int, Int) -> A) {
 		var values: [Memo<A>] = []
