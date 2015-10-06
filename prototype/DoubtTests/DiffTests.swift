@@ -12,11 +12,11 @@ final class DiffTests: XCTestCase {
 	}
 
 	func testSESCanInsertAtHead() {
-		XCTAssertEqual(Diff.diff([ a, b, c ], [ d, a, b, c ]), [ Diff.Insert(d), Diff(a), Diff(b), Diff(c) ])
+		assert(SES([ a, b, c ], [ d, a, b, c ]), ==, [ insert(d), roll(a), roll(b), roll(c) ])
 	}
 
 	func testSESCanDeleteAtHead() {
-		XCTAssertEqual(Diff.diff([ d, a, b, c ], [ a, b, c ]), [ Diff.Delete(d), Diff(a), Diff(b), Diff(c) ])
+		assert(SES([ d, a, b, c ], [ a, b, c ]), ==, [ delete(d), roll(a), roll(b), roll(c) ])
 	}
 
 	func testSESCanInsertInMiddle() {
