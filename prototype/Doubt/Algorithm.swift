@@ -79,18 +79,13 @@ public enum FreeAlgorithm<A, B> {
 
 	/// Evaluates the encoded algorithm, returning its result.
 	public func evaluate(equals: (A, A) -> Bool, recur: (Term, Term) -> Diff) -> B {
-		/// Deep-copies a `Term` into a `Diff` without changes.
-		func copy(b: Term) -> Diff {
-			return Diff.Roll(b.out.map(copy))
-		}
-
 		switch self {
 		case let .Pure(b):
 			return b
 
 		case let .Roll(.Recursive(a, b, f)):
 			return f(Term.equals(equals)(a, b)
-				? copy(b)
+				? Diff(b)
 				// This must not call `recur` with `a` and `b`, as that would infinite loop if actually recursive.
 				: Diff.Pure(.Replace(a, b))).evaluate(equals, recur: recur)
 
