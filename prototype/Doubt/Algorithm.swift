@@ -118,8 +118,8 @@ public enum FreeAlgorithm<A, B> {
 				}
 			}
 
-			let cons: (Diff, Memo<Stream<(Diff, Int)>>) -> Stream<(Diff, Int)> = {
-				return .Cons(($0, cost($0) + ($1.value.first?.1 ?? 0)), $1)
+			func cons(diff: Diff, rest: Memo<Stream<(Diff, Int)>>) -> Stream<(Diff, Int)> {
+				return .Cons((diff, cost(diff) + (rest.value.first?.1 ?? 0)), rest)
 			}
 
 			var matrix: Matrix<Stream<(Diff, Int)>>!
@@ -138,16 +138,16 @@ public enum FreeAlgorithm<A, B> {
 
 				// right extent of the edit graph; can only move down
 				if let down = down {
-					return cons(diff, down)
+					return cons(diff, rest: down)
 				}
 
 				// bottom extent of the edit graph; can only move right
 				if let right = right {
-					return cons(diff, right)
+					return cons(diff, rest: right)
 				}
 
 				// bottom-right corner of the edit graph
-				return cons(diff, Memo(evaluated: Stream.Nil))
+				return cons(diff, rest: Memo(evaluated: Stream.Nil))
 			}
 
 			return f(Array(matrix[0, 0]!.value.map { diff, _ in diff })).evaluate(equals)
