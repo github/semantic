@@ -3,8 +3,8 @@
 /// These values are populated by a function from the coordinates of a given cell to the matrix’s element type.
 ///
 /// Values are retrieved by subscripting with row/column indices. Out-of-bound indices produce `nil` values, rather than asserting.
-struct Matrix<A> {
-	init(width: Int, height: Int, compute: (Int, Int) -> A) {
+public struct Matrix<A> {
+	public init(width: Int, height: Int, compute: (Int, Int) -> A) {
 		var values: [Memo<A>] = []
 		values.reserveCapacity(width * height)
 
@@ -17,12 +17,12 @@ struct Matrix<A> {
 		self.init(width: width, height: height, values: values)
 	}
 
-	let width: Int
-	let height: Int
+	public let width: Int
+	public let height: Int
 
 	private let values: [Memo<A>]
 
-	subscript (i: Int, j: Int) -> Memo<A>? {
+	public subscript (i: Int, j: Int) -> Memo<A>? {
 		guard i < width && j < height else { return nil }
 		return values[i + j * height]
 	}
@@ -30,7 +30,7 @@ struct Matrix<A> {
 
 	// MARK: Functor
 
-	func map<Other>(transform: A -> Other) -> Matrix<Other> {
+	public func map<Other>(transform: A -> Other) -> Matrix<Other> {
 		return Matrix<Other>(width: width, height: height, values: values.map { $0.map(transform) })
 	}
 
