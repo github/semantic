@@ -119,7 +119,7 @@ public enum FreeAlgorithm<A, B> {
 			}
 
 			func cons(diff: Diff, rest: Memo<Stream<(Diff, Int)>>) -> Stream<(Diff, Int)> {
-				return .Cons((diff, cost(diff) + (rest.value.first?.1 ?? 0)), rest)
+				return .Cons((diff, cost(diff) + costOfStream(rest)), rest)
 			}
 
 			func costOfStream(stream: Memo<Stream<(Diff, Int)>>) -> Int {
