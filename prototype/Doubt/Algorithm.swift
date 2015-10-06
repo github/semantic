@@ -129,11 +129,10 @@ public enum FreeAlgorithm<A, B> {
 				let diagonal = matrix[i + 1, j + 1]
 
 				let diff = Diff.Pure(Patch.Replace(a[i], b[j]))
-				let here = (diff, 1)
 
 				if let right = right, down = down, diagonal = diagonal {
 					// nominate the best edge to continue along
-					return Stream.Cons(here, Memo(evaluated: .Nil))
+					return cons(diff, rest: Memo(evaluated: .Nil))
 				}
 
 				// right extent of the edit graph; can only move down
