@@ -74,10 +74,7 @@ extension Free where A: Hashable, B: Hashable {
 
 
 public func iter<A, B>(transform: Syntax<B, A> -> B)(_ free: Free<A, B>) -> B {
-	switch free {
-	case let .Pure(a):
-		return a
-	case let .Roll(s):
-		return transform(s.map(iter(transform)))
-	}
+	return free.analysis(
+		ifPure: id,
+		ifRoll: { transform($0.map(iter(transform))) })
 }
