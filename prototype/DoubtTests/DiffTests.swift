@@ -41,5 +41,5 @@ private let c = Term.In(.Leaf(.Literal("c", [])))
 private let d = Term.In(.Leaf(.Literal("d", [])))
 
 
-import Doubt
+@testable import Doubt
 import XCTest
