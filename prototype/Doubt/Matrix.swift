@@ -8,8 +8,8 @@ public struct Matrix<A> {
 		var values: [Memo<A>] = []
 		values.reserveCapacity(width * height)
 
-		for i in 0..<width {
-			for j in 0..<height {
+		for j in 0..<height {
+			for i in 0..<width {
 				values.append(Memo<A> { compute(i, j) })
 			}
 		}
