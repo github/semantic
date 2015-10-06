@@ -33,7 +33,7 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 
 	// A matrix whose values are streams representing paths through the edit graph, carrying both the diff & the cost of the remainder of the path.
 	var matrix: Matrix<Stream<(Diff, Int)>>!
-	matrix = Matrix(width: a.count, height: b.count) { i, j in
+	matrix = Matrix(width: a.count + 1, height: b.count + 1) { i, j in
 		let right = matrix[i + 1, j]
 		let down = matrix[i, j + 1]
 		let diagonal = matrix[i + 1, j + 1]
@@ -75,7 +75,7 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 		}
 
 		// bottom-right corner of the edit graph
-		return cons(recur(a[i], b[j]), rest: Memo(evaluated: Stream.Nil))
+		return Stream.Nil
 	}
 
 	return Array(matrix[0, 0]!.value.map { diff, _ in diff })
