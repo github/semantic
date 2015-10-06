@@ -201,4 +201,8 @@ extension FreeAlgorithm where B: FreeConvertible, B.RollType == A, B.PureType ==
 			self = .Roll(.Recursive(a, b, B.init >>> FreeAlgorithm.Pure))
 		}
 	}
+
+	public func evaluate(equals: (A, A) -> Bool) -> B {
+		return evaluate(equals, recur: { FreeAlgorithm($0, $1).evaluate(equals).free })
+	}
 }
