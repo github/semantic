@@ -206,3 +206,9 @@ extension FreeAlgorithm where B: FreeConvertible, B.RollType == A, B.PureType ==
 		return evaluate(equals, recur: { FreeAlgorithm($0, $1).evaluate(equals).free })
 	}
 }
+
+extension FreeAlgorithm where A: Equatable, B: FreeConvertible, B.RollType == A, B.PureType == Patch<A> {
+	public func evaluate() -> B {
+		return evaluate(==)
+	}
+}
