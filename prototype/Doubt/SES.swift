@@ -37,7 +37,6 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 		let down = matrix[i, j + 1]
 		let diagonal = matrix[i + 1, j + 1]
 
-		let diff = recur(a[i], b[j])
 		func copy(term: Term) -> Diff {
 			return Diff.Roll(term.out.map(copy))
 		}
@@ -75,7 +74,7 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 		}
 
 		// bottom-right corner of the edit graph
-		return cons(diff, rest: Memo(evaluated: Stream.Nil))
+		return cons(recur(a[i], b[j]), rest: Memo(evaluated: Stream.Nil))
 	}
 
 	return Array(matrix[0, 0]!.value.map { diff, _ in diff })
