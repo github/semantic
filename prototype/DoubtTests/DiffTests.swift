@@ -8,7 +8,7 @@ final class DiffTests: XCTestCase {
 	}
 
 	func testSESOverNonEmptyAndEmptyCollectionsIsDeletions() {
-		assert(SES([ a, b ], []), ==, [ Diff.Pure(.Delete(a)), Diff.Pure(.Delete(b)) ])
+		assert(SES([ a, b ], []), ==, [ delete(a), delete(b) ])
 	}
 
 	func testSESCanInsertAtHead() {
