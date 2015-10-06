@@ -79,7 +79,7 @@ public enum FreeAlgorithm<A, B> {
 
 	// fixme: move this to the extension where B: FreeConvertible.
 	/// Evaluates the encoded algorithm, returning its result.
-	public func evaluate(equals: (A, A) -> Bool) -> B {
+	public func evaluate(equals: (A, A) -> Bool, recur: (Term, Term) -> B) -> B {
 		/// Deep-copies a `Term` into a `Diff` without changes.
 		func copy(b: Term) -> Diff {
 			return Diff.Roll(b.out.map(copy))
@@ -92,18 +92,18 @@ public enum FreeAlgorithm<A, B> {
 		case let .Roll(.Recursive(a, b, f)):
 			return f(Fix.equals(equals)(a, b)
 				? copy(b)
-				: Diff.Pure(.Replace(a, b))).evaluate(equals)
+				: Diff.Pure(.Replace(a, b))).evaluate(equals, recur: recur)
 
 		case let .Roll(.ByKey(a, b, f)):
 			let deleted = Set(a.keys).subtract(b.keys).map { ($0, Diff.Pure(Patch.Delete(a[$0]!))) }
 			let inserted = Set(b.keys).subtract(a.keys).map { ($0, Diff.Pure(Patch.Insert(b[$0]!))) }
 			// fixme: this should recur
 			let patched = Set(a.keys).intersect(b.keys).map { ($0, Diff.Pure(Patch.Replace(a[$0]!, b[$0]!))) }
-			return f(Dictionary(elements: deleted + inserted + patched)).evaluate(equals)
+			return f(Dictionary(elements: deleted + inserted + patched)).evaluate(equals, recur: recur)
 
 		case let .Roll(.ByIndex(a, b, f)):
-			if a.isEmpty { return f(b.map { Diff.Pure(Patch.Insert($0)) }).evaluate(equals) }
-			if b.isEmpty { return f(a.map { Diff.Pure(Patch.Delete($0)) }).evaluate(equals) }
+			if a.isEmpty { return f(b.map { Diff.Pure(Patch.Insert($0)) }).evaluate(equals, recur: recur) }
+			if b.isEmpty { return f(a.map { Diff.Pure(Patch.Delete($0)) }).evaluate(equals, recur: recur) }
 
 			func cost(diff: Diff) -> Int {
 				return diff.map(const(1)).iterate { syntax in
@@ -164,14 +164,14 @@ public enum FreeAlgorithm<A, B> {
 				return cons(diff, rest: Memo(evaluated: Stream.Nil))
 			}
 
-			return f(Array(matrix[0, 0]!.value.map { diff, _ in diff })).evaluate(equals)
+			return f(Array(matrix[0, 0]!.value.map { diff, _ in diff })).evaluate(equals, recur: recur)
 		}
 	}
 }
 
 extension FreeAlgorithm where A: Equatable {
-	public func evaluate() -> B {
-		return evaluate(==)
+	public func evaluate(recur: (Term, Term) -> B) -> B {
+		return evaluate(==, recur: recur)
 	}
 }
 
