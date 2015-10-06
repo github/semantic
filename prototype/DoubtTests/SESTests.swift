@@ -56,6 +56,10 @@ private func SES(a: [Term], _ b: [Term]) -> [Diff] {
 	return SES(a, b, equals: ==, recur: { Diff.Pure(Patch.Replace($0, $1)) })
 }
 
+private func == (a: [Diff], b: [Diff]) -> Bool {
+	return a.count == b.count && zip(a, b).lazy.map(Diff.equals(ifPure: Patch.equals(==), ifRoll: ==)).reduce(true) { $0 && $1 }
+}
+
 
 import Assertions
 @testable import Doubt
