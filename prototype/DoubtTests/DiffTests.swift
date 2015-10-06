@@ -33,6 +33,18 @@ final class DiffTests: XCTestCase {
 	}
 }
 
+private func insert(term: Term) -> Diff {
+	return Diff.Pure(.Insert(term))
+}
+
+private func delete(term: Term) -> Diff {
+	return Diff.Pure(.Delete(term))
+}
+
+private func copy(term: Term) -> Diff {
+	return Diff.Roll(term.out.map(copy))
+}
+
 private typealias Term = Fix<Info>
 private typealias Diff = Free<Info, Patch<Info>>
 
