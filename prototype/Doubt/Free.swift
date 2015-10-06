@@ -12,6 +12,13 @@ public enum Free<A, B>: CustomDebugStringConvertible {
 	/// A recursive instantiation of `Syntax`, unrolling another iteration of the recursive type.
 	indirect case Roll(Syntax<Free, A>)
 
+
+	/// Recursively copies a `Fix<A>` into a `Free<A, B>`, essentially mapping `Fix.In` onto `Free.Roll`.
+	public init(_ fix: Fix<A>) {
+		self = .Roll(fix.out.map(Free.init))
+	}
+
+
 	public func analysis<C>(@noescape ifPure ifPure: B -> C, @noescape ifRoll: Syntax<Free, A> -> C) -> C {
 		switch self {
 		case let .Pure(b):
