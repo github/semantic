@@ -124,7 +124,8 @@ public enum FreeAlgorithm<A, B> {
 				let down = matrix[i, j + 1]
 				let diagonal = matrix[i + 1, j + 1]
 
-				let here = (Diff.Pure(Patch.Replace(a[i], b[j])), 1)
+				let diff = Diff.Pure(Patch.Replace(a[i], b[j]))
+				let here = (diff, 1)
 
 				if let right = right, down = down, diagonal = diagonal {
 					// nominate the best edge to continue along
