@@ -40,6 +40,10 @@ private let b = Term.In(.Leaf(.Literal("b", [])))
 private let c = Term.In(.Leaf(.Literal("c", [])))
 private let d = Term.In(.Leaf(.Literal("d", [])))
 
+private func SES(a: [Term], _ b: [Term]) -> [Diff] {
+	return SES(a, b, equals: ==, recur: { Diff.Pure(Patch.Replace($0, $1)) })
+}
+
 
 @testable import Doubt
 import XCTest
