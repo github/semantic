@@ -41,8 +41,8 @@ private func delete(term: Term) -> Diff {
 	return Diff.Pure(.Delete(term))
 }
 
-private func copy(term: Term) -> Diff {
-	return Diff.Roll(term.out.map(copy))
+private func roll(term: Term) -> Diff {
+	return Diff.Roll(term.out.map(roll))
 }
 
 private typealias Term = Fix<Info>
