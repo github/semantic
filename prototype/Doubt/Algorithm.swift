@@ -79,7 +79,7 @@ public enum FreeAlgorithm<A, B> {
 
 	// fixme: move this to the extension where B: FreeConvertible.
 	/// Evaluates the encoded algorithm, returning its result.
-	public func evaluate(equals: (A, A) -> Bool, recur: (Term, Term) -> B) -> B {
+	public func evaluate(equals: (A, A) -> Bool, recur: (Term, Term) -> Diff) -> B {
 		/// Deep-copies a `Term` into a `Diff` without changes.
 		func copy(b: Term) -> Diff {
 			return Diff.Roll(b.out.map(copy))
@@ -171,7 +171,7 @@ public enum FreeAlgorithm<A, B> {
 }
 
 extension FreeAlgorithm where A: Equatable {
-	public func evaluate(recur: (Term, Term) -> B) -> B {
+	public func evaluate(recur: (Term, Term) -> Diff) -> B {
 		return evaluate(==, recur: recur)
 	}
 }
