@@ -5,7 +5,7 @@
 /// Values are retrieved by subscripting with row/column indices. Out-of-bound indices produce `nil` values, rather than asserting.
 public struct Matrix<A> {
 	public init(width: Int, height: Int, compute: (Int, Int) -> A) {
-		self.init(width: width, height: height, values: constructRowMajor(width, height: height, forEach: compute >>> Memo.init))
+		self.init(width: width, height: height, values: constructRowMajor(width, height: height, forEach: { i, j in Memo { compute(i, j) } }))
 	}
 
 	public let width: Int
