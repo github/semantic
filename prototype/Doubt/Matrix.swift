@@ -35,6 +35,7 @@ public struct Matrix<A> {
 	}
 }
 
+/// Constructs a row-major ordering of values produced with `forEach`.
 private func constructRowMajor<A>(width: Int, height: Int, @noescape forEach: (Int, Int) -> A) -> [A] {
 	var values: [A] = []
 	values.reserveCapacity(width * height)
