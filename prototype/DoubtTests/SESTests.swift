@@ -27,6 +27,10 @@ final class SESTests: XCTestCase {
 		assert(SES([ a, d, b, c ], [ a, b, c ]), ==, [ roll(a), delete(d), roll(b), roll(c) ])
 	}
 
+	func testDeletesAtEnd() {
+		assert(SES([ a, b, c, d ], [ a, b, c ]), ==, [ roll(a), roll(b), roll(c), delete(d) ])
+	}
+
 	func testSESOfLongerSequences() {
 		assert(SES([ a, b, c, a, b, b, a ], [ c, b, a, b, a, c ]), ==, [ Diff.Pure(.Replace(a, c)), roll(b), delete(c), roll(a), delete(b), roll(b), roll(a), insert(c) ])
 	}
