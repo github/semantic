@@ -28,7 +28,6 @@ final class DiffTests: XCTestCase {
 	}
 
 	func testSESOfLongerSequences() {
-		// fixme: this is awfully slow for such a short sequence
 		assert(SES([ a, b, c, a, b, b, a ], [ c, b, a, b, a, c ]), ==, [ Diff.Pure(.Replace(a, c)), roll(b), delete(c), roll(a), delete(b), roll(b), roll(a), insert(c) ])
 	}
 }
