@@ -3,6 +3,10 @@ func fix<T, U>(f: (T -> U) -> T -> U) -> T -> U {
 }
 
 
+func id<A>(a: A) -> A {
+	return a
+}
+
 func const<A, B>(a: A)(_ b: B) -> A {
 	return a
 }
