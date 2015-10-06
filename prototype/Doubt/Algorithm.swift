@@ -105,8 +105,8 @@ public enum FreeAlgorithm<A, B> {
 			if a.isEmpty { return f(b.map { Diff.Pure(Patch.Insert($0)) }).evaluate(equals) }
 			if b.isEmpty { return f(a.map { Diff.Pure(Patch.Delete($0)) }).evaluate(equals) }
 
-			let cost: Diff -> Int = { diff in
-				diff.map(const(1)).iterate { syntax in
+			func cost(diff: Diff) -> Int {
+				return diff.map(const(1)).iterate { syntax in
 					switch syntax {
 					case .Leaf:
 						return 0
