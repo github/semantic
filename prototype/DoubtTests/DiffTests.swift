@@ -45,5 +45,6 @@ private func SES(a: [Term], _ b: [Term]) -> [Diff] {
 }
 
 
+import Assertions
 @testable import Doubt
 import XCTest
