@@ -92,6 +92,7 @@ public enum FreeAlgorithm<A, B> {
 		case let .Roll(.Recursive(a, b, f)):
 			return f(Fix.equals(equals)(a, b)
 				? copy(b)
+				// This must not call `recur` with `a` and `b`, as that would infinite loop if actually recursive.
 				: Diff.Pure(.Replace(a, b))).evaluate(equals, recur: recur)
 
 		case let .Roll(.ByKey(a, b, f)):
