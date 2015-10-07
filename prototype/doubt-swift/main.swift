@@ -83,7 +83,7 @@ extension Fix where A: StringConvertible {
 		do {
 			switch JSON.dictionary?["key.substructure"] {
 			case let .Some(.Array(a)):
-				self = .Roll(.Branch(try a.map { try Fix(JSON: $0) ?? bail() }))
+				self = .In(.Branch(try a.map { try Fix(JSON: $0) ?? bail() }))
 			default:
 				return nil
 			}
