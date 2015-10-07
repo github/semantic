@@ -113,7 +113,7 @@ extension SequenceType where Generator.Element == Doc {
 
 	public func joinWithSeparator(separator: String) -> Doc {
 		return fold {
-			$0 <> .Text(separator) <+> $1
+			$0 <> .Text(separator) </> $1
 		}
 	}
 }
