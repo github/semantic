@@ -15,10 +15,15 @@ public enum Doc: CustomDebugStringConvertible, CustomDocConvertible, Equatable {
 	}
 
 	public func bracket(left: String, _ right: String) -> Doc {
-		return (Text(left)
-			<> Nest(2, Line <> self)
-			<> Line
-			<> Text(right)).group()
+		switch self {
+		case .Empty:
+			return Text(left) <> Text(right)
+		default:
+			return (Text(left)
+				<> Nest(2, Line <> self)
+				<> Line
+				<> Text(right)).group()
+		}
 	}
 
 	public var flattened: Doc {
