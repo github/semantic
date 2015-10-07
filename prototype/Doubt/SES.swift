@@ -31,6 +31,10 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 		return stream.value.first?.1 ?? 0
 	}
 
+	func min<A>(a: A, _ rest: A..., _ isLessThan: (A, A) -> Bool) -> A {
+		return rest.reduce(a, combine: { isLessThan($0, $1) ? $0 : $1 })
+	}
+
 	// A matrix whose values are streams representing paths through the edit graph, carrying both the diff & the cost of the remainder of the path.
 	var matrix: Matrix<Stream<(Diff, Int)>>!
 	matrix = Matrix(width: a.count + 1, height: b.count + 1) { i, j in
