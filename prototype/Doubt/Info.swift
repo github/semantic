@@ -18,10 +18,10 @@ public enum Info: AlgebraicHashable, CustomDebugStringConvertible {
 
 	public var debugDescription: String {
 		switch self {
+		case let .Literal(s, c) where c.isEmpty:
+			return s
 		case let .Literal(s, c):
-			return c.isEmpty
-				? s
-				: s + " (" + c.map { String(reflecting: $0) }.joinWithSeparator(", ") + ")"
+			return s + " (" + c.sort().map { String(reflecting: $0) }.joinWithSeparator(", ") + ")"
 		}
 	}
 }
