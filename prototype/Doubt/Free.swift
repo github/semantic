@@ -103,29 +103,11 @@ extension Free where B: PatchConvertible, B.Info == A {
 	}
 
 	public var before: Term? {
-		return map { $0.patch.state.before }.iterate {
-			switch $0 {
-			case let .Leaf(a):
-				return .In(.Leaf(a))
-			case let .Indexed(a):
-				return .In(.Indexed(a.flatMap(id)))
-			case let .Keyed(a):
-				return .In(.Keyed(Dictionary(elements: a.flatMap { k, v in v.map { (k, $0) } })))
-			}
-		}
+		return map { $0.patch.state.before }.iterate(self.discardNullTerms)
 	}
 
 	public var after: Term? {
-		return map { $0.patch.state.after }.iterate {
-			switch $0 {
-			case let .Leaf(a):
-				return .In(.Leaf(a))
-			case let .Indexed(a):
-				return .In(.Indexed(a.flatMap(id)))
-			case let .Keyed(a):
-				return .In(.Keyed(Dictionary(elements: a.flatMap { k, v in v.map { (k, $0) } })))
-			}
-		}
+		return map { $0.patch.state.after }.iterate(self.discardNullTerms)
 	}
 }
 
