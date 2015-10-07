@@ -32,6 +32,7 @@ extension JSON {
 	}
 
 	typealias Term = Fix<JSONLeaf>
+	typealias Diff = Free<JSONLeaf, Patch<JSONLeaf>>
 
 	var term: Term {
 		switch self {
@@ -49,4 +50,9 @@ extension JSON {
 			return .In(.Leaf(.Null))
 		}
 	}
+}
+
+let arguments = BoundsCheckedArray(array: Process.arguments)
+if let a = arguments[1].flatMap(JSON.init), b = arguments[2].flatMap(JSON.init) {
+	print(Algorithm<JSONLeaf, JSON.Diff>(a.term, b.term).evaluate())
 }
