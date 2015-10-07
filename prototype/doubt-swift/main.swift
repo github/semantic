@@ -104,5 +104,5 @@ extension Fix where A: StringConvertible {
 }
 
 if let a = arguments[1].flatMap({ Fix<Info>(path: $0) }), b = arguments[2].flatMap({ Fix<Info>(path: $0) }) {
-	print(String(reflecting: FreeAlgorithm<Info, Free<Info, Patch<Info>>>(a, b)))
+	print(String(reflecting: FreeAlgorithm<Info, Free<Info, Patch<Info>>>(a, b).evaluate()))
 }
