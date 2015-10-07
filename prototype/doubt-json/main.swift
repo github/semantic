@@ -8,6 +8,7 @@ enum JSONLeaf {
 	case Null
 }
 
+
 extension JSON {
 	init?(path: Swift.String) {
 		guard let data = try? NSData(contentsOfFile: path, options: []) else { return nil }
