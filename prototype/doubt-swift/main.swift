@@ -91,8 +91,7 @@ extension Fix where A: StringConvertible {
 
 	init?(path: String) {
 		guard path != "/dev/null" else {
-			self = .Empty
-			return
+			return nil
 		}
 		guard let term = File(path: path)
 			.map(Structure.init)
