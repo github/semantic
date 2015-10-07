@@ -35,22 +35,22 @@ extension Fix where A: StringConvertible {
 				let kind = d["key.kind"]?.string
 				switch kind {
 				case
-				.Some("source.lang.swift.decl.class"),
-				.Some("source.lang.swift.decl.extension"),
-				.Some("source.lang.swift.decl.enum"),
-				.Some("source.lang.swift.decl.struct"):
+					.Some("source.lang.swift.decl.class"),
+					.Some("source.lang.swift.decl.extension"),
+					.Some("source.lang.swift.decl.enum"),
+					.Some("source.lang.swift.decl.struct"):
 					self = .In(.Branch([ .In(.Leaf(A(string: name))), .In(.Branch(try substructure.map { try Fix(JSON: $0) ?? bail() })) ]))
 
 				case .Some("source.lang.swift.decl.enumelement"):
 					fallthrough
 				case
-				.Some("source.lang.swift.decl.function.method.instance"),
-				.Some("source.lang.swift.decl.function.free"):
+					.Some("source.lang.swift.decl.function.method.instance"),
+					.Some("source.lang.swift.decl.function.free"):
 					self = .In(.Branch([ .In(.Leaf(A(string: name))), .In(.Branch(try substructure.map { try Fix(JSON: $0) ?? bail() })) ]))
 
 				case
-				.Some("source.lang.swift.decl.var.instance"),
-				.Some("source.lang.swift.decl.var.static"):
+					.Some("source.lang.swift.decl.var.instance"),
+					.Some("source.lang.swift.decl.var.static"):
 					self = .In(.Leaf(A(string: name)))
 
 				default:
