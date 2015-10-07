@@ -1,5 +1,3 @@
-//  Copyright © 2015 GitHub. All rights reserved.
-
 /// Computes the SES (shortest edit script), i.e. the shortest sequence of diffs (`Free<A, Patch<A>>`) for two arrays of terms (`Fix<A>`) which would suffice to transform `a` into `b`.
 ///
 /// This is computed w.r.t. an `equals` function, which computes the equality of leaf nodes within terms, and a `recur` function, which produces diffs representing matched-up terms.
@@ -18,7 +16,7 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 			case let .Indexed(costs):
 				return costs.reduce(0, combine: +)
 			case let .Keyed(costs):
-				return costs.lazy.map { $1 }.reduce(0, combine: +)
+				return costs.values.reduce(0, combine: +)
 			}
 		}
 	}
@@ -29,6 +27,10 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 
 	func costOfStream(stream: Memo<Stream<(Diff, Int)>>) -> Int {
 		return stream.value.first?.1 ?? 0
+	}
+
+	func min<A>(a: A, _ rest: A..., _ isLessThan: (A, A) -> Bool) -> A {
+		return rest.reduce(a, combine: { isLessThan($0, $1) ? $0 : $1 })
 	}
 
 	// A matrix whose values are streams representing paths through the edit graph, carrying both the diff & the cost of the remainder of the path.
@@ -51,19 +53,11 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 		}
 
 		if let right = right, down = down, diagonal = diagonal {
-			let costs = (right: costOfStream(right), down: costOfStream(down), diagonal: costOfStream(diagonal))
 			// nominate the best edge to continue along
-			let best: Memo<Stream<(Diff, Int)>>
-			let diff: Diff
-			if costs.diagonal < costs.down {
-				(best, diff) = costs.diagonal < costs.right
-					? (diagonal, recur(a[i], b[j]))
-					: (right, Diff.Pure(Patch.Delete(a[i])))
-			} else {
-				(best, diff) = costs.down < costs.right
-					? (down, Diff.Pure(Patch.Insert(b[j])))
-					: (right, Diff.Pure(Patch.Delete(a[i])))
-			}
+			let (best, diff, _) = min(
+				(diagonal, recur(a[i], b[j]), costOfStream(diagonal)),
+				(right, Diff.Pure(Patch.Delete(a[i])), costOfStream(right)),
+				(down, Diff.Pure(Patch.Insert(b[j])), costOfStream(down))) { $0.2 < $1.2 }
 			return cons(diff, rest: best)
 		}
 
