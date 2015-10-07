@@ -38,7 +38,8 @@ extension Fix where A: StringConvertible {
 					.Some("source.lang.swift.decl.class"),
 					.Some("source.lang.swift.decl.extension"),
 					.Some("source.lang.swift.decl.enum"),
-					.Some("source.lang.swift.decl.struct"):
+					.Some("source.lang.swift.decl.struct"),
+					.Some("source.lang.swift.decl.protocol"):
 					self = .In(.Indexed([ .In(.Leaf(A(string: name))), .In(.Indexed(try substructure.map { try Fix(JSON: $0) ?? bail() })) ]))
 
 				case .Some("source.lang.swift.decl.enumelement"):
