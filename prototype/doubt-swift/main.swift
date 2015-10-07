@@ -22,7 +22,7 @@ extension Info: StringConvertible {
 private struct Bail: ErrorType {}
 
 extension Fix where A: StringConvertible {
-	/// Constructs a Term representing `JSON`.
+	/// Constructs a term representing `JSON`.
 	init?(JSON: Doubt.JSON) {
 		func bail<B>() throws -> B {
 			throw Bail()
@@ -72,7 +72,7 @@ extension Fix where A: StringConvertible {
 		}
 	}
 
-	/// Constructs a Term representing the `JSON` in a file at `path`.
+	/// Constructs a term representing the `JSON` in a file at `path`.
 	init?(path: String, JSON: Doubt.JSON) {
 		func bail<B>() throws -> B {
 			throw Bail()
