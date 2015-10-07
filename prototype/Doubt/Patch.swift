@@ -62,3 +62,11 @@ extension Patch {
 		])
 	}
 }
+
+
+public protocol PatchConvertible {
+	typealias Info
+
+	init(patch: Patch<Info>)
+	var patch: Patch<Info> { get }
+}
