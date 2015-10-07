@@ -90,6 +90,11 @@ public enum FreeAlgorithm<A, B> {
 				: Diff.Pure(.Replace(a, b))).evaluate(equals, recur: recur)
 
 		case let .Roll(.ByKey(a, b, f)):
+			let recur = {
+				Term.equals(equals)($0, $1)
+					? Diff($1)
+					: recur($0, $1)
+			}
 			let deleted = Set(a.keys).subtract(b.keys).map { ($0, Diff.Pure(Patch.Delete(a[$0]!))) }
 			let inserted = Set(b.keys).subtract(a.keys).map { ($0, Diff.Pure(Patch.Insert(b[$0]!))) }
 			let patched = Set(a.keys).intersect(b.keys).map { ($0, recur(a[$0]!, b[$0]!)) }
