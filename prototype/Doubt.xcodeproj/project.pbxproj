@@ -119,6 +119,7 @@
 		D4AAE53F1B5AE2D0004E581F /* Syntax.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Syntax.swift; sourceTree = "<group>"; };
 		D4D7F3161BBB22E500AAB0C0 /* Hash.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hash.swift; sourceTree = "<group>"; };
 		D4DF96EC1BC46B630040F41F /* SES.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SES.swift; sourceTree = "<group>"; };
+		D4DF96F01BC54C970040F41F /* Doubt.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = Doubt.modulemap; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -226,6 +227,7 @@
 				D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */,
 				D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */,
 				D4AAE5011B5AE22E004E581F /* Info.plist */,
+				D4DF96F01BC54C970040F41F /* Doubt.modulemap */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -559,6 +561,7 @@
 				INFOPLIST_FILE = Doubt/Info.plist;
 				INSTALL_PATH = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = Doubt/Doubt.modulemap;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.github.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -580,6 +583,7 @@
 				INFOPLIST_FILE = Doubt/Info.plist;
 				INSTALL_PATH = "@rpath";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = Doubt/Doubt.modulemap;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.github.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
