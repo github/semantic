@@ -70,3 +70,8 @@ public protocol PatchConvertible {
 	init(patch: Patch<Info>)
 	var patch: Patch<Info> { get }
 }
+
+extension Patch: PatchConvertible {
+	public init(patch: Patch) { self = patch }
+	public var patch: Patch { return self }
+}
