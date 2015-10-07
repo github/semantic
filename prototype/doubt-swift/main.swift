@@ -39,14 +39,14 @@ extension Fix where A: StringConvertible {
 					.Some("source.lang.swift.decl.extension"),
 					.Some("source.lang.swift.decl.enum"),
 					.Some("source.lang.swift.decl.struct"):
-					self = .In(.Branch([ .In(.Leaf(A(string: name))), .In(.Branch(try substructure.map { try Fix(JSON: $0) ?? bail() })) ]))
+					self = .In(.Indexed([ .In(.Leaf(A(string: name))), .In(.Indexed(try substructure.map { try Fix(JSON: $0) ?? bail() })) ]))
 
 				case .Some("source.lang.swift.decl.enumelement"):
 					fallthrough
 				case
 					.Some("source.lang.swift.decl.function.method.instance"),
 					.Some("source.lang.swift.decl.function.free"):
-					self = .In(.Branch([ .In(.Leaf(A(string: name))), .In(.Branch(try substructure.map { try Fix(JSON: $0) ?? bail() })) ]))
+					self = .In(.Indexed([ .In(.Leaf(A(string: name))), .In(.Indexed(try substructure.map { try Fix(JSON: $0) ?? bail() })) ]))
 
 				case
 					.Some("source.lang.swift.decl.var.instance"),
@@ -83,7 +83,7 @@ extension Fix where A: StringConvertible {
 		do {
 			switch JSON.dictionary?["key.substructure"] {
 			case let .Some(.Array(a)):
-				self = .In(.Branch(try a.map { try Fix(JSON: $0) ?? bail() }))
+				self = .In(.Indexed(try a.map { try Fix(JSON: $0) ?? bail() }))
 			default:
 				return nil
 			}
