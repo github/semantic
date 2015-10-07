@@ -62,7 +62,7 @@ extension Fix where A: StringConvertible {
 				self = try Fix(JSON: substructure[0]) ?? bail()
 
 			case let .Dictionary(d) where d["key.kind"]?.string == "source.lang.swift.syntaxtype.comment.mark":
-				self = .Empty
+				self = .In(.Leaf(A(string: "mark")))
 
 			case .Null:
 				self = .Empty
