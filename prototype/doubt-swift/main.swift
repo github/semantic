@@ -21,7 +21,7 @@ extension Info: StringConvertible {
 
 private struct Bail: ErrorType {}
 
-extension Term where A: StringConvertible {
+extension Fix where A: StringConvertible {
 	/// Constructs a Term representing `JSON`.
 	init?(JSON: Doubt.JSON) {
 		func bail<B>() throws -> B {
@@ -39,14 +39,14 @@ extension Term where A: StringConvertible {
 				.Some("source.lang.swift.decl.extension"),
 				.Some("source.lang.swift.decl.enum"),
 				.Some("source.lang.swift.decl.struct"):
-					self = .Branch([ .Leaf(A(string: name)), .Branch(try substructure.map { try Term(JSON: $0) ?? bail() }) ])
+					self = .Branch([ .Leaf(A(string: name)), .Branch(try substructure.map { try Fix(JSON: $0) ?? bail() }) ])
 
 				case .Some("source.lang.swift.decl.enumelement"):
 					fallthrough
 				case
 				.Some("source.lang.swift.decl.function.method.instance"),
 				.Some("source.lang.swift.decl.function.free"):
-					self = .Branch([ .Leaf(A(string: name)), .Branch(try substructure.map { try Term(JSON: $0) ?? bail() }) ])
+					self = .Branch([ .Leaf(A(string: name)), .Branch(try substructure.map { try Fix(JSON: $0) ?? bail() }) ])
 
 				case
 				.Some("source.lang.swift.decl.var.instance"),
@@ -59,7 +59,7 @@ extension Term where A: StringConvertible {
 
 			case let .Dictionary(d) where d["key.kind"]?.string == "source.lang.swift.decl.enumcase" && d["key.substructure"]?.array?.count == 1:
 				let substructure = d["key.substructure"]?.array ?? []
-				self = try Term(JSON: substructure[0]) ?? bail()
+				self = try Fix(JSON: substructure[0]) ?? bail()
 
 			case let .Dictionary(d) where d["key.kind"]?.string == "source.lang.swift.syntaxtype.comment.mark":
 				self = .Empty
@@ -83,7 +83,7 @@ extension Term where A: StringConvertible {
 		do {
 			switch JSON.dictionary?["key.substructure"] {
 			case let .Some(.Array(a)):
-				self = .Roll(.Branch(try a.map { try Term(JSON: $0) ?? bail() }))
+				self = .Roll(.Branch(try a.map { try Fix(JSON: $0) ?? bail() }))
 			default:
 				return nil
 			}
@@ -101,7 +101,7 @@ extension Term where A: StringConvertible {
 			.map(Structure.init)
 			.map({ $0.dictionary })
 			.map(toAnyObject)
-			.flatMap({ JSON(object: $0).flatMap { Term(path: path, JSON: $0) } }) else { return nil }
+			.flatMap({ JSON(object: $0).flatMap { Fix(path: path, JSON: $0) } }) else { return nil }
 		self = term
 	}
 }
