@@ -14,4 +14,6 @@ extension JSON {
 		guard let object = try? NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments) else { return nil }
 		self.init(object: object)
 	}
+
+	typealias Term = Fix<JSONLeaf>
 }
