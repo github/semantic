@@ -107,5 +107,5 @@ extension Term where A: StringConvertible {
 }
 
 if let a = arguments[1].flatMap(Term<Info>.init), b = arguments[2].flatMap(Term<Info>.init) {
-	print(String(reflecting: Diff(a, b)))
+	print(String(reflecting: FreeAlgorithm<Info, Free<Info, Patch<Info>>>(a, b)))
 }
