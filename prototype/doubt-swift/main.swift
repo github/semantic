@@ -13,6 +13,12 @@ extension String: StringConvertible {
 	}
 }
 
+extension Info: StringConvertible {
+	public init(string: String) {
+		self = .Literal(string, [])
+	}
+}
+
 private struct Bail: ErrorType {}
 
 extension Term where A: StringConvertible {
