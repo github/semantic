@@ -188,8 +188,8 @@ private enum Layout: CustomStringConvertible, Equatable {
 		}
 	}
 
-	static func better(width: Int, _ placed: Int, _ x: Layout, _ y: Layout) -> Layout {
-		return x.fits(width - placed) ? x : y
+	static func better(width: Int, _ placed: Int, _ x: Layout, @autoclosure _ y: () -> Layout) -> Layout {
+		return x.fits(width - placed) ? x : y()
 	}
 }
 
