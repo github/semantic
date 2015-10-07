@@ -1,4 +1,4 @@
-public enum Category: AlgebraicHashable, CustomDebugStringConvertible {
+public enum Category: AlgebraicHashable, Comparable, CustomDebugStringConvertible {
 	case Tag(String)
 
 
@@ -25,8 +25,9 @@ public enum Category: AlgebraicHashable, CustomDebugStringConvertible {
 }
 
 public func == (left: Category, right: Category) -> Bool {
-	switch (left, right) {
-	case let (.Tag(a), .Tag(b)):
-		return a == b
-	}
+	return left.tag == right.tag
+}
+
+public func < (left: Category, right: Category) -> Bool {
+	return left.tag < right.tag
 }
