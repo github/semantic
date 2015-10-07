@@ -64,9 +64,6 @@ extension Fix where A: StringConvertible {
 			case let .Dictionary(d) where d["key.kind"]?.string == "source.lang.swift.syntaxtype.comment.mark":
 				self = .In(.Leaf(A(string: "mark")))
 
-			case .Null:
-				self = .Empty
-
 			default:
 				return nil
 			}
