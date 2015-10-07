@@ -34,9 +34,9 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 		case let .Leaf(n):
 			return Doc(n)
 		case let .Indexed(x):
-			return x.map(Doc.init).joinWithSeparator(", ").bracket("[", "]")
+			return x.map(Doc.init).joinWithSeparator(",").bracket("[", "]")
 		case let .Keyed(d):
-			return d.lazy.map { Doc($0) <> Doc(":") <+> Doc($1) }.joinWithSeparator(", ").bracket("[", "]")
+			return d.lazy.map { Doc($0) <> Doc(":") <+> Doc($1) }.joinWithSeparator(",").bracket("[", "]")
 		}
 	}
 }
