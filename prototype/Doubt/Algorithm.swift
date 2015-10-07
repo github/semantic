@@ -1,5 +1,5 @@
 /// An operation of diffing over terms or collections of terms.
-public enum Algorithm<Recur, A> {
+public enum Operation<Recur, A> {
 	/// The type of `Term`s over which `Algorithm`s operate.
 	public typealias Term = Fix<A>
 
@@ -20,7 +20,7 @@ public enum Algorithm<Recur, A> {
 
 	// MARK: Functor
 
-	public func map<Other>(transform: Recur -> Other) -> Algorithm<Other, A> {
+	public func map<Other>(transform: Recur -> Other) -> Operation<Other, A> {
 		switch self {
 		case let .Recursive(a, b, f):
 			return .Recursive(a, b, f >>> transform)
@@ -40,10 +40,10 @@ public enum Algorithm<Recur, A> {
 /// Where `Algorithm` models a single diffing strategy, `FreeAlgorithm` models the recursive selection of diffing strategies at each node. Thus, a value in `FreeAlgorithm` models an algorithm for constructing a value in the type `B` from the resulting diffs. By this means, diffing can be adapted not just to the specific grammar, but to specific trees produced by that grammar, and even the values of type `A` encapsulated at each node.
 public enum FreeAlgorithm<A, B> {
 	/// The type of `Term`s over which `FreeAlgorithm`s operate.
-	public typealias Term = Algorithm<FreeAlgorithm, A>.Term
+	public typealias Term = Operation<FreeAlgorithm, A>.Term
 
 	/// The type of `Diff`s which `FreeAlgorithm`s produce.
-	public typealias Diff = Algorithm<FreeAlgorithm, A>.Diff
+	public typealias Diff = Operation<FreeAlgorithm, A>.Diff
 
 	/// The injection of a value of type `B` into an `Algorithm`.
 	///
@@ -51,9 +51,9 @@ public enum FreeAlgorithm<A, B> {
 	case Pure(B)
 
 	/// A recursive instantiation of `Algorithm`, unrolling another iteration of the recursive type.
-	case Roll(Algorithm<FreeAlgorithm, A>)
+	case Roll(Operation<FreeAlgorithm, A>)
 
-	public func analysis<C>(@noescape ifPure ifPure: B -> C, @noescape ifRoll: Algorithm<FreeAlgorithm, A> -> C) -> C {
+	public func analysis<C>(@noescape ifPure ifPure: B -> C, @noescape ifRoll: Operation<FreeAlgorithm, A> -> C) -> C {
 		switch self {
 		case let .Pure(b):
 			return ifPure(b)
