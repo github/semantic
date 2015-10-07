@@ -1,5 +1,5 @@
 public struct BoundsCheckedArray<Element>: CollectionType {
-	init(array: [Element]) {
+	public init(array: [Element]) {
 		self.array = array
 	}
 
