@@ -92,8 +92,8 @@ extension Free where B: PatchConvertible, B.Info == A {
 	public typealias Term = Fix<A>
 
 	public var before: Term? {
-		return map { $0.patch.state.before }.iterate { syntax -> Term? in
-			switch syntax {
+		return map { $0.patch.state.before }.iterate {
+			switch $0 {
 			case let .Leaf(a):
 				return .In(.Leaf(a))
 			case let .Indexed(a):
@@ -105,8 +105,8 @@ extension Free where B: PatchConvertible, B.Info == A {
 	}
 
 	public var after: Term? {
-		return map { $0.patch.state.after }.iterate { syntax -> Term? in
-			switch syntax {
+		return map { $0.patch.state.after }.iterate {
+			switch $0 {
 			case let .Leaf(a):
 				return .In(.Leaf(a))
 			case let .Indexed(a):
