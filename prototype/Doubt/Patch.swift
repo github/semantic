@@ -64,6 +64,7 @@ extension Patch {
 }
 
 
+/// A hack to enable constrained extensions on `Free<A, Patch<A>>`.
 public protocol PatchConvertible {
 	typealias Info
 
