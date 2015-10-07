@@ -1,11 +1,26 @@
 import Doubt
 import Cocoa
 
-enum JSONLeaf {
+enum JSONLeaf: Equatable {
 	case Number(Double)
 	case Boolean(Bool)
 	case String(Swift.String)
 	case Null
+}
+
+func == (left: JSONLeaf, right: JSONLeaf) -> Bool {
+	switch (left, right) {
+	case let (.Number(a), .Number(b)):
+		return a == b
+	case let (.Boolean(a), .Boolean(b)):
+		return a == b
+	case let (.String(a), .String(b)):
+		return a == b
+	case (.Null, .Null):
+		return true
+	default:
+		return false
+	}
 }
 
 
