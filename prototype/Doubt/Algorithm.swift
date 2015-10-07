@@ -1,9 +1,9 @@
 /// An operation of diffing over terms or collections of terms.
 public enum Operation<Recur, A> {
-	/// The type of `Term`s over which `Algorithm`s operate.
+	/// The type of `Term`s over which `Operation`s operate.
 	public typealias Term = Fix<A>
 
-	/// The type of `Diff`s which `Algorithm`s produce.
+	/// The type of `Diff`s which `Operation`s produce.
 	public typealias Diff = Free<A, Patch<A>>
 
 	/// Indicates that diffing should compare the enclosed `Term`s.
@@ -33,11 +33,11 @@ public enum Operation<Recur, A> {
 }
 
 
-/// The free monad over `Algorithm`, implementing the language of diffing.
+/// The free monad over `Operation`, implementing the language of diffing.
 ///
-/// As with `Free`, this is “free” in the sense of “unconstrained,” i.e. “the monad induced by `Algorithm` without extra assumptions.”
+/// As with `Free`, this is “free” in the sense of “unconstrained,” i.e. “the monad induced by `Operation` without extra assumptions.”
 ///
-/// Where `Algorithm` models a single diffing strategy, `FreeAlgorithm` models the recursive selection of diffing strategies at each node. Thus, a value in `FreeAlgorithm` models an algorithm for constructing a value in the type `B` from the resulting diffs. By this means, diffing can be adapted not just to the specific grammar, but to specific trees produced by that grammar, and even the values of type `A` encapsulated at each node.
+/// Where `Operation` models a single diffing strategy, `FreeAlgorithm` models the recursive selection of diffing strategies at each node. Thus, a value in `FreeAlgorithm` models an algorithm for constructing a value in the type `B` from the resulting diffs. By this means, diffing can be adapted not just to the specific grammar, but to specific trees produced by that grammar, and even the values of type `A` encapsulated at each node.
 public enum FreeAlgorithm<A, B> {
 	/// The type of `Term`s over which `FreeAlgorithm`s operate.
 	public typealias Term = Operation<FreeAlgorithm, A>.Term
@@ -45,12 +45,12 @@ public enum FreeAlgorithm<A, B> {
 	/// The type of `Diff`s which `FreeAlgorithm`s produce.
 	public typealias Diff = Operation<FreeAlgorithm, A>.Diff
 
-	/// The injection of a value of type `B` into an `Algorithm`.
+	/// The injection of a value of type `B` into an `Operation`.
 	///
 	/// Equally, a way to return a result or throw an error during computation, as determined by the type which `B` is instantiated to, and the specific context in which it is being evaluated.
 	case Pure(B)
 
-	/// A recursive instantiation of `Algorithm`, unrolling another iteration of the recursive type.
+	/// A recursive instantiation of `Operation`, unrolling another iteration of the recursive type.
 	case Roll(Operation<FreeAlgorithm, A>)
 
 	public func analysis<C>(@noescape ifPure ifPure: B -> C, @noescape ifRoll: Operation<FreeAlgorithm, A> -> C) -> C {
