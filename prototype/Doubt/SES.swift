@@ -18,7 +18,7 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 			case let .Indexed(costs):
 				return costs.reduce(0, combine: +)
 			case let .Keyed(costs):
-				return costs.lazy.map { $1 }.reduce(0, combine: +)
+				return costs.values.reduce(0, combine: +)
 			}
 		}
 	}
