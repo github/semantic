@@ -25,8 +25,5 @@ public enum Category: AlgebraicHashable, CustomDebugStringConvertible {
 }
 
 public func == (left: Category, right: Category) -> Bool {
-	switch (left, right) {
-	case let (.Tag(a), .Tag(b)):
-		return a == b
-	}
+	return left.tag == right.tag
 }
