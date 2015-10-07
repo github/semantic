@@ -1,4 +1,4 @@
-public enum Doc: CustomDocConvertible, Equatable {
+public enum Doc: CustomDebugStringConvertible, CustomDocConvertible, Equatable {
 	case Empty
 	indirect case Concat(Doc, Doc)
 	indirect case Union(Doc, Doc)
@@ -46,6 +46,26 @@ public enum Doc: CustomDocConvertible, Equatable {
 
 	public var doc: Doc {
 		return self
+	}
+
+
+	// MARK: CustomDebugStringConvertible
+
+	public var debugDescription: String {
+		switch self {
+		case .Empty:
+			return ".Empty"
+		case let .Concat(a, b):
+			return ".Concat(\(String(reflecting: a)), \(String(reflecting: b)))"
+		case let .Union(a, b):
+			return ".Union(\(String(reflecting: a)), \(String(reflecting: b)))"
+		case let .Text(s):
+			return ".Text(\(String(reflecting: s)))"
+		case let .Nest(i, x):
+			return ".Nest(\(String(reflecting: i)), \(String(reflecting: x)))"
+		case .Line:
+			return ".Line"
+		}
 	}
 }
 
