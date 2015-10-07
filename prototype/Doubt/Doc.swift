@@ -29,8 +29,8 @@ public enum Doc: CustomDebugStringConvertible, CustomDocConvertible, Equatable {
 			return .Concat(a.flattened, b.flattened)
 		case let .Union(a, _):
 			return a.flattened
-		case let .Nest(_, Doc):
-			return Doc.flattened
+		case let .Nest(_, doc):
+			return doc.flattened
 		case .Line:
 			return .Text(" ")
 		}
