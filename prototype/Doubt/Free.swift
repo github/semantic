@@ -88,6 +88,11 @@ public enum Free<A, B>: CustomDebugStringConvertible {
 }
 
 
+extension Free where B: PatchConvertible, B.Info == A {
+	public typealias Term = Fix<A>
+}
+
+
 // MARK: - Equality
 
 extension Free {
