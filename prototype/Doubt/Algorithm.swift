@@ -95,6 +95,7 @@ public enum Algorithm<A, B> {
 					? Diff($1)
 					: recur($0, $1)
 			}
+			// Essentially [set reconciliation](https://en.wikipedia.org/wiki/Data_synchronization#Unordered_data) on the keys, followed by recurring into the values of the intersecting keys.
 			let deleted = Set(a.keys).subtract(b.keys).map { ($0, Diff.Pure(Patch.Delete(a[$0]!))) }
 			let inserted = Set(b.keys).subtract(a.keys).map { ($0, Diff.Pure(Patch.Insert(b[$0]!))) }
 			let patched = Set(a.keys).intersect(b.keys).map { ($0, recur(a[$0]!, b[$0]!)) }
