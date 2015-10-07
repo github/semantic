@@ -106,6 +106,6 @@ extension Term where A: StringConvertible {
 	}
 }
 
-if let a = arguments[1].flatMap(Term<Info>.init), b = arguments[2].flatMap(Term<Info>.init) {
+if let a = arguments[1].flatMap({ Fix<Info>(path: $0) }), b = arguments[2].flatMap({ Fix<Info>(path: $0) }) {
 	print(String(reflecting: FreeAlgorithm<Info, Free<Info, Patch<Info>>>(a, b)))
 }
