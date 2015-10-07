@@ -85,9 +85,7 @@ extension Term where A: StringConvertible {
 			return nil
 		}
 	}
-}
 
-extension Term where A: StringConvertible {
 	init?(path: String) {
 		guard path != "/dev/null" else {
 			self = .Empty
