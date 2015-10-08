@@ -1,6 +1,6 @@
-public enum JSON: Equatable {
-	public typealias ArrayType = [JSON]
-	public typealias DictionaryType = [Swift.String:JSON]
+public enum JSON: Equatable, JSONConvertible {
+	public typealias ArrayType = [Doubt.JSON]
+	public typealias DictionaryType = [Swift.String:Doubt.JSON]
 
 	case Number(Double)
 	case Boolean(Bool)
@@ -54,15 +54,26 @@ public enum JSON: Equatable {
 			case let s as Swift.String:
 				self = .String(s)
 			case let a as [AnyObject]:
-				self = .Array(try a.map { try JSON(object: $0) ?? die() })
+				self = .Array(try a.map { try Doubt.JSON(object: $0) ?? die() })
 			case let d as [Swift.String:AnyObject]:
-				self = .Dictionary(Swift.Dictionary(elements: try d.map { ($0, try JSON(object: $1) ?? die()) }))
+				self = .Dictionary(Swift.Dictionary(elements: try d.map { ($0, try Doubt.JSON(object: $1) ?? die()) }))
 			case is NSNull:
 				self = .Null
 			default:
 				return nil
 			}
 		} catch { return nil }
+	}
+
+
+	// MARK: JSONConvertible
+
+	public init?(JSON: Doubt.JSON) {
+		self = JSON
+	}
+
+	public var JSON: Doubt.JSON {
+		return self
 	}
 }
 
