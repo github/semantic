@@ -1,4 +1,4 @@
-public enum JSON {
+public enum JSON: Equatable {
 	public typealias ArrayType = [JSON]
 	public typealias DictionaryType = [Swift.String:JSON]
 
@@ -63,6 +63,26 @@ public enum JSON {
 				return nil
 			}
 		} catch { return nil }
+	}
+}
+
+
+public func == (left: JSON, right: JSON) -> Bool {
+	switch (left, right) {
+	case let (.Number(a), .Number(b)):
+		return a == b
+	case let (.Boolean(a), .Boolean(b)):
+		return a == b
+	case let (.String(a), .String(b)):
+		return a == b
+	case let (.Array(a), .Array(b)):
+		return a == b
+	case let (.Dictionary(a), .Dictionary(b)):
+		return a == b
+	case (.Null, .Null):
+		return true
+	default:
+		return false
 	}
 }
 
