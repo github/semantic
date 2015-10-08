@@ -91,19 +91,18 @@ extension Patch {
 		switch self {
 		case let .Replace(a, b):
 			return Doubt.JSON.Dictionary([
-				"case": .String("Replace"),
-				"before": a.JSON(ifLeaf),
-				"after": b.JSON(ifLeaf),
+				"replace": Doubt.JSON.Dictionary([
+					"before": a.JSON(ifLeaf),
+					"after": b.JSON(ifLeaf),
+				])
 			])
 		case let .Insert(b):
 			return Doubt.JSON.Dictionary([
-				"case": .String("Insert"),
-				"after": b.JSON(ifLeaf),
+				"insert": b.JSON(ifLeaf),
 			])
 		case let .Delete(a):
 			return Doubt.JSON.Dictionary([
-				"case": .String("Delete"),
-				"before": a.JSON(ifLeaf)
+				"delete": a.JSON(ifLeaf)
 			])
 		}
 	}
