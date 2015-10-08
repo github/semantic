@@ -163,3 +163,12 @@ extension Free where A: Hashable, B: Hashable {
 		return hash(ifPure: Hash.init, ifRoll: Hash.init)
 	}
 }
+
+
+// MARK: - JSONConvertible
+
+extension Free {
+	public func JSON(ifPure ifPure: B -> Doubt.JSON, ifLeaf: A -> Doubt.JSON) -> Doubt.JSON {
+		return analysis(ifPure: ifPure, ifRoll: { $0.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifPure: ifPure, ifLeaf: ifLeaf) }) })
+	}
+}
