@@ -54,3 +54,12 @@ extension Fix where A: Hashable {
 		return hash(Hash.init)
 	}
 }
+
+
+// MARK: JSONConvertible
+
+extension Fix {
+	public func JSON(ifLeaf: A -> Doubt.JSON) -> Doubt.JSON {
+		return out.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifLeaf) })
+	}
+}
