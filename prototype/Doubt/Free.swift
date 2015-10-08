@@ -175,6 +175,10 @@ extension Free {
 					"pure": ifPure($0),
 				])
 			},
-			ifRoll: { $0.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifPure: ifPure, ifLeaf: ifLeaf) }) })
+			ifRoll: {
+				Doubt.JSON.Dictionary([
+					"roll": $0.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifPure: ifPure, ifLeaf: ifLeaf) })
+				])
+			})
 	}
 }
