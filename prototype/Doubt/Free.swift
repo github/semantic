@@ -5,12 +5,19 @@
 /// `Syntax` is a non-recursive type parameterized by the type of its child nodes. Instantiating it to `Free` makes it recursive through the `Roll` case, and allows it to wrap values of type `B` through the `Pure` case.
 ///
 /// In Doubt, this allows us to represent diffs as values of the `Free` monad obtained from `Syntax`, injecting `Patch` into the tree; or otherwise put, a diff is a tree of mutually-recursive `Free.Roll`/`Syntax` nodes with `Pure` nodes injecting the actual changes.
-public enum Free<A, B> {
+public enum Free<A, B>: CustomDebugStringConvertible {
 	/// The injection of a value of type `B` into the `Syntax` tree.
 	case Pure(B)
 
 	/// A recursive instantiation of `Syntax`, unrolling another iteration of the recursive type.
 	indirect case Roll(Syntax<Free, A>)
+
+
+	/// Recursively copies a `Fix<A>` into a `Free<A, B>`, essentially mapping `Fix.In` onto `Free.Roll`.
+	public init(_ fix: Fix<A>) {
+		self = .Roll(fix.out.map(Free.init))
+	}
+
 
 	public func analysis<C>(@noescape ifPure ifPure: B -> C, @noescape ifRoll: Syntax<Free, A> -> C) -> C {
 		switch self {
@@ -19,6 +26,38 @@ public enum Free<A, B> {
 		case let .Roll(s):
 			return ifRoll(s)
 		}
+	}
+
+	/// Reduce the receiver by iteration.
+	///
+	/// `Pure` values are simply unpacked. `Roll` values are mapped recursively, and then have `transform` applied to them.
+	///
+	/// This forms a _catamorphism_ (from the Greek “cata”, “downwards”; compare “catastrophe”), a generalization of folds over regular trees (and datatypes isomorphic to them). It operates at the leaves first, and then branches near the periphery, recursively collapsing values by whatever is computed by `transform`. Catamorphisms are themselves an example of _recursion schemes_, which characterize specific well-behaved patterns of recursion. This gives `iterate` some useful properties for computations performed over trees.
+	///
+	/// Due to the character of recursion captured by catamorphisms, `iterate` ensures that computation will not only halt, but will further be linear in the size of the receiver. (Nesting a call to `iterate` will therefore result in O(n²) complexity.) This guarantee is achieved by careful composition of calls to `map` with recursive calls to `iterate`, only calling `transform` once the recursive call has completed. `transform` is itself non-recursive, receiving a `Syntax` whose recurrences have already been flattened to `B`.
+	///
+	/// The linearity of `iterate` in the size of the receiver makes it trivial to compute said size, by counting leaves as 1 and summing branches’ children:
+	///
+	///		func size<A, B>(free: Free<A, B>) -> Int {
+	///			return free.iterate { flattenedSyntax in
+	///				switch flattenedSyntax {
+	///				case .Leaf:
+	///					return 1
+	///				case let .Indexed(children):
+	///					return children.reduce(0, combine: +)
+	///				case let .Keyed(children):
+	///					return children.lazy.map { $1 }.reduce(0, combine: +)
+	///				}
+	///			}
+	///		}
+	///
+	/// While not every function on a given `Free` can be computed using `iterate`, these guarantees of termination and complexity, as well as the brevity and focus on the operation being performed n times, make it a desirable scaffolding for any function which can.
+	///
+	/// For a lucid, in-depth tutorial on recursion schemes, I recommend [Patrick Thomson](https://twitter.com/importantshock)’s _[An Introduction to Recursion Schemes](http://patrickthomson.ghost.io/an-introduction-to-recursion-schemes/)_ and _[Recursion Schemes, Part 2: A Mob of Morphisms](http://patrickthomson.ghost.io/recursion-schemes-part-2/)_.
+	public func iterate(transform: Syntax<B, A> -> B) -> B {
+		return analysis(
+			ifPure: id,
+			ifRoll: { transform($0.map { $0.iterate(transform) }) })
 	}
 
 
@@ -33,6 +72,18 @@ public enum Free<A, B> {
 
 	public func flatMap<C>(@noescape transform: B -> Free<A, C>) -> Free<A, C> {
 		return analysis(ifPure: transform, ifRoll: { .Roll($0.map { $0.flatMap(transform) }) })
+	}
+
+
+	// MARK: CustomDebugStringConvertible
+
+	public var debugDescription: String {
+		switch self {
+		case let .Pure(b):
+			return ".Pure(\(String(reflecting: b)))"
+		case let .Roll(s):
+			return ".Roll(\(String(reflecting: s)))"
+		}
 	}
 }
 
@@ -67,7 +118,7 @@ extension Free {
 
 
 extension Free where A: Hashable, B: Hashable {
-	var hash: Hash {
+	public var hash: Hash {
 		return hash(ifPure: Hash.init, ifRoll: Hash.init)
 	}
 }

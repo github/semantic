@@ -1,19 +1,42 @@
 /// A patch to some part of a `Syntax` tree.
-public enum Patch<A> {
-	case Replace(Fix<A>?, Fix<A>?)
-
-	public static func Insert(term: Fix<A>) -> Patch {
-		return .Replace(nil, term)
-	}
-
-	public static func Delete(term: Fix<A>) -> Patch {
-		return .Replace(term, nil)
-	}
+public enum Patch<A>: CustomDebugStringConvertible {
+	case Replace(Fix<A>, Fix<A>)
+	case Insert(Fix<A>)
+	case Delete(Fix<A>)
 
 	public var state: (before: Fix<A>?, after: Fix<A>?) {
 		switch self {
 		case let .Replace(a, b):
 			return (a, b)
+		case let .Insert(b):
+			return (nil, b)
+		case let .Delete(a):
+			return (a, nil)
+		}
+	}
+
+
+	/// The cost of a patch to the diff.
+	public var cost: Int {
+		switch self {
+		case .Replace:
+			return 2
+		default:
+			return 1
+		}
+	}
+
+
+	// MARK: CustomDebugStringConvertible
+
+	public var debugDescription: String {
+		switch self {
+		case let .Replace(a, b):
+			return ".Replace(\(String(reflecting: a)), \(String(reflecting: b)))"
+		case let .Insert(b):
+			return ".Insert(\(String(reflecting: b)))"
+		case let .Delete(a):
+			return ".Delete(\(String(reflecting: a)))"
 		}
 	}
 }

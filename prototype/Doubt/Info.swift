@@ -1,5 +1,5 @@
 /// Source info & categorization for nodes in a syntax tree.
-public enum Info: AlgebraicHashable {
+public enum Info: AlgebraicHashable, CustomDebugStringConvertible {
 	case Literal(String, Set<Category>)
 
 	public var categories: Set<Category> {
@@ -13,6 +13,15 @@ public enum Info: AlgebraicHashable {
 		switch self {
 		case let .Literal(source, categories):
 			return Hash("Literal", Hash(source), Hash(categories))
+		}
+	}
+
+	public var debugDescription: String {
+		switch self {
+		case let .Literal(s, c) where c.isEmpty:
+			return s
+		case let .Literal(s, c):
+			return s + " (" + c.sort().map { String(reflecting: $0) }.joinWithSeparator(", ") + ")"
 		}
 	}
 }
