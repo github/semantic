@@ -64,6 +64,8 @@ public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F
 }
 
 
+// MARK: - Hashing
+
 extension Syntax {
 	public func hash(ifLeaf ifLeaf: A -> Hash, ifRecur: Recur -> Hash) -> Hash {
 		switch self {
