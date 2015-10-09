@@ -86,5 +86,8 @@ extension JSON {
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
 if let a = arguments[1].flatMap(JSON.init), b = arguments[2].flatMap(JSON.init) {
-	print(Algorithm<JSONLeaf, JSON.Diff>(a.term, b.term).evaluate())
+	let diff = Algorithm<JSONLeaf, JSON.Diff>(a.term, b.term).evaluate()
+	if let JSON = NSString(data: diff.JSON.serialize(), encoding: NSUTF8StringEncoding) {
+		print(JSON)
+	}
 }
