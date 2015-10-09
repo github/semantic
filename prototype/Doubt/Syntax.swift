@@ -100,3 +100,14 @@ extension Syntax {
 		}
 	}
 }
+
+
+// MARK: - Construction
+
+/// SyntaxConvertible types can be constructed with the same constructors available on Syntax itself, as a convenience.
+public protocol SyntaxConvertible {
+	typealias RecurType
+	typealias LeafType
+
+	init(syntax: Syntax<RecurType, LeafType>)
+}
