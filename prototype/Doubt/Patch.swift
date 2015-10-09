@@ -90,20 +90,20 @@ extension Patch {
 	public func JSON(ifLeaf: A -> Doubt.JSON) -> Doubt.JSON {
 		switch self {
 		case let .Replace(a, b):
-			return Doubt.JSON.Dictionary([
-				"replace": Doubt.JSON.Dictionary([
+			return [
+				"replace": [
 					"before": a.JSON(ifLeaf),
 					"after": b.JSON(ifLeaf),
-				])
-			])
+				]
+			]
 		case let .Insert(b):
-			return Doubt.JSON.Dictionary([
+			return [
 				"insert": b.JSON(ifLeaf),
-			])
+			]
 		case let .Delete(a):
-			return Doubt.JSON.Dictionary([
+			return [
 				"delete": a.JSON(ifLeaf)
-			])
+			]
 		}
 	}
 }
