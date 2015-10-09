@@ -9,6 +9,9 @@ public enum Info: AlgebraicHashable, CustomDebugStringConvertible {
 		}
 	}
 
+
+	// MARK: AlgebraicHashable
+
 	public var hash: Hash {
 		switch self {
 		case let .Literal(source, categories):
