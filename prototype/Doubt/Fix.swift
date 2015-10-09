@@ -60,7 +60,7 @@ extension Fix where A: Hashable {
 
 extension Fix {
 	public func JSON(ifLeaf: A -> Doubt.JSON) -> Doubt.JSON {
-		return [ "in": out.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifLeaf) }) ]
+		return out.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifLeaf) })
 	}
 }
 
