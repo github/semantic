@@ -1,11 +1,27 @@
 import Doubt
 import Cocoa
 
-enum JSONLeaf: Equatable, CustomStringConvertible {
+enum JSONLeaf: Equatable, CustomJSONConvertible, CustomStringConvertible {
 	case Number(Double)
 	case Boolean(Bool)
 	case String(Swift.String)
 	case Null
+
+
+	// MARK: CustomJSONConvertible
+
+	var JSON: Doubt.JSON {
+		switch self {
+		case let .Number(n):
+			return .Number(n)
+		case let .Boolean(b):
+			return .Boolean(b)
+		case let .String(s):
+			return .String(s)
+		case .Null:
+			return .Null
+		}
+	}
 
 
 	// MARK: CustomStringConvertible
