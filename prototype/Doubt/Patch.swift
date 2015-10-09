@@ -109,6 +109,13 @@ extension Patch {
 }
 
 
+extension Patch where A: CustomJSONConvertible {
+	public var JSON: Doubt.JSON {
+		return self.JSON { $0.JSON }
+	}
+}
+
+
 /// A hack to enable constrained extensions on `Free<A, Patch<A>>`.
 public protocol PatchConvertible {
 	typealias Info
