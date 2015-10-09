@@ -40,19 +40,19 @@ extension Fix where A: StringConvertible {
 					.Some("source.lang.swift.decl.enum"),
 					.Some("source.lang.swift.decl.struct"),
 					.Some("source.lang.swift.decl.protocol"):
-					self = .In(.Indexed([ .In(.Leaf(A(string: name))), .In(.Indexed(try substructure.map { try Fix(JSON: $0) ?? bail() })) ]))
+					self = .Indexed([ .Leaf(A(string: name)), .Indexed(try substructure.map { try Fix(JSON: $0) ?? bail() }) ])
 
 				case .Some("source.lang.swift.decl.enumelement"):
 					fallthrough
 				case
 					.Some("source.lang.swift.decl.function.method.instance"),
 					.Some("source.lang.swift.decl.function.free"):
-					self = .In(.Indexed([ .In(.Leaf(A(string: name))), .In(.Indexed(try substructure.map { try Fix(JSON: $0) ?? bail() })) ]))
+					self = .Indexed([ .Leaf(A(string: name)), .Indexed(try substructure.map { try Fix(JSON: $0) ?? bail() }) ])
 
 				case
 					.Some("source.lang.swift.decl.var.instance"),
 					.Some("source.lang.swift.decl.var.static"):
-					self = .In(.Leaf(A(string: name)))
+					self = .Leaf(A(string: name))
 
 				default:
 					return nil
@@ -63,7 +63,7 @@ extension Fix where A: StringConvertible {
 				self = try Fix(JSON: substructure[0]) ?? bail()
 
 			case let .Dictionary(d) where d["key.kind"]?.string == "source.lang.swift.syntaxtype.comment.mark":
-				self = .In(.Leaf(A(string: "mark")))
+				self = .Leaf(A(string: "mark"))
 
 			default:
 				return nil
@@ -81,7 +81,7 @@ extension Fix where A: StringConvertible {
 		do {
 			switch JSON.dictionary?["key.substructure"] {
 			case let .Some(.Array(a)):
-				self = .In(.Indexed(try a.map { try Fix(JSON: $0) ?? bail() }))
+				self = .Indexed(try a.map { try Fix(JSON: $0) ?? bail() })
 			default:
 				return nil
 			}
