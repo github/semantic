@@ -84,7 +84,7 @@ extension Patch {
 }
 
 
-// MARK: - JSONConvertible
+// MARK: - JSON
 
 extension Patch {
 	public func JSON(ifLeaf: A -> Doubt.JSON) -> Doubt.JSON {
