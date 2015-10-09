@@ -27,6 +27,18 @@ public enum Patch<A>: CustomDebugStringConvertible {
 	}
 
 
+	public var inverse: Patch {
+		switch self {
+		case let .Replace(a, b):
+			return .Replace(b, a)
+		case let .Insert(b):
+			return .Delete(b)
+		case let .Delete(a):
+			return .Insert(a)
+		}
+	}
+
+
 	// MARK: CustomDebugStringConvertible
 
 	public var debugDescription: String {

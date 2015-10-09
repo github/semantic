@@ -109,6 +109,11 @@ extension Free where B: PatchConvertible, B.Info == A {
 	public var after: Term? {
 		return map { $0.patch.state.after }.iterate(self.discardNullTerms)
 	}
+
+
+	public var inverse: Free {
+		return map { B(patch: $0.patch.inverse) }
+	}
 }
 
 
