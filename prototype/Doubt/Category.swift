@@ -36,6 +36,9 @@ public enum Category: AlgebraicHashable, Comparable, CustomDebugStringConvertibl
 	}
 }
 
+
+// MARK: - Equatable
+
 public func == (left: Category, right: Category) -> Bool {
 	return left.tag == right.tag
 }
