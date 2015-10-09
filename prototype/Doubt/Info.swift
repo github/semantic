@@ -16,6 +16,9 @@ public enum Info: AlgebraicHashable, CustomDebugStringConvertible {
 		}
 	}
 
+
+	// MARK: CustomDebugStringConvertible
+
 	public var debugDescription: String {
 		switch self {
 		case let .Literal(s, c) where c.isEmpty:
