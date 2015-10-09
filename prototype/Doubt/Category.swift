@@ -1,4 +1,4 @@
-public enum Category: AlgebraicHashable, Comparable, CustomDebugStringConvertible {
+public enum Category: AlgebraicHashable, Comparable, CustomDebugStringConvertible, CustomJSONConvertible {
 	case Tag(String)
 
 
@@ -20,6 +20,18 @@ public enum Category: AlgebraicHashable, Comparable, CustomDebugStringConvertibl
 		switch self {
 		case let .Tag(s):
 			return ".Tag(\(s))"
+		}
+	}
+
+
+	// MARK: CustomJSONConvertible
+
+	public var JSON: Doubt.JSON {
+		switch self {
+		case let .Tag(s):
+			return .Dictionary([
+				"tag": .String(s),
+			])
 		}
 	}
 }
