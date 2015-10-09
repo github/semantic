@@ -62,3 +62,17 @@ extension Patch {
 		])
 	}
 }
+
+
+/// A hack to enable constrained extensions on `Free<A, Patch<A>>`.
+public protocol PatchConvertible {
+	typealias Info
+
+	init(patch: Patch<Info>)
+	var patch: Patch<Info> { get }
+}
+
+extension Patch: PatchConvertible {
+	public init(patch: Patch) { self = patch }
+	public var patch: Patch { return self }
+}
