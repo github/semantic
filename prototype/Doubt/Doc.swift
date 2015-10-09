@@ -1,4 +1,4 @@
-public enum Doc: CustomDocConvertible, Equatable {
+public enum Doc: CustomDebugStringConvertible, CustomDocConvertible, Equatable {
 	case Empty
 	indirect case Concat(Doc, Doc)
 	indirect case Union(Doc, Doc)
@@ -15,10 +15,15 @@ public enum Doc: CustomDocConvertible, Equatable {
 	}
 
 	public func bracket(left: String, _ right: String) -> Doc {
-		return (Text(left)
-			<> Nest(2, Line <> self)
-			<> Line
-			<> Text(right)).group()
+		switch self {
+		case .Empty:
+			return Text(left) <> Text(right)
+		default:
+			return (Text(left)
+				<> Nest(2, Line <> self)
+				<> Line
+				<> Text(right)).group()
+		}
 	}
 
 	public var flattened: Doc {
@@ -29,8 +34,8 @@ public enum Doc: CustomDocConvertible, Equatable {
 			return .Concat(a.flattened, b.flattened)
 		case let .Union(a, _):
 			return a.flattened
-		case let .Nest(_, Doc):
-			return Doc.flattened
+		case let .Nest(i, doc):
+			return .Nest(i, doc.flattened)
 		case .Line:
 			return .Text(" ")
 		}
@@ -46,6 +51,26 @@ public enum Doc: CustomDocConvertible, Equatable {
 
 	public var doc: Doc {
 		return self
+	}
+
+
+	// MARK: CustomDebugStringConvertible
+
+	public var debugDescription: String {
+		switch self {
+		case .Empty:
+			return ".Empty"
+		case let .Concat(a, b):
+			return ".Concat(\(String(reflecting: a)), \(String(reflecting: b)))"
+		case let .Union(a, b):
+			return ".Union(\(String(reflecting: a)), \(String(reflecting: b)))"
+		case let .Text(s):
+			return ".Text(\(String(reflecting: s)))"
+		case let .Nest(i, x):
+			return ".Nest(\(String(reflecting: i)), \(String(reflecting: x)))"
+		case .Line:
+			return ".Line"
+		}
 	}
 }
 
@@ -93,7 +118,7 @@ extension SequenceType where Generator.Element == Doc {
 
 	public func joinWithSeparator(separator: String) -> Doc {
 		return fold {
-			$0 <> .Text(separator) <+> $1
+			$0 <> .Text(separator) </> $1
 		}
 	}
 }
@@ -168,8 +193,8 @@ private enum Layout: CustomStringConvertible, Equatable {
 		}
 	}
 
-	static func better(width: Int, _ placed: Int, _ x: Layout, _ y: Layout) -> Layout {
-		return x.fits(width - placed) ? x : y
+	static func better(width: Int, _ placed: Int, _ x: Layout, @autoclosure _ y: () -> Layout) -> Layout {
+		return x.fits(width - placed) ? x : y()
 	}
 }
 

@@ -1,5 +1,5 @@
 /// A patch to some part of a `Syntax` tree.
-public enum Patch<A>: CustomDebugStringConvertible {
+public enum Patch<A>: CustomDebugStringConvertible, CustomDocConvertible {
 	case Replace(Fix<A>, Fix<A>)
 	case Insert(Fix<A>)
 	case Delete(Fix<A>)
@@ -50,6 +50,14 @@ public enum Patch<A>: CustomDebugStringConvertible {
 		case let .Delete(a):
 			return ".Delete(\(String(reflecting: a)))"
 		}
+	}
+
+
+	// MARK: CustomDocConvertible
+
+	public var doc: Doc {
+		return (state.before?.doc.bracket("{-", "-}") ?? .Empty)
+			<> (state.after?.doc.bracket("{+", "+}") ?? .Empty)
 	}
 }
 
