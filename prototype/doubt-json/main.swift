@@ -8,6 +8,8 @@ enum JSONLeaf: Equatable, CustomStringConvertible {
 	case Null
 
 
+	// MARK: CustomStringConvertible
+
 	var description: Swift.String {
 		switch self {
 		case let .Number(n):
