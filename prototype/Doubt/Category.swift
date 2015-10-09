@@ -43,6 +43,9 @@ public func == (left: Category, right: Category) -> Bool {
 	return left.tag == right.tag
 }
 
+
+// MARK: - Comparable
+
 public func < (left: Category, right: Category) -> Bool {
 	return left.tag < right.tag
 }
