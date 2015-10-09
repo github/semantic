@@ -94,9 +94,9 @@ extension Syntax {
 		case let .Leaf(a):
 			return ifLeaf(a)
 		case let .Indexed(a):
-			return Doubt.JSON.Array(a.map(ifRecur))
+			return .Array(a.map(ifRecur))
 		case let .Keyed(d):
-			return Doubt.JSON.Dictionary(Dictionary(elements: d.map { ($0, ifRecur($1)) }))
+			return .Dictionary(Dictionary(elements: d.map { ($0, ifRecur($1)) }))
 		}
 	}
 }
