@@ -182,3 +182,9 @@ extension Free where A: CustomJSONConvertible {
 		return JSON(ifPure: ifPure, ifLeaf: { $0.JSON })
 	}
 }
+
+extension Free where A: CustomJSONConvertible, B: PatchConvertible, B.Info == A {
+	public var JSON: Doubt.JSON {
+		return JSON { $0.patch.JSON }
+	}
+}
