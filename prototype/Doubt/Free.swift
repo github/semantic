@@ -165,7 +165,7 @@ extension Free where A: Hashable, B: Hashable {
 }
 
 
-// MARK: - JSONConvertible
+// MARK: - JSON
 
 extension Free {
 	public func JSON(ifPure ifPure: B -> Doubt.JSON, ifLeaf: A -> Doubt.JSON) -> Doubt.JSON {
