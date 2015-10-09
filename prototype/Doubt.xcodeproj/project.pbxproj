@@ -34,14 +34,12 @@
 		D4AAE5481B5AE2D0004E581F /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE53D1B5AE2D0004E581F /* String.swift */; };
 		D4AAE5491B5AE2D0004E581F /* StringLiteralConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE53E1B5AE2D0004E581F /* StringLiteralConvertible.swift */; };
 		D4AAE54A1B5AE2D0004E581F /* Syntax.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4AAE53F1B5AE2D0004E581F /* Syntax.swift */; };
-		D4C2B12E1BB33CEC0096F92A /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435B7471BB31949000902F6 /* main.swift */; };
 		D4C2B12F1BB33D050096F92A /* Doubt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4AAE4FD1B5AE22E004E581F /* Doubt.framework */; };
 		D4C2B1301BB33D080096F92A /* Commandant.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FE71BB055AE00E3C3C1 /* Commandant.framework */; };
 		D4C2B1311BB33D080096F92A /* Result.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FDA1BB0536700E3C3C1 /* Result.framework */; };
 		D4C2B1321BB33D080096F92A /* SWXMLHash.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */; };
 		D4C2B1331BB33D080096F92A /* SwiftXPC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */; };
 		D4C2B1341BB33D080096F92A /* SourceKittenFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */; };
-		D4C2B1351BB33D1D0096F92A /* BoundsCheckedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435B7521BB31BBC000902F6 /* BoundsCheckedArray.swift */; };
 		D4C2B13F1BB3474C0096F92A /* Commandant.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FE71BB055AE00E3C3C1 /* Commandant.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D4C2B1401BB3474C0096F92A /* Result.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FDA1BB0536700E3C3C1 /* Result.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		D4C2B1411BB3474C0096F92A /* SWXMLHash.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -51,6 +49,10 @@
 		D4D7F3171BBB22E500AAB0C0 /* Hash.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4D7F3161BBB22E500AAB0C0 /* Hash.swift */; settings = {ASSET_TAGS = (); }; };
 		D4DF96ED1BC46B630040F41F /* SES.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DF96EC1BC46B630040F41F /* SES.swift */; settings = {ASSET_TAGS = (); }; };
 		D4DF96F61BC576720040F41F /* DocTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DF96F51BC576720040F41F /* DocTests.swift */; settings = {ASSET_TAGS = (); }; };
+		D4DF970A1BC5DF800040F41F /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DF97091BC5DF800040F41F /* main.swift */; settings = {ASSET_TAGS = (); }; };
+		D4DF970B1BC5DF990040F41F /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435B7471BB31949000902F6 /* main.swift */; settings = {ASSET_TAGS = (); }; };
+		D4DF970C1BC5DF9E0040F41F /* BoundsCheckedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435B7521BB31BBC000902F6 /* BoundsCheckedArray.swift */; settings = {ASSET_TAGS = (); }; };
+		D4DF970D1BC5E1B40040F41F /* Doubt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4AAE4FD1B5AE22E004E581F /* Doubt.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -120,6 +122,8 @@
 		D4DF96EC1BC46B630040F41F /* SES.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SES.swift; sourceTree = "<group>"; };
 		D4DF96F01BC54C970040F41F /* Doubt.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = Doubt.modulemap; sourceTree = "<group>"; };
 		D4DF96F51BC576720040F41F /* DocTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DocTests.swift; sourceTree = "<group>"; };
+		D4DF96FB1BC5DF050040F41F /* doubt-json.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "doubt-json.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4DF97091BC5DF800040F41F /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,6 +161,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D4DF96F81BC5DF050040F41F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4DF970D1BC5E1B40040F41F /* Doubt.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -164,7 +176,6 @@
 			isa = PBXGroup;
 			children = (
 				D435B7471BB31949000902F6 /* main.swift */,
-				D435B7521BB31BBC000902F6 /* BoundsCheckedArray.swift */,
 			);
 			path = "doubt-swift";
 			sourceTree = "<group>";
@@ -175,6 +186,7 @@
 				D4AAE4FF1B5AE22E004E581F /* Doubt */,
 				D4AAE5111B5AE22E004E581F /* DoubtTests */,
 				D435B7461BB31949000902F6 /* doubt-swift */,
+				D4DF96FC1BC5DF050040F41F /* doubt-json */,
 				D4AAE4FE1B5AE22E004E581F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -185,6 +197,7 @@
 				D4AAE4FD1B5AE22E004E581F /* Doubt.framework */,
 				D4AAE50D1B5AE22E004E581F /* DoubtTests.xctest */,
 				D435B7581BB32117000902F6 /* doubt-swift.app */,
+				D4DF96FB1BC5DF050040F41F /* doubt-json.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -213,6 +226,7 @@
 				D49FCBC51BBF214300C5E9C3 /* Patch.swift */,
 				D49FCBC71BBF2C4300C5E9C3 /* Algorithm.swift */,
 				D4DF96EC1BC46B630040F41F /* SES.swift */,
+				D435B7521BB31BBC000902F6 /* BoundsCheckedArray.swift */,
 				D4AAE5001B5AE22E004E581F /* Supporting Files */,
 			);
 			path = Doubt;
@@ -241,6 +255,14 @@
 				D40B89C71BC439000078E098 /* Assertions.framework */,
 			);
 			path = DoubtTests;
+			sourceTree = "<group>";
+		};
+		D4DF96FC1BC5DF050040F41F /* doubt-json */ = {
+			isa = PBXGroup;
+			children = (
+				D4DF97091BC5DF800040F41F /* main.swift */,
+			);
+			path = "doubt-json";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -310,6 +332,23 @@
 			productReference = D4AAE50D1B5AE22E004E581F /* DoubtTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		D4DF96FA1BC5DF050040F41F /* doubt-json */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D4DF97071BC5DF060040F41F /* Build configuration list for PBXNativeTarget "doubt-json" */;
+			buildPhases = (
+				D4DF96F71BC5DF050040F41F /* Sources */,
+				D4DF96F81BC5DF050040F41F /* Frameworks */,
+				D4DF96F91BC5DF050040F41F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "doubt-json";
+			productName = "doubt-json";
+			productReference = D4DF96FB1BC5DF050040F41F /* doubt-json.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -329,6 +368,9 @@
 					D4AAE50C1B5AE22E004E581F = {
 						CreatedOnToolsVersion = 7.0;
 					};
+					D4DF96FA1BC5DF050040F41F = {
+						CreatedOnToolsVersion = 7.0.1;
+					};
 				};
 			};
 			buildConfigurationList = D4AAE4F71B5AE22E004E581F /* Build configuration list for PBXProject "Doubt" */;
@@ -347,6 +389,7 @@
 				D4AAE4FC1B5AE22E004E581F /* Doubt */,
 				D4AAE50C1B5AE22E004E581F /* DoubtTests */,
 				D435B7571BB32117000902F6 /* doubt-swift */,
+				D4DF96FA1BC5DF050040F41F /* doubt-json */,
 			);
 		};
 /* End PBXProject section */
@@ -373,6 +416,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D4DF96F91BC5DF050040F41F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -380,8 +430,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D4C2B1351BB33D1D0096F92A /* BoundsCheckedArray.swift in Sources */,
-				D4C2B12E1BB33CEC0096F92A /* main.swift in Sources */,
+				D4DF970B1BC5DF990040F41F /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,6 +454,7 @@
 				D45A36CD1BBC75DF00BE3DDE /* Info.swift in Sources */,
 				D4AAE5461B5AE2D0004E581F /* Parse.swift in Sources */,
 				D49FCBC81BBF2C4300C5E9C3 /* Algorithm.swift in Sources */,
+				D4DF970C1BC5DF9E0040F41F /* BoundsCheckedArray.swift in Sources */,
 				D432D4751BA9D6A400F3FABC /* Memo.swift in Sources */,
 				D40B89C41BC319070078E098 /* Matrix.swift in Sources */,
 				D4AAE5491B5AE2D0004E581F /* StringLiteralConvertible.swift in Sources */,
@@ -419,6 +469,14 @@
 			files = (
 				D4DF96F61BC576720040F41F /* DocTests.swift in Sources */,
 				D432D4711BA9AC0B00F3FABC /* SESTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D4DF96F71BC5DF050040F41F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4DF970A1BC5DF800040F41F /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -621,6 +679,33 @@
 			};
 			name = Release;
 		};
+		D4DF97051BC5DF050040F41F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = "doubt-json/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.antitypical.doubt-json";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D4DF97061BC5DF050040F41F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				INFOPLIST_FILE = "doubt-json/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.antitypical.doubt-json";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -659,6 +744,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		D4DF97071BC5DF060040F41F /* Build configuration list for PBXNativeTarget "doubt-json" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D4DF97051BC5DF050040F41F /* Debug */,
+				D4DF97061BC5DF050040F41F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
