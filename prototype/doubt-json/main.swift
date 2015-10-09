@@ -69,17 +69,17 @@ extension JSON {
 	var term: Term {
 		switch self {
 		case let .Array(a):
-			return .In(.Indexed(a.map { $0.term }))
+			return .Indexed(a.map { $0.term })
 		case let .Dictionary(d):
-			return .In(.Keyed(Swift.Dictionary(elements: d.map { ($0, $1.term) })))
+			return .Keyed(Swift.Dictionary(elements: d.map { ($0, $1.term) }))
 		case let .Number(n):
-			return .In(.Leaf(.Number(n)))
+			return .Leaf(.Number(n))
 		case let .Boolean(b):
-			return .In(.Leaf(.Boolean(b)))
+			return .Leaf(.Boolean(b))
 		case let .String(s):
-			return .In(.Leaf(.String(s)))
+			return .Leaf(.String(s))
 		case .Null:
-			return .In(.Leaf(.Null))
+			return .Leaf(.Null)
 		}
 	}
 }
