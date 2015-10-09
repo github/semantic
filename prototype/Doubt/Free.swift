@@ -113,11 +113,11 @@ extension Free where B: PatchConvertible, B.Info == A {
 	private func discardNullTerms(syntax: Syntax<Term?, A>) -> Term? {
 		switch syntax {
 		case let .Leaf(a):
-			return .In(.Leaf(a))
+			return .Leaf(a)
 		case let .Indexed(a):
-			return .In(.Indexed(a.flatMap(id)))
+			return .Indexed(a.flatMap(id))
 		case let .Keyed(a):
-			return .In(.Keyed(Dictionary(elements: a.flatMap { k, v in v.map { (k, $0) } })))
+			return .Keyed(Dictionary(elements: a.flatMap { k, v in v.map { (k, $0) } }))
 		}
 	}
 
