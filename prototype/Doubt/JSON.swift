@@ -66,6 +66,24 @@ public enum JSON: ArrayLiteralConvertible, BooleanLiteralConvertible, Dictionary
 	}
 
 
+	public var object: AnyObject {
+		switch self {
+		case let .Number(n):
+			return n
+		case let .Boolean(b):
+			return b
+		case let .String(s):
+			return s
+		case let .Array(a):
+			return a.map { $0.object }
+		case let .Dictionary(d):
+			return Swift.Dictionary(elements: d.map { ($0, $1.object) })
+		case .Null:
+			return NSNull()
+		}
+	}
+
+
 	// MARK: ArrayLiteralConvertible
 
 	public init(arrayLiteral: Doubt.JSON...) {
