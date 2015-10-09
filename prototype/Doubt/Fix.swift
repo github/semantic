@@ -56,7 +56,7 @@ extension Fix where A: Hashable {
 }
 
 
-// MARK: JSONConvertible
+// MARK: - JSON
 
 extension Fix {
 	public func JSON(ifLeaf: A -> Doubt.JSON) -> Doubt.JSON {
