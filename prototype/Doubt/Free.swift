@@ -176,3 +176,9 @@ extension Free {
 			})
 	}
 }
+
+extension Free where A: CustomJSONConvertible {
+	public func JSON(ifPure: B -> Doubt.JSON) -> Doubt.JSON {
+		return JSON(ifPure: ifPure, ifLeaf: { $0.JSON })
+	}
+}
