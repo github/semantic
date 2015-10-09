@@ -1,0 +1,613 @@
+{
+	"roll": [{
+		"roll": [{
+			"roll": {
+				"literal": {
+					"source": "Algorithm",
+					"categories": [
+
+					]
+				}
+			}
+		}, {
+			"roll": [{
+				"roll": [{
+					"roll": {
+						"literal": {
+							"source": "Recursive",
+							"categories": [
+
+							]
+						}
+					}
+				}, {
+					"roll": [
+
+					]
+				}]
+			}, {
+				"roll": [{
+					"roll": {
+						"literal": {
+							"source": "ByKey",
+							"categories": [
+
+							]
+						}
+					}
+				}, {
+					"roll": [
+
+					]
+				}]
+			}, {
+				"pure": {
+					"insert": {
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "ByIndex",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}
+				}
+			}, {
+				"roll": {
+					"literal": {
+						"source": "mark",
+						"categories": [
+
+						]
+					}
+				}
+			}, {
+				"roll": [{
+					"roll": {
+						"literal": {
+							"source": "map(_:)",
+							"categories": [
+
+							]
+						}
+					}
+				}, {
+					"roll": [
+
+					]
+				}]
+			}]
+		}]
+	}, {
+		"pure": {
+			"insert": {
+				"in": [{
+					"in": {
+						"literal": {
+							"source": "FreeAlgorithm",
+							"categories": [
+
+							]
+						}
+					}
+				}, {
+					"in": [{
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "Pure",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}, {
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "Roll",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}, {
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "analysis(ifPure:ifRoll:)",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}, {
+						"in": {
+							"literal": {
+								"source": "mark",
+								"categories": [
+
+								]
+							}
+						}
+					}, {
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "map(_:)",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}, {
+						"in": {
+							"literal": {
+								"source": "mark",
+								"categories": [
+
+								]
+							}
+						}
+					}, {
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "flatMap(_:)",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}, {
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "evaluate(_:recur:)",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}]
+				}]
+			}
+		}
+	}, {
+		"pure": {
+			"replace": {
+				"before": {
+					"in": {
+						"literal": {
+							"source": "mark",
+							"categories": [
+
+							]
+						}
+					}
+				},
+				"after": {
+					"in": [{
+						"in": {
+							"literal": {
+								"source": "FreeAlgorithm",
+								"categories": [
+
+								]
+							}
+						}
+					}, {
+						"in": [{
+							"in": [{
+								"in": {
+									"literal": {
+										"source": "evaluate(_:)",
+										"categories": [
+
+										]
+									}
+								}
+							}, {
+								"in": [
+
+								]
+							}]
+						}]
+					}]
+				}
+			}
+		}
+	}, {
+		"pure": {
+			"delete": {
+				"in": [{
+					"in": {
+						"literal": {
+							"source": "Algorithm",
+							"categories": [
+
+							]
+						}
+					}
+				}, {
+					"in": [{
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "evaluate(_:)",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [{
+								"in": [{
+									"in": {
+										"literal": {
+											"source": "copy(_:)",
+											"categories": [
+
+											]
+										}
+									}
+								}, {
+									"in": [
+
+									]
+								}]
+							}]
+						}]
+					}]
+				}]
+			}
+		}
+	}, {
+		"pure": {
+			"delete": {
+				"in": [{
+					"in": {
+						"literal": {
+							"source": "FreeAlgorithm",
+							"categories": [
+
+							]
+						}
+					}
+				}, {
+					"in": [{
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "Pure",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}, {
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "Roll",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}, {
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "analysis(ifPure:ifRoll:)",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}, {
+						"in": {
+							"literal": {
+								"source": "mark",
+								"categories": [
+
+								]
+							}
+						}
+					}, {
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "map(_:)",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}, {
+						"in": {
+							"literal": {
+								"source": "mark",
+								"categories": [
+
+								]
+							}
+						}
+					}, {
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "flatMap(_:)",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}, {
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "evaluate(_:)",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}]
+				}]
+			}
+		}
+	}, {
+		"pure": {
+			"delete": {
+				"in": [{
+					"in": {
+						"literal": {
+							"source": "FreeAlgorithm",
+							"categories": [
+
+							]
+						}
+					}
+				}, {
+					"in": [{
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "evaluate()",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}]
+				}]
+			}
+		}
+	}, {
+		"roll": [{
+			"roll": {
+				"literal": {
+					"source": "FreeConvertible",
+					"categories": [
+
+					]
+				}
+			}
+		}, {
+			"roll": [{
+				"roll": [{
+					"roll": {
+						"literal": {
+							"source": "init(free:)",
+							"categories": [
+
+							]
+						}
+					}
+				}, {
+					"roll": [
+
+					]
+				}]
+			}, {
+				"roll": {
+					"literal": {
+						"source": "free",
+						"categories": [
+
+						]
+					}
+				}
+			}]
+		}]
+	}, {
+		"roll": [{
+			"roll": {
+				"literal": {
+					"source": "Free",
+					"categories": [
+
+					]
+				}
+			}
+		}, {
+			"roll": [{
+				"roll": [{
+					"roll": {
+						"literal": {
+							"source": "init(free:)",
+							"categories": [
+
+							]
+						}
+					}
+				}, {
+					"roll": [
+
+					]
+				}]
+			}, {
+				"roll": {
+					"literal": {
+						"source": "free",
+						"categories": [
+
+						]
+					}
+				}
+			}]
+		}]
+	}, {
+		"roll": [{
+			"roll": {
+				"literal": {
+					"source": "FreeAlgorithm",
+					"categories": [
+
+					]
+				}
+			}
+		}, {
+			"roll": [{
+				"roll": [{
+					"roll": {
+						"literal": {
+							"source": "init(_:_:)",
+							"categories": [
+
+							]
+						}
+					}
+				}, {
+					"roll": [
+
+					]
+				}]
+			}, {
+				"pure": {
+					"insert": {
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "evaluate(_:)",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}
+				}
+			}]
+		}]
+	}, {
+		"pure": {
+			"insert": {
+				"in": [{
+					"in": {
+						"literal": {
+							"source": "FreeAlgorithm",
+							"categories": [
+
+							]
+						}
+					}
+				}, {
+					"in": [{
+						"in": [{
+							"in": {
+								"literal": {
+									"source": "evaluate()",
+									"categories": [
+
+									]
+								}
+							}
+						}, {
+							"in": [
+
+							]
+						}]
+					}]
+				}]
+			}
+		}
+	}]
+}
