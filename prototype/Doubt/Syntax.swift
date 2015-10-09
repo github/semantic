@@ -86,7 +86,7 @@ extension Syntax where Recur: Hashable, A: Hashable {
 }
 
 
-// MARK: - JSONConvertible
+// MARK: - JSON
 
 extension Syntax {
 	public func JSON(ifLeaf ifLeaf: A -> Doubt.JSON, ifRecur: Recur -> Doubt.JSON) -> Doubt.JSON {
