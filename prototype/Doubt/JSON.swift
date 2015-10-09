@@ -1,4 +1,4 @@
-public enum JSON: ArrayLiteralConvertible, BooleanLiteralConvertible, DictionaryLiteralConvertible, Equatable, FloatLiteralConvertible, IntegerLiteralConvertible, JSONConvertible, StringLiteralConvertible {
+public enum JSON: ArrayLiteralConvertible, BooleanLiteralConvertible, DictionaryLiteralConvertible, Equatable, FloatLiteralConvertible, IntegerLiteralConvertible, JSONConvertible, NilLiteralConvertible, StringLiteralConvertible {
 	public typealias ArrayType = [Doubt.JSON]
 	public typealias DictionaryType = [Swift.String:Doubt.JSON]
 
@@ -109,6 +109,13 @@ public enum JSON: ArrayLiteralConvertible, BooleanLiteralConvertible, Dictionary
 
 	public var JSON: Doubt.JSON {
 		return self
+	}
+
+
+	// MARK: NilLiteralConvertible
+
+	public init(nilLiteral: ()) {
+		self = .Null
 	}
 
 
