@@ -1,5 +1,5 @@
 /// Source info & categorization for nodes in a syntax tree.
-public enum Info: AlgebraicHashable, CustomDebugStringConvertible {
+public enum Info: AlgebraicHashable, CustomDebugStringConvertible, CustomJSONConvertible {
 	case Literal(String, Set<Category>)
 
 	public var categories: Set<Category> {
@@ -28,6 +28,21 @@ public enum Info: AlgebraicHashable, CustomDebugStringConvertible {
 			return s
 		case let .Literal(s, c):
 			return s + " (" + c.sort().map { String(reflecting: $0) }.joinWithSeparator(", ") + ")"
+		}
+	}
+
+
+	// MARK: CustomJSONConvertible
+
+	public var JSON: Doubt.JSON {
+		switch self {
+		case let .Literal(source, categories):
+			return .Dictionary([
+				"literal": .Dictionary([
+					"source": .String(source),
+					"categories": .Array(categories.map { $0.JSON })
+				])
+			])
 		}
 	}
 }
