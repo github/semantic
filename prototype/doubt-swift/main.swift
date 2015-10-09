@@ -98,7 +98,7 @@ extension Fix where A: StringConvertible {
 			.map(Structure.init)
 			.map({ $0.dictionary })
 			.map(toAnyObject)
-			.flatMap({ JSON(object: $0).flatMap { Fix(path: path, JSON: $0) } }) else { return nil }
+			.flatMap({ Doubt.JSON(object: $0).flatMap { Fix(path: path, JSON: $0) } }) else { return nil }
 		self = term
 	}
 }
