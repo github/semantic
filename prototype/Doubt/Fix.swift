@@ -63,3 +63,9 @@ extension Fix {
 		return [ "in": out.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifLeaf) }) ]
 	}
 }
+
+extension Fix where A: CustomJSONConvertible {
+	public var JSON: Doubt.JSON {
+		return JSON { $0.JSON }
+	}
+}
