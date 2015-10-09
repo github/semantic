@@ -9,6 +9,9 @@ public enum Category: AlgebraicHashable, Comparable, CustomDebugStringConvertibl
 		}
 	}
 
+
+	// MARK: AlgebraicHashable
+
 	public var hash: Hash {
 		return Hash("Tag", Hash(tag))
 	}
