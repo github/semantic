@@ -37,12 +37,12 @@ public enum Info: AlgebraicHashable, CustomDebugStringConvertible, CustomJSONCon
 	public var JSON: Doubt.JSON {
 		switch self {
 		case let .Literal(source, categories):
-			return .Dictionary([
-				"literal": .Dictionary([
+			return [
+				"literal": [
 					"source": .String(source),
 					"categories": .Array(categories.map { $0.JSON })
-				])
-			])
+				]
+			]
 		}
 	}
 }
