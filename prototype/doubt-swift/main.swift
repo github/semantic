@@ -13,10 +13,16 @@ extension String: StringConvertible {
 	}
 }
 
+extension Info: StringConvertible {
+	public init(string: String) {
+		self = .Literal(string, [])
+	}
+}
+
 private struct Bail: ErrorType {}
 
-extension Term where A: StringConvertible {
-	/// Constructs a Term representing `JSON`.
+extension Fix where A: StringConvertible {
+	/// Constructs a term representing `JSON`.
 	init?(JSON: Doubt.JSON) {
 		func bail<B>() throws -> B {
 			throw Bail()
@@ -29,23 +35,24 @@ extension Term where A: StringConvertible {
 				let kind = d["key.kind"]?.string
 				switch kind {
 				case
-				.Some("source.lang.swift.decl.class"),
-				.Some("source.lang.swift.decl.extension"),
-				.Some("source.lang.swift.decl.enum"),
-				.Some("source.lang.swift.decl.struct"):
-					self = .Branch([ .Leaf(A(string: name)), .Branch(try substructure.map { try Term(JSON: $0) ?? bail() }) ])
+					.Some("source.lang.swift.decl.class"),
+					.Some("source.lang.swift.decl.extension"),
+					.Some("source.lang.swift.decl.enum"),
+					.Some("source.lang.swift.decl.struct"),
+					.Some("source.lang.swift.decl.protocol"):
+					self = .In(.Indexed([ .In(.Leaf(A(string: name))), .In(.Indexed(try substructure.map { try Fix(JSON: $0) ?? bail() })) ]))
 
 				case .Some("source.lang.swift.decl.enumelement"):
 					fallthrough
 				case
-				.Some("source.lang.swift.decl.function.method.instance"),
-				.Some("source.lang.swift.decl.function.free"):
-					self = .Branch([ .Leaf(A(string: name)), .Branch(try substructure.map { try Term(JSON: $0) ?? bail() }) ])
+					.Some("source.lang.swift.decl.function.method.instance"),
+					.Some("source.lang.swift.decl.function.free"):
+					self = .In(.Indexed([ .In(.Leaf(A(string: name))), .In(.Indexed(try substructure.map { try Fix(JSON: $0) ?? bail() })) ]))
 
 				case
-				.Some("source.lang.swift.decl.var.instance"),
-				.Some("source.lang.swift.decl.var.static"):
-					self = .Leaf(A(string: name))
+					.Some("source.lang.swift.decl.var.instance"),
+					.Some("source.lang.swift.decl.var.static"):
+					self = .In(.Leaf(A(string: name)))
 
 				default:
 					return nil
@@ -53,13 +60,10 @@ extension Term where A: StringConvertible {
 
 			case let .Dictionary(d) where d["key.kind"]?.string == "source.lang.swift.decl.enumcase" && d["key.substructure"]?.array?.count == 1:
 				let substructure = d["key.substructure"]?.array ?? []
-				self = try Term(JSON: substructure[0]) ?? bail()
+				self = try Fix(JSON: substructure[0]) ?? bail()
 
 			case let .Dictionary(d) where d["key.kind"]?.string == "source.lang.swift.syntaxtype.comment.mark":
-				self = .Empty
-
-			case .Null:
-				self = .Empty
+				self = .In(.Leaf(A(string: "mark")))
 
 			default:
 				return nil
@@ -69,7 +73,7 @@ extension Term where A: StringConvertible {
 		}
 	}
 
-	/// Constructs a Term representing the `JSON` in a file at `path`.
+	/// Constructs a term representing the `JSON` in a file at `path`.
 	init?(path: String, JSON: Doubt.JSON) {
 		func bail<B>() throws -> B {
 			throw Bail()
@@ -77,7 +81,7 @@ extension Term where A: StringConvertible {
 		do {
 			switch JSON.dictionary?["key.substructure"] {
 			case let .Some(.Array(a)):
-				self = .Roll(.Branch(try a.map { try Term(JSON: $0) ?? bail() }))
+				self = .In(.Indexed(try a.map { try Fix(JSON: $0) ?? bail() }))
 			default:
 				return nil
 			}
@@ -85,23 +89,20 @@ extension Term where A: StringConvertible {
 			return nil
 		}
 	}
-}
 
-extension Term where A: StringConvertible {
 	init?(path: String) {
 		guard path != "/dev/null" else {
-			self = .Empty
-			return
+			return nil
 		}
 		guard let term = File(path: path)
 			.map(Structure.init)
 			.map({ $0.dictionary })
 			.map(toAnyObject)
-			.flatMap({ JSON(object: $0).flatMap { Term(path: path, JSON: $0) } }) else { return nil }
+			.flatMap({ JSON(object: $0).flatMap { Fix(path: path, JSON: $0) } }) else { return nil }
 		self = term
 	}
 }
 
-if let a = arguments[1].flatMap(Term<Info>.init), b = arguments[2].flatMap(Term<Info>.init) {
-	print(String(reflecting: Diff(a, b)))
+if let a = arguments[1].flatMap({ Fix<Info>(path: $0) }), b = arguments[2].flatMap({ Fix<Info>(path: $0) }) {
+	print(String(reflecting: FreeAlgorithm<Info, Free<Info, Patch<Info>>>(a, b).evaluate()))
 }
