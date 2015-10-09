@@ -1,4 +1,4 @@
-public enum JSON: Equatable, JSONConvertible {
+public enum JSON: Equatable, IntegerLiteralConvertible, JSONConvertible {
 	public typealias ArrayType = [Doubt.JSON]
 	public typealias DictionaryType = [Swift.String:Doubt.JSON]
 
@@ -63,6 +63,13 @@ public enum JSON: Equatable, JSONConvertible {
 				return nil
 			}
 		} catch { return nil }
+	}
+
+
+	// MARK: IntegerLiteralConvertible
+
+	public init(integerLiteral: Int) {
+		self = .Number(Double(integerLiteral))
 	}
 
 
