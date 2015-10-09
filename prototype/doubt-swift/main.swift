@@ -104,5 +104,8 @@ extension Fix where A: StringConvertible {
 }
 
 if let a = arguments[1].flatMap({ Fix<Info>(path: $0) }), b = arguments[2].flatMap({ Fix<Info>(path: $0) }) {
-	print(Algorithm<Info, Free<Info, Patch<Info>>>(a, b).evaluate())
+	let diff = Algorithm<Info, Free<Info, Patch<Info>>>(a, b).evaluate()
+	if let JSON = NSString(data: diff.JSON.serialize(), encoding: NSUTF8StringEncoding) {
+		print(JSON)
+	}
 }
