@@ -98,10 +98,15 @@ public func == (left: JSON, right: JSON) -> Bool {
 }
 
 
-/// A type which can be converted to and from JSON.
-public protocol JSONConvertible {
-	init?(JSON: Doubt.JSON)
+/// A type which can be converted to JSON.
+public protocol CustomJSONConvertible {
 	var JSON: Doubt.JSON { get }
+}
+
+
+/// A type which can be converted to and from JSON.
+public protocol JSONConvertible: CustomJSONConvertible {
+	init?(JSON: Doubt.JSON)
 }
 
 
