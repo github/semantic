@@ -111,3 +111,17 @@ public protocol SyntaxConvertible {
 
 	init(syntax: Syntax<RecurType, LeafType>)
 }
+
+extension SyntaxConvertible {
+	static func Leaf(value: LeafType) -> Self {
+		return Self(syntax: .Leaf(value))
+	}
+
+	static func Indexed(children: [RecurType]) -> Self {
+		return Self(syntax: .Indexed(children))
+	}
+
+	static func Keyed(children: [String:RecurType]) -> Self {
+		return Self(syntax: .Keyed(children))
+	}
+}
