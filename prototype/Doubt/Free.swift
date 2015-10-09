@@ -170,9 +170,9 @@ extension Free where A: Hashable, B: Hashable {
 extension Free {
 	public func JSON(ifPure ifPure: B -> Doubt.JSON, ifLeaf: A -> Doubt.JSON) -> Doubt.JSON {
 		return analysis(
-			ifPure: { [ "pure": ifPure($0) ] },
+			ifPure: ifPure,
 			ifRoll: {
-				[ "roll": $0.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifPure: ifPure, ifLeaf: ifLeaf) }) ]
+				$0.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifPure: ifPure, ifLeaf: ifLeaf) })
 			})
 	}
 }
