@@ -87,10 +87,13 @@ public enum Algorithm<A, B> {
 			// Recur structurally into both terms, if compatible, patching paired sub-terms. This is akin to the shape of unification, except that it computes a patched tree instead of a substitution. It’s also a little like a structural zip on the pair of terms.
 			//
 			// At the moment, there are no restrictions on whether terms are compatible, and there is no structure to exploit in terms; therefore, this simplifies to copying if equal, and replacing otherwise.
-			return f(Term.equals(equals)(a, b)
-				? Diff(b)
+			if Term.equals(equals)(a, b) { return f(Diff(b)).evaluate(equals, recur: recur) }
+
+			switch (a, b) {
+			default:
 				// This must not call `recur` with `a` and `b`, as that would infinite loop if actually recursive.
-				: Diff.Pure(.Replace(a, b))).evaluate(equals, recur: recur)
+				return f(Diff.Pure(.Replace(a, b))).evaluate(equals, recur: recur)
+			}
 
 		case let .Roll(.ByKey(a, b, f)):
 			let recur = {
