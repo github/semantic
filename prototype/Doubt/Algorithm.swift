@@ -90,6 +90,9 @@ public enum Algorithm<A, B> {
 			if Term.equals(equals)(a, b) { return f(Diff(b)).evaluate(equals, recur: recur) }
 
 			switch (a.out, b.out) {
+			case let (.Indexed(a), .Indexed(b)) where a.count == b.count:
+				return f(.Indexed(zip(a, b).map(recur))).evaluate(equals, recur: recur)
+
 			default:
 				// This must not call `recur` with `a` and `b`, as that would infinite loop if actually recursive.
 				return f(Diff.Pure(.Replace(a, b))).evaluate(equals, recur: recur)
