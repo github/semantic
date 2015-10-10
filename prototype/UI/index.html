@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+  	<title>semantic-diff</title>
+    <script type="text/javascript">
+    function loadJSON(path, callback) {
+        var request = new XMLHttpRequest();
+        request.overrideMimeType("application/json");
+        request.open('GET', '' + path, true);
+        request.onreadystatechange = function () {
+            if (request.readyState == 4 && (request.status == "200" || request.status == 0)) {
+                callback(request.responseText);
+            }
+        };
+        request.send(null);
+    }
+    </script>
+  </head>
+  <body>
+    <script type="text/javascript">
+    loadJSON('Fixtures/swift.json', function(json) {
+        console.log(json);
+    });
+    </script>
+  </body>
+</html>
