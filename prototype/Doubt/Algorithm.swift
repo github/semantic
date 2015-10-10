@@ -89,7 +89,7 @@ public enum Algorithm<A, B> {
 			// At the moment, there are no restrictions on whether terms are compatible, and there is no structure to exploit in terms; therefore, this simplifies to copying if equal, and replacing otherwise.
 			if Term.equals(equals)(a, b) { return f(Diff(b)).evaluate(equals, recur: recur) }
 
-			switch (a, b) {
+			switch (a.out, b.out) {
 			default:
 				// This must not call `recur` with `a` and `b`, as that would infinite loop if actually recursive.
 				return f(Diff.Pure(.Replace(a, b))).evaluate(equals, recur: recur)
