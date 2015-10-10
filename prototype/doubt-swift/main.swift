@@ -98,11 +98,14 @@ extension Fix where A: StringConvertible {
 			.map(Structure.init)
 			.map({ $0.dictionary })
 			.map(toAnyObject)
-			.flatMap({ JSON(object: $0).flatMap { Fix(path: path, JSON: $0) } }) else { return nil }
+			.flatMap({ Doubt.JSON(object: $0).flatMap { Fix(path: path, JSON: $0) } }) else { return nil }
 		self = term
 	}
 }
 
 if let a = arguments[1].flatMap({ Fix<Info>(path: $0) }), b = arguments[2].flatMap({ Fix<Info>(path: $0) }) {
-	print(FreeAlgorithm<Info, Free<Info, Patch<Info>>>(a, b).evaluate())
+	let diff = Algorithm<Info, Free<Info, Patch<Info>>>(a, b).evaluate()
+	if let JSON = NSString(data: diff.JSON.serialize(), encoding: NSUTF8StringEncoding) {
+		print(JSON)
+	}
 }

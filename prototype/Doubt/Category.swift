@@ -1,4 +1,4 @@
-public enum Category: AlgebraicHashable, Comparable, CustomDebugStringConvertible {
+public enum Category: AlgebraicHashable, Comparable, CustomDebugStringConvertible, CustomJSONConvertible {
 	case Tag(String)
 
 
@@ -8,6 +8,9 @@ public enum Category: AlgebraicHashable, Comparable, CustomDebugStringConvertibl
 			return s
 		}
 	}
+
+
+	// MARK: AlgebraicHashable
 
 	public var hash: Hash {
 		return Hash("Tag", Hash(tag))
@@ -22,11 +25,27 @@ public enum Category: AlgebraicHashable, Comparable, CustomDebugStringConvertibl
 			return ".Tag(\(s))"
 		}
 	}
+
+
+	// MARK: CustomJSONConvertible
+
+	public var JSON: Doubt.JSON {
+		switch self {
+		case let .Tag(s):
+			return [ "tag": .String(s) ]
+		}
+	}
 }
+
+
+// MARK: - Equatable
 
 public func == (left: Category, right: Category) -> Bool {
 	return left.tag == right.tag
 }
+
+
+// MARK: - Comparable
 
 public func < (left: Category, right: Category) -> Bool {
 	return left.tag < right.tag

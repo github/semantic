@@ -84,6 +84,38 @@ extension Patch {
 }
 
 
+// MARK: - JSON
+
+extension Patch {
+	public func JSON(ifLeaf: A -> Doubt.JSON) -> Doubt.JSON {
+		switch self {
+		case let .Replace(a, b):
+			return [
+				"replace": [
+					"before": a.JSON(ifLeaf),
+					"after": b.JSON(ifLeaf),
+				]
+			]
+		case let .Insert(b):
+			return [
+				"insert": b.JSON(ifLeaf),
+			]
+		case let .Delete(a):
+			return [
+				"delete": a.JSON(ifLeaf)
+			]
+		}
+	}
+}
+
+
+extension Patch where A: CustomJSONConvertible {
+	public var JSON: Doubt.JSON {
+		return self.JSON { $0.JSON }
+	}
+}
+
+
 /// A hack to enable constrained extensions on `Free<A, Patch<A>>`.
 public protocol PatchConvertible {
 	typealias Info

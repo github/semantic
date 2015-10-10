@@ -64,6 +64,8 @@ public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F
 }
 
 
+// MARK: - Hashing
+
 extension Syntax {
 	public func hash(ifLeaf ifLeaf: A -> Hash, ifRecur: Recur -> Hash) -> Hash {
 		switch self {
@@ -80,5 +82,21 @@ extension Syntax {
 extension Syntax where Recur: Hashable, A: Hashable {
 	public var hash: Hash {
 		return hash(ifLeaf: Hash.init, ifRecur: Hash.init)
+	}
+}
+
+
+// MARK: - JSON
+
+extension Syntax {
+	public func JSON(ifLeaf ifLeaf: A -> Doubt.JSON, ifRecur: Recur -> Doubt.JSON) -> Doubt.JSON {
+		switch self {
+		case let .Leaf(a):
+			return ifLeaf(a)
+		case let .Indexed(a):
+			return .Array(a.map(ifRecur))
+		case let .Keyed(d):
+			return .Dictionary(Dictionary(elements: d.map { ($0, ifRecur($1)) }))
+		}
 	}
 }
