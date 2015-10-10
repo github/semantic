@@ -100,3 +100,28 @@ extension Syntax {
 		}
 	}
 }
+
+
+// MARK: - Construction
+
+/// SyntaxConvertible types can be constructed with the same constructors available on Syntax itself, as a convenience.
+public protocol SyntaxConvertible {
+	typealias RecurType
+	typealias LeafType
+
+	init(syntax: Syntax<RecurType, LeafType>)
+}
+
+extension SyntaxConvertible {
+	public static func Leaf(value: LeafType) -> Self {
+		return Self(syntax: .Leaf(value))
+	}
+
+	public static func Indexed(children: [RecurType]) -> Self {
+		return Self(syntax: .Indexed(children))
+	}
+
+	public static func Keyed(children: [String:RecurType]) -> Self {
+		return Self(syntax: .Keyed(children))
+	}
+}

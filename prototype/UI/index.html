@@ -2,6 +2,20 @@
 <html>
   <head>
   	<title>semantic-diff</title>
+    <style type="text/css">
+    #left {
+        position: absolute;
+        left: 0; top: 0;
+        width: 50%;
+        outline: 1px solid green;
+    }
+    #right {
+        position: absolute;
+        right: 0; top: 0;
+        width: 50%;
+        outline: 1px solid red;
+    }
+    </style>
     <script type="text/javascript">
     function loadJSON(path, callback) {
         var request = new XMLHttpRequest();
@@ -9,7 +23,7 @@
         request.open('GET', '' + path, true);
         request.onreadystatechange = function () {
             if (request.readyState == 4 && (request.status == "200" || request.status == 0)) {
-                callback(request.responseText);
+                callback(JSON.parse(request.responseText));
             }
         };
         request.send(null);
@@ -17,8 +31,10 @@
     </script>
   </head>
   <body>
+    <div id="left"></div>
+    <div id="right"></div>
     <script type="text/javascript">
-    loadJSON('Fixtures/swift.json', function(json) {
+    loadJSON('Fixtures/swift.json', function (json) {
         console.log(json);
     });
     </script>

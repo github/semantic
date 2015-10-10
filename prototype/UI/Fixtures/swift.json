@@ -1,613 +1,478 @@
-{
-	"roll": [{
-		"roll": [{
-			"roll": {
-				"literal": {
-					"source": "Algorithm",
-					"categories": [
+[
+	[{
+			"literal": {
+				"source": "Algorithm",
+				"categories": [
 
-					]
-				}
+				]
 			}
-		}, {
-			"roll": [{
-				"roll": [{
-					"roll": {
-						"literal": {
-							"source": "Recursive",
-							"categories": [
-
-							]
-						}
-					}
-				}, {
-					"roll": [
-
-					]
-				}]
-			}, {
-				"roll": [{
-					"roll": {
-						"literal": {
-							"source": "ByKey",
-							"categories": [
-
-							]
-						}
-					}
-				}, {
-					"roll": [
-
-					]
-				}]
-			}, {
-				"pure": {
-					"insert": {
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "ByIndex",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}
-				}
-			}, {
-				"roll": {
+		},
+		[
+			[{
 					"literal": {
-						"source": "mark",
+						"source": "Recursive",
 						"categories": [
 
 						]
-					}
-				}
-			}, {
-				"roll": [{
-					"roll": {
-						"literal": {
-							"source": "map(_:)",
-							"categories": [
-
-							]
-						}
-					}
-				}, {
-					"roll": [
-
-					]
-				}]
-			}]
-		}]
-	}, {
-		"pure": {
-			"insert": {
-				"in": [{
-					"in": {
-						"literal": {
-							"source": "FreeAlgorithm",
-							"categories": [
-
-							]
-						}
-					}
-				}, {
-					"in": [{
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "Pure",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}, {
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "Roll",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}, {
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "analysis(ifPure:ifRoll:)",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}, {
-						"in": {
-							"literal": {
-								"source": "mark",
-								"categories": [
-
-								]
-							}
-						}
-					}, {
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "map(_:)",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}, {
-						"in": {
-							"literal": {
-								"source": "mark",
-								"categories": [
-
-								]
-							}
-						}
-					}, {
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "flatMap(_:)",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}, {
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "evaluate(_:recur:)",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}]
-				}]
-			}
-		}
-	}, {
-		"pure": {
-			"replace": {
-				"before": {
-					"in": {
-						"literal": {
-							"source": "mark",
-							"categories": [
-
-							]
-						}
 					}
 				},
-				"after": {
-					"in": [{
-						"in": {
-							"literal": {
-								"source": "FreeAlgorithm",
-								"categories": [
+				[
 
-								]
-							}
-						}
-					}, {
-						"in": [{
-							"in": [{
-								"in": {
-									"literal": {
-										"source": "evaluate(_:)",
-										"categories": [
-
-										]
-									}
-								}
-							}, {
-								"in": [
-
-								]
-							}]
-						}]
-					}]
-				}
-			}
-		}
-	}, {
-		"pure": {
-			"delete": {
-				"in": [{
-					"in": {
-						"literal": {
-							"source": "Algorithm",
-							"categories": [
-
-							]
-						}
-					}
-				}, {
-					"in": [{
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "evaluate(_:)",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [{
-								"in": [{
-									"in": {
-										"literal": {
-											"source": "copy(_:)",
-											"categories": [
-
-											]
-										}
-									}
-								}, {
-									"in": [
-
-									]
-								}]
-							}]
-						}]
-					}]
-				}]
-			}
-		}
-	}, {
-		"pure": {
-			"delete": {
-				"in": [{
-					"in": {
-						"literal": {
-							"source": "FreeAlgorithm",
-							"categories": [
-
-							]
-						}
-					}
-				}, {
-					"in": [{
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "Pure",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}, {
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "Roll",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}, {
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "analysis(ifPure:ifRoll:)",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}, {
-						"in": {
-							"literal": {
-								"source": "mark",
-								"categories": [
-
-								]
-							}
-						}
-					}, {
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "map(_:)",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}, {
-						"in": {
-							"literal": {
-								"source": "mark",
-								"categories": [
-
-								]
-							}
-						}
-					}, {
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "flatMap(_:)",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}, {
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "evaluate(_:)",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}]
-				}]
-			}
-		}
-	}, {
-		"pure": {
-			"delete": {
-				"in": [{
-					"in": {
-						"literal": {
-							"source": "FreeAlgorithm",
-							"categories": [
-
-							]
-						}
-					}
-				}, {
-					"in": [{
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "evaluate()",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}]
-				}]
-			}
-		}
-	}, {
-		"roll": [{
-			"roll": {
-				"literal": {
-					"source": "FreeConvertible",
-					"categories": [
-
-					]
-				}
-			}
-		}, {
-			"roll": [{
-				"roll": [{
-					"roll": {
-						"literal": {
-							"source": "init(free:)",
-							"categories": [
-
-							]
-						}
-					}
-				}, {
-					"roll": [
-
-					]
-				}]
-			}, {
-				"roll": {
+				]
+			],
+			[{
 					"literal": {
-						"source": "free",
+						"source": "ByKey",
 						"categories": [
 
 						]
 					}
-				}
-			}]
-		}]
-	}, {
-		"roll": [{
-			"roll": {
-				"literal": {
-					"source": "Free",
-					"categories": [
+				},
+				[
 
-					]
-				}
-			}
-		}, {
-			"roll": [{
-				"roll": [{
-					"roll": {
+				]
+			], {
+				"insert": [{
 						"literal": {
-							"source": "init(free:)",
+							"source": "ByIndex",
 							"categories": [
 
 							]
 						}
-					}
-				}, {
-					"roll": [
+					},
+					[
 
 					]
-				}]
+				]
 			}, {
-				"roll": {
+				"literal": {
+					"source": "mark",
+					"categories": [
+
+					]
+				}
+			},
+			[{
 					"literal": {
-						"source": "free",
+						"source": "map(_:)",
 						"categories": [
 
 						]
 					}
-				}
-			}]
-		}]
-	}, {
-		"roll": [{
-			"roll": {
+				},
+				[
+
+				]
+			]
+		]
+	], {
+		"insert": [{
 				"literal": {
 					"source": "FreeAlgorithm",
 					"categories": [
 
 					]
 				}
-			}
-		}, {
-			"roll": [{
-				"roll": [{
-					"roll": {
+			},
+			[
+				[{
 						"literal": {
-							"source": "init(_:_:)",
+							"source": "Pure",
 							"categories": [
 
 							]
 						}
-					}
-				}, {
-					"roll": [
+					},
+					[
 
 					]
-				}]
-			}, {
-				"pure": {
-					"insert": {
-						"in": [{
-							"in": {
-								"literal": {
-									"source": "evaluate(_:)",
-									"categories": [
-
-									]
-								}
-							}
-						}, {
-							"in": [
-
-							]
-						}]
-					}
-				}
-			}]
-		}]
-	}, {
-		"pure": {
-			"insert": {
-				"in": [{
-					"in": {
+				],
+				[{
 						"literal": {
-							"source": "FreeAlgorithm",
+							"source": "Roll",
 							"categories": [
 
 							]
 						}
+					},
+					[
+
+					]
+				],
+				[{
+						"literal": {
+							"source": "analysis(ifPure:ifRoll:)",
+							"categories": [
+
+							]
+						}
+					},
+					[
+
+					]
+				], {
+					"literal": {
+						"source": "mark",
+						"categories": [
+
+						]
 					}
-				}, {
-					"in": [{
-						"in": [{
-							"in": {
+				},
+				[{
+						"literal": {
+							"source": "map(_:)",
+							"categories": [
+
+							]
+						}
+					},
+					[
+
+					]
+				], {
+					"literal": {
+						"source": "mark",
+						"categories": [
+
+						]
+					}
+				},
+				[{
+						"literal": {
+							"source": "flatMap(_:)",
+							"categories": [
+
+							]
+						}
+					},
+					[
+
+					]
+				],
+				[{
+						"literal": {
+							"source": "evaluate(_:recur:)",
+							"categories": [
+
+							]
+						}
+					},
+					[
+
+					]
+				]
+			]
+		]
+	}, {
+		"replace": {
+			"before": {
+				"literal": {
+					"source": "mark",
+					"categories": [
+
+					]
+				}
+			},
+			"after": [{
+					"literal": {
+						"source": "FreeAlgorithm",
+						"categories": [
+
+						]
+					}
+				},
+				[
+					[{
+							"literal": {
+								"source": "evaluate(_:)",
+								"categories": [
+
+								]
+							}
+						},
+						[
+
+						]
+					]
+				]
+			]
+		}
+	}, {
+		"delete": [{
+				"literal": {
+					"source": "Algorithm",
+					"categories": [
+
+					]
+				}
+			},
+			[
+				[{
+						"literal": {
+							"source": "evaluate(_:)",
+							"categories": [
+
+							]
+						}
+					},
+					[
+						[{
 								"literal": {
-									"source": "evaluate()",
+									"source": "copy(_:)",
 									"categories": [
 
 									]
 								}
-							}
-						}, {
-							"in": [
+							},
+							[
 
 							]
-						}]
-					}]
-				}]
+						]
+					]
+				]
+			]
+		]
+	}, {
+		"delete": [{
+				"literal": {
+					"source": "FreeAlgorithm",
+					"categories": [
+
+					]
+				}
+			},
+			[
+				[{
+						"literal": {
+							"source": "Pure",
+							"categories": [
+
+							]
+						}
+					},
+					[
+
+					]
+				],
+				[{
+						"literal": {
+							"source": "Roll",
+							"categories": [
+
+							]
+						}
+					},
+					[
+
+					]
+				],
+				[{
+						"literal": {
+							"source": "analysis(ifPure:ifRoll:)",
+							"categories": [
+
+							]
+						}
+					},
+					[
+
+					]
+				], {
+					"literal": {
+						"source": "mark",
+						"categories": [
+
+						]
+					}
+				},
+				[{
+						"literal": {
+							"source": "map(_:)",
+							"categories": [
+
+							]
+						}
+					},
+					[
+
+					]
+				], {
+					"literal": {
+						"source": "mark",
+						"categories": [
+
+						]
+					}
+				},
+				[{
+						"literal": {
+							"source": "flatMap(_:)",
+							"categories": [
+
+							]
+						}
+					},
+					[
+
+					]
+				],
+				[{
+						"literal": {
+							"source": "evaluate(_:)",
+							"categories": [
+
+							]
+						}
+					},
+					[
+
+					]
+				]
+			]
+		]
+	}, {
+		"delete": [{
+				"literal": {
+					"source": "FreeAlgorithm",
+					"categories": [
+
+					]
+				}
+			},
+			[
+				[{
+						"literal": {
+							"source": "evaluate()",
+							"categories": [
+
+							]
+						}
+					},
+					[
+
+					]
+				]
+			]
+		]
+	},
+	[{
+			"literal": {
+				"source": "FreeConvertible",
+				"categories": [
+
+				]
 			}
-		}
-	}]
-}
+		},
+		[
+			[{
+					"literal": {
+						"source": "init(free:)",
+						"categories": [
+
+						]
+					}
+				},
+				[
+
+				]
+			], {
+				"literal": {
+					"source": "free",
+					"categories": [
+
+					]
+				}
+			}
+		]
+	],
+	[{
+			"literal": {
+				"source": "Free",
+				"categories": [
+
+				]
+			}
+		},
+		[
+			[{
+					"literal": {
+						"source": "init(free:)",
+						"categories": [
+
+						]
+					}
+				},
+				[
+
+				]
+			], {
+				"literal": {
+					"source": "free",
+					"categories": [
+
+					]
+				}
+			}
+		]
+	],
+	[{
+			"literal": {
+				"source": "FreeAlgorithm",
+				"categories": [
+
+				]
+			}
+		},
+		[
+			[{
+					"literal": {
+						"source": "init(_:_:)",
+						"categories": [
+
+						]
+					}
+				},
+				[
+
+				]
+			], {
+				"insert": [{
+						"literal": {
+							"source": "evaluate(_:)",
+							"categories": [
+
+							]
+						}
+					},
+					[
+
+					]
+				]
+			}
+		]
+	], {
+		"insert": [{
+				"literal": {
+					"source": "FreeAlgorithm",
+					"categories": [
+
+					]
+				}
+			},
+			[
+				[{
+						"literal": {
+							"source": "evaluate()",
+							"categories": [
+
+							]
+						}
+					},
+					[
+
+					]
+				]
+			]
+		]
+	}
+]

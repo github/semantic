@@ -5,7 +5,7 @@
 /// `Syntax` is a non-recursive type parameterized by the type of its child nodes. Instantiating it to `Free` makes it recursive through the `Roll` case, and allows it to wrap values of type `B` through the `Pure` case.
 ///
 /// In Doubt, this allows us to represent diffs as values of the `Free` monad obtained from `Syntax`, injecting `Patch` into the tree; or otherwise put, a diff is a tree of mutually-recursive `Free.Roll`/`Syntax` nodes with `Pure` nodes injecting the actual changes.
-public enum Free<A, B>: CustomDebugStringConvertible, CustomDocConvertible {
+public enum Free<A, B>: CustomDebugStringConvertible, CustomDocConvertible, SyntaxConvertible {
 	/// The injection of a value of type `B` into the `Syntax` tree.
 	case Pure(B)
 
@@ -97,6 +97,13 @@ public enum Free<A, B>: CustomDebugStringConvertible, CustomDocConvertible {
 			return s.doc
 		}
 	}
+
+
+	// MARK: SyntaxConvertible
+
+	public init(syntax: Syntax<Free, A>) {
+		self = .Roll(syntax)
+	}
 }
 
 
@@ -106,11 +113,11 @@ extension Free where B: PatchConvertible, B.Info == A {
 	private func discardNullTerms(syntax: Syntax<Term?, A>) -> Term? {
 		switch syntax {
 		case let .Leaf(a):
-			return .In(.Leaf(a))
+			return .Leaf(a)
 		case let .Indexed(a):
-			return .In(.Indexed(a.flatMap(id)))
+			return .Indexed(a.flatMap(id))
 		case let .Keyed(a):
-			return .In(.Keyed(Dictionary(elements: a.flatMap { k, v in v.map { (k, $0) } })))
+			return .Keyed(Dictionary(elements: a.flatMap { k, v in v.map { (k, $0) } }))
 		}
 	}
 
@@ -170,9 +177,9 @@ extension Free where A: Hashable, B: Hashable {
 extension Free {
 	public func JSON(ifPure ifPure: B -> Doubt.JSON, ifLeaf: A -> Doubt.JSON) -> Doubt.JSON {
 		return analysis(
-			ifPure: { [ "pure": ifPure($0) ] },
+			ifPure: ifPure,
 			ifRoll: {
-				[ "roll": $0.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifPure: ifPure, ifLeaf: ifLeaf) }) ]
+				$0.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifPure: ifPure, ifLeaf: ifLeaf) })
 			})
 	}
 }
