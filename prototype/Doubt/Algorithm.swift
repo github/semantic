@@ -93,6 +93,9 @@ public enum Algorithm<A, B> {
 			case let (.Indexed(a), .Indexed(b)) where a.count == b.count:
 				return f(.Indexed(zip(a, b).map(recur))).evaluate(equals, recur: recur)
 
+			case let (.Keyed(a), .Keyed(b)) where Array(a.keys) == Array(b.keys):
+				return f(.Keyed(Dictionary(elements: b.keys.map { ($0, recur(a[$0]!, b[$0]!)) }))).evaluate(equals, recur: recur)
+
 			default:
 				// This must not call `recur` with `a` and `b`, as that would infinite loop if actually recursive.
 				return f(Diff.Pure(.Replace(a, b))).evaluate(equals, recur: recur)
