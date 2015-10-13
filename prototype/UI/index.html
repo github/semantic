@@ -29,37 +29,37 @@
     }
 
     function toDOM(json) {
-        var div = document.createElement("div");
+        var node = document.createElement("div");
         if (json instanceof Array) {
             for (index in json) {
-                div.appendChild(toDOM(json[index]));
+                node.appendChild(toDOM(json[index]));
             }
         } else if (json instanceof Object) {
             if (json['source'] != null) {
-                div.textContent = json['source'];
+                node.textContent = json['source'];
             } else if (json['insert'] != null) {
-                div.classList.add('insert');
-                div.appendChild(toDOM(json['insert']));
+                node.classList.add('insert');
+                node.appendChild(toDOM(json['insert']));
             } else if (json['delete'] != null) {
-                div.classList.add('delete');
-                div.appendChild(toDOM(json['delete']));
+                node.classList.add('delete');
+                node.appendChild(toDOM(json['delete']));
             } else if (json['replace'] != null) {
-                div.classList.add('replace');
-                div.appendChild(toDOM(json['replace']));
+                node.classList.add('replace');
+                node.appendChild(toDOM(json['replace']));
             } else if (json['before'] != null) {
-                div.classList.add('delete');
-                div.appendChild(toDOM(json['before']));
+                node.classList.add('delete');
+                node.appendChild(toDOM(json['before']));
             } else if (json['after'] != null) {
-                div.classList.add('insert');
-                div.appendChild(toDOM(json['after']));
+                node.classList.add('insert');
+                node.appendChild(toDOM(json['after']));
             }
             if (json['categories'] != null) {
                 for (index in json['categories']) {
-                    div.classList.add('category-'+json['categories'][index]);
+                    node.classList.add('category-'+json['categories'][index]);
                 }
             }
         }
-        return div;
+        return node;
     }
     </script>
   </head>
