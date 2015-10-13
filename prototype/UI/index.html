@@ -34,7 +34,7 @@
         if (json instanceof Array) {
             console.log("it's an array");
             for (index in json) {
-                console.log(json[index]);
+                div.appendChild(toDOM(json[index]));
             }
         } else if (json instanceof Object) {
             for (key in json) {
