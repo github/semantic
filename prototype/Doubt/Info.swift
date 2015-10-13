@@ -38,10 +38,8 @@ public enum Info: AlgebraicHashable, CustomDebugStringConvertible, CustomJSONCon
 		switch self {
 		case let .Literal(source, categories):
 			return [
-				"literal": [
-					"source": .String(source),
-					"categories": .Array(categories.map { $0.JSON })
-				]
+				"source": .String(source),
+				"categories": .Array(categories.map { $0.JSON }),
 			]
 		}
 	}
