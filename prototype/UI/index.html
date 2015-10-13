@@ -40,6 +40,11 @@
             if (json['source'] != null) {
                 div.textContent = json['source'];
             }
+            if (json['categories'] != null) {
+                for (index in json['categories']) {
+                    div.classList.add(json['categories'][index]);
+                }
+            }
             for (key in json) {
                 console.log(key);
             }
