@@ -35,12 +35,14 @@
     }
 
     function toDOM(json) {
-        var node = document.createElement("div");
+        var node;
         if (json instanceof Array) {
+            node = document.createElement("ol");
             for (index in json) {
                 node.appendChild(toDOM(json[index]));
             }
         } else if (json instanceof Object) {
+            node = document.createElement("div");
             if (json['source'] != null) {
                 node.textContent = json['source'];
             } else if (json['insert'] != null) {
