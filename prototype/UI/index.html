@@ -24,6 +24,7 @@
     }
 
     function wrap(tagName, element) {
+        if (element == null) { return null; }
         var node = document.createElement(tagName);
         node.appendChild(element);
         return node;
