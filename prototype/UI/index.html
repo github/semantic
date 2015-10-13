@@ -30,6 +30,7 @@
     }
 
     function toDOM(json) {
+        var div = document.createElement("div");
         if (json instanceof Array) {
             console.log("it's an array");
             for (index in json) {
@@ -40,6 +41,7 @@
                 console.log(key);
             }
         }
+        return div;
     }
     </script>
   </head>
