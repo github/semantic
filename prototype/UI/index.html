@@ -47,6 +47,12 @@
             } else if (json['replace'] != null) {
                 div.classList.add('replace');
                 div.appendChild(toDOM(json['replace']));
+            } else if (json['before'] != null) {
+                div.classList.add('delete');
+                div.appendChild(toDOM(json['before']));
+            } else if (json['after'] != null) {
+                div.classList.add('insert');
+                div.appendChild(toDOM(json['after']));
             }
             if (json['categories'] != null) {
                 for (index in json['categories']) {
