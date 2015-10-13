@@ -44,6 +44,9 @@
             } else if (json['delete'] != null) {
                 div.classList.add('delete');
                 div.appendChild(toDOM(json['delete']));
+            } else if (json['replace'] != null) {
+                div.classList.add('replace');
+                div.appendChild(toDOM(json['replace']));
             }
             if (json['categories'] != null) {
                 for (index in json['categories']) {
