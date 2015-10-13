@@ -28,6 +28,12 @@
         request.send(null);
     }
 
+    function wrap(tagName, element) {
+        var node = document.createElement(tagName);
+        node.appendChild(element);
+        return node;
+    }
+
     function toDOM(json) {
         var node = document.createElement("div");
         if (json instanceof Array) {
