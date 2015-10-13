@@ -39,7 +39,7 @@
         if (json instanceof Array) {
             node = document.createElement("ol");
             for (index in json) {
-                node.appendChild(toDOM(json[index]));
+                node.appendChild(wrap("li", toDOM(json[index])));
             }
         } else if (json instanceof Object) {
             node = document.createElement("div");
