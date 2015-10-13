@@ -57,18 +57,8 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 			let down = (down, Diff.Pure(Patch.Insert(b[j])), costOfStream(down))
 			let diagonal = recur(a[i], b[j]).map { (diagonal, $0, costOfStream(diagonal)) }
 			// nominate the best edge to continue along
-			if let diagonal = diagonal {
-				let (best, diff, _) = min(
-					diagonal,
-					right,
-					down) { $0.2 < $1.2 }
-				return cons(diff, rest: best)
-			} else {
-				let (best, diff, _) = min(
-					right,
-					down) { $0.2 < $1.2 }
-				return cons(diff, rest: best)
-			}
+			let (best, diff, _) = diagonal.map { min($0, right, down) { $0.2 < $1.2 } } ?? min(right, down) { $0.2 < $1.2 }
+			return cons(diff, rest: best)
 		}
 
 		// right extent of the edit graph; can only move down
