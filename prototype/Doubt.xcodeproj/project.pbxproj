@@ -13,6 +13,18 @@
 		D42F096C1BCCC41600B95610 /* Memo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09681BCCC41600B95610 /* Memo.framework */; };
 		D42F096D1BCCC41600B95610 /* Prelude.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09691BCCC41600B95610 /* Prelude.framework */; };
 		D42F096E1BCCC41600B95610 /* Stream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F096A1BCCC41600B95610 /* Stream.framework */; };
+		D42F096F1BCCC5C900B95610 /* Either.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09671BCCC41600B95610 /* Either.framework */; };
+		D42F09701BCCC5C900B95610 /* Memo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09681BCCC41600B95610 /* Memo.framework */; };
+		D42F09711BCCC5C900B95610 /* Prelude.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09691BCCC41600B95610 /* Prelude.framework */; };
+		D42F09721BCCC5C900B95610 /* Stream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F096A1BCCC41600B95610 /* Stream.framework */; };
+		D42F09731BCCC5CE00B95610 /* Either.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09671BCCC41600B95610 /* Either.framework */; };
+		D42F09741BCCC5CE00B95610 /* Memo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09681BCCC41600B95610 /* Memo.framework */; };
+		D42F09751BCCC5CE00B95610 /* Prelude.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09691BCCC41600B95610 /* Prelude.framework */; };
+		D42F09761BCCC5CE00B95610 /* Stream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F096A1BCCC41600B95610 /* Stream.framework */; };
+		D42F09771BCCC5DC00B95610 /* Either.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09671BCCC41600B95610 /* Either.framework */; };
+		D42F09781BCCC5DC00B95610 /* Memo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09681BCCC41600B95610 /* Memo.framework */; };
+		D42F09791BCCC5DC00B95610 /* Prelude.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09691BCCC41600B95610 /* Prelude.framework */; };
+		D42F097A1BCCC5DC00B95610 /* Stream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F096A1BCCC41600B95610 /* Stream.framework */; };
 		D432D4711BA9AC0B00F3FABC /* SESTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4701BA9AC0B00F3FABC /* SESTests.swift */; };
 		D4413FEF1BB06D4C00E3C3C1 /* Dictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4413FEE1BB06D4C00E3C3C1 /* Dictionary.swift */; };
 		D4413FF11BB08FDC00E3C3C1 /* JSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4413FF01BB08FDC00E3C3C1 /* JSON.swift */; };
@@ -134,6 +146,10 @@
 				D4C2B1321BB33D080096F92A /* SWXMLHash.framework in Frameworks */,
 				D4C2B1331BB33D080096F92A /* SwiftXPC.framework in Frameworks */,
 				D4C2B1341BB33D080096F92A /* SourceKittenFramework.framework in Frameworks */,
+				D42F096F1BCCC5C900B95610 /* Either.framework in Frameworks */,
+				D42F09701BCCC5C900B95610 /* Memo.framework in Frameworks */,
+				D42F09711BCCC5C900B95610 /* Prelude.framework in Frameworks */,
+				D42F09721BCCC5C900B95610 /* Stream.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -154,6 +170,10 @@
 			files = (
 				D40B89C81BC439000078E098 /* Assertions.framework in Frameworks */,
 				D4AAE50E1B5AE22E004E581F /* Doubt.framework in Frameworks */,
+				D42F09771BCCC5DC00B95610 /* Either.framework in Frameworks */,
+				D42F09781BCCC5DC00B95610 /* Memo.framework in Frameworks */,
+				D42F09791BCCC5DC00B95610 /* Prelude.framework in Frameworks */,
+				D42F097A1BCCC5DC00B95610 /* Stream.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -162,6 +182,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4DF970D1BC5E1B40040F41F /* Doubt.framework in Frameworks */,
+				D42F09731BCCC5CE00B95610 /* Either.framework in Frameworks */,
+				D42F09741BCCC5CE00B95610 /* Memo.framework in Frameworks */,
+				D42F09751BCCC5CE00B95610 /* Prelude.framework in Frameworks */,
+				D42F09761BCCC5CE00B95610 /* Stream.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
