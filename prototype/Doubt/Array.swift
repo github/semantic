@@ -1,5 +1,5 @@
-extension Array {
-	static func cons(head: Element, _ tail: Array) -> Array {
-		return [head] + tail
+extension RangeReplaceableCollectionType {
+	static func cons(head: Generator.Element, _ tail: Self) -> Self {
+		return [ head ] + tail
 	}
 }
