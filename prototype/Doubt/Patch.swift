@@ -16,17 +16,6 @@ public enum Patch<A>: CustomDebugStringConvertible, CustomDocConvertible {
 	}
 
 
-	/// The cost of a patch to the diff.
-	public var cost: Int {
-		switch self {
-		case .Replace:
-			return 2
-		default:
-			return 1
-		}
-	}
-
-
 	public var inverse: Patch {
 		switch self {
 		case let .Replace(a, b):
