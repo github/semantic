@@ -38,7 +38,7 @@
         } else if (json instanceof Object) {
             if (json['source'] != null) {
                 div.textContent = json['source'];
-            } else if (json['insert']) {
+            } else if (json['insert'] != null) {
                 div.classList.add('insert');
                 div.appendChild(toDOM(json['insert']));
             } else if (json['delete'] != null) {
