@@ -44,6 +44,7 @@
         } else if (json instanceof Object) {
             node = document.createElement("div");
             if (json['source'] != null) {
+                node = document.createElement("p");
                 node.textContent = json['source'];
             } else if (json['insert'] != null) {
                 node.classList.add('insert');
