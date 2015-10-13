@@ -37,6 +37,9 @@
                 div.appendChild(toDOM(json[index]));
             }
         } else if (json instanceof Object) {
+            if (json['source'] != null) {
+                div.textContent = json['source'];
+            }
             for (key in json) {
                 console.log(key);
             }
