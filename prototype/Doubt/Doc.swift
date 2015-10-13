@@ -105,7 +105,7 @@ extension SequenceType where Generator.Element == Doc {
 				return combine(x, fold(rest.value))
 			}
 		}
-		return fold(Stream(sequence: self))
+		return fold(Stream(self))
 	}
 
 	public func spread() -> Doc {
@@ -210,3 +210,7 @@ private func == (left: Layout, right: Layout) -> Bool {
 		return false
 	}
 }
+
+
+import Memo
+import Stream

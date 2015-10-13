@@ -46,3 +46,6 @@ private func constructRowMajor<A>(width: Int, height: Int, @noescape forEach: (I
 	}
 	return values
 }
+
+
+import Memo

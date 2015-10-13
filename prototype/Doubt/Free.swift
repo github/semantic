@@ -195,3 +195,6 @@ extension Free where A: CustomJSONConvertible, B: PatchConvertible, B.Info == A 
 		return JSON { $0.patch.JSON }
 	}
 }
+
+
+import Prelude

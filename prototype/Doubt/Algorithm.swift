@@ -159,3 +159,6 @@ extension Algorithm where A: Equatable, B: FreeConvertible, B.RollType == A, B.P
 		return evaluate(==)
 	}
 }
+
+
+import Prelude

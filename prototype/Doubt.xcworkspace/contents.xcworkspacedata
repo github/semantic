@@ -22,4 +22,16 @@
    <FileRef
       location = "group:External/SourceKitten/Carthage/Checkouts/SWXMLHash/SWXMLHash.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:External/Stream/Stream.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:External/Stream/Carthage/Checkouts/Memo/Memo.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:External/Stream/Carthage/Checkouts/Either/Either.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:External/Stream/Carthage/Checkouts/Prelude/Prelude.xcodeproj">
+   </FileRef>
 </Workspace>
