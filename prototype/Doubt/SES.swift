@@ -9,7 +9,7 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 	if b.isEmpty { return a.map { Diff.Pure(Patch.Delete($0)) } }
 
 	func cost(diff: Diff) -> Int {
-		return diff.map { $0.cost }.iterate { syntax in
+		return diff.map(const(1)).iterate { syntax in
 			switch syntax {
 			case .Leaf:
 				return 0
@@ -80,4 +80,5 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 
 
 import Memo
+import Prelude
 import Stream
