@@ -42,7 +42,7 @@
             }
             if (json['categories'] != null) {
                 for (index in json['categories']) {
-                    div.classList.add(json['categories'][index]);
+                    div.classList.add('category-'+json['categories'][index]);
                 }
             }
             for (key in json) {
