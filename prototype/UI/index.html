@@ -3,17 +3,18 @@
   <head>
   	<title>semantic-diff</title>
     <style type="text/css">
-    #left {
-        position: absolute;
-        left: 0; top: 0;
-        width: 50%;
-        outline: 1px solid green;
+    .insert {
+        background-color: #eaffea;
+        outline: 1px solid #c1e9c1;
+        margin-left: 50%;
     }
-    #right {
-        position: absolute;
-        right: 0; top: 0;
-        width: 50%;
-        outline: 1px solid red;
+    .delete {
+        background-color: #ffecec;
+        outline: 1px solid #f1c0c0;
+        margin-right: 50%;
+    }
+    .replace {
+        background-color: #eee;
     }
     </style>
     <script type="text/javascript">
@@ -28,14 +29,63 @@
         };
         request.send(null);
     }
+
+    function wrap(tagName, element) {
+        if (element == null) { return null; }
+        var node = document.createElement(tagName);
+        node.appendChild(element);
+        return node;
+    }
+
+    function toDOM(json) {
+        var node;
+        if (json instanceof Array) {
+            node = document.createElement("ol");
+            for (index in json) {
+                var child = wrap("li", toDOM(json[index]));
+                if (child != null) {
+                    node.appendChild(child);
+                }
+            }
+            if (node.childNodes.length == 0) {
+                node = null;
+            }
+        } else if (json instanceof Object) {
+            node = document.createElement("div");
+            if (json['source'] != null) {
+                node = document.createElement("p");
+                node.textContent = json['source'];
+            } else if (json['insert'] != null) {
+                node.classList.add('insert');
+                node.appendChild(toDOM(json['insert']));
+            } else if (json['delete'] != null) {
+                node.classList.add('delete');
+                node.appendChild(toDOM(json['delete']));
+            } else if (json['replace'] != null) {
+                node.classList.add('replace');
+                node.appendChild(toDOM(json['replace']));
+            } else if (json['before'] != null) {
+                node.classList.add('delete');
+                node.appendChild(toDOM(json['before']));
+            } else if (json['after'] != null) {
+                node.classList.add('insert');
+                node.appendChild(toDOM(json['after']));
+            }
+            if (json['categories'] != null) {
+                for (index in json['categories']) {
+                    node.classList.add('category-'+json['categories'][index]);
+                }
+            }
+        }
+        return node;
+    }
     </script>
   </head>
   <body>
-    <div id="left"></div>
-    <div id="right"></div>
+    <div id="diff"></div>
     <script type="text/javascript">
     loadJSON('Fixtures/swift.json', function (json) {
-        console.log(json);
+        document.getElementById("diff").appendChild(toDOM(json));
     });
     </script>
   </body>
