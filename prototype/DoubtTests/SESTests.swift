@@ -36,7 +36,7 @@ final class SESTests: XCTestCase {
 	}
 
 	func testSESOfLongerSequences() {
-		assert(SES([ a, b, c, a, b, b, a ], [ c, b, a, b, a, c ]), ==, [ Diff.Pure(.Replace(a, c)), Diff(b), delete(c), Diff(a), delete(b), Diff(b), Diff(a), insert(c) ])
+		assert(SES([ a, b, c, a, b, b, a ], [ c, b, a, b, a, c ]), ==, [ insert(c), delete(a), Diff(b), delete(c), Diff(a), delete(b), Diff(b), Diff(a), insert(c) ])
 	}
 }
 
