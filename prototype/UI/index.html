@@ -41,6 +41,9 @@
             } else if (json['insert']) {
                 div.classList.add('insert');
                 div.appendChild(toDOM(json['insert']));
+            } else if (json['delete'] != null) {
+                div.classList.add('delete');
+                div.appendChild(toDOM(json['delete']));
             }
             if (json['categories'] != null) {
                 for (index in json['categories']) {
