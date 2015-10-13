@@ -79,6 +79,9 @@ public enum Algorithm<A, B> {
 
 	/// Evaluates the encoded algorithm, returning its result.
 	public func evaluate(equals: (A, A) -> Bool, recur: (Term, Term) -> Diff) -> B {
+		func replace(a: Term, _ b: Term) -> Diff {
+			return .Pure(.Replace(a, b))
+		}
 		switch self {
 		case let .Pure(b):
 			return b
