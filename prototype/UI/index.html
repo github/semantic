@@ -50,7 +50,7 @@
     <div id="right"></div>
     <script type="text/javascript">
     loadJSON('Fixtures/swift.json', function (json) {
-        toDOM(json)
+        document.getElementById("left").appendChild(toDOM(json));
     });
     </script>
   </body>
