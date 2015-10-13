@@ -67,9 +67,10 @@
   <body>
     <div id="left"></div>
     <div id="right"></div>
+    <div id="diff"></div>
     <script type="text/javascript">
     loadJSON('Fixtures/swift.json', function (json) {
-        document.body.appendChild(toDOM(json));
+        document.getElementById("diff").appendChild(toDOM(json));
     });
     </script>
   </body>
