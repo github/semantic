@@ -53,17 +53,19 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 		}
 
 		if let right = right, down = down, diagonal = diagonal {
+			let right = (right, Diff.Pure(Patch.Delete(a[i])), costOfStream(right))
+			let down = (down, Diff.Pure(Patch.Insert(b[j])), costOfStream(down))
 			// nominate the best edge to continue along
 			if let compareHere = recur(a[i], b[j]) {
 				let (best, diff, _) = min(
 					(diagonal, compareHere, costOfStream(diagonal)),
-					(right, Diff.Pure(Patch.Delete(a[i])), costOfStream(right)),
-					(down, Diff.Pure(Patch.Insert(b[j])), costOfStream(down))) { $0.2 < $1.2 }
+					right,
+					down) { $0.2 < $1.2 }
 				return cons(diff, rest: best)
 			} else {
 				let (best, diff, _) = min(
-					(right, Diff.Pure(Patch.Delete(a[i])), costOfStream(right)),
-					(down, Diff.Pure(Patch.Insert(b[j])), costOfStream(down))) { $0.2 < $1.2 }
+					right,
+					down) { $0.2 < $1.2 }
 				return cons(diff, rest: best)
 			}
 		}
