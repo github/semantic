@@ -22,4 +22,7 @@
    <FileRef
       location = "group:External/SourceKitten/Carthage/Checkouts/SWXMLHash/SWXMLHash.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:External/Stream/Stream.xcodeproj">
+   </FileRef>
 </Workspace>
