@@ -1,8 +1,3 @@
-func >>> <T, U, V> (f: T -> U, g: U -> V) -> T -> V {
-	return { g(f($0)) }
-}
-
-
 extension Optional {
 	static func equals(param: (Wrapped, Wrapped) -> Bool)(_ left: Wrapped?, _ right: Wrapped?) -> Bool {
 		switch (left, right) {
