@@ -28,6 +28,19 @@
         };
         request.send(null);
     }
+
+    function toDOM(json) {
+        if (json instanceof Array) {
+            console.log("it's an array")
+            for (index in json) {
+                console.log(json[index])
+            }
+        } else if (json instanceof Object) {
+            for (key in json) {
+                console.log(key)
+            }
+        }
+    }
     </script>
   </head>
   <body>
