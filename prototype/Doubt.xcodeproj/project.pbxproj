@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		D40B89C41BC319070078E098 /* Matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B89C31BC319070078E098 /* Matrix.swift */; settings = {ASSET_TAGS = (); }; };
 		D40B89C81BC439000078E098 /* Assertions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D40B89C71BC439000078E098 /* Assertions.framework */; };
+		D42F096B1BCCC41600B95610 /* Either.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09671BCCC41600B95610 /* Either.framework */; };
+		D42F096C1BCCC41600B95610 /* Memo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09681BCCC41600B95610 /* Memo.framework */; };
+		D42F096D1BCCC41600B95610 /* Prelude.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09691BCCC41600B95610 /* Prelude.framework */; };
+		D42F096E1BCCC41600B95610 /* Stream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F096A1BCCC41600B95610 /* Stream.framework */; };
 		D432D4711BA9AC0B00F3FABC /* SESTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4701BA9AC0B00F3FABC /* SESTests.swift */; };
 		D432D4731BA9C55300F3FABC /* Stream.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4721BA9C55300F3FABC /* Stream.swift */; };
 		D432D4751BA9D6A400F3FABC /* Memo.swift in Sources */ = {isa = PBXBuildFile; fileRef = D432D4741BA9D6A400F3FABC /* Memo.swift */; };
@@ -81,6 +85,10 @@
 /* Begin PBXFileReference section */
 		D40B89C31BC319070078E098 /* Matrix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Matrix.swift; sourceTree = "<group>"; };
 		D40B89C71BC439000078E098 /* Assertions.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Assertions.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D42F09671BCCC41600B95610 /* Either.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Either.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D42F09681BCCC41600B95610 /* Memo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Memo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D42F09691BCCC41600B95610 /* Prelude.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Prelude.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D42F096A1BCCC41600B95610 /* Stream.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Stream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D432D4701BA9AC0B00F3FABC /* SESTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SESTests.swift; sourceTree = "<group>"; };
 		D432D4721BA9C55300F3FABC /* Stream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stream.swift; sourceTree = "<group>"; };
 		D432D4741BA9D6A400F3FABC /* Memo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Memo.swift; sourceTree = "<group>"; };
@@ -137,6 +145,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D42F096B1BCCC41600B95610 /* Either.framework in Frameworks */,
+				D42F096C1BCCC41600B95610 /* Memo.framework in Frameworks */,
+				D42F096D1BCCC41600B95610 /* Prelude.framework in Frameworks */,
+				D42F096E1BCCC41600B95610 /* Stream.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -229,6 +241,10 @@
 			children = (
 				D4AAE5011B5AE22E004E581F /* Info.plist */,
 				D4DF96F01BC54C970040F41F /* Doubt.modulemap */,
+				D42F09671BCCC41600B95610 /* Either.framework */,
+				D42F09681BCCC41600B95610 /* Memo.framework */,
+				D42F09691BCCC41600B95610 /* Prelude.framework */,
+				D42F096A1BCCC41600B95610 /* Stream.framework */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
