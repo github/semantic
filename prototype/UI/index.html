@@ -3,18 +3,6 @@
   <head>
   	<title>semantic-diff</title>
     <style type="text/css">
-    #left {
-        position: absolute;
-        left: 0; top: 0;
-        width: 50%;
-        outline: 1px solid green;
-    }
-    #right {
-        position: absolute;
-        right: 0; top: 0;
-        width: 50%;
-        outline: 1px solid red;
-    }
     #diff div {
         clear: both;
     }
@@ -76,8 +64,6 @@
     </script>
   </head>
   <body>
-    <div id="left"></div>
-    <div id="right"></div>
     <div id="diff"></div>
     <script type="text/javascript">
     loadJSON('Fixtures/swift.json', function (json) {
