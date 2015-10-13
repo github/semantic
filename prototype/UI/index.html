@@ -31,13 +31,13 @@
 
     function toDOM(json) {
         if (json instanceof Array) {
-            console.log("it's an array")
+            console.log("it's an array");
             for (index in json) {
-                console.log(json[index])
+                console.log(json[index]);
             }
         } else if (json instanceof Object) {
             for (key in json) {
-                console.log(key)
+                console.log(key);
             }
         }
     }
