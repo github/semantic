@@ -57,7 +57,9 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 			let down = (down, Diff.Pure(Patch.Insert(b[j])), costOfStream(down))
 			let diagonal = recur(a[i], b[j]).map { (diagonal, $0, costOfStream(diagonal)) }
 			// nominate the best edge to continue along
-			let (best, diff, _) = diagonal.map { min($0, right, down) { $0.2 < $1.2 } } ?? min(right, down) { $0.2 < $1.2 }
+			let (best, diff, _) = diagonal
+				.map { min($0, right, down) { $0.2 < $1.2 } }
+				?? min(right, down) { $0.2 < $1.2 }
 			return cons(diff, rest: best)
 		}
 
