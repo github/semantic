@@ -4,3 +4,6 @@
 [submodule "prototype/External/Assertions"]
 	path = prototype/External/Assertions
 	url = https://github.com/robrix/Assertions.git
+[submodule "prototype/External/Stream"]
+	path = prototype/External/Stream
+	url = https://github.com/antitypical/Stream.git

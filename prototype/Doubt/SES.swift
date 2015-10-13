@@ -77,3 +77,7 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 
 	return Array(matrix[0, 0]!.value.map { diff, _ in diff })
 }
+
+
+import Memo
+import Stream

@@ -86,11 +86,20 @@ public enum Algorithm<A, B> {
 		case let .Roll(.Recursive(a, b, f)):
 			// Recur structurally into both terms, if compatible, patching paired sub-terms. This is akin to the shape of unification, except that it computes a patched tree instead of a substitution. It’s also a little like a structural zip on the pair of terms.
 			//
-			// At the moment, there are no restrictions on whether terms are compatible, and there is no structure to exploit in terms; therefore, this simplifies to copying if equal, and replacing otherwise.
-			return f(Term.equals(equals)(a, b)
-				? Diff(b)
+			// At the moment, there are no restrictions on whether terms are compatible.
+			if Term.equals(equals)(a, b) { return f(Diff(b)).evaluate(equals, recur: recur) }
+
+			switch (a.out, b.out) {
+			case let (.Indexed(a), .Indexed(b)) where a.count == b.count:
+				return f(.Indexed(zip(a, b).map(recur))).evaluate(equals, recur: recur)
+
+			case let (.Keyed(a), .Keyed(b)) where Array(a.keys) == Array(b.keys):
+				return f(.Keyed(Dictionary(elements: b.keys.map { ($0, recur(a[$0]!, b[$0]!)) }))).evaluate(equals, recur: recur)
+
+			default:
 				// This must not call `recur` with `a` and `b`, as that would infinite loop if actually recursive.
-				: Diff.Pure(.Replace(a, b))).evaluate(equals, recur: recur)
+				return f(Diff.Pure(.Replace(a, b))).evaluate(equals, recur: recur)
+			}
 
 		case let .Roll(.ByKey(a, b, f)):
 			let recur = {
@@ -153,3 +162,6 @@ extension Algorithm where A: Equatable, B: FreeConvertible, B.RollType == A, B.P
 		return evaluate(==)
 	}
 }
+
+
+import Prelude
