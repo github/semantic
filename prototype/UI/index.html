@@ -40,6 +40,9 @@
                     node.appendChild(child);
                 }
             }
+            if (node.childNodes.length == 0) {
+                node = null;
+            }
         } else if (json instanceof Object) {
             node = document.createElement("div");
             if (json['source'] != null) {
