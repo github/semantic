@@ -3,15 +3,15 @@
 /// As with `Free`, this is “free” in the sense of “unconstrained,” i.e. “the monad induced by `Operation` without extra assumptions.”
 ///
 /// Where `Operation` models a single diffing strategy, `Algorithm` models the recursive selection of diffing strategies at each node. Thus, a value in `Algorithm` models an algorithm for constructing a value in the type `B` from the resulting diffs. By this means, diffing can be adapted not just to the specific grammar, but to specific trees produced by that grammar, and even the values of type `A` encapsulated at each node.
-public enum Algorithm<A, B> {
+public enum Algorithm<Leaf, B> {
 	/// The type of `Term`s over which `Algorithm`s operate.
-	public typealias Term = Fix<A>
+	public typealias Term = Fix<Leaf>
 
 	/// The type of `Patch`es produced by `Algorithm`s.
 	public typealias Patch = Doubt.Patch<Term>
 
 	/// The type of `Diff`s which `Algorithm`s produce.
-	public typealias Diff = Free<A, Patch>
+	public typealias Diff = Free<Leaf, Patch>
 
 	/// The injection of a value of type `B` into an `Operation`.
 	///
@@ -33,20 +33,20 @@ public enum Algorithm<A, B> {
 
 	// MARK: Functor
 
-	public func map<Other>(transform: B -> Other) -> Algorithm<A, Other> {
-		return analysis(ifPure: transform >>> Algorithm<A, Other>.Pure, ifRoll: { .Roll($0.map { $0.map(transform) }) })
+	public func map<Other>(transform: B -> Other) -> Algorithm<Leaf, Other> {
+		return analysis(ifPure: transform >>> Algorithm<Leaf, Other>.Pure, ifRoll: { .Roll($0.map { $0.map(transform) }) })
 	}
 
 
 	// MARK: Monad
 
-	public func flatMap<C>(transform: B -> Algorithm<A, C>) -> Algorithm<A, C> {
+	public func flatMap<C>(transform: B -> Algorithm<Leaf, C>) -> Algorithm<Leaf, C> {
 		return analysis(ifPure: transform, ifRoll: { .Roll($0.map { $0.flatMap(transform) }) })
 	}
 
 
 	/// Evaluates the encoded algorithm, returning its result.
-	public func evaluate(equals: (A, A) -> Bool, recur: (Term, Term) -> Diff?) -> B {
+	public func evaluate(equals: (Leaf, Leaf) -> Bool, recur: (Term, Term) -> Diff?) -> B {
 		let recur = {
 			Term.equals(equals)($0, $1)
 				? Diff($1)
@@ -90,7 +90,7 @@ public enum Algorithm<A, B> {
 	}
 }
 
-extension Algorithm where A: Equatable {
+extension Algorithm where Leaf: Equatable {
 	public func evaluate(recur: (Term, Term) -> Diff?) -> B {
 		return evaluate(==, recur: recur)
 	}
@@ -110,7 +110,7 @@ extension Free: FreeConvertible {
 	public var free: Free { return self }
 }
 
-extension Algorithm where B: FreeConvertible, B.RollType == A, B.PureType == Algorithm<A, B>.Patch {
+extension Algorithm where B: FreeConvertible, B.RollType == Leaf, B.PureType == Algorithm<Leaf, B>.Patch {
 	/// `Algorithm<A, Diff>`s can be constructed from a pair of `Term`s using `ByKey` when `Keyed`, `ByIndex` when `Indexed`, and `Recursive` otherwise.
 	public init(_ a: Term, _ b: Term) {
 		switch (a.out, b.out) {
@@ -123,12 +123,12 @@ extension Algorithm where B: FreeConvertible, B.RollType == A, B.PureType == Alg
 		}
 	}
 
-	public func evaluate(equals: (A, A) -> Bool) -> B {
+	public func evaluate(equals: (Leaf, Leaf) -> Bool) -> B {
 		return evaluate(equals, recur: { Algorithm($0, $1).evaluate(equals).free })
 	}
 }
 
-extension Algorithm where A: Equatable, B: FreeConvertible, B.RollType == A, B.PureType == Algorithm<A, B>.Patch {
+extension Algorithm where Leaf: Equatable, B: FreeConvertible, B.RollType == Leaf, B.PureType == Algorithm<Leaf, B>.Patch {
 	public func evaluate() -> B {
 		return evaluate(==)
 	}
