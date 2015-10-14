@@ -2,6 +2,13 @@
 
 public enum Cofree<A, B> {
 	indirect case Unroll(B, Syntax<Cofree, A>)
+
+	public var unwrap: Syntax<Cofree, A> {
+		switch self {
+		case let .Unroll(_, rest):
+			return rest
+		}
+	}
 }
 
 
