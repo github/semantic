@@ -49,7 +49,7 @@ private func delete(term: Term) -> Diff {
 }
 
 private typealias Term = Fix<Info>
-private typealias Diff = Free<Info, Patch<Info>>
+private typealias Diff = Free<Info, Patch<Fix<Info>>>
 
 private let a = Term.Leaf(.Literal("a", []))
 private let b = Term.Leaf(.Literal("b", []))

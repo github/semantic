@@ -8,7 +8,7 @@ public enum Algorithm<A, B> {
 	public typealias Term = Fix<A>
 
 	/// The type of `Patch`es produced by `Algorithm`s.
-	public typealias Patch = Doubt.Patch<A>
+	public typealias Patch = Doubt.Patch<Term>
 
 	/// The type of `Diff`s which `Algorithm`s produce.
 	public typealias Diff = Free<A, Patch>
