@@ -1,6 +1,9 @@
 import Doubt
 import Cocoa
 
+typealias Term = Fix<JSONLeaf>
+typealias Diff = Free<JSONLeaf, Patch<JSONLeaf>>
+
 enum JSONLeaf: Equatable, CustomJSONConvertible, CustomStringConvertible {
 	case Number(Double)
 	case Boolean(Bool)
@@ -62,9 +65,6 @@ extension JSON {
 		guard let object = try? NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments) else { return nil }
 		self.init(object: object)
 	}
-
-	typealias Term = Fix<JSONLeaf>
-	typealias Diff = Free<JSONLeaf, Patch<JSONLeaf>>
 
 	var term: Term {
 		switch self {
