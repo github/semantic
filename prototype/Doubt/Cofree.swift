@@ -94,4 +94,16 @@ extension Cofree where A: Hashable, B: Hashable {
 }
 
 
+// MARK: - JSON
+
+extension Cofree {
+	public func JSON(annotation annotation: B -> Doubt.JSON, leaf: A -> Doubt.JSON) -> Doubt.JSON {
+		return [
+			"extract": annotation(extract),
+			"unwrap": unwrap.JSON(ifLeaf: leaf, ifRecur: { $0.JSON(annotation: annotation, leaf: leaf) })
+		]
+	}
+}
+
+
 import Prelude
