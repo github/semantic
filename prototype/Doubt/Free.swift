@@ -18,6 +18,10 @@ public enum Free<A, B>: CustomDebugStringConvertible, CustomDocConvertible, Synt
 		self = .Roll(fix.out.map(Free.init))
 	}
 
+	public init<Term: TermType where Term.LeafType == A>(_ term: Term) {
+		self = .Roll(term.out.map(Free.init))
+	}
+
 
 	public func analysis<C>(@noescape ifPure ifPure: B -> C, @noescape ifRoll: Syntax<Free, A> -> C) -> C {
 		switch self {
@@ -194,6 +198,23 @@ extension Free where A: CustomJSONConvertible, B: PatchConvertible, B.Element ==
 	public var JSON: Doubt.JSON {
 		return JSON { $0.patch.JSON { $0.JSON } }
 	}
+}
+
+
+// MARK: - FreeConvertible
+
+/// A hack to work around the unavailability of same-type requirements.
+public protocol FreeConvertible {
+	typealias RollType
+	typealias PureType
+
+	init(free: Free<RollType, PureType>)
+	var free: Free<RollType, PureType> { get }
+}
+
+extension Free: FreeConvertible {
+	public init(free: Free<A, B>) { self = free }
+	public var free: Free { return self }
 }
 
 

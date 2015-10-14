@@ -1,5 +1,9 @@
-import Doubt
 import Cocoa
+import Doubt
+import Prelude
+
+typealias Term = Cofree<JSONLeaf, Int>
+typealias Diff = Free<JSONLeaf, Patch<Term>>
 
 enum JSONLeaf: Equatable, CustomJSONConvertible, CustomStringConvertible {
 	case Number(Double)
@@ -63,31 +67,42 @@ extension JSON {
 		self.init(object: object)
 	}
 
-	typealias Term = Fix<JSONLeaf>
-	typealias Diff = Free<JSONLeaf, Patch<JSONLeaf>>
-
 	var term: Term {
+		func annotate(json: Syntax<Term, JSONLeaf>) -> Term {
+			return Cofree(size(json), json)
+		}
+		func size(syntax: Syntax<Term, JSONLeaf>) -> Int {
+			switch syntax {
+			case .Leaf:
+				return 1
+			case let .Indexed(i):
+				return 1 + i.map { size($0.unwrap) }.reduce(0, combine: +)
+			case let .Keyed(i):
+				return 1 + i.values.map { size($0.unwrap) }.reduce(0, combine: +)
+			}
+		}
+
 		switch self {
 		case let .Array(a):
-			return .Indexed(a.map { $0.term })
+			return annotate(.Indexed(a.map { $0.term }))
 		case let .Dictionary(d):
-			return .Keyed(Swift.Dictionary(elements: d.map { ($0, $1.term) }))
+			return annotate(.Keyed(Swift.Dictionary(elements: d.map { ($0, $1.term) })))
 		case let .Number(n):
-			return .Leaf(.Number(n))
+			return annotate(.Leaf(.Number(n)))
 		case let .Boolean(b):
-			return .Leaf(.Boolean(b))
+			return annotate(.Leaf(.Boolean(b)))
 		case let .String(s):
-			return .Leaf(.String(s))
+			return annotate(.Leaf(.String(s)))
 		case .Null:
-			return .Leaf(.Null)
+			return annotate(.Leaf(.Null))
 		}
 	}
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
 if let a = arguments[1].flatMap(JSON.init), b = arguments[2].flatMap(JSON.init) {
-	let diff = Algorithm<JSONLeaf, JSON.Diff>(a.term, b.term).evaluate()
-	if let JSON = NSString(data: diff.JSON.serialize(), encoding: NSUTF8StringEncoding) {
+	let diff = Algorithm<Term, Diff>(a.term, b.term).evaluate(Cofree.equals(annotation: const(true), leaf: ==))
+	if let JSON = NSString(data: diff.JSON(ifPure: { $0.JSON { $0.JSON } }, ifLeaf: { $0.JSON }).serialize(), encoding: NSUTF8StringEncoding) {
 		print(JSON)
 	}
 }

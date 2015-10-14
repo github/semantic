@@ -1,5 +1,3 @@
-//  Copyright © 2015 GitHub. All rights reserved.
-
 /// The cofree comonad over `Syntax`.
 ///
 /// This is “free” in the sense of “unconstrained” rather than “zero-cost”; it’s the comonad obtained by taking a functor (in this case `Syntax`) and adding the minimum necessary details (the `B` paired with it) to satisfy the comonad laws.
@@ -13,6 +11,11 @@ public enum Cofree<A, B> {
 		case let .Unroll(_, rest):
 			return rest()
 		}
+	}
+
+
+	public init(_ annotation: B, @autoclosure(escaping) _ syntax: () -> Syntax<Cofree, A>) {
+		self = .Unroll(annotation, syntax)
 	}
 
 
