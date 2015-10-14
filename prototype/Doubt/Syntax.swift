@@ -51,6 +51,15 @@ extension Syntax: ArrayLiteralConvertible {
 }
 
 
+// MARK: - DictionaryLiteralConvertible
+
+extension Syntax: DictionaryLiteralConvertible {
+	public init(dictionaryLiteral elements: (String, Recur)...) {
+		self = .Keyed(Dictionary(elements: elements))
+	}
+}
+
+
 // MARK: - Equality
 
 extension Syntax {
