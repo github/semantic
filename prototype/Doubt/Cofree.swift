@@ -87,5 +87,11 @@ extension Cofree {
 	}
 }
 
+extension Cofree where A: Hashable, B: Hashable {
+	public var hash: Hash {
+		return hash(annotation: Hash.init, leaf: Hash.init)
+	}
+}
+
 
 import Prelude
