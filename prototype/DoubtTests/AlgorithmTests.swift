@@ -11,6 +11,10 @@ final class AlgorithmTests: XCTestCase {
 	func testComparisonsAreUnrestrictedByDefault() {
 		assert(Algorithm(a, b).evaluate(==), ==, unrestricted)
 	}
+
+	func testComparisonsOfUncategorizedTermsAreUnrestricted() {
+		assert(Algorithm(a, b).evaluate(==, categorize: const(Set<String>())), ==, unrestricted)
+	}
 }
 
 
