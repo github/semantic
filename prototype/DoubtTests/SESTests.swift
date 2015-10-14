@@ -57,7 +57,7 @@ private let c = Term.Leaf("c")
 private let d = Term.Leaf("d")
 
 private func SES(a: [Term], _ b: [Term]) -> [Diff] {
-	return SES(a, b, recur: const(nil))
+	return SES(a, b, equals: ==, recur: const(nil))
 }
 
 private func == (a: [Diff], b: [Diff]) -> Bool {
