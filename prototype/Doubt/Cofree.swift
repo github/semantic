@@ -44,6 +44,9 @@ extension Cofree {
 
 	/// Returns a new `Cofree` constructed by recursively annotating each subtree with itself.
 	public var duplicate: Cofree<A, Cofree<A, B>> {
-		return .Unroll(self, unwrap.map { $0.duplicate })
+		return extend(id)
 	}
 }
+
+
+import Prelude
