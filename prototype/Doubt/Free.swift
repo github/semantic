@@ -18,6 +18,10 @@ public enum Free<A, B>: CustomDebugStringConvertible, CustomDocConvertible, Synt
 		self = .Roll(fix.out.map(Free.init))
 	}
 
+	public init<Term: TermType where Term.LeafType == A>(_ term: Term) {
+		self = .Roll(term.out.map(Free.init))
+	}
+
 
 	public func analysis<C>(@noescape ifPure ifPure: B -> C, @noescape ifRoll: Syntax<Free, A> -> C) -> C {
 		switch self {
