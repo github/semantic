@@ -1,7 +1,7 @@
 /// Computes the SES (shortest edit script), i.e. the shortest sequence of diffs (`Free<A, Patch<A>>`) for two arrays of terms (`Fix<A>`) which would suffice to transform `a` into `b`.
 ///
 /// This is computed w.r.t. an `equals` function, which computes the equality of leaf nodes within terms, and a `recur` function, which produces diffs representing matched-up terms.
-public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (Fix<A>, Fix<A>) -> Free<A, Patch<A>>) -> [Free<A, Patch<A>>] {
+public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], recur: (Fix<A>, Fix<A>) -> Free<A, Patch<A>>) -> [Free<A, Patch<A>>] {
 	typealias Term = Fix<A>
 	typealias Diff = Free<A, Patch<A>>
 
