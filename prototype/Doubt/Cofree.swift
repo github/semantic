@@ -37,6 +37,7 @@ extension Cofree {
 		}
 	}
 
+	/// Returns a new `Cofree` by recursively applying `transform` to each node, producing the annotations for the copy.
 	public func extend<Other>(@noescape transform: Cofree -> Other) -> Cofree<A, Other> {
 		return .Unroll(transform(self), unwrap.map { $0.extend(transform) })
 	}
