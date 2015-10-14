@@ -74,5 +74,9 @@ extension Cofree {
 	}
 }
 
+public func == <A: Equatable, B: Equatable> (left: Cofree<A, B>, right: Cofree<A, B>) -> Bool {
+	return Cofree.equals(annotation: ==, leaf: ==)(left, right)
+}
+
 
 import Prelude
