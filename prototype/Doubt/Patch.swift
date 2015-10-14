@@ -118,10 +118,10 @@ extension Patch where A: CustomJSONConvertible {
 
 /// A hack to enable constrained extensions on `Free<A, Patch<A>>`.
 public protocol PatchConvertible {
-	typealias Info
+	typealias Element
 
-	init(patch: Patch<Info>)
-	var patch: Patch<Info> { get }
+	init(patch: Patch<Element>)
+	var patch: Patch<Element> { get }
 }
 
 extension Patch: PatchConvertible {
