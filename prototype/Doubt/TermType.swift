@@ -4,3 +4,6 @@ public protocol TermType {
 
 	var out: Syntax<Self, LeafType> { get }
 }
+
+
+extension Fix: TermType {}
