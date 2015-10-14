@@ -80,12 +80,6 @@ extension Fix where A: CustomJSONConvertible {
 
 // MARK: - Categorizable
 
-extension Fix: Categorizable {
-	public var categories: Set<Category> {
-		return []
-	}
-}
-
 extension Fix where A: Categorizable {
 	public var categories: Set<Category> {
 		switch self {
