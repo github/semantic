@@ -4,7 +4,8 @@ final class AlgorithmTests: XCTestCase {
 	}
 
 	func testComparisonsOfDisjointlyCategorizedTermsAreRestricted() {
-		assert(Algorithm(a, b).evaluate(==, categorize: { [ $0.extract ] }), ==, restricted)
+		var effects = 0
+		assert(Algorithm(a, b).evaluate(==, categorize: { _ in [ effects++ ] }), ==, restricted)
 	}
 
 	func testComparisonsAreUnrestrictedByDefault() {
