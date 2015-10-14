@@ -174,6 +174,12 @@ public protocol CustomJSONConvertible {
 	var JSON: Doubt.JSON { get }
 }
 
+extension String: CustomJSONConvertible {
+	public var JSON: Doubt.JSON {
+		return .String(self)
+	}
+}
+
 
 /// A type which can be converted to and from JSON.
 public protocol JSONConvertible: CustomJSONConvertible {
