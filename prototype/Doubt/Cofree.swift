@@ -12,6 +12,15 @@ public enum Cofree<A, B> {
 }
 
 
+// MARK: - Functor
+
+extension Cofree {
+	public func map<Other>(transform: B -> Other) -> Cofree<A, Other> {
+		return .Unroll(transform(extract), unwrap.map { $0.map(transform) })
+	}
+}
+
+
 // MARK: - Comonad
 
 extension Cofree {
