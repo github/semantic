@@ -71,6 +71,17 @@ extension JSON {
 		func annotate(json: Syntax<Term, JSONLeaf>) -> Term {
 			return Cofree(0, json)
 		}
+		func size(syntax: Syntax<Term, JSONLeaf>) -> Int {
+			switch syntax {
+			case .Leaf:
+				return 1
+			case let .Indexed(i):
+				return 1 + i.map { size($0.unwrap) }.reduce(0, combine: +)
+			case let .Keyed(i):
+				return 1 + i.values.map { size($0.unwrap) }.reduce(0, combine: +)
+			}
+		}
+
 		switch self {
 		case let .Array(a):
 			return annotate(.Indexed(a.map { $0.term }))
