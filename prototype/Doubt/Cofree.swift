@@ -36,6 +36,15 @@ public enum Cofree<A, B> {
 }
 
 
+// MARK: - CustomDebugStringConvertible
+
+extension Cofree: CustomDebugStringConvertible {
+	public var debugDescription: String {
+		return "(\(String(reflecting: extract)), \(String(reflecting: unwrap)))"
+	}
+}
+
+
 // MARK: - Functor
 
 extension Cofree {
