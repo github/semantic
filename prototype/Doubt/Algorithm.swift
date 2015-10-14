@@ -19,7 +19,7 @@ public enum Algorithm<Leaf, B> {
 	case Pure(B)
 
 	/// A recursive instantiation of `Operation`, unrolling another iteration of the recursive type.
-	case Roll(Operation<Algorithm, Term, Diff>)
+	indirect case Roll(Operation<Algorithm, Term, Diff>)
 
 	public func analysis<C>(@noescape ifPure ifPure: B -> C, @noescape ifRoll: Operation<Algorithm, Term, Diff> -> C) -> C {
 		switch self {
