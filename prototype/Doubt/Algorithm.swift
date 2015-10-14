@@ -94,7 +94,7 @@ public enum Algorithm<Term: TermType, B> {
 			return f(Dictionary(elements: deleted + inserted + patched)).evaluate(equals, recur: recur)
 
 		case let .Roll(.ByIndex(a, b, f)):
-			return f(SES(a, b, recur: recur)).evaluate(equals, recur: recur)
+			return f(SES(a, b, cost: cost, recur: recur)).evaluate(equals, recur: recur)
 		}
 	}
 }
