@@ -136,9 +136,9 @@ extension Algorithm where Term: Categorizable, B: FreeConvertible, B.RollType ==
 }
 
 
-extension Algorithm where Term.LeafType: Categorizable, Term: Equatable, B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
+extension Algorithm where Term: Categorizable, Term: Equatable, B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
 	public func evaluate() -> B {
-		return evaluate(==)
+		return evaluate(==, categorize: { $0.categories })
 	}
 }
 
