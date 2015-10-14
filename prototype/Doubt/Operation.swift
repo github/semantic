@@ -10,10 +10,12 @@ public enum Operation<Recur, Term, Diff> {
 
 	/// Represents a diff to be performed over an array of terms by index.
 	case ByIndex([Term], [Term], [Diff] -> Recur)
+}
 
 
-	// MARK: Functor
+// MARK: - Functor
 
+extension Operation {
 	public func map<Other>(transform: Recur -> Other) -> Operation<Other, Term, Diff> {
 		switch self {
 		case let .Recursive(a, b, f):
