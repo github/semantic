@@ -16,6 +16,11 @@ public enum Cofree<A, B> {
 	}
 
 
+	/// Recursively copies a `Fix<A>` into a `Cofree<A, B>` with a function assigning `B` for every `Fix<A>`.
+	public init(_ fix: Fix<A>, _ annotate: Fix<A> -> B) {
+		self = Cofree<A, Fix<A>>.coiterate { $0.out } (fix).map(annotate)
+	}
+
 	public static func coiterate(annotate: B -> Syntax<B, A>)(_ seed: B) -> Cofree {
 		return .Unroll(seed, annotate(seed).map(coiterate(annotate)))
 	}
