@@ -7,8 +7,11 @@ public enum Algorithm<A, B> {
 	/// The type of `Term`s over which `Algorithm`s operate.
 	public typealias Term = Fix<A>
 
+	/// The type of `Patch`es produced by `Algorithm`s.
+	public typealias Patch = Doubt.Patch<Term>
+
 	/// The type of `Diff`s which `Algorithm`s produce.
-	public typealias Diff = Free<A, Patch<A>>
+	public typealias Diff = Free<A, Patch>
 
 	/// The injection of a value of type `B` into an `Operation`.
 	///
@@ -82,7 +85,7 @@ public enum Algorithm<A, B> {
 			return f(Dictionary(elements: deleted + inserted + patched)).evaluate(equals, recur: recur)
 
 		case let .Roll(.ByIndex(a, b, f)):
-			return f(SES(a, b, equals: equals, recur: recur)).evaluate(equals, recur: recur)
+			return f(SES(a, b, recur: recur)).evaluate(equals, recur: recur)
 		}
 	}
 }
@@ -107,7 +110,7 @@ extension Free: FreeConvertible {
 	public var free: Free { return self }
 }
 
-extension Algorithm where B: FreeConvertible, B.RollType == A, B.PureType == Patch<A> {
+extension Algorithm where B: FreeConvertible, B.RollType == A, B.PureType == Algorithm<A, B>.Patch {
 	/// `Algorithm<A, Diff>`s can be constructed from a pair of `Term`s using `ByKey` when `Keyed`, `ByIndex` when `Indexed`, and `Recursive` otherwise.
 	public init(_ a: Term, _ b: Term) {
 		switch (a.out, b.out) {
@@ -125,7 +128,7 @@ extension Algorithm where B: FreeConvertible, B.RollType == A, B.PureType == Pat
 	}
 }
 
-extension Algorithm where A: Equatable, B: FreeConvertible, B.RollType == A, B.PureType == Patch<A> {
+extension Algorithm where A: Equatable, B: FreeConvertible, B.RollType == A, B.PureType == Algorithm<A, B>.Patch {
 	public func evaluate() -> B {
 		return evaluate(==)
 	}

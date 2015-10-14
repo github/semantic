@@ -1,10 +1,10 @@
 /// A patch to some part of a `Syntax` tree.
 public enum Patch<A>: CustomDebugStringConvertible, CustomDocConvertible {
-	case Replace(Fix<A>, Fix<A>)
-	case Insert(Fix<A>)
-	case Delete(Fix<A>)
+	case Replace(A, A)
+	case Insert(A)
+	case Delete(A)
 
-	public var state: (before: Fix<A>?, after: Fix<A>?) {
+	public var state: (before: A?, after: A?) {
 		switch self {
 		case let .Replace(a, b):
 			return (a, b)
@@ -45,8 +45,8 @@ public enum Patch<A>: CustomDebugStringConvertible, CustomDocConvertible {
 	// MARK: CustomDocConvertible
 
 	public var doc: Doc {
-		return (state.before?.doc.bracket("{-", "-}") ?? .Empty)
-			<> (state.after?.doc.bracket("{+", "+}") ?? .Empty)
+		return (state.before.map(Doc.init)?.bracket("{-", "-}") ?? .Empty)
+			<> (state.after.map(Doc.init)?.bracket("{+", "+}") ?? .Empty)
 	}
 }
 
@@ -55,8 +55,8 @@ public enum Patch<A>: CustomDebugStringConvertible, CustomDocConvertible {
 
 extension Patch {
 	public static func equals(param: (A, A) -> Bool)(_ left: Patch, _ right: Patch) -> Bool {
-		return Optional.equals(Fix.equals(param))(left.state.before, right.state.before)
-			&& Optional.equals(Fix.equals(param))(left.state.after, right.state.after)
+		return Optional.equals(param)(left.state.before, right.state.before)
+			&& Optional.equals(param)(left.state.after, right.state.after)
 	}
 }
 
@@ -66,8 +66,8 @@ extension Patch {
 extension Patch {
 	public func hash(param: A -> Hash) -> Hash {
 		return Hash.Ordered([
-			state.before.map { $0.hash(param) } ?? Hash.Empty,
-			state.after.map { $0.hash(param) } ?? Hash.Empty
+			state.before.map(param) ?? Hash.Empty,
+			state.after.map(param) ?? Hash.Empty
 		])
 	}
 }
@@ -81,17 +81,17 @@ extension Patch {
 		case let .Replace(a, b):
 			return [
 				"replace": [
-					"before": a.JSON(ifLeaf),
-					"after": b.JSON(ifLeaf),
+					"before": ifLeaf(a),
+					"after": ifLeaf(b),
 				]
 			]
 		case let .Insert(b):
 			return [
-				"insert": b.JSON(ifLeaf),
+				"insert": ifLeaf(b),
 			]
 		case let .Delete(a):
 			return [
-				"delete": a.JSON(ifLeaf)
+				"delete": ifLeaf(a)
 			]
 		}
 	}
@@ -100,17 +100,17 @@ extension Patch {
 
 extension Patch where A: CustomJSONConvertible {
 	public var JSON: Doubt.JSON {
-		return self.JSON { $0.JSON }
+		return JSON { $0.JSON }
 	}
 }
 
 
-/// A hack to enable constrained extensions on `Free<A, Patch<A>>`.
+/// A hack to enable constrained extensions on `Free<A, Patch<Fix<A>>`.
 public protocol PatchConvertible {
-	typealias Info
+	typealias Element
 
-	init(patch: Patch<Info>)
-	var patch: Patch<Info> { get }
+	init(patch: Patch<Element>)
+	var patch: Patch<Element> { get }
 }
 
 extension Patch: PatchConvertible {
