@@ -2,6 +2,10 @@ final class AlgorithmTests: XCTestCase {
 	func testRestrictsComparisonsWhenRecurReturnsNil() {
 		assert(Algorithm(a, b).evaluate(==, recur: const(nil)), ==, restricted)
 	}
+
+	func testRestrictsComparisonsOfTermsInDisjointCategories() {
+		assert(Algorithm(a, b).evaluate(==, categorize: { [ $0.extract ] }), ==, restricted)
+	}
 }
 
 
