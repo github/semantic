@@ -1,9 +1,8 @@
-/// Computes the SES (shortest edit script), i.e. the shortest sequence of diffs (`Free<A, Patch<A>>`) for two arrays of terms (`Fix<A>`) which would suffice to transform `a` into `b`.
+/// Computes the SES (shortest edit script), i.e. the shortest sequence of diffs (`Free<A, Patch<Term>>`) for two arrays of `Term`s which would suffice to transform `a` into `b`.
 ///
 /// This is computed w.r.t. an `equals` function, which computes the equality of leaf nodes within terms, and a `recur` function, which produces diffs representing matched-up terms.
-public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (Fix<A>, Fix<A>) -> Free<A, Patch<A>>) -> [Free<A, Patch<A>>] {
-	typealias Term = Fix<A>
-	typealias Diff = Free<A, Patch<A>>
+public func SES<Term, A>(a: [Term], _ b: [Term], recur: (Term, Term) -> Free<A, Patch<Term>>?) -> [Free<A, Patch<Term>>] {
+	typealias Diff = Free<A, Patch<Term>>
 
 	if a.isEmpty { return b.map { Diff.Pure(Patch.Insert($0)) } }
 	if b.isEmpty { return a.map { Diff.Pure(Patch.Delete($0)) } }
@@ -46,18 +45,14 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 		let down = matrix[i, j + 1]
 		let diagonal = matrix[i + 1, j + 1]
 
-		let recur = {
-			Term.equals(equals)($0, $1)
-				? Diff($1)
-				: recur($0, $1)
-		}
-
 		if let right = right, down = down, diagonal = diagonal {
-			// nominate the best edge to continue along
-			let (best, diff, _) = min(
-				(diagonal, recur(a[i], b[j]), costOfStream(diagonal)),
-				(right, Diff.Pure(Patch.Delete(a[i])), costOfStream(right)),
-				(down, Diff.Pure(Patch.Insert(b[j])), costOfStream(down))) { $0.2 < $1.2 }
+			let right = (right, Diff.Pure(Patch.Delete(a[i])), costOfStream(right))
+			let down = (down, Diff.Pure(Patch.Insert(b[j])), costOfStream(down))
+			let diagonal = recur(a[i], b[j]).map { (diagonal, $0, costOfStream(diagonal)) }
+			// nominate the best edge to continue along, not considering diagonal if `recur` returned `nil`.
+			let (best, diff, _) = diagonal
+				.map { min($0, right, down) { $0.2 < $1.2 } }
+				?? min(right, down) { $0.2 < $1.2 }
 			return cons(diff, rest: best)
 		}
 

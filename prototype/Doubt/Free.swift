@@ -107,7 +107,7 @@ public enum Free<A, B>: CustomDebugStringConvertible, CustomDocConvertible, Synt
 }
 
 
-extension Free where B: PatchConvertible, B.Info == A {
+extension Free where B: PatchConvertible, B.Element == Fix<A> {
 	public typealias Term = Fix<A>
 
 	private func discardNullTerms(syntax: Syntax<Term?, A>) -> Term? {
@@ -190,9 +190,9 @@ extension Free where A: CustomJSONConvertible {
 	}
 }
 
-extension Free where A: CustomJSONConvertible, B: PatchConvertible, B.Info == A {
+extension Free where A: CustomJSONConvertible, B: PatchConvertible, B.Element == Fix<A> {
 	public var JSON: Doubt.JSON {
-		return JSON { $0.patch.JSON }
+		return JSON { $0.patch.JSON { $0.JSON } }
 	}
 }
 

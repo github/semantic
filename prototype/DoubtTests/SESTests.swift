@@ -36,7 +36,7 @@ final class SESTests: XCTestCase {
 	}
 
 	func testSESOfLongerSequences() {
-		assert(SES([ a, b, c, a, b, b, a ], [ c, b, a, b, a, c ]), ==, [ Diff.Pure(.Replace(a, c)), Diff(b), delete(c), Diff(a), delete(b), Diff(b), Diff(a), insert(c) ])
+		assert(SES([ a, b, c, a, b, b, a ], [ c, b, a, b, a, c ]), ==, [ insert(c), delete(a), Diff(b), delete(c), Diff(a), delete(b), Diff(b), Diff(a), insert(c) ])
 	}
 }
 
@@ -48,16 +48,16 @@ private func delete(term: Term) -> Diff {
 	return Diff.Pure(.Delete(term))
 }
 
-private typealias Term = Fix<Info>
-private typealias Diff = Free<Info, Patch<Info>>
+private typealias Term = Fix<String>
+private typealias Diff = Free<String, Patch<Term>>
 
-private let a = Term.Leaf(.Literal("a", []))
-private let b = Term.Leaf(.Literal("b", []))
-private let c = Term.Leaf(.Literal("c", []))
-private let d = Term.Leaf(.Literal("d", []))
+private let a = Term.Leaf("a")
+private let b = Term.Leaf("b")
+private let c = Term.Leaf("c")
+private let d = Term.Leaf("d")
 
 private func SES(a: [Term], _ b: [Term]) -> [Diff] {
-	return SES(a, b, equals: ==, recur: { Diff.Pure(Patch.Replace($0, $1)) })
+	return SES(a, b) { $0 == $1 ? Diff($1) : nil }
 }
 
 private func == (a: [Diff], b: [Diff]) -> Bool {
@@ -67,4 +67,5 @@ private func == (a: [Diff], b: [Diff]) -> Bool {
 
 import Assertions
 @testable import Doubt
+import Prelude
 import XCTest
