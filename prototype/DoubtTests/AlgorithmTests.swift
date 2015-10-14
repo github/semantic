@@ -6,6 +6,10 @@ final class AlgorithmTests: XCTestCase {
 	func testComparisonsOfDisjointlyCategorizedTermsAreRestricted() {
 		assert(Algorithm(a, b).evaluate(==, categorize: { [ $0.extract ] }), ==, restricted)
 	}
+
+	func testComparisonsAreUnrestrictedByDefault() {
+		assert(Algorithm(a, b).evaluate(==), ==, unrestricted)
+	}
 }
 
 
