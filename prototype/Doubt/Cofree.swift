@@ -14,6 +14,11 @@ public enum Cofree<A, B> {
 			return rest
 		}
 	}
+
+
+	public static func coiterate(annotate: B -> Syntax<B, A>)(_ seed: B) -> Cofree {
+		return .Unroll(seed, annotate(seed).map(coiterate(annotate)))
+	}
 }
 
 
