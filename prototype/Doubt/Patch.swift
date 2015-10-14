@@ -105,6 +105,8 @@ extension Patch where A: CustomJSONConvertible {
 }
 
 
+// MARK: - PatchConvertible
+
 /// A hack to enable constrained extensions on `Free<A, Patch<Fix<A>>`.
 public protocol PatchConvertible {
 	typealias Element
