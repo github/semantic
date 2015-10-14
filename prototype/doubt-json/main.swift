@@ -2,7 +2,7 @@ import Cocoa
 import Doubt
 import Prelude
 
-typealias Term = Cofree<JSONLeaf, ()>
+typealias Term = Cofree<JSONLeaf, Int>
 typealias Diff = Free<JSONLeaf, Patch<Term>>
 
 enum JSONLeaf: Equatable, CustomJSONConvertible, CustomStringConvertible {
@@ -69,7 +69,7 @@ extension JSON {
 
 	var term: Term {
 		func annotate(json: Syntax<Term, JSONLeaf>) -> Term {
-			return Cofree((), json)
+			return Cofree(0, json)
 		}
 		switch self {
 		case let .Array(a):
