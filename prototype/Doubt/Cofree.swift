@@ -6,12 +6,12 @@
 ///
 /// This type is dual to `Free`. Where `Free` is inhabited by syntax trees where some terms are replaced with `B`s, `Cofree` is inhabited by syntax trees where all terms are annotated with `B`s. In Doubt, this allows us to e.g. annotate terms with source range information, categorization, etc.
 public enum Cofree<A, B> {
-	indirect case Unroll(B, Syntax<Cofree, A>)
+	indirect case Unroll(B, () -> Syntax<Cofree, A>)
 
 	public var unwrap: Syntax<Cofree, A> {
 		switch self {
 		case let .Unroll(_, rest):
-			return rest
+			return rest()
 		}
 	}
 
@@ -28,7 +28,7 @@ public enum Cofree<A, B> {
 	///
 	/// As this is the dual of `Free.iterate`, it’s unsurprising that we have a similar guarantee: coiteration is linear in the size of the constructed tree.
 	public static func coiterate(annotate: B -> Syntax<B, A>)(_ seed: B) -> Cofree {
-		return .Unroll(seed, annotate(seed).map(coiterate(annotate)))
+		return .Unroll(seed, { annotate(seed).map(coiterate(annotate)) })
 	}
 }
 
@@ -36,8 +36,8 @@ public enum Cofree<A, B> {
 // MARK: - Functor
 
 extension Cofree {
-	public func map<Other>(@noescape transform: B -> Other) -> Cofree<A, Other> {
-		return .Unroll(transform(extract), unwrap.map { $0.map(transform) })
+	public func map<Other>(transform: B -> Other) -> Cofree<A, Other> {
+		return .Unroll(transform(extract), { self.unwrap.map { $0.map(transform) } })
 	}
 }
 
@@ -54,8 +54,8 @@ extension Cofree {
 	}
 
 	/// Returns a new `Cofree` by recursively applying `transform` to each node, producing the annotations for the copy.
-	public func extend<Other>(@noescape transform: Cofree -> Other) -> Cofree<A, Other> {
-		return .Unroll(transform(self), unwrap.map { $0.extend(transform) })
+	public func extend<Other>(transform: Cofree -> Other) -> Cofree<A, Other> {
+		return .Unroll(transform(self), { self.unwrap.map { $0.extend(transform) } })
 	}
 
 	/// Returns a new `Cofree` constructed by recursively annotating each subtree with itself.
