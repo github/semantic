@@ -115,4 +115,13 @@ extension Cofree where A: CustomJSONConvertible, B: CustomJSONConvertible {
 }
 
 
+// MARK: - Categorizable
+
+extension Cofree where B: Categorizable {
+	var categories: Set<B.Category> {
+		return extract.categories
+	}
+}
+
+
 import Prelude
