@@ -63,13 +63,7 @@
 		D42F09691BCCC41600B95610 /* Prelude.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Prelude.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D42F096A1BCCC41600B95610 /* Stream.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Stream.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D432D4701BA9AC0B00F3FABC /* SESTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SESTests.swift; sourceTree = "<group>"; };
-		D435B7471BB31949000902F6 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D435B7521BB31BBC000902F6 /* BoundsCheckedArray.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BoundsCheckedArray.swift; sourceTree = "<group>"; };
-		D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SourceKittenFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SwiftXPC.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = SWXMLHash.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D4413FDA1BB0536700E3C3C1 /* Result.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Result.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		D4413FE71BB055AE00E3C3C1 /* Commandant.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Commandant.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4413FEE1BB06D4C00E3C3C1 /* Dictionary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dictionary.swift; sourceTree = "<group>"; };
 		D4413FF01BB08FDC00E3C3C1 /* JSON.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSON.swift; sourceTree = "<group>"; };
 		D45A36C81BBC667D00BE3DDE /* Category.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Category.swift; sourceTree = "<group>"; };
@@ -136,25 +130,11 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		D435B7461BB31949000902F6 /* doubt-swift */ = {
-			isa = PBXGroup;
-			children = (
-				D435B7471BB31949000902F6 /* main.swift */,
-				D4413FE71BB055AE00E3C3C1 /* Commandant.framework */,
-				D4413FDA1BB0536700E3C3C1 /* Result.framework */,
-				D4413FD81BB0534000E3C3C1 /* SWXMLHash.framework */,
-				D4413FD61BB0531E00E3C3C1 /* SwiftXPC.framework */,
-				D4413FD41BB052ED00E3C3C1 /* SourceKittenFramework.framework */,
-			);
-			path = "doubt-swift";
-			sourceTree = "<group>";
-		};
 		D4AAE4F31B5AE22E004E581F = {
 			isa = PBXGroup;
 			children = (
 				D4AAE4FF1B5AE22E004E581F /* Doubt */,
 				D4AAE5111B5AE22E004E581F /* DoubtTests */,
-				D435B7461BB31949000902F6 /* doubt-swift */,
 				D4DF96FC1BC5DF050040F41F /* doubt-json */,
 				D4AAE4FE1B5AE22E004E581F /* Products */,
 			);
