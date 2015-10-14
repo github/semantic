@@ -3,15 +3,12 @@
 /// As with `Free`, this is “free” in the sense of “unconstrained,” i.e. “the monad induced by `Operation` without extra assumptions.”
 ///
 /// Where `Operation` models a single diffing strategy, `Algorithm` models the recursive selection of diffing strategies at each node. Thus, a value in `Algorithm` models an algorithm for constructing a value in the type `B` from the resulting diffs. By this means, diffing can be adapted not just to the specific grammar, but to specific trees produced by that grammar, and even the values of type `A` encapsulated at each node.
-public enum Algorithm<Leaf, B> {
-	/// The type of `Term`s over which `Algorithm`s operate.
-	public typealias Term = Fix<Leaf>
-
+public enum Algorithm<Term: TermType, B> {
 	/// The type of `Patch`es produced by `Algorithm`s.
 	public typealias Patch = Doubt.Patch<Term>
 
 	/// The type of `Diff`s which `Algorithm`s produce.
-	public typealias Diff = Free<Leaf, Patch>
+	public typealias Diff = Free<Term.LeafType, Patch>
 
 	/// The injection of a value of type `B` into an `Operation`.
 	///
@@ -33,22 +30,22 @@ public enum Algorithm<Leaf, B> {
 
 	// MARK: Functor
 
-	public func map<Other>(transform: B -> Other) -> Algorithm<Leaf, Other> {
-		return analysis(ifPure: transform >>> Algorithm<Leaf, Other>.Pure, ifRoll: { .Roll($0.map { $0.map(transform) }) })
+	public func map<Other>(transform: B -> Other) -> Algorithm<Term, Other> {
+		return analysis(ifPure: transform >>> Algorithm<Term, Other>.Pure, ifRoll: { .Roll($0.map { $0.map(transform) }) })
 	}
 
 
 	// MARK: Monad
 
-	public func flatMap<C>(transform: B -> Algorithm<Leaf, C>) -> Algorithm<Leaf, C> {
+	public func flatMap<C>(transform: B -> Algorithm<Term, C>) -> Algorithm<Term, C> {
 		return analysis(ifPure: transform, ifRoll: { .Roll($0.map { $0.flatMap(transform) }) })
 	}
 
 
 	/// Evaluates the encoded algorithm, returning its result.
-	public func evaluate(equals: (Leaf, Leaf) -> Bool, recur: (Term, Term) -> Diff?) -> B {
+	public func evaluate(equals: (Term, Term) -> Bool, recur: (Term, Term) -> Diff?) -> B {
 		let recur = {
-			Term.equals(equals)($0, $1)
+			equals($0, $1)
 				? Diff($1)
 				: recur($0, $1)
 		}
@@ -63,7 +60,7 @@ public enum Algorithm<Leaf, B> {
 			// Recur structurally into both terms, if compatible, patching paired sub-terms. This is akin to the shape of unification, except that it computes a patched tree instead of a substitution. It’s also a little like a structural zip on the pair of terms.
 			//
 			// At the moment, there are no restrictions on whether terms are compatible.
-			if Term.equals(equals)(a, b) { return f(Diff(b)).evaluate(equals, recur: recur) }
+			if equals(a, b) { return f(Diff(b)).evaluate(equals, recur: recur) }
 
 			switch (a.out, b.out) {
 			case let (.Indexed(a), .Indexed(b)) where a.count == b.count:
@@ -90,14 +87,14 @@ public enum Algorithm<Leaf, B> {
 	}
 }
 
-extension Algorithm where Leaf: Equatable {
+extension Algorithm where Term: Equatable {
 	public func evaluate(recur: (Term, Term) -> Diff?) -> B {
 		return evaluate(==, recur: recur)
 	}
 }
 
-extension Algorithm where B: FreeConvertible, B.RollType == Leaf, B.PureType == Algorithm<Leaf, B>.Patch {
-	/// `Algorithm<A, Diff>`s can be constructed from a pair of `Term`s using `ByKey` when `Keyed`, `ByIndex` when `Indexed`, and `Recursive` otherwise.
+extension Algorithm where B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
+	/// `Algorithm<Term, Diff>`s can be constructed from a pair of `Term`s using `ByKey` when `Keyed`, `ByIndex` when `Indexed`, and `Recursive` otherwise.
 	public init(_ a: Term, _ b: Term) {
 		switch (a.out, b.out) {
 		case let (.Keyed(a), .Keyed(b)):
@@ -109,12 +106,12 @@ extension Algorithm where B: FreeConvertible, B.RollType == Leaf, B.PureType == 
 		}
 	}
 
-	public func evaluate(equals: (Leaf, Leaf) -> Bool) -> B {
+	public func evaluate(equals: (Term, Term) -> Bool) -> B {
 		return evaluate(equals, recur: { Algorithm($0, $1).evaluate(equals).free })
 	}
 }
 
-extension Algorithm where Leaf: Equatable, B: FreeConvertible, B.RollType == Leaf, B.PureType == Algorithm<Leaf, B>.Patch {
+extension Algorithm where Term: Equatable, B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
 	public func evaluate() -> B {
 		return evaluate(==)
 	}
