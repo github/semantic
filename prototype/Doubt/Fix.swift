@@ -81,7 +81,7 @@ extension Fix where A: CustomJSONConvertible {
 // MARK: - Categorizable
 
 extension Fix where A: Categorizable {
-	public var categories: Set<Category> {
+	public var categories: Set<A.Category> {
 		switch self {
 		case let .In(.Leaf(a)):
 			return a.categories
