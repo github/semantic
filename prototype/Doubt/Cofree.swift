@@ -1,7 +1,7 @@
 //  Copyright © 2015 GitHub. All rights reserved.
 
-public enum Cofree<B> {
-	case Unroll(B)
+public enum Cofree<A, B> {
+	case Unroll(B, Syntax<Cofree, A>)
 }
 
 
@@ -10,7 +10,7 @@ public enum Cofree<B> {
 extension Cofree {
 	var extract: B {
 		switch self {
-		case let .Unroll(b):
+		case let .Unroll(b, _):
 			return b
 		}
 	}
