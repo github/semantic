@@ -1,3 +1,4 @@
+/// A syntactic category to which nodes can belong.
 public enum Category: AlgebraicHashable, Comparable, CustomDebugStringConvertible, CustomJSONConvertible {
 	case Tag(String)
 
