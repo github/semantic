@@ -22,7 +22,7 @@ extension Cofree {
 		}
 	}
 
-	func extend<Other>(transform: Cofree -> Other) -> Cofree<A, Other> {
+	public func extend<Other>(transform: Cofree -> Other) -> Cofree<A, Other> {
 		return .Unroll(transform(self), unwrap.map { $0.extend(transform) })
 	}
 }
