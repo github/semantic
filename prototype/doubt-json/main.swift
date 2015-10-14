@@ -1,6 +1,10 @@
 import Doubt
 import Cocoa
 
+typealias Term = Fix<JSONLeaf>
+typealias Diff = Free<JSONLeaf, Patch<JSONLeaf>>
+
+
 enum JSONLeaf: Equatable, CustomJSONConvertible, CustomStringConvertible {
 	case Number(Double)
 	case Boolean(Bool)
@@ -63,9 +67,6 @@ extension JSON {
 		self.init(object: object)
 	}
 
-	typealias Term = Fix<JSONLeaf>
-	typealias Diff = Free<JSONLeaf, Patch<JSONLeaf>>
-
 	var term: Term {
 		switch self {
 		case let .Array(a):
@@ -86,7 +87,7 @@ extension JSON {
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
 if let a = arguments[1].flatMap(JSON.init), b = arguments[2].flatMap(JSON.init) {
-	let diff = Algorithm<JSONLeaf, JSON.Diff>(a.term, b.term).evaluate()
+	let diff = Algorithm<JSONLeaf, Diff>(a.term, b.term).evaluate()
 	if let JSON = NSString(data: diff.JSON.serialize(), encoding: NSUTF8StringEncoding) {
 		print(JSON)
 	}
