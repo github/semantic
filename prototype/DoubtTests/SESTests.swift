@@ -48,13 +48,13 @@ private func delete(term: Term) -> Diff {
 	return Diff.Pure(.Delete(term))
 }
 
-private typealias Term = Fix<Info>
-private typealias Diff = Free<Info, Patch<Fix<Info>>>
+private typealias Term = Fix<String>
+private typealias Diff = Free<String, Patch<Term>>
 
-private let a = Term.Leaf(.Literal("a", []))
-private let b = Term.Leaf(.Literal("b", []))
-private let c = Term.Leaf(.Literal("c", []))
-private let d = Term.Leaf(.Literal("d", []))
+private let a = Term.Leaf("a")
+private let b = Term.Leaf("b")
+private let c = Term.Leaf("c")
+private let d = Term.Leaf("d")
 
 private func SES(a: [Term], _ b: [Term]) -> [Diff] {
 	return SES(a, b, recur: { Diff.Pure(Patch.Replace($0, $1)) })
