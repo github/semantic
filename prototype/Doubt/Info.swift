@@ -1,5 +1,5 @@
 /// Source info & categorization for nodes in a syntax tree.
-public enum Info: AlgebraicHashable, CustomDebugStringConvertible, CustomJSONConvertible {
+public enum Info: AlgebraicHashable, Categorizable, CustomDebugStringConvertible, CustomJSONConvertible {
 	case Literal(String, Set<Category>)
 
 	public var categories: Set<Category> {
