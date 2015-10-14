@@ -3,7 +3,7 @@ final class AlgorithmTests: XCTestCase {
 		assert(Algorithm(a, b).evaluate(==, recur: const(nil)), ==, restricted)
 	}
 
-	func testRestrictsComparisonsOfTermsInDisjointCategories() {
+	func testComparisonsOfDisjointlyCategorizedTermsAreRestricted() {
 		assert(Algorithm(a, b).evaluate(==, categorize: { [ $0.extract ] }), ==, restricted)
 	}
 }
