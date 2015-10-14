@@ -8,7 +8,7 @@ public func SES<Term, A>(a: [Term], _ b: [Term], recur: (Term, Term) -> Free<A, 
 	if b.isEmpty { return a.map { Diff.Pure(Patch.Delete($0)) } }
 
 	func cost(diff: Diff) -> Int {
-		return diff.map { $0.cost }.iterate { syntax in
+		return diff.map(const(1)).iterate { syntax in
 			switch syntax {
 			case .Leaf:
 				return 0
@@ -75,4 +75,5 @@ public func SES<Term, A>(a: [Term], _ b: [Term], recur: (Term, Term) -> Free<A, 
 
 
 import Memo
+import Prelude
 import Stream
