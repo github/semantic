@@ -96,20 +96,6 @@ extension Algorithm where Leaf: Equatable {
 	}
 }
 
-/// A hack to work around the unavailability of same-type requirements.
-public protocol FreeConvertible {
-	typealias RollType
-	typealias PureType
-
-	init(free: Free<RollType, PureType>)
-	var free: Free<RollType, PureType> { get }
-}
-
-extension Free: FreeConvertible {
-	public init(free: Free<A, B>) { self = free }
-	public var free: Free { return self }
-}
-
 extension Algorithm where B: FreeConvertible, B.RollType == Leaf, B.PureType == Algorithm<Leaf, B>.Patch {
 	/// `Algorithm<A, Diff>`s can be constructed from a pair of `Term`s using `ByKey` when `Keyed`, `ByIndex` when `Indexed`, and `Recursive` otherwise.
 	public init(_ a: Term, _ b: Term) {

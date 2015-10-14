@@ -197,4 +197,21 @@ extension Free where A: CustomJSONConvertible, B: PatchConvertible, B.Element ==
 }
 
 
+// MARK: - FreeConvertible
+
+/// A hack to work around the unavailability of same-type requirements.
+public protocol FreeConvertible {
+	typealias RollType
+	typealias PureType
+
+	init(free: Free<RollType, PureType>)
+	var free: Free<RollType, PureType> { get }
+}
+
+extension Free: FreeConvertible {
+	public init(free: Free<A, B>) { self = free }
+	public var free: Free { return self }
+}
+
+
 import Prelude
