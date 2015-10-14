@@ -21,6 +21,12 @@ public enum Cofree<A, B> {
 		self = Cofree<A, Fix<A>>.coiterate { $0.out } (fix).map(annotate)
 	}
 
+
+	/// Constructs a cofree by coiteration.
+	///
+	/// The initial seed is used as the annotation of the returned value. The continuation of the structure is unpacked by applying `annotate` to the seed and mapping the resulting syntax’s values recursively. In this manner, the structure is unfolded bottom-up, starting with `seed` and ending at the leaves.
+	///
+	/// As this is the dual of `Free.iterate`, it’s unsurprising that we have a similar guarantee: coiteration is linear in the size of the constructed tree.
 	public static func coiterate(annotate: B -> Syntax<B, A>)(_ seed: B) -> Cofree {
 		return .Unroll(seed, annotate(seed).map(coiterate(annotate)))
 	}
