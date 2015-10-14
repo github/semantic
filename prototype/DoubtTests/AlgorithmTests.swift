@@ -23,6 +23,12 @@ private let restricted = Diff.Roll([
 	.Pure(.Delete(Term(3, .Leaf("c")))),
 ])
 
+private let unrestricted = Diff.Roll([
+	.Pure(.Replace(Term(1, .Leaf("a")), Term(1, .Leaf("c")))),
+	Diff(Term(2, .Leaf("b"))),
+	.Pure(.Replace(Term(3, .Leaf("c")), Term(3, .Leaf("a")))),
+])
+
 
 import Assertions
 @testable import Doubt
