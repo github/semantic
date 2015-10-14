@@ -2,7 +2,7 @@ import Doubt
 import Cocoa
 
 typealias Term = Fix<JSONLeaf>
-typealias Diff = Free<JSONLeaf, Patch<JSONLeaf>>
+typealias Diff = Free<JSONLeaf, Patch<Term>>
 
 enum JSONLeaf: Equatable, CustomJSONConvertible, CustomStringConvertible {
 	case Number(Double)
