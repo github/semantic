@@ -15,7 +15,7 @@ public enum Cofree<A, B> {
 // MARK: - Comonad
 
 extension Cofree {
-	var extract: B {
+	public var extract: B {
 		switch self {
 		case let .Unroll(b, _):
 			return b
