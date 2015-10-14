@@ -52,6 +52,18 @@ public enum Algorithm<Term: TermType, B> {
 		let recurOrReplace = {
 			recur($0, $1) ?? .Pure(.Replace($0, $1))
 		}
+		func cost(diff: Diff) -> Int {
+			return diff.map { abs(($0.state.before?.size ?? 0) - ($0.state.after?.size ?? 0)) }.iterate { syntax in
+				switch syntax {
+				case .Leaf:
+					return 0
+				case let .Indexed(costs):
+					return costs.reduce(0, combine: +)
+				case let .Keyed(costs):
+					return costs.values.reduce(0, combine: +)
+				}
+			}
+		}
 		switch self {
 		case let .Pure(b):
 			return b
