@@ -42,6 +42,15 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 }
 
 
+// MARK: - ArrayLiteralConvertible
+
+extension Syntax: ArrayLiteralConvertible {
+	public init(arrayLiteral: Recur...) {
+		self = .Indexed(arrayLiteral)
+	}
+}
+
+
 // MARK: - Equality
 
 extension Syntax {
