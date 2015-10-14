@@ -43,7 +43,15 @@ public enum Algorithm<A, B> {
 
 
 	/// Evaluates the encoded algorithm, returning its result.
-	public func evaluate(equals: (A, A) -> Bool, recur: (Term, Term) -> Diff) -> B {
+	public func evaluate(equals: (A, A) -> Bool, recur: (Term, Term) -> Diff?) -> B {
+		let recur = {
+			Term.equals(equals)($0, $1)
+				? Diff($1)
+				: recur($0, $1)
+		}
+		let recurOrReplace = {
+			recur($0, $1) ?? .Pure(.Replace($0, $1))
+		}
 		switch self {
 		case let .Pure(b):
 			return b
@@ -56,10 +64,10 @@ public enum Algorithm<A, B> {
 
 			switch (a.out, b.out) {
 			case let (.Indexed(a), .Indexed(b)) where a.count == b.count:
-				return f(.Indexed(zip(a, b).map(recur))).evaluate(equals, recur: recur)
+				return f(.Indexed(zip(a, b).map(recurOrReplace))).evaluate(equals, recur: recur)
 
 			case let (.Keyed(a), .Keyed(b)) where Array(a.keys) == Array(b.keys):
-				return f(.Keyed(Dictionary(elements: b.keys.map { ($0, recur(a[$0]!, b[$0]!)) }))).evaluate(equals, recur: recur)
+				return f(.Keyed(Dictionary(elements: b.keys.map { ($0, recurOrReplace(a[$0]!, b[$0]!)) }))).evaluate(equals, recur: recur)
 
 			default:
 				// This must not call `recur` with `a` and `b`, as that would infinite loop if actually recursive.
@@ -67,15 +75,10 @@ public enum Algorithm<A, B> {
 			}
 
 		case let .Roll(.ByKey(a, b, f)):
-			let recur = {
-				Term.equals(equals)($0, $1)
-					? Diff($1)
-					: recur($0, $1)
-			}
 			// Essentially [set reconciliation](https://en.wikipedia.org/wiki/Data_synchronization#Unordered_data) on the keys, followed by recurring into the values of the intersecting keys.
 			let deleted = Set(a.keys).subtract(b.keys).map { ($0, Diff.Pure(Patch.Delete(a[$0]!))) }
 			let inserted = Set(b.keys).subtract(a.keys).map { ($0, Diff.Pure(Patch.Insert(b[$0]!))) }
-			let patched = Set(a.keys).intersect(b.keys).map { ($0, recur(a[$0]!, b[$0]!)) }
+			let patched = Set(a.keys).intersect(b.keys).map { ($0, recurOrReplace(a[$0]!, b[$0]!)) }
 			return f(Dictionary(elements: deleted + inserted + patched)).evaluate(equals, recur: recur)
 
 		case let .Roll(.ByIndex(a, b, f)):
@@ -85,7 +88,7 @@ public enum Algorithm<A, B> {
 }
 
 extension Algorithm where A: Equatable {
-	public func evaluate(recur: (Term, Term) -> Diff) -> B {
+	public func evaluate(recur: (Term, Term) -> Diff?) -> B {
 		return evaluate(==, recur: recur)
 	}
 }
