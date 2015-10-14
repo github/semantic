@@ -105,5 +105,11 @@ extension Cofree {
 	}
 }
 
+extension Cofree where A: CustomJSONConvertible, B: CustomJSONConvertible {
+	public var JSON: Doubt.JSON {
+		return JSON(annotation: { $0.JSON }, leaf: { $0.JSON })
+	}
+}
+
 
 import Prelude
