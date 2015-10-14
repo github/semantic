@@ -51,3 +51,9 @@ public func == (left: Category, right: Category) -> Bool {
 public func < (left: Category, right: Category) -> Bool {
 	return left.tag < right.tag
 }
+
+
+// MARK: - Categorizable
+
+/// A type whose values belong to a set of categories.
+public protocol Categorizable {}
