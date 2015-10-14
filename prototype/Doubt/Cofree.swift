@@ -14,6 +14,11 @@ public enum Cofree<A, B> {
 	}
 
 
+	public init(_ annotation: B, @autoclosure(escaping) _ syntax: () -> Syntax<Cofree, A>) {
+		self = .Unroll(annotation, syntax)
+	}
+
+
 	/// Recursively copies a `Fix<A>` into a `Cofree<A, B>` with a function assigning `B` for every `Fix<A>`.
 	public init(_ fix: Fix<A>, _ annotate: Fix<A> -> B) {
 		self = Cofree<A, Fix<A>>.coiterate { $0.out } (fix).map(annotate)
