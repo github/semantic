@@ -177,4 +177,11 @@ extension Algorithm where A: Categorizable, B: FreeConvertible, B.RollType == A,
 }
 
 
+extension Algorithm where A: Categorizable, A: Equatable, B: FreeConvertible, B.RollType == A, B.PureType == Patch<A> {
+	public func evaluate() -> B {
+		return evaluate(==)
+	}
+}
+
+
 import Prelude
