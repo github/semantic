@@ -166,5 +166,15 @@ extension Algorithm where A: Equatable, B: FreeConvertible, B.RollType == A, B.P
 	}
 }
 
+extension Algorithm where A: Categorizable, B: FreeConvertible, B.RollType == A, B.PureType == Patch<A> {
+	public func evaluate(equals: (A, A) -> Bool) -> B {
+		return evaluate(equals, recur: {
+			($0.categories.isEmpty || $1.categories.isEmpty) && !$0.categories.intersect($1.categories).isEmpty
+				? Algorithm($0, $1).evaluate(equals).free
+				: nil
+		})
+	}
+}
+
 
 import Prelude
