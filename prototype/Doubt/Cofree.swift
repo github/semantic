@@ -65,4 +65,14 @@ extension Cofree {
 }
 
 
+// MARK: - Equality
+
+extension Cofree {
+	public static func equals(annotation annotation: (B, B) -> Bool, leaf: (A, A) -> Bool)(_ left: Cofree, _ right: Cofree) -> Bool {
+		return annotation(left.extract, right.extract)
+			&& Syntax.equals(ifLeaf: leaf, ifRecur: Cofree.equals(annotation: annotation, leaf: leaf))(left.unwrap, right.unwrap)
+	}
+}
+
+
 import Prelude
