@@ -29,6 +29,7 @@ extension Cofree {
 // MARK: - Comonad
 
 extension Cofree {
+	/// Returns the value annotating the syntax tree at this node.
 	public var extract: B {
 		switch self {
 		case let .Unroll(b, _):
