@@ -21,4 +21,8 @@ extension Cofree {
 			return b
 		}
 	}
+
+	func extend<Other>(transform: Cofree -> Other) -> Cofree<A, Other> {
+		return .Unroll(transform(self), unwrap.map { $0.extend(transform) })
+	}
 }
