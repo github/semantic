@@ -4,3 +4,6 @@
 [submodule "prototype/External/Stream"]
 	path = prototype/External/Stream
 	url = https://github.com/antitypical/Stream.git
+[submodule "prototype/External/Madness"]
+	path = prototype/External/Madness
+	url = https://github.com/robrix/Madness
