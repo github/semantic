@@ -25,4 +25,8 @@ extension Cofree {
 	public func extend<Other>(transform: Cofree -> Other) -> Cofree<A, Other> {
 		return .Unroll(transform(self), unwrap.map { $0.extend(transform) })
 	}
+
+	public var duplicate: Cofree<A, Cofree<A, B>> {
+		return .Unroll(self, unwrap.map { $0.duplicate })
+	}
 }
