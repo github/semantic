@@ -1,8 +1,8 @@
 /// Source info & categorization for nodes in a syntax tree.
 public enum Info: AlgebraicHashable, Categorizable, CustomDebugStringConvertible, CustomJSONConvertible {
-	case Literal(String, Set<Category>)
+	case Literal(String, Set<String>)
 
-	public var categories: Set<Category> {
+	public var categories: Set<String> {
 		switch self {
 		case let .Literal(_, c):
 			return c
