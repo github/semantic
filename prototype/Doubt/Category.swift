@@ -56,4 +56,6 @@ public func < (left: Category, right: Category) -> Bool {
 // MARK: - Categorizable
 
 /// A type whose values belong to a set of categories.
-public protocol Categorizable {}
+public protocol Categorizable {
+	var categories: Set<Category> { get }
+}
