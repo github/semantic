@@ -76,3 +76,23 @@ extension Fix where A: CustomJSONConvertible {
 		return JSON { $0.JSON }
 	}
 }
+
+
+// MARK: - Categorizable
+
+extension Fix: Categorizable {
+	public var categories: Set<Category> {
+		return []
+	}
+}
+
+extension Fix where A: Categorizable {
+	public var categories: Set<Category> {
+		switch self {
+		case let .In(.Leaf(a)):
+			return a.categories
+		default:
+			return []
+		}
+	}
+}
