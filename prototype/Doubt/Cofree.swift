@@ -42,6 +42,7 @@ extension Cofree {
 		return .Unroll(transform(self), unwrap.map { $0.extend(transform) })
 	}
 
+	/// Returns a new `Cofree` constructed by recursively annotating each subtree with itself.
 	public var duplicate: Cofree<A, Cofree<A, B>> {
 		return .Unroll(self, unwrap.map { $0.duplicate })
 	}
