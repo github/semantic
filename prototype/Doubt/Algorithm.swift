@@ -112,7 +112,7 @@ extension Algorithm where B: FreeConvertible, B.RollType == Term.LeafType, B.Pur
 
 	public func evaluate<C>(equals: (Term, Term) -> Bool, categorize: Term -> Set<C>) -> B {
 		return evaluate(equals, recur: {
-			(categorize($0).isEmpty || categorize($1).isEmpty) && !categorize($0).intersect(categorize($1)).isEmpty
+			categorize($0).isEmpty || categorize($1).isEmpty || !categorize($0).intersect(categorize($1)).isEmpty
 				? Algorithm($0, $1).evaluate(equals).free
 				: nil
 		})
