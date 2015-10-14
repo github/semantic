@@ -46,12 +46,6 @@ public func SES<A>(a: [Fix<A>], _ b: [Fix<A>], equals: (A, A) -> Bool, recur: (F
 		let down = matrix[i, j + 1]
 		let diagonal = matrix[i + 1, j + 1]
 
-		let recur = {
-			Term.equals(equals)($0, $1)
-				? Diff($1)
-				: recur($0, $1)
-		}
-
 		if let right = right, down = down, diagonal = diagonal {
 			// nominate the best edge to continue along
 			let (best, diff, _) = min(
