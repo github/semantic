@@ -29,6 +29,9 @@ public struct Interpreter<Term: TermType> {
 			case let (.Indexed(a), .Indexed(b)) where a.count == b.count:
 				return recur(f(.Indexed(zip(a, b).map(run))))
 
+			case let (.Keyed(a), .Keyed(b)) where Array(a.keys) == Array(b.keys):
+				return recur(f(.Keyed(Dictionary(elements: b.keys.map { ($0, self.run(a[$0]!, b[$0]!)) }))))
+
 			default:
 				return nil
 			}
