@@ -1,5 +1,6 @@
 /// An interpreter of `Algorithm`s.
 public struct Interpreter<Term: TermType> {
+	/// The type of diffs constructed by `Interpreter`s.
 	public typealias Diff = Free<Term.LeafType, Patch<Term>>
 
 	public init(equals: (Term, Term) -> Bool, comparable: (Term, Term) -> Bool, cost: Diff -> Int) {
