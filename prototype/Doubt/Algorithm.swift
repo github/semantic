@@ -121,11 +121,39 @@ extension Algorithm where B: FreeConvertible, B.RollType == Term.LeafType, B.Pur
 	public func evaluate(equals: (Term, Term) -> Bool) -> B {
 		return evaluate(equals, recur: { Algorithm($0, $1).evaluate(equals).free })
 	}
+
+	/// Evaluate the algorithm.
+	///
+	/// `equals` compares two terms for equality. It should be strictly syntactic equality, ignoring any annotations/metadata on the terms.
+	///
+	/// `categorize` provides sets of categories for terms. If the categories of two terms are distinct and non-intersecting, then the terms should not be compared in e.g. SES. This is provided as a parameter so that `Term` need not be `Categorizable` in order to use it.
+	public func evaluate<C>(equals: (Term, Term) -> Bool, categorize: Term -> Set<C>) -> B {
+		return evaluate(equals, recur: {
+			let c0 = categorize($0)
+			let c1 = categorize($1)
+			return c0 == c1 || !categorize($0).intersect(categorize($1)).isEmpty
+				? Algorithm($0, $1).evaluate(equals).free
+				: nil
+		})
+	}
 }
 
 extension Algorithm where Term: Equatable, B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
 	public func evaluate() -> B {
 		return evaluate(==)
+	}
+}
+
+extension Algorithm where Term: Categorizable, B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
+	public func evaluate(equals: (Term, Term) -> Bool) -> B {
+		return evaluate(equals, categorize: { $0.categories })
+	}
+}
+
+
+extension Algorithm where Term: Categorizable, Term: Equatable, B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
+	public func evaluate() -> B {
+		return evaluate(==, categorize: { $0.categories })
 	}
 }
 
