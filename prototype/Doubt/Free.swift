@@ -13,11 +13,7 @@ public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 	indirect case Roll(Syntax<Free, A>)
 
 
-	/// Recursively copies a `Fix<A>` into a `Free<A, B>`, essentially mapping `Fix.In` onto `Free.Roll`.
-	public init(_ fix: Fix<A>) {
-		self = .Roll(fix.out.map(Free.init))
-	}
-
+	/// Recursively copies a `Term: TermType where Term.LeafType == A` into a `Free<A, B>`, essentially mapping `Term.out` onto `Free.Roll`.
 	public init<Term: TermType where Term.LeafType == A>(_ term: Term) {
 		self = .Roll(term.out.map(Free.init))
 	}
