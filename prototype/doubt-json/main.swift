@@ -1,6 +1,8 @@
 import Cocoa
 import Doubt
+import Either
 import Prelude
+import Madness
 
 typealias Term = Cofree<JSONLeaf, Int>
 typealias Diff = Free<JSONLeaf, Patch<Term>>
@@ -59,7 +61,6 @@ func == (left: JSONLeaf, right: JSONLeaf) -> Bool {
 	}
 }
 
-
 extension JSON {
 	init?(path: Swift.String) {
 		guard let data = try? NSData(contentsOfFile: path, options: []) else { return nil }
@@ -100,6 +101,47 @@ extension JSON {
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
+
+let file = NSData(contentsOfFile: Process.arguments[1])
+
+typealias CofreeJSON = Cofree<JSONLeaf, Range<String.CharacterView.Index>>
+typealias JSONParser = Parser<String, CofreeJSON>.Function
+
+extension String: CollectionType {
+	public var count: Index.Distance {
+		return characters.count
+	}
+}
+
+func not<C: CollectionType, T>(parser: Parser<C, T>.Function)(_ input: C, _ index: C.Index) -> Either<Error<C.Index>, (C.Generator.Element, C.Index)> {
+	if index.distanceTo(input.endIndex) <= 0 || parser(input, index).right != nil {
+		return .Left(Error(reason: "", index: index, children: []))
+	} else {
+		return .Right(input[index], index.successor())
+	}
+}
+
+typealias StringParser = Parser<String, String>.Function
+
+let json: JSONParser = fix { json in
+	// TODO: Parse backslashed escape characters
+	let stringBody: StringParser = { $0.map({ String($0) }).joinWithSeparator("") } <^>
+		not(%"\\" | %"\"")*
+	let quoted = { $1.0 } <^> %"\"" ++ stringBody ++ %"\""
+	let string: JSONParser = quoted --> { Cofree($1, .Leaf(.String($2))) }
+	let array =  %"[" ++ json* ++ %"]" --> { Cofree($1, .Indexed($2.1.0)) }
+
+	let dict: JSONParser =  %"{" ++ (quoted ++ %":" ++ json)* ++ %"}" --> { (_, range: Range<String.Index>, value: (String, ([(String, (String, CofreeJSON))], String))) in
+		Cofree(range, .Keyed([value.0: value.1.0[0].1.1]))
+	}
+
+	// TODO: Parse Numbers correctly
+	let number: JSONParser = %"0" --> { Cofree($1, .Leaf(.String($2))) }
+
+	return dict | array
+}
+
+
 if let a = arguments[1].flatMap(JSON.init), b = arguments[2].flatMap(JSON.init) {
 	let diff = Algorithm<Term, Diff>(a.term, b.term).evaluate(Cofree.equals(annotation: const(true), leaf: ==))
 	if let JSON = NSString(data: diff.JSON(ifPure: { $0.JSON { $0.JSON } }, ifLeaf: { $0.JSON }).serialize(), encoding: NSUTF8StringEncoding) {

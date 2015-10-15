@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D18FF8821BD0404700D18F2D /* Madness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D18FF8811BD0404700D18F2D /* Madness.framework */; };
 		D40B89C41BC319070078E098 /* Matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B89C31BC319070078E098 /* Matrix.swift */; settings = {ASSET_TAGS = (); }; };
 		D40B89C81BC439000078E098 /* Assertions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D40B89C71BC439000078E098 /* Assertions.framework */; };
 		D40D72541BCEEB1F001B7A9E /* AlgorithmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40D72531BCEEB1F001B7A9E /* AlgorithmTests.swift */; settings = {ASSET_TAGS = (); }; };
@@ -55,6 +56,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D18FF8811BD0404700D18F2D /* Madness.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Madness.framework; path = "../../../../Library/Developer/Xcode/DerivedData/Doubt-gibmbsxjgxflybarnuoisglmgdll/Build/Products/Debug/Madness.framework"; sourceTree = "<group>"; };
 		D40B89C31BC319070078E098 /* Matrix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Matrix.swift; sourceTree = "<group>"; };
 		D40B89C71BC439000078E098 /* Assertions.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Assertions.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D40D72531BCEEB1F001B7A9E /* AlgorithmTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlgorithmTests.swift; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D18FF8821BD0404700D18F2D /* Madness.framework in Frameworks */,
 				D42F096B1BCCC41600B95610 /* Either.framework in Frameworks */,
 				D42F096C1BCCC41600B95610 /* Memo.framework in Frameworks */,
 				D42F096D1BCCC41600B95610 /* Prelude.framework in Frameworks */,
@@ -180,6 +183,7 @@
 				D4DF96F01BC54C970040F41F /* Doubt.modulemap */,
 				D42F09671BCCC41600B95610 /* Either.framework */,
 				D42F09681BCCC41600B95610 /* Memo.framework */,
+				D18FF8811BD0404700D18F2D /* Madness.framework */,
 				D42F09691BCCC41600B95610 /* Prelude.framework */,
 				D42F096A1BCCC41600B95610 /* Stream.framework */,
 			);
@@ -486,6 +490,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/External/Madness/build/Debug",
+				);
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Doubt/Info.plist;
 				INSTALL_PATH = "@rpath";
@@ -508,6 +516,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/External/Madness/build/Debug",
+				);
 				FRAMEWORK_VERSION = A;
 				INFOPLIST_FILE = Doubt/Info.plist;
 				INSTALL_PATH = "@rpath";
