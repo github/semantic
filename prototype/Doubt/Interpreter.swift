@@ -77,4 +77,13 @@ public struct Interpreter<Term: TermType> {
 }
 
 
+// MARK: - Constrained constructors
+
+extension Interpreter where Term.LeafType: Equatable {
+	public init(comparable: (Term, Term) -> Bool, cost: Diff -> Int) {
+		self.init(equal: Term.equals(==), comparable: comparable, cost: cost)
+	}
+}
+
+
 import Prelude
