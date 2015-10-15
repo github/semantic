@@ -16,6 +16,14 @@ public struct Interpreter<Term: TermType> {
 		self.cost = cost
 	}
 
+
+	/// Computes a term comparable function from a categorizing function.
+	public static func comparable<C>(categorize: Term -> Set<C>)(_ a: Term, _ b: Term) -> Bool {
+		let c0 = categorize(a)
+		let c1 = categorize(b)
+		return c0 == c1 || !categorize(a).intersect(categorize(b)).isEmpty
+	}
+
 	/// Computes a diff cost function from a patch cost function.
 	public static func cost(cost: Patch<Term> -> Int)(_ diff: Diff) -> Int {
 		return diff.map(cost).reduce(0, combine: +)
