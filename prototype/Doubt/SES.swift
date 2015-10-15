@@ -58,12 +58,12 @@ public func SES<Term, A>(a: [Term], _ b: [Term], recur: (Term, Term) -> Free<A, 
 
 		// right extent of the edit graph; can only move down
 		if let down = down {
-			return cons(Diff.Pure(Patch.Insert(b[j])), rest: down)
+			return cons(Diff.Insert(b[j]), rest: down)
 		}
 
 		// bottom extent of the edit graph; can only move right
 		if let right = right {
-			return cons(Diff.Pure(Patch.Delete(a[i])), rest: right)
+			return cons(Diff.Delete(a[i]), rest: right)
 		}
 
 		// bottom-right corner of the edit graph
