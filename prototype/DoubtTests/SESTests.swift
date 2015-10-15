@@ -4,39 +4,39 @@ final class SESTests: XCTestCase {
 	}
 
 	func testSESOverEmptyAndNonEmptyCollectionsIsInsertions() {
-		assert(SES([], [ a, b ]), ==, [ insert(a), insert(b) ])
+		assert(SES([], [ a, b ]), ==, [ .Insert(a), .Insert(b) ])
 	}
 
 	func testSESOverNonEmptyAndEmptyCollectionsIsDeletions() {
-		assert(SES([ a, b ], []), ==, [ delete(a), delete(b) ])
+		assert(SES([ a, b ], []), ==, [ .Delete(a), .Delete(b) ])
 	}
 
 	func testSESCanInsertAtHead() {
-		assert(SES([ a, b, c ], [ d, a, b, c ]), ==, [ insert(d), Diff(a), Diff(b), Diff(c) ])
+		assert(SES([ a, b, c ], [ d, a, b, c ]), ==, [ .Insert(d), Diff(a), Diff(b), Diff(c) ])
 	}
 
 	func testSESCanDeleteAtHead() {
-		assert(SES([ d, a, b, c ], [ a, b, c ]), ==, [ delete(d), Diff(a), Diff(b), Diff(c) ])
+		assert(SES([ d, a, b, c ], [ a, b, c ]), ==, [ .Delete(d), Diff(a), Diff(b), Diff(c) ])
 	}
 
 	func testSESCanInsertInMiddle() {
-		assert(SES([ a, b, c ], [ a, d, b, c ]), ==, [ Diff(a), insert(d), Diff(b), Diff(c) ])
+		assert(SES([ a, b, c ], [ a, d, b, c ]), ==, [ Diff(a), .Insert(d), Diff(b), Diff(c) ])
 	}
 
 	func testSESCanDeleteInMiddle() {
-		assert(SES([ a, d, b, c ], [ a, b, c ]), ==, [ Diff(a), delete(d), Diff(b), Diff(c) ])
+		assert(SES([ a, d, b, c ], [ a, b, c ]), ==, [ Diff(a), .Delete(d), Diff(b), Diff(c) ])
 	}
 
 	func testInsertsAtEnd() {
-		assert(SES([ a, b, c ], [ a, b, c, d ]), ==, [ Diff(a), Diff(b), Diff(c), insert(d) ])
+		assert(SES([ a, b, c ], [ a, b, c, d ]), ==, [ Diff(a), Diff(b), Diff(c), .Insert(d) ])
 	}
 
 	func testDeletesAtEnd() {
-		assert(SES([ a, b, c, d ], [ a, b, c ]), ==, [ Diff(a), Diff(b), Diff(c), delete(d) ])
+		assert(SES([ a, b, c, d ], [ a, b, c ]), ==, [ Diff(a), Diff(b), Diff(c), .Delete(d) ])
 	}
 
 	func testSESOfLongerSequences() {
-		assert(SES([ a, b, c, a, b, b, a ], [ c, b, a, b, a, c ]), ==, [ insert(c), delete(a), Diff(b), delete(c), Diff(a), delete(b), Diff(b), Diff(a), insert(c) ])
+		assert(SES([ a, b, c, a, b, b, a ], [ c, b, a, b, a, c ]), ==, [ .Insert(c), .Delete(a), Diff(b), .Delete(c), Diff(a), .Delete(b), Diff(b), Diff(a), .Insert(c) ])
 	}
 }
 
