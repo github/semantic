@@ -1,4 +1,4 @@
-final class AlgorithmTests: XCTestCase {
+final class InterpreterTests: XCTestCase {
 	func testRestrictsComparisonsWhenRecurReturnsNil() {
 		assert(Algorithm(a, b).evaluate(==, recur: const(nil)), ==, restricted)
 	}
