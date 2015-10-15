@@ -7,6 +7,9 @@ public protocol TermType {
 
 
 extension TermType {
+	/// Catamorphism over `TermType`s.
+	///
+	/// Folds the tree encoded by the receiver into a single value by recurring top-down through the tree, applying `transform` to leaves, then to branches, and so forth.
 	public func cata<Result>(transform: Syntax<Result, LeafType> -> Result) -> Result {
 		return self |> ({ $0.out } >>> { $0.map { $0.cata(transform) } } >>> transform)
 	}
