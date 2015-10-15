@@ -1,19 +1,19 @@
 final class InterpreterTests: XCTestCase {
-	func testRestrictsComparisonsWhenRecurReturnsNil() {
-		assert(Algorithm(a, b).evaluate(==, recur: const(nil)), ==, restricted)
+	func testRestrictsComparisons() {
+		assert(Interpreter(equal: ==, comparable: const(false), cost: const(1)).run(a, b), ==, restricted)
 	}
 
 	func testComparisonsOfDisjointlyCategorizedTermsAreRestricted() {
 		var effects = 0
-		assert(Algorithm(a, b).evaluate(==, categorize: { _ in [ effects++ ] }), ==, restricted)
+		assert(Interpreter(equal: ==, comparable: Interpreter.comparable { _ in [ effects++ ] }, cost: const(1)).run(a, b), ==, restricted)
 	}
 
-	func testComparisonsAreUnrestrictedByDefault() {
-		assert(Algorithm(a, b).evaluate(==), ==, unrestricted)
+	func testUnrestrictedComparisonsComputeReplacements() {
+		assert(Interpreter(equal: ==, comparable: const(true), cost: const(1)).run(a, b), ==, unrestricted)
 	}
 
 	func testComparisonsOfUncategorizedTermsAreUnrestricted() {
-		assert(Algorithm(a, b).evaluate(==, categorize: const(Set<String>())), ==, unrestricted)
+		assert(Interpreter(equal: ==, comparable: Interpreter.comparable { _ in Set<String>() }, cost: const(1)).run(a, b), ==, unrestricted)
 	}
 }
 
