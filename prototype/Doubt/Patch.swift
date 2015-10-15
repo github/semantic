@@ -53,18 +53,6 @@ extension Patch {
 }
 
 
-// MARK: - Hashing
-
-extension Patch {
-	public func hash(param: A -> Hash) -> Hash {
-		return Hash.Ordered([
-			state.before.map(param) ?? Hash.Empty,
-			state.after.map(param) ?? Hash.Empty
-		])
-	}
-}
-
-
 // MARK: - JSON
 
 extension Patch {
