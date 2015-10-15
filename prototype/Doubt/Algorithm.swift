@@ -110,6 +110,9 @@ extension Algorithm where B: FreeConvertible, B.RollType == Term.LeafType, B.Pur
 		return evaluate(equals, recur: { Algorithm($0, $1).evaluate(equals).free })
 	}
 
+	/// Evaluate the algorithm.
+	///
+	/// `equals` compares two terms for equality. It should be strictly syntactic equality, ignoring any annotations/metadata on the terms.
 	public func evaluate<C>(equals: (Term, Term) -> Bool, categorize: Term -> Set<C>) -> B {
 		return evaluate(equals, recur: {
 			let c0 = categorize($0)
