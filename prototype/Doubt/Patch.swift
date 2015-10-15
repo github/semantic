@@ -72,6 +72,11 @@ extension Patch where A: TermType {
 	public static func sum(patch: Patch) -> Int {
 		return sum { $0.size } (patch)
 	}
+
+	/// Computes the size of a `patch` as the absolute difference of the sizes of its terms.
+	public static func difference(patch: Patch) -> Int {
+		return difference { $0.size } (patch)
+	}
 }
 
 
