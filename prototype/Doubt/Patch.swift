@@ -38,7 +38,7 @@ public enum Patch<A>: CustomDebugStringConvertible {
 			return ".Insert(\(String(reflecting: b)))"
 		case let .Delete(a):
 			return ".Delete(\(String(reflecting: a)))"
-		}
+	}
 	}
 }
 
@@ -84,6 +84,8 @@ extension Patch where A: CustomJSONConvertible {
 	}
 }
 
+
+// MARK: - PatchConvertible
 
 /// A hack to enable constrained extensions on `Free<A, Patch<Term: TermType where LeafType == A>`.
 public protocol PatchConvertible {
