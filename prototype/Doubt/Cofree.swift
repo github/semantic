@@ -112,4 +112,15 @@ extension Cofree where B: Categorizable {
 }
 
 
+// MARK: - CofreeConvertible
+
+public protocol CofreeConvertible {
+	typealias Leaf
+	typealias Annotation
+
+	init(cofree: Cofree<Leaf, Annotation>)
+	var cofree: Cofree<Leaf, Annotation> { get }
+}
+
+
 import Prelude
