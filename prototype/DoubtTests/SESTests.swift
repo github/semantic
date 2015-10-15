@@ -40,14 +40,6 @@ final class SESTests: XCTestCase {
 	}
 }
 
-private func insert(term: Term) -> Diff {
-	return Diff.Pure(.Insert(term))
-}
-
-private func delete(term: Term) -> Diff {
-	return Diff.Pure(.Delete(term))
-}
-
 private typealias Term = Cofree<String, ()>
 private typealias Diff = Free<String, Patch<Term>>
 
