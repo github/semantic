@@ -50,7 +50,7 @@ public enum Algorithm<Term: TermType, B> {
 				: recur($0, $1)
 		}
 		let recurOrReplace = {
-			recur($0, $1) ?? .Pure(.Replace($0, $1))
+			recur($0, $1) ?? .Replace($0, $1)
 		}
 		switch self {
 		case let .Pure(b):
@@ -71,7 +71,7 @@ public enum Algorithm<Term: TermType, B> {
 
 			default:
 				// This must not call `recur` with `a` and `b`, as that would infinite loop if actually recursive.
-				return f(Diff.Pure(.Replace(a, b))).evaluate(equals, recur: recur)
+				return f(.Replace(a, b)).evaluate(equals, recur: recur)
 			}
 
 		case let .Roll(.ByKey(a, b, f)):
