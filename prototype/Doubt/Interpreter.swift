@@ -6,6 +6,7 @@ public struct Interpreter<Term: TermType> {
 	private let comparable: (Term, Term) -> Bool
 	private let cost: Diff -> Int
 
+	/// Diff `a` against `b`, if comparable.
 	private func recur(a: Term, _ b: Term) -> Diff? {
 		if equals(a, b) { return Diff(b) }
 
