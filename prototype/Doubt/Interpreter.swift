@@ -4,5 +4,5 @@ public struct Interpreter<Term: TermType> {
 
 	public let equals: (Term, Term) -> Bool
 
-	public func run() {}
+	public func run(a: Term, _ b: Term) {}
 }
