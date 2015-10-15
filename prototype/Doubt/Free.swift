@@ -13,13 +13,9 @@ public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 	indirect case Roll(Syntax<Free, A>)
 
 
-	/// Recursively copies a `Fix<A>` into a `Free<A, B>`, essentially mapping `Fix.In` onto `Free.Roll`.
-	public init(_ fix: Fix<A>) {
-		self = .Roll(fix.out.map(Free.init))
-	}
-
+	/// Recursively copies a `Term: TermType where Term.LeafType == A` into a `Free<A, B>`, essentially mapping `Term.unwrap` onto `Free.Roll`.
 	public init<Term: TermType where Term.LeafType == A>(_ term: Term) {
-		self = .Roll(term.out.map(Free.init))
+		self = .Roll(term.unwrap.map(Free.init))
 	}
 
 
@@ -99,17 +95,17 @@ public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 }
 
 
-extension Free where B: PatchConvertible, B.Element == Fix<A> {
-	public typealias Term = Fix<A>
+extension Free where B: PatchConvertible, B.Element == Cofree<A, ()> {
+	public typealias Term = B.Element
 
 	private func discardNullTerms(syntax: Syntax<Term?, A>) -> Term? {
 		switch syntax {
 		case let .Leaf(a):
-			return .Leaf(a)
+			return Cofree((), .Leaf(a))
 		case let .Indexed(a):
-			return .Indexed(a.flatMap(id))
+			return Cofree((), .Indexed(a.flatMap(id)))
 		case let .Keyed(a):
-			return .Keyed(Dictionary(elements: a.flatMap { k, v in v.map { (k, $0) } }))
+			return Cofree((), .Keyed(Dictionary(elements: a.flatMap { k, v in v.map { (k, $0) } })))
 		}
 	}
 
@@ -179,12 +175,6 @@ extension Free {
 extension Free where A: CustomJSONConvertible {
 	public func JSON(ifPure: B -> Doubt.JSON) -> Doubt.JSON {
 		return JSON(ifPure: ifPure, ifLeaf: { $0.JSON })
-	}
-}
-
-extension Free where A: CustomJSONConvertible, B: PatchConvertible, B.Element == Fix<A> {
-	public var JSON: Doubt.JSON {
-		return JSON { $0.patch.JSON { $0.JSON } }
 	}
 }
 
