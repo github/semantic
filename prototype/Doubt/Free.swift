@@ -75,6 +75,11 @@ public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 		}
 	}
 
+	/// Returns a function which sums `Free`s by first `transform`ing `Pure` values into integers, and then summing these.
+	public static func sum(transform: B -> Int)(_ free: Free) -> Int {
+		return free.map(transform).reduce(0, combine: +)
+	}
+
 
 	// MARK: Functor
 
