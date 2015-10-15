@@ -3,7 +3,7 @@ public struct Interpreter<Term: TermType> {
 	/// The type of diffs constructed by `Interpreter`s.
 	public typealias Diff = Free<Term.LeafType, Patch<Term>>
 
-	/// Constructs an `Interpreter` parameterized by the `equal` and `comparable` tests on `Term`s, and the `cost` function for diffs.
+	/// Constructs an `Interpreter` parameterized by the `equal` and `comparable` tests on `Term`s, and the `cost` function for `Diff`s.
 	///
 	/// `equal` determines whether two terms are equal. This should typically be strict syntactic equality, not e.g. including any annotations of source ranges. If two terms are considered equal by this function, then an unchanged diff will be returned directly. No diffing will be performed, and `comparable` will not be applied to the terms at all.
 	///
