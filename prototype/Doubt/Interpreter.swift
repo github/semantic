@@ -20,7 +20,12 @@ public struct Interpreter<Term: TermType> {
 	}
 
 	private func recur(algorithm: Algorithm<Term, Diff>) -> Diff? {
-		return nil
+		switch algorithm {
+		case let .Pure(diff):
+			return diff
+		default:
+			return nil
+		}
 	}
 
 	public func run(a: Term, _ b: Term) -> Diff {
