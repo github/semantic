@@ -130,6 +130,10 @@ extension Free where B: PatchConvertible, B.Element == Cofree<A, ()> {
 	public static func Insert(after: B.Element) -> Free {
 		return .Pure(B(patch: .Insert(after)))
 	}
+
+	public static func Delete(before: B.Element) -> Free {
+		return .Pure(B(patch: .Delete(before)))
+	}
 }
 
 
