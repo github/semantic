@@ -114,12 +114,12 @@ extension Cofree where B: Categorizable {
 
 // MARK: - CofreeConvertible
 
-public protocol CofreeConvertible {
-	typealias Leaf
+public protocol CofreeType {
 	typealias Annotation
+	typealias Leaf
 
-	init(cofree: Cofree<Leaf, Annotation>)
-	var cofree: Cofree<Leaf, Annotation> { get }
+	var extract: Annotation { get }
+	var unwrap: Syntax<Self, Leaf> { get }
 }
 
 
