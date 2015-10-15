@@ -144,22 +144,6 @@ public func == <A: Equatable, B: Equatable> (left: Free<A, B>, right: Free<A, B>
 }
 
 
-// MARK: - Hashing
-
-extension Free {
-	public func hash(ifPure ifPure: B -> Hash, ifRoll: A -> Hash) -> Hash {
-		return analysis(ifPure: ifPure, ifRoll: { $0.hash(ifLeaf: ifRoll, ifRecur: { $0.hash(ifPure: ifPure, ifRoll: ifRoll) }) })
-	}
-}
-
-
-extension Free where A: Hashable, B: Hashable {
-	public var hash: Hash {
-		return hash(ifPure: Hash.init, ifRoll: Hash.init)
-	}
-}
-
-
 // MARK: - JSON
 
 extension Free {
