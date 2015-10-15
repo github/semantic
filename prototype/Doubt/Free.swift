@@ -178,12 +178,6 @@ extension Free where A: CustomJSONConvertible {
 	}
 }
 
-extension Free where A: CustomJSONConvertible, B: PatchConvertible, B.Element == Fix<A> {
-	public var JSON: Doubt.JSON {
-		return JSON { $0.patch.JSON { $0.JSON } }
-	}
-}
-
 
 // MARK: - FreeConvertible
 
