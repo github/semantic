@@ -6,7 +6,8 @@ final class InterpreterTests: XCTestCase {
 
 	func testComparisonsOfDisjointlyCategorizedTermsAreRestricted() {
 		var effects = 0
-		assert(Interpreter(equal: ==, comparable: Interpreter.comparable { _ in [ effects++ ] }, cost: const(1)).run(a, b), ==, restricted)
+		let categorize: Term -> Set<Int> = { $0.extract == 0 ? [ 0 ] : [ effects++ ] }
+		assert(Interpreter(equal: ==, comparable: Interpreter.comparable(categorize), cost: const(1)).run(a, b), ==, restricted)
 	}
 
 	func testUnrestrictedComparisonsComputeReplacements() {
