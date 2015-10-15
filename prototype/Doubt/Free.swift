@@ -124,6 +124,8 @@ extension Free where B: PatchConvertible, B.Element == Cofree<A, ()> {
 }
 
 
+// MARK: - Patch construction
+
 extension Free where B: PatchConvertible {
 	public static func Replace(before: B.Element, _ after: B.Element) -> Free {
 		return .Pure(B(patch: .Replace(before, after)))
