@@ -60,6 +60,11 @@ extension Patch {
 	public static func sum(size: A -> Int)(_ patch: Patch) -> Int {
 		return (patch.state.before.map(size) ?? 0) + (patch.state.after.map(size) ?? 0)
 	}
+
+	/// Returns a function which computes the size of a `patch` as the absolute difference of the sizes of its terms, as computed by `size`.
+	public static func difference(size: A -> Int)(_ patch: Patch) -> Int {
+		return abs((patch.state.before.map(size) ?? 0) - (patch.state.after.map(size) ?? 0))
+	}
 }
 
 
