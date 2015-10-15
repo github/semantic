@@ -50,7 +50,7 @@ public enum Algorithm<Term: TermType, Result> {
 				: recur($0, $1)
 		}
 		let recurOrReplace = {
-			recur($0, $1) ?? .Pure(.Replace($0, $1))
+			recur($0, $1) ?? .Replace($0, $1)
 		}
 		func cost(diff: Diff) -> Int {
 			return diff.map { abs(($0.state.before?.size ?? 0) - ($0.state.after?.size ?? 0)) }.iterate { syntax in
@@ -83,13 +83,13 @@ public enum Algorithm<Term: TermType, Result> {
 
 			default:
 				// This must not call `recur` with `a` and `b`, as that would infinite loop if actually recursive.
-				return f(Diff.Pure(.Replace(a, b))).evaluate(equals, recur: recur)
+				return f(.Replace(a, b)).evaluate(equals, recur: recur)
 			}
 
 		case let .Roll(.ByKey(a, b, f)):
 			// Essentially [set reconciliation](https://en.wikipedia.org/wiki/Data_synchronization#Unordered_data) on the keys, followed by recurring into the values of the intersecting keys.
-			let deleted = Set(a.keys).subtract(b.keys).map { ($0, Diff.Pure(Patch.Delete(a[$0]!))) }
-			let inserted = Set(b.keys).subtract(a.keys).map { ($0, Diff.Pure(Patch.Insert(b[$0]!))) }
+			let deleted = Set(a.keys).subtract(b.keys).map { ($0, Diff.Delete(a[$0]!)) }
+			let inserted = Set(b.keys).subtract(a.keys).map { ($0, Diff.Insert(b[$0]!)) }
 			let patched = Set(a.keys).intersect(b.keys).map { ($0, recurOrReplace(a[$0]!, b[$0]!)) }
 			return f(Dictionary(elements: deleted + inserted + patched)).evaluate(equals, recur: recur)
 

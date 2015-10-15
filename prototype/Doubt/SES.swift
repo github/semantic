@@ -4,8 +4,8 @@
 public func SES<Term, A>(a: [Term], _ b: [Term], cost: Free<A, Patch<Term>> -> Int, recur: (Term, Term) -> Free<A, Patch<Term>>?) -> [Free<A, Patch<Term>>] {
 	typealias Diff = Free<A, Patch<Term>>
 
-	if a.isEmpty { return b.map { Diff.Pure(Patch.Insert($0)) } }
-	if b.isEmpty { return a.map { Diff.Pure(Patch.Delete($0)) } }
+	if a.isEmpty { return b.map { .Insert($0) } }
+	if b.isEmpty { return a.map { .Delete($0) } }
 
 	func cons(diff: Diff, rest: Memo<Stream<(Diff, Int)>>) -> Stream<(Diff, Int)> {
 		return .Cons((diff, cost(diff) + costOfStream(rest)), rest)
@@ -33,8 +33,8 @@ public func SES<Term, A>(a: [Term], _ b: [Term], cost: Free<A, Patch<Term>> -> I
 		let diagonal = matrix[i + 1, j + 1]
 
 		if let right = right, down = down, diagonal = diagonal {
-			let right = (right, Diff.Pure(Patch.Delete(a[i])), costOfStream(right))
-			let down = (down, Diff.Pure(Patch.Insert(b[j])), costOfStream(down))
+			let right = (right, Diff.Delete(a[i]), costOfStream(right))
+			let down = (down, Diff.Insert(b[j]), costOfStream(down))
 			let diagonal = recur(a[i], b[j]).map { (diagonal, $0, costOfStream(diagonal)) }
 			// nominate the best edge to continue along, not considering diagonal if `recur` returned `nil`.
 			let (best, diff, _) = diagonal
@@ -45,12 +45,12 @@ public func SES<Term, A>(a: [Term], _ b: [Term], cost: Free<A, Patch<Term>> -> I
 
 		// right extent of the edit graph; can only move down
 		if let down = down {
-			return cons(Diff.Pure(Patch.Insert(b[j])), rest: down)
+			return cons(Diff.Insert(b[j]), rest: down)
 		}
 
 		// bottom extent of the edit graph; can only move right
 		if let right = right {
-			return cons(Diff.Pure(Patch.Delete(a[i])), rest: right)
+			return cons(Diff.Delete(a[i]), rest: right)
 		}
 
 		// bottom-right corner of the edit graph
