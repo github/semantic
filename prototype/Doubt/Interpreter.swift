@@ -46,8 +46,8 @@ public struct Interpreter<Term: TermType> {
 			let patched = Set(a.keys).intersect(b.keys).map { ($0, run(a[$0]!, b[$0]!)) }
 			return recur(f(Dictionary(elements: deleted + inserted + patched)))
 
-		default:
-			return nil
+		case let .Roll(.ByIndex(a, b, f)):
+			return recur(f(SES(a, b, cost: cost, recur: recur)))
 		}
 	}
 
