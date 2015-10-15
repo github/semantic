@@ -4,8 +4,9 @@ public struct Interpreter<Term: TermType> {
 
 	public let equals: (Term, Term) -> Bool
 
-	public func run(a: Term, _ b: Term) -> Diff {
+	private func recur(a: Term, _ b: Term) -> Diff? {
 		if equals(a, b) { return Diff(b) }
+
 		let algorithm: Algorithm<Term, Diff>
 		switch (a.unwrap, b.unwrap) {
 		case let (.Keyed(a), .Keyed(b)):
@@ -15,7 +16,11 @@ public struct Interpreter<Term: TermType> {
 		default:
 			algorithm = .Roll(.Recursive(a, b, Algorithm.Pure))
 		}
-		return Diff.Pure(.Replace(a, b))
+		return nil
+	}
+
+	public func run(a: Term, _ b: Term) -> Diff {
+		return recur(a, b) ?? Diff.Replace(a, b)
 	}
 }
 
