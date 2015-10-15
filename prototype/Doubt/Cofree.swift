@@ -30,6 +30,15 @@ public enum Cofree<A, B> {
 }
 
 
+// MARK: - CustomDebugStringConvertible
+
+extension Cofree: CustomDebugStringConvertible {
+	public var debugDescription: String {
+		return "(\(String(reflecting: extract)), \(String(reflecting: unwrap)))"
+	}
+}
+
+
 // MARK: - Functor
 
 extension Cofree {
@@ -90,6 +99,15 @@ extension Cofree {
 extension Cofree where A: CustomJSONConvertible, B: CustomJSONConvertible {
 	public var JSON: Doubt.JSON {
 		return JSON(annotation: { $0.JSON }, leaf: { $0.JSON })
+	}
+}
+
+
+// MARK: - Categorizable
+
+extension Cofree where B: Categorizable {
+	var categories: Set<B.Category> {
+		return extract.categories
 	}
 }
 

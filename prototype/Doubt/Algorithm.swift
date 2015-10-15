@@ -109,11 +109,34 @@ extension Algorithm where B: FreeConvertible, B.RollType == Term.LeafType, B.Pur
 	public func evaluate(equals: (Term, Term) -> Bool) -> B {
 		return evaluate(equals, recur: { Algorithm($0, $1).evaluate(equals).free })
 	}
+
+	public func evaluate<C>(equals: (Term, Term) -> Bool, categorize: Term -> Set<C>) -> B {
+		return evaluate(equals, recur: {
+			let c0 = categorize($0)
+			let c1 = categorize($1)
+			return c0 == c1 || !categorize($0).intersect(categorize($1)).isEmpty
+				? Algorithm($0, $1).evaluate(equals).free
+				: nil
+		})
+	}
 }
 
 extension Algorithm where Term: Equatable, B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
 	public func evaluate() -> B {
 		return evaluate(==)
+	}
+}
+
+extension Algorithm where Term: Categorizable, B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
+	public func evaluate(equals: (Term, Term) -> Bool) -> B {
+		return evaluate(equals, categorize: { $0.categories })
+	}
+}
+
+
+extension Algorithm where Term: Categorizable, Term: Equatable, B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
+	public func evaluate() -> B {
+		return evaluate(==, categorize: { $0.categories })
 	}
 }
 

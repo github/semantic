@@ -143,6 +143,10 @@ public func == <A: Equatable, B: Equatable> (left: Free<A, B>, right: Free<A, B>
 	return Free.equals(ifPure: ==, ifRoll: ==)(left, right)
 }
 
+public func == <Term: TermType where Term.LeafType: Equatable> (left: Free<Term.LeafType, Patch<Term>>, right: Free<Term.LeafType, Patch<Term>>) -> Bool {
+	return Free.equals(ifPure: Patch.equals(Term.equals(==)), ifRoll: ==)(left, right)
+}
+
 
 // MARK: - JSON
 

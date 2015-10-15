@@ -5,7 +5,7 @@ import Prelude
 typealias Term = Cofree<JSONLeaf, Int>
 typealias Diff = Free<JSONLeaf, Patch<Term>>
 
-enum JSONLeaf: Equatable, CustomJSONConvertible, CustomStringConvertible {
+enum JSONLeaf: CustomJSONConvertible, CustomStringConvertible, Equatable {
 	case Number(Double)
 	case Boolean(Bool)
 	case String(Swift.String)

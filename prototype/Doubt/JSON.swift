@@ -174,7 +174,6 @@ public protocol CustomJSONConvertible {
 	var JSON: Doubt.JSON { get }
 }
 
-
 extension String: CustomJSONConvertible {
 	public var JSON: Doubt.JSON {
 		return .String(self)
