@@ -2,6 +2,12 @@
 public struct Interpreter<Term: TermType> {
 	public typealias Diff = Free<Term.LeafType, Patch<Term>>
 
+	public init(equals: (Term, Term) -> Bool, comparable: (Term, Term) -> Bool, cost: Diff -> Int) {
+		self.equals = equals
+		self.comparable = comparable
+		self.cost = cost
+	}
+
 	private let equals: (Term, Term) -> Bool
 	private let comparable: (Term, Term) -> Bool
 	private let cost: Diff -> Int
