@@ -33,7 +33,8 @@ public struct Interpreter<Term: TermType> {
 				return recur(f(.Keyed(Dictionary(elements: b.keys.map { ($0, self.run(a[$0]!, b[$0]!)) }))))
 
 			default:
-				return nil
+				// This must not call `recur` directly with `a` and `b`, as that would infinite loop if actually recursive.
+				return recur(f(.Replace(a, b)))
 			}
 
 		default:
