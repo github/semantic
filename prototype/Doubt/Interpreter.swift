@@ -16,6 +16,10 @@ public struct Interpreter<Term: TermType> {
 		default:
 			algorithm = .Roll(.Recursive(a, b, Algorithm.Pure))
 		}
+		return recur(algorithm)
+	}
+
+	private func recur(algorithm: Algorithm<Term, Diff>) -> Diff? {
 		return nil
 	}
 
