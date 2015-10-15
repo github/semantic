@@ -17,6 +17,7 @@ public struct Interpreter<Term: TermType> {
 	}
 
 
+	/// Run the interpreter over a given pair of `Term`s, producing a `Diff` as its result.
 	public func run(a: Term, _ b: Term) -> Diff {
 		return recur(a, b) ?? .Replace(a, b)
 	}
