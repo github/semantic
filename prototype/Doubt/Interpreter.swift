@@ -23,6 +23,16 @@ public struct Interpreter<Term: TermType> {
 		switch algorithm {
 		case let .Pure(diff):
 			return diff
+
+		case let .Roll(.Recursive(a, b, f)):
+			switch (a.unwrap, b.unwrap) {
+			case let (.Indexed(a), .Indexed(b)) where a.count == b.count:
+				return recur(f(.Indexed(zip(a, b).map(run))))
+
+			default:
+				return nil
+			}
+
 		default:
 			return nil
 		}
