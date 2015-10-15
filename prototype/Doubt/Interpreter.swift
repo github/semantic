@@ -25,6 +25,7 @@ public struct Interpreter<Term: TermType> {
 			return diff
 
 		case let .Roll(.Recursive(a, b, f)):
+			// Recur structurally into both terms, patching differing sub-terms. This is akin to unification, except that it computes a patched tree instead of a substitution. It’s also a little like a structural zip on pairs of terms.
 			switch (a.unwrap, b.unwrap) {
 			case let (.Indexed(a), .Indexed(b)) where a.count == b.count:
 				return recur(f(.Indexed(zip(a, b).map(run))))
