@@ -61,7 +61,7 @@ public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 	}
 
 
-	/// Reduces the receiver top-down, left-to-right, starting from an `initial` value, and applying `combine` to successive values.s
+	/// Reduces the receiver top-down, left-to-right, starting from an `initial` value, and applying `combine` to successive values.
 	public func reduce(initial: B, combine: (B, B) -> B) -> B {
 		return iterate {
 			switch $0 {
