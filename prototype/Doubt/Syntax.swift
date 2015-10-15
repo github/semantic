@@ -71,28 +71,6 @@ public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F
 }
 
 
-// MARK: - Hashing
-
-extension Syntax {
-	public func hash(ifLeaf ifLeaf: A -> Hash, ifRecur: Recur -> Hash) -> Hash {
-		switch self {
-		case let .Leaf(n):
-			return Hash("Leaf", ifLeaf(n))
-		case let .Indexed(x):
-			return Hash("Indexed", .Ordered(x.map(ifRecur)))
-		case let .Keyed(d):
-			return Hash("Keyed", .Ordered(d.keys.sort().map { Hash($0, ifRecur(d[$0]!)) }))
-		}
-	}
-}
-
-extension Syntax where Recur: Hashable, A: Hashable {
-	public var hash: Hash {
-		return hash(ifLeaf: Hash.init, ifRecur: Hash.init)
-	}
-}
-
-
 // MARK: - JSON
 
 extension Syntax {
