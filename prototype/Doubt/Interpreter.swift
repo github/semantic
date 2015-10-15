@@ -3,19 +3,19 @@ public struct Interpreter<Term: TermType> {
 	/// The type of diffs constructed by `Interpreter`s.
 	public typealias Diff = Free<Term.LeafType, Patch<Term>>
 
-	public init(equals: (Term, Term) -> Bool, comparable: (Term, Term) -> Bool, cost: Diff -> Int) {
-		self.equals = equals
+	public init(equal: (Term, Term) -> Bool, comparable: (Term, Term) -> Bool, cost: Diff -> Int) {
+		self.equal = equal
 		self.comparable = comparable
 		self.cost = cost
 	}
 
-	private let equals: (Term, Term) -> Bool
+	private let equal: (Term, Term) -> Bool
 	private let comparable: (Term, Term) -> Bool
 	private let cost: Diff -> Int
 
 	/// Diff `a` against `b`, if comparable.
 	private func recur(a: Term, _ b: Term) -> Diff? {
-		if equals(a, b) { return Diff(b) }
+		if equal(a, b) { return Diff(b) }
 		guard comparable(a, b) else { return nil }
 
 		let algorithm: Algorithm<Term, Diff>
