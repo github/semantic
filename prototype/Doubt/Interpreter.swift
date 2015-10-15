@@ -9,6 +9,12 @@ public struct Interpreter<Term: TermType> {
 		self.cost = cost
 	}
 
+
+	public func run(a: Term, _ b: Term) -> Diff {
+		return recur(a, b) ?? .Replace(a, b)
+	}
+
+
 	private let equal: (Term, Term) -> Bool
 	private let comparable: (Term, Term) -> Bool
 	private let cost: Diff -> Int
@@ -59,10 +65,6 @@ public struct Interpreter<Term: TermType> {
 		case let .Roll(.ByIndex(a, b, f)):
 			return recur(f(SES(a, b, cost: cost, recur: recur)))
 		}
-	}
-
-	public func run(a: Term, _ b: Term) -> Diff {
-		return recur(a, b) ?? .Replace(a, b)
 	}
 }
 
