@@ -48,20 +48,20 @@ private func delete(term: Term) -> Diff {
 	return Diff.Pure(.Delete(term))
 }
 
-private typealias Term = Fix<String>
+private typealias Term = Cofree<String, ()>
 private typealias Diff = Free<String, Patch<Term>>
 
-private let a = Term.Leaf("a")
-private let b = Term.Leaf("b")
-private let c = Term.Leaf("c")
-private let d = Term.Leaf("d")
+private let a = Term((), .Leaf("a"))
+private let b = Term((), .Leaf("b"))
+private let c = Term((), .Leaf("c"))
+private let d = Term((), .Leaf("d"))
 
 private func SES(a: [Term], _ b: [Term]) -> [Diff] {
-	return SES(a, b) { $0 == $1 ? Diff($1) : nil }
+	return SES(a, b) { Cofree.equals(annotation: const(true), leaf: ==)($0, $1) ? Diff($1) : nil }
 }
 
 private func == (a: [Diff], b: [Diff]) -> Bool {
-	return a.count == b.count && zip(a, b).lazy.map(Diff.equals(ifPure: Patch.equals(==), ifRoll: ==)).reduce(true) { $0 && $1 }
+	return a.count == b.count && zip(a, b).lazy.map(Diff.equals(ifPure: Patch.equals(Cofree.equals(annotation: const(true), leaf: ==)), ifRoll: ==)).reduce(true) { $0 && $1 }
 }
 
 

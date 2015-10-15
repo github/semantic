@@ -5,7 +5,7 @@
 /// `Syntax` is a non-recursive type parameterized by the type of its child nodes. Instantiating it to `Free` makes it recursive through the `Roll` case, and allows it to wrap values of type `B` through the `Pure` case.
 ///
 /// In Doubt, this allows us to represent diffs as values of the `Free` monad obtained from `Syntax`, injecting `Patch` into the tree; or otherwise put, a diff is a tree of mutually-recursive `Free.Roll`/`Syntax` nodes with `Pure` nodes injecting the actual changes.
-public enum Free<A, B>: CustomDebugStringConvertible, CustomDocConvertible, SyntaxConvertible {
+public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 	/// The injection of a value of type `B` into the `Syntax` tree.
 	case Pure(B)
 
@@ -13,13 +13,9 @@ public enum Free<A, B>: CustomDebugStringConvertible, CustomDocConvertible, Synt
 	indirect case Roll(Syntax<Free, A>)
 
 
-	/// Recursively copies a `Fix<A>` into a `Free<A, B>`, essentially mapping `Fix.In` onto `Free.Roll`.
-	public init(_ fix: Fix<A>) {
-		self = .Roll(fix.out.map(Free.init))
-	}
-
+	/// Recursively copies a `Term: TermType where Term.LeafType == A` into a `Free<A, B>`, essentially mapping `Term.unwrap` onto `Free.Roll`.
 	public init<Term: TermType where Term.LeafType == A>(_ term: Term) {
-		self = .Roll(term.out.map(Free.init))
+		self = .Roll(term.unwrap.map(Free.init))
 	}
 
 
@@ -91,18 +87,6 @@ public enum Free<A, B>: CustomDebugStringConvertible, CustomDocConvertible, Synt
 	}
 
 
-	// MARK: CustomDocConvertible
-
-	public var doc: Doc {
-		switch self {
-		case let .Pure(b):
-			return Doc(b)
-		case let .Roll(s):
-			return s.doc
-		}
-	}
-
-
 	// MARK: SyntaxConvertible
 
 	public init(syntax: Syntax<Free, A>) {
@@ -111,17 +95,17 @@ public enum Free<A, B>: CustomDebugStringConvertible, CustomDocConvertible, Synt
 }
 
 
-extension Free where B: PatchConvertible, B.Element == Fix<A> {
-	public typealias Term = Fix<A>
+extension Free where B: PatchConvertible, B.Element == Cofree<A, ()> {
+	public typealias Term = B.Element
 
 	private func discardNullTerms(syntax: Syntax<Term?, A>) -> Term? {
 		switch syntax {
 		case let .Leaf(a):
-			return .Leaf(a)
+			return Cofree((), .Leaf(a))
 		case let .Indexed(a):
-			return .Indexed(a.flatMap(id))
+			return Cofree((), .Indexed(a.flatMap(id)))
 		case let .Keyed(a):
-			return .Keyed(Dictionary(elements: a.flatMap { k, v in v.map { (k, $0) } }))
+			return Cofree((), .Keyed(Dictionary(elements: a.flatMap { k, v in v.map { (k, $0) } })))
 		}
 	}
 
@@ -195,12 +179,6 @@ extension Free {
 extension Free where A: CustomJSONConvertible {
 	public func JSON(ifPure: B -> Doubt.JSON) -> Doubt.JSON {
 		return JSON(ifPure: ifPure, ifLeaf: { $0.JSON })
-	}
-}
-
-extension Free where A: CustomJSONConvertible, B: PatchConvertible, B.Element == Fix<A> {
-	public var JSON: Doubt.JSON {
-		return JSON { $0.patch.JSON { $0.JSON } }
 	}
 }
 

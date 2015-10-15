@@ -19,12 +19,6 @@ public enum Cofree<A, B> {
 	}
 
 
-	/// Recursively copies a `Fix<A>` into a `Cofree<A, B>` with a function assigning `B` for every `Fix<A>`.
-	public init(_ fix: Fix<A>, _ annotate: Fix<A> -> B) {
-		self = Cofree<A, Fix<A>>.coiterate { $0.out } (fix).map(annotate)
-	}
-
-
 	/// Constructs a cofree by coiteration.
 	///
 	/// The initial seed is used as the annotation of the returned value. The continuation of the structure is unpacked by applying `annotate` to the seed and mapping the resulting syntax’s values recursively. In this manner, the structure is unfolded bottom-up, starting with `seed` and ending at the leaves.

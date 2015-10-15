@@ -1,5 +1,5 @@
 /// A node in a syntax tree. Expressed algebraically to enable representation of both normal syntax trees and their diffs.
-public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible {
+public enum Syntax<Recur, A>: CustomDebugStringConvertible {
 	case Leaf(A)
 	case Indexed([Recur])
 	case Keyed([String:Recur])
@@ -26,17 +26,6 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible, CustomDocConvertible
 			return ".Indexed(\(String(reflecting: x)))"
 		case let .Keyed(d):
 			return ".Keyed(\(String(reflecting: d)))"
-		}
-	}
-
-	public var doc: Doc {
-		switch self {
-		case let .Leaf(n):
-			return Doc(n)
-		case let .Indexed(x):
-			return x.map(Doc.init).joinWithSeparator(",").bracket("[", "]")
-		case let .Keyed(d):
-			return d.lazy.map { Doc($0) <> Doc(":") <+> Doc($1) }.joinWithSeparator(",").bracket("[", "]")
 		}
 	}
 }
