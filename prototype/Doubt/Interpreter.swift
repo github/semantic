@@ -38,6 +38,13 @@ public struct Interpreter<Term: TermType> {
 				return recur(f(.Replace(a, b)))
 			}
 
+		case let .Roll(.ByKey(a, b, f)):
+			// Perform [set reconciliation](https://en.wikipedia.org/wiki/Data_synchronization#Unordered_data) on the keys, followed by recurring into the values of the intersecting keys.
+			let deleted = Set(a.keys).subtract(b.keys).map { ($0, Diff.Delete(a[$0]!)) }
+			let inserted = Set(b.keys).subtract(a.keys).map { ($0, Diff.Insert(b[$0]!)) }
+			let patched = Set(a.keys).intersect(b.keys).map { ($0, run(a[$0]!, b[$0]!)) }
+			return recur(f(Dictionary(elements: deleted + inserted + patched)))
+
 		default:
 			return nil
 		}
