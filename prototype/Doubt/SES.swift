@@ -1,24 +1,11 @@
 /// Computes the SES (shortest edit script), i.e. the shortest sequence of diffs (`Free<A, Patch<Term>>`) for two arrays of `Term`s which would suffice to transform `a` into `b`.
 ///
 /// This is computed w.r.t. an `equals` function, which computes the equality of leaf nodes within terms, and a `recur` function, which produces diffs representing matched-up terms.
-public func SES<Term, A>(a: [Term], _ b: [Term], recur: (Term, Term) -> Free<A, Patch<Term>>?) -> [Free<A, Patch<Term>>] {
+public func SES<Term, A>(a: [Term], _ b: [Term], cost: Free<A, Patch<Term>> -> Int, recur: (Term, Term) -> Free<A, Patch<Term>>?) -> [Free<A, Patch<Term>>] {
 	typealias Diff = Free<A, Patch<Term>>
 
 	if a.isEmpty { return b.map { Diff.Pure(Patch.Insert($0)) } }
 	if b.isEmpty { return a.map { Diff.Pure(Patch.Delete($0)) } }
-
-	func cost(diff: Diff) -> Int {
-		return diff.map(const(1)).iterate { syntax in
-			switch syntax {
-			case .Leaf:
-				return 0
-			case let .Indexed(costs):
-				return costs.reduce(0, combine: +)
-			case let .Keyed(costs):
-				return costs.values.reduce(0, combine: +)
-			}
-		}
-	}
 
 	func cons(diff: Diff, rest: Memo<Stream<(Diff, Int)>>) -> Stream<(Diff, Int)> {
 		return .Cons((diff, cost(diff) + costOfStream(rest)), rest)
