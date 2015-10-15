@@ -1,6 +1,7 @@
 final class InterpreterTests: XCTestCase {
 	func testRestrictsComparisons() {
-		assert(Interpreter(equal: ==, comparable: const(false), cost: const(1)).run(a, b), ==, restricted)
+		let comparable: (Term, Term) -> Bool = { $0.extract == 0 && $1.extract == 0 }
+		assert(Interpreter(equal: ==, comparable: comparable, cost: const(1)).run(a, b), ==, restricted)
 	}
 
 	func testComparisonsOfDisjointlyCategorizedTermsAreRestricted() {
