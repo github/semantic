@@ -95,17 +95,17 @@ public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 }
 
 
-extension Free where B: PatchConvertible, B.Element == Fix<A> {
-	public typealias Term = Fix<A>
+extension Free where B: PatchConvertible, B.Element == Cofree<A, ()> {
+	public typealias Term = B.Element
 
 	private func discardNullTerms(syntax: Syntax<Term?, A>) -> Term? {
 		switch syntax {
 		case let .Leaf(a):
-			return .Leaf(a)
+			return Cofree((), .Leaf(a))
 		case let .Indexed(a):
-			return .Indexed(a.flatMap(id))
+			return Cofree((), .Indexed(a.flatMap(id)))
 		case let .Keyed(a):
-			return .Keyed(Dictionary(elements: a.flatMap { k, v in v.map { (k, $0) } }))
+			return Cofree((), .Keyed(Dictionary(elements: a.flatMap { k, v in v.map { (k, $0) } })))
 		}
 	}
 
