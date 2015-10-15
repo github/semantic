@@ -6,8 +6,6 @@ public protocol TermType {
 }
 
 
-extension Fix: TermType {}
-
 extension Cofree: TermType {
 	public var out: Syntax<Cofree, A> {
 		return unwrap
