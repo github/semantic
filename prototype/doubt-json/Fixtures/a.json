@@ -1,478 +1,2073 @@
-[
-	[{
-			"literal": {
-				"source": "Algorithm",
-				"categories": [
+[{
+	"insert": {
+		"extract": 29,
+		"unwrap": [{
+			"extract": 3,
+			"unwrap": {
+				"categories": {
+					"extract": 1,
+					"unwrap": [
 
-				]
+					]
+				},
+				"source": {
+					"extract": 1,
+					"unwrap": "Algorithm"
+				}
 			}
-		},
-		[
-			[{
-					"literal": {
-						"source": "Recursive",
-						"categories": [
-
-						]
-					}
-				},
-				[
-
-				]
-			],
-			[{
-					"literal": {
-						"source": "ByKey",
-						"categories": [
-
-						]
-					}
-				},
-				[
-
-				]
-			], {
-				"insert": [{
-						"literal": {
-							"source": "ByIndex",
-							"categories": [
+		}, {
+			"extract": 25,
+			"unwrap": [{
+				"extract": 5,
+				"unwrap": [{
+					"extract": 3,
+					"unwrap": {
+						"categories": {
+							"extract": 1,
+							"unwrap": [
 
 							]
-						}
-					},
-					[
-
-					]
-				]
-			}, {
-				"literal": {
-					"source": "mark",
-					"categories": [
-
-					]
-				}
-			},
-			[{
-					"literal": {
-						"source": "map(_:)",
-						"categories": [
-
-						]
-					}
-				},
-				[
-
-				]
-			]
-		]
-	], {
-		"insert": [{
-				"literal": {
-					"source": "FreeAlgorithm",
-					"categories": [
-
-					]
-				}
-			},
-			[
-				[{
-						"literal": {
-							"source": "Pure",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				],
-				[{
-						"literal": {
-							"source": "Roll",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				],
-				[{
-						"literal": {
-							"source": "analysis(ifPure:ifRoll:)",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				], {
-					"literal": {
-						"source": "mark",
-						"categories": [
-
-						]
-					}
-				},
-				[{
-						"literal": {
-							"source": "map(_:)",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				], {
-					"literal": {
-						"source": "mark",
-						"categories": [
-
-						]
-					}
-				},
-				[{
-						"literal": {
-							"source": "flatMap(_:)",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				],
-				[{
-						"literal": {
-							"source": "evaluate(_:recur:)",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				]
-			]
-		]
-	}, {
-		"replace": {
-			"before": {
-				"literal": {
-					"source": "mark",
-					"categories": [
-
-					]
-				}
-			},
-			"after": [{
-					"literal": {
-						"source": "FreeAlgorithm",
-						"categories": [
-
-						]
-					}
-				},
-				[
-					[{
-							"literal": {
-								"source": "evaluate(_:)",
-								"categories": [
-
-								]
-							}
 						},
-						[
-
-						]
-					]
-				]
-			]
-		}
-	}, {
-		"delete": [{
-				"literal": {
-					"source": "Algorithm",
-					"categories": [
+						"source": {
+							"extract": 1,
+							"unwrap": "Recursive"
+						}
+					}
+				}, {
+					"extract": 1,
+					"unwrap": [
 
 					]
-				}
-			},
-			[
-				[{
-						"literal": {
-							"source": "evaluate(_:)",
-							"categories": [
+				}]
+			}, {
+				"extract": 5,
+				"unwrap": [{
+					"extract": 3,
+					"unwrap": {
+						"categories": {
+							"extract": 1,
+							"unwrap": [
 
 							]
+						},
+						"source": {
+							"extract": 1,
+							"unwrap": "ByKey"
 						}
-					},
-					[
-						[{
-								"literal": {
-									"source": "copy(_:)",
-									"categories": [
+					}
+				}, {
+					"extract": 1,
+					"unwrap": [
+
+					]
+				}]
+			}, {
+				"extract": 6,
+				"unwrap": {
+					"insert": {
+						"extract": 5,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
 
 									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "ByIndex"
 								}
-							},
-							[
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
 
 							]
-						]
-					]
-				]
-			]
-		]
-	}, {
-		"delete": [{
-				"literal": {
-					"source": "FreeAlgorithm",
-					"categories": [
-
-					]
-				}
-			},
-			[
-				[{
-						"literal": {
-							"source": "Pure",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				],
-				[{
-						"literal": {
-							"source": "Roll",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				],
-				[{
-						"literal": {
-							"source": "analysis(ifPure:ifRoll:)",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				], {
-					"literal": {
-						"source": "mark",
-						"categories": [
-
-						]
+						}]
 					}
-				},
-				[{
-						"literal": {
-							"source": "map(_:)",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				], {
-					"literal": {
-						"source": "mark",
-						"categories": [
+				}
+			}, {
+				"extract": 3,
+				"unwrap": {
+					"categories": {
+						"extract": 1,
+						"unwrap": [
 
 						]
+					},
+					"source": {
+						"extract": 1,
+						"unwrap": "mark"
 					}
-				},
-				[{
-						"literal": {
-							"source": "flatMap(_:)",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				],
-				[{
-						"literal": {
-							"source": "evaluate(_:)",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				]
-			]
-		]
-	}, {
-		"delete": [{
-				"literal": {
-					"source": "FreeAlgorithm",
-					"categories": [
-
-					]
 				}
-			},
-			[
-				[{
-						"literal": {
-							"source": "evaluate()",
-							"categories": [
+			}, {
+				"extract": 5,
+				"unwrap": [{
+					"extract": 3,
+					"unwrap": {
+						"categories": {
+							"extract": 1,
+							"unwrap": [
 
 							]
+						},
+						"source": {
+							"extract": 1,
+							"unwrap": "map(_:)"
 						}
-					},
-					[
-
-					]
-				]
-			]
-		]
-	},
-	[{
-			"literal": {
-				"source": "FreeConvertible",
-				"categories": [
-
-				]
-			}
-		},
-		[
-			[{
-					"literal": {
-						"source": "init(free:)",
-						"categories": [
-
-						]
 					}
-				},
-				[
-
-				]
-			], {
-				"literal": {
-					"source": "free",
-					"categories": [
+				}, {
+					"extract": 1,
+					"unwrap": [
 
 					]
-				}
-			}
-		]
-	],
-	[{
-			"literal": {
-				"source": "Free",
-				"categories": [
-
-				]
-			}
-		},
-		[
-			[{
-					"literal": {
-						"source": "init(free:)",
-						"categories": [
-
-						]
-					}
-				},
-				[
-
-				]
-			], {
-				"literal": {
-					"source": "free",
-					"categories": [
-
-					]
-				}
-			}
-		]
-	],
-	[{
-			"literal": {
-				"source": "FreeAlgorithm",
-				"categories": [
-
-				]
-			}
-		},
-		[
-			[{
-					"literal": {
-						"source": "init(_:_:)",
-						"categories": [
-
-						]
-					}
-				},
-				[
-
-				]
-			], {
-				"insert": [{
-						"literal": {
-							"source": "evaluate(_:)",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				]
-			}
-		]
-	], {
-		"insert": [{
-				"literal": {
-					"source": "FreeAlgorithm",
-					"categories": [
-
-					]
-				}
-			},
-			[
-				[{
-						"literal": {
-							"source": "evaluate()",
-							"categories": [
-
-							]
-						}
-					},
-					[
-
-					]
-				]
-			]
-		]
+				}]
+			}]
+		}]
 	}
-]
+}, {
+	"insert": {
+		"extract": 42,
+		"unwrap": {
+			"insert": {
+				"extract": 41,
+				"unwrap": [{
+					"extract": 3,
+					"unwrap": {
+						"categories": {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						},
+						"source": {
+							"extract": 1,
+							"unwrap": "FreeAlgorithm"
+						}
+					}
+				}, {
+					"extract": 37,
+					"unwrap": [{
+						"extract": 5,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "Pure"
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 5,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "Roll"
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 5,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "analysis(ifPure:ifRoll:)"
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "mark"
+							}
+						}
+					}, {
+						"extract": 5,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "map(_:)"
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "mark"
+							}
+						}
+					}, {
+						"extract": 5,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "flatMap(_:)"
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 5,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "evaluate(_:recur:)"
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}]
+				}]
+			}
+		}
+	}
+}, {
+	"insert": {
+		"extract": 15,
+		"unwrap": {
+			"replace": {
+				"extract": 14,
+				"unwrap": {
+					"before": {
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "mark"
+							}
+						}
+					},
+					"after": {
+						"extract": 10,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "FreeAlgorithm"
+								}
+							}
+						}, {
+							"extract": 6,
+							"unwrap": [{
+								"extract": 5,
+								"unwrap": [{
+									"extract": 3,
+									"unwrap": {
+										"categories": {
+											"extract": 1,
+											"unwrap": [
+
+											]
+										},
+										"source": {
+											"extract": 1,
+											"unwrap": "evaluate(_:)"
+										}
+									}
+								}, {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								}]
+							}]
+						}]
+					}
+				}
+			}
+		}
+	}
+}, {
+	"insert": {
+		"extract": 16,
+		"unwrap": {
+			"delete": {
+				"extract": 15,
+				"unwrap": [{
+					"extract": 3,
+					"unwrap": {
+						"categories": {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						},
+						"source": {
+							"extract": 1,
+							"unwrap": "Algorithm"
+						}
+					}
+				}, {
+					"extract": 11,
+					"unwrap": [{
+						"extract": 10,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "evaluate(_:)"
+								}
+							}
+						}, {
+							"extract": 6,
+							"unwrap": [{
+								"extract": 5,
+								"unwrap": [{
+									"extract": 3,
+									"unwrap": {
+										"categories": {
+											"extract": 1,
+											"unwrap": [
+
+											]
+										},
+										"source": {
+											"extract": 1,
+											"unwrap": "copy(_:)"
+										}
+									}
+								}, {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								}]
+							}]
+						}]
+					}]
+				}]
+			}
+		}
+	}
+}, {
+	"insert": {
+		"extract": 42,
+		"unwrap": {
+			"delete": {
+				"extract": 41,
+				"unwrap": [{
+					"extract": 3,
+					"unwrap": {
+						"categories": {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						},
+						"source": {
+							"extract": 1,
+							"unwrap": "FreeAlgorithm"
+						}
+					}
+				}, {
+					"extract": 37,
+					"unwrap": [{
+						"extract": 5,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "Pure"
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 5,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "Roll"
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 5,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "analysis(ifPure:ifRoll:)"
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "mark"
+							}
+						}
+					}, {
+						"extract": 5,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "map(_:)"
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "mark"
+							}
+						}
+					}, {
+						"extract": 5,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "flatMap(_:)"
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 5,
+						"unwrap": [{
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "evaluate(_:)"
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}]
+				}]
+			}
+		}
+	}
+}, {
+	"replace": {
+		"before": {
+			"extract": 35,
+			"unwrap": [{
+				"extract": 4,
+				"unwrap": {
+					"literal": {
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "Algorithm"
+							}
+						}
+					}
+				}
+			}, {
+				"extract": 30,
+				"unwrap": [{
+					"extract": 6,
+					"unwrap": [{
+						"extract": 4,
+						"unwrap": {
+							"literal": {
+								"extract": 3,
+								"unwrap": {
+									"categories": {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									},
+									"source": {
+										"extract": 1,
+										"unwrap": "Recursive"
+									}
+								}
+							}
+						}
+					}, {
+						"extract": 1,
+						"unwrap": [
+
+						]
+					}]
+				}, {
+					"extract": 6,
+					"unwrap": [{
+						"extract": 4,
+						"unwrap": {
+							"literal": {
+								"extract": 3,
+								"unwrap": {
+									"categories": {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									},
+									"source": {
+										"extract": 1,
+										"unwrap": "ByKey"
+									}
+								}
+							}
+						}
+					}, {
+						"extract": 1,
+						"unwrap": [
+
+						]
+					}]
+				}, {
+					"extract": 7,
+					"unwrap": {
+						"insert": {
+							"extract": 6,
+							"unwrap": [{
+								"extract": 4,
+								"unwrap": {
+									"literal": {
+										"extract": 3,
+										"unwrap": {
+											"categories": {
+												"extract": 1,
+												"unwrap": [
+
+												]
+											},
+											"source": {
+												"extract": 1,
+												"unwrap": "ByIndex"
+											}
+										}
+									}
+								}
+							}, {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							}]
+						}
+					}
+				}, {
+					"extract": 4,
+					"unwrap": {
+						"literal": {
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "mark"
+								}
+							}
+						}
+					}
+				}, {
+					"extract": 6,
+					"unwrap": [{
+						"extract": 4,
+						"unwrap": {
+							"literal": {
+								"extract": 3,
+								"unwrap": {
+									"categories": {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									},
+									"source": {
+										"extract": 1,
+										"unwrap": "map(_:)"
+									}
+								}
+							}
+						}
+					}, {
+						"extract": 1,
+						"unwrap": [
+
+						]
+					}]
+				}]
+			}]
+		},
+		"after": {
+			"extract": 11,
+			"unwrap": {
+				"delete": {
+					"extract": 10,
+					"unwrap": [{
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "FreeAlgorithm"
+							}
+						}
+					}, {
+						"extract": 6,
+						"unwrap": [{
+							"extract": 5,
+							"unwrap": [{
+								"extract": 3,
+								"unwrap": {
+									"categories": {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									},
+									"source": {
+										"extract": 1,
+										"unwrap": "evaluate()"
+									}
+								}
+							}, {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							}]
+						}]
+					}]
+				}
+			}
+		}
+	}
+}, {
+	"delete": {
+		"extract": 51,
+		"unwrap": {
+			"insert": {
+				"extract": 50,
+				"unwrap": [{
+					"extract": 4,
+					"unwrap": {
+						"literal": {
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "FreeAlgorithm"
+								}
+							}
+						}
+					}
+				}, {
+					"extract": 45,
+					"unwrap": [{
+						"extract": 6,
+						"unwrap": [{
+							"extract": 4,
+							"unwrap": {
+								"literal": {
+									"extract": 3,
+									"unwrap": {
+										"categories": {
+											"extract": 1,
+											"unwrap": [
+
+											]
+										},
+										"source": {
+											"extract": 1,
+											"unwrap": "Pure"
+										}
+									}
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 6,
+						"unwrap": [{
+							"extract": 4,
+							"unwrap": {
+								"literal": {
+									"extract": 3,
+									"unwrap": {
+										"categories": {
+											"extract": 1,
+											"unwrap": [
+
+											]
+										},
+										"source": {
+											"extract": 1,
+											"unwrap": "Roll"
+										}
+									}
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 6,
+						"unwrap": [{
+							"extract": 4,
+							"unwrap": {
+								"literal": {
+									"extract": 3,
+									"unwrap": {
+										"categories": {
+											"extract": 1,
+											"unwrap": [
+
+											]
+										},
+										"source": {
+											"extract": 1,
+											"unwrap": "analysis(ifPure:ifRoll:)"
+										}
+									}
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 4,
+						"unwrap": {
+							"literal": {
+								"extract": 3,
+								"unwrap": {
+									"categories": {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									},
+									"source": {
+										"extract": 1,
+										"unwrap": "mark"
+									}
+								}
+							}
+						}
+					}, {
+						"extract": 6,
+						"unwrap": [{
+							"extract": 4,
+							"unwrap": {
+								"literal": {
+									"extract": 3,
+									"unwrap": {
+										"categories": {
+											"extract": 1,
+											"unwrap": [
+
+											]
+										},
+										"source": {
+											"extract": 1,
+											"unwrap": "map(_:)"
+										}
+									}
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 4,
+						"unwrap": {
+							"literal": {
+								"extract": 3,
+								"unwrap": {
+									"categories": {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									},
+									"source": {
+										"extract": 1,
+										"unwrap": "mark"
+									}
+								}
+							}
+						}
+					}, {
+						"extract": 6,
+						"unwrap": [{
+							"extract": 4,
+							"unwrap": {
+								"literal": {
+									"extract": 3,
+									"unwrap": {
+										"categories": {
+											"extract": 1,
+											"unwrap": [
+
+											]
+										},
+										"source": {
+											"extract": 1,
+											"unwrap": "flatMap(_:)"
+										}
+									}
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}, {
+						"extract": 6,
+						"unwrap": [{
+							"extract": 4,
+							"unwrap": {
+								"literal": {
+									"extract": 3,
+									"unwrap": {
+										"categories": {
+											"extract": 1,
+											"unwrap": [
+
+											]
+										},
+										"source": {
+											"extract": 1,
+											"unwrap": "evaluate(_:recur:)"
+										}
+									}
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}]
+				}]
+			}
+		}
+	}
+}, {
+	"delete": {
+		"extract": 18,
+		"unwrap": {
+			"replace": {
+				"extract": 17,
+				"unwrap": {
+					"before": {
+						"extract": 4,
+						"unwrap": {
+							"literal": {
+								"extract": 3,
+								"unwrap": {
+									"categories": {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									},
+									"source": {
+										"extract": 1,
+										"unwrap": "mark"
+									}
+								}
+							}
+						}
+					},
+					"after": {
+						"extract": 12,
+						"unwrap": [{
+							"extract": 4,
+							"unwrap": {
+								"literal": {
+									"extract": 3,
+									"unwrap": {
+										"categories": {
+											"extract": 1,
+											"unwrap": [
+
+											]
+										},
+										"source": {
+											"extract": 1,
+											"unwrap": "FreeAlgorithm"
+										}
+									}
+								}
+							}
+						}, {
+							"extract": 7,
+							"unwrap": [{
+								"extract": 6,
+								"unwrap": [{
+									"extract": 4,
+									"unwrap": {
+										"literal": {
+											"extract": 3,
+											"unwrap": {
+												"categories": {
+													"extract": 1,
+													"unwrap": [
+
+													]
+												},
+												"source": {
+													"extract": 1,
+													"unwrap": "evaluate(_:)"
+												}
+											}
+										}
+									}
+								}, {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								}]
+							}]
+						}]
+					}
+				}
+			}
+		}
+	}
+}, {
+	"replace": {
+		"before": {
+			"extract": 19,
+			"unwrap": {
+				"delete": {
+					"extract": 18,
+					"unwrap": [{
+						"extract": 4,
+						"unwrap": {
+							"literal": {
+								"extract": 3,
+								"unwrap": {
+									"categories": {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									},
+									"source": {
+										"extract": 1,
+										"unwrap": "Algorithm"
+									}
+								}
+							}
+						}
+					}, {
+						"extract": 13,
+						"unwrap": [{
+							"extract": 12,
+							"unwrap": [{
+								"extract": 4,
+								"unwrap": {
+									"literal": {
+										"extract": 3,
+										"unwrap": {
+											"categories": {
+												"extract": 1,
+												"unwrap": [
+
+												]
+											},
+											"source": {
+												"extract": 1,
+												"unwrap": "evaluate(_:)"
+											}
+										}
+									}
+								}
+							}, {
+								"extract": 7,
+								"unwrap": [{
+									"extract": 6,
+									"unwrap": [{
+										"extract": 4,
+										"unwrap": {
+											"literal": {
+												"extract": 3,
+												"unwrap": {
+													"categories": {
+														"extract": 1,
+														"unwrap": [
+
+														]
+													},
+													"source": {
+														"extract": 1,
+														"unwrap": "copy(_:)"
+													}
+												}
+											}
+										}
+									}, {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									}]
+								}]
+							}]
+						}]
+					}]
+				}
+			}
+		},
+		"after": {
+			"extract": 13,
+			"unwrap": [{
+				"extract": 3,
+				"unwrap": {
+					"categories": {
+						"extract": 1,
+						"unwrap": [
+
+						]
+					},
+					"source": {
+						"extract": 1,
+						"unwrap": "FreeConvertible"
+					}
+				}
+			}, {
+				"extract": 9,
+				"unwrap": [{
+					"extract": 5,
+					"unwrap": [{
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "init(free:)"
+							}
+						}
+					}, {
+						"extract": 1,
+						"unwrap": [
+
+						]
+					}]
+				}, {
+					"extract": 3,
+					"unwrap": {
+						"categories": {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						},
+						"source": {
+							"extract": 1,
+							"unwrap": "free"
+						}
+					}
+				}]
+			}]
+		}
+	}
+}, {
+	"replace": {
+		"before": {
+			"extract": 51,
+			"unwrap": {
+				"delete": {
+					"extract": 50,
+					"unwrap": [{
+						"extract": 4,
+						"unwrap": {
+							"literal": {
+								"extract": 3,
+								"unwrap": {
+									"categories": {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									},
+									"source": {
+										"extract": 1,
+										"unwrap": "FreeAlgorithm"
+									}
+								}
+							}
+						}
+					}, {
+						"extract": 45,
+						"unwrap": [{
+							"extract": 6,
+							"unwrap": [{
+								"extract": 4,
+								"unwrap": {
+									"literal": {
+										"extract": 3,
+										"unwrap": {
+											"categories": {
+												"extract": 1,
+												"unwrap": [
+
+												]
+											},
+											"source": {
+												"extract": 1,
+												"unwrap": "Pure"
+											}
+										}
+									}
+								}
+							}, {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							}]
+						}, {
+							"extract": 6,
+							"unwrap": [{
+								"extract": 4,
+								"unwrap": {
+									"literal": {
+										"extract": 3,
+										"unwrap": {
+											"categories": {
+												"extract": 1,
+												"unwrap": [
+
+												]
+											},
+											"source": {
+												"extract": 1,
+												"unwrap": "Roll"
+											}
+										}
+									}
+								}
+							}, {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							}]
+						}, {
+							"extract": 6,
+							"unwrap": [{
+								"extract": 4,
+								"unwrap": {
+									"literal": {
+										"extract": 3,
+										"unwrap": {
+											"categories": {
+												"extract": 1,
+												"unwrap": [
+
+												]
+											},
+											"source": {
+												"extract": 1,
+												"unwrap": "analysis(ifPure:ifRoll:)"
+											}
+										}
+									}
+								}
+							}, {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							}]
+						}, {
+							"extract": 4,
+							"unwrap": {
+								"literal": {
+									"extract": 3,
+									"unwrap": {
+										"categories": {
+											"extract": 1,
+											"unwrap": [
+
+											]
+										},
+										"source": {
+											"extract": 1,
+											"unwrap": "mark"
+										}
+									}
+								}
+							}
+						}, {
+							"extract": 6,
+							"unwrap": [{
+								"extract": 4,
+								"unwrap": {
+									"literal": {
+										"extract": 3,
+										"unwrap": {
+											"categories": {
+												"extract": 1,
+												"unwrap": [
+
+												]
+											},
+											"source": {
+												"extract": 1,
+												"unwrap": "map(_:)"
+											}
+										}
+									}
+								}
+							}, {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							}]
+						}, {
+							"extract": 4,
+							"unwrap": {
+								"literal": {
+									"extract": 3,
+									"unwrap": {
+										"categories": {
+											"extract": 1,
+											"unwrap": [
+
+											]
+										},
+										"source": {
+											"extract": 1,
+											"unwrap": "mark"
+										}
+									}
+								}
+							}
+						}, {
+							"extract": 6,
+							"unwrap": [{
+								"extract": 4,
+								"unwrap": {
+									"literal": {
+										"extract": 3,
+										"unwrap": {
+											"categories": {
+												"extract": 1,
+												"unwrap": [
+
+												]
+											},
+											"source": {
+												"extract": 1,
+												"unwrap": "flatMap(_:)"
+											}
+										}
+									}
+								}
+							}, {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							}]
+						}, {
+							"extract": 6,
+							"unwrap": [{
+								"extract": 4,
+								"unwrap": {
+									"literal": {
+										"extract": 3,
+										"unwrap": {
+											"categories": {
+												"extract": 1,
+												"unwrap": [
+
+												]
+											},
+											"source": {
+												"extract": 1,
+												"unwrap": "evaluate(_:)"
+											}
+										}
+									}
+								}
+							}, {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							}]
+						}]
+					}]
+				}
+			}
+		},
+		"after": {
+			"extract": 13,
+			"unwrap": [{
+				"extract": 3,
+				"unwrap": {
+					"categories": {
+						"extract": 1,
+						"unwrap": [
+
+						]
+					},
+					"source": {
+						"extract": 1,
+						"unwrap": "Free"
+					}
+				}
+			}, {
+				"extract": 9,
+				"unwrap": [{
+					"extract": 5,
+					"unwrap": [{
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "init(free:)"
+							}
+						}
+					}, {
+						"extract": 1,
+						"unwrap": [
+
+						]
+					}]
+				}, {
+					"extract": 3,
+					"unwrap": {
+						"categories": {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						},
+						"source": {
+							"extract": 1,
+							"unwrap": "free"
+						}
+					}
+				}]
+			}]
+		}
+	}
+}, {
+	"replace": {
+		"before": {
+			"extract": 13,
+			"unwrap": {
+				"delete": {
+					"extract": 12,
+					"unwrap": [{
+						"extract": 4,
+						"unwrap": {
+							"literal": {
+								"extract": 3,
+								"unwrap": {
+									"categories": {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									},
+									"source": {
+										"extract": 1,
+										"unwrap": "FreeAlgorithm"
+									}
+								}
+							}
+						}
+					}, {
+						"extract": 7,
+						"unwrap": [{
+							"extract": 6,
+							"unwrap": [{
+								"extract": 4,
+								"unwrap": {
+									"literal": {
+										"extract": 3,
+										"unwrap": {
+											"categories": {
+												"extract": 1,
+												"unwrap": [
+
+												]
+											},
+											"source": {
+												"extract": 1,
+												"unwrap": "evaluate()"
+											}
+										}
+									}
+								}
+							}, {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							}]
+						}]
+					}]
+				}
+			}
+		},
+		"after": {
+			"extract": 16,
+			"unwrap": [{
+				"extract": 3,
+				"unwrap": {
+					"categories": {
+						"extract": 1,
+						"unwrap": [
+
+						]
+					},
+					"source": {
+						"extract": 1,
+						"unwrap": "FreeAlgorithm"
+					}
+				}
+			}, {
+				"extract": 12,
+				"unwrap": [{
+					"extract": 5,
+					"unwrap": [{
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "init(_:_:)"
+							}
+						}
+					}, {
+						"extract": 1,
+						"unwrap": [
+
+						]
+					}]
+				}, {
+					"extract": 6,
+					"unwrap": {
+						"insert": {
+							"extract": 5,
+							"unwrap": [{
+								"extract": 3,
+								"unwrap": {
+									"categories": {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									},
+									"source": {
+										"extract": 1,
+										"unwrap": "evaluate(_:)"
+									}
+								}
+							}, {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							}]
+						}
+					}
+				}]
+			}]
+		}
+	}
+}, {
+	"delete": {
+		"extract": 16,
+		"unwrap": [{
+			"extract": 4,
+			"unwrap": {
+				"literal": {
+					"extract": 3,
+					"unwrap": {
+						"categories": {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						},
+						"source": {
+							"extract": 1,
+							"unwrap": "FreeConvertible"
+						}
+					}
+				}
+			}
+		}, {
+			"extract": 11,
+			"unwrap": [{
+				"extract": 6,
+				"unwrap": [{
+					"extract": 4,
+					"unwrap": {
+						"literal": {
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "init(free:)"
+								}
+							}
+						}
+					}
+				}, {
+					"extract": 1,
+					"unwrap": [
+
+					]
+				}]
+			}, {
+				"extract": 4,
+				"unwrap": {
+					"literal": {
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "free"
+							}
+						}
+					}
+				}
+			}]
+		}]
+	}
+}, {
+	"delete": {
+		"extract": 16,
+		"unwrap": [{
+			"extract": 4,
+			"unwrap": {
+				"literal": {
+					"extract": 3,
+					"unwrap": {
+						"categories": {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						},
+						"source": {
+							"extract": 1,
+							"unwrap": "Free"
+						}
+					}
+				}
+			}
+		}, {
+			"extract": 11,
+			"unwrap": [{
+				"extract": 6,
+				"unwrap": [{
+					"extract": 4,
+					"unwrap": {
+						"literal": {
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "init(free:)"
+								}
+							}
+						}
+					}
+				}, {
+					"extract": 1,
+					"unwrap": [
+
+					]
+				}]
+			}, {
+				"extract": 4,
+				"unwrap": {
+					"literal": {
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "free"
+							}
+						}
+					}
+				}
+			}]
+		}]
+	}
+}, {
+	"replace": {
+		"before": {
+			"extract": 19,
+			"unwrap": [{
+				"extract": 4,
+				"unwrap": {
+					"literal": {
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "FreeAlgorithm"
+							}
+						}
+					}
+				}
+			}, {
+				"extract": 14,
+				"unwrap": [{
+					"extract": 6,
+					"unwrap": [{
+						"extract": 4,
+						"unwrap": {
+							"literal": {
+								"extract": 3,
+								"unwrap": {
+									"categories": {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									},
+									"source": {
+										"extract": 1,
+										"unwrap": "init(_:_:)"
+									}
+								}
+							}
+						}
+					}, {
+						"extract": 1,
+						"unwrap": [
+
+						]
+					}]
+				}, {
+					"extract": 7,
+					"unwrap": {
+						"insert": {
+							"extract": 6,
+							"unwrap": [{
+								"extract": 4,
+								"unwrap": {
+									"literal": {
+										"extract": 3,
+										"unwrap": {
+											"categories": {
+												"extract": 1,
+												"unwrap": [
+
+												]
+											},
+											"source": {
+												"extract": 1,
+												"unwrap": "evaluate(_:)"
+											}
+										}
+									}
+								}
+							}, {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							}]
+						}
+					}
+				}]
+			}]
+		},
+		"after": {
+			"extract": 11,
+			"unwrap": {
+				"insert": {
+					"extract": 10,
+					"unwrap": [{
+						"extract": 3,
+						"unwrap": {
+							"categories": {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							},
+							"source": {
+								"extract": 1,
+								"unwrap": "FreeAlgorithm"
+							}
+						}
+					}, {
+						"extract": 6,
+						"unwrap": [{
+							"extract": 5,
+							"unwrap": [{
+								"extract": 3,
+								"unwrap": {
+									"categories": {
+										"extract": 1,
+										"unwrap": [
+
+										]
+									},
+									"source": {
+										"extract": 1,
+										"unwrap": "evaluate()"
+									}
+								}
+							}, {
+								"extract": 1,
+								"unwrap": [
+
+								]
+							}]
+						}]
+					}]
+				}
+			}
+		}
+	}
+}, {
+	"delete": {
+		"extract": 13,
+		"unwrap": {
+			"insert": {
+				"extract": 12,
+				"unwrap": [{
+					"extract": 4,
+					"unwrap": {
+						"literal": {
+							"extract": 3,
+							"unwrap": {
+								"categories": {
+									"extract": 1,
+									"unwrap": [
+
+									]
+								},
+								"source": {
+									"extract": 1,
+									"unwrap": "FreeAlgorithm"
+								}
+							}
+						}
+					}
+				}, {
+					"extract": 7,
+					"unwrap": [{
+						"extract": 6,
+						"unwrap": [{
+							"extract": 4,
+							"unwrap": {
+								"literal": {
+									"extract": 3,
+									"unwrap": {
+										"categories": {
+											"extract": 1,
+											"unwrap": [
+
+											]
+										},
+										"source": {
+											"extract": 1,
+											"unwrap": "evaluate()"
+										}
+									}
+								}
+							}
+						}, {
+							"extract": 1,
+							"unwrap": [
+
+							]
+						}]
+					}]
+				}]
+			}
+		}
+	}
+}]
