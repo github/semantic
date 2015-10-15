@@ -98,7 +98,7 @@ public enum Free<A, B>: CustomDebugStringConvertible, CustomDocConvertible, Synt
 		case let .Pure(b):
 			return Doc(b)
 		case let .Roll(s):
-			return s.doc
+			return Doc(s)
 		}
 	}
 

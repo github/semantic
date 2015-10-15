@@ -23,7 +23,7 @@ public enum Fix<A>: CustomDebugStringConvertible, CustomDocConvertible, SyntaxCo
 	// MARK: CustomDocConvertible
 
 	public var doc: Doc {
-		return out.doc
+		return Doc(out)
 	}
 
 
