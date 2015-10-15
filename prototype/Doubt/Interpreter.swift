@@ -3,6 +3,13 @@ public struct Interpreter<Term: TermType> {
 	/// The type of diffs constructed by `Interpreter`s.
 	public typealias Diff = Free<Term.LeafType, Patch<Term>>
 
+	/// Constructs an `Interpreter` parameterized by the `equal` and `comparable` tests on `Term`s, and the `cost` function for diffs.
+	///
+	/// `equal` determines whether two terms are equal. This should typically be strict syntactic equality, not e.g. including any annotations of source ranges. If two terms are considered equal by this function, then an unchanged diff will be returned directly. No diffing will be performed, and `comparable` will not be applied to the terms at all.
+	///
+	/// `comparable` determines whether two terms should be considered comparable when encountered at some point within the tree. When diffing two `.Indexed` terms, this will cause diffing to delete one term and insert the other rather than recurring through the pair (possibly constructing a single replacement). This has far-reaching implications for performance, as it enables the caller to dramatically prune the search space.
+	///
+	/// `cost` computes the cost of a single diff. This is used when computing the diff of `.Indexed` terms: the algorithm selects the lowest-total-cost sequence of diffs which completely cover the arrays. This computation is performed a minimum of 2mn and a maximum of 3mn times, where m is the length of the first array and n is the length of the second. Therefore, it should be as efficient as possible, ideally no more than linear in the size of the diff.
 	public init(equal: (Term, Term) -> Bool, comparable: (Term, Term) -> Bool, cost: Diff -> Int) {
 		self.equal = equal
 		self.comparable = comparable
