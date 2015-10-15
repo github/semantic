@@ -38,7 +38,7 @@ public enum Patch<A>: CustomDebugStringConvertible {
 			return ".Insert(\(String(reflecting: b)))"
 		case let .Delete(a):
 			return ".Delete(\(String(reflecting: a)))"
-	}
+		}
 	}
 }
 
