@@ -2,7 +2,7 @@
 public protocol TermType {
 	typealias LeafType
 
-	var out: Syntax<Self, LeafType> { get }
+	var unwrap: Syntax<Self, LeafType> { get }
 }
 
 
@@ -11,7 +11,7 @@ extension TermType {
 	///
 	/// Folds the tree encoded by the receiver into a single value by recurring top-down through the tree, applying `transform` to leaves, then to branches, and so forth.
 	public func cata<Result>(transform: Syntax<Result, LeafType> -> Result) -> Result {
-		return self |> ({ $0.out } >>> { $0.map { $0.cata(transform) } } >>> transform)
+		return self |> ({ $0.unwrap } >>> { $0.map { $0.cata(transform) } } >>> transform)
 	}
 
 
@@ -31,11 +31,14 @@ extension TermType {
 }
 
 
-extension Fix: TermType {}
+extension Cofree: TermType {}
 
-extension Cofree: TermType {
-	public var out: Syntax<Cofree, A> {
-		return unwrap
+
+// MARK: - Equality
+
+extension TermType {
+	public static func equals(leaf: (LeafType, LeafType) -> Bool)(_ a: Self, _ b: Self) -> Bool {
+		return Syntax.equals(ifLeaf: leaf, ifRecur: equals(leaf))(a.unwrap, b.unwrap)
 	}
 }
 

@@ -1,5 +1,5 @@
 /// A patch to some part of a `Syntax` tree.
-public enum Patch<A>: CustomDebugStringConvertible, CustomDocConvertible {
+public enum Patch<A>: CustomDebugStringConvertible {
 	case Replace(A, A)
 	case Insert(A)
 	case Delete(A)
@@ -38,15 +38,7 @@ public enum Patch<A>: CustomDebugStringConvertible, CustomDocConvertible {
 			return ".Insert(\(String(reflecting: b)))"
 		case let .Delete(a):
 			return ".Delete(\(String(reflecting: a)))"
-		}
 	}
-
-
-	// MARK: CustomDocConvertible
-
-	public var doc: Doc {
-		return (state.before.map(Doc.init)?.bracket("{-", "-}") ?? .Empty)
-			<> (state.after.map(Doc.init)?.bracket("{+", "+}") ?? .Empty)
 	}
 }
 
@@ -107,7 +99,7 @@ extension Patch where A: CustomJSONConvertible {
 
 // MARK: - PatchConvertible
 
-/// A hack to enable constrained extensions on `Free<A, Patch<Fix<A>>`.
+/// A hack to enable constrained extensions on `Free<A, Patch<Term: TermType where LeafType == A>`.
 public protocol PatchConvertible {
 	typealias Element
 

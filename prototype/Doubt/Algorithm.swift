@@ -74,7 +74,7 @@ public enum Algorithm<Term: TermType, B> {
 			// At the moment, there are no restrictions on whether terms are compatible.
 			if equals(a, b) { return f(Diff(b)).evaluate(equals, recur: recur) }
 
-			switch (a.out, b.out) {
+			switch (a.unwrap, b.unwrap) {
 			case let (.Indexed(a), .Indexed(b)) where a.count == b.count:
 				return f(.Indexed(zip(a, b).map(recurOrReplace))).evaluate(equals, recur: recur)
 
@@ -108,7 +108,7 @@ extension Algorithm where Term: Equatable {
 extension Algorithm where B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
 	/// `Algorithm<Term, Diff>`s can be constructed from a pair of `Term`s using `ByKey` when `Keyed`, `ByIndex` when `Indexed`, and `Recursive` otherwise.
 	public init(_ a: Term, _ b: Term) {
-		switch (a.out, b.out) {
+		switch (a.unwrap, b.unwrap) {
 		case let (.Keyed(a), .Keyed(b)):
 			self = .Roll(.ByKey(a, b, Syntax.Keyed >>> Free.Roll >>> B.init >>> Pure))
 		case let (.Indexed(a), .Indexed(b)):
