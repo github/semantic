@@ -29,7 +29,7 @@ public struct Interpreter<Term: TermType> {
 	}
 
 	public func run(a: Term, _ b: Term) -> Diff {
-		return recur(a, b) ?? Diff.Replace(a, b)
+		return recur(a, b) ?? .Replace(a, b)
 	}
 }
 
