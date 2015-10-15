@@ -15,7 +15,9 @@ extension TermType {
 	}
 
 
-	/// The size of the receiver.
+	/// The count of nodes in the receiver.
+	///
+	/// This is used to compute the cost of patches, such that a patch inserting a very large tree will be charged approximately the same as a very large tree consisting of many small patches.
 	public var size: Int {
 		return cata {
 			switch $0 {
