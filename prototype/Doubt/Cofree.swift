@@ -85,21 +85,6 @@ public func == <A: Equatable, B: Equatable> (left: Cofree<A, B>, right: Cofree<A
 }
 
 
-// MARK: - Hashing
-
-extension Cofree {
-	public func hash(annotation annotation: B -> Hash, leaf: A -> Hash) -> Hash {
-		return .Ordered([ annotation(extract), unwrap.hash(ifLeaf: leaf, ifRecur: { $0.hash(annotation: annotation, leaf: leaf) }) ])
-	}
-}
-
-extension Cofree where A: Hashable, B: Hashable {
-	public var hash: Hash {
-		return hash(annotation: Hash.init, leaf: Hash.init)
-	}
-}
-
-
 // MARK: - JSON
 
 extension Cofree {
