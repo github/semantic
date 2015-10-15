@@ -98,5 +98,11 @@ extension Interpreter where Term.LeafType: Equatable {
 	}
 }
 
+extension Interpreter where Term: CofreeType, Term.Annotation: Categorizable {
+	public init(equal: (Term, Term) -> Bool, cost: Diff -> Int) {
+		self.init(equal: equal, comparable: Interpreter.comparable { $0.extract.categories }, cost: cost)
+	}
+}
+
 
 import Prelude
