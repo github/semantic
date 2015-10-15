@@ -16,9 +16,9 @@ public struct Interpreter<Term: TermType> {
 		self.cost = cost
 	}
 
-	/// Constructs an `Interpreter` parameterized by the `equal` and `comparable` tests on `Term`s, and the `cost` function for `Patch`es.
-	public init(equal: (Term, Term) -> Bool, comparable: (Term, Term) -> Bool, cost: Patch<Term> -> Int) {
-		self.init(equal: equal, comparable: comparable, cost: { $0.map(cost).reduce(0, combine: +) })
+	/// Computes a diff cost function from a patch cost function.
+	public static func cost(cost: Patch<Term> -> Int)(_ diff: Diff) -> Int {
+		return diff.map(cost).reduce(0, combine: +)
 	}
 
 
