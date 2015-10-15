@@ -67,6 +67,13 @@ extension Patch {
 	}
 }
 
+extension Patch where A: TermType {
+	/// Computes the size of a `patch` as the sum of the sizes of its terms.
+	public static func sum(patch: Patch) -> Int {
+		return sum { $0.size } (patch)
+	}
+}
+
 
 // MARK: - JSON
 
