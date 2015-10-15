@@ -2,7 +2,7 @@
 public struct Interpreter<Term: TermType> {
 	public typealias Diff = Free<Term.LeafType, Patch<Term>>
 
-	public let equals: (Term, Term) -> Bool
+	private let equals: (Term, Term) -> Bool
 
 	private func recur(a: Term, _ b: Term) -> Diff? {
 		if equals(a, b) { return Diff(b) }
