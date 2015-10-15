@@ -122,5 +122,7 @@ public protocol CofreeType {
 	var unwrap: Syntax<Self, Leaf> { get }
 }
 
+extension Cofree: CofreeType {}
+
 
 import Prelude
