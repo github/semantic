@@ -2,23 +2,23 @@
 ///
 /// As with `Free`, this is “free” in the sense of “unconstrained,” i.e. “the monad induced by `Operation` without extra assumptions.”
 ///
-/// Where `Operation` models a single diffing strategy, `Algorithm` models the recursive selection of diffing strategies at each node. Thus, a value in `Algorithm` models an algorithm for constructing a value in the type `B` from the resulting diffs. By this means, diffing can be adapted not just to the specific grammar, but to specific trees produced by that grammar, and even the values of type `A` encapsulated at each node.
-public enum Algorithm<Term: TermType, B> {
+/// Where `Operation` models a single diffing strategy, `Algorithm` models the recursive selection of diffing strategies at each node. Thus, a value in `Algorithm` models an algorithm for constructing a value in the type `Result` from the resulting diffs. By this means, diffing can be adapted not just to the specific grammar, but to specific trees produced by that grammar, and even the values of type `A` encapsulated at each node.
+public enum Algorithm<Term: TermType, Result> {
 	/// The type of `Patch`es produced by `Algorithm`s.
 	public typealias Patch = Doubt.Patch<Term>
 
 	/// The type of `Diff`s which `Algorithm`s produce.
 	public typealias Diff = Free<Term.LeafType, Patch>
 
-	/// The injection of a value of type `B` into an `Operation`.
+	/// The injection of a value of type `Result` into an `Operation`.
 	///
-	/// Equally, a way to return a result or throw an error during computation, as determined by the type which `B` is instantiated to, and the specific context in which it is being evaluated.
-	case Pure(B)
+	/// Equally, a way to return a result or throw an error during computation, as determined by the type which `Result` is instantiated to, and the specific context in which it is being evaluated.
+	case Pure(Result)
 
 	/// A recursive instantiation of `Operation`, unrolling another iteration of the recursive type.
 	indirect case Roll(Operation<Algorithm, Term, Diff>)
 
-	public func analysis<C>(@noescape ifPure ifPure: B -> C, @noescape ifRoll: Operation<Algorithm, Term, Diff> -> C) -> C {
+	public func analysis<C>(@noescape ifPure ifPure: Result -> C, @noescape ifRoll: Operation<Algorithm, Term, Diff> -> C) -> C {
 		switch self {
 		case let .Pure(b):
 			return ifPure(b)
@@ -30,20 +30,20 @@ public enum Algorithm<Term: TermType, B> {
 
 	// MARK: Functor
 
-	public func map<Other>(transform: B -> Other) -> Algorithm<Term, Other> {
+	public func map<Other>(transform: Result -> Other) -> Algorithm<Term, Other> {
 		return analysis(ifPure: transform >>> Algorithm<Term, Other>.Pure, ifRoll: { .Roll($0.map { $0.map(transform) }) })
 	}
 
 
 	// MARK: Monad
 
-	public func flatMap<C>(transform: B -> Algorithm<Term, C>) -> Algorithm<Term, C> {
+	public func flatMap<C>(transform: Result -> Algorithm<Term, C>) -> Algorithm<Term, C> {
 		return analysis(ifPure: transform, ifRoll: { .Roll($0.map { $0.flatMap(transform) }) })
 	}
 
 
 	/// Evaluates the encoded algorithm, returning its result.
-	public func evaluate(equals: (Term, Term) -> Bool, recur: (Term, Term) -> Diff?) -> B {
+	public func evaluate(equals: (Term, Term) -> Bool, recur: (Term, Term) -> Diff?) -> Result {
 		let recur = {
 			equals($0, $1)
 				? Diff($1)
@@ -100,29 +100,29 @@ public enum Algorithm<Term: TermType, B> {
 }
 
 extension Algorithm where Term: Equatable {
-	public func evaluate(recur: (Term, Term) -> Diff?) -> B {
+	public func evaluate(recur: (Term, Term) -> Diff?) -> Result {
 		return evaluate(==, recur: recur)
 	}
 }
 
-extension Algorithm where B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
+extension Algorithm where Result: FreeConvertible, Result.RollType == Term.LeafType, Result.PureType == Algorithm<Term, Result>.Patch {
 	/// `Algorithm<Term, Diff>`s can be constructed from a pair of `Term`s using `ByKey` when `Keyed`, `ByIndex` when `Indexed`, and `Recursive` otherwise.
 	public init(_ a: Term, _ b: Term) {
 		switch (a.unwrap, b.unwrap) {
 		case let (.Keyed(a), .Keyed(b)):
-			self = .Roll(.ByKey(a, b, Syntax.Keyed >>> Free.Roll >>> B.init >>> Pure))
+			self = .Roll(.ByKey(a, b, Syntax.Keyed >>> Free.Roll >>> Result.init >>> Pure))
 		case let (.Indexed(a), .Indexed(b)):
-			self = .Roll(.ByIndex(a, b, Syntax.Indexed >>> Free.Roll >>> B.init >>> Pure))
+			self = .Roll(.ByIndex(a, b, Syntax.Indexed >>> Free.Roll >>> Result.init >>> Pure))
 		default:
-			self = .Roll(.Recursive(a, b, B.init >>> Algorithm.Pure))
+			self = .Roll(.Recursive(a, b, Result.init >>> Algorithm.Pure))
 		}
 	}
 
-	public func evaluate(equals: (Term, Term) -> Bool) -> B {
+	public func evaluate(equals: (Term, Term) -> Bool) -> Result {
 		return evaluate(equals, recur: { Algorithm($0, $1).evaluate(equals).free })
 	}
 
-	public func evaluate<C>(equals: (Term, Term) -> Bool, categorize: Term -> Set<C>) -> B {
+	public func evaluate<C>(equals: (Term, Term) -> Bool, categorize: Term -> Set<C>) -> Result {
 		return evaluate(equals, recur: {
 			let c0 = categorize($0)
 			let c1 = categorize($1)
@@ -133,21 +133,21 @@ extension Algorithm where B: FreeConvertible, B.RollType == Term.LeafType, B.Pur
 	}
 }
 
-extension Algorithm where Term: Equatable, B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
-	public func evaluate() -> B {
+extension Algorithm where Term: Equatable, Result: FreeConvertible, Result.RollType == Term.LeafType, Result.PureType == Algorithm<Term, Result>.Patch {
+	public func evaluate() -> Result {
 		return evaluate(==)
 	}
 }
 
-extension Algorithm where Term: Categorizable, B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
-	public func evaluate(equals: (Term, Term) -> Bool) -> B {
+extension Algorithm where Term: Categorizable, Result: FreeConvertible, Result.RollType == Term.LeafType, Result.PureType == Algorithm<Term, Result>.Patch {
+	public func evaluate(equals: (Term, Term) -> Bool) -> Result {
 		return evaluate(equals, categorize: { $0.categories })
 	}
 }
 
 
-extension Algorithm where Term: Categorizable, Term: Equatable, B: FreeConvertible, B.RollType == Term.LeafType, B.PureType == Algorithm<Term, B>.Patch {
-	public func evaluate() -> B {
+extension Algorithm where Term: Categorizable, Term: Equatable, Result: FreeConvertible, Result.RollType == Term.LeafType, Result.PureType == Algorithm<Term, Result>.Patch {
+	public func evaluate() -> Result {
 		return evaluate(==, categorize: { $0.categories })
 	}
 }
