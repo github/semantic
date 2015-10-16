@@ -165,18 +165,28 @@ func members(json: JSONParser) -> MembersParser {
 			<* whitespace
 			<*> separatedPairs
 
-	let zero: MembersParser = pure([])
-	return oneOrMore
-			<|> zero
+	return oneOrMore <|> pure([])
 }
+
+typealias ValuesParser = Parser<String, [CofreeJSON]>.Function;
+func elements(json: JSONParser) -> ValuesParser {
+	let value: Parser<String, CofreeJSON>.Function = whitespace *> json <* whitespace
+
+	let separatedValues: ValuesParser = (%"," *> whitespace *> value <* whitespace)*
+
+	let oneOrMore: ValuesParser = curry { [$0] + $1 } <^>
+		value
+		<* whitespace
+		<*> separatedValues
+	return oneOrMore <|> pure([])
+}
+
 
 let json: JSONParser = fix { json in
 	// TODO: Parse backslashed escape characters
 
 	let string: JSONParser = quoted --> { Cofree($1, .Leaf(.String($2))) }
-	let array: JSONParser =  %"["
-		*> whitespace
-		*> json* <* %"]" --> { Cofree($1, .Indexed($2)) }
+	let array: JSONParser =  %"[" *> elements(json) <* %"]" --> { Cofree($1, .Indexed($2)) }
 
 	let dict: JSONParser =
 		%"{"
@@ -203,6 +213,9 @@ print(parse(json, input: dictWithSpaces))
 
 let dictWithMembers = "{\"hello\":\"world\",\"sup\":\"cat\"}"
 print(parse(json, input: dictWithMembers))
+
+let dictWithArray = "{\"hello\": [\"world\"],\"sup\": [\"cat\", \"dog\", \"keith\"] }"
+print(parse(json, input: dictWithArray))
 
 //if let a = arguments[1].flatMap(JSON.init), b = arguments[2].flatMap(JSON.init) {
 //	let diff = Algorithm<Term, Diff>(a.term, b.term).evaluate(Cofree.equals(annotation: const(true), leaf: ==))
