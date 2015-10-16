@@ -136,11 +136,6 @@ extension Free where B: PatchType, B.Element == Cofree<A, ()> {
 	public var after: Term? {
 		return map { $0.state.after }.iterate(self.discardNullTerms)
 	}
-
-
-	public var inverse: Free {
-		return map { $0.inverse }
-	}
 }
 
 
@@ -157,6 +152,11 @@ extension Free where B: PatchType {
 
 	public static func Delete(before: B.Element) -> Free {
 		return .Pure(B(deleting: before))
+	}
+
+
+	public var inverse: Free {
+		return map { $0.inverse }
 	}
 }
 
