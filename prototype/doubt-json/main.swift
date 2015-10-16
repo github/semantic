@@ -146,12 +146,34 @@ typealias CharacterParser = Parser<String, [Character]>.Function
 let stringBody: StringParser = { $0.map({ String($0) }).joinWithSeparator("") } <^>
 		not(%"\\" <|> %"\"")*
 let quoted = %"\"" *> stringBody <* %"\""
+let whitespace: CharacterParser  = satisfy({ (c: Character) in c == " " })*
+
+typealias MembersParser = Parser<String, [(String, CofreeJSON)]>.Function;
+
+func members(json: JSONParser) -> MembersParser {
+	let pairs: Parser<String, (String, CofreeJSON)>.Function = (curry(pair) <^>
+	quoted
+	<* whitespace
+	<* %":"
+	<* whitespace
+	<*> json)
+
+	let separatedPairs: MembersParser  = (%"," *> whitespace *> pairs <* whitespace)*
+
+	let oneOrMore: MembersParser = curry { [$0] + $1 } <^>
+			pairs
+			<* whitespace
+			<*> separatedPairs
+
+	let zero: MembersParser = pure([])
+	return oneOrMore
+			<|> zero
+}
 
 let json: JSONParser = fix { json in
 	// TODO: Parse backslashed escape characters
 
 	let string: JSONParser = quoted --> { Cofree($1, .Leaf(.String($2))) }
-	let whitespace: CharacterParser  = satisfy({ (c: Character) in c == " " })*
 	let array: JSONParser =  %"["
 		*> whitespace
 		*> json* <* %"]" --> { Cofree($1, .Indexed($2)) }
@@ -159,12 +181,7 @@ let json: JSONParser = fix { json in
 	let dict: JSONParser =
 		%"{"
 			*> whitespace
-			*> (curry(pair) <^>
-				quoted
-				<* whitespace
-				<* %":"
-				<* whitespace
-				<*> json)*
+			*> members(json)
 			<* whitespace
 			<* %"}"
 		--> { (_, range, values) in
@@ -177,10 +194,15 @@ let json: JSONParser = fix { json in
 	return dict <|> array <|> string
 }
 
+let empty = "{}"
+print(parse(json, input: empty))
 let dict = "{\"hello\":\"world\"}"
 print(parse(json, input: dict))
 let dictWithSpaces = "{ \"hello\" : \"world\" }"
 print(parse(json, input: dictWithSpaces))
+
+let dictWithMembers = "{\"hello\":\"world\",\"sup\":\"cat\"}"
+print(parse(json, input: dictWithMembers))
 
 //if let a = arguments[1].flatMap(JSON.init), b = arguments[2].flatMap(JSON.init) {
 //	let diff = Algorithm<Term, Diff>(a.term, b.term).evaluate(Cofree.equals(annotation: const(true), leaf: ==))
