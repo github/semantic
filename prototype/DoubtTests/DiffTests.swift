@@ -13,6 +13,12 @@ final class DiffTests: XCTestCase {
 			Diff.sum(const(1))(self.interpreter.run(term.term, term.term)) == 0
 		}
 	}
+
+	func testEqualityIsReflexive() {
+		property("equality is reflexive") <- forAll { (diff: RangedDiff) in
+			Free.equals(ifPure: Patch.equals(Cofree.equals(annotation: ==, leaf: ==)), ifRoll: ==)(diff.diff, diff.diff)
+		}
+	}
 }
 
 
