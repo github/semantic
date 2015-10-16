@@ -19,6 +19,15 @@ final class DiffTests: XCTestCase {
 			Free.equals(ifPure: Patch.equals(Cofree.equals(annotation: ==, leaf: ==)), ifRoll: ==)(diff.diff, diff.diff)
 		}
 	}
+
+	func testOriginalTermsAreRecoverable() {
+		let equal = Cofree<String, ()>.equals(annotation: const(true), leaf: ==)
+		property("before state is recoverable") <- forAll { (diff: RangedDiff) in
+			return diff.diff.map { $0.map { $0.map(const(())) } }.before.map {
+				equal($0, diff.a.map(const(())))
+			} ?? false
+		}
+	}
 }
 
 
