@@ -152,7 +152,7 @@ extension Free where B: PatchType {
 	}
 
 	public static func Insert(after: B.Element) -> Free {
-		return .Pure(B(patch: .Insert(after)))
+		return .Pure(B(inserting: after))
 	}
 
 	public static func Delete(before: B.Element) -> Free {
