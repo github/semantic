@@ -156,7 +156,7 @@ extension Free where B: PatchType {
 	}
 
 	public static func Delete(before: B.Element) -> Free {
-		return .Pure(B(patch: .Delete(before)))
+		return .Pure(B(deleting: before))
 	}
 }
 
