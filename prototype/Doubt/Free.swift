@@ -130,11 +130,11 @@ extension Free where B: PatchType, B.Element == Cofree<A, ()> {
 	}
 
 	public var before: Term? {
-		return map { $0.patch.state.before }.iterate(self.discardNullTerms)
+		return map { $0.state.before }.iterate(self.discardNullTerms)
 	}
 
 	public var after: Term? {
-		return map { $0.patch.state.after }.iterate(self.discardNullTerms)
+		return map { $0.state.after }.iterate(self.discardNullTerms)
 	}
 
 
