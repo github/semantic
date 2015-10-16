@@ -123,6 +123,7 @@ public protocol PatchType {
 	var inverse: Self { get }
 
 	init(replacing before: Element, with after: Element)
+	init(deleting before: Element)
 
 	init(patch: Patch<Element>)
 }
@@ -132,5 +133,9 @@ extension Patch: PatchType {
 
 	public init(replacing before: A, with after: A) {
 		self = .Replace(before, after)
+	}
+
+	public init(deleting before: A) {
+		self = .Delete(before)
 	}
 }
