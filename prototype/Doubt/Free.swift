@@ -148,7 +148,7 @@ extension Free where B: PatchType, B.Element == Cofree<A, ()> {
 
 extension Free where B: PatchType {
 	public static func Replace(before: B.Element, _ after: B.Element) -> Free {
-		return .Pure(B(patch: .Replace(before, after)))
+		return .Pure(B(replacing: before, with: after))
 	}
 
 	public static func Insert(after: B.Element) -> Free {
