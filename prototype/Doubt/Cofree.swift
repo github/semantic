@@ -4,7 +4,7 @@
 ///
 /// This type is dual to `Free`. Where `Free` is inhabited by syntax trees where some terms are replaced with `B`s, `Cofree` is inhabited by syntax trees where all terms are annotated with `B`s. In Doubt, this allows us to e.g. annotate terms with source range information, categorization, etc.
 public enum Cofree<A, B> {
-	case Unroll(B, Memo<Syntax<Cofree, A>>)
+	indirect case Unroll(B, Memo<Syntax<Cofree, A>>)
 
 	public var unwrap: Syntax<Cofree, A> {
 		switch self {
