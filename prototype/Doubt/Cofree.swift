@@ -112,7 +112,7 @@ extension Cofree where B: Categorizable {
 }
 
 
-// MARK: - CofreeConvertible
+// MARK: - CofreeType
 
 public protocol CofreeType {
 	typealias Annotation
