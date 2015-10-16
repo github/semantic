@@ -92,9 +92,7 @@ extension UnannotatedTerm: Arbitrary {
 			leaf,
 			indexed,
 			keyed,
-		]).fmap {
-			UnannotatedTerm(term: $0)
-		}
+		]).fmap(UnannotatedTerm.init)
 	}
 
 	static var arbitrary: Gen<UnannotatedTerm> {
