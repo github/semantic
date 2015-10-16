@@ -12,7 +12,7 @@ struct UnannotatedTerm {
 extension UnannotatedTerm: Arbitrary {
 	static var arbitrary: Gen<UnannotatedTerm> {
 		let leaf: Gen<Term> = String.arbitrary.fmap { Term((), .Leaf($0)) }
-		let branch: Gen<Term> = Gen.sized { n in
+		let indexed: Gen<Term> = Gen.sized { n in
 			Gen<Int>.choose((0, n)).bind { n in
 				sequence((0..<n).map(const(UnannotatedTerm.arbitrary))).fmap {
 					Term((), .Indexed($0.map { $0.term }))
@@ -21,7 +21,7 @@ extension UnannotatedTerm: Arbitrary {
 		}
 		return Gen.oneOf([
 			leaf,
-			branch,
+			indexed,
 		]).fmap {
 			UnannotatedTerm(term: $0)
 		}
