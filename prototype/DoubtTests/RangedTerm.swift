@@ -108,13 +108,6 @@ extension RangedTerm: Arbitrary {
 }
 
 
-extension Gen {
-	func delay(f: () -> Gen) -> Gen {
-		return Gen<()>.pure(()).bind(f)
-	}
-}
-
-
 @testable import Doubt
 import Prelude
 import SwiftCheck
