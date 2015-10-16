@@ -120,6 +120,8 @@ public protocol PatchType {
 
 	var state: (before: Element?, after: Element?) { get }
 
+	var inverse: Self { get }
+
 	init(patch: Patch<Element>)
 	var patch: Patch<Element> { get }
 }
