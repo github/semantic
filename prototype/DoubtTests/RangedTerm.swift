@@ -3,6 +3,10 @@ struct RangedTerm {
 	let term: Term
 }
 
+struct UnannotatedTerm {
+	typealias Term = Cofree<String, ()>
+	let term: Term
+}
 
 extension RangedTerm: Arbitrary {
 	static var arbitrary: Gen<RangedTerm> {
