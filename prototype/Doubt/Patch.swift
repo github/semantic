@@ -118,6 +118,8 @@ extension Patch where A: CustomJSONConvertible {
 public protocol PatchType {
 	typealias Element
 
+	var state: (before: Element?, after: Element?) { get }
+
 	init(patch: Patch<Element>)
 	var patch: Patch<Element> { get }
 }
