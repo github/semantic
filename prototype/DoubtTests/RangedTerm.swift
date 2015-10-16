@@ -6,6 +6,19 @@ struct RangedTerm {
 struct UnannotatedTerm {
 	typealias Term = Cofree<String, ()>
 	let term: Term
+
+	var source: String {
+		return term.cata {
+			switch $0 {
+			case let .Leaf(s):
+				return s
+			case let .Indexed(s):
+				return "[\n\t" + s.joinWithSeparator(",\n\t") + "\n]"
+			case let .Keyed(s):
+				return "{\n\t" + s.map { "\"\($0)\": \($1)" }.joinWithSeparator(",\n\t") + "\n}"
+			}
+		}
+	}
 }
 
 
