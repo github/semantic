@@ -75,19 +75,19 @@ struct UnannotatedTerm {
 
 
 extension UnannotatedTerm: Arbitrary {
-	static func arbitrary(n: Int) -> Gen<UnannotatedTerm> {
+	static func arbitrary(k: Int) -> Gen<UnannotatedTerm> {
 		let symbol: Gen<String> = Gen<Int>.choose((0, 15)).fmap { "_\($0)" }
 		let leaf: Gen<Term> = symbol.fmap { Term((), .Leaf($0)) }
 		let indexed: Gen<Term> = Gen.sized { n in
 			Gen<Int>.choose((0, n)).bind { n in
-				sequence((0..<n).map { _ in Gen.pure(()).bind { UnannotatedTerm.arbitrary } }).fmap {
+				sequence((0..<n).map { _ in arbitrary(k - 1) }).fmap {
 					Term((), .Indexed($0.map { $0.term }))
 				}
 			}
 		}
 		let keyed: Gen<Term> = Gen.sized { n in
 			Gen<Int>.choose((0, n)).bind { n in
-				sequence((0..<n).map { _ in symbol.bind { key in Gen.pure(()).bind { UnannotatedTerm.arbitrary }.fmap { (key, $0.term) } } }).fmap {
+				sequence((0..<n).map { _ in symbol.bind { key in Gen.pure(()).bind { arbitrary(k - 1) }.fmap { (key, $0.term) } } }).fmap {
 					Term((), .Keyed(Dictionary(elements: $0)))
 				}
 			}
