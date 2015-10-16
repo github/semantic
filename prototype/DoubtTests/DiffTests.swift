@@ -14,6 +14,13 @@ final class DiffTests: XCTestCase {
 		}
 	}
 
+	func testInequalTermsProduceNonIdentityDiffs() {
+		property("inequal terms produce non-identity diffs") <- forAll { (diff: RangedDiff) in
+			// fixme: limit this to inequal terms
+			Diff.sum(const(1))(diff.diff) > 0
+		}
+	}
+
 	func testEqualityIsReflexive() {
 		property("equality is reflexive") <- forAll { (diff: RangedDiff) in
 			equal(diff.diff, diff.diff)
