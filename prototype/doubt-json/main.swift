@@ -138,12 +138,12 @@ let json: JSONParser = fix { json in
 	let array: JSONParser =  %"[" *> json* <* %"]" --> { Cofree($1, .Indexed($2)) }
 
 	let dict: JSONParser =
-		(%"{" *>
+		%"{" *>
 			(curry(pair) <^> quoted <* String.lift(%":") <*> json)*
-		<* %"}")
-			--> { (_, range: Range<String.Index>, values: [(String, CofreeJSON)]) in
-				Cofree(range, .Keyed(Dictionary(elements: values)))
-			}
+		<* %"}"
+		--> { (_, range, values) in
+			Cofree(range, .Keyed(Dictionary(elements: values)))
+		}
 
 	// TODO: Parse Numbers correctly
 	let number: JSONParser = %"0" --> { Cofree($1, .Leaf(.String($2))) }
