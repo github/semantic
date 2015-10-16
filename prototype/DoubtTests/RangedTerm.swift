@@ -8,18 +8,14 @@ struct UnannotatedTerm {
 	let term: Term
 }
 
-extension RangedTerm: Arbitrary {
-	static var arbitrary: Gen<RangedTerm> {
-		func arbitrary(from: Int) -> Gen<Term> {
-			let leaf: Gen<Term> = String.arbitrary.fmap {
-				Cofree(($0, from..<Int($0.characters.count)), .Leaf($0))
-			}
-			return Gen.oneOf([
-				leaf,
-			])
-		}
-		return arbitrary(0).fmap {
-			RangedTerm(term: $0)
+
+extension UnannotatedTerm: Arbitrary {
+	static var arbitrary: Gen<UnannotatedTerm> {
+		let leaf: Gen<Term> = String.arbitrary.fmap { Term((), .Leaf($0)) }
+		return Gen.oneOf([
+			leaf,
+		]).fmap {
+			UnannotatedTerm(term: $0)
 		}
 	}
 }
