@@ -139,7 +139,7 @@ extension Free where B: PatchType, B.Element == Cofree<A, ()> {
 
 
 	public var inverse: Free {
-		return map { B(patch: $0.patch.inverse) }
+		return map { $0.inverse }
 	}
 }
 
