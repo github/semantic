@@ -87,7 +87,7 @@ extension UnannotatedTerm: Arbitrary {
 		}
 		let keyed: Gen<Term> = Gen.sized { n in
 			Gen<Int>.choose((0, n)).bind { n in
-				sequence((0..<n).map { _ in String.arbitrary.bind { key in Gen.pure(()).bind { UnannotatedTerm.arbitrary }.fmap { (key, $0.term) } } }).fmap {
+				sequence((0..<n).map { _ in symbol.bind { key in Gen.pure(()).bind { UnannotatedTerm.arbitrary }.fmap { (key, $0.term) } } }).fmap {
 					Term((), .Keyed(Dictionary(elements: $0)))
 				}
 			}
