@@ -76,6 +76,7 @@ struct UnannotatedTerm {
 
 extension UnannotatedTerm: Arbitrary {
 	static var arbitrary: Gen<UnannotatedTerm> {
+		let symbol: Gen<String> = Gen<Int>.choose((0, 15)).fmap { "_\($0)" }
 		let leaf: Gen<Term> = String.arbitrary.fmap { Term((), .Leaf($0)) }
 		let indexed: Gen<Term> = Gen.sized { n in
 			Gen<Int>.choose((0, n)).bind { n in
