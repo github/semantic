@@ -111,6 +111,12 @@ extension String: CollectionType {
 	public var count: Index.Distance {
 		return characters.count
 	}
+	
+	public static func lift<A>(parser: Parser<String.CharacterView, A>.Function) -> Parser<String, A>.Function {
+		return {
+			parser($0.characters, $1)
+		}
+	}
 }
 
 func not<C: CollectionType, T>(parser: Parser<C, T>.Function)(_ input: C, _ index: C.Index) -> Either<Error<C.Index>, (C.Generator.Element, C.Index)> {
@@ -126,19 +132,23 @@ typealias StringParser = Parser<String, String>.Function
 let json: JSONParser = fix { json in
 	// TODO: Parse backslashed escape characters
 	let stringBody: StringParser = { $0.map({ String($0) }).joinWithSeparator("") } <^>
-		not(%"\\" | %"\"")*
-	let quoted = { $1.0 } <^> %"\"" ++ stringBody ++ %"\""
+		not(%"\\" <|> %"\"")*
+	let quoted = %"\"" *> stringBody <* %"\""
 	let string: JSONParser = quoted --> { Cofree($1, .Leaf(.String($2))) }
-	let array =  %"[" ++ json* ++ %"]" --> { Cofree($1, .Indexed($2.1.0)) }
+	let array: JSONParser =  %"[" *> json* <* %"]" --> { Cofree($1, .Indexed($2)) }
 
-	let dict: JSONParser =  %"{" ++ (quoted ++ %":" ++ json)* ++ %"}" --> { (_, range: Range<String.Index>, value: (String, ([(String, (String, CofreeJSON))], String))) in
-		Cofree(range, .Keyed([value.0: value.1.0[0].1.1]))
-	}
+	let dict: JSONParser =
+		(%"{" *>
+			(curry(pair) <^> quoted <* String.lift(%":") <*> json)*
+		<* %"}")
+			--> { (_, range: Range<String.Index>, values: [(String, CofreeJSON)]) in
+				Cofree(range, .Keyed(Dictionary(elements: values)))
+			}
 
 	// TODO: Parse Numbers correctly
 	let number: JSONParser = %"0" --> { Cofree($1, .Leaf(.String($2))) }
 
-	return dict | array
+	return dict <|> array
 }
 
 
