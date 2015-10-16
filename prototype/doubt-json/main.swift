@@ -21,7 +21,7 @@ let dictWithArray = "{\"hello\": [\"world\"],\"sup\": [\"cat\", \"dog\", \"keith
 print(parse(json, input: dictWithArray))
 
 if let a = arguments[1].flatMap(JSON.init), b = arguments[2].flatMap(JSON.init) {
-	let diff = Algorithm<Term, Diff>(a.term, b.term).evaluate(Cofree.equals(annotation: const(true), leaf: ==))
+	let diff = Interpreter(comparable: const(true), cost: Diff.sum(Patch.difference)).run(a.term, b.term)
 	if let JSON = NSString(data: diff.JSON(ifPure: { $0.JSON { $0.JSON } }, ifLeaf: { $0.JSON }).serialize(), encoding: NSUTF8StringEncoding) {
 		print(JSON)
 	}
