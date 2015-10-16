@@ -16,7 +16,7 @@ final class DiffTests: XCTestCase {
 
 	func testEqualityIsReflexive() {
 		property("equality is reflexive") <- forAll { (diff: RangedDiff) in
-			Free.equals(ifPure: Patch.equals(Cofree.equals(annotation: ==, leaf: ==)), ifRoll: ==)(diff.diff, diff.diff)
+			equal(diff.diff, diff.diff)
 		}
 	}
 
@@ -34,6 +34,11 @@ final class DiffTests: XCTestCase {
 			} ?? false
 		}
 	}
+}
+
+
+private func equal(a: DiffTests.Diff, _ b: DiffTests.Diff) -> Bool {
+	return Free.equals(ifPure: Patch.equals(Cofree.equals(annotation: ==, leaf: ==)), ifRoll: ==)(a, b)
 }
 
 
