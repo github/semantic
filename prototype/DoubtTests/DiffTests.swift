@@ -27,6 +27,12 @@ final class DiffTests: XCTestCase {
 		}
 	}
 
+	func testDoubleInversionIsIdempotent() {
+		property("double inversion is idempotent") <- forAll { (diff: RangedDiff) in
+			equal(diff.diff, diff.diff.inverse.inverse)
+		}
+	}
+
 	func testOriginalTermsAreRecoverable() {
 		let equal = Cofree<String, ()>.equals(annotation: const(true), leaf: ==)
 		property("before state is recoverable") <- forAll { (diff: RangedDiff) in
