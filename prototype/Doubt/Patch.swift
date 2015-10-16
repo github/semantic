@@ -38,7 +38,7 @@ public enum Patch<A>: CustomDebugStringConvertible {
 			return ".Insert(\(String(reflecting: b)))"
 		case let .Delete(a):
 			return ".Delete(\(String(reflecting: a)))"
-	}
+		}
 	}
 }
 
@@ -49,6 +49,33 @@ extension Patch {
 	public static func equals(param: (A, A) -> Bool)(_ left: Patch, _ right: Patch) -> Bool {
 		return Optional.equals(param)(left.state.before, right.state.before)
 			&& Optional.equals(param)(left.state.after, right.state.after)
+	}
+}
+
+
+// MARK: - Cost calculations
+
+extension Patch {
+	/// Returns a function which computes the size of a `patch` as the sum of the sizes of its terms, as computed by `size`.
+	public static func sum(size: A -> Int)(_ patch: Patch) -> Int {
+		return (patch.state.before.map(size) ?? 0) + (patch.state.after.map(size) ?? 0)
+	}
+
+	/// Returns a function which computes the size of a `patch` as the absolute difference of the sizes of its terms, as computed by `size`.
+	public static func difference(size: A -> Int)(_ patch: Patch) -> Int {
+		return abs((patch.state.before.map(size) ?? 0) - (patch.state.after.map(size) ?? 0))
+	}
+}
+
+extension Patch where A: TermType {
+	/// Computes the size of a `patch` as the sum of the sizes of its terms.
+	public static func sum(patch: Patch) -> Int {
+		return sum { $0.size } (patch)
+	}
+
+	/// Computes the size of a `patch` as the absolute difference of the sizes of its terms.
+	public static func difference(patch: Patch) -> Int {
+		return difference { $0.size } (patch)
 	}
 }
 
@@ -85,17 +112,31 @@ extension Patch where A: CustomJSONConvertible {
 }
 
 
-// MARK: - PatchConvertible
+// MARK: - PatchType
 
 /// A hack to enable constrained extensions on `Free<A, Patch<Term: TermType where LeafType == A>`.
-public protocol PatchConvertible {
+public protocol PatchType {
 	typealias Element
 
-	init(patch: Patch<Element>)
-	var patch: Patch<Element> { get }
+	var state: (before: Element?, after: Element?) { get }
+
+	var inverse: Self { get }
+
+	init(replacing before: Element, with after: Element)
+	init(deleting before: Element)
+	init(inserting after: Element)
 }
 
-extension Patch: PatchConvertible {
-	public init(patch: Patch) { self = patch }
-	public var patch: Patch { return self }
+extension Patch: PatchType {
+	public init(replacing before: A, with after: A) {
+		self = .Replace(before, after)
+	}
+
+	public init(deleting before: A) {
+		self = .Delete(before)
+	}
+
+	public init(inserting after: A) {
+		self = .Insert(after)
+	}
 }

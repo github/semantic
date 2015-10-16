@@ -61,6 +61,26 @@ public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 	}
 
 
+	/// Reduces the receiver top-down, left-to-right, starting from an `initial` value, and applying `combine` to successive values.
+	public func reduce(initial: B, combine: (B, B) -> B) -> B {
+		return iterate {
+			switch $0 {
+			case .Leaf:
+				return initial
+			case let .Indexed(a):
+				return a.reduce(initial, combine: combine)
+			case let .Keyed(a):
+				return a.values.reduce(initial, combine: combine)
+			}
+		}
+	}
+
+	/// Returns a function which sums `Free`s by first `transform`ing `Pure` values into integers, and then summing these.
+	public static func sum(transform: B -> Int)(_ free: Free) -> Int {
+		return free.map(transform).reduce(0, combine: +)
+	}
+
+
 	// MARK: Functor
 
 	public func map<C>(@noescape transform: B -> C) -> Free<A, C> {
@@ -95,7 +115,7 @@ public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 }
 
 
-extension Free where B: PatchConvertible, B.Element == Cofree<A, ()> {
+extension Free where B: PatchType, B.Element == Cofree<A, ()> {
 	public typealias Term = B.Element
 
 	private func discardNullTerms(syntax: Syntax<Term?, A>) -> Term? {
@@ -110,33 +130,33 @@ extension Free where B: PatchConvertible, B.Element == Cofree<A, ()> {
 	}
 
 	public var before: Term? {
-		return map { $0.patch.state.before }.iterate(self.discardNullTerms)
+		return map { $0.state.before }.iterate(self.discardNullTerms)
 	}
 
 	public var after: Term? {
-		return map { $0.patch.state.after }.iterate(self.discardNullTerms)
+		return map { $0.state.after }.iterate(self.discardNullTerms)
 	}
 
 
 	public var inverse: Free {
-		return map { B(patch: $0.patch.inverse) }
+		return map { $0.inverse }
 	}
 }
 
 
 // MARK: - Patch construction
 
-extension Free where B: PatchConvertible {
+extension Free where B: PatchType {
 	public static func Replace(before: B.Element, _ after: B.Element) -> Free {
-		return .Pure(B(patch: .Replace(before, after)))
+		return .Pure(B(replacing: before, with: after))
 	}
 
 	public static func Insert(after: B.Element) -> Free {
-		return .Pure(B(patch: .Insert(after)))
+		return .Pure(B(inserting: after))
 	}
 
 	public static func Delete(before: B.Element) -> Free {
-		return .Pure(B(patch: .Delete(before)))
+		return .Pure(B(deleting: before))
 	}
 }
 
@@ -181,23 +201,6 @@ extension Free where A: CustomJSONConvertible {
 	public func JSON(ifPure: B -> Doubt.JSON) -> Doubt.JSON {
 		return JSON(ifPure: ifPure, ifLeaf: { $0.JSON })
 	}
-}
-
-
-// MARK: - FreeConvertible
-
-/// A hack to work around the unavailability of same-type requirements.
-public protocol FreeConvertible {
-	typealias RollType
-	typealias PureType
-
-	init(free: Free<RollType, PureType>)
-	var free: Free<RollType, PureType> { get }
-}
-
-extension Free: FreeConvertible {
-	public init(free: Free<A, B>) { self = free }
-	public var free: Free { return self }
 }
 
 
