@@ -125,13 +125,9 @@ public protocol PatchType {
 	init(replacing before: Element, with after: Element)
 	init(deleting before: Element)
 	init(inserting after: Element)
-
-	init(patch: Patch<Element>)
 }
 
 extension Patch: PatchType {
-	public init(patch: Patch) { self = patch }
-
 	public init(replacing before: A, with after: A) {
 		self = .Replace(before, after)
 	}
