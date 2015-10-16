@@ -115,7 +115,7 @@ public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 }
 
 
-extension Free where B: PatchConvertible, B.Element == Cofree<A, ()> {
+extension Free where B: PatchType, B.Element == Cofree<A, ()> {
 	public typealias Term = B.Element
 
 	private func discardNullTerms(syntax: Syntax<Term?, A>) -> Term? {
@@ -146,7 +146,7 @@ extension Free where B: PatchConvertible, B.Element == Cofree<A, ()> {
 
 // MARK: - Patch construction
 
-extension Free where B: PatchConvertible {
+extension Free where B: PatchType {
 	public static func Replace(before: B.Element, _ after: B.Element) -> Free {
 		return .Pure(B(patch: .Replace(before, after)))
 	}

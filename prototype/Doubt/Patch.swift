@@ -112,17 +112,17 @@ extension Patch where A: CustomJSONConvertible {
 }
 
 
-// MARK: - PatchConvertible
+// MARK: - PatchType
 
 /// A hack to enable constrained extensions on `Free<A, Patch<Term: TermType where LeafType == A>`.
-public protocol PatchConvertible {
+public protocol PatchType {
 	typealias Element
 
 	init(patch: Patch<Element>)
 	var patch: Patch<Element> { get }
 }
 
-extension Patch: PatchConvertible {
+extension Patch: PatchType {
 	public init(patch: Patch) { self = patch }
 	public var patch: Patch { return self }
 }
