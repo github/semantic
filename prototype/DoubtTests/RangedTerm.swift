@@ -101,6 +101,12 @@ extension UnannotatedTerm: Arbitrary {
 	}
 }
 
+extension RangedTerm: Arbitrary {
+	static var arbitrary: Gen<RangedTerm> {
+		return UnannotatedTerm.arbitrary.fmap { $0.arranged }
+	}
+}
+
 
 @testable import Doubt
 import Prelude
