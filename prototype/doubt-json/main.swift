@@ -159,9 +159,10 @@ let json: JSONParser = fix { json in
 	let dict: JSONParser =
 		%"{"
 			*> whitespace
-			*> (curry(pair) <^> quoted
+			*> (curry(pair) <^>
+				quoted
 				<* whitespace
-				<* String.lift(%":")
+				<* %":"
 				<* whitespace
 				<*> json)*
 			<* whitespace
