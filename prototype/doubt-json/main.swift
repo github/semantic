@@ -102,8 +102,6 @@ extension JSON {
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
 
-let file = NSData(contentsOfFile: Process.arguments[1])
-
 typealias CofreeJSON = Cofree<JSONLeaf, Range<String.CharacterView.Index>>
 typealias JSONParser = Parser<String, CofreeJSON>.Function
 
@@ -111,7 +109,7 @@ extension String: CollectionType {
 	public var count: Index.Distance {
 		return characters.count
 	}
-	
+
 	public static func lift<A>(parser: Parser<String.CharacterView, A>.Function) -> Parser<String, A>.Function {
 		return {
 			parser($0.characters, $1)
@@ -127,20 +125,47 @@ func not<C: CollectionType, T>(parser: Parser<C, T>.Function)(_ input: C, _ inde
 	}
 }
 
+public func satisfy<C: CollectionType> (pred: C.Generator.Element -> Bool) -> Parser<C, C.Generator.Element>.Function {
+	return { input, index in
+		if input.count > 0 {
+			let parsed = input[index]
+			let next = index.successor()
+
+			return pred(parsed)
+				? .Right((parsed, next))
+				: .Left(Error.leaf("Failed to match predicate at index", index))
+		} else {
+			return .Left(Error.leaf("", index))
+		}
+	}
+}
+
 typealias StringParser = Parser<String, String>.Function
+typealias CharacterParser = Parser<String, [Character]>.Function
+
+let stringBody: StringParser = { $0.map({ String($0) }).joinWithSeparator("") } <^>
+		not(%"\\" <|> %"\"")*
+let quoted = %"\"" *> stringBody <* %"\""
 
 let json: JSONParser = fix { json in
 	// TODO: Parse backslashed escape characters
-	let stringBody: StringParser = { $0.map({ String($0) }).joinWithSeparator("") } <^>
-		not(%"\\" <|> %"\"")*
-	let quoted = %"\"" *> stringBody <* %"\""
+
 	let string: JSONParser = quoted --> { Cofree($1, .Leaf(.String($2))) }
-	let array: JSONParser =  %"[" *> json* <* %"]" --> { Cofree($1, .Indexed($2)) }
+	let whitespace: CharacterParser  = satisfy({ (c: Character) in c == " " })*
+	let array: JSONParser =  %"["
+		*> whitespace
+		*> json* <* %"]" --> { Cofree($1, .Indexed($2)) }
 
 	let dict: JSONParser =
-		%"{" *>
-			(curry(pair) <^> quoted <* String.lift(%":") <*> json)*
-		<* %"}"
+		%"{"
+			*> whitespace
+			*> (curry(pair) <^> quoted
+				<* whitespace
+				<* String.lift(%":")
+				<* whitespace
+				<*> json)*
+			<* whitespace
+			<* %"}"
 		--> { (_, range, values) in
 			Cofree(range, .Keyed(Dictionary(elements: values)))
 		}
@@ -148,13 +173,17 @@ let json: JSONParser = fix { json in
 	// TODO: Parse Numbers correctly
 	let number: JSONParser = %"0" --> { Cofree($1, .Leaf(.String($2))) }
 
-	return dict <|> array
+	return dict <|> array <|> string
 }
 
+let dict = "{\"hello\":\"world\"}"
+print(parse(json, input: dict))
+let dictWithSpaces = "{ \"hello\" : \"world\" }"
+print(parse(json, input: dictWithSpaces))
 
-if let a = arguments[1].flatMap(JSON.init), b = arguments[2].flatMap(JSON.init) {
-	let diff = Algorithm<Term, Diff>(a.term, b.term).evaluate(Cofree.equals(annotation: const(true), leaf: ==))
-	if let JSON = NSString(data: diff.JSON(ifPure: { $0.JSON { $0.JSON } }, ifLeaf: { $0.JSON }).serialize(), encoding: NSUTF8StringEncoding) {
-		print(JSON)
-	}
-}
+//if let a = arguments[1].flatMap(JSON.init), b = arguments[2].flatMap(JSON.init) {
+//	let diff = Algorithm<Term, Diff>(a.term, b.term).evaluate(Cofree.equals(annotation: const(true), leaf: ==))
+//	if let JSON = NSString(data: diff.JSON(ifPure: { $0.JSON { $0.JSON } }, ifLeaf: { $0.JSON }).serialize(), encoding: NSUTF8StringEncoding) {
+//		print(JSON)
+//	}
+//}
