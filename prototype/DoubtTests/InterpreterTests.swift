@@ -1,19 +1,21 @@
-final class AlgorithmTests: XCTestCase {
-	func testRestrictsComparisonsWhenRecurReturnsNil() {
-		assert(Algorithm(a, b).evaluate(==, recur: const(nil)), ==, restricted)
+final class InterpreterTests: XCTestCase {
+	func testRestrictsComparisons() {
+		let comparable: (Term, Term) -> Bool = { $0.extract == 0 && $1.extract == 0 }
+		assert(Interpreter(equal: ==, comparable: comparable, cost: const(1)).run(a, b), ==, restricted)
 	}
 
 	func testComparisonsOfDisjointlyCategorizedTermsAreRestricted() {
 		var effects = 0
-		assert(Algorithm(a, b).evaluate(==, categorize: { _ in [ effects++ ] }), ==, restricted)
+		let categorize: Term -> Set<Int> = { $0.extract == 0 ? [ 0 ] : [ effects++ ] }
+		assert(Interpreter(equal: ==, comparable: Interpreter.comparable(categorize), cost: const(1)).run(a, b), ==, restricted)
 	}
 
-	func testComparisonsAreUnrestrictedByDefault() {
-		assert(Algorithm(a, b).evaluate(==), ==, unrestricted)
+	func testUnrestrictedComparisonsComputeReplacements() {
+		assert(Interpreter(equal: ==, comparable: const(true), cost: const(1)).run(a, b), ==, unrestricted)
 	}
 
 	func testComparisonsOfUncategorizedTermsAreUnrestricted() {
-		assert(Algorithm(a, b).evaluate(==, categorize: const(Set<String>())), ==, unrestricted)
+		assert(Interpreter(equal: ==, comparable: Interpreter.comparable { _ in Set<String>() }, cost: const(1)).run(a, b), ==, unrestricted)
 	}
 }
 
