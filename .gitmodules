@@ -4,3 +4,6 @@
 [submodule "prototype/External/Stream"]
 	path = prototype/External/Stream
 	url = https://github.com/antitypical/Stream.git
+[submodule "prototype/External/SwiftCheck"]
+	path = prototype/External/SwiftCheck
+	url = https://github.com/typelift/SwiftCheck.git
