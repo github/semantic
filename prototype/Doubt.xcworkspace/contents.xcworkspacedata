@@ -8,6 +8,9 @@
       location = "group:External/Assertions/Assertions.xcodeproj">
    </FileRef>
    <FileRef
+      location = "group:External/SwiftCheck/SwiftCheck.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:External/Stream/Stream.xcodeproj">
    </FileRef>
    <FileRef
