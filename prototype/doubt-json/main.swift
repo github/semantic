@@ -69,7 +69,7 @@ extension JSON {
 
 	var term: Term {
 		func annotate(json: Syntax<Term, JSONLeaf>) -> Term {
-			return Cofree(size(json), json)
+			return Term(size(json), json)
 		}
 		func size(syntax: Syntax<Term, JSONLeaf>) -> Int {
 			switch syntax {
