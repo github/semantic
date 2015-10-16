@@ -79,7 +79,7 @@ extension UnannotatedTerm: Arbitrary {
 		let leaf: Gen<Term> = String.arbitrary.fmap { Term((), .Leaf($0)) }
 		let indexed: Gen<Term> = Gen.sized { n in
 			Gen<Int>.choose((0, n)).bind { n in
-				sequence((0..<n).map(const(UnannotatedTerm.arbitrary))).fmap {
+				sequence((0..<n).map { _ in Gen.pure(()).bind { UnannotatedTerm.arbitrary } }).fmap {
 					Term((), .Indexed($0.map { $0.term }))
 				}
 			}
