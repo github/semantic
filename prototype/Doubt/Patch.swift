@@ -140,3 +140,13 @@ extension Patch: PatchType {
 		self = .Insert(after)
 	}
 }
+
+
+extension PatchType where Element: CofreeType, Element.Annotation == Range<String.Index> {
+	public func JSON(a a: String, b: String) -> Doubt.JSON {
+		return [
+			"before": state.before.map { $0.JSON(a) } ?? nil,
+			"after": state.after.map { $0.JSON(b) } ?? nil,
+		]
+	}
+}
