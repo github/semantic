@@ -123,10 +123,8 @@ public protocol PatchType {
 	var inverse: Self { get }
 
 	init(patch: Patch<Element>)
-	var patch: Patch<Element> { get }
 }
 
 extension Patch: PatchType {
 	public init(patch: Patch) { self = patch }
-	public var patch: Patch { return self }
 }
