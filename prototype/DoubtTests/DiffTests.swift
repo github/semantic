@@ -36,13 +36,13 @@ final class DiffTests: XCTestCase {
 		let equal = Cofree<String, ()>.equals(annotation: const(true), leaf: ==)
 		property("before state is recoverable") <- forAll { (diff: RangedDiff) in
 			diff.diff.map { $0.map { $0.map(const(())) } }.before.map {
-				equal($0, diff.a.map(const(())))
+				equal($0, diff.a.term.map(const(())))
 			} ?? false
 		}
 
 		property("after state is recoverable") <- forAll { (diff: RangedDiff) in
 			diff.diff.map { $0.map { $0.map(const(())) } }.after.map {
-				equal($0, diff.b.map(const(())))
+				equal($0, diff.b.term.map(const(())))
 			} ?? false
 		}
 	}
