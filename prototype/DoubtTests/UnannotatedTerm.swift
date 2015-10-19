@@ -114,7 +114,9 @@ extension UnannotatedTerm: Arbitrary {
 					? i.dropLast().map { $1 }
 					: i.map { $1 }))
 			case let .Keyed(k):
-				return Cofree((), .Keyed(Dictionary(elements: k.map { ($0, $1.1) })))
+				return Cofree((), .Keyed(Dictionary(elements: k.reduce(true) { $0 && equal($1.1) }
+					? k.dropLast().map { ($0, $1.1) }
+					: k.map { ($0, $1.1) })))
 			}
 		}
 		return equal(term.term, shrunk)
