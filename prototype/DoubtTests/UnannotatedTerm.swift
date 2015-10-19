@@ -90,7 +90,7 @@ extension UnannotatedTerm: Arbitrary {
 	}
 
 	static var arbitrary: Gen<UnannotatedTerm> {
-		return arbitrary(7)
+		return arbitrary(4)
 	}
 
 
