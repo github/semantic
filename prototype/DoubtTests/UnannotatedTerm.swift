@@ -119,6 +119,7 @@ extension UnannotatedTerm: Arbitrary {
 					: k.map { ($0, $1.1) })))
 			}
 		}
+		/// If the permutation is unchanged, we cannot shrink any further.
 		return equal(term.term, shrunk)
 			? []
 			: [ UnannotatedTerm(term: shrunk) ]
