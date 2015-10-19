@@ -123,10 +123,10 @@ extension Free where B: PatchType, B.Element == Cofree<A, ()> {
 	}
 
 	public func merge(transform: B -> Term?) -> Term? {
-		return map(transform).iterate(self.discardNullTerms)
+		return map(transform).iterate(Free.discardNullTerms)
 	}
 
-	private func discardNullTerms(syntax: Syntax<Term?, A>) -> Term? {
+	private static func discardNullTerms(syntax: Syntax<Term?, A>) -> Term? {
 		switch syntax {
 		case let .Leaf(a):
 			return Cofree((), .Leaf(a))
@@ -138,11 +138,11 @@ extension Free where B: PatchType, B.Element == Cofree<A, ()> {
 	}
 
 	public var before: Term? {
-		return map { $0.state.before }.iterate(self.discardNullTerms)
+		return map { $0.state.before }.iterate(Free.discardNullTerms)
 	}
 
 	public var after: Term? {
-		return map { $0.state.after }.iterate(self.discardNullTerms)
+		return map { $0.state.after }.iterate(Free.discardNullTerms)
 	}
 
 
