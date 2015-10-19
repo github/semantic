@@ -35,13 +35,13 @@ final class DiffTests: XCTestCase {
 	func testOriginalTermsAreRecoverable() {
 		let equal = Cofree<String, ()>.equals(annotation: const(true), leaf: ==)
 		property("before state is recoverable") <- forAll { (diff: RangedDiff) in
-			return diff.diff.map { $0.map { $0.map(const(())) } }.before.map {
+			diff.diff.map { $0.map { $0.map(const(())) } }.before.map {
 				equal($0, diff.a.map(const(())))
 			} ?? false
 		}
 
 		property("after state is recoverable") <- forAll { (diff: RangedDiff) in
-			return diff.diff.map { $0.map { $0.map(const(())) } }.after.map {
+			diff.diff.map { $0.map { $0.map(const(())) } }.after.map {
 				equal($0, diff.b.map(const(())))
 			} ?? false
 		}
