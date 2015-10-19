@@ -80,7 +80,6 @@ func elements(json: JSONParser) -> ValuesParser {
 
 	let oneOrMore: ValuesParser = curry { [$0] + $1 } <^>
 		value
-		<* whitespace
 		<*> separatedValues
 	return oneOrMore <|> pure([])
 }
