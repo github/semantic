@@ -95,7 +95,16 @@ extension UnannotatedTerm: Arbitrary {
 
 
 	static func shrink(term: UnannotatedTerm) -> [UnannotatedTerm] {
-		return []
+		return term.term.cata {
+			switch $0 {
+			case .Leaf:
+				return []
+			case let .Indexed(i):
+				return []
+			case let .Keyed(k):
+				return []
+			}
+		}
 	}
 }
 
