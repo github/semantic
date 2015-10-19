@@ -103,20 +103,23 @@ extension UnannotatedTerm: Arbitrary {
 
 
 	static func shrink(term: UnannotatedTerm) -> [UnannotatedTerm] {
-		return term.term.cata {
+		let equal = Term.equals(annotation: const(true), leaf: ==)
+		let shrunk: UnannotatedTerm.Term = term.term.para {
 			switch $0 {
-			case .Leaf:
-				return []
+			case let .Leaf(a):
+				return Cofree((), .Leaf(a))
 			case let .Indexed(i):
-				return i.flatMap {
-					Array.shrink($0).map {
-						UnannotatedTerm(term: Cofree((), .Indexed($0.map { $0.term })))
-					}
-				}.sort()
+				/// if the child nodes are unchanged, shrink the array
+				return Cofree((), i.reduce(true) { $0 && equal($1) }
+					? .Indexed(i.dropLast().map { $1 })
+					: .Indexed(i.map { $1 }))
 			case let .Keyed(k):
-				return []
+				return Cofree((), .Keyed(Dictionary(elements: k.map { ($0, $1.1) })))
 			}
 		}
+		return equal(term.term, shrunk)
+			? []
+			: [ UnannotatedTerm(term: shrunk) ]
 	}
 }
 
