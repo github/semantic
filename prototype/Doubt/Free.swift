@@ -118,6 +118,10 @@ public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 extension Free where B: PatchType, B.Element == Cofree<A, ()> {
 	public typealias Term = B.Element
 
+	public func merge(transform: B -> Term) -> Free {
+		return flatMap(transform >>> Free.init)
+	}
+
 	private func discardNullTerms(syntax: Syntax<Term?, A>) -> Term? {
 		switch syntax {
 		case let .Leaf(a):
