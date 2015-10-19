@@ -104,12 +104,12 @@ extension UnannotatedTerm: Arbitrary {
 
 	static func shrink(term: UnannotatedTerm) -> [UnannotatedTerm] {
 		let equal = Term.equals(annotation: const(true), leaf: ==)
+		/// A smaller-than-or-equal-to permutation of `term`. Shrinking is performed outward-in by dropping elements from branches.
 		let shrunk: UnannotatedTerm.Term = term.term.para {
 			switch $0 {
 			case let .Leaf(a):
 				return Cofree((), .Leaf(a))
 			case let .Indexed(i):
-				/// if the child nodes are unchanged, shrink the array
 				return Cofree((), .Indexed(i.reduce(true) { $0 && equal($1) }
 					? i.dropLast().map { $1 }
 					: i.map { $1 }))
