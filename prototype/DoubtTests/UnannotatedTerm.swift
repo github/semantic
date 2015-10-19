@@ -104,7 +104,11 @@ extension UnannotatedTerm: Arbitrary {
 			case .Leaf:
 				return []
 			case let .Indexed(i):
-				return []
+				return i.flatMap {
+					Array.shrink($0).map {
+						UnannotatedTerm(term: Cofree((), .Indexed($0.map { $0.term })))
+					}
+				}
 			case let .Keyed(k):
 				return []
 			}
