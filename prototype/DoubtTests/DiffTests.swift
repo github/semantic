@@ -16,7 +16,7 @@ final class DiffTests: XCTestCase {
 
 	func testInequalTermsProduceNonIdentityDiffs() {
 		property("inequal terms produce non-identity diffs") <- forAll { (diff: RangedDiff) in
-			(!Term.equals(annotation: const(true), leaf: ==)(diff.a, diff.b)) ==> Diff.sum(const(1))(diff.diff) > 0
+			(!Term.equals(annotation: const(true), leaf: ==)(diff.a.term, diff.b.term)) ==> Diff.sum(const(1))(diff.diff) > 0
 		}
 	}
 

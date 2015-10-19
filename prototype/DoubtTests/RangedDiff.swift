@@ -1,19 +1,18 @@
 struct RangedDiff {
-	typealias Term = RangedTerm.Term
-	typealias Diff = Free<String, Patch<Term>>
+	typealias Diff = Free<String, Patch<RangedTerm.Term>>
 
-	let a: Term
-	let b: Term
+	let a: RangedTerm
+	let b: RangedTerm
 	let diff: Diff
 }
 
 extension RangedDiff: Arbitrary {
-	static let interpreter = Interpreter<Term>(equal: ==, comparable: const(true), cost: Diff.sum(Patch.difference))
+	static let interpreter = Interpreter<RangedTerm.Term>(equal: ==, comparable: const(true), cost: Diff.sum(Patch.difference))
 
 	static var arbitrary: Gen<RangedDiff> {
 		return RangedTerm.arbitrary.bind { a in
 			RangedTerm.arbitrary.fmap { b in
-				RangedDiff(a: a.term, b: b.term, diff: interpreter.run(a.term, b.term))
+				RangedDiff(a: a, b: b, diff: interpreter.run(a.term, b.term))
 			}
 		}
 	}
