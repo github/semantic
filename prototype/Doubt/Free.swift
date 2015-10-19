@@ -118,7 +118,15 @@ public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 extension Free where B: PatchType, B.Element == Cofree<A, ()> {
 	public typealias Term = B.Element
 
-	private func discardNullTerms(syntax: Syntax<Term?, A>) -> Term? {
+	public func merge(transform: B -> Term) -> Term {
+		return map(transform).iterate { Cofree((), $0) }
+	}
+
+	public func merge(transform: B -> Term?) -> Term? {
+		return map(transform).iterate(Free.discardNullTerms)
+	}
+
+	private static func discardNullTerms(syntax: Syntax<Term?, A>) -> Term? {
 		switch syntax {
 		case let .Leaf(a):
 			return Cofree((), .Leaf(a))
@@ -130,16 +138,11 @@ extension Free where B: PatchType, B.Element == Cofree<A, ()> {
 	}
 
 	public var before: Term? {
-		return map { $0.state.before }.iterate(self.discardNullTerms)
+		return merge { $0.state.before }
 	}
 
 	public var after: Term? {
-		return map { $0.state.after }.iterate(self.discardNullTerms)
-	}
-
-
-	public var inverse: Free {
-		return map { $0.inverse }
+		return merge { $0.state.after }
 	}
 }
 
@@ -157,6 +160,11 @@ extension Free where B: PatchType {
 
 	public static func Delete(before: B.Element) -> Free {
 		return .Pure(B(deleting: before))
+	}
+
+
+	public var inverse: Free {
+		return map { $0.inverse }
 	}
 }
 
