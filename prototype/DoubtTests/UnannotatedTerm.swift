@@ -1,4 +1,4 @@
-struct UnannotatedTerm: Comparable {
+struct UnannotatedTerm: Equatable {
 	typealias Term = Cofree<String, ()>
 	let term: Term
 
@@ -69,10 +69,6 @@ struct UnannotatedTerm: Comparable {
 
 func == (left: UnannotatedTerm, right: UnannotatedTerm) -> Bool {
 	return UnannotatedTerm.Term.equals(annotation: const(true), leaf: ==)(left.term, right.term)
-}
-
-func < (left: UnannotatedTerm, right: UnannotatedTerm) -> Bool {
-	return left.term.size < right.term.size
 }
 
 
