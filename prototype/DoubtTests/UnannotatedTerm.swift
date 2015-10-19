@@ -112,7 +112,7 @@ extension UnannotatedTerm: Arbitrary {
 					Array.shrink($0).map {
 						UnannotatedTerm(term: Cofree((), .Indexed($0.map { $0.term })))
 					}
-				}
+				}.sort()
 			case let .Keyed(k):
 				return []
 			}
