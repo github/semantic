@@ -2,6 +2,10 @@ struct RangedTerm {
 	typealias Term = Cofree<String, Range<String.Index>>
 	let term: Term
 	let source: String
+
+	var stripped: UnannotatedTerm {
+		return UnannotatedTerm(term: term.map(const(())))
+	}
 }
 
 extension RangedTerm: Arbitrary {
