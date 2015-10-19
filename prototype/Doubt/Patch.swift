@@ -43,6 +43,22 @@ public enum Patch<A>: CustomDebugStringConvertible {
 }
 
 
+// MARK: - Functor
+
+extension Patch {
+	public func map<B>(@noescape transform: A -> B) -> Patch<B> {
+		switch self {
+		case let .Replace(a, b):
+			return .Replace(transform(a), transform(b))
+		case let .Delete(a):
+			return .Delete(transform(a))
+		case let .Insert(b):
+			return .Insert(transform(b))
+		}
+	}
+}
+
+
 // MARK: - Equality
 
 extension Patch {

@@ -7,3 +7,6 @@
 [submodule "prototype/External/Madness"]
 	path = prototype/External/Madness
 	url = https://github.com/robrix/Madness
+[submodule "prototype/External/SwiftCheck"]
+	path = prototype/External/SwiftCheck
+	url = https://github.com/typelift/SwiftCheck.git
