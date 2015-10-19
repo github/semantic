@@ -14,6 +14,10 @@ extension TermType {
 		return self |> ({ $0.unwrap } >>> { $0.map { $0.cata(transform) } } >>> transform)
 	}
 
+	public func para<Result>(transform: (Syntax<(Self, Result), LeafType>) -> Result) -> Result {
+		return self |> ({ $0.unwrap } >>> { $0.map { ($0, $0.para(transform)) } } >>> transform)
+	}
+
 
 	/// The count of nodes in the receiver.
 	///
