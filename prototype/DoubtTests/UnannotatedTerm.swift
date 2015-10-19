@@ -110,9 +110,9 @@ extension UnannotatedTerm: Arbitrary {
 				return Cofree((), .Leaf(a))
 			case let .Indexed(i):
 				/// if the child nodes are unchanged, shrink the array
-				return Cofree((), i.reduce(true) { $0 && equal($1) }
-					? .Indexed(i.dropLast().map { $1 })
-					: .Indexed(i.map { $1 }))
+				return Cofree((), .Indexed(i.reduce(true) { $0 && equal($1) }
+					? i.dropLast().map { $1 }
+					: i.map { $1 }))
 			case let .Keyed(k):
 				return Cofree((), .Keyed(Dictionary(elements: k.map { ($0, $1.1) })))
 			}
