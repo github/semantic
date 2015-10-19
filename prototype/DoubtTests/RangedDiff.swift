@@ -16,6 +16,11 @@ extension RangedDiff: Arbitrary {
 			}
 		}
 	}
+
+	static func shrink(diff: RangedDiff) -> [RangedDiff] {
+		return RangedTerm.shrink(diff.a).map { RangedDiff(a: $0, b: diff.b, diff: interpreter.run($0.term, diff.b.term)) }
+			+ RangedTerm.shrink(diff.b).map { RangedDiff(a: diff.a, b: $0, diff: interpreter.run(diff.a.term, $0.term)) }
+	}
 }
 
 
