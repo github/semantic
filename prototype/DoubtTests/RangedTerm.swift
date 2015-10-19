@@ -12,6 +12,10 @@ extension RangedTerm: Arbitrary {
 	static var arbitrary: Gen<RangedTerm> {
 		return UnannotatedTerm.arbitrary.fmap { $0.arranged }
 	}
+
+	static func shrink(term: RangedTerm) -> [RangedTerm] {
+		return UnannotatedTerm.shrink(term.stripped).map { $0.arranged }
+	}
 }
 
 
