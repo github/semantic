@@ -27,16 +27,16 @@ print(parse(json, input: dictWithMembers))
 let dictWithArray = "{\"hello\": [\"world\"],\"sup\": [\"cat\", \"dog\", \"keith\"] }"
 print(parse(json, input: dictWithArray))
 
-func diffAndSerialize(a aString: String, b bString: String) -> String? {
+func diffAndSerialize(a aString: String, b bString: String, to: String) throws {
 	let aParsed = benchmark("parsing a") { curry(parse)(json)(aString) }
 	guard let a = aParsed.right else {
 		_ = aParsed.left.map { print("error parsing a:", $0) }
-		return nil
+		return
 	}
 	let bParsed = benchmark("parsing b") { curry(parse)(json)(bString) }
 	guard let b = bParsed.right else {
 		_ = bParsed.left.map { print("error parsing b:", $0) }
-		return nil
+		return
 	}
 
 	let diff = benchmark("diffing a & b") {
@@ -59,6 +59,8 @@ func diffAndSerialize(a aString: String, b bString: String) -> String? {
 		JSON.serialize()
 	}
 
+	try data.writeToFile(to, options: .DataWritingAtomic)
+
 	return benchmark("decoding data into string") {
 		NSString(data: data, encoding: NSUTF8StringEncoding) as String?
 	}
@@ -69,6 +71,6 @@ let readFile = { (path: String) -> String? in
 	return data as String?
 }
 
-if let a = arguments[1].flatMap(readFile), b = arguments[2].flatMap(readFile), diff = diffAndSerialize(a: a, b: b) {
-	print(diff)
+if let a = arguments[1].flatMap(readFile), b = arguments[2].flatMap(readFile), c = arguments[3] {
+	try diffAndSerialize(a: a, b: b, to: c)
 }
