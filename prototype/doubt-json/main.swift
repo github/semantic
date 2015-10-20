@@ -21,7 +21,16 @@ let dictWithArray = "{\"hello\": [\"world\"],\"sup\": [\"cat\", \"dog\", \"keith
 print(parse(json, input: dictWithArray))
 
 func diffAndSerialize(a aString: String, b bString: String) -> String? {
-	guard let a = curry(parse)(json)(aString).right, b = curry(parse)(json)(bString).right else { return nil }
+	let aParsed = curry(parse)(json)(aString)
+	guard let a = aParsed.right else {
+		_ = aParsed.left.map { print($0) }
+		return nil
+	}
+	let bParsed = curry(parse)(json)(bString)
+	guard let b = bParsed.right else {
+		_ = bParsed.left.map { print($0) }
+		return nil
+	}
 
 	let diff = Interpreter<CofreeJSON>(equal: CofreeJSON.equals(annotation: const(true), leaf: ==), comparable: const(true), cost: Free.sum(Patch.difference)).run(a, b)
 
