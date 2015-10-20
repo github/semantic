@@ -19,6 +19,12 @@ extension String: CollectionType {
 	public var count: Index.Distance {
 		return characters.count
 	}
+	
+	public static func lift<A>(parser: Parser<String.CharacterView, A>.Function) -> Parser<String, A>.Function {
+		return {
+			parser($0.characters, $1)
+		}
+	}
 }
 
 func not<C: CollectionType, T>(parser: Parser<C, T>.Function)(_ input: C, _ index: C.Index) -> Either<Error<C.Index>, (C.Generator.Element, C.Index)> {
