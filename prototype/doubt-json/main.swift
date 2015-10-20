@@ -25,12 +25,8 @@ func readFile(path: String) -> String? {
 	return try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
 }
 
-func parseJSON(string: String) -> CofreeJSON? {
-	return parse(json, input: string).right
-}
-
 func diffAndSerialize(a aString: String, b bString: String) -> String? {
-	guard let a = parseJSON(aString), b = parseJSON(bString) else { return nil }
+	guard let a = curry(parse)(json)(aString).right, b = curry(parse)(json)(bString).right else { return nil }
 
 	let diff = Interpreter<CofreeJSON>(equal: CofreeJSON.equals(annotation: const(true), leaf: ==), comparable: const(true), cost: Free.sum(Patch.difference)).run(a, b)
 
