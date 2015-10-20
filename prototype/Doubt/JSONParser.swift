@@ -39,13 +39,18 @@ func not<C: CollectionType, T>(parser: Parser<C, T>.Function)(_ input: C, _ inde
 typealias StringParser = Parser<String, String>.Function
 typealias CharacterParser = Parser<String, [Character]>.Function
 
+// Inlined for performance reasons
+let whitespaceChars: [Character] = [" ", "\n", "\t", "\r"]
+let whitespace: CharacterParser = String.lift(satisfy({ whitespaceChars.contains($0) })*)
+
+// Quoted strings parser
 let stringBody: StringParser = { $0.map({ String($0) }).joinWithSeparator("") } <^>
 		not(%"\\" <|> %"\"")*
-let quoted = %"\"" *> stringBody <* %"\""
-let whitespace: CharacterParser = String.lift(space()* <|> endOfLine()* <|> tab()*)
+let quoted = %"\"" *> stringBody <* %"\"" <* whitespace
 
 typealias MembersParser = Parser<String, [(String, CofreeJSON)]>.Function;
 
+// Parses an array of (String, CofreeJSON) object members
 func members(json: JSONParser) -> MembersParser {
 	let pairs: Parser<String, (String, CofreeJSON)>.Function = (curry(pair) <^>
 	quoted
@@ -65,6 +70,8 @@ func members(json: JSONParser) -> MembersParser {
 }
 
 typealias ValuesParser = Parser<String, [CofreeJSON]>.Function;
+
+// Parses an array of CofreeJSON array values
 func elements(json: JSONParser) -> ValuesParser {
 	let value: Parser<String, CofreeJSON>.Function = whitespace *> json <* whitespace
 
@@ -76,12 +83,11 @@ func elements(json: JSONParser) -> ValuesParser {
 	return oneOrMore <|> pure([])
 }
 
-
 let json: JSONParser = fix { json in
 	// TODO: Parse backslashed escape characters
 
 	let string: JSONParser = quoted --> { Cofree($1, .Leaf(.String($2))) }
-	let array: JSONParser =  %"[" *> elements(json) <* %"]" --> { Cofree($1, .Indexed($2)) }
+	let array: JSONParser =  %"[" <* whitespace *> elements(json) <* %"]" <* whitespace --> { Cofree($1, .Indexed($2)) }
 
 	let object: JSONParser =
 		%"{"
@@ -89,17 +95,27 @@ let json: JSONParser = fix { json in
 			*> members(json)
 			<* whitespace
 			<* %"}"
+			<* whitespace
 		--> { (_, range, values) in
 			Cofree(range, .Keyed(Dictionary(elements: values)))
 		}
 
-	// TODO: Parse Numbers correctly
-	let doubleParser = String.lift(double())
+	let doubleParser = String.lift(double()) <* whitespace
 	let number: JSONParser = doubleParser --> { _, range, value in
 		let num = JSONLeaf.Number(value)
 		return Cofree(range, .Leaf(num))
 	}
+	
+	let null: JSONParser = %"null" --> { (_, range, value) in
+		return Cofree(range, .Leaf(.Null))
+	}
+	
+	let boolean: JSONParser = %"false" <|> %"true" --> { (_, range, value) in
+		let boolean = value == "true"
+		return Cofree(range, .Leaf(.Boolean(boolean)))
+	}
 
-	// TODO: This should just be dict <|> array and Value = dict | array | string | number | null | bool
-	return object <|> array <|> string <|> number
+	// TODO: This should be JSON = dict <|> array and
+	// Value = dict | array | string | number | null | bool
+	return object <|> array <|> string <|> number <|> boolean <|> null
 }
