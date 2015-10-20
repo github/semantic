@@ -43,8 +43,16 @@ func diffAndSerialize(a aString: String, b bString: String) -> String? {
 		Interpreter<CofreeJSON>(equal: CofreeJSON.equals(annotation: const(true), leaf: ==), comparable: const(true), cost: Free.sum(Patch.difference)).run(a, b)
 	}
 
-	return benchmark("JSON") {
-		NSString(data: diff.JSON(ifPure: { $0.JSON(a: aString, b: bString) }, ifLeaf: { $0.JSON }).serialize(), encoding: NSUTF8StringEncoding) as String?
+	let JSON = benchmark("converting diff to JSON") {
+		diff.JSON(ifPure: { $0.JSON(a: aString, b: bString) }, ifLeaf: { $0.JSON })
+	}
+
+	let data = benchmark("serializing JSON to NSData") {
+		JSON.serialize()
+	}
+
+	return benchmark("decoding data into string") {
+		NSString(data: data, encoding: NSUTF8StringEncoding) as String?
 	}
 }
 
