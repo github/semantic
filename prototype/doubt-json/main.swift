@@ -23,12 +23,12 @@ print(parse(json, input: dictWithArray))
 func diffAndSerialize(a aString: String, b bString: String) -> String? {
 	let aParsed = curry(parse)(json)(aString)
 	guard let a = aParsed.right else {
-		_ = aParsed.left.map { print($0) }
+		_ = aParsed.left.map { print("error parsing a: ", $0) }
 		return nil
 	}
 	let bParsed = curry(parse)(json)(bString)
 	guard let b = bParsed.right else {
-		_ = bParsed.left.map { print($0) }
+		_ = bParsed.left.map { print("error parsing b: ", $0) }
 		return nil
 	}
 
