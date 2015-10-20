@@ -94,7 +94,11 @@ let json: JSONParser = fix { json in
 		}
 
 	// TODO: Parse Numbers correctly
-	let number: JSONParser = %"0" --> { Cofree($1, .Leaf(.String($2))) }
+	let doubleParser = String.lift(double())
+	let number: JSONParser = doubleParser --> { _, range, value in
+		let num = JSONLeaf.Number(value)
+		return Cofree(range, .Leaf(num))
+	}
 
 	// TODO: This should just be dict <|> array and Value = dict | array | string | number | null | bool
 	return object <|> array <|> string <|> number
