@@ -30,8 +30,6 @@ func diffAndSerialize(a aString: String, b bString: String) -> String? {
 	return JSON as String
 }
 
-_ = diffAndSerialize(a: "{\"hello\":\"world\",\"sup\":\"cat\"}", b: "{\"hello\":\"world\",\"sup\":\"dog\"}").map { print($0) }
-
 let readFile = { (path: String) -> String? in
 	guard let data = try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) else { return nil }
 	return data as String?
