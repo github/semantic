@@ -35,20 +35,6 @@ func not<C: CollectionType, T>(parser: Parser<C, T>.Function)(_ input: C, _ inde
 	}
 }
 
-public func satisfy<C: CollectionType> (pred: C.Generator.Element -> Bool) -> Parser<C, C.Generator.Element>.Function {
-	return { input, index in
-		if input.count > 0 {
-			let parsed = input[index]
-			let next = index.successor()
-
-			return pred(parsed)
-				? .Right((parsed, next))
-				: .Left(Error.leaf("Failed to match predicate at index", index))
-		} else {
-			return .Left(Error.leaf("", index))
-		}
-	}
-}
 
 typealias StringParser = Parser<String, String>.Function
 typealias CharacterParser = Parser<String, [Character]>.Function
