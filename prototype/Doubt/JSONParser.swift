@@ -100,7 +100,7 @@ let json: JSONParser = fix { json in
 			Cofree(range, .Keyed(Dictionary(elements: values)))
 		}
 
-	let doubleParser = String.lift(double()) <* whitespace
+	let doubleParser = String.lift(double) <* whitespace
 	let number: JSONParser = doubleParser --> { _, range, value in
 		let num = JSONLeaf.Number(value)
 		return Cofree(range, .Leaf(num))
