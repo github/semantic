@@ -42,7 +42,7 @@ typealias CharacterParser = Parser<String, [Character]>.Function
 let stringBody: StringParser = { $0.map({ String($0) }).joinWithSeparator("") } <^>
 		not(%"\\" <|> %"\"")*
 let quoted = %"\"" *> stringBody <* %"\""
-let whitespace: CharacterParser  = satisfy({ (c: Character) in c == " " })*
+let whitespace: CharacterParser = String.lift(space()* <|> endOfLine()* <|> tab()*)
 
 typealias MembersParser = Parser<String, [(String, CofreeJSON)]>.Function;
 
