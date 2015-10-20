@@ -21,12 +21,8 @@ let dictWithArray = "{\"hello\": [\"world\"],\"sup\": [\"cat\", \"dog\", \"keith
 print(parse(json, input: dictWithArray))
 
 
-func data(path: String) -> NSData? {
-	return try? NSData(contentsOfFile: path, options: [])
-}
-
-func string(data: NSData) -> String? {
-	return NSString(data: data, encoding: NSUTF8StringEncoding) as String?
+func readFile(path: String) -> String? {
+	return try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) as String
 }
 
 func parseJSON(string: String) -> CofreeJSON? {
@@ -45,6 +41,6 @@ func diffAndSerialize(a aString: String, b bString: String) -> String? {
 
 _ = diffAndSerialize(a: "{\"hello\":\"world\",\"sup\":\"cat\"}", b: "{\"hello\":\"world\",\"sup\":\"dog\"}").map { print($0) }
 
-if let aString = arguments[1].flatMap(data).flatMap(string), bString = arguments[2].flatMap(data).flatMap(string), JSON = diffAndSerialize(a: aString, b: bString) {
+if let aString = arguments[1].flatMap(readFile), bString = arguments[2].flatMap(readFile), JSON = diffAndSerialize(a: aString, b: bString) {
 	print(JSON)
 }
