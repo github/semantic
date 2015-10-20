@@ -51,8 +51,12 @@ func diffAndSerialize(a aString: String, b bString: String, to: String) throws {
 			.Number(Double(end - start)),
 		]
 	}
-	let JSON = benchmark("converting diff to JSON") {
-		diff.JSON(ifPure: { $0.JSON { $0.JSON(annotation: range, leaf: { $0.JSON }) } }, ifLeaf: { $0.JSON })
+	let JSON: Doubt.JSON = benchmark("converting diff to JSON") {
+		[
+			"a": .String(aString),
+			"b": .String(bString),
+			"diff": diff.JSON(ifPure: { $0.JSON { $0.JSON(annotation: range, leaf: { $0.JSON }) } }, ifLeaf: { $0.JSON }),
+		]
 	}
 
 	let data = benchmark("serializing JSON to NSData") {
