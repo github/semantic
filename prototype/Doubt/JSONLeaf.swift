@@ -9,7 +9,7 @@
 import Foundation
 import Doubt
 
-typealias Term = Cofree<JSONLeaf, Int>
+typealias Term = Cofree<JSONLeaf, Range<String.Index>>
 typealias Diff = Free<JSONLeaf, Patch<Term>>
 
 enum JSONLeaf: CustomJSONConvertible, CustomStringConvertible, Equatable {
@@ -65,42 +65,42 @@ func == (left: JSONLeaf, right: JSONLeaf) -> Bool {
 		return false
 	}
 }
-
-extension JSON {
-	init?(path: Swift.String) {
-		guard let data = try? NSData(contentsOfFile: path, options: []) else { return nil }
-		guard let object = try? NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments) else { return nil }
-		self.init(object: object)
-	}
-
-	var term: Term {
-		func annotate(json: Syntax<Term, JSONLeaf>) -> Term {
-			return Cofree(size(json), json)
-		}
-		func size(syntax: Syntax<Term, JSONLeaf>) -> Int {
-			switch syntax {
-			case .Leaf:
-				return 1
-			case let .Indexed(i):
-				return 1 + i.map { size($0.unwrap) }.reduce(0, combine: +)
-			case let .Keyed(i):
-				return 1 + i.values.map { size($0.unwrap) }.reduce(0, combine: +)
-			}
-		}
-
-		switch self {
-		case let .Array(a):
-			return annotate(.Indexed(a.map { $0.term }))
-		case let .Dictionary(d):
-			return annotate(.Keyed(Swift.Dictionary(elements: d.map { ($0, $1.term) })))
-		case let .Number(n):
-			return annotate(.Leaf(.Number(n)))
-		case let .Boolean(b):
-			return annotate(.Leaf(.Boolean(b)))
-		case let .String(s):
-			return annotate(.Leaf(.String(s)))
-		case .Null:
-			return annotate(.Leaf(.Null))
-		}
-	}
-}
+//
+//extension JSON {
+//	init?(path: Swift.String) {
+//		guard let data = try? NSData(contentsOfFile: path, options: []) else { return nil }
+//		guard let object = try? NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments) else { return nil }
+//		self.init(object: object)
+//	}
+//
+//	var term: Term {
+//		func annotate(json: Syntax<Term, JSONLeaf>) -> Term {
+//			return Cofree(size(json), json)
+//		}
+//		func size(syntax: Syntax<Term, JSONLeaf>) -> Int {
+//			switch syntax {
+//			case .Leaf:
+//				return 1
+//			case let .Indexed(i):
+//				return 1 + i.map { size($0.unwrap) }.reduce(0, combine: +)
+//			case let .Keyed(i):
+//				return 1 + i.values.map { size($0.unwrap) }.reduce(0, combine: +)
+//			}
+//		}
+//
+//		switch self {
+//		case let .Array(a):
+//			return annotate(.Indexed(a.map { $0.term }))
+//		case let .Dictionary(d):
+//			return annotate(.Keyed(Swift.Dictionary(elements: d.map { ($0, $1.term) })))
+//		case let .Number(n):
+//			return annotate(.Leaf(.Number(n)))
+//		case let .Boolean(b):
+//			return annotate(.Leaf(.Boolean(b)))
+//		case let .String(s):
+//			return annotate(.Leaf(.String(s)))
+//		case .Null:
+//			return annotate(.Leaf(.Null))
+//		}
+//	}
+//}
