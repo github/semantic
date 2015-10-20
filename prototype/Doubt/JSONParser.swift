@@ -45,7 +45,7 @@ let whitespace: CharacterParser = String.lift(satisfy({ whitespaceChars.contains
 
 // Quoted strings parser
 let stringBody: StringParser = { $0.map({ String($0) }).joinWithSeparator("") } <^>
-		not(%"\\" <|> %"\"")*
+		String.lift(noneOf("\n\"")*)
 let quoted = %"\"" *> stringBody <* %"\"" <* whitespace
 
 typealias MembersParser = Parser<String, [(String, CofreeJSON)]>.Function;
@@ -100,7 +100,7 @@ let json: JSONParser = fix { json in
 			Cofree(range, .Keyed(Dictionary(elements: values)))
 		}
 
-	let doubleParser = String.lift(double()) <* whitespace
+	let doubleParser = String.lift(double) <* whitespace
 	let number: JSONParser = doubleParser --> { _, range, value in
 		let num = JSONLeaf.Number(value)
 		return Cofree(range, .Leaf(num))
