@@ -4,6 +4,13 @@ import Either
 import Prelude
 import Madness
 
+func benchmark<T>(label: String? = nil, _ f: () -> T) -> T {
+	let start = NSDate.timeIntervalSinceReferenceDate()
+	let result = f()
+	let end = NSDate.timeIntervalSinceReferenceDate()
+	print((label.map { "\($0): " } ?? "") + "\(end - start)s")
+	return result
+}
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
 
