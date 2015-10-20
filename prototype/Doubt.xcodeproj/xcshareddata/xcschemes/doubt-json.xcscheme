@@ -71,7 +71,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "$(SRCROOT)/UI/Fixtures/swift.json"
+            argument = "$(SRCROOT)/UI/diff.json"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
