@@ -28,12 +28,12 @@ let dictWithArray = "{\"hello\": [\"world\"],\"sup\": [\"cat\", \"dog\", \"keith
 print(parse(json, input: dictWithArray))
 
 func diffAndSerialize(a aString: String, b bString: String) -> String? {
-	let aParsed = curry(parse)(json)(aString)
+	let aParsed = benchmark("parsing a") { curry(parse)(json)(aString) }
 	guard let a = aParsed.right else {
 		_ = aParsed.left.map { print("error parsing a:", $0) }
 		return nil
 	}
-	let bParsed = curry(parse)(json)(bString)
+	let bParsed = benchmark("parsing b") { curry(parse)(json)(bString) }
 	guard let b = bParsed.right else {
 		_ = bParsed.left.map { print("error parsing b:", $0) }
 		return nil
