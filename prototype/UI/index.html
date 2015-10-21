@@ -67,7 +67,7 @@
     }
 
     function term(term, a, b) {
-        if (term.extract == null || term.unwrap == null) { return; }
+        if (term.extract == null || term.unwrap == null) { return null; }
 
         return syntax(term.unwrap, a, b, term);
     }
