@@ -154,15 +154,7 @@
                     return 0;
                 });
 
-                var previous = model.range[0];
-                for (i in values) {
-                    var k = values[i][0];
-                    var value = values[i][1];
-                    var dt = document.createElement("dt");
-                    dt.textContent = k;
-                    element.appendChild(dt);
-                    element.appendChild(wrap("dd", toDOM(value)));
-                }
+                addTextAndChildNodes(element, model.source, model.range, values);
             } else {
                 for (k in model.values) {
                     var dt = document.createElement("dt");
