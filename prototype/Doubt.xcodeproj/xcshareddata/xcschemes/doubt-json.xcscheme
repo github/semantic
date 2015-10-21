@@ -70,6 +70,10 @@
             argument = "$(SRCROOT)/doubt-json/Fixtures/b.json"
             isEnabled = "YES">
          </CommandLineArgument>
+         <CommandLineArgument
+            argument = "$(SRCROOT)/UI/diff.json"
+            isEnabled = "YES">
+         </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
