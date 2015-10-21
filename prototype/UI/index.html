@@ -85,9 +85,11 @@
     }
 
     function indexed(array, a, b, continuation) {
+        var out = [];
         for (index in array) {
-            continuation(array[index], a, b);
+            out.push(continuation(array[index], a, b));
         }
+        return out;
     }
 
     function keyed(object, a, b, continuation) {
