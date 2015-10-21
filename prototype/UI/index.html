@@ -74,6 +74,7 @@
     function syntax(json) {
         if (json instanceof Array) { return indexed(json); }
         if (json instanceof Object) { return keyed(json); }
+        // fixme: handle leaves
     }
 
     function diff(json) {
