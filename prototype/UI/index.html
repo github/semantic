@@ -64,37 +64,35 @@
     }
 
     function toDOM(model) {
+        var element;
+
         if (model instanceof Delete) {
-            var element = document.createElement("div");
+            element = document.createElement("div");
             element.classList.add("delete");
             element.appendChild(toDOM(model.before));
-            return element;
         }
 
         if (model instanceof Insert) {
-            var element = document.createElement("div");
+            element = document.createElement("div");
             element.classList.add("insert");
             element.appendChild(toDOM(model.after));
-            return element;
         }
 
         if (model instanceof Replace) {
-            var element = document.createElement("div");
+            element = document.createElement("div");
             element.classList.add("replace");
             element.appendChild(toDOM(model.before));
             element.appendChild(toDOM(model.after));
-            return element;
         }
 
         if (model instanceof Term) {
-            var element = document.createElement("div");
+            element = document.createElement("div");
             element.classList.add("term");
             element.appendChild(toDOM(model.syntax));
-            return element;
         }
 
         if (model instanceof Diff) {
-            var element = document.createElement("div");
+            element = document.createElement("div");
             element.classList.add("diff");
             if (model.pure != null) {
                 element.classList.add("pure");
@@ -103,33 +101,31 @@
                 element.classList.add("roll");
                 element.appendChild(toDOM(model.roll));
             }
-            return element;
         }
 
         if (model instanceof Indexed) {
-            var element = document.createElement("ul");
+            element = document.createElement("ul");
             for (i in model.values) {
                 element.appendChild(wrap("li", toDOM(model.values[i])));
             }
-            return element;
         }
 
         if (model instanceof Keyed) {
-            var element = document.createElement("dl");
+            element = document.createElement("dl");
             for (k in model.values) {
                 var dt = document.createElement("dt");
                 dt.textContent = k;
                 element.appendChild(dt);
                 element.appendChild(wrap("dd", toDOM(model.values[k])));
             }
-            return element;
         }
 
         if (model instanceof Leaf) {
-            var element = document.createElement("span");
+            element = document.createElement("span");
             // ?
-            return element;
         }
+
+        return element;
     }
 
     function patch(patch, a, b) {
