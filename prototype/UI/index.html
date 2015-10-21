@@ -54,7 +54,7 @@
     }
 
     function term(term, element) {
-        if (term["extract"] == null || term["unwrap"] == null) { return; }
+        if (term.extract == null || term.unwrap == null) { return; }
         // fixme: do something…?
     }
 
@@ -62,9 +62,9 @@
         var before = document.getElementById("before");
         var after = document.getElementById("after");
         // fixme: handle annotated terms
-        if (patch["delete"] != null) { return term(patch["delete"], before); }
-        if (patch["insert"] != null) { return term(patch["insert"], after); }
-        if (patch["replace"] != null) {}
+        if (patch.delete != null) { return term(patch.delete, before); }
+        if (patch.insert != null) { return term(patch.insert, after); }
+        if (patch.replace != null) {}
     }
 
     function indexed(array, continuation) {
@@ -86,8 +86,8 @@
     }
 
     function diff(json) {
-        if (json["pure"] != null) { return patch(json["pure"]); }
-        if (json["roll"] != null) { return syntax(json["roll"], diff); }
+        if (json.pure != null) { return patch(json.pure); }
+        if (json.roll != null) { return syntax(json.roll, diff); }
     }
     </script>
   </head>
@@ -100,8 +100,8 @@
         document.getElementById("before").textContent = json.a;
         document.getElementById("after").textContent = json.b;
 
-        console.log(json["diff"]);
-        diff(json["diff"]);
+        console.log(json.diff);
+        diff(json.diff);
     });
     </script>
   </body>
