@@ -45,11 +45,11 @@ typealias MembersParser = Parser<String, [(String, CofreeJSON)]>.Function;
 // Parses an array of (String, CofreeJSON) object members
 func members(json: JSONParser) -> MembersParser {
 	let pairs: Parser<String, (String, CofreeJSON)>.Function = (curry(pair) <^>
-	quoted
-	<* whitespace
-	<* %":"
-	<* whitespace
-	<*> json)
+		quoted
+		<* whitespace
+		<* %":"
+		<* whitespace
+		<*> json)
 
 	let separatedPairs: MembersParser  = (%"," *> whitespace *> pairs <* whitespace)*
 
