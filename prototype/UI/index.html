@@ -154,7 +154,7 @@
                     return 0;
                 });
 
-                addTextAndChildNodes(element, model.source, model.range, values);
+                addTextAndChildNodes(element, model.source, model.range, values.map(function(x) { return x[1]; }));
             } else {
                 for (k in model.values) {
                     var dt = document.createElement("dt");
