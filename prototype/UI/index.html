@@ -62,7 +62,7 @@
     function patch(patch) {
         var before = document.getElementById("before");
         var after = document.getElementById("after");
-        // fixme: handle annotated terms
+        
         if (patch.delete != null) { return term(patch.delete, before); }
         if (patch.insert != null) { return term(patch.insert, after); }
         if (patch.replace != null) {
