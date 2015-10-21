@@ -53,6 +53,11 @@
         return node;
     }
 
+    function term(term) {
+        if (term["extract"] == null || term["unwrap"] == null) { return; }
+        // fixme: do something…?
+    }
+
     function patch(patch) {
         // fixme: handle annotated terms
         if (patch["delete"] != null) {}
