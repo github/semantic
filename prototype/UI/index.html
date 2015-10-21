@@ -93,7 +93,7 @@
 
         if (model.syntax instanceof Indexed) {
             var element = document.createElement("ul");
-            for (i in model.syntax) {
+            for (i in model.values) {
                 element.appendChild(wrap("li", toDOM(model.syntax[i])));
             }
             return element;
@@ -101,7 +101,7 @@
 
         if (model.syntax instanceof Keyed) {
             var element = document.createElement("dl");
-            for (k in model.syntax) {
+            for (k in model.values) {
                 var dt = document.createElement("dt");
                 dt.textContent = k;
                 element.appendChild(dt);
