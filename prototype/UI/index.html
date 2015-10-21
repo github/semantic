@@ -110,10 +110,14 @@
         return this;
     }
 
+    function Leaf(object, a, b) {
+        return this;
+    }
+
     function syntax(json, a, b, continuation) {
         if (json instanceof Array) { return new Indexed(json, a, b, continuation); }
         if (json instanceof Object) { return new Keyed(json, a, b, continuation); }
-        return continuation(json, a, b);
+        return new Leaf(json, a, b);
     }
 
     function diff(json, a, b) {
