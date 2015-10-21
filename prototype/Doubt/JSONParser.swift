@@ -91,11 +91,11 @@ let json: JSONParser = fix { json in
 			Cofree(range, .Keyed(Dictionary(elements: values)))
 		}
 
-	let doubleParser = String.lift(double) <* whitespace
-	let number: JSONParser = doubleParser --> { _, range, value in
+	let doubleParser: DoubleParser = number
+	let numberParser: JSONParser = String.lift(doubleParser --> { _, range, value in
 		let num = JSONLeaf.Number(value)
 		return Cofree(range, .Leaf(num))
-	}
+	})
 	
 	let null: JSONParser = %"null" --> { (_, range, value) in
 		return Cofree(range, .Leaf(.Null))
@@ -108,5 +108,5 @@ let json: JSONParser = fix { json in
 
 	// TODO: This should be JSON = dict <|> array and
 	// Value = dict | array | string | number | null | bool
-	return object <|> array <|> string <|> number <|> boolean <|> null
+	return object <|> array <|> string <|> numberParser <|> boolean <|> null
 }
