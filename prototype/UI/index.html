@@ -116,17 +116,6 @@
             }
         }
 
-        function addTextAndChildNodes(element, source, range, values) {
-            var previous = range[0];
-            for (i in values) {
-                var value = values[i];
-                element.appendChild(document.createTextNode(source.substr(previous, value.range[0] - previous)));
-                element.appendChild(wrap("li", toDOM(value)));
-                previous = value.range[0] + value.range[1];
-            }
-            element.appendChild(document.createTextNode(source.substr(previous, range[0] + range[1] - previous)));
-        }
-
         if (model instanceof Indexed) {
             element = document.createElement("ul");
             if (model.source != null && model.range != null) {
