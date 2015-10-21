@@ -70,6 +70,13 @@
             element.appendChild(toDOM(view.before));
             return element;
         }
+
+        if (view instanceof Term) {
+            var element = document.createElement("div");
+            element.classList.add("term");
+            element.appendChild(toDOM(view.syntax));
+            return element;
+        }
     }
 
     function term(json, a, b) {
