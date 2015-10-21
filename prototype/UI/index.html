@@ -60,6 +60,11 @@
             syntax(object[key]);
         }
     }
+
+    function syntax(json) {
+        if (json instanceof Array) { return indexed(json); }
+        if (json instanceof Object) { return keyed(json); }
+    }
     </script>
   </head>
   <body>
