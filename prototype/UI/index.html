@@ -57,9 +57,9 @@
         return this;
     }
 
-    function Term(range, syntax) {
-        this.range = range;
-        this.syntax = syntax;
+    function Term(json, a, b) {
+        this.range = json.extract;
+        this.syntax = syntax(json.unwrap, a, b, function(x, a, b) { return new Term(x, a, b); });
         return this;
     }
 
@@ -88,16 +88,10 @@
         }
     }
 
-    function term(json, a, b) {
-        if (json.extract == null || json.unwrap == null) { return null; }
-
-        return new Term(json.extract, syntax(json.unwrap, a, b, term));
-    }
-
     function patch(patch, a, b) {
-        if (patch.delete != null) { return new Delete(term(patch.delete, a, b)); }
-        if (patch.insert != null) { return new Insert(term(patch.insert, a, b)); }
-        if (patch.replace != null) { return new Replace(term(patch.replace.before, a, b), term(patch.replace.after, a, b)); }
+        if (patch.delete != null) { return new Delete(new Term(patch.delete, a, b)); }
+        if (patch.insert != null) { return new Insert(new Term(patch.insert, a, b)); }
+        if (patch.replace != null) { return new Replace(new Term(patch.replace.before, a, b), new Term(patch.replace.after, a, b)); }
     }
 
     function Indexed(array, a, b, continuation) {
