@@ -91,7 +91,7 @@
             return element;
         }
 
-        if (model.syntax instanceof Indexed) {
+        if (model instanceof Indexed) {
             var element = document.createElement("ul");
             for (i in model.values) {
                 element.appendChild(wrap("li", toDOM(model.syntax[i])));
@@ -99,7 +99,7 @@
             return element;
         }
 
-        if (model.syntax instanceof Keyed) {
+        if (model instanceof Keyed) {
             var element = document.createElement("dl");
             for (k in model.values) {
                 var dt = document.createElement("dt");
@@ -110,7 +110,7 @@
             return element;
         }
 
-        if (model.syntax instanceof Leaf) {
+        if (model instanceof Leaf) {
             var element = document.createElement("span");
             // ?
             return element;
