@@ -134,23 +134,23 @@
         if (patch.replace != null) { return new Replace(patch.replace.before, patch.replace.after, a, b); }
     }
 
-    function Indexed(array, a, b, continuation) {
+    function Indexed(array, continuation) {
         this.values = [];
         for (index in array) {
-            this.values.push(continuation(array[index], a, b));
+            this.values.push(continuation(array[index]));
         }
         return this;
     }
 
-    function Keyed(object, a, b, continuation) {
+    function Keyed(object, continuation) {
         this.values = {};
         for (key in object) {
-            this.values[key] = continuation(object[key], a, b);
+            this.values[key] = continuation(object[key]);
         }
         return this;
     }
 
-    function Leaf(object, a, b) {
+    function Leaf(object) {
         this.value = object;
         return this;
     }
