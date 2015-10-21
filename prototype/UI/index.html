@@ -110,8 +110,19 @@
 
         if (model instanceof Indexed) {
             element = document.createElement("ul");
-            for (i in model.values) {
-                element.appendChild(wrap("li", toDOM(model.values[i])));
+            if (model.source != null && model.range != null) {
+                var previous = model.range[0];
+                for (i in model.values) {
+                    var value = model.values[i];
+                    element.appendChild(document.createTextNode(model.source.substr(previous, value.range[0])));
+                    element.appendChild(wrap("li", toDOM(value)));
+                    previous = value.range[1];
+                }
+                element.appendChild(document.createTextNode(model.source.substr(previous, model.range[1])));
+            } else {
+                for (i in model.values) {
+                    element.appendChild(wrap("li", toDOM(model.values[i])));
+                }
             }
         }
 
