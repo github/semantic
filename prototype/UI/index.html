@@ -119,7 +119,14 @@
         if (model instanceof Indexed) {
             element = document.createElement("ul");
             if (model.source != null && model.range != null) {
-                addTextAndChildNodes(element, model.source, model.range, model.values);
+                var previous = range[0];
+                for (i in values) {
+                    var value = values[i];
+                    element.appendChild(document.createTextNode(source.substr(previous, value.range[0] - previous)));
+                    element.appendChild(wrap("li", toDOM(value)));
+                    previous = value.range[0] + value.range[1];
+                }
+                element.appendChild(document.createTextNode(source.substr(previous, range[0] + range[1] - previous)));
             } else {
                 for (i in model.values) {
                     element.appendChild(wrap("li", toDOM(model.values[i])));
@@ -143,7 +150,17 @@
                     return 0;
                 });
 
-                addTextAndChildNodes(element, model.source, model.range, values.map(function(x) { return x[1]; }));
+                var previous = range[0];
+                for (i in values) {
+                    var value = values[i];
+                    element.appendChild(document.createTextNode(source.substr(previous, value.range[0] - previous)));
+                    var dt = document.createElement("dt");
+                    dt.textContent = k;
+                    element.appendChild(dt);
+                    element.appendChild(wrap("dd", toDOM(value)));
+                    previous = value.range[0] + value.range[1];
+                }
+                element.appendChild(document.createTextNode(source.substr(previous, range[0] + range[1] - previous)));
             } else {
                 for (k in model.values) {
                     var dt = document.createElement("dt");
