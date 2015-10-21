@@ -78,6 +78,10 @@
                 for (i in view.syntax) {
                     element.appendChild(toDOM(view.syntax[i]));
                 }
+            } else if (view.syntax instanceof Object) {
+                for (k in view.syntax) {
+                    element.appendChild(toDOM(view.syntax[k]));
+                }
             }
 
             return element;
