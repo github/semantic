@@ -69,6 +69,14 @@
         return this;
     }
 
+    function toDOM(view) {
+        if (view instanceof Delete) {
+            var element = document.createElement("div");
+            element.classList.add("delete");
+            element.appendChild(toDOM(view.before));
+        }
+    }
+
     function term(term, element) {
         if (term.extract == null || term.unwrap == null) { return; }
 
