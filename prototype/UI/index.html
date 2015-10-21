@@ -61,7 +61,7 @@
         this.range = json.extract;
         this.syntax = syntax(json.unwrap, function(x) { return new Term(x, source); });
         if (this.syntax instanceof Leaf) {
-            this.syntax.textContent = source.substr(this.range[0], this.range[1] - this.range[0]);
+            this.syntax.textContent = source.substr(this.range[0], this.range[1]);
         }
         return this;
     }
