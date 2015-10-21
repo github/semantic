@@ -55,7 +55,8 @@
 
     function term(term, element) {
         if (term.extract == null || term.unwrap == null) { return; }
-        // fixme: do something…?
+
+        return syntax(term.unwrap, function(a) { return term(a, element); });
     }
 
     function patch(patch) {
