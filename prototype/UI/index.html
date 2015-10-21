@@ -73,9 +73,9 @@
     }
 
     function patch(patch, a, b) {
-        if (patch.delete != null) { return Delete(term(patch.delete, a, b)); }
-        if (patch.insert != null) { return Insert(term(patch.insert, a, b)); }
-        if (patch.replace != null) { return Replace(term(patch.replace.before, a, b), term(patch.replace.after, a, b)); }
+        if (patch.delete != null) { return new Delete(term(patch.delete, a, b)); }
+        if (patch.insert != null) { return new Insert(term(patch.insert, a, b)); }
+        if (patch.replace != null) { return new Replace(term(patch.replace.before, a, b), term(patch.replace.after, a, b)); }
     }
 
     function indexed(array, a, b, continuation) {
