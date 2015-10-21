@@ -66,8 +66,8 @@
         if (patch.delete != null) { return term(patch.delete, before); }
         if (patch.insert != null) { return term(patch.insert, after); }
         if (patch.replace != null) {
-            if (term.patch.before != null) { term(patch.replace.before); }
-            if (term.patch.after != null) { term(patch.replace.after); }
+            if (term.patch.before != null) { term(patch.replace.before, before); }
+            if (term.patch.after != null) { term(patch.replace.after, after); }
         }
     }
 
