@@ -137,7 +137,14 @@
         if (model instanceof Keyed) {
             element = document.createElement("dl");
             if (model.source != null && model.range != null) {
-                
+                var previous = model.range[0];
+                for (k in model.values) {
+                    var value = model.values[k];
+                    var dt = document.createElement("dt");
+                    dt.textContent = k;
+                    element.appendChild(dt);
+                    element.appendChild(wrap("dd", toDOM(value)));
+                }
             } else {
                 for (k in model.values) {
                     var dt = document.createElement("dt");
