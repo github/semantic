@@ -35,8 +35,9 @@ let whitespaceChars: [Character] = [" ", "\n", "\t", "\r"]
 let whitespace: CharacterParser = String.lift(satisfy({ whitespaceChars.contains($0) })*)
 
 // Quoted strings parser
+// TODO: Improve string parsing
 let stringBody: StringParser = { $0.map({ String($0) }).joinWithSeparator("") } <^>
-		String.lift(noneOf("\n\"")*)
+		String.lift(noneOf("\"")*)
 let quoted = %"\"" *> stringBody <* %"\"" <* whitespace
 
 typealias MembersParser = Parser<String, [(String, CofreeJSON)]>.Function;
