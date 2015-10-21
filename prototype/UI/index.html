@@ -59,7 +59,7 @@
 
     function Term(json, source) {
         this.range = json.extract;
-        this.syntax = syntax(json.unwrap, null, null, function(x) { return new Term(x, source); });
+        this.syntax = syntax(json.unwrap, function(x) { return new Term(x, source); });
         return this;
     }
 
@@ -155,15 +155,15 @@
         return this;
     }
 
-    function syntax(json, a, b, continuation) {
-        if (json instanceof Array) { return new Indexed(json, a, b, continuation); }
-        if (json instanceof Object) { return new Keyed(json, a, b, continuation); }
-        return new Leaf(json, a, b);
+    function syntax(json, continuation) {
+        if (json instanceof Array) { return new Indexed(json, continuation); }
+        if (json instanceof Object) { return new Keyed(json, continuation); }
+        return new Leaf(json);
     }
 
     function Diff(json, a, b) {
         if (json.pure != null) { this.pure = patch(json.pure, a, b); }
-        if (json.roll != null) { this.roll = syntax(json.roll, a, b, function(x, a, b) { return new Diff(x, a, b); }); }
+        if (json.roll != null) { this.roll = syntax(json.roll, function(x) { return new Diff(x, a, b); }); }
         return this;
     }
     </script>
