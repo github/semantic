@@ -75,6 +75,8 @@
     loadJSON('diff.json', function (json) {
         document.getElementById("before").textContent = json.a;
         document.getElementById("after").textContent = json.b;
+
+        syntax(json["diff"]);
     });
     </script>
   </body>
