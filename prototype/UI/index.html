@@ -75,7 +75,7 @@
     function term(term, a, b) {
         if (term.extract == null || term.unwrap == null) { return null; }
 
-        return syntax(term.unwrap, a, b, term);
+        return new Term(term.extract, syntax(term.unwrap, a, b, term));
     }
 
     function patch(patch, a, b) {
