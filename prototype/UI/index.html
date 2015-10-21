@@ -54,6 +54,12 @@
             syntax(array[index]);
         }
     }
+
+    function keyed(object) {
+        for (key in object) {
+            syntax(object[key]);
+        }
+    }
     </script>
   </head>
   <body>
