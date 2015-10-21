@@ -99,7 +99,8 @@
     <div id="diff"></div>
     <script type="text/javascript">
     loadJSON('diff.json', function (json) {
-        document.getElementById("diff").appendChild(toDOM(json));
+        document.getElementById("before").textContent = json.a;
+        document.getElementById("after").textContent = json.b;
     });
     </script>
   </body>
