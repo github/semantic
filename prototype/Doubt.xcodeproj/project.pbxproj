@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D18FF8821BD0404700D18F2D /* Madness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D18FF8811BD0404700D18F2D /* Madness.framework */; };
+		D1A0934E1BD18969005A6326 /* JSONLeaf.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A0934C1BD188F5005A6326 /* JSONLeaf.swift */; settings = {ASSET_TAGS = (); }; };
+		D1A0934F1BD189B4005A6326 /* JSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A0934A1BD188CA005A6326 /* JSONParser.swift */; settings = {ASSET_TAGS = (); }; };
 		D40B89C41BC319070078E098 /* Matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B89C31BC319070078E098 /* Matrix.swift */; settings = {ASSET_TAGS = (); }; };
 		D40B89C81BC439000078E098 /* Assertions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D40B89C71BC439000078E098 /* Assertions.framework */; };
 		D40D72541BCEEB1F001B7A9E /* InterpreterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40D72531BCEEB1F001B7A9E /* InterpreterTests.swift */; settings = {ASSET_TAGS = (); }; };
@@ -62,6 +65,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		D18FF8811BD0404700D18F2D /* Madness.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Madness.framework; path = "../../../../Library/Developer/Xcode/DerivedData/Doubt-gibmbsxjgxflybarnuoisglmgdll/Build/Products/Debug/Madness.framework"; sourceTree = "<group>"; };
+		D1A0934A1BD188CA005A6326 /* JSONParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONParser.swift; sourceTree = "<group>"; };
+		D1A0934C1BD188F5005A6326 /* JSONLeaf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONLeaf.swift; sourceTree = "<group>"; };
 		D40B89C31BC319070078E098 /* Matrix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Matrix.swift; sourceTree = "<group>"; };
 		D40B89C71BC439000078E098 /* Assertions.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Assertions.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D40D72531BCEEB1F001B7A9E /* InterpreterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InterpreterTests.swift; sourceTree = "<group>"; };
@@ -107,6 +113,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D18FF8821BD0404700D18F2D /* Madness.framework in Frameworks */,
 				D42F096B1BCCC41600B95610 /* Either.framework in Frameworks */,
 				D42F096C1BCCC41600B95610 /* Memo.framework in Frameworks */,
 				D42F096D1BCCC41600B95610 /* Prelude.framework in Frameworks */,
@@ -183,6 +190,8 @@
 				D4DF96EC1BC46B630040F41F /* SES.swift */,
 				D435B7521BB31BBC000902F6 /* BoundsCheckedArray.swift */,
 				D42F097F1BCECB7900B95610 /* TermType.swift */,
+				D1A0934A1BD188CA005A6326 /* JSONParser.swift */,
+				D1A0934C1BD188F5005A6326 /* JSONLeaf.swift */,
 				D40D72551BCFF360001B7A9E /* Interpreter.swift */,
 				D4AAE5001B5AE22E004E581F /* Supporting Files */,
 			);
@@ -196,6 +205,7 @@
 				D4DF96F01BC54C970040F41F /* Doubt.modulemap */,
 				D42F09671BCCC41600B95610 /* Either.framework */,
 				D42F09681BCCC41600B95610 /* Memo.framework */,
+				D18FF8811BD0404700D18F2D /* Madness.framework */,
 				D42F09691BCCC41600B95610 /* Prelude.framework */,
 				D42F096A1BCCC41600B95610 /* Stream.framework */,
 			);
@@ -403,6 +413,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4DF970A1BC5DF800040F41F /* main.swift in Sources */,
+				D1A0934E1BD18969005A6326 /* JSONLeaf.swift in Sources */,
+				D1A0934F1BD189B4005A6326 /* JSONParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
