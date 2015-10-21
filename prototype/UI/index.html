@@ -89,10 +89,7 @@
 
         if (patch.delete != null) { return Delete(term(patch.delete)); }
         if (patch.insert != null) { return Insert(term(patch.insert)); }
-        if (patch.replace != null) {
-            if (term.patch.before != null) { term(patch.replace.before, before); }
-            if (term.patch.after != null) { term(patch.replace.after, after); }
-        }
+        if (patch.replace != null) { return Replace(term(patch.replace.before), term(patch.replace.after)); }
     }
 
     function indexed(array, continuation) {
