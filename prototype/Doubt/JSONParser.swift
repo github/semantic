@@ -27,15 +27,6 @@ extension String: CollectionType {
 	}
 }
 
-func not<C: CollectionType, T>(parser: Parser<C, T>.Function)(_ input: C, _ index: C.Index) -> Either<Error<C.Index>, (C.Generator.Element, C.Index)> {
-	if index.distanceTo(input.endIndex) <= 0 || parser(input, index).right != nil {
-		return .Left(Error(reason: "", index: index, children: []))
-	} else {
-		return .Right(input[index], index.successor())
-	}
-}
-
-
 typealias StringParser = Parser<String, String>.Function
 typealias CharacterParser = Parser<String, [Character]>.Function
 
