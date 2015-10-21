@@ -120,9 +120,10 @@
         return new Leaf(json, a, b);
     }
 
-    function diff(json, a, b) {
-        if (json.pure != null) { return patch(json.pure, a, b); }
-        if (json.roll != null) { return syntax(json.roll, a, b, diff); }
+    function Diff(json, a, b) {
+        if (json.pure != null) { this.pure = patch(json.pure, a, b); }
+        if (json.roll != null) { this.roll = syntax(json.roll, a, b, diff); }
+        return this;
     }
     </script>
   </head>
@@ -131,7 +132,7 @@
     <script type="text/javascript">
     loadJSON('diff.json', function (json) {
         console.log(json.diff);
-        var model = diff(json.diff, json.a, json.b);
+        var model = new Diff(json.diff, json.a, json.b);
         var dom = toDOM(model);
         var root = document.getElementById("diff");
         root.appendChild(dom);
