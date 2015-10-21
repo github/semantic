@@ -53,9 +53,9 @@ func members(json: JSONParser) -> MembersParser {
 	let separatedPairs: MembersParser  = (%"," *> whitespace *> pairs <* whitespace)*
 
 	let oneOrMore: MembersParser = curry { [$0] + $1 } <^>
-			pairs
-			<* whitespace
-			<*> separatedPairs
+		pairs
+		<* whitespace
+		<*> separatedPairs
 
 	return oneOrMore <|> pure([])
 }
