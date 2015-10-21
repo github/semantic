@@ -141,9 +141,23 @@
         if (model instanceof Keyed) {
             element = document.createElement("dl");
             if (model.source != null && model.range != null) {
-                var previous = model.range[0];
+                var values = [];
                 for (k in model.values) {
-                    var value = model.values[k];
+                    values.push([ k, model.values[k] ]);
+                }
+                values.sort(function(a, b) {
+                    if (a[1].range[0] < b[1].range[0]) {
+                        return -1;
+                    } else if (a[1].range[0] > b[1].range[0]) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                var previous = model.range[0];
+                for (i in values) {
+                    var k = values[i][0];
+                    var value = values[i][1];
                     var dt = document.createElement("dt");
                     dt.textContent = k;
                     element.appendChild(dt);
