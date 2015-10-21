@@ -78,34 +78,42 @@ func elements(json: JSONParser) -> ValuesParser {
 let json: JSONParser = fix { json in
 	// TODO: Parse backslashed escape characters
 
-	let string: JSONParser = quoted --> { Cofree($1, .Leaf(.String($2))) }
-	let array: JSONParser =  %"[" <* whitespace *> elements(json) <* %"]" <* whitespace --> { Cofree($1, .Indexed($2)) }
+	let string: JSONParser = quoted --> {
+		Cofree($1, .Leaf(.String($2)))
+	} <?> "string"
 
-	let object: JSONParser =
-		%"{"
-			*> whitespace
-			*> members(json)
-			<* whitespace
-			<* %"}"
-			<* whitespace
+	let array: JSONParser =  %"["
+		<* whitespace
+		*> elements(json)
+		<* %"]"
+		<* whitespace --> {
+			Cofree($1, .Indexed($2))
+		} <?> "array"
+
+	let object: JSONParser = %"{"
+		*> whitespace
+		*> members(json)
+		<* whitespace
+		<* %"}"
+		<* whitespace
 		--> { (_, range, values) in
 			Cofree(range, .Keyed(Dictionary(elements: values)))
-		}
+		} <?> "object"
 
 	let doubleParser: DoubleParser = number
 	let numberParser: JSONParser = String.lift(doubleParser --> { _, range, value in
 		let num = JSONLeaf.Number(value)
 		return Cofree(range, .Leaf(num))
-	})
+	}) <?> "number"
 	
 	let null: JSONParser = %"null" --> { (_, range, value) in
 		return Cofree(range, .Leaf(.Null))
-	}
+	} <?> "null"
 	
 	let boolean: JSONParser = %"false" <|> %"true" --> { (_, range, value) in
 		let boolean = value == "true"
 		return Cofree(range, .Leaf(.Boolean(boolean)))
-	}
+	} <?> "boolean"
 
 	// TODO: This should be JSON = dict <|> array and
 	// Value = dict | array | string | number | null | bool
