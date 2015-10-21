@@ -99,6 +99,17 @@
             return element;
         }
 
+        if (model.syntax instanceof Keyed) {
+            var element = document.createElement("dl");
+            for (k in model.syntax) {
+                var dt = document.createElement("dt");
+                dt.textContent = k;
+                element.appendChild(dt);
+                element.appendChild(wrap("dd", toDOM(model.syntax[k])));
+            }
+            return element;
+        }
+
         if (model.syntax instanceof Leaf) {
             var element = document.createElement("span");
             // ?
