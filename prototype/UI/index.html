@@ -90,6 +90,14 @@
             }
             return element;
         }
+
+        if (model.syntax instanceof Indexed) {
+            var element = document.createElement("ul");
+            for (i in model.syntax) {
+                element.appendChild(wrap("li", toDOM(model.syntax[i])));
+            }
+            return element;
+        }
     }
 
     function patch(patch, a, b) {
