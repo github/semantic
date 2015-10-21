@@ -94,7 +94,7 @@
         if (model instanceof Indexed) {
             var element = document.createElement("ul");
             for (i in model.values) {
-                element.appendChild(wrap("li", toDOM(model.syntax[i])));
+                element.appendChild(wrap("li", toDOM(model.values[i])));
             }
             return element;
         }
@@ -105,7 +105,7 @@
                 var dt = document.createElement("dt");
                 dt.textContent = k;
                 element.appendChild(dt);
-                element.appendChild(wrap("dd", toDOM(model.syntax[k])));
+                element.appendChild(wrap("dd", toDOM(model.values[k])));
             }
             return element;
         }
