@@ -77,39 +77,39 @@
         }
     }
 
-    function term(term, element) {
+    function term(term, a, b) {
         if (term.extract == null || term.unwrap == null) { return; }
 
-        return syntax(term.unwrap, function(a) { return term(a, element); });
+        return syntax(term.unwrap, a, b, term);
     }
 
-    function patch(patch) {
-        if (patch.delete != null) { return Delete(term(patch.delete)); }
-        if (patch.insert != null) { return Insert(term(patch.insert)); }
-        if (patch.replace != null) { return Replace(term(patch.replace.before), term(patch.replace.after)); }
+    function patch(patch, a, b) {
+        if (patch.delete != null) { return Delete(term(patch.delete, a, b)); }
+        if (patch.insert != null) { return Insert(term(patch.insert, a, b)); }
+        if (patch.replace != null) { return Replace(term(patch.replace.before, a, b), term(patch.replace.after, a, b)); }
     }
 
-    function indexed(array, continuation) {
+    function indexed(array, a, b, continuation) {
         for (index in array) {
-            continuation(array[index]);
+            continuation(array[index], a, b);
         }
     }
 
-    function keyed(object, continuation) {
+    function keyed(object, a, b, continuation) {
         for (key in object) {
-            continuation(object[key]);
+            continuation(object[key], a, b);
         }
     }
 
-    function syntax(json, continuation) {
-        if (json instanceof Array) { return indexed(json, continuation); }
-        if (json instanceof Object) { return keyed(json, continuation); }
+    function syntax(json, a, b, continuation) {
+        if (json instanceof Array) { return indexed(json, a, b, continuation); }
+        if (json instanceof Object) { return keyed(json, a, b, continuation); }
         // fixme: handle leaves
     }
 
-    function diff(json) {
-        if (json.pure != null) { return patch(json.pure); }
-        if (json.roll != null) { return syntax(json.roll, diff); }
+    function diff(json, a, b) {
+        if (json.pure != null) { return patch(json.pure, a, b); }
+        if (json.roll != null) { return syntax(json.roll, a, b, diff); }
     }
     </script>
   </head>
@@ -123,7 +123,7 @@
         document.getElementById("after").textContent = json.b;
 
         console.log(json.diff);
-        diff(json.diff);
+        diff(json.diff, json.a, json.b);
     });
     </script>
   </body>
