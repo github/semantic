@@ -82,8 +82,12 @@
         if (model instanceof Replace) {
             element = document.createElement("div");
             element.classList.add("replace");
-            element.appendChild(toDOM(model.before));
-            element.appendChild(toDOM(model.after));
+            var before = toDOM(model.before);
+            before.classList.add("delete");
+            element.appendChild(before);
+            var after = toDOM(model.after);
+            after.classList.add("insert");
+            element.appendChild(after);
         }
 
         if (model instanceof Term) {
