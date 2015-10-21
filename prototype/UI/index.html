@@ -41,17 +41,17 @@
         return node;
     }
 
-    function Delete(before) {
+    function Delete(before, a, b) {
         this.before = before;
         return this;
     }
 
-    function Insert(after) {
+    function Insert(after, a, b) {
         this.after = after;
         return this;
     }
 
-    function Replace(before, after) {
+    function Replace(before, after, a, b) {
         this.before = before;
         this.after = after;
         return this;
