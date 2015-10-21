@@ -62,13 +62,13 @@
 
     function indexed(array, continuation) {
         for (index in array) {
-            syntax(array[index]);
+            continuation(array[index]);
         }
     }
 
     function keyed(object, continuation) {
         for (key in object) {
-            syntax(object[key]);
+            continuation(object[key]);
         }
     }
 
