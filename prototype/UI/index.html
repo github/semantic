@@ -88,6 +88,19 @@
 
             return element;
         }
+
+        if (model instanceof Diff) {
+            var element = document.createElement("div");
+            element.classList.add("diff");
+            if (model.pure != null) {
+                element.classList.add("pure");
+                element.appendChild(toDOM(model.pure));
+            } else if(model.roll != null) {
+                element.classList.add("roll");
+                element.appendChild(toDOM(model.roll));
+            }
+            return element;
+        }
     }
 
     function patch(patch, a, b) {
