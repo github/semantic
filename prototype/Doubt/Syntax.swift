@@ -74,7 +74,7 @@ public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F
 // MARK: - JSON
 
 extension Syntax {
-	public func JSON(ifLeaf ifLeaf: A -> Doubt.JSON, ifRecur: Recur -> Doubt.JSON) -> Doubt.JSON {
+	public func JSON(@noescape ifLeaf ifLeaf: A -> Doubt.JSON, @noescape ifRecur: Recur -> Doubt.JSON) -> Doubt.JSON {
 		switch self {
 		case let .Leaf(a):
 			return ifLeaf(a)

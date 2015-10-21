@@ -124,5 +124,21 @@ public protocol CofreeType {
 
 extension Cofree: CofreeType {}
 
+extension CofreeType where Self.Annotation == Range<String.Index> {
+	public func JSON(source: String) -> Doubt.JSON {
+		return unwrap.JSON(
+			ifLeaf: { _ in .String(source[extract]) },
+			ifRecur: {
+				[
+					"range": [
+						"offset": .Number(Double(source.startIndex.distanceTo($0.extract.startIndex))),
+						"length": .Number(Double($0.extract.count)),
+					],
+					"unwrap": $0.JSON(source)
+				]
+		})
+	}
+}
+
 
 import Prelude
