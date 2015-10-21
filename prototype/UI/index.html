@@ -74,11 +74,11 @@
         if (view instanceof Term) {
             var element = document.createElement("div");
             element.classList.add("term");
-            if (view.syntax instanceof Array) {
+            if (view.syntax instanceof Indexed) {
                 for (i in view.syntax) {
                     element.appendChild(toDOM(view.syntax[i]));
                 }
-            } else if (view.syntax instanceof Object) {
+            } else if (view.syntax instanceof Keyed) {
                 for (k in view.syntax) {
                     element.appendChild(toDOM(view.syntax[k]));
                 }
