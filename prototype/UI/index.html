@@ -63,24 +63,24 @@
         return this;
     }
 
-    function toDOM(view) {
-        if (view instanceof Delete) {
+    function toDOM(model) {
+        if (model instanceof Delete) {
             var element = document.createElement("div");
             element.classList.add("delete");
-            element.appendChild(toDOM(view.before));
+            element.appendChild(toDOM(model.before));
             return element;
         }
 
-        if (view instanceof Term) {
+        if (model instanceof Term) {
             var element = document.createElement("div");
             element.classList.add("term");
-            if (view.syntax instanceof Indexed) {
-                for (i in view.syntax) {
-                    element.appendChild(toDOM(view.syntax[i]));
+            if (model.syntax instanceof Indexed) {
+                for (i in model.syntax) {
+                    element.appendChild(toDOM(model.syntax[i]));
                 }
-            } else if (view.syntax instanceof Keyed) {
-                for (k in view.syntax) {
-                    element.appendChild(toDOM(view.syntax[k]));
+            } else if (model.syntax instanceof Keyed) {
+                for (k in model.syntax) {
+                    element.appendChild(toDOM(model.syntax[k]));
                 }
             }
 
