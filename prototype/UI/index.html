@@ -42,24 +42,24 @@
     }
 
     function Delete(before, a, b) {
-        this.before = before;
+        this.before = new Term(before, a);
         return this;
     }
 
     function Insert(after, a, b) {
-        this.after = after;
+        this.after = new Term(after, b);
         return this;
     }
 
     function Replace(before, after, a, b) {
-        this.before = before;
-        this.after = after;
+        this.before = new Term(before, a);
+        this.after = new Term(after, b);
         return this;
     }
 
-    function Term(json, a, b) {
+    function Term(json, source) {
         this.range = json.extract;
-        this.syntax = syntax(json.unwrap, a, b, function(x, a, b) { return new Term(x, a, b); });
+        this.syntax = syntax(json.unwrap, null, null, function(x) { return new Term(x, source); });
         return this;
     }
 
@@ -129,9 +129,9 @@
     }
 
     function patch(patch, a, b) {
-        if (patch.delete != null) { return new Delete(new Term(patch.delete, a, b)); }
-        if (patch.insert != null) { return new Insert(new Term(patch.insert, a, b)); }
-        if (patch.replace != null) { return new Replace(new Term(patch.replace.before, a, b), new Term(patch.replace.after, a, b)); }
+        if (patch.delete != null) { return new Delete(patch.delete, a, b); }
+        if (patch.insert != null) { return new Insert(patch.insert, a, b); }
+        if (patch.replace != null) { return new Replace(patch.replace.before, patch.replace.after, a, b); }
     }
 
     function Indexed(array, a, b, continuation) {
