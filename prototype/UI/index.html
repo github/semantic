@@ -91,6 +91,7 @@
         document.getElementById("before").textContent = json.a;
         document.getElementById("after").textContent = json.b;
 
+        console.log(json["diff"]);
         syntax(json["diff"]);
     });
     </script>
