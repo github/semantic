@@ -56,6 +56,7 @@
     }
 
     function Term(json, source) {
+        this.source = source;
         this.range = json.extract;
         this.syntax = syntax(json.unwrap, function(x) { return new Term(x, source); });
         this.syntax.source = source;
