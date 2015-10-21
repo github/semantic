@@ -59,7 +59,7 @@
         this.range = json.extract;
         this.syntax = syntax(json.unwrap, function(x) { return new Term(x, source); });
         if (this.syntax instanceof Leaf) {
-            this.syntax.textContent = source.substr(this.range[0], this.range[1]);
+            this.textContent = source.substr(this.range[0], this.range[1]);
         }
         return this;
     }
@@ -127,9 +127,6 @@
 
         if (model instanceof Leaf) {
             element = document.createElement("span");
-            if (model.textContent != null) {
-                element.textContent = model.textContent;
-            }
             // ?
         }
 
