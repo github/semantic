@@ -128,7 +128,7 @@
         if (model instanceof Leaf) {
             element = document.createElement("span");
             if (model.source != null && model.range != null) {
-                element.textContent = model.source.substr(this.range[0], this.range[1]);
+                element.textContent = model.source.substr(model.range[0], model.range[1]);
             }
             // ?
         }
