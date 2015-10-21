@@ -53,6 +53,22 @@
         return node;
     }
 
+    function Delete(before) {
+        this.before = before;
+        return this;
+    }
+
+    function Insert(after) {
+        this.after = after;
+        return this;
+    }
+
+    function Replace(before, after) {
+        this.before = before;
+        this.after = after;
+        return this;
+    }
+
     function term(term, element) {
         if (term.extract == null || term.unwrap == null) { return; }
 
