@@ -101,7 +101,7 @@
     function syntax(json, a, b, continuation) {
         if (json instanceof Array) { return indexed(json, a, b, continuation); }
         if (json instanceof Object) { return keyed(json, a, b, continuation); }
-        // fixme: handle leaves
+        return continuation(json, a, b);
     }
 
     function diff(json, a, b) {
