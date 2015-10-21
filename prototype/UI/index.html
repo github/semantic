@@ -74,18 +74,7 @@
         if (model instanceof Term) {
             var element = document.createElement("div");
             element.classList.add("term");
-            if (model.syntax instanceof Indexed) {
-                for (i in model.syntax) {
-                    element.appendChild(toDOM(model.syntax[i]));
-                }
-            } else if (model.syntax instanceof Keyed) {
-                for (k in model.syntax) {
-                    element.appendChild(toDOM(model.syntax[k]));
-                }
-            } else if (model.syntax instanceof Leaf) {
-                // ?
-            }
-
+            element.appendChild(toDOM(model.syntax));
             return element;
         }
 
