@@ -53,6 +53,12 @@
         return node;
     }
 
+    function patch(patch) {
+        if (patch["delete"] != null) {}
+        if (patch["insert"] != null) {}
+        if (patch["replace"] != null) {}
+    }
+
     function indexed(array) {
         for (index in array) {
             syntax(array[index]);
