@@ -59,21 +59,21 @@
         if (patch["replace"] != null) {}
     }
 
-    function indexed(array) {
+    function indexed(array, continuation) {
         for (index in array) {
             syntax(array[index]);
         }
     }
 
-    function keyed(object) {
+    function keyed(object, continuation) {
         for (key in object) {
             syntax(object[key]);
         }
     }
 
-    function syntax(json) {
-        if (json instanceof Array) { return indexed(json); }
-        if (json instanceof Object) { return keyed(json); }
+    function syntax(json, continuation) {
+        if (json instanceof Array) { return indexed(json, continuation); }
+        if (json instanceof Object) { return keyed(json, continuation); }
         // fixme: handle leaves
     }
 
