@@ -80,7 +80,7 @@
 
     function diff(json) {
         if (json["pure"] != null) { return patch(json["pure"]); }
-        if (json["roll"] != null) { return syntax(json["roll"]); }
+        if (json["roll"] != null) { return syntax(json["roll"], diff); }
     }
     </script>
   </head>
