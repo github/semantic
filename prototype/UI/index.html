@@ -75,6 +75,11 @@
         if (json instanceof Array) { return indexed(json); }
         if (json instanceof Object) { return keyed(json); }
     }
+
+    function diff(json) {
+        if (json["pure"] != null) { return patch(json["pure"]); }
+        if (json["roll"] != null) { return syntax(json["roll"]); }
+    }
     </script>
   </head>
   <body>
