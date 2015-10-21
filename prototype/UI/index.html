@@ -131,7 +131,10 @@
     <script type="text/javascript">
     loadJSON('diff.json', function (json) {
         console.log(json.diff);
-        document.getElementById("diff").appendChild(toDOM(diff(json.diff, json.a, json.b)));
+        var model = diff(json.diff, json.a, json.b);
+        var dom = toDOM(model);
+        var root = document.getElementById("diff");
+        root.appendChild(dom);
     });
     </script>
   </body>
