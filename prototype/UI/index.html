@@ -82,6 +82,8 @@
                 for (k in model.syntax) {
                     element.appendChild(toDOM(model.syntax[k]));
                 }
+            } else if (model.syntax instanceof Leaf) {
+                // ?
             }
 
             return element;
