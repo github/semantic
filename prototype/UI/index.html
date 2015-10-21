@@ -74,7 +74,12 @@
         if (view instanceof Term) {
             var element = document.createElement("div");
             element.classList.add("term");
-            element.appendChild(toDOM(view.syntax));
+            if (view.syntax instanceof Array) {
+                for (i in view.syntax) {
+                    element.appendChild(toDOM(view.syntax[i]));
+                }
+            }
+
             return element;
         }
     }
