@@ -93,9 +93,11 @@
     }
 
     function keyed(object, a, b, continuation) {
+        var out = {};
         for (key in object) {
-            continuation(object[key], a, b);
+            out[key] = continuation(object[key], a, b);
         }
+        return out;
     }
 
     function syntax(json, a, b, continuation) {
