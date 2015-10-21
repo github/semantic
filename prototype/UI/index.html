@@ -57,6 +57,12 @@
         return this;
     }
 
+    function Term(range, syntax) {
+        this.range = range;
+        this.syntax = syntax;
+        return this;
+    }
+
     function toDOM(view) {
         if (view instanceof Delete) {
             var element = document.createElement("div");
