@@ -100,25 +100,25 @@
         if (patch.replace != null) { return new Replace(term(patch.replace.before, a, b), term(patch.replace.after, a, b)); }
     }
 
-    function indexed(array, a, b, continuation) {
-        var out = [];
+    function Indexed(array, a, b, continuation) {
+        this.values = [];
         for (index in array) {
-            out.push(continuation(array[index], a, b));
+            this.values.push(continuation(array[index], a, b));
         }
-        return out;
+        return this;
     }
 
-    function keyed(object, a, b, continuation) {
-        var out = {};
+    function Keyed(object, a, b, continuation) {
+        this.values = {};
         for (key in object) {
-            out[key] = continuation(object[key], a, b);
+            this.values[key] = continuation(object[key], a, b);
         }
-        return out;
+        return this;
     }
 
     function syntax(json, a, b, continuation) {
-        if (json instanceof Array) { return indexed(json, a, b, continuation); }
-        if (json instanceof Object) { return keyed(json, a, b, continuation); }
+        if (json instanceof Array) { return new Indexed(json, a, b, continuation); }
+        if (json instanceof Object) { return new Keyed(json, a, b, continuation); }
         return continuation(json, a, b);
     }
 
