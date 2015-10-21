@@ -175,7 +175,6 @@
     <div id="diff"></div>
     <script type="text/javascript">
     loadJSON('diff.json', function (json) {
-        console.log(json.diff);
         var model = new Diff(json.diff, json.a, json.b);
         var dom = toDOM(model);
         var root = document.getElementById("diff");
