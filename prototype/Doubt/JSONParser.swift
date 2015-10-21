@@ -67,12 +67,7 @@ typealias ValuesParser = Parser<String, [CofreeJSON]>.Function;
 func elements(json: JSONParser) -> ValuesParser {
 	let value: Parser<String, CofreeJSON>.Function = whitespace *> json <* whitespace
 
-	let separatedValues: ValuesParser = (%"," *> value)*
-
-	let oneOrMore: ValuesParser = curry { [$0] + $1 } <^>
-		value
-		<*> separatedValues
-	return oneOrMore <|> pure([])
+	return sepBy(value, %",")
 }
 
 let json: JSONParser = fix { json in
