@@ -78,6 +78,14 @@
             return element;
         }
 
+        if (model instanceof Replace) {
+            var element = document.createElement("div");
+            element.classList.add("replace");
+            element.appendChild(toDOM(model.before));
+            element.appendChild(toDOM(model.after));
+            return element;
+        }
+
         if (model instanceof Term) {
             var element = document.createElement("div");
             element.classList.add("term");
