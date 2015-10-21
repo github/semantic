@@ -98,6 +98,12 @@
             }
             return element;
         }
+
+        if (model.syntax instanceof Leaf) {
+            var element = document.createElement("span");
+            // ?
+            return element;
+        }
     }
 
     function patch(patch, a, b) {
