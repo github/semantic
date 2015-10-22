@@ -124,6 +124,20 @@ extension CofreeType {
 	public static func coiterate(unfold: Annotation -> Syntax<Annotation, Leaf>)(_ seed: Annotation) -> Self {
 		return (Wrap(seed) <<< { $0.map(coiterate(unfold)) } <<< unfold) <| seed
 	}
+
+	public static func zip(a: Self, _ b: Self) -> Cofree<Leaf, (Annotation, Annotation)>? {
+		let annotations = (a.extract, b.extract)
+		switch (a.unwrap, b.unwrap) {
+		case let (.Leaf, .Leaf(b)):
+			return Cofree(annotations, .Leaf(b))
+		case let (.Indexed(a), .Indexed(b)):
+			return Cofree(annotations, .Indexed(Swift.zip(a, b).flatMap(zip)))
+		case let (.Keyed(a), .Keyed(b)):
+			return Cofree(annotations, .Keyed(Dictionary(elements: b.keys.flatMap { key in zip(a[key]!, b[key]!).map { (key, $0) } })))
+		default:
+			return nil
+		}
+	}
 }
 
 extension Cofree: CofreeType {}
