@@ -13,8 +13,8 @@ public enum Free<Leaf, Value>: CustomDebugStringConvertible, SyntaxConvertible {
 	indirect case Roll(Syntax<Free, Leaf>)
 
 
-	/// Recursively copies a `Term: TermType where Term.LeafType == Leaf` into a `Free<Leaf, Value>`, essentially mapping `Term.unwrap` onto `Free.Roll`.
-	public init<Term: TermType where Term.LeafType == Leaf>(_ term: Term) {
+	/// Recursively copies a `Term: TermType where Term.Leaf == Leaf` into a `Free<Leaf, Value>`, essentially mapping `Term.unwrap` onto `Free.Roll`.
+	public init<Term: TermType where Term.Leaf == Leaf>(_ term: Term) {
 		self = .Roll(term.unwrap.map(Free.init))
 	}
 
@@ -188,7 +188,7 @@ public func == <Leaf: Equatable, Value: Equatable> (left: Free<Leaf, Value>, rig
 	return Free.equals(ifPure: ==, ifRoll: ==)(left, right)
 }
 
-public func == <Term: TermType where Term.LeafType: Equatable> (left: Free<Term.LeafType, Patch<Term>>, right: Free<Term.LeafType, Patch<Term>>) -> Bool {
+public func == <Term: TermType where Term.Leaf: Equatable> (left: Free<Term.Leaf, Patch<Term>>, right: Free<Term.Leaf, Patch<Term>>) -> Bool {
 	return Free.equals(ifPure: Patch.equals(Term.equals(==)), ifRoll: ==)(left, right)
 }
 

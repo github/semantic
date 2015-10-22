@@ -1,7 +1,7 @@
 /// An interpreter of `Algorithm`s.
 public struct Interpreter<Term: TermType> {
 	/// The type of diffs constructed by `Interpreter`s.
-	public typealias Diff = Free<Term.LeafType, Patch<Term>>
+	public typealias Diff = Free<Term.Leaf, Patch<Term>>
 
 	/// Constructs an `Interpreter` parameterized by the `equal` and `comparable` tests on `Term`s, and the `cost` function for `Diff`s.
 	///
@@ -92,7 +92,7 @@ public struct Interpreter<Term: TermType> {
 
 // MARK: - Constrained constructors
 
-extension Interpreter where Term.LeafType: Equatable {
+extension Interpreter where Term.Leaf: Equatable {
 	public init(comparable: (Term, Term) -> Bool, cost: Diff -> Int) {
 		self.init(equal: Term.equals(==), comparable: comparable, cost: cost)
 	}
