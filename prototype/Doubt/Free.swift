@@ -165,12 +165,12 @@ extension Free where Value: PatchType {
 // MARK: - Equality
 
 extension Free {
-	public static func equals(ifPure ifPure: (Value, Value) -> Bool, ifRoll: (Leaf, Leaf) -> Bool)(_ left: Free, _ right: Free) -> Bool {
+	public static func equals(pure pure: (Value, Value) -> Bool, leaf: (Leaf, Leaf) -> Bool)(_ left: Free, _ right: Free) -> Bool {
 		switch (left, right) {
 		case let (.Pure(a), .Pure(b)):
-			return ifPure(a, b)
+			return pure(a, b)
 		case let (.Roll(a), .Roll(b)):
-			return Syntax.equals(ifLeaf: ifRoll, ifRecur: equals(ifPure: ifPure, ifRoll: ifRoll))(a, b)
+			return Syntax.equals(ifLeaf: leaf, ifRecur: equals(pure: pure, leaf: leaf))(a, b)
 		default:
 			return false
 		}
@@ -178,11 +178,11 @@ extension Free {
 }
 
 public func == <Leaf: Equatable, Value: Equatable, Annotation: Equatable> (left: Free<Leaf, Annotation, Value>, right: Free<Leaf, Annotation, Value>) -> Bool {
-	return Free.equals(ifPure: ==, ifRoll: ==)(left, right)
+	return Free.equals(pure: ==, leaf: ==)(left, right)
 }
 
 public func == <Term: CofreeType where Term.Leaf: Equatable> (left: Free<Term.Leaf, Term.Annotation, Patch<Term>>, right: Free<Term.Leaf, Term.Annotation, Patch<Term>>) -> Bool {
-	return Free.equals(ifPure: Patch.equals(Term.equals(==)), ifRoll: ==)(left, right)
+	return Free.equals(pure: Patch.equals(Term.equals(==)), leaf: ==)(left, right)
 }
 
 
