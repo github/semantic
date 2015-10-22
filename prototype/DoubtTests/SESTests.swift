@@ -43,6 +43,10 @@ final class SESTests: XCTestCase {
 private typealias Term = Cofree<String, ()>
 private typealias Diff = Free<String, (), Patch<Term>>
 
+private func copy(term: Term) -> Diff {
+	return hylo(Diff.Introduce(()), Term.unwrap)(term)
+}
+
 private let a = Term((), .Leaf("a"))
 private let b = Term((), .Leaf("b"))
 private let c = Term((), .Leaf("c"))
