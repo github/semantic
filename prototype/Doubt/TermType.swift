@@ -40,9 +40,6 @@ extension TermType {
 }
 
 
-extension Cofree: TermType {}
-
-
 // MARK: - Equality
 
 extension TermType {
