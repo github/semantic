@@ -116,6 +116,10 @@ extension CofreeType {
 		return Self(annotation, syntax)
 	}
 
+	public static func eliminate(term: Self) -> (Annotation, Syntax<Self, Leaf>) {
+		return (term.extract, term.unwrap)
+	}
+
 	/// Constructs a cofree by coiteration.
 	///
 	/// This is an _anamorphism_ (from the Greek “ana,” “upwards”; compare “anabolism”), a generalization of unfolds over regular trees (and datatypes isomorphic to them). The initial seed is used as the annotation of the returned value. The continuation of the structure is unpacked by applying `annotate` to the seed and mapping the resulting syntax’s values recursively. In this manner, the structure is unfolded bottom-up, starting with `seed` and ending at the leaves.
