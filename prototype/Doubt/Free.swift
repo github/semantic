@@ -193,7 +193,7 @@ extension Free {
 		return analysis(
 			ifPure: pure,
 			ifRoll: {
-				$0.JSON(ifLeaf: leaf, ifRecur: { $0.JSON(pure: pure, leaf: leaf) })
+				$0.JSON(leaf: leaf, recur: { $0.JSON(pure: pure, leaf: leaf) })
 			})
 	}
 }

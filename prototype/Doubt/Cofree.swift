@@ -91,7 +91,7 @@ extension Cofree {
 	public func JSON(annotation annotation: Annotation -> Doubt.JSON, leaf: Leaf -> Doubt.JSON) -> Doubt.JSON {
 		return [
 			"extract": annotation(extract),
-			"unwrap": unwrap.JSON(ifLeaf: leaf, ifRecur: { $0.JSON(annotation: annotation, leaf: leaf) })
+			"unwrap": unwrap.JSON(leaf: leaf, recur: { $0.JSON(annotation: annotation, leaf: leaf) })
 		]
 	}
 }
@@ -125,8 +125,8 @@ extension Cofree: CofreeType {}
 extension CofreeType where Self.Annotation == Range<String.Index> {
 	public func JSON(source: String) -> Doubt.JSON {
 		return unwrap.JSON(
-			ifLeaf: { _ in .String(source[extract]) },
-			ifRecur: {
+			leaf: { _ in .String(source[extract]) },
+			recur: {
 				[
 					"range": [
 						"offset": .Number(Double(source.startIndex.distanceTo($0.extract.startIndex))),

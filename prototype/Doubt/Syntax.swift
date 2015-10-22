@@ -74,14 +74,14 @@ public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F
 // MARK: - JSON
 
 extension Syntax {
-	public func JSON(@noescape ifLeaf ifLeaf: A -> Doubt.JSON, @noescape ifRecur: Recur -> Doubt.JSON) -> Doubt.JSON {
+	public func JSON(@noescape leaf leaf: A -> Doubt.JSON, @noescape recur: Recur -> Doubt.JSON) -> Doubt.JSON {
 		switch self {
 		case let .Leaf(a):
-			return ifLeaf(a)
+			return leaf(a)
 		case let .Indexed(a):
-			return .Array(a.map(ifRecur))
+			return .Array(a.map(recur))
 		case let .Keyed(d):
-			return .Dictionary(Dictionary(elements: d.map { ($0, ifRecur($1)) }))
+			return .Dictionary(Dictionary(elements: d.map { ($0, recur($1)) }))
 		}
 	}
 }
