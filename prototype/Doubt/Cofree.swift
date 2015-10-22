@@ -125,6 +125,9 @@ extension CofreeType {
 		return (Wrap(seed) <<< { $0.map(coiterate(unfold)) } <<< unfold) <| seed
 	}
 
+	/// `Zip` two `CofreeType` values into a single `Cofree`, pairing their annotations.
+	///
+	/// This is partial, returning `nil` for any pair of values which are not of the same “shape,” i.e. where they wrap `Syntax` values of different constructors. The values of leaves are always taken from the second parameter.
 	public static func zip(a: Self, _ b: Self) -> Cofree<Leaf, (Annotation, Annotation)>? {
 		let annotations = (a.extract, b.extract)
 		switch (a.unwrap, b.unwrap) {
