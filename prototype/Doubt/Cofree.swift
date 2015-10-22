@@ -25,7 +25,7 @@ public enum Cofree<Leaf, Annotation> {
 	///
 	/// As this is the dual of `Free.iterate`, it’s unsurprising that we have a similar guarantee: coiteration is linear in the size of the constructed tree.
 	public static func coiterate(annotate: Annotation -> Syntax<Annotation, Leaf>)(_ seed: Annotation) -> Cofree {
-		return .Unroll(seed, annotate(seed).map(coiterate(annotate)))
+		return (curry(Unroll)(seed) <<< { $0.map(coiterate(annotate)) } <<< annotate) <| seed
 	}
 }
 
