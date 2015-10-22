@@ -121,6 +121,12 @@ public protocol CofreeType: TermType {
 	var extract: Annotation { get }
 }
 
+extension CofreeType {
+	public static func Wrap(annotation: Annotation)(syntax: Syntax<Self, Leaf>) -> Self {
+		return Self(annotation, syntax)
+	}
+}
+
 extension Cofree: CofreeType {}
 
 extension CofreeType where Self.Annotation == Range<String.Index> {
