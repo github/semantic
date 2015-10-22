@@ -18,6 +18,9 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible {
 		}
 	}
 
+
+	// MARK: CustomDebugStringConvertible
+
 	public var debugDescription: String {
 		switch self {
 		case let .Leaf(n):
