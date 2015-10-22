@@ -7,6 +7,10 @@ public protocol TermType {
 
 
 extension TermType {
+	public static func unwrap(term: Self) -> Syntax<Self, LeafType> {
+		return term.unwrap
+	}
+
 	/// Catamorphism over `TermType`s.
 	///
 	/// Folds the tree encoded by the receiver into a single value by recurring top-down through the tree, applying `transform` to leaves, then to branches, and so forth.
