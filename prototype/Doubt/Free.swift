@@ -105,13 +105,6 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 			return ".Roll(\(String(reflecting: s)))"
 		}
 	}
-
-
-	// MARK: SyntaxConvertible
-
-	public init(syntax: Syntax<Free, Leaf>) {
-		self = .Roll(syntax)
-	}
 }
 
 
