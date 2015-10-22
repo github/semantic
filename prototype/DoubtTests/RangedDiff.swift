@@ -1,5 +1,5 @@
 struct RangedDiff {
-	typealias Diff = Free<String, RangedTerm.Term.Annotation, Patch<RangedTerm.Term>>
+	typealias Diff = Free<String, (RangedTerm.Term.Annotation, RangedTerm.Term.Annotation), Patch<RangedTerm.Term>>
 
 	let a: RangedTerm
 	let b: RangedTerm

@@ -1,7 +1,7 @@
 /// An interpreter of `Algorithm`s.
 public struct Interpreter<Term: CofreeType> {
 	/// The type of diffs constructed by `Interpreter`s.
-	public typealias Diff = Free<Term.Leaf, Term.Annotation, Patch<Term>>
+	public typealias Diff = Free<Term.Leaf, (Term.Annotation, Term.Annotation), Patch<Term>>
 
 	/// Constructs an `Interpreter` parameterized by the `equal` and `comparable` tests on `Term`s, and the `cost` function for `Diff`s.
 	///

@@ -4,7 +4,7 @@ final class DiffTests: XCTestCase {
 	}
 
 	typealias Term = RangedTerm.Term
-	typealias Diff = Free<String, Term.Annotation, Patch<Term>>
+	typealias Diff = Free<String, (Term.Annotation, Term.Annotation), Patch<Term>>
 
 	let interpreter = Interpreter<Term>(equal: ==, comparable: const(true), cost: Diff.sum(const(1)))
 

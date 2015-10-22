@@ -8,7 +8,7 @@ public enum Algorithm<Term: CofreeType, Result> {
 	public typealias Patch = Doubt.Patch<Term>
 
 	/// The type of `Diff`s which `Algorithm`s produce.
-	public typealias Diff = Free<Term.Leaf, Term.Annotation, Patch>
+	public typealias Diff = Free<Term.Leaf, (Term.Annotation, Term.Annotation), Patch>
 
 	/// The injection of a value of type `Result` into an `Operation`.
 	///
