@@ -1,5 +1,5 @@
 /// An interpreter of `Algorithm`s.
-public struct Interpreter<Term: TermType> {
+public struct Interpreter<Term: CofreeType> {
 	/// The type of diffs constructed by `Interpreter`s.
 	public typealias Diff = Free<Term.Leaf, Patch<Term>>
 
