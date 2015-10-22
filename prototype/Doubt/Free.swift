@@ -120,6 +120,13 @@ extension Free {
 }
 
 
+// MARK: - Hylomorphism
+
+public func hylo<A, B, Leaf>(down: Syntax<B, Leaf> -> B, _ up: A -> Syntax<A, Leaf>) -> A -> B {
+	return up >>> { $0.map(hylo(down, up)) } >>> down
+}
+
+
 extension Free where Value: PatchType, Value.Element == Cofree<Leaf, ()> {
 	public typealias Term = Value.Element
 
