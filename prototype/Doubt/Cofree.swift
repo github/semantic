@@ -112,7 +112,7 @@ public protocol CofreeType: TermType {
 }
 
 extension CofreeType {
-	public static func Wrap(annotation: Annotation)(syntax: Syntax<Self, Leaf>) -> Self {
+	public static func Introduce(annotation: Annotation)(syntax: Syntax<Self, Leaf>) -> Self {
 		return Self(annotation, syntax)
 	}
 
@@ -122,7 +122,7 @@ extension CofreeType {
 	///
 	/// As this is the dual of `Free.iterate`, it’s unsurprising that we have a similar guarantee: coiteration is linear in the size of the constructed tree.
 	public static func coiterate(unfold: Annotation -> Syntax<Annotation, Leaf>)(_ seed: Annotation) -> Self {
-		return (Wrap(seed) <<< { $0.map(coiterate(unfold)) } <<< unfold) <| seed
+		return (Introduce(seed) <<< { $0.map(coiterate(unfold)) } <<< unfold) <| seed
 	}
 
 	/// `Zip` two `CofreeType` values into a single `Cofree`, pairing their annotations.
