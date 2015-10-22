@@ -10,16 +10,10 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	case Pure(Value)
 
 	/// A recursive instantiation of `Syntax`, unrolling another iteration of the recursive type.
-	indirect case Roll(Syntax<Free, Leaf>)
+	indirect case Roll(Annotation, Syntax<Free, Leaf>)
 
 
-	/// Recursively copies a `Term: TermType where Term.Leaf == Leaf, Term.Annotation == Annotation` into a `Free<Leaf, Annotation, Value>`, essentially mapping `Term.unwrap` onto `Free.Roll`.
-	public init<Term: CofreeType where Term.Leaf == Leaf>(_ term: Term) {
-		self = .Roll(term.unwrap.map(Free.init))
-	}
-
-
-	public func analysis<C>(@noescape ifPure ifPure: Value -> C, @noescape ifRoll: Syntax<Free, Leaf> -> C) -> C {
+	public func analysis<C>(@noescape ifPure ifPure: Value -> C, @noescape ifRoll: (Annotation, Syntax<Free, Leaf>) -> C) -> C {
 		switch self {
 		case let .Pure(b):
 			return ifPure(b)
@@ -57,7 +51,7 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	public func iterate(transform: Syntax<Value, Leaf> -> Value) -> Value {
 		return analysis(
 			ifPure: id,
-			ifRoll: { $0.map { $0.iterate(transform) } } >>> transform)
+			ifRoll: { $1.map { $0.iterate(transform) } } >>> transform)
 	}
 
 
@@ -84,14 +78,14 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	// MARK: Functor
 
 	public func map<C>(@noescape transform: Value -> C) -> Free<Leaf, Annotation, C> {
-		return analysis(ifPure: { .Pure(transform($0)) }, ifRoll: { .Roll($0.map { $0.map(transform) }) })
+		return analysis(ifPure: { .Pure(transform($0)) }, ifRoll: { .Roll($0, $1.map { $0.map(transform) }) })
 	}
 
 
 	// MARK: Monad
 
 	public func flatMap<C>(@noescape transform: Value -> Free<Leaf, Annotation, C>) -> Free<Leaf, Annotation, C> {
-		return analysis(ifPure: transform, ifRoll: { .Roll($0.map { $0.flatMap(transform) }) })
+		return analysis(ifPure: transform, ifRoll: { .Roll($0, $1.map { $0.flatMap(transform) }) })
 	}
 
 
@@ -111,11 +105,15 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 // MARK: - Anamorphism
 
 extension Free {
+	public static func Introduce(annotation: Annotation)(syntax: Syntax<Free, Leaf>) -> Free {
+		return Roll(annotation, syntax)
+	}
+
 	/// Anamorphism over `Free`.
 	///
 	/// Unfolds a tree bottom-up by recursively applying `transform` to a series of values starting with `seed`. Since `Syntax.Leaf` does not recur, this will halt when it has produced leaves for every branch.
-	public static func ana<Seed>(unfold: Seed -> Syntax<Seed, Leaf>)(_ seed: Seed) -> Free {
-		return (Roll <<< { $0.map(ana(unfold)) } <<< unfold) <| seed
+	public static func coiterate(unfold: Annotation -> Syntax<Annotation, Leaf>)(_ seed: Annotation) -> Free {
+		return (Introduce(seed) <<< { $0.map(coiterate(unfold)) } <<< unfold) <| seed
 	}
 }
 
@@ -177,35 +175,42 @@ extension Free where Value: PatchType {
 // MARK: - Equality
 
 extension Free {
-	public static func equals(pure pure: (Value, Value) -> Bool, leaf: (Leaf, Leaf) -> Bool)(_ left: Free, _ right: Free) -> Bool {
+	public static func equals(pure pure: (Value, Value) -> Bool, leaf: (Leaf, Leaf) -> Bool, annotation: (Annotation, Annotation) -> Bool)(_ left: Free, _ right: Free) -> Bool {
 		switch (left, right) {
 		case let (.Pure(a), .Pure(b)):
 			return pure(a, b)
-		case let (.Roll(a), .Roll(b)):
-			return Syntax.equals(leaf: leaf, recur: equals(pure: pure, leaf: leaf))(a, b)
+		case let (.Roll(annotation1, syntax1), .Roll(annotation2, syntax2)):
+			return annotation(annotation1, annotation2) && Syntax.equals(leaf: leaf, recur: equals(pure: pure, leaf: leaf, annotation: annotation))(syntax1, syntax2)
 		default:
 			return false
 		}
 	}
 }
 
-public func == <Leaf: Equatable, Value: Equatable, Annotation> (left: Free<Leaf, Annotation, Value>, right: Free<Leaf, Annotation, Value>) -> Bool {
-	return Free.equals(pure: ==, leaf: ==)(left, right)
+public func == <Leaf: Equatable, Value: Equatable, Annotation: Equatable> (left: Free<Leaf, Annotation, Value>, right: Free<Leaf, Annotation, Value>) -> Bool {
+	return Free.equals(pure: ==, leaf: ==, annotation: ==)(left, right)
+}
+
+public func == <Term: CofreeType, Annotation: Equatable where Term.Leaf: Equatable> (left: Free<Term.Leaf, Annotation, Patch<Term>>, right: Free<Term.Leaf, Annotation, Patch<Term>>) -> Bool {
+	return Free.equals(pure: Patch.equals(Term.equals(==)), leaf: ==, annotation: ==)(left, right)
 }
 
 public func == <Term: CofreeType, Annotation where Term.Leaf: Equatable> (left: Free<Term.Leaf, Annotation, Patch<Term>>, right: Free<Term.Leaf, Annotation, Patch<Term>>) -> Bool {
-	return Free.equals(pure: Patch.equals(Term.equals(==)), leaf: ==)(left, right)
+	return Free.equals(pure: Patch.equals(Term.equals(==)), leaf: ==, annotation: const(true))(left, right)
 }
 
 
 // MARK: - JSON
 
 extension Free {
-	public func JSON(pure pure: Value -> Doubt.JSON, leaf: Leaf -> Doubt.JSON) -> Doubt.JSON {
+	public func JSON(pure pure: Value -> Doubt.JSON, leaf: Leaf -> Doubt.JSON, annotation: Annotation -> Doubt.JSON) -> Doubt.JSON {
 		return analysis(
 			ifPure: pure,
 			ifRoll: {
-				$0.JSON(leaf: leaf, recur: { $0.JSON(pure: pure, leaf: leaf) })
+				[
+					"extract": annotation($0),
+					"unwrap": $1.JSON(leaf: leaf, recur: { $0.JSON(pure: pure, leaf: leaf, annotation: annotation) })
+				]
 			})
 	}
 }

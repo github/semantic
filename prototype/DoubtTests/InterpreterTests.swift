@@ -1,7 +1,9 @@
 final class InterpreterTests: XCTestCase {
 	func testRestrictsComparisons() {
 		let comparable: (Term, Term) -> Bool = { $0.extract == 0 && $1.extract == 0 }
-		assert(Interpreter(equal: ==, comparable: comparable, cost: const(1)).run(a, b), ==, restricted)
+		let i = Interpreter(equal: ==, comparable: comparable, cost: const(1))
+		let d = i.run(a, b)
+		assert(d, ==, restricted)
 	}
 
 	func testComparisonsOfDisjointlyCategorizedTermsAreRestricted() {
@@ -26,17 +28,17 @@ private typealias Diff = Free<String, (Int, Int), Patch<Term>>
 private let a = Term(0, [ Term(1, .Leaf("a")), Term(2, .Leaf("b")), Term(3, .Leaf("c")) ])
 private let b = Term(0, [ Term(1, .Leaf("c")), Term(2, .Leaf("b")), Term(3, .Leaf("a")) ])
 
-private let restricted = Diff.Roll([
+private let restricted = Diff.Roll((0, 0), [
 	.Pure(.Insert(Term(1, .Leaf("c")))),
 	.Pure(.Delete(Term(1, .Leaf("a")))),
-	Diff(Term(2, .Leaf("b"))),
+	.Roll((2, 2), .Leaf("b")),
 	.Pure(.Insert(Term(3, .Leaf("a")))),
 	.Pure(.Delete(Term(3, .Leaf("c")))),
 ])
 
-private let unrestricted = Diff.Roll([
+private let unrestricted = Diff.Roll((0, 0), [
 	.Pure(.Replace(Term(1, .Leaf("a")), Term(1, .Leaf("c")))),
-	Diff(Term(2, .Leaf("b"))),
+	.Roll((2, 2), .Leaf("b")),
 	.Pure(.Replace(Term(3, .Leaf("c")), Term(3, .Leaf("a")))),
 ])
 

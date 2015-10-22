@@ -50,7 +50,7 @@ final class DiffTests: XCTestCase {
 
 
 private func equal(a: DiffTests.Diff, _ b: DiffTests.Diff) -> Bool {
-	return Free.equals(pure: Patch.equals(Cofree.equals(annotation: ==, leaf: ==)), leaf: ==)(a, b)
+	return Free.equals(pure: Patch.equals(Cofree.equals(annotation: ==, leaf: ==)), leaf: ==, annotation: const(true))(a, b)
 }
 
 

@@ -42,15 +42,18 @@ public struct Interpreter<Term: CofreeType> {
 
 	/// Diff `a` against `b`, if comparable.
 	private func recur(a: Term, _ b: Term) -> Diff? {
-		if equal(a, b) { return hylo(Diff.Roll, Cofree.unwrap)(Term.zip(a, b)!) }
+		if equal(a, b) { return reiterate(Diff.Roll, Cofree.eliminate)(Term.zip(a, b)!) }
 		guard comparable(a, b) else { return nil }
 
 		let algorithm: Algorithm<Term, Diff>
+		let annotations = (a.extract, b.extract)
 		switch (a.unwrap, b.unwrap) {
+		case let (.Leaf, .Leaf(leaf)) where equal(a, b):
+			return .Roll(annotations, .Leaf(leaf))
 		case let (.Keyed(a), .Keyed(b)):
-			algorithm = .Roll(.ByKey(a, b, Syntax.Keyed >>> Diff.Roll >>> Algorithm.Pure))
+			algorithm = .Roll(.ByKey(a, b, Syntax.Keyed >>> curry(Diff.Roll)(annotations) >>> Algorithm.Pure))
 		case let (.Indexed(a), .Indexed(b)):
-			algorithm = .Roll(.ByIndex(a, b, Syntax.Indexed >>> Diff.Roll >>> Algorithm.Pure))
+			algorithm = .Roll(.ByIndex(a, b, Syntax.Indexed >>> curry(Diff.Roll)(annotations) >>> Algorithm.Pure))
 		default:
 			algorithm = .Roll(.Recursive(a, b, Algorithm.Pure))
 		}
@@ -64,12 +67,13 @@ public struct Interpreter<Term: CofreeType> {
 
 		case let .Roll(.Recursive(a, b, f)):
 			// Recur structurally into both terms, patching differing sub-terms. This is akin to unification, except that it computes a patched tree instead of a substitution. It’s also a little like a structural zip on pairs of terms.
+			let annotations = (a.extract, b.extract)
 			switch (a.unwrap, b.unwrap) {
 			case let (.Indexed(a), .Indexed(b)) where a.count == b.count:
-				return recur(f(.Roll(.Indexed(zip(a, b).map(run)))))
+				return recur(f(.Roll(annotations, .Indexed(zip(a, b).map(run)))))
 
 			case let (.Keyed(a), .Keyed(b)) where Array(a.keys) == Array(b.keys):
-				return recur(f(.Roll(.Keyed(Dictionary(elements: b.keys.map { ($0, self.run(a[$0]!, b[$0]!)) })))))
+				return recur(f(.Roll(annotations, .Keyed(Dictionary(elements: b.keys.map { ($0, self.run(a[$0]!, b[$0]!)) })))))
 
 			default:
 				// This must not call `recur` directly with `a` and `b`, as that would infinite loop if actually recursive.
