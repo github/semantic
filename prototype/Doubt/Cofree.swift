@@ -117,6 +117,7 @@ extension Cofree where Annotation: Categorizable {
 public protocol CofreeType: TermType {
 	typealias Annotation
 
+	init(_ annotation: Annotation, _ syntax: Syntax<Self, Leaf>)
 	var extract: Annotation { get }
 }
 
