@@ -181,7 +181,7 @@ public func == <Leaf: Equatable, Value: Equatable, Annotation: Equatable> (left:
 	return Free.equals(pure: ==, leaf: ==)(left, right)
 }
 
-public func == <Term: CofreeType where Term.Leaf: Equatable> (left: Free<Term.Leaf, Term.Annotation, Patch<Term>>, right: Free<Term.Leaf, Term.Annotation, Patch<Term>>) -> Bool {
+public func == <Term: CofreeType where Term.Leaf: Equatable, Term.Annotation: Equatable> (left: Free<Term.Leaf, Term.Annotation, Patch<Term>>, right: Free<Term.Leaf, Term.Annotation, Patch<Term>>) -> Bool {
 	return Free.equals(pure: Patch.equals(Term.equals(==)), leaf: ==)(left, right)
 }
 
