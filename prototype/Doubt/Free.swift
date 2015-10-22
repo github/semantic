@@ -121,8 +121,8 @@ extension Free {
 	/// Anamorphism over `Free`.
 	///
 	/// Unfolds a tree bottom-up by recursively applying `transform` to a series of values starting with `seed`. Since `Syntax.Leaf` does not recur, this will halt when it has produced leaves for every branch.
-	public func ana<Seed>(transform: Seed -> Syntax<Seed, A>)(_ seed: Seed) -> Free {
-		return (Roll <<< { $0.map(self.ana(transform)) } <<< transform)(seed)
+	public static func ana<Seed>(transform: Seed -> Syntax<Seed, A>)(_ seed: Seed) -> Free {
+		return (Roll <<< { $0.map(ana(transform)) } <<< transform)(seed)
 	}
 }
 
