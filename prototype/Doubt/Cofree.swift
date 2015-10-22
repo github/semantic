@@ -17,16 +17,6 @@ public enum Cofree<Leaf, Annotation> {
 	public init(_ annotation: Annotation, _ syntax: Syntax<Cofree, Leaf>) {
 		self = .Unroll(annotation, syntax)
 	}
-
-
-	/// Constructs a cofree by coiteration.
-	///
-	/// This is an _anamorphism_ (from the Greek “ana,” “upwards”; compare “anabolism”), a generalization of unfolds over regular trees (and datatypes isomorphic to them). The initial seed is used as the annotation of the returned value. The continuation of the structure is unpacked by applying `annotate` to the seed and mapping the resulting syntax’s values recursively. In this manner, the structure is unfolded bottom-up, starting with `seed` and ending at the leaves.
-	///
-	/// As this is the dual of `Free.iterate`, it’s unsurprising that we have a similar guarantee: coiteration is linear in the size of the constructed tree.
-	public static func coiterate(unfold: Annotation -> Syntax<Annotation, Leaf>)(_ seed: Annotation) -> Cofree {
-		return (curry(Unroll)(seed) <<< { $0.map(coiterate(unfold)) } <<< unfold) <| seed
-	}
 }
 
 
@@ -124,6 +114,15 @@ public protocol CofreeType: TermType {
 extension CofreeType {
 	public static func Wrap(annotation: Annotation)(syntax: Syntax<Self, Leaf>) -> Self {
 		return Self(annotation, syntax)
+	}
+
+	/// Constructs a cofree by coiteration.
+	///
+	/// This is an _anamorphism_ (from the Greek “ana,” “upwards”; compare “anabolism”), a generalization of unfolds over regular trees (and datatypes isomorphic to them). The initial seed is used as the annotation of the returned value. The continuation of the structure is unpacked by applying `annotate` to the seed and mapping the resulting syntax’s values recursively. In this manner, the structure is unfolded bottom-up, starting with `seed` and ending at the leaves.
+	///
+	/// As this is the dual of `Free.iterate`, it’s unsurprising that we have a similar guarantee: coiteration is linear in the size of the constructed tree.
+	public static func coiterate(unfold: Annotation -> Syntax<Annotation, Leaf>)(_ seed: Annotation) -> Self {
+		return (Wrap(seed) <<< { $0.map(coiterate(unfold)) } <<< unfold) <| seed
 	}
 }
 
