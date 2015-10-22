@@ -69,10 +69,6 @@ func diffAndSerialize(a aString: String, b bString: String, to: String) throws {
 	}
 
 	try data.writeToFile(to, options: .DataWritingAtomic)
-
-	return benchmark("decoding data into string") {
-		NSString(data: data, encoding: NSUTF8StringEncoding) as String?
-	}
 }
 
 let readFile = { (path: String) -> String? in
