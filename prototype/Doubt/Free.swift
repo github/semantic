@@ -13,8 +13,8 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible, SyntaxC
 	indirect case Roll(Syntax<Free, Leaf>)
 
 
-	/// Recursively copies a `Term: TermType where Term.Leaf == Leaf` into a `Free<Leaf, Value>`, essentially mapping `Term.unwrap` onto `Free.Roll`.
-	public init<Term: CofreeType where Term.Leaf == Leaf>(_ term: Term) {
+	/// Recursively copies a `Term: TermType where Term.Leaf == Leaf, Term.Annotation == Annotation` into a `Free<Leaf, Annotation, Value>`, essentially mapping `Term.unwrap` onto `Free.Roll`.
+	public init<Term: CofreeType where Term.Leaf == Leaf, Term.Annotation == Annotation>(_ term: Term) {
 		self = .Roll(term.unwrap.map(Free.init))
 	}
 
@@ -38,7 +38,7 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible, SyntaxC
 	///
 	/// The linearity of `iterate` in the size of the receiver makes it trivial to compute said size, by counting leaves as 1 and summing branches’ children:
 	///
-	///		func size<Leaf, Value>(free: Free<Leaf, Value>) -> Int {
+	///		func size<Leaf, Annotation, Value>(free: Free<Leaf, Annotation, Value>) -> Int {
 	///			return free.iterate { flattenedSyntax in
 	///				switch flattenedSyntax {
 	///				case .Leaf:
