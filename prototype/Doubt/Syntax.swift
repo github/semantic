@@ -34,6 +34,17 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible {
 }
 
 
+// MARK: - Hylomorphism
+
+public func hylo<A, B, Leaf>(down: Syntax<B, Leaf> -> B, _ up: A -> Syntax<A, Leaf>) -> A -> B {
+	return up >>> { $0.map(hylo(down, up)) } >>> down
+}
+
+public func reiterate<A, B, Leaf, Annotation>(down: (Annotation, Syntax<B, Leaf>) -> B, _ up: A -> (Annotation, Syntax<A, Leaf>)) -> A -> B {
+	return up >>> { ($0, $1.map(reiterate(down, up))) } >>> down
+}
+
+
 // MARK: - ArrayLiteralConvertible
 
 extension Syntax: ArrayLiteralConvertible {
@@ -88,3 +99,6 @@ extension Syntax {
 		}
 	}
 }
+
+
+import Prelude
