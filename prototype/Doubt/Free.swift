@@ -57,7 +57,7 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	public func iterate(transform: Syntax<Value, Leaf> -> Value) -> Value {
 		return analysis(
 			ifPure: id,
-			ifRoll: { transform($0.map { $0.iterate(transform) }) })
+			ifRoll: { $0.map { $0.iterate(transform) } } >>> transform)
 	}
 
 
