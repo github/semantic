@@ -114,12 +114,10 @@ extension Cofree where B: Categorizable {
 
 // MARK: - CofreeType
 
-public protocol CofreeType {
+public protocol CofreeType: TermType {
 	typealias Annotation
-	typealias Leaf
 
 	var extract: Annotation { get }
-	var unwrap: Syntax<Self, Leaf> { get }
 }
 
 extension Cofree: CofreeType {}
