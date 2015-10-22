@@ -126,6 +126,11 @@ public func hylo<A, B, Leaf>(down: Syntax<B, Leaf> -> B, _ up: A -> Syntax<A, Le
 	return up >>> { $0.map(hylo(down, up)) } >>> down
 }
 
+public func reiterate<A, B, Leaf, Annotation>(down: (Annotation, Syntax<B, Leaf>) -> B, _ up: A -> (Annotation, Syntax<A, Leaf>)) -> A -> B {
+	return up >>> { ($0, $1.map(reiterate(down, up))) } >>> down
+}
+
+
 
 extension Free where Value: PatchType, Value.Element == Cofree<Leaf, ()> {
 	public typealias Term = Value.Element
