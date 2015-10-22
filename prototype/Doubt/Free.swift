@@ -115,6 +115,15 @@ public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 }
 
 
+// MARK: - Anamorphism
+
+extension Free {
+	public func ana<Seed>(f: Seed -> Syntax<Seed, A>)(_ seed: Seed) -> Free {
+		return (Roll <<< { $0.map(self.ana(f)) } <<< f)(seed)
+	}
+}
+
+
 extension Free where B: PatchType, B.Element == Cofree<A, ()> {
 	public typealias Term = B.Element
 
