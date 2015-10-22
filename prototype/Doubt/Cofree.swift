@@ -76,7 +76,7 @@ extension Cofree {
 extension Cofree {
 	public static func equals(annotation annotation: (Annotation, Annotation) -> Bool, leaf: (Leaf, Leaf) -> Bool)(_ left: Cofree, _ right: Cofree) -> Bool {
 		return annotation(left.extract, right.extract)
-			&& Syntax.equals(ifLeaf: leaf, ifRecur: Cofree.equals(annotation: annotation, leaf: leaf))(left.unwrap, right.unwrap)
+			&& Syntax.equals(leaf: leaf, recur: Cofree.equals(annotation: annotation, leaf: leaf))(left.unwrap, right.unwrap)
 	}
 }
 

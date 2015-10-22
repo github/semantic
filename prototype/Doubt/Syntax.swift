@@ -52,14 +52,14 @@ extension Syntax: DictionaryLiteralConvertible {
 // MARK: - Equality
 
 extension Syntax {
-	public static func equals(ifLeaf ifLeaf: (A, A) -> Bool, ifRecur: (Recur, Recur) -> Bool)(_ left: Syntax<Recur, A>, _ right: Syntax<Recur, A>) -> Bool {
+	public static func equals(leaf leaf: (A, A) -> Bool, recur: (Recur, Recur) -> Bool)(_ left: Syntax<Recur, A>, _ right: Syntax<Recur, A>) -> Bool {
 		switch (left, right) {
 		case let (.Leaf(l1), .Leaf(l2)):
-			return ifLeaf(l1, l2)
+			return leaf(l1, l2)
 		case let (.Indexed(v1), .Indexed(v2)):
-			return v1.count == v2.count && zip(v1, v2).lazy.map(ifRecur).reduce(true) { $0 && $1 }
+			return v1.count == v2.count && zip(v1, v2).lazy.map(recur).reduce(true) { $0 && $1 }
 		case let (.Keyed(d1), .Keyed(d2)):
-			return Set(d1.keys) == Set(d2.keys) && d1.keys.map { ifRecur(d1[$0]!, d2[$0]!) }.reduce(true) { $0 && $1 }
+			return Set(d1.keys) == Set(d2.keys) && d1.keys.map { recur(d1[$0]!, d2[$0]!) }.reduce(true) { $0 && $1 }
 		default:
 			return false
 		}
@@ -67,7 +67,7 @@ extension Syntax {
 }
 
 public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F, A>) -> Bool {
-	return Syntax.equals(ifLeaf: ==, ifRecur: ==)(left, right)
+	return Syntax.equals(leaf: ==, recur: ==)(left, right)
 }
 
 

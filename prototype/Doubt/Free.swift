@@ -170,7 +170,7 @@ extension Free {
 		case let (.Pure(a), .Pure(b)):
 			return pure(a, b)
 		case let (.Roll(a), .Roll(b)):
-			return Syntax.equals(ifLeaf: leaf, ifRecur: equals(pure: pure, leaf: leaf))(a, b)
+			return Syntax.equals(leaf: leaf, recur: equals(pure: pure, leaf: leaf))(a, b)
 		default:
 			return false
 		}

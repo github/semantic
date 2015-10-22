@@ -44,7 +44,7 @@ extension TermType {
 
 extension TermType {
 	public static func equals(leaf: (Leaf, Leaf) -> Bool)(_ a: Self, _ b: Self) -> Bool {
-		return Syntax.equals(ifLeaf: leaf, ifRecur: equals(leaf))(a.unwrap, b.unwrap)
+		return Syntax.equals(leaf: leaf, recur: equals(leaf))(a.unwrap, b.unwrap)
 	}
 }
 
