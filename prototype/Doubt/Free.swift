@@ -108,6 +108,18 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 }
 
 
+// MARK: - Anamorphism
+
+extension Free {
+	/// Anamorphism over `Free`.
+	///
+	/// Unfolds a tree bottom-up by recursively applying `transform` to a series of values starting with `seed`. Since `Syntax.Leaf` does not recur, this will halt when it has produced leaves for every branch.
+	public static func ana<Seed>(transform: Seed -> Syntax<Seed, Leaf>)(_ seed: Seed) -> Free {
+		return (Roll <<< { $0.map(ana(transform)) } <<< transform)(seed)
+	}
+}
+
+
 extension Free where Value: PatchType, Value.Element == Cofree<Leaf, ()> {
 	public typealias Term = Value.Element
 

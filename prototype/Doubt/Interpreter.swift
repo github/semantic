@@ -42,7 +42,7 @@ public struct Interpreter<Term: CofreeType> {
 
 	/// Diff `a` against `b`, if comparable.
 	private func recur(a: Term, _ b: Term) -> Diff? {
-		if equal(a, b) { return Diff(b) }
+		if equal(a, b) { return Diff.ana(Term.unwrap)(b) }
 		guard comparable(a, b) else { return nil }
 
 		let algorithm: Algorithm<Term, Diff>
