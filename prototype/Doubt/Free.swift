@@ -198,11 +198,5 @@ extension Free {
 	}
 }
 
-extension Free where Leaf: CustomJSONConvertible {
-	public func JSON(pure: Value -> Doubt.JSON) -> Doubt.JSON {
-		return JSON(pure: pure, leaf: { $0.JSON })
-	}
-}
-
 
 import Prelude
