@@ -55,7 +55,7 @@ func diffAndSerialize(a aString: String, b bString: String, to: String) throws {
 		[
 			"a": .String(aString),
 			"b": .String(bString),
-			"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: range, leaf: { $0.JSON }) } }, leaf: { $0.JSON }),
+			"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: range, leaf: { $0.JSON }) } }, leaf: { $0.JSON }, annotation: const(nil)),
 		]
 	}
 
