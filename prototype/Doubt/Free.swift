@@ -189,7 +189,7 @@ extension Free {
 	}
 }
 
-public func == <Leaf: Equatable, Value: Equatable, Annotation: Equatable> (left: Free<Leaf, Annotation, Value>, right: Free<Leaf, Annotation, Value>) -> Bool {
+public func == <Leaf: Equatable, Value: Equatable, Annotation> (left: Free<Leaf, Annotation, Value>, right: Free<Leaf, Annotation, Value>) -> Bool {
 	return Free.equals(pure: ==, leaf: ==)(left, right)
 }
 
