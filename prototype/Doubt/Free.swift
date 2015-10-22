@@ -14,7 +14,7 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible, SyntaxC
 
 
 	/// Recursively copies a `Term: TermType where Term.Leaf == Leaf` into a `Free<Leaf, Value>`, essentially mapping `Term.unwrap` onto `Free.Roll`.
-	public init<Term: TermType where Term.Leaf == Leaf>(_ term: Term) {
+	public init<Term: CofreeType where Term.Leaf == Leaf>(_ term: Term) {
 		self = .Roll(term.unwrap.map(Free.init))
 	}
 
