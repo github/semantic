@@ -66,10 +66,10 @@ public struct Interpreter<Term: CofreeType> {
 			// Recur structurally into both terms, patching differing sub-terms. This is akin to unification, except that it computes a patched tree instead of a substitution. It’s also a little like a structural zip on pairs of terms.
 			switch (a.unwrap, b.unwrap) {
 			case let (.Indexed(a), .Indexed(b)) where a.count == b.count:
-				return recur(f(.Indexed(zip(a, b).map(run))))
+				return recur(f(.Roll(.Indexed(zip(a, b).map(run)))))
 
 			case let (.Keyed(a), .Keyed(b)) where Array(a.keys) == Array(b.keys):
-				return recur(f(.Keyed(Dictionary(elements: b.keys.map { ($0, self.run(a[$0]!, b[$0]!)) }))))
+				return recur(f(.Roll(.Keyed(Dictionary(elements: b.keys.map { ($0, self.run(a[$0]!, b[$0]!)) })))))
 
 			default:
 				// This must not call `recur` directly with `a` and `b`, as that would infinite loop if actually recursive.
