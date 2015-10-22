@@ -41,7 +41,7 @@ final class SESTests: XCTestCase {
 }
 
 private typealias Term = Cofree<String, ()>
-private typealias Diff = Free<String, Patch<Term>>
+private typealias Diff = Free<String, (), Patch<Term>>
 
 private let a = Term((), .Leaf("a"))
 private let b = Term((), .Leaf("b"))

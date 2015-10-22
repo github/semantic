@@ -5,7 +5,7 @@
 /// `Syntax` is a non-recursive type parameterized by the type of its child nodes. Instantiating it to `Free` makes it recursive through the `Roll` case, and allows it to wrap values of type `Value` through the `Pure` case.
 ///
 /// In Doubt, this allows us to represent diffs as values of the `Free` monad obtained from `Syntax`, injecting `Patch` into the tree; or otherwise put, a diff is a tree of mutually-recursive `Free.Roll`/`Syntax` nodes with `Pure` nodes injecting the actual changes.
-public enum Free<Leaf, Value>: CustomDebugStringConvertible, SyntaxConvertible {
+public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible, SyntaxConvertible {
 	/// The injection of a value of type `Value` into the `Syntax` tree.
 	case Pure(Value)
 
@@ -83,14 +83,14 @@ public enum Free<Leaf, Value>: CustomDebugStringConvertible, SyntaxConvertible {
 
 	// MARK: Functor
 
-	public func map<C>(@noescape transform: Value -> C) -> Free<Leaf, C> {
+	public func map<C>(@noescape transform: Value -> C) -> Free<Leaf, Annotation, C> {
 		return analysis(ifPure: { .Pure(transform($0)) }, ifRoll: { .Roll($0.map { $0.map(transform) }) })
 	}
 
 
 	// MARK: Monad
 
-	public func flatMap<C>(@noescape transform: Value -> Free<Leaf, C>) -> Free<Leaf, C> {
+	public func flatMap<C>(@noescape transform: Value -> Free<Leaf, Annotation, C>) -> Free<Leaf, Annotation, C> {
 		return analysis(ifPure: transform, ifRoll: { .Roll($0.map { $0.flatMap(transform) }) })
 	}
 
@@ -184,11 +184,11 @@ extension Free {
 	}
 }
 
-public func == <Leaf: Equatable, Value: Equatable> (left: Free<Leaf, Value>, right: Free<Leaf, Value>) -> Bool {
+public func == <Leaf: Equatable, Value: Equatable, Annotation: Equatable> (left: Free<Leaf, Annotation, Value>, right: Free<Leaf, Annotation, Value>) -> Bool {
 	return Free.equals(ifPure: ==, ifRoll: ==)(left, right)
 }
 
-public func == <Term: TermType where Term.Leaf: Equatable> (left: Free<Term.Leaf, Patch<Term>>, right: Free<Term.Leaf, Patch<Term>>) -> Bool {
+public func == <Term: CofreeType where Term.Leaf: Equatable> (left: Free<Term.Leaf, Term.Annotation, Patch<Term>>, right: Free<Term.Leaf, Term.Annotation, Patch<Term>>) -> Bool {
 	return Free.equals(ifPure: Patch.equals(Term.equals(==)), ifRoll: ==)(left, right)
 }
 
