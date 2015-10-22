@@ -118,8 +118,8 @@ public enum Free<A, B>: CustomDebugStringConvertible, SyntaxConvertible {
 // MARK: - Anamorphism
 
 extension Free {
-	public func ana<Seed>(f: Seed -> Syntax<Seed, A>)(_ seed: Seed) -> Free {
-		return (Roll <<< { $0.map(self.ana(f)) } <<< f)(seed)
+	public func ana<Seed>(transform: Seed -> Syntax<Seed, A>)(_ seed: Seed) -> Free {
+		return (Roll <<< { $0.map(self.ana(transform)) } <<< transform)(seed)
 	}
 }
 
