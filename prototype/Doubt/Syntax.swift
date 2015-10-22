@@ -91,22 +91,22 @@ extension Syntax {
 
 /// SyntaxConvertible types can be constructed with the same constructors available on Syntax itself, as a convenience.
 public protocol SyntaxConvertible {
-	typealias RecurType
-	typealias LeafType
+	typealias Recur
+	typealias Leaf
 
-	init(syntax: Syntax<RecurType, LeafType>)
+	init(syntax: Syntax<Recur, Leaf>)
 }
 
 extension SyntaxConvertible {
-	public static func Leaf(value: LeafType) -> Self {
+	public static func Leaf(value: Leaf) -> Self {
 		return Self(syntax: .Leaf(value))
 	}
 
-	public static func Indexed(children: [RecurType]) -> Self {
+	public static func Indexed(children: [Recur]) -> Self {
 		return Self(syntax: .Indexed(children))
 	}
 
-	public static func Keyed(children: [String:RecurType]) -> Self {
+	public static func Keyed(children: [String:Recur]) -> Self {
 		return Self(syntax: .Keyed(children))
 	}
 }
