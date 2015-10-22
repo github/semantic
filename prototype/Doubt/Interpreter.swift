@@ -51,9 +51,9 @@ public struct Interpreter<Term: CofreeType> {
 		case let (.Leaf, .Leaf(leaf)) where equal(a, b):
 			return .Roll(annotations, .Leaf(leaf))
 		case let (.Keyed(a), .Keyed(b)):
-			algorithm = .Roll(.ByKey(a, b, Syntax.Keyed >>> curry(Diff.Roll)(annotations) >>> Algorithm.Pure))
+			algorithm = .Roll(.ByKey(a, b, Syntax.Keyed >>> Diff.Introduce(annotations) >>> Algorithm.Pure))
 		case let (.Indexed(a), .Indexed(b)):
-			algorithm = .Roll(.ByIndex(a, b, Syntax.Indexed >>> curry(Diff.Roll)(annotations) >>> Algorithm.Pure))
+			algorithm = .Roll(.ByIndex(a, b, Syntax.Indexed >>> Diff.Introduce(annotations) >>> Algorithm.Pure))
 		default:
 			algorithm = .Roll(.Recursive(a, b, Algorithm.Pure))
 		}
