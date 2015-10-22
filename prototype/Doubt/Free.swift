@@ -189,18 +189,18 @@ public func == <Term: CofreeType where Term.Leaf: Equatable> (left: Free<Term.Le
 // MARK: - JSON
 
 extension Free {
-	public func JSON(ifPure ifPure: Value -> Doubt.JSON, ifLeaf: Leaf -> Doubt.JSON) -> Doubt.JSON {
+	public func JSON(pure pure: Value -> Doubt.JSON, leaf: Leaf -> Doubt.JSON) -> Doubt.JSON {
 		return analysis(
-			ifPure: ifPure,
+			ifPure: pure,
 			ifRoll: {
-				$0.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifPure: ifPure, ifLeaf: ifLeaf) })
+				$0.JSON(ifLeaf: leaf, ifRecur: { $0.JSON(pure: pure, leaf: leaf) })
 			})
 	}
 }
 
 extension Free where Leaf: CustomJSONConvertible {
-	public func JSON(ifPure: Value -> Doubt.JSON) -> Doubt.JSON {
-		return JSON(ifPure: ifPure, ifLeaf: { $0.JSON })
+	public func JSON(pure: Value -> Doubt.JSON) -> Doubt.JSON {
+		return JSON(pure: pure, leaf: { $0.JSON })
 	}
 }
 
