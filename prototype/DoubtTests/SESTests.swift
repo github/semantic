@@ -53,7 +53,7 @@ private func SES(a: [Term], _ b: [Term]) -> [Diff] {
 }
 
 private func == (a: [Diff], b: [Diff]) -> Bool {
-	return a.count == b.count && zip(a, b).lazy.map(Diff.equals(ifPure: Patch.equals(Cofree.equals(annotation: const(true), leaf: ==)), ifRoll: ==)).reduce(true) { $0 && $1 }
+	return a.count == b.count && zip(a, b).lazy.map(Diff.equals(pure: Patch.equals(Cofree.equals(annotation: const(true), leaf: ==)), leaf: ==)).reduce(true) { $0 && $1 }
 }
 
 
