@@ -143,7 +143,7 @@
 
     function Syntax(json, continuation) {
         if (json.indexed != null) { this.indexed = json.map(continuation); }
-        if (json.keyed != null) { this.keyed = (new Dictionary(json)).map(continuation); }
+        if (json.keyed != null) { this.keyed = (new Dictionary(json.keyed)).map(continuation); }
         if (json.leaf != null) { this.leaf = json; }
         return this;
     }
