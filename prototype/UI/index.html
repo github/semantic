@@ -232,9 +232,9 @@
 
     // forall a b. Syntax a -> (a -> b) -> Syntax b
     Syntax.prototype.map = function(transform) {
-        if (this.indexed != null) { return new Syntax(this.indexed, transform); }
-        if (this.keyed != null) { return new Syntax(this.keyed, transform); }
-        if (this.leaf != null) { return new Syntax(this.leaf, transform); }
+        if (this.indexed != null) { return new Syntax(this, transform); }
+        if (this.keyed != null) { return new Syntax(this, transform); }
+        if (this.leaf != null) { return new Syntax(this, transform); }
     }
 
     function Diff(json) {
