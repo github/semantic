@@ -150,7 +150,9 @@
 
     // forall a b. Syntax a -> (a -> b) -> Syntax b
     Syntax.prototype.map = function(transform) {
-        return new Syntax(this, transform);
+        if (this.leaf != null) { return new Syntax({ leaf: this.leaf }, transform); }
+        if (this.indexed != null) { return new Syntax({ indexed: this.indexed }, transform); }
+        if (this.keyed != null) { return new Syntax({ keyed: this.keyed }, transform); }
     }
 
     function diffFromJSON(json) {
