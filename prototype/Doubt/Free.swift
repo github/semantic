@@ -13,6 +13,14 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	indirect case Roll(Annotation, Syntax<Free, Leaf>)
 
 
+	/// Construct a `Free` from a `CofreeType` with matching `Leaf` and `Annotation` types, copying the recursive structure of the term in via hylomorphism.
+	///
+	/// The resulting `Free` value will not have any `Pure` cases.
+	public init<Term: CofreeType where Term.Leaf == Leaf, Term.Annotation == Annotation>(_ term: Term) {
+		self = hylo(Free.Roll, Term.eliminate)(term)
+	}
+
+
 	public func analysis<C>(@noescape ifPure ifPure: Value -> C, @noescape ifRoll: (Annotation, Syntax<Free, Leaf>) -> C) -> C {
 		switch self {
 		case let .Pure(b):
