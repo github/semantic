@@ -105,11 +105,11 @@ extension Syntax {
 	public func JSON(@noescape leaf leaf: A -> Doubt.JSON, @noescape recur: Recur -> Doubt.JSON) -> Doubt.JSON {
 		switch self {
 		case let .Leaf(a):
-			return leaf(a)
+			return [ "leaf": leaf(a) ]
 		case let .Indexed(a):
-			return .Array(a.map(recur))
+			return [ "indexed": .Array(a.map(recur)) ]
 		case let .Keyed(d):
-			return .Dictionary(Dictionary(elements: d.map { ($0, recur($1)) }))
+			return [ "keyed": .Dictionary(Dictionary(elements: d.map { ($0, recur($1)) })) ]
 		}
 	}
 }
