@@ -53,17 +53,25 @@
 
     function Delete(before, a, b) {
         this.before = new Term(before, a);
+        this.source = this.before.source;
+        this.range = this.before.range;
         return this;
     }
 
     function Insert(after, a, b) {
         this.after = new Term(after, b);
+        this.source = this.after.source;
+        this.range = this.after.range;
         return this;
     }
 
     function Replace(before, after, a, b) {
         this.before = new Term(before, a);
         this.after = new Term(after, b);
+        this.sources = { "a": this.before.source, "b": this.after.source };
+        this.ranges = { "a": this.before.range, "b": this.after.range };
+        this.source = this.sources.b;
+        this.range = this.ranges.b;
         return this;
     }
 
