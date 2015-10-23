@@ -12,36 +12,40 @@ final class SESTests: XCTestCase {
 	}
 
 	func testSESCanInsertAtHead() {
-		assert(SES([ a, b, c ], [ d, a, b, c ]), ==, [ .Insert(d), Diff(a), Diff(b), Diff(c) ])
+		assert(SES([ a, b, c ], [ d, a, b, c ]), ==, [ .Insert(d), Copy(a), Copy(b), Copy(c) ])
 	}
 
 	func testSESCanDeleteAtHead() {
-		assert(SES([ d, a, b, c ], [ a, b, c ]), ==, [ .Delete(d), Diff(a), Diff(b), Diff(c) ])
+		assert(SES([ d, a, b, c ], [ a, b, c ]), ==, [ .Delete(d), Copy(a), Copy(b), Copy(c) ])
 	}
 
 	func testSESCanInsertInMiddle() {
-		assert(SES([ a, b, c ], [ a, d, b, c ]), ==, [ Diff(a), .Insert(d), Diff(b), Diff(c) ])
+		assert(SES([ a, b, c ], [ a, d, b, c ]), ==, [ Copy(a), .Insert(d), Copy(b), Copy(c) ])
 	}
 
 	func testSESCanDeleteInMiddle() {
-		assert(SES([ a, d, b, c ], [ a, b, c ]), ==, [ Diff(a), .Delete(d), Diff(b), Diff(c) ])
+		assert(SES([ a, d, b, c ], [ a, b, c ]), ==, [ Copy(a), .Delete(d), Copy(b), Copy(c) ])
 	}
 
 	func testInsertsAtEnd() {
-		assert(SES([ a, b, c ], [ a, b, c, d ]), ==, [ Diff(a), Diff(b), Diff(c), .Insert(d) ])
+		assert(SES([ a, b, c ], [ a, b, c, d ]), ==, [ Copy(a), Copy(b), Copy(c), .Insert(d) ])
 	}
 
 	func testDeletesAtEnd() {
-		assert(SES([ a, b, c, d ], [ a, b, c ]), ==, [ Diff(a), Diff(b), Diff(c), .Delete(d) ])
+		assert(SES([ a, b, c, d ], [ a, b, c ]), ==, [ Copy(a), Copy(b), Copy(c), .Delete(d) ])
 	}
 
 	func testSESOfLongerSequences() {
-		assert(SES([ a, b, c, a, b, b, a ], [ c, b, a, b, a, c ]), ==, [ .Insert(c), .Delete(a), Diff(b), .Delete(c), Diff(a), .Delete(b), Diff(b), Diff(a), .Insert(c) ])
+		assert(SES([ a, b, c, a, b, b, a ], [ c, b, a, b, a, c ]), ==, [ .Insert(c), .Delete(a), Copy(b), .Delete(c), Copy(a), .Delete(b), Copy(b), Copy(a), .Insert(c) ])
 	}
 }
 
 private typealias Term = Cofree<String, ()>
-private typealias Diff = Free<String, Patch<Term>>
+private typealias Diff = Free<String, (), Patch<Term>>
+
+private func Copy(term: Term) -> Diff {
+	return hylo(Diff.Introduce(()), Term.unwrap)(term)
+}
 
 private let a = Term((), .Leaf("a"))
 private let b = Term((), .Leaf("b"))
@@ -49,11 +53,11 @@ private let c = Term((), .Leaf("c"))
 private let d = Term((), .Leaf("d"))
 
 private func SES(a: [Term], _ b: [Term]) -> [Diff] {
-	return SES(a, b, cost: const(1)) { Cofree.equals(annotation: const(true), leaf: ==)($0, $1) ? Diff($1) : nil }
+	return SES(a, b, cost: const(1)) { Cofree.equals(annotation: const(true), leaf: ==)($0, $1) ? Copy($1) : nil }
 }
 
 private func == (a: [Diff], b: [Diff]) -> Bool {
-	return a.count == b.count && zip(a, b).lazy.map(Diff.equals(ifPure: Patch.equals(Cofree.equals(annotation: const(true), leaf: ==)), ifRoll: ==)).reduce(true) { $0 && $1 }
+	return a.count == b.count && zip(a, b).lazy.map(Diff.equals(pure: Patch.equals(Cofree.equals(annotation: const(true), leaf: ==)), leaf: ==, annotation: const(true))).reduce(true) { $0 && $1 }
 }
 
 

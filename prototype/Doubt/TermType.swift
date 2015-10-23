@@ -1,27 +1,27 @@
 /// The type of terms.
 public protocol TermType {
-	typealias LeafType
+	typealias Leaf
 
-	var unwrap: Syntax<Self, LeafType> { get }
+	var unwrap: Syntax<Self, Leaf> { get }
 }
 
 
 extension TermType {
-	public static func unwrap(term: Self) -> Syntax<Self, LeafType> {
+	public static func unwrap(term: Self) -> Syntax<Self, Leaf> {
 		return term.unwrap
 	}
 
 	/// Catamorphism over `TermType`s.
 	///
 	/// Folds the tree encoded by the receiver into a single value by recurring top-down through the tree, applying `transform` to leaves, then to branches, and so forth.
-	public func cata<Result>(transform: Syntax<Result, LeafType> -> Result) -> Result {
+	public func cata<Result>(transform: Syntax<Result, Leaf> -> Result) -> Result {
 		return self |> (Self.unwrap >>> { $0.map { $0.cata(transform) } } >>> transform)
 	}
 
 	/// Paramorphism over `TermType`s.
 	///
 	/// Folds the tree encoded by the receiver into a single value by recurring top-down through the tree, applying `transform` to leaves, then to branches, and so forth. Each recursive instance is made available in the `Syntax` alongside the result value at that node.
-	public func para<Result>(transform: Syntax<(Self, Result), LeafType> -> Result) -> Result {
+	public func para<Result>(transform: Syntax<(Self, Result), Leaf> -> Result) -> Result {
 		return self |> (Self.unwrap >>> { $0.map { ($0, $0.para(transform)) } } >>> transform)
 	}
 
@@ -44,14 +44,11 @@ extension TermType {
 }
 
 
-extension Cofree: TermType {}
-
-
 // MARK: - Equality
 
 extension TermType {
-	public static func equals(leaf: (LeafType, LeafType) -> Bool)(_ a: Self, _ b: Self) -> Bool {
-		return Syntax.equals(ifLeaf: leaf, ifRecur: equals(leaf))(a.unwrap, b.unwrap)
+	public static func equals(leaf: (Leaf, Leaf) -> Bool)(_ a: Self, _ b: Self) -> Bool {
+		return Syntax.equals(leaf: leaf, recur: equals(leaf))(a.unwrap, b.unwrap)
 	}
 }
 

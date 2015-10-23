@@ -4,7 +4,7 @@ final class DiffTests: XCTestCase {
 	}
 
 	typealias Term = RangedTerm.Term
-	typealias Diff = Free<String, Patch<Term>>
+	typealias Diff = Free<String, (Term.Annotation, Term.Annotation), Patch<Term>>
 
 	let interpreter = Interpreter<Term>(equal: ==, comparable: const(true), cost: Diff.sum(const(1)))
 
@@ -50,7 +50,7 @@ final class DiffTests: XCTestCase {
 
 
 private func equal(a: DiffTests.Diff, _ b: DiffTests.Diff) -> Bool {
-	return Free.equals(ifPure: Patch.equals(Cofree.equals(annotation: ==, leaf: ==)), ifRoll: ==)(a, b)
+	return Free.equals(pure: Patch.equals(Cofree.equals(annotation: ==, leaf: ==)), leaf: ==, annotation: const(true))(a, b)
 }
 
 
