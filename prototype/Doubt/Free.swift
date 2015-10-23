@@ -205,9 +205,7 @@ public func == <Term: CofreeType, Annotation where Term.Leaf: Equatable> (left: 
 extension Free {
 	public func JSON(pure pure: Value -> Doubt.JSON, leaf: Leaf -> Doubt.JSON, annotation: Annotation -> Doubt.JSON) -> Doubt.JSON {
 		return analysis(
-			ifPure: {
-				[ "pure": pure($0) ]
-			},
+			ifPure: { [ "pure": pure($0) ] },
 			ifRoll: {
 				[ "roll": [
 					"extract": annotation($0),
