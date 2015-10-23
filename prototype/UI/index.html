@@ -228,10 +228,11 @@
         return this;
     }
 
-    function syntax(json, continuation) {
-        if (json instanceof Array) { return new Indexed(json, continuation); }
-        if (json instanceof Object) { return new Keyed(json, continuation); }
-        return new Leaf(json);
+    function Syntax(json, continuation) {
+        if (json instanceof Array) { this.indexed = new Indexed(json, continuation); }
+        else if (json instanceof Object) { this.keyed = new Keyed(json, continuation); }
+        else this.leaf = new Leaf(json);
+        return this;
     }
 
     function Diff(json) {
@@ -240,7 +241,7 @@
         }
         if (json.roll != null) {
             this.ranges = json.roll.extract;
-            this.roll = syntax(json.roll.unwrap, function(x) { return new Diff(x); });
+            this.roll = new Syntax(json.roll.unwrap, function(x) { return new Diff(x); });
         }
         return this;
     }
