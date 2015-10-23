@@ -127,12 +127,6 @@
             element.appendChild(after);
         }
 
-        if (model instanceof Term) {
-            element = document.createElement("div");
-            element.classList.add("term");
-            element.appendChild(toDOM(model.unwrap));
-        }
-
         if (model instanceof Diff) {
             element = document.createElement("div");
             element.classList.add("diff");
