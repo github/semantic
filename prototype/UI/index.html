@@ -229,9 +229,9 @@
     }
 
     function Syntax(json, continuation) {
-        if (json instanceof Array) { this.indexed = new Indexed(json, continuation); }
-        else if (json instanceof Object) { this.keyed = new Keyed(json, continuation); }
-        else this.leaf = new Leaf(json);
+        if (json instanceof Array) { this.indexed = json.map(continuation); }
+        else if (json instanceof Object) { this.keyed = (new Dictionary(json)).map(continuation); }
+        else this.leaf = json;
         return this;
     }
 
