@@ -65,25 +65,12 @@
     }
 
     function Patch(patch) {
-        if (patch.delete != null) { this.patch = new Delete(patch.delete); }
-        if (patch.insert != null) { this.patch = new Insert(patch.insert); }
-        if (patch.replace != null) { this.patch = new Replace(patch.replace.before, patch.replace.after); }
-        return this;
-    }
-
-    function Delete(before) {
-        this.before = new Term(before);
-        return this;
-    }
-
-    function Insert(after) {
-        this.after = new Term(after);
-        return this;
-    }
-
-    function Replace(before, after) {
-        this.before = new Term(before);
-        this.after = new Term(after);
+        if (patch.delete != null) { this.before = new Term(patch.delete); }
+        if (patch.insert != null) { this.after = new Term(patch.insert); }
+        if (patch.replace != null) {
+            this.before = new Term(patch.replace.before);
+            this.after = new Term(patch.replace.after);
+        }
         return this;
     }
 
