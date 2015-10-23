@@ -1,1685 +1,1822 @@
-[
-	[{
-			"categories": {
-				"insert": {
-					"extract": 1,
-					"unwrap": [
-
-					]
-				}
-			},
-			"literal": {
-				"delete": {
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "Algorithm"
-						}
-					}
-				}
-			},
-			"source": {
-				"insert": {
-					"extract": 1,
-					"unwrap": "Algorithm"
-				}
-			}
-		},
-		[
-			[{
-					"categories": {
-						"insert": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}
-					},
-					"literal": {
-						"delete": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "Recursive"
-								}
-							}
-						}
-					},
-					"source": {
-						"insert": {
-							"extract": 1,
-							"unwrap": "Recursive"
-						}
-					}
-				},
-				[
-
-				]
-			],
-			[{
-					"categories": {
-						"insert": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}
-					},
-					"literal": {
-						"delete": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "ByKey"
-								}
-							}
-						}
-					},
-					"source": {
-						"insert": {
-							"extract": 1,
-							"unwrap": "ByKey"
-						}
-					}
-				},
-				[
-
-				]
-			], {
-				"insert": [{
-						"categories": {
-							"insert": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}
-						},
-						"literal": {
-							"delete": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "ByIndex"
-									}
-								}
-							}
-						},
-						"source": {
-							"insert": {
-								"extract": 1,
-								"unwrap": "ByIndex"
-							}
-						}
-					},
-					[
-
-					]
-				]
-			}, {
-				"categories": {
-					"insert": {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}
-				},
-				"literal": {
-					"delete": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "mark"
-							}
-						}
-					}
-				},
-				"source": {
-					"insert": {
-						"extract": 1,
-						"unwrap": "mark"
-					}
-				}
-			},
-			[{
-					"categories": {
-						"insert": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}
-					},
-					"literal": {
-						"delete": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "map(_:)"
-								}
-							}
-						}
-					},
-					"source": {
-						"insert": {
-							"extract": 1,
-							"unwrap": "map(_:)"
-						}
-					}
-				},
-				[
-
-				]
-			]
-		]
-	], {
-		"insert": [{
-				"categories": {
-					"insert": {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}
-				},
-				"literal": {
-					"delete": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "FreeAlgorithm"
-							}
-						}
-					}
-				},
-				"source": {
-					"insert": {
-						"extract": 1,
-						"unwrap": "FreeAlgorithm"
-					}
-				}
-			},
-			[{
-					"delete": {
-						"extract": 6,
-						"unwrap": [{
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "Pure"
-										}
-									}
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}
-				},
-				[{
-						"categories": {
-							"insert": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}
-						},
-						"literal": {
-							"delete": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "Roll"
-									}
-								}
-							}
-						},
-						"source": {
-							"insert": {
-								"extract": 1,
-								"unwrap": "Pure"
-							}
-						}
-					},
-					[
-
-					]
-				],
-				[{
-						"categories": {
-							"insert": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}
-						},
-						"literal": {
-							"delete": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "analysis(ifPure:ifRoll:)"
-									}
-								}
-							}
-						},
-						"source": {
-							"insert": {
-								"extract": 1,
-								"unwrap": "Roll"
-							}
-						}
-					},
-					[
-
-					]
-				], {
-					"replace": {
-						"before": {
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "mark"
-										}
-									}
-								}
-							}
-						},
-						"after": {
-							"extract": 5,
-							"unwrap": [{
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "analysis(ifPure:ifRoll:)"
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}
-					}
-				}, {
-					"replace": {
-						"before": {
-							"extract": 6,
-							"unwrap": [{
-								"extract": 4,
-								"unwrap": {
-									"literal": {
-										"extract": 3,
-										"unwrap": {
-											"categories": {
-												"extract": 1,
-												"unwrap": [
-
-												]
-											},
-											"source": {
-												"extract": 1,
-												"unwrap": "map(_:)"
-											}
-										}
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						},
-						"after": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "mark"
-								}
-							}
-						}
-					}
-				}, {
-					"replace": {
-						"before": {
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "mark"
-										}
-									}
-								}
-							}
-						},
-						"after": {
-							"extract": 5,
-							"unwrap": [{
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "map(_:)"
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}
-					}
-				}, {
-					"insert": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "mark"
-							}
-						}
-					}
-				},
-				[{
-						"categories": {
-							"insert": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}
-						},
-						"literal": {
-							"delete": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "flatMap(_:)"
-									}
-								}
-							}
-						},
-						"source": {
-							"insert": {
-								"extract": 1,
-								"unwrap": "flatMap(_:)"
-							}
-						}
-					},
-					[
-
-					]
-				],
-				[{
-						"categories": {
-							"insert": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}
-						},
-						"literal": {
-							"delete": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "evaluate(_:recur:)"
-									}
-								}
-							}
-						},
-						"source": {
-							"insert": {
-								"extract": 1,
-								"unwrap": "evaluate(_:recur:)"
-							}
-						}
-					},
-					[
-
-					]
-				]
-			]
-		]
-	}, {
-		"replace": {
-			"after": [{
-					"categories": {
-						"insert": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}
-					},
-					"literal": {
-						"delete": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "FreeAlgorithm"
-								}
-							}
-						}
-					},
-					"source": {
-						"insert": {
-							"extract": 1,
-							"unwrap": "FreeAlgorithm"
-						}
-					}
-				},
-				[
-					[{
-							"categories": {
-								"insert": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								}
-							},
-							"literal": {
-								"delete": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "evaluate(_:)"
-										}
-									}
-								}
-							},
-							"source": {
-								"insert": {
-									"extract": 1,
-									"unwrap": "evaluate(_:)"
-								}
-							}
-						},
-						[
-
-						]
-					]
-				]
-			],
-			"before": {
-				"categories": {
-					"insert": {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}
-				},
-				"literal": {
-					"delete": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "mark"
-							}
-						}
-					}
-				},
-				"source": {
-					"insert": {
-						"extract": 1,
-						"unwrap": "mark"
-					}
-				}
-			}
-		}
-	}, {
-		"delete": [{
-				"categories": {
-					"insert": {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}
-				},
-				"literal": {
-					"delete": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "Algorithm"
-							}
-						}
-					}
-				},
-				"source": {
-					"insert": {
-						"extract": 1,
-						"unwrap": "Algorithm"
-					}
-				}
-			},
-			[
-				[{
-						"categories": {
-							"insert": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}
-						},
-						"literal": {
-							"delete": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "evaluate(_:)"
-									}
-								}
-							}
-						},
-						"source": {
-							"insert": {
-								"extract": 1,
-								"unwrap": "evaluate(_:)"
-							}
-						}
-					},
-					[
-						[{
-								"categories": {
-									"insert": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									}
-								},
-								"literal": {
-									"delete": {
-										"extract": 3,
-										"unwrap": {
-											"categories": {
-												"extract": 1,
-												"unwrap": [
-
-												]
-											},
-											"source": {
-												"extract": 1,
-												"unwrap": "copy(_:)"
-											}
-										}
-									}
-								},
-								"source": {
-									"insert": {
-										"extract": 1,
-										"unwrap": "copy(_:)"
-									}
-								}
-							},
-							[
-
-							]
-						]
-					]
-				]
-			]
-		]
-	}, {
-		"delete": [{
-				"categories": {
-					"insert": {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}
-				},
-				"literal": {
-					"delete": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "FreeAlgorithm"
-							}
-						}
-					}
-				},
-				"source": {
-					"insert": {
-						"extract": 1,
-						"unwrap": "FreeAlgorithm"
-					}
-				}
-			},
-			[{
-					"delete": {
-						"extract": 6,
-						"unwrap": [{
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "Pure"
-										}
-									}
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}
-				},
-				[{
-						"categories": {
-							"insert": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}
-						},
-						"literal": {
-							"delete": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "Roll"
-									}
-								}
-							}
-						},
-						"source": {
-							"insert": {
-								"extract": 1,
-								"unwrap": "Pure"
-							}
-						}
-					},
-					[
-
-					]
-				],
-				[{
-						"categories": {
-							"insert": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}
-						},
-						"literal": {
-							"delete": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "analysis(ifPure:ifRoll:)"
-									}
-								}
-							}
-						},
-						"source": {
-							"insert": {
-								"extract": 1,
-								"unwrap": "Roll"
-							}
-						}
-					},
-					[
-
-					]
-				], {
-					"replace": {
-						"before": {
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "mark"
-										}
-									}
-								}
-							}
-						},
-						"after": {
-							"extract": 5,
-							"unwrap": [{
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "analysis(ifPure:ifRoll:)"
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}
-					}
-				}, {
-					"replace": {
-						"before": {
-							"extract": 6,
-							"unwrap": [{
-								"extract": 4,
-								"unwrap": {
-									"literal": {
-										"extract": 3,
-										"unwrap": {
-											"categories": {
-												"extract": 1,
-												"unwrap": [
-
-												]
-											},
-											"source": {
-												"extract": 1,
-												"unwrap": "map(_:)"
-											}
-										}
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						},
-						"after": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "mark"
-								}
-							}
-						}
-					}
-				}, {
-					"replace": {
-						"before": {
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "mark"
-										}
-									}
-								}
-							}
-						},
-						"after": {
-							"extract": 5,
-							"unwrap": [{
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "map(_:)"
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}
-					}
-				}, {
-					"insert": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "mark"
-							}
-						}
-					}
-				},
-				[{
-						"categories": {
-							"insert": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}
-						},
-						"literal": {
-							"delete": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "flatMap(_:)"
-									}
-								}
-							}
-						},
-						"source": {
-							"insert": {
-								"extract": 1,
-								"unwrap": "flatMap(_:)"
-							}
-						}
-					},
-					[
-
-					]
-				],
-				[{
-						"categories": {
-							"insert": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}
-						},
-						"literal": {
-							"delete": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "evaluate(_:)"
-									}
-								}
-							}
-						},
-						"source": {
-							"insert": {
-								"extract": 1,
-								"unwrap": "evaluate(_:)"
-							}
-						}
-					},
-					[
-
-					]
-				]
-			]
-		]
-	}, {
-		"delete": [{
-				"categories": {
-					"insert": {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}
-				},
-				"literal": {
-					"delete": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "FreeAlgorithm"
-							}
-						}
-					}
-				},
-				"source": {
-					"insert": {
-						"extract": 1,
-						"unwrap": "FreeAlgorithm"
-					}
-				}
-			},
-			[
-				[{
-						"categories": {
-							"insert": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}
-						},
-						"literal": {
-							"delete": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "evaluate()"
-									}
-								}
-							}
-						},
-						"source": {
-							"insert": {
-								"extract": 1,
-								"unwrap": "evaluate()"
-							}
-						}
-					},
-					[
-
-					]
-				]
-			]
-		]
-	},
-	[{
-			"categories": {
-				"insert": {
-					"extract": 1,
-					"unwrap": [
-
-					]
-				}
-			},
-			"literal": {
-				"delete": {
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "FreeConvertible"
-						}
-					}
-				}
-			},
-			"source": {
-				"insert": {
-					"extract": 1,
-					"unwrap": "FreeConvertible"
-				}
-			}
-		},
-		[{
-			"delete": {
-				"extract": 6,
-				"unwrap": [{
-					"extract": 4,
-					"unwrap": {
-						"literal": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "init(free:)"
-								}
-							}
-						}
-					}
-				}, {
-					"extract": 1,
-					"unwrap": [
-
-					]
-				}]
-			}
-		}, {
-			"replace": {
-				"before": {
-					"extract": 4,
-					"unwrap": {
-						"literal": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "free"
-								}
-							}
-						}
-					}
-				},
-				"after": {
-					"extract": 5,
-					"unwrap": [{
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "init(free:)"
-							}
-						}
-					}, {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}]
-				}
-			}
-		}, {
-			"insert": {
-				"extract": 3,
-				"unwrap": {
-					"categories": {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					},
-					"source": {
-						"extract": 1,
-						"unwrap": "free"
-					}
-				}
-			}
-		}]
-	],
-	[{
-			"categories": {
-				"insert": {
-					"extract": 1,
-					"unwrap": [
-
-					]
-				}
-			},
-			"literal": {
-				"delete": {
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "Free"
-						}
-					}
-				}
-			},
-			"source": {
-				"insert": {
-					"extract": 1,
-					"unwrap": "Free"
-				}
-			}
-		},
-		[{
-			"delete": {
-				"extract": 6,
-				"unwrap": [{
-					"extract": 4,
-					"unwrap": {
-						"literal": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "init(free:)"
-								}
-							}
-						}
-					}
-				}, {
-					"extract": 1,
-					"unwrap": [
-
-					]
-				}]
-			}
-		}, {
-			"replace": {
-				"before": {
-					"extract": 4,
-					"unwrap": {
-						"literal": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "free"
-								}
-							}
-						}
-					}
-				},
-				"after": {
-					"extract": 5,
-					"unwrap": [{
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "init(free:)"
-							}
-						}
-					}, {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}]
-				}
-			}
-		}, {
-			"insert": {
-				"extract": 3,
-				"unwrap": {
-					"categories": {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					},
-					"source": {
-						"extract": 1,
-						"unwrap": "free"
-					}
-				}
-			}
-		}]
-	],
-	[{
-			"categories": {
-				"insert": {
-					"extract": 1,
-					"unwrap": [
-
-					]
-				}
-			},
-			"literal": {
-				"delete": {
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "FreeAlgorithm"
-						}
-					}
-				}
-			},
-			"source": {
-				"insert": {
-					"extract": 1,
-					"unwrap": "FreeAlgorithm"
-				}
-			}
-		},
-		[
-			[{
-					"categories": {
-						"insert": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}
-					},
-					"literal": {
-						"delete": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "init(_:_:)"
-								}
-							}
-						}
-					},
-					"source": {
-						"insert": {
-							"extract": 1,
-							"unwrap": "init(_:_:)"
-						}
-					}
-				},
-				[
-
-				]
-			], {
-				"insert": [{
-						"categories": {
-							"insert": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}
-						},
-						"literal": {
-							"delete": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "evaluate(_:)"
-									}
-								}
-							}
-						},
-						"source": {
-							"insert": {
-								"extract": 1,
-								"unwrap": "evaluate(_:)"
-							}
-						}
-					},
-					[
-
-					]
-				]
-			}
-		]
-	], {
-		"insert": [{
-				"categories": {
-					"insert": {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}
-				},
-				"literal": {
-					"delete": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "FreeAlgorithm"
-							}
-						}
-					}
-				},
-				"source": {
-					"insert": {
-						"extract": 1,
-						"unwrap": "FreeAlgorithm"
-					}
-				}
-			},
-			[
-				[{
-						"categories": {
-							"insert": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}
-						},
-						"literal": {
-							"delete": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "evaluate()"
-									}
-								}
-							}
-						},
-						"source": {
-							"insert": {
-								"extract": 1,
-								"unwrap": "evaluate()"
-							}
-						}
-					},
-					[
-
-					]
-				]
-			]
-		]
-	}
-]
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Conditions": {
+    "BaseAmiBuildFromDefault": {
+      "Fn::Or": [
+        {
+          "Condition": "BaseAmiForceBuildFromDefaultIsTrue"
+        },
+        {
+          "Condition": "BaseAmiCachedMapAbsent"
+        }
+      ]
+    },
+    "BaseAmiCachedMapAbsent": {
+      "Fn::Equals": [
+        {
+          "Fn::FindInMap": [
+            "EnvironmentMap",
+            {
+              "Ref": "Environment"
+            },
+            "BaseAmiCachedMap"
+          ]
+        },
+        ""
+      ]
+    },
+    "BaseAmiForceBuildFromDefaultIsFalse": {
+      "Fn::Equals": [
+        {
+          "Ref": "BaseAmiForceBuildFromDefault"
+        },
+        "false"
+      ]
+    },
+    "BaseAmiForceBuildFromDefaultIsTrue": {
+      "Fn::Equals": [
+        {
+          "Ref": "BaseAmiForceBuildFromDefault"
+        },
+        "true"
+      ]
+    },
+    "BaseAmiForceBuildIsFalse": {
+      "Fn::Equals": [
+        {
+          "Ref": "BaseAmiForceBuild"
+        },
+        "false"
+      ]
+    },
+    "BaseAmiForceBuildIsTrue": {
+      "Fn::Equals": [
+        {
+          "Ref": "BaseAmiForceBuild"
+        },
+        "true"
+      ]
+    },
+    "BaseAmiPuppetShaIsEmpty": {
+      "Fn::Equals": [
+        {
+          "Ref": "BaseAmiPuppetSha"
+        },
+        ""
+      ]
+    },
+    "BaseAmiPuppetShaIsPresent": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "BaseAmiPuppetSha"
+            },
+            ""
+          ]
+        }
+      ]
+    },
+    "PuppetmasterAndVpnReadyIsTrue": {
+      "Fn::Equals": [
+        {
+          "Fn::FindInMap": [
+            "EnvironmentMap",
+            {
+              "Ref": "Environment"
+            },
+            "PuppetmasterAndVpnReady"
+          ]
+        },
+        "true"
+      ]
+    },
+    "VpnCustomerGatewayIpAddressIsEmpty": {
+      "Fn::Equals": [
+        {
+          "Ref": "VpnCustomerGatewayIpAddress"
+        },
+        ""
+      ]
+    },
+    "VpnCustomerGatewayIpAddressIsPresent": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "VpnCustomerGatewayIpAddress"
+            },
+            ""
+          ]
+        }
+      ]
+    },
+    "not_production": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "Environment"
+            },
+            "production"
+          ]
+        }
+      ]
+    },
+    "not_staging": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "Environment"
+            },
+            "staging"
+          ]
+        }
+      ]
+    },
+    "not_test": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "Environment"
+            },
+            "test"
+          ]
+        }
+      ]
+    },
+    "production": {
+      "Fn::Equals": [
+        {
+          "Ref": "Environment"
+        },
+        "production"
+      ]
+    },
+    "staging": {
+      "Fn::Equals": [
+        {
+          "Ref": "Environment"
+        },
+        "staging"
+      ]
+    },
+    "test": {
+      "Fn::Equals": [
+        {
+          "Ref": "Environment"
+        },
+        "test"
+      ]
+    }
+  },
+  "Description": "The core infrastructure for GitHub's Disaster Recovery environment. This stack is designed to contain resources that all other services need, like a network, apt repositories, a puppetmaster, etc. Identifiers for the services provisioned are includes in this stack's Ouputs so other applications can be deployed as separate stacks.",
+  "Mappings": {
+    "AccountAzMapping": {
+      "702486989568": {
+        "PrimaryZone": "us-west-2a",
+        "SecondaryZone": "us-west-2c",
+        "Zones": [
+          "us-west-2a",
+          "us-west-2c"
+        ]
+      },
+      "827735963447": {
+        "PrimaryZone": "us-west-2a",
+        "SecondaryZone": "us-west-2c",
+        "Zones": [
+          "us-west-2a",
+          "us-west-2c"
+        ]
+      },
+      "934964882584": {
+        "PrimaryZone": "us-west-2a",
+        "SecondaryZone": "us-west-2c",
+        "Zones": [
+          "us-west-2a",
+          "us-west-2c"
+        ]
+      }
+    },
+    "EnvironmentMap": {
+      "production": {
+        "KeyName": "github-cloudformation",
+        "ShortName": "prd"
+      },
+      "staging": {
+        "BaseAmiCachedMap": "core-ami-clean-hostname/resources/outputs/core2-AmiBuilder2-I7BKXODRFL81-db5ed2be2986bffa55103f08a8a0587fdf506880.json",
+        "BaseAmiPuppetSha": "db5ed2be2986bffa55103f08a8a0587fdf506880",
+        "KeyName": "github-cloudformation-staging",
+        "PuppetmasterAndVpnReady": "true",
+        "ShortName": "stg"
+      },
+      "test": {
+        "BaseAmiCachedMap": "core-builder-jenkins-7550/resources/outputs/ami-jenkins-7550-c4f7199.json",
+        "BaseAmiPuppetSha": "c4f7199",
+        "KeyName": "github-cloudformation-test",
+        "PuppetmasterAndVpnReady": "true",
+        "ShortName": "t"
+      }
+    },
+    "SnapshotsMap": {
+      "production": {
+        "Mirrors": "",
+        "PackageServer2": ""
+      },
+      "staging": {
+        "Mirrors": "snap-11044349",
+        "PackageServer2": "snap-65e39a3b"
+      },
+      "test": {
+        "Mirrors": "",
+        "PackageServer2": ""
+      }
+    }
+  },
+  "Metadata": {
+    "AmiBuilder2": {
+      "Description": "Builds AMIs containing github::core. Generates a single output that when placed in the EnvironmentMap as BaseAmiCachedMap will cause all instances to be replaced with the contained AMIs."
+    },
+    "Aux2": {
+      "Description": "A private instance designed to demonstrate the charactaristics of instances without public addresses in stack."
+    },
+    "BaseAmiMap": {
+      "Description": "A stack contining the Base AMI Ids we should use to create instances as Outputs. If a path to a cached stack is provided in BaseAmiCachedMap, the contents of that path are used as a template. Otherwise, we use the core-builder-default stack."
+    },
+    "Bastion2": {
+      "Description": "A nested stack containing an AutoScalingGroup and ELB to provide HA SSH access to this environment."
+    },
+    "CoreGpanelNotificationTopic": {
+      "Description": "Instances in this stack are configured to send a message containing their instance ID on boot. All messages are delivered to CoreGpanelQueue."
+    },
+    "CoreGpanelQueue": {
+      "Description": "Instances in this stack communicate their existance to gPanel by sending an SNS message. These messages are routed to this SQS queue, which gPanel subscribes to for the purposes of creating host records as they're seen and cleaning up old instances as necessary."
+    },
+    "CoreGpanelRole": {
+      "Description": "Create a special IAM role for gPanel that can be assumed by our prod AWS account. This allows gPanel to read from the queue we've created, delete messages once the've been acted on, and describe instances."
+    },
+    "CoreIamInstanceProfile": {
+      "Description": "Creates an IAM role and Instance profile with the baseline policies required for all nodes. The ARN of the generated resources are output so other stacks can reference them."
+    },
+    "DefaultAmiMap": {
+      "Description": "An stack containing default Ubuntu AMIs. Included only when we force a build from the default AMIs so existing instances can continue to reference their current AMIs."
+    },
+    "GpanelSNSToSQS": {
+      "Description": "Allow SNS to send messages to the gPanel SQS queue."
+    },
+    "HTTPSecurityGroup": {
+      "Description": "Allow cp1, pe1, and CoreSecurityGroup to access the package server over HTTP and HTTPS."
+    },
+    "Network": {
+      "Description": "Contains the VPC, VPN, and NAT instances to provide a network in which to deploy other resources."
+    }
+  },
+  "Outputs": {
+    "CoreBastionDNSName": {
+      "Condition": "PuppetmasterAndVpnReadyIsTrue",
+      "Description": "SSH to this address to access the stack.",
+      "Value": {
+        "Fn::GetAtt": [
+          "Bastion2",
+          "Outputs.BastionDNSName"
+        ]
+      }
+    },
+    "CoreBastionRoute53Name": {
+      "Condition": "PuppetmasterAndVpnReadyIsTrue",
+      "Description": "SSH to this address to access the stack if DNS has not yet configured.",
+      "Value": {
+        "Fn::GetAtt": [
+          "Bastion2",
+          "Outputs.BastionRoute53Name"
+        ]
+      }
+    },
+    "CoreGpanelNotificationTopic": {
+      "Description": "The ARN of the SNS to which instances should send a message containing their Instance ID to add them to gPanel.",
+      "Value": {
+        "Ref": "CoreGpanelNotificationTopic"
+      }
+    },
+    "CoreGpanelQueue": {
+      "Description": "The url of the SQS queue that gPanel should poll for instance creation messages.",
+      "Value": {
+        "Ref": "CoreGpanelQueue"
+      }
+    },
+    "CoreGpanelRole": {
+      "Description": "The ARN of the IAM role that gPanel should assume to receive notification of new instances and describe them.",
+      "Value": {
+        "Fn::GetAtt": [
+          "CoreGpanelRole",
+          "Arn"
+        ]
+      }
+    },
+    "CoreRoute53ZoneId": {
+      "Description": "The ID of the Route53 zone created by the Network stack.",
+      "Value": {
+        "Fn::GetAtt": [
+          "Network",
+          "Outputs.Route53ZoneId"
+        ]
+      }
+    },
+    "CoreRoute53ZoneName": {
+      "Description": "The Name of the Route53 zone created by the Network stack.",
+      "Value": {
+        "Fn::GetAtt": [
+          "Network",
+          "Outputs.Route53ZoneName"
+        ]
+      }
+    },
+    "CoreSecurityGroupId": {
+      "Description": "The ID that all instances should join for ICMP and mutual SSH access.",
+      "Value": {
+        "Fn::GetAtt": [
+          "Network",
+          "Outputs.CoreSecurityGroupId"
+        ]
+      }
+    },
+    "CustomerGatewayIpAddress": {
+      "Description": "The CustomerGatewayIpAddress our ipsec VPN is configured to connect to.",
+      "Value": {
+        "Fn::GetAtt": [
+          "Network",
+          "Outputs.CustomerGatewayIpAddress"
+        ]
+      }
+    },
+    "IamRole": {
+      "Description": "The ARN of an IAM Role with all permissions required for baseline operation.",
+      "Value": {
+        "Fn::GetAtt": [
+          "CoreIamInstanceProfile",
+          "Outputs.IamRole"
+        ]
+      }
+    },
+    "InstanceProfile": {
+      "Description": "The ARN of an IAM InstanceProfile with all permissions required for baseline operation.",
+      "Value": {
+        "Fn::GetAtt": [
+          "CoreIamInstanceProfile",
+          "Outputs.InstanceProfile"
+        ]
+      }
+    },
+    "KeyName": {
+      "Description": "The default key name used to provision instances in this stack.",
+      "Value": {
+        "Fn::FindInMap": [
+          "EnvironmentMap",
+          {
+            "Ref": "Environment"
+          },
+          "KeyName"
+        ]
+      }
+    },
+    "PrimaryPrivateSubnet": {
+      "Description": "The ID of the primary subnet for instances without public addresses. Outbound access to the public internet is enabled using NAT instances in the Network stack.",
+      "Value": {
+        "Fn::GetAtt": [
+          "Network",
+          "Outputs.PrimaryPrivateSubnet"
+        ]
+      }
+    },
+    "PrimaryPublicSubnet": {
+      "Description": "The ID of the primary subnet with access to an InternetGateway. Only provision instances in this subnet if a public access is explicitly required and NAT or ELB will not do.",
+      "Value": {
+        "Fn::GetAtt": [
+          "Network",
+          "Outputs.PrimaryPublicSubnet"
+        ]
+      }
+    },
+    "PrimaryZone": {
+      "Description": "The Availability Zone containing the primary subnets.",
+      "Value": {
+        "Fn::FindInMap": [
+          "AccountAzMapping",
+          {
+            "Ref": "AWS::AccountId"
+          },
+          "PrimaryZone"
+        ]
+      }
+    },
+    "SecondaryPrivateSubnet": {
+      "Description": "The ID of the *secondary* subnet for instances without public addresses. Outbound access to the public internet is enabled using NAT instances in the Network stack. Only provision instances in this subnet if your application is able to operate in multiple availability zones.",
+      "Value": {
+        "Fn::GetAtt": [
+          "Network",
+          "Outputs.SecondaryPrivateSubnet"
+        ]
+      }
+    },
+    "SecondaryPublicSubnet": {
+      "Description": "The ID of the *secondary* subnet with access to an InternetGateway. Only provision instances in this subnet if a public access is explicitly required and NAT or ELB will not do and your application is able to operate in multiple availability zones.",
+      "Value": {
+        "Fn::GetAtt": [
+          "Network",
+          "Outputs.SecondaryPublicSubnet"
+        ]
+      }
+    },
+    "SecondaryZone": {
+      "Description": "The Availability Zone containing the secondary subnets.",
+      "Value": {
+        "Fn::FindInMap": [
+          "AccountAzMapping",
+          {
+            "Ref": "AWS::AccountId"
+          },
+          "SecondaryZone"
+        ]
+      }
+    },
+    "VpcCidr": {
+      "Description": "The CIDR address space of the VPC generated by the Network stack.",
+      "Value": {
+        "Fn::GetAtt": [
+          "Network",
+          "Outputs.VpcCidr"
+        ]
+      }
+    },
+    "VpcId": {
+      "Description": "The ID of the VPC generated by the Network stack.",
+      "Value": {
+        "Fn::GetAtt": [
+          "Network",
+          "Outputs.VpcId"
+        ]
+      }
+    }
+  },
+  "Parameters": {
+    "BaseAmiForceBuild": {
+      "Default": "false",
+      "Description": "Set this to true to force an AMI build.",
+      "Type": "String"
+    },
+    "BaseAmiForceBuildFromDefault": {
+      "Default": "false",
+      "Description": "Set this to true to force AMI builds to happen from a default Ubuntu AMI instead of using the currently cached AMI.",
+      "Type": "String"
+    },
+    "BaseAmiPuppetSha": {
+      "Default": "",
+      "Description": "Desired Puppet SHA to create AMIs from. If a value isn't provided, the value is expected to be contained in EnvironmentMap for the current Environment.",
+      "Type": "String"
+    },
+    "Environment": {
+      "AllowedValues": [
+        "test",
+        "staging",
+        "production"
+      ],
+      "ConstraintDescription": "must be test, staging, or production",
+      "Default": "test",
+      "Description": "Environment. Defaults to test",
+      "Type": "String"
+    },
+    "GitHubToken": {
+      "Description": "GitHub Token. Used for downloading puppet manifests.",
+      "NoEcho": "true",
+      "Type": "String"
+    },
+    "GitHubUsername": {
+      "Description": "GitHub Username. Used for downloading puppet manifests.",
+      "Type": "String"
+    },
+    "LogRetentionInDays": {
+      "Default": "7",
+      "Description": "Days to retain logs in CloudWatch Logs",
+      "Type": "Number"
+    },
+    "ResourceBase": {
+      "Description": "S3 Base URL for stack resources",
+      "Type": "String"
+    },
+    "ResourceBucket": {
+      "Description": "S3 Bucket",
+      "Type": "String"
+    },
+    "StackIdentifier": {
+      "Description": "Treeish or PID to represent the version of this stack. Related resources are similary named",
+      "Type": "String"
+    },
+    "StackInstance": {
+      "Description": "Stack name and Identifier",
+      "Type": "String"
+    },
+    "VpnCustomerGatewayIpAddress": {
+      "Default": "",
+      "Description": "Specify the CustomerGatewayIpAddress. If not provided, The default of this parameter value comes from the Network stack's EnvironmentMap",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "AmiBuilder2": {
+      "DependsOn": [
+        "Network"
+      ],
+      "Properties": {
+        "NotificationARNs": {
+          "Ref": "AWS::NotificationARNs"
+        },
+        "Parameters": {
+          "CachedSha": {
+            "Fn::GetAtt": [
+              "BaseAmiMap",
+              "Outputs.Sha"
+            ]
+          },
+          "Environment": {
+            "Ref": "Environment"
+          },
+          "ForceBuild": {
+            "Ref": "BaseAmiForceBuild"
+          },
+          "GitHubToken": {
+            "Ref": "GitHubToken"
+          },
+          "GitHubUsername": {
+            "Ref": "GitHubUsername"
+          },
+          "ImageId": {
+            "Fn::If": [
+              "BaseAmiBuildFromDefault",
+              {
+                "Fn::GetAtt": [
+                  "DefaultAmiMap",
+                  "Outputs.HvmSsdImageId"
+                ]
+              },
+              {
+                "Fn::GetAtt": [
+                  "BaseAmiMap",
+                  "Outputs.HvmSsdImageId"
+                ]
+              }
+            ]
+          },
+          "KeyName": {
+            "Fn::FindInMap": [
+              "EnvironmentMap",
+              {
+                "Ref": "Environment"
+              },
+              "KeyName"
+            ]
+          },
+          "PuppetSha": {
+            "Fn::If": [
+              "BaseAmiPuppetShaIsEmpty",
+              {
+                "Fn::FindInMap": [
+                  "EnvironmentMap",
+                  {
+                    "Ref": "Environment"
+                  },
+                  "BaseAmiPuppetSha"
+                ]
+              },
+              {
+                "Ref": "BaseAmiPuppetSha"
+              }
+            ]
+          },
+          "ResourceBase": {
+            "Ref": "ResourceBase"
+          },
+          "ResourceBucket": {
+            "Ref": "ResourceBucket"
+          },
+          "StackIdentifier": {
+            "Ref": "StackIdentifier"
+          },
+          "StackInstance": {
+            "Ref": "StackInstance"
+          },
+          "Subnet": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.PrimaryPublicSubnet"
+            ]
+          },
+          "Vpc": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.VpcId"
+            ]
+          },
+          "Zone": {
+            "Fn::FindInMap": [
+              "AccountAzMapping",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "PrimaryZone"
+            ]
+          },
+          "ZoneId": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.Route53ZoneId"
+            ]
+          },
+          "ZoneName": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.Route53ZoneName"
+            ]
+          }
+        },
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Ref": "ResourceBase"
+              },
+              {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "core-builder",
+                    {
+                      "Ref": "StackIdentifier"
+                    }
+                  ]
+                ]
+              },
+              "stack.json"
+            ]
+          ]
+        }
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
+    "Aux2": {
+      "Condition": "PuppetmasterAndVpnReadyIsTrue",
+      "DependsOn": [
+        "Network",
+        "CoreIamInstanceProfile",
+        "CoreGpanelNotificationTopic"
+      ],
+      "Properties": {
+        "NotificationARNs": {
+          "Ref": "AWS::NotificationARNs"
+        },
+        "Parameters": {
+          "App": "ops",
+          "Branch": "master",
+          "Environment": {
+            "Ref": "Environment"
+          },
+          "GpanelSnsTopic": {
+            "Ref": "CoreGpanelNotificationTopic"
+          },
+          "IamRole": {
+            "Fn::GetAtt": [
+              "CoreIamInstanceProfile",
+              "Outputs.IamRole"
+            ]
+          },
+          "ImageId": {
+            "Fn::GetAtt": [
+              "BaseAmiMap",
+              "Outputs.HvmSsdImageId"
+            ]
+          },
+          "InstanceProfile": {
+            "Fn::GetAtt": [
+              "CoreIamInstanceProfile",
+              "Outputs.InstanceProfile"
+            ]
+          },
+          "InstanceType": "c4.large",
+          "KeyName": {
+            "Fn::FindInMap": [
+              "EnvironmentMap",
+              {
+                "Ref": "Environment"
+              },
+              "KeyName"
+            ]
+          },
+          "ResourceBase": {
+            "Ref": "ResourceBase"
+          },
+          "ResourceBucket": {
+            "Ref": "ResourceBucket"
+          },
+          "Role": "aux",
+          "SecurityGroupIds": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.CoreSecurityGroupId"
+            ]
+          },
+          "StackIdentifier": {
+            "Ref": "StackIdentifier"
+          },
+          "StackInstance": {
+            "Ref": "StackInstance"
+          },
+          "Subnet": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.PrimaryPrivateSubnet"
+            ]
+          },
+          "Vpc": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.VpcId"
+            ]
+          },
+          "Zone": {
+            "Fn::FindInMap": [
+              "AccountAzMapping",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "PrimaryZone"
+            ]
+          },
+          "ZoneId": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.Route53ZoneId"
+            ]
+          },
+          "ZoneName": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.Route53ZoneName"
+            ]
+          }
+        },
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Ref": "ResourceBase"
+              },
+              {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "core-instance",
+                    {
+                      "Ref": "StackIdentifier"
+                    }
+                  ]
+                ]
+              },
+              "stack.json"
+            ]
+          ]
+        },
+        "TimeoutInMinutes": "45"
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
+    "BaseAmiMap": {
+      "Properties": {
+        "NotificationARNs": {
+          "Ref": "AWS::NotificationARNs"
+        },
+        "Parameters": {
+          "Environment": {
+            "Ref": "Environment"
+          },
+          "ResourceBase": {
+            "Ref": "ResourceBase"
+          },
+          "ResourceBucket": {
+            "Ref": "ResourceBucket"
+          },
+          "StackIdentifier": {
+            "Ref": "StackIdentifier"
+          },
+          "StackInstance": {
+            "Ref": "StackInstance"
+          }
+        },
+        "TemplateURL": {
+          "Fn::If": [
+            "BaseAmiBuildFromDefault",
+            {
+              "Fn::Join": [
+                "/",
+                [
+                  {
+                    "Ref": "ResourceBase"
+                  },
+                  {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "core-builder-default",
+                        {
+                          "Ref": "StackIdentifier"
+                        }
+                      ]
+                    ]
+                  },
+                  "stack.json"
+                ]
+              ]
+            },
+            {
+              "Fn::Join": [
+                "/",
+                [
+                  {
+                    "Ref": "ResourceBase"
+                  },
+                  {
+                    "Fn::FindInMap": [
+                      "EnvironmentMap",
+                      {
+                        "Ref": "Environment"
+                      },
+                      "BaseAmiCachedMap"
+                    ]
+                  }
+                ]
+              ]
+            }
+          ]
+        }
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
+    "Bastion2": {
+      "Condition": "PuppetmasterAndVpnReadyIsTrue",
+      "DependsOn": [
+        "Network",
+        "CoreIamInstanceProfile",
+        "CoreGpanelNotificationTopic"
+      ],
+      "Properties": {
+        "NotificationARNs": {
+          "Ref": "AWS::NotificationARNs"
+        },
+        "Parameters": {
+          "Environment": {
+            "Ref": "Environment"
+          },
+          "GpanelSnsTopic": {
+            "Ref": "CoreGpanelNotificationTopic"
+          },
+          "IamRole": {
+            "Fn::GetAtt": [
+              "CoreIamInstanceProfile",
+              "Outputs.IamRole"
+            ]
+          },
+          "ImageId": {
+            "Fn::GetAtt": [
+              "BaseAmiMap",
+              "Outputs.HvmSsdImageId"
+            ]
+          },
+          "InstanceProfile": {
+            "Fn::GetAtt": [
+              "CoreIamInstanceProfile",
+              "Outputs.InstanceProfile"
+            ]
+          },
+          "KeyName": {
+            "Fn::FindInMap": [
+              "EnvironmentMap",
+              {
+                "Ref": "Environment"
+              },
+              "KeyName"
+            ]
+          },
+          "Port": 443,
+          "PrimarySubnet": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.PrimaryPublicSubnet"
+            ]
+          },
+          "PrimaryZone": {
+            "Fn::FindInMap": [
+              "AccountAzMapping",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "PrimaryZone"
+            ]
+          },
+          "ResourceBase": {
+            "Ref": "ResourceBase"
+          },
+          "ResourceBucket": {
+            "Ref": "ResourceBucket"
+          },
+          "SecondarySubnet": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.SecondaryPublicSubnet"
+            ]
+          },
+          "SecondaryZone": {
+            "Fn::FindInMap": [
+              "AccountAzMapping",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "SecondaryZone"
+            ]
+          },
+          "SecurityGroupId": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.CoreSecurityGroupId"
+            ]
+          },
+          "StackIdentifier": {
+            "Ref": "StackIdentifier"
+          },
+          "StackInstance": {
+            "Ref": "StackInstance"
+          },
+          "Vpc": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.VpcId"
+            ]
+          },
+          "ZoneId": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.Route53ZoneId"
+            ]
+          },
+          "ZoneName": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.Route53ZoneName"
+            ]
+          }
+        },
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Ref": "ResourceBase"
+              },
+              {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "core-bastion",
+                    {
+                      "Ref": "StackIdentifier"
+                    }
+                  ]
+                ]
+              },
+              "stack.json"
+            ]
+          ]
+        },
+        "TimeoutInMinutes": "45"
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
+    "CoreGpanelNotificationTopic": {
+      "Properties": {
+        "Subscription": [
+          {
+            "Endpoint": {
+              "Fn::GetAtt": [
+                "CoreGpanelQueue",
+                "Arn"
+              ]
+            },
+            "Protocol": "sqs"
+          }
+        ]
+      },
+      "Type": "AWS::SNS::Topic"
+    },
+    "CoreGpanelQueue": {
+      "Properties": {
+        "MessageRetentionPeriod": "3600",
+        "VisibilityTimeout": "300"
+      },
+      "Type": "AWS::SQS::Queue"
+    },
+    "CoreGpanelRole": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "sts:AssumeRole"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": "arn:aws:iam::895557238572:user/gpanel-queue"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Path": "/",
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "sqs:ReceiveMessage",
+                    "sqs:DeleteMessage"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": [
+                        "CoreGpanelQueue",
+                        "Arn"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Action": [
+                    "ec2:DescribeInstances"
+                  ],
+                  "Effect": "Allow",
+                  "Resource": [
+                    "*"
+                  ]
+                }
+              ],
+              "Version": "2012-10-17"
+            },
+            "PolicyName": "CoreGpanelSQSRole"
+          }
+        ]
+      },
+      "Type": "AWS::IAM::Role"
+    },
+    "CoreIamInstanceProfile": {
+      "DependsOn": [
+        "CoreGpanelNotificationTopic",
+        "Network"
+      ],
+      "Properties": {
+        "NotificationARNs": {
+          "Ref": "AWS::NotificationARNs"
+        },
+        "Parameters": {
+          "Environment": {
+            "Ref": "Environment"
+          },
+          "GpanelSnsTopic": {
+            "Ref": "CoreGpanelNotificationTopic"
+          },
+          "ResourceBase": {
+            "Ref": "ResourceBase"
+          },
+          "ResourceBucket": {
+            "Ref": "ResourceBucket"
+          },
+          "StackIdentifier": {
+            "Ref": "StackIdentifier"
+          },
+          "StackInstance": {
+            "Ref": "StackInstance"
+          },
+          "ZoneId": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.Route53ZoneId"
+            ]
+          }
+        },
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Ref": "ResourceBase"
+              },
+              {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "core-iam-instance-profile",
+                    {
+                      "Ref": "StackIdentifier"
+                    }
+                  ]
+                ]
+              },
+              "stack.json"
+            ]
+          ]
+        }
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
+    "DefaultAmiMap": {
+      "Condition": "BaseAmiBuildFromDefault",
+      "Properties": {
+        "NotificationARNs": {
+          "Ref": "AWS::NotificationARNs"
+        },
+        "Parameters": {
+          "Environment": {
+            "Ref": "Environment"
+          },
+          "ResourceBase": {
+            "Ref": "ResourceBase"
+          },
+          "ResourceBucket": {
+            "Ref": "ResourceBucket"
+          },
+          "StackIdentifier": {
+            "Ref": "StackIdentifier"
+          },
+          "StackInstance": {
+            "Ref": "StackInstance"
+          }
+        },
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Ref": "ResourceBase"
+              },
+              {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "core-builder-default",
+                    {
+                      "Ref": "StackIdentifier"
+                    }
+                  ]
+                ]
+              },
+              "stack.json"
+            ]
+          ]
+        },
+        "TimeoutInMinutes": "2"
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
+    "GpanelSNSToSQS": {
+      "Properties": {
+        "PolicyDocument": {
+          "Id": "GpanelSNSToSQS",
+          "Statement": [
+            {
+              "Action": [
+                "sqs:SendMessage"
+              ],
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Ref": "CoreGpanelNotificationTopic"
+                  }
+                }
+              },
+              "Effect": "Allow",
+              "Principal": "*",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "CoreGpanelQueue",
+                  "Arn"
+                ]
+              },
+              "Sid": "GpanelSNSToSQS"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Queues": [
+          {
+            "Ref": "CoreGpanelQueue"
+          }
+        ]
+      },
+      "Type": "AWS::SQS::QueuePolicy"
+    },
+    "HTTPSecurityGroup": {
+      "Properties": {
+        "GroupDescription": "In: HTTP(S)",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "172.16.0.0/16",
+            "FromPort": 80,
+            "IpProtocol": "tcp",
+            "ToPort": 80
+          },
+          {
+            "CidrIp": "172.19.0.0/16",
+            "FromPort": 80,
+            "IpProtocol": "tcp",
+            "ToPort": 80
+          },
+          {
+            "FromPort": 80,
+            "IpProtocol": "tcp",
+            "SourceSecurityGroupId": {
+              "Fn::GetAtt": [
+                "Network",
+                "Outputs.CoreSecurityGroupId"
+              ]
+            },
+            "ToPort": 80
+          },
+          {
+            "CidrIp": "172.16.0.0/16",
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "ToPort": 443
+          },
+          {
+            "CidrIp": "172.19.0.0/16",
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "ToPort": 443
+          },
+          {
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "SourceSecurityGroupId": {
+              "Fn::GetAtt": [
+                "Network",
+                "Outputs.CoreSecurityGroupId"
+              ]
+            },
+            "ToPort": 443
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "provisioner",
+            "Value": "gh-aws:cloudformation"
+          },
+          {
+            "Key": "Name",
+            "Value": "HTTPSecurityGroup"
+          }
+        ],
+        "VpcId": {
+          "Fn::GetAtt": [
+            "Network",
+            "Outputs.VpcId"
+          ]
+        }
+      },
+      "Type": "AWS::EC2::SecurityGroup"
+    },
+    "LogGroup": {
+      "Properties": {
+        "RetentionInDays": {
+          "Ref": "LogRetentionInDays"
+        }
+      },
+      "Type": "AWS::Logs::LogGroup"
+    },
+    "Mirrors": {
+      "Condition": "PuppetmasterAndVpnReadyIsTrue",
+      "DependsOn": [
+        "Network",
+        "CoreIamInstanceProfile",
+        "CoreGpanelNotificationTopic"
+      ],
+      "Properties": {
+        "NotificationARNs": {
+          "Ref": "AWS::NotificationARNs"
+        },
+        "Parameters": {
+          "App": "ops",
+          "Branch": "master",
+          "EbsDeleteOnTermination": true,
+          "EbsDeviceName": "/dev/xvdf",
+          "EbsVolumeSize": "3200",
+          "EbsVolumeSnapshotId": {
+            "Fn::FindInMap": [
+              "SnapshotsMap",
+              {
+                "Ref": "Environment"
+              },
+              "Mirrors"
+            ]
+          },
+          "Environment": {
+            "Ref": "Environment"
+          },
+          "GpanelSnsTopic": {
+            "Ref": "CoreGpanelNotificationTopic"
+          },
+          "IamRole": {
+            "Fn::GetAtt": [
+              "CoreIamInstanceProfile",
+              "Outputs.IamRole"
+            ]
+          },
+          "ImageId": {
+            "Fn::GetAtt": [
+              "BaseAmiMap",
+              "Outputs.HvmSsdImageId"
+            ]
+          },
+          "InstanceProfile": {
+            "Fn::GetAtt": [
+              "CoreIamInstanceProfile",
+              "Outputs.InstanceProfile"
+            ]
+          },
+          "InstanceType": "c4.large",
+          "KeyName": {
+            "Fn::FindInMap": [
+              "EnvironmentMap",
+              {
+                "Ref": "Environment"
+              },
+              "KeyName"
+            ]
+          },
+          "ResourceBase": {
+            "Ref": "ResourceBase"
+          },
+          "ResourceBucket": {
+            "Ref": "ResourceBucket"
+          },
+          "Role": "mirrors",
+          "SecurityGroupIds": {
+            "Fn::Join": [
+              ",",
+              [
+                {
+                  "Fn::GetAtt": [
+                    "Network",
+                    "Outputs.CoreSecurityGroupId"
+                  ]
+                },
+                {
+                  "Ref": "HTTPSecurityGroup"
+                }
+              ]
+            ]
+          },
+          "StackIdentifier": {
+            "Ref": "StackIdentifier"
+          },
+          "StackInstance": {
+            "Ref": "StackInstance"
+          },
+          "Subnet": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.PrimaryPrivateSubnet"
+            ]
+          },
+          "Vpc": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.VpcId"
+            ]
+          },
+          "Zone": {
+            "Fn::FindInMap": [
+              "AccountAzMapping",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "PrimaryZone"
+            ]
+          },
+          "ZoneId": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.Route53ZoneId"
+            ]
+          },
+          "ZoneName": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.Route53ZoneName"
+            ]
+          }
+        },
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Ref": "ResourceBase"
+              },
+              {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "ebs-instance",
+                    {
+                      "Ref": "StackIdentifier"
+                    }
+                  ]
+                ]
+              },
+              "stack.json"
+            ]
+          ]
+        },
+        "TimeoutInMinutes": "45"
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
+    "MirrorsDnsRecord": {
+      "DependsOn": [
+        "Mirrors"
+      ],
+      "Properties": {
+        "HostedZoneId": {
+          "Fn::GetAtt": [
+            "Network",
+            "Outputs.Route53ZoneId"
+          ]
+        },
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              "mirrors.",
+              {
+                "Fn::GetAtt": [
+                  "Network",
+                  "Outputs.Route53ZoneName"
+                ]
+              },
+              "."
+            ]
+          ]
+        },
+        "ResourceRecords": [
+          {
+            "Fn::GetAtt": [
+              "Mirrors",
+              "Outputs.PrivateIp"
+            ]
+          }
+        ],
+        "TTL": "60",
+        "Type": "A"
+      },
+      "Type": "AWS::Route53::RecordSet"
+    },
+    "Network": {
+      "DependsOn": [
+        "CoreGpanelNotificationTopic"
+      ],
+      "Properties": {
+        "NotificationARNs": {
+          "Ref": "AWS::NotificationARNs"
+        },
+        "Parameters": {
+          "CustomerGatewayIpAddress": {
+            "Ref": "VpnCustomerGatewayIpAddress"
+          },
+          "Environment": {
+            "Ref": "Environment"
+          },
+          "GpanelSnsTopic": {
+            "Ref": "CoreGpanelNotificationTopic"
+          },
+          "NatImageId": {
+            "Fn::GetAtt": [
+              "BaseAmiMap",
+              "Outputs.HvmSsdImageId"
+            ]
+          },
+          "NatKeyName": {
+            "Fn::FindInMap": [
+              "EnvironmentMap",
+              {
+                "Ref": "Environment"
+              },
+              "KeyName"
+            ]
+          },
+          "PrimaryZone": {
+            "Fn::FindInMap": [
+              "AccountAzMapping",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "PrimaryZone"
+            ]
+          },
+          "ProvisionNatInstances": {
+            "Fn::If": [
+              "PuppetmasterAndVpnReadyIsTrue",
+              "true",
+              "false"
+            ]
+          },
+          "ResourceBase": {
+            "Ref": "ResourceBase"
+          },
+          "ResourceBucket": {
+            "Ref": "ResourceBucket"
+          },
+          "Route53ZoneName": {
+            "Fn::If": [
+              "test",
+              {
+                "Fn::Join": [
+                  ".",
+                  [
+                    {
+                      "Ref": "AWS::StackName"
+                    },
+                    "github",
+                    "test"
+                  ]
+                ]
+              },
+              {
+                "Fn::Join": [
+                  "",
+                  [
+                    {
+                      "Ref": "AWS::StackName"
+                    },
+                    "-",
+                    {
+                      "Fn::FindInMap": [
+                        "EnvironmentMap",
+                        {
+                          "Ref": "Environment"
+                        },
+                        "ShortName"
+                      ]
+                    },
+                    "-",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ".",
+                    "github.net"
+                  ]
+                ]
+              }
+            ]
+          },
+          "SecondaryZone": {
+            "Fn::FindInMap": [
+              "AccountAzMapping",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "SecondaryZone"
+            ]
+          },
+          "StackIdentifier": {
+            "Ref": "StackIdentifier"
+          },
+          "StackInstance": {
+            "Ref": "StackInstance"
+          }
+        },
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Ref": "ResourceBase"
+              },
+              {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "core-network",
+                    {
+                      "Ref": "StackIdentifier"
+                    }
+                  ]
+                ]
+              },
+              "stack.json"
+            ]
+          ]
+        }
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
+    "PackageServer2": {
+      "Condition": "PuppetmasterAndVpnReadyIsTrue",
+      "DependsOn": [
+        "Network",
+        "CoreIamInstanceProfile",
+        "CoreGpanelNotificationTopic"
+      ],
+      "Properties": {
+        "NotificationARNs": {
+          "Ref": "AWS::NotificationARNs"
+        },
+        "Parameters": {
+          "App": "ops",
+          "Branch": "master",
+          "EbsDeleteOnTermination": true,
+          "EbsDeviceName": "/dev/xvdf",
+          "EbsVolumeSize": "200",
+          "EbsVolumeSnapshotId": {
+            "Fn::FindInMap": [
+              "SnapshotsMap",
+              {
+                "Ref": "Environment"
+              },
+              "PackageServer2"
+            ]
+          },
+          "Environment": {
+            "Ref": "Environment"
+          },
+          "GpanelSnsTopic": {
+            "Ref": "CoreGpanelNotificationTopic"
+          },
+          "IamRole": {
+            "Fn::GetAtt": [
+              "CoreIamInstanceProfile",
+              "Outputs.IamRole"
+            ]
+          },
+          "ImageId": {
+            "Fn::GetAtt": [
+              "BaseAmiMap",
+              "Outputs.HvmSsdImageId"
+            ]
+          },
+          "InstanceProfile": {
+            "Fn::GetAtt": [
+              "CoreIamInstanceProfile",
+              "Outputs.InstanceProfile"
+            ]
+          },
+          "InstanceType": "c4.large",
+          "KeyName": {
+            "Fn::FindInMap": [
+              "EnvironmentMap",
+              {
+                "Ref": "Environment"
+              },
+              "KeyName"
+            ]
+          },
+          "ResourceBase": {
+            "Ref": "ResourceBase"
+          },
+          "ResourceBucket": {
+            "Ref": "ResourceBucket"
+          },
+          "Role": "packageserver",
+          "SecurityGroupIds": {
+            "Fn::Join": [
+              ",",
+              [
+                {
+                  "Fn::GetAtt": [
+                    "Network",
+                    "Outputs.CoreSecurityGroupId"
+                  ]
+                },
+                {
+                  "Ref": "HTTPSecurityGroup"
+                }
+              ]
+            ]
+          },
+          "StackIdentifier": {
+            "Ref": "StackIdentifier"
+          },
+          "StackInstance": {
+            "Ref": "StackInstance"
+          },
+          "Subnet": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.PrimaryPrivateSubnet"
+            ]
+          },
+          "Vpc": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.VpcId"
+            ]
+          },
+          "Zone": {
+            "Fn::FindInMap": [
+              "AccountAzMapping",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              "PrimaryZone"
+            ]
+          },
+          "ZoneId": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.Route53ZoneId"
+            ]
+          },
+          "ZoneName": {
+            "Fn::GetAtt": [
+              "Network",
+              "Outputs.Route53ZoneName"
+            ]
+          }
+        },
+        "TemplateURL": {
+          "Fn::Join": [
+            "/",
+            [
+              {
+                "Ref": "ResourceBase"
+              },
+              {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "ebs-instance",
+                    {
+                      "Ref": "StackIdentifier"
+                    }
+                  ]
+                ]
+              },
+              "stack.json"
+            ]
+          ]
+        },
+        "TimeoutInMinutes": "45"
+      },
+      "Type": "AWS::CloudFormation::Stack"
+    },
+    "PackagesDnsRecord": {
+      "DependsOn": [
+        "PackageServer2"
+      ],
+      "Properties": {
+        "HostedZoneId": {
+          "Fn::GetAtt": [
+            "Network",
+            "Outputs.Route53ZoneId"
+          ]
+        },
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              "packages.",
+              {
+                "Fn::GetAtt": [
+                  "Network",
+                  "Outputs.Route53ZoneName"
+                ]
+              },
+              "."
+            ]
+          ]
+        },
+        "ResourceRecords": [
+          {
+            "Fn::GetAtt": [
+              "PackageServer2",
+              "Outputs.PrivateIp"
+            ]
+          }
+        ],
+        "TTL": "60",
+        "Type": "A"
+      },
+      "Type": "AWS::Route53::RecordSet"
+    }
+  }
+}

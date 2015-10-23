@@ -3,18 +3,32 @@
   <head>
   	<title>semantic-diff</title>
     <style type="text/css">
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: monospace;
+    }
     .insert {
         background-color: #eaffea;
         outline: 1px solid #c1e9c1;
-        margin-left: 50%;
     }
     .delete {
         background-color: #ffecec;
         outline: 1px solid #f1c0c0;
-        margin-right: 50%;
     }
     .replace {
         background-color: #eee;
+    }
+
+    #diff div, #diff ul, #diff li, #diff dl, #diff dd, #diff span {
+        white-space: pre-wrap;
+        display: inline;
+        margin: 0;
+        padding: 0;
+    }
+
+    #diff dt {
+        display: none;
     }
     </style>
     <script type="text/javascript">
@@ -37,47 +51,182 @@
         return node;
     }
 
-    function toDOM(json) {
-        var node;
-        if (json instanceof Array) {
-            node = document.createElement("ol");
-            for (index in json) {
-                var child = wrap("li", toDOM(json[index]));
-                if (child != null) {
-                    node.appendChild(child);
+    function Delete(before, a, b) {
+        this.before = new Term(before, a);
+        return this;
+    }
+
+    function Insert(after, a, b) {
+        this.after = new Term(after, b);
+        return this;
+    }
+
+    function Replace(before, after, a, b) {
+        this.before = new Term(before, a);
+        this.after = new Term(after, b);
+        return this;
+    }
+
+    function Term(json, source) {
+        this.source = source;
+        this.range = json.extract;
+        this.syntax = syntax(json.unwrap, function(x) { return new Term(x, source); });
+        this.syntax.source = source;
+        this.syntax.range = this.range;
+        return this;
+    }
+
+    function toDOM(model) {
+        var element;
+
+        if (model instanceof Delete) {
+            element = document.createElement("div");
+            element.classList.add("patch");
+            element.classList.add("delete");
+            element.appendChild(toDOM(model.before));
+        }
+
+        if (model instanceof Insert) {
+            element = document.createElement("div");
+            element.classList.add("patch");
+            element.classList.add("insert");
+            element.appendChild(toDOM(model.after));
+        }
+
+        if (model instanceof Replace) {
+            element = document.createElement("div");
+            element.classList.add("patch");
+            element.classList.add("replace");
+            var before = toDOM(model.before);
+            before.classList.add("delete");
+            element.appendChild(before);
+            var after = toDOM(model.after);
+            after.classList.add("insert");
+            element.appendChild(after);
+        }
+
+        if (model instanceof Term) {
+            element = document.createElement("div");
+            element.classList.add("term");
+            element.appendChild(toDOM(model.syntax));
+        }
+
+        if (model instanceof Diff) {
+            element = document.createElement("div");
+            element.classList.add("diff");
+            if (model.pure != null) {
+                element.classList.add("pure");
+                element.appendChild(toDOM(model.pure));
+            } else if(model.roll != null) {
+                element.classList.add("roll");
+                element.appendChild(toDOM(model.roll));
+            }
+        }
+
+        if (model instanceof Indexed) {
+            element = document.createElement("ul");
+            if (model.source != null && model.range != null) {
+                var previous = model.range[0];
+                for (i in model.values) {
+                    var value = model.values[i];
+                    element.appendChild(document.createTextNode(model.source.substr(previous, value.range[0] - previous)));
+                    element.appendChild(wrap("li", toDOM(value)));
+                    previous = value.range[0] + value.range[1];
                 }
-            }
-            if (node.childNodes.length == 0) {
-                node = null;
-            }
-        } else if (json instanceof Object) {
-            node = document.createElement("div");
-            if (json['source'] != null) {
-                node = document.createElement("p");
-                node.textContent = json['source'];
-            } else if (json['insert'] != null) {
-                node.classList.add('insert');
-                node.appendChild(toDOM(json['insert']));
-            } else if (json['delete'] != null) {
-                node.classList.add('delete');
-                node.appendChild(toDOM(json['delete']));
-            } else if (json['replace'] != null) {
-                node.classList.add('replace');
-                node.appendChild(toDOM(json['replace']));
-            } else if (json['before'] != null) {
-                node.classList.add('delete');
-                node.appendChild(toDOM(json['before']));
-            } else if (json['after'] != null) {
-                node.classList.add('insert');
-                node.appendChild(toDOM(json['after']));
-            }
-            if (json['categories'] != null) {
-                for (index in json['categories']) {
-                    node.classList.add('category-'+json['categories'][index]);
+                element.appendChild(document.createTextNode(model.source.substr(previous, model.range[0] + model.range[1] - previous)));
+            } else {
+                for (i in model.values) {
+                    element.appendChild(wrap("li", toDOM(model.values[i])));
                 }
             }
         }
-        return node;
+
+        if (model instanceof Keyed) {
+            element = document.createElement("dl");
+            if (model.source != null && model.range != null) {
+                var values = [];
+                for (k in model.values) {
+                    values.push([ k, model.values[k] ]);
+                }
+                values.sort(function(a, b) {
+                    if (a[1].range[0] < b[1].range[0]) {
+                        return -1;
+                    } else if (a[1].range[0] > b[1].range[0]) {
+                        return 1;
+                    }
+                    return 0;
+                });
+
+                var previous = model.range[0];
+                for (i in values) {
+                    var k = values[i][0];
+                    var value = values[i][1];
+                    element.appendChild(document.createTextNode(model.source.substr(previous, value.range[0] - previous)));
+                    var dt = document.createElement("dt");
+                    dt.textContent = k;
+                    element.appendChild(dt);
+                    element.appendChild(wrap("dd", toDOM(value)));
+                    previous = value.range[0] + value.range[1];
+                }
+                element.appendChild(document.createTextNode(model.source.substr(previous, model.range[0] + model.range[1] - previous)));
+            } else {
+                for (k in model.values) {
+                    var dt = document.createElement("dt");
+                    dt.textContent = k;
+                    element.appendChild(dt);
+                    element.appendChild(wrap("dd", toDOM(model.values[k])));
+                }
+            }
+        }
+
+        if (model instanceof Leaf) {
+            element = document.createElement("span");
+            if (model.source != null && model.range != null) {
+                element.textContent = model.source.substr(model.range[0], model.range[1]);
+            }
+            // ?
+        }
+
+        return element;
+    }
+
+    function patch(patch, a, b) {
+        if (patch.delete != null) { return new Delete(patch.delete, a, b); }
+        if (patch.insert != null) { return new Insert(patch.insert, a, b); }
+        if (patch.replace != null) { return new Replace(patch.replace.before, patch.replace.after, a, b); }
+    }
+
+    function Indexed(array, continuation) {
+        this.values = [];
+        for (index in array) {
+            this.values.push(continuation(array[index]));
+        }
+        return this;
+    }
+
+    function Keyed(object, continuation) {
+        this.values = {};
+        for (key in object) {
+            this.values[key] = continuation(object[key]);
+        }
+        return this;
+    }
+
+    function Leaf(object) {
+        this.value = object;
+        return this;
+    }
+
+    function syntax(json, continuation) {
+        if (json instanceof Array) { return new Indexed(json, continuation); }
+        if (json instanceof Object) { return new Keyed(json, continuation); }
+        return new Leaf(json);
+    }
+
+    function Diff(json, a, b) {
+        if (json.pure != null) { this.pure = patch(json.pure, a, b); }
+        if (json.roll != null) { this.roll = syntax(json.roll, function(x) { return new Diff(x, a, b); }); }
+        return this;
     }
     </script>
   </head>
@@ -85,7 +234,10 @@
     <div id="diff"></div>
     <script type="text/javascript">
     loadJSON('diff.json', function (json) {
-        document.getElementById("diff").appendChild(toDOM(json));
+        var model = new Diff(json.diff, json.a, json.b);
+        var dom = toDOM(model);
+        var root = document.getElementById("diff");
+        root.appendChild(dom);
     });
     </script>
   </body>

@@ -198,9 +198,11 @@ public func == <Term: TermType where Term.LeafType: Equatable> (left: Free<Term.
 extension Free {
 	public func JSON(ifPure ifPure: B -> Doubt.JSON, ifLeaf: A -> Doubt.JSON) -> Doubt.JSON {
 		return analysis(
-			ifPure: ifPure,
+			ifPure: {
+				[ "pure": ifPure($0) ]
+			},
 			ifRoll: {
-				$0.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifPure: ifPure, ifLeaf: ifLeaf) })
+				[ "roll": $0.JSON(ifLeaf: ifLeaf, ifRecur: { $0.JSON(ifPure: ifPure, ifLeaf: ifLeaf) }) ]
 			})
 	}
 }

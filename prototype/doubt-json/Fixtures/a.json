@@ -1,2073 +1,692 @@
-[{
-	"insert": {
-		"extract": 29,
-		"unwrap": [{
-			"extract": 3,
-			"unwrap": {
-				"categories": {
-					"extract": 1,
-					"unwrap": [
-
-					]
-				},
-				"source": {
-					"extract": 1,
-					"unwrap": "Algorithm"
-				}
-			}
-		}, {
-			"extract": 25,
-			"unwrap": [{
-				"extract": 5,
-				"unwrap": [{
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "Recursive"
-						}
-					}
-				}, {
-					"extract": 1,
-					"unwrap": [
-
-					]
-				}]
-			}, {
-				"extract": 5,
-				"unwrap": [{
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "ByKey"
-						}
-					}
-				}, {
-					"extract": 1,
-					"unwrap": [
-
-					]
-				}]
-			}, {
-				"extract": 6,
-				"unwrap": {
-					"insert": {
-						"extract": 5,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "ByIndex"
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}
-				}
-			}, {
-				"extract": 3,
-				"unwrap": {
-					"categories": {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					},
-					"source": {
-						"extract": 1,
-						"unwrap": "mark"
-					}
-				}
-			}, {
-				"extract": 5,
-				"unwrap": [{
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "map(_:)"
-						}
-					}
-				}, {
-					"extract": 1,
-					"unwrap": [
-
-					]
-				}]
-			}]
-		}]
-	}
-}, {
-	"insert": {
-		"extract": 42,
-		"unwrap": {
-			"insert": {
-				"extract": 41,
-				"unwrap": [{
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "FreeAlgorithm"
-						}
-					}
-				}, {
-					"extract": 37,
-					"unwrap": [{
-						"extract": 5,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "Pure"
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 5,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "Roll"
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 5,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "analysis(ifPure:ifRoll:)"
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "mark"
-							}
-						}
-					}, {
-						"extract": 5,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "map(_:)"
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "mark"
-							}
-						}
-					}, {
-						"extract": 5,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "flatMap(_:)"
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 5,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "evaluate(_:recur:)"
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}]
-				}]
-			}
-		}
-	}
-}, {
-	"insert": {
-		"extract": 15,
-		"unwrap": {
-			"replace": {
-				"extract": 14,
-				"unwrap": {
-					"before": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "mark"
-							}
-						}
-					},
-					"after": {
-						"extract": 10,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "FreeAlgorithm"
-								}
-							}
-						}, {
-							"extract": 6,
-							"unwrap": [{
-								"extract": 5,
-								"unwrap": [{
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "evaluate(_:)"
-										}
-									}
-								}, {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								}]
-							}]
-						}]
-					}
-				}
-			}
-		}
-	}
-}, {
-	"insert": {
-		"extract": 16,
-		"unwrap": {
-			"delete": {
-				"extract": 15,
-				"unwrap": [{
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "Algorithm"
-						}
-					}
-				}, {
-					"extract": 11,
-					"unwrap": [{
-						"extract": 10,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "evaluate(_:)"
-								}
-							}
-						}, {
-							"extract": 6,
-							"unwrap": [{
-								"extract": 5,
-								"unwrap": [{
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "copy(_:)"
-										}
-									}
-								}, {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								}]
-							}]
-						}]
-					}]
-				}]
-			}
-		}
-	}
-}, {
-	"insert": {
-		"extract": 42,
-		"unwrap": {
-			"delete": {
-				"extract": 41,
-				"unwrap": [{
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "FreeAlgorithm"
-						}
-					}
-				}, {
-					"extract": 37,
-					"unwrap": [{
-						"extract": 5,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "Pure"
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 5,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "Roll"
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 5,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "analysis(ifPure:ifRoll:)"
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "mark"
-							}
-						}
-					}, {
-						"extract": 5,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "map(_:)"
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "mark"
-							}
-						}
-					}, {
-						"extract": 5,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "flatMap(_:)"
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 5,
-						"unwrap": [{
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "evaluate(_:)"
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}]
-				}]
-			}
-		}
-	}
-}, {
-	"replace": {
-		"before": {
-			"extract": 35,
-			"unwrap": [{
-				"extract": 4,
-				"unwrap": {
-					"literal": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "Algorithm"
-							}
-						}
-					}
-				}
-			}, {
-				"extract": 30,
-				"unwrap": [{
-					"extract": 6,
-					"unwrap": [{
-						"extract": 4,
-						"unwrap": {
-							"literal": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "Recursive"
-									}
-								}
-							}
-						}
-					}, {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}]
-				}, {
-					"extract": 6,
-					"unwrap": [{
-						"extract": 4,
-						"unwrap": {
-							"literal": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "ByKey"
-									}
-								}
-							}
-						}
-					}, {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}]
-				}, {
-					"extract": 7,
-					"unwrap": {
-						"insert": {
-							"extract": 6,
-							"unwrap": [{
-								"extract": 4,
-								"unwrap": {
-									"literal": {
-										"extract": 3,
-										"unwrap": {
-											"categories": {
-												"extract": 1,
-												"unwrap": [
-
-												]
-											},
-											"source": {
-												"extract": 1,
-												"unwrap": "ByIndex"
-											}
-										}
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}
-					}
-				}, {
-					"extract": 4,
-					"unwrap": {
-						"literal": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "mark"
-								}
-							}
-						}
-					}
-				}, {
-					"extract": 6,
-					"unwrap": [{
-						"extract": 4,
-						"unwrap": {
-							"literal": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "map(_:)"
-									}
-								}
-							}
-						}
-					}, {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}]
-				}]
-			}]
-		},
-		"after": {
-			"extract": 11,
-			"unwrap": {
-				"delete": {
-					"extract": 10,
-					"unwrap": [{
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "FreeAlgorithm"
-							}
-						}
-					}, {
-						"extract": 6,
-						"unwrap": [{
-							"extract": 5,
-							"unwrap": [{
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "evaluate()"
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}]
-					}]
-				}
-			}
-		}
-	}
-}, {
-	"delete": {
-		"extract": 51,
-		"unwrap": {
-			"insert": {
-				"extract": 50,
-				"unwrap": [{
-					"extract": 4,
-					"unwrap": {
-						"literal": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "FreeAlgorithm"
-								}
-							}
-						}
-					}
-				}, {
-					"extract": 45,
-					"unwrap": [{
-						"extract": 6,
-						"unwrap": [{
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "Pure"
-										}
-									}
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 6,
-						"unwrap": [{
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "Roll"
-										}
-									}
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 6,
-						"unwrap": [{
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "analysis(ifPure:ifRoll:)"
-										}
-									}
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 4,
-						"unwrap": {
-							"literal": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "mark"
-									}
-								}
-							}
-						}
-					}, {
-						"extract": 6,
-						"unwrap": [{
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "map(_:)"
-										}
-									}
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 4,
-						"unwrap": {
-							"literal": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "mark"
-									}
-								}
-							}
-						}
-					}, {
-						"extract": 6,
-						"unwrap": [{
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "flatMap(_:)"
-										}
-									}
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}, {
-						"extract": 6,
-						"unwrap": [{
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "evaluate(_:recur:)"
-										}
-									}
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}]
-				}]
-			}
-		}
-	}
-}, {
-	"delete": {
-		"extract": 18,
-		"unwrap": {
-			"replace": {
-				"extract": 17,
-				"unwrap": {
-					"before": {
-						"extract": 4,
-						"unwrap": {
-							"literal": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "mark"
-									}
-								}
-							}
-						}
-					},
-					"after": {
-						"extract": 12,
-						"unwrap": [{
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "FreeAlgorithm"
-										}
-									}
-								}
-							}
-						}, {
-							"extract": 7,
-							"unwrap": [{
-								"extract": 6,
-								"unwrap": [{
-									"extract": 4,
-									"unwrap": {
-										"literal": {
-											"extract": 3,
-											"unwrap": {
-												"categories": {
-													"extract": 1,
-													"unwrap": [
-
-													]
-												},
-												"source": {
-													"extract": 1,
-													"unwrap": "evaluate(_:)"
-												}
-											}
-										}
-									}
-								}, {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								}]
-							}]
-						}]
-					}
-				}
-			}
-		}
-	}
-}, {
-	"replace": {
-		"before": {
-			"extract": 19,
-			"unwrap": {
-				"delete": {
-					"extract": 18,
-					"unwrap": [{
-						"extract": 4,
-						"unwrap": {
-							"literal": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "Algorithm"
-									}
-								}
-							}
-						}
-					}, {
-						"extract": 13,
-						"unwrap": [{
-							"extract": 12,
-							"unwrap": [{
-								"extract": 4,
-								"unwrap": {
-									"literal": {
-										"extract": 3,
-										"unwrap": {
-											"categories": {
-												"extract": 1,
-												"unwrap": [
-
-												]
-											},
-											"source": {
-												"extract": 1,
-												"unwrap": "evaluate(_:)"
-											}
-										}
-									}
-								}
-							}, {
-								"extract": 7,
-								"unwrap": [{
-									"extract": 6,
-									"unwrap": [{
-										"extract": 4,
-										"unwrap": {
-											"literal": {
-												"extract": 3,
-												"unwrap": {
-													"categories": {
-														"extract": 1,
-														"unwrap": [
-
-														]
-													},
-													"source": {
-														"extract": 1,
-														"unwrap": "copy(_:)"
-													}
-												}
-											}
-										}
-									}, {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									}]
-								}]
-							}]
-						}]
-					}]
-				}
-			}
-		},
-		"after": {
-			"extract": 13,
-			"unwrap": [{
-				"extract": 3,
-				"unwrap": {
-					"categories": {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					},
-					"source": {
-						"extract": 1,
-						"unwrap": "FreeConvertible"
-					}
-				}
-			}, {
-				"extract": 9,
-				"unwrap": [{
-					"extract": 5,
-					"unwrap": [{
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "init(free:)"
-							}
-						}
-					}, {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}]
-				}, {
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "free"
-						}
-					}
-				}]
-			}]
-		}
-	}
-}, {
-	"replace": {
-		"before": {
-			"extract": 51,
-			"unwrap": {
-				"delete": {
-					"extract": 50,
-					"unwrap": [{
-						"extract": 4,
-						"unwrap": {
-							"literal": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "FreeAlgorithm"
-									}
-								}
-							}
-						}
-					}, {
-						"extract": 45,
-						"unwrap": [{
-							"extract": 6,
-							"unwrap": [{
-								"extract": 4,
-								"unwrap": {
-									"literal": {
-										"extract": 3,
-										"unwrap": {
-											"categories": {
-												"extract": 1,
-												"unwrap": [
-
-												]
-											},
-											"source": {
-												"extract": 1,
-												"unwrap": "Pure"
-											}
-										}
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}, {
-							"extract": 6,
-							"unwrap": [{
-								"extract": 4,
-								"unwrap": {
-									"literal": {
-										"extract": 3,
-										"unwrap": {
-											"categories": {
-												"extract": 1,
-												"unwrap": [
-
-												]
-											},
-											"source": {
-												"extract": 1,
-												"unwrap": "Roll"
-											}
-										}
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}, {
-							"extract": 6,
-							"unwrap": [{
-								"extract": 4,
-								"unwrap": {
-									"literal": {
-										"extract": 3,
-										"unwrap": {
-											"categories": {
-												"extract": 1,
-												"unwrap": [
-
-												]
-											},
-											"source": {
-												"extract": 1,
-												"unwrap": "analysis(ifPure:ifRoll:)"
-											}
-										}
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}, {
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "mark"
-										}
-									}
-								}
-							}
-						}, {
-							"extract": 6,
-							"unwrap": [{
-								"extract": 4,
-								"unwrap": {
-									"literal": {
-										"extract": 3,
-										"unwrap": {
-											"categories": {
-												"extract": 1,
-												"unwrap": [
-
-												]
-											},
-											"source": {
-												"extract": 1,
-												"unwrap": "map(_:)"
-											}
-										}
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}, {
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "mark"
-										}
-									}
-								}
-							}
-						}, {
-							"extract": 6,
-							"unwrap": [{
-								"extract": 4,
-								"unwrap": {
-									"literal": {
-										"extract": 3,
-										"unwrap": {
-											"categories": {
-												"extract": 1,
-												"unwrap": [
-
-												]
-											},
-											"source": {
-												"extract": 1,
-												"unwrap": "flatMap(_:)"
-											}
-										}
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}, {
-							"extract": 6,
-							"unwrap": [{
-								"extract": 4,
-								"unwrap": {
-									"literal": {
-										"extract": 3,
-										"unwrap": {
-											"categories": {
-												"extract": 1,
-												"unwrap": [
-
-												]
-											},
-											"source": {
-												"extract": 1,
-												"unwrap": "evaluate(_:)"
-											}
-										}
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}]
-					}]
-				}
-			}
-		},
-		"after": {
-			"extract": 13,
-			"unwrap": [{
-				"extract": 3,
-				"unwrap": {
-					"categories": {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					},
-					"source": {
-						"extract": 1,
-						"unwrap": "Free"
-					}
-				}
-			}, {
-				"extract": 9,
-				"unwrap": [{
-					"extract": 5,
-					"unwrap": [{
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "init(free:)"
-							}
-						}
-					}, {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}]
-				}, {
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "free"
-						}
-					}
-				}]
-			}]
-		}
-	}
-}, {
-	"replace": {
-		"before": {
-			"extract": 13,
-			"unwrap": {
-				"delete": {
-					"extract": 12,
-					"unwrap": [{
-						"extract": 4,
-						"unwrap": {
-							"literal": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "FreeAlgorithm"
-									}
-								}
-							}
-						}
-					}, {
-						"extract": 7,
-						"unwrap": [{
-							"extract": 6,
-							"unwrap": [{
-								"extract": 4,
-								"unwrap": {
-									"literal": {
-										"extract": 3,
-										"unwrap": {
-											"categories": {
-												"extract": 1,
-												"unwrap": [
-
-												]
-											},
-											"source": {
-												"extract": 1,
-												"unwrap": "evaluate()"
-											}
-										}
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}]
-					}]
-				}
-			}
-		},
-		"after": {
-			"extract": 16,
-			"unwrap": [{
-				"extract": 3,
-				"unwrap": {
-					"categories": {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					},
-					"source": {
-						"extract": 1,
-						"unwrap": "FreeAlgorithm"
-					}
-				}
-			}, {
-				"extract": 12,
-				"unwrap": [{
-					"extract": 5,
-					"unwrap": [{
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "init(_:_:)"
-							}
-						}
-					}, {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}]
-				}, {
-					"extract": 6,
-					"unwrap": {
-						"insert": {
-							"extract": 5,
-							"unwrap": [{
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "evaluate(_:)"
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}
-					}
-				}]
-			}]
-		}
-	}
-}, {
-	"delete": {
-		"extract": 16,
-		"unwrap": [{
-			"extract": 4,
-			"unwrap": {
-				"literal": {
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "FreeConvertible"
-						}
-					}
-				}
-			}
-		}, {
-			"extract": 11,
-			"unwrap": [{
-				"extract": 6,
-				"unwrap": [{
-					"extract": 4,
-					"unwrap": {
-						"literal": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "init(free:)"
-								}
-							}
-						}
-					}
-				}, {
-					"extract": 1,
-					"unwrap": [
-
-					]
-				}]
-			}, {
-				"extract": 4,
-				"unwrap": {
-					"literal": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "free"
-							}
-						}
-					}
-				}
-			}]
-		}]
-	}
-}, {
-	"delete": {
-		"extract": 16,
-		"unwrap": [{
-			"extract": 4,
-			"unwrap": {
-				"literal": {
-					"extract": 3,
-					"unwrap": {
-						"categories": {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						},
-						"source": {
-							"extract": 1,
-							"unwrap": "Free"
-						}
-					}
-				}
-			}
-		}, {
-			"extract": 11,
-			"unwrap": [{
-				"extract": 6,
-				"unwrap": [{
-					"extract": 4,
-					"unwrap": {
-						"literal": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "init(free:)"
-								}
-							}
-						}
-					}
-				}, {
-					"extract": 1,
-					"unwrap": [
-
-					]
-				}]
-			}, {
-				"extract": 4,
-				"unwrap": {
-					"literal": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "free"
-							}
-						}
-					}
-				}
-			}]
-		}]
-	}
-}, {
-	"replace": {
-		"before": {
-			"extract": 19,
-			"unwrap": [{
-				"extract": 4,
-				"unwrap": {
-					"literal": {
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "FreeAlgorithm"
-							}
-						}
-					}
-				}
-			}, {
-				"extract": 14,
-				"unwrap": [{
-					"extract": 6,
-					"unwrap": [{
-						"extract": 4,
-						"unwrap": {
-							"literal": {
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "init(_:_:)"
-									}
-								}
-							}
-						}
-					}, {
-						"extract": 1,
-						"unwrap": [
-
-						]
-					}]
-				}, {
-					"extract": 7,
-					"unwrap": {
-						"insert": {
-							"extract": 6,
-							"unwrap": [{
-								"extract": 4,
-								"unwrap": {
-									"literal": {
-										"extract": 3,
-										"unwrap": {
-											"categories": {
-												"extract": 1,
-												"unwrap": [
-
-												]
-											},
-											"source": {
-												"extract": 1,
-												"unwrap": "evaluate(_:)"
-											}
-										}
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}
-					}
-				}]
-			}]
-		},
-		"after": {
-			"extract": 11,
-			"unwrap": {
-				"insert": {
-					"extract": 10,
-					"unwrap": [{
-						"extract": 3,
-						"unwrap": {
-							"categories": {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							},
-							"source": {
-								"extract": 1,
-								"unwrap": "FreeAlgorithm"
-							}
-						}
-					}, {
-						"extract": 6,
-						"unwrap": [{
-							"extract": 5,
-							"unwrap": [{
-								"extract": 3,
-								"unwrap": {
-									"categories": {
-										"extract": 1,
-										"unwrap": [
-
-										]
-									},
-									"source": {
-										"extract": 1,
-										"unwrap": "evaluate()"
-									}
-								}
-							}, {
-								"extract": 1,
-								"unwrap": [
-
-								]
-							}]
-						}]
-					}]
-				}
-			}
-		}
-	}
-}, {
-	"delete": {
-		"extract": 13,
-		"unwrap": {
-			"insert": {
-				"extract": 12,
-				"unwrap": [{
-					"extract": 4,
-					"unwrap": {
-						"literal": {
-							"extract": 3,
-							"unwrap": {
-								"categories": {
-									"extract": 1,
-									"unwrap": [
-
-									]
-								},
-								"source": {
-									"extract": 1,
-									"unwrap": "FreeAlgorithm"
-								}
-							}
-						}
-					}
-				}, {
-					"extract": 7,
-					"unwrap": [{
-						"extract": 6,
-						"unwrap": [{
-							"extract": 4,
-							"unwrap": {
-								"literal": {
-									"extract": 3,
-									"unwrap": {
-										"categories": {
-											"extract": 1,
-											"unwrap": [
-
-											]
-										},
-										"source": {
-											"extract": 1,
-											"unwrap": "evaluate()"
-										}
-									}
-								}
-							}
-						}, {
-							"extract": 1,
-							"unwrap": [
-
-							]
-						}]
-					}]
-				}]
-			}
-		}
-	}
-}]
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Conditions": {
+    "EbsVolumeSnapshotIdIsEmpty": {
+      "Fn::Equals": [
+        {
+          "Ref": "EbsVolumeSnapshotId"
+        },
+        ""
+      ]
+    },
+    "EbsVolumeSnapshotIdIsPresent": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "EbsVolumeSnapshotId"
+            },
+            ""
+          ]
+        }
+      ]
+    },
+    "not_production": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "Environment"
+            },
+            "production"
+          ]
+        }
+      ]
+    },
+    "not_staging": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "Environment"
+            },
+            "staging"
+          ]
+        }
+      ]
+    },
+    "not_test": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "Environment"
+            },
+            "test"
+          ]
+        }
+      ]
+    },
+    "production": {
+      "Fn::Equals": [
+        {
+          "Ref": "Environment"
+        },
+        "production"
+      ]
+    },
+    "staging": {
+      "Fn::Equals": [
+        {
+          "Ref": "Environment"
+        },
+        "staging"
+      ]
+    },
+    "test": {
+      "Fn::Equals": [
+        {
+          "Ref": "Environment"
+        },
+        "test"
+      ]
+    }
+  },
+  "Description": "A single EC2 instance with an EBS volume",
+  "Mappings": {},
+  "Metadata": {},
+  "Outputs": {
+    "AvailabilityZone": {
+      "Description": "The instance availability zone",
+      "Value": {
+        "Fn::GetAtt": [
+          "EbsInstance",
+          "AvailabilityZone"
+        ]
+      }
+    },
+    "InstanceID": {
+      "Description": "The instance identifier",
+      "Value": "EbsInstance"
+    },
+    "PrivateDnsName": {
+      "Description": "The instance private DNS name",
+      "Value": {
+        "Fn::GetAtt": [
+          "EbsInstance",
+          "PrivateDnsName"
+        ]
+      }
+    },
+    "PrivateIp": {
+      "Description": "The instance private IP address",
+      "Value": {
+        "Fn::GetAtt": [
+          "EbsInstance",
+          "PrivateIp"
+        ]
+      }
+    }
+  },
+  "Parameters": {
+    "App": {
+      "Description": "App",
+      "MinLength": "1",
+      "Type": "String"
+    },
+    "CreationPolicyResourceSignalCount": {
+      "Default": "1",
+      "Description": "Number of signals to wait on to consider an instance ready",
+      "Type": "String"
+    },
+    "CreationPolicyResourceSignalTimeout": {
+      "Default": "PT1H",
+      "Description": "How long to wait for an instance to signal before timing out",
+      "Type": "String"
+    },
+    "EbsDeleteOnTermination": {
+      "Default": true,
+      "Description": "Determines whether to delete the volume on instance termination. The default value is true",
+      "Type": "String"
+    },
+    "EbsDeviceName": {
+      "Default": "/dev/xvdf",
+      "Description": "The name of the device within Amazon EC2",
+      "Type": "String"
+    },
+    "EbsVolumeSize": {
+      "Default": "40",
+      "Description": "The size of the EBS (gp2) volume",
+      "Type": "String"
+    },
+    "EbsVolumeSnapshotId": {
+      "Default": "",
+      "Description": "The snapshot from which to create the new volume",
+      "Type": "String"
+    },
+    "Environment": {
+      "AllowedValues": [
+        "test",
+        "staging",
+        "production"
+      ],
+      "ConstraintDescription": "must be test, staging, or production",
+      "Default": "test",
+      "Description": "Environment. Defaults to test",
+      "Type": "String"
+    },
+    "GpanelSnsTopic": {
+      "Description": "GpanelSnsTopic",
+      "MinLength": "1",
+      "Type": "String"
+    },
+    "IamRole": {
+      "Description": "IamRole",
+      "MinLength": "1",
+      "Type": "String"
+    },
+    "ImageId": {
+      "Description": "AMI",
+      "Type": "AWS::EC2::Image::Id"
+    },
+    "InstanceName": {
+      "Description": "The name of the instance being added",
+      "Type": "String"
+    },
+    "InstanceProfile": {
+      "Description": "InstanceProfile",
+      "MinLength": "1",
+      "Type": "String"
+    },
+    "InstanceType": {
+      "Default": "c4.large",
+      "Description": "Instance Type",
+      "Type": "String"
+    },
+    "KeyName": {
+      "Description": "Key Name",
+      "Type": "AWS::EC2::KeyPair::KeyName"
+    },
+    "LogRetentionInDays": {
+      "Default": "7",
+      "Description": "Days to retain logs in CloudWatch Logs",
+      "Type": "Number"
+    },
+    "ResourceBase": {
+      "Description": "S3 Base URL for stack resources",
+      "Type": "String"
+    },
+    "ResourceBucket": {
+      "Description": "S3 Bucket",
+      "Type": "String"
+    },
+    "Role": {
+      "Description": "Role",
+      "MinLength": "1",
+      "Type": "String"
+    },
+    "SecurityGroupIds": {
+      "Description": "List of security groups to assign to the instance",
+      "Type": "CommaDelimitedList"
+    },
+    "StackIdentifier": {
+      "Description": "Treeish or PID to represent the version of this stack. Related resources are similary named",
+      "Type": "String"
+    },
+    "StackInstance": {
+      "Description": "Stack name and Identifier",
+      "Type": "String"
+    },
+    "Subnet": {
+      "Description": "Subnets",
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "Vpc": {
+      "Description": "VPC ID",
+      "Type": "AWS::EC2::VPC::Id"
+    },
+    "Zone": {
+      "Description": "AZs",
+      "Type": "AWS::EC2::AvailabilityZone::Name"
+    },
+    "ZoneId": {
+      "Description": "Zone ID",
+      "Type": "AWS::Route53::HostedZone::Id"
+    },
+    "ZoneName": {
+      "Description": "Zone Domain Name",
+      "MinLength": "1",
+      "Type": "String"
+    }
+  },
+  "Resources": {
+    "EbsInstance": {
+      "CreationPolicy": {
+        "ResourceSignal": {
+          "Count": {
+            "Ref": "CreationPolicyResourceSignalCount"
+          },
+          "Timeout": {
+            "Ref": "CreationPolicyResourceSignalTimeout"
+          }
+        }
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Authentication": {
+          "CoreS3ResourceBucketAuth": {
+            "buckets": [
+              {
+                "Ref": "ResourceBucket"
+              }
+            ],
+            "roleName": {
+              "Ref": "IamRole"
+            },
+            "type": "s3"
+          }
+        },
+        "AWS::CloudFormation::Init": {
+          "GpanelConfigset": {
+            "commands": {
+              "/root/gpanel.sh": {
+                "command": "/root/gpanel.sh",
+                "cwd": "/root",
+                "env": {
+                  "AWS_DEFAULT_REGION": {
+                    "Ref": "AWS::Region"
+                  },
+                  "ROUTE53_DOMAIN": {
+                    "Ref": "ZoneName"
+                  },
+                  "ROUTE53_ZONEID": {
+                    "Ref": "ZoneId"
+                  },
+                  "TOPIC": {
+                    "Ref": "GpanelSnsTopic"
+                  }
+                }
+              }
+            },
+            "files": {
+              "/etc/init.d/route53": {
+                "authentication": "CoreS3ResourceBucketAuth",
+                "group": "root",
+                "mode": "000755",
+                "owner": "root",
+                "source": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "ResourceBase"
+                      },
+                      {
+                        "Ref": "StackInstance"
+                      },
+                      "resources",
+                      "route53.init"
+                    ]
+                  ]
+                }
+              },
+              "/home/ubuntu/.ssh/id_rsa": {
+                "Fn::If": [
+                  "test",
+                  {
+                    "authentication": "CoreS3ResourceBucketAuth",
+                    "group": "ubuntu",
+                    "mode": "000400",
+                    "owner": "ubuntu",
+                    "source": {
+                      "Fn::Join": [
+                        "/",
+                        [
+                          {
+                            "Ref": "ResourceBase"
+                          },
+                          {
+                            "Ref": "StackInstance"
+                          },
+                          "resources",
+                          "github-cloudformation-test"
+                        ]
+                      ]
+                    }
+                  },
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
+                ]
+              },
+              "/root/gpanel.sh": {
+                "authentication": "CoreS3ResourceBucketAuth",
+                "group": "root",
+                "mode": "000755",
+                "owner": "root",
+                "source": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "ResourceBase"
+                      },
+                      {
+                        "Ref": "StackInstance"
+                      },
+                      "resources",
+                      "gpanel.sh"
+                    ]
+                  ]
+                }
+              },
+              "/usr/local/sbin/route53": {
+                "authentication": "CoreS3ResourceBucketAuth",
+                "group": "root",
+                "mode": "000755",
+                "owner": "root",
+                "source": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "ResourceBase"
+                      },
+                      {
+                        "Ref": "StackInstance"
+                      },
+                      "resources",
+                      "route53.sh"
+                    ]
+                  ]
+                }
+              }
+            }
+          },
+          "PuppetConfigset": {
+            "commands": {
+              "/root/puppet.sh": {
+                "command": "/root/puppet.sh",
+                "cwd": "/root",
+                "env": {
+                  "AWS_DEFAULT_REGION": {
+                    "Ref": "AWS::Region"
+                  },
+                  "BRANCH": "master",
+                  "ENVIRONMENT": {
+                    "Ref": "Environment"
+                  }
+                }
+              }
+            },
+            "files": {
+              "/root/puppet.sh": {
+                "authentication": "CoreS3ResourceBucketAuth",
+                "group": "root",
+                "mode": "000755",
+                "owner": "root",
+                "source": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "ResourceBase"
+                      },
+                      {
+                        "Ref": "StackInstance"
+                      },
+                      "resources",
+                      "puppet.sh"
+                    ]
+                  ]
+                }
+              },
+              "/tmp/awslogs.conf": {
+                "content": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "[general]\n",
+                      "state_file= /var/awslogs/state/agent-state\n",
+                      "[/var/log/syslog]\n",
+                      "file = /var/log/syslog\n",
+                      "log_group_name = ",
+                      {
+                        "Ref": "LogGroup"
+                      },
+                      "\n",
+                      "log_stream_name = {hostname}/syslog\n",
+                      "datetime_format = %b %d %H:%M:%S\n",
+                      "[/var/log/messages]\n",
+                      "file = /var/log/messages\n",
+                      "log_group_name = ",
+                      {
+                        "Ref": "LogGroup"
+                      },
+                      "\n",
+                      "log_stream_name = {hostname}/messages\n",
+                      "datetime_format = %b %d %H:%M:%S\n",
+                      "[/var/log/cloud-init.log]\n",
+                      "file = /var/log/cloud-init.log\n",
+                      "log_group_name = ",
+                      {
+                        "Ref": "LogGroup"
+                      },
+                      "\n",
+                      "log_stream_name = {hostname}/cloud-init.log\n",
+                      "datetime_format = \n",
+                      "[/var/log/cloud-init.log]\n",
+                      "file = /var/log/cloud-init.log\n",
+                      "log_group_name = ",
+                      {
+                        "Ref": "LogGroup"
+                      },
+                      "\n",
+                      "log_stream_name = {hostname}/cloud-init.log\n",
+                      "datetime_format = \n",
+                      "[/var/log/cfn-init-cmd.log]\n",
+                      "file = /var/log/cfn-init-cmd.log\n",
+                      "log_group_name = ",
+                      {
+                        "Ref": "LogGroup"
+                      },
+                      "\n",
+                      "log_stream_name = {hostname}/cfn-init-cmd.log\n",
+                      "datetime_format = \n",
+                      "[/var/log/cfn-init.log]\n",
+                      "file = /var/log/cfn-init.log\n",
+                      "log_group_name = ",
+                      {
+                        "Ref": "LogGroup"
+                      },
+                      "\n",
+                      "log_stream_name = {hostname}/cfn-init.log\n",
+                      "datetime_format = \n",
+                      "[/var/log/cfn-hup.log]\n",
+                      "file = /var/log/cfn-hup.log\n",
+                      "log_group_name = ",
+                      {
+                        "Ref": "LogGroup"
+                      },
+                      "\n",
+                      "log_stream_name = {hostname}/cfn-hup.log\n",
+                      "datetime_format = \n",
+                      "[/var/log/cfn-wire.log]\n",
+                      "file = /var/log/cfn-wire.log\n",
+                      "log_group_name = ",
+                      {
+                        "Ref": "LogGroup"
+                      },
+                      "\n",
+                      "log_stream_name = {hostname}/cfn-wire.log\n",
+                      "datetime_format = \n"
+                    ]
+                  ]
+                },
+                "group": "root",
+                "mode": "000444",
+                "owner": "root"
+              }
+            }
+          },
+          "configSets": {
+            "default": [
+              "GpanelConfigset",
+              "PuppetConfigset"
+            ]
+          }
+        },
+        "facter": {
+          "app": {
+            "Ref": "App"
+          },
+          "environment": {
+            "Ref": "Environment"
+          },
+          "puppet_autorole": "true",
+          "role": {
+            "Ref": "Role"
+          }
+        }
+      },
+      "Properties": {
+        "AvailabilityZone": {
+          "Ref": "Zone"
+        },
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": {
+              "Ref": "EbsDeviceName"
+            },
+            "Ebs": {
+              "DeleteOnTermination": {
+                "Ref": "EbsDeleteOnTermination"
+              },
+              "Encrypted": true,
+              "SnapshotId": {
+                "Fn::If": [
+                  "EbsVolumeSnapshotIdIsPresent",
+                  {
+                    "Ref": "EbsVolumeSnapshotId"
+                  },
+                  {
+                    "Ref": "AWS::NoValue"
+                  }
+                ]
+              },
+              "VolumeSize": {
+                "Ref": "EbsVolumeSize"
+              },
+              "VolumeType": "gp2"
+            }
+          }
+        ],
+        "EbsOptimized": true,
+        "IamInstanceProfile": {
+          "Ref": "InstanceProfile"
+        },
+        "ImageId": {
+          "Ref": "ImageId"
+        },
+        "InstanceType": {
+          "Ref": "InstanceType"
+        },
+        "KeyName": {
+          "Ref": "KeyName"
+        },
+        "Monitoring": "true",
+        "SecurityGroupIds": {
+          "Ref": "SecurityGroupIds"
+        },
+        "SubnetId": {
+          "Ref": "Subnet"
+        },
+        "Tags": [
+          {
+            "Key": "monitored",
+            "Value": "true"
+          },
+          {
+            "Key": "app",
+            "Value": {
+              "Ref": "App"
+            }
+          },
+          {
+            "Key": "role",
+            "Value": {
+              "Ref": "Role"
+            }
+          },
+          {
+            "Key": "env",
+            "Value": {
+              "Ref": "Environment"
+            }
+          },
+          {
+            "Key": "provisioner",
+            "Value": "gh-aws:cloudformation"
+          },
+          {
+            "Key": "Name",
+            "Value": "EbsInstance"
+          }
+        ],
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash -x\n",
+                "# 0 \n",
+                "/sbin/ifconfig eth0 mtu 1436 up\n",
+                "/usr/bin/apt-get install -y python-setuptools\n",
+                "/usr/bin/easy_install --upgrade awscli\n",
+                "/usr/bin/easy_install ",
+                "https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+                "STACK_STATE=$(aws cloudformation describe-stacks",
+                "         --region",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --stack-name",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --query 'Stacks[*].StackStatus'",
+                "         --output text)\n",
+                "/usr/local/bin/cfn-init -v ",
+                "         --configsets default ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource EbsInstance ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "cfn_init_res=$?\n",
+                "if [ echo $STACK_STATE | grep -q ROLLBACK ]; then\n",
+                "  cfn_init_res=0\n",
+                "fi\n",
+                "/usr/local/bin/cfn-signal -e $cfn_init_res ",
+                "         --stack ",
+                {
+                  "Ref": "AWS::StackName"
+                },
+                "         --resource EbsInstance ",
+                "         --region ",
+                {
+                  "Ref": "AWS::Region"
+                },
+                "\n",
+                "cat /var/log/cfn-init.log \n"
+              ]
+            ]
+          }
+        }
+      },
+      "Type": "AWS::EC2::Instance"
+    },
+    "LogGroup": {
+      "Properties": {
+        "RetentionInDays": {
+          "Ref": "LogRetentionInDays"
+        }
+      },
+      "Type": "AWS::Logs::LogGroup"
+    }
+  }
+}
