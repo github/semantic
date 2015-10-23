@@ -215,10 +215,10 @@
         return this;
     }
 
-    function Keyed(object, continuation) {
+    function Dictionary(object) {
         this.values = {};
         for (key in object) {
-            this.values[key] = continuation(object[key]);
+            this.values[key] = object[key];
         }
         return this;
     }
