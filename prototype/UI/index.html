@@ -172,8 +172,8 @@
         if (this.roll != null) {
             return new Diff({
                 roll: {
-                    extract: roll.extract,
-                    unwrap: roll.unwrap.map(function(x) { return x.map(transform); })
+                    extract: this.roll.extract,
+                    unwrap: this.roll.unwrap.map(function(x) { return x.map(transform); })
                 }
             });
         }
