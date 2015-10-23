@@ -182,14 +182,6 @@
             }
         }
 
-        if (model instanceof Leaf) {
-            element = document.createElement("span");
-            if (model.source != null && model.range != null) {
-                element.textContent = model.source.substr(model.range[0], model.range[1]);
-            }
-            // ?
-        }
-
         return element;
     }
 
