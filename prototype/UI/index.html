@@ -240,7 +240,7 @@
     <script type="text/javascript">
     loadJSON('diff.json', function (json) {
         var model = new Diff(json.diff);
-        var dom = toDOM(model);
+        var dom = toDOM(model, json.a, json.b);
         var root = document.getElementById("diff");
         root.appendChild(dom);
     });
