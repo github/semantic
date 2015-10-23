@@ -218,7 +218,7 @@
     Dictionary.prototype.map = function(transform) {
         var copy = new Dictionary();
         for (key in this.values) {
-            copy.values[key] = transform(this.values[key]);
+            copy.values[key] = transform(this.values[key], key);
         }
         return copy;
     }
