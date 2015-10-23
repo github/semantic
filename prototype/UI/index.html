@@ -155,6 +155,13 @@
         if (this.leaf != null) { return new Syntax(this, transform); }
     }
 
+    function diffFromJSON(json) {
+        if (json.pure != null) { return new Diff({ pure: new Patch(json.pure) }); }
+        if (json.roll != null) {
+            return new Diff({ ranges: json.roll.extract, roll: new Syntax(json.roll.unwrap, function(x) { return diffFromJSON(x); }) });
+        }
+    }
+
     function Diff(json) {
         if (json.pure != null) {
             this.pure = new Patch(json.pure);
