@@ -51,10 +51,11 @@
         return node;
     }
 
-    function patch(patch) {
-        if (patch.delete != null) { return new Delete(patch.delete); }
-        if (patch.insert != null) { return new Insert(patch.insert); }
-        if (patch.replace != null) { return new Replace(patch.replace.before, patch.replace.after); }
+    function Patch(patch) {
+        if (patch.delete != null) { this.patch = new Delete(patch.delete); }
+        if (patch.insert != null) { this.patch = new Insert(patch.insert); }
+        if (patch.replace != null) { this.patch = new Replace(patch.replace.before, patch.replace.after); }
+        return this;
     }
 
     function Delete(before) {
@@ -222,7 +223,7 @@
 
     function Diff(json) {
         if (json.pure != null) {
-            this.pure = patch(json.pure);
+            this.pure = new Patch(json.pure);
         }
         if (json.roll != null) {
             this.ranges = json.roll.extract;
