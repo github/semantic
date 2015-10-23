@@ -185,9 +185,15 @@
     <div id="after"></div>
     <script type="text/javascript">
     loadJSON('diff.json', function (json) {
-        var model = new Diff(json.diff);
-        document.getElementById("before").appendChild(toDOM(model, "before", json["before"]));
-        document.getElementById("after").appendChild(toDOM(model, "after", json["after"]));
+        var diff = diffFromJSON(json.diff);
+        var mapped = diff.map(function(value) {
+            return {
+                before: value.before != null ? toDOM(value.before, "before", source) : document.createTextNode(""),
+                before: value.after != null ? toDOM(value.after, "after", source) : document.createTextNode(""),
+            };
+        });
+        document.getElementById("before").appendChild(toDOM(mapped, "before", json["before"]));
+        document.getElementById("after").appendChild(toDOM(mapped, "after", json["after"]));
     });
     </script>
   </body>
