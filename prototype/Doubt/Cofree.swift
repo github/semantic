@@ -125,8 +125,8 @@ extension CofreeType {
 	/// This is an _anamorphism_ (from the Greek “ana,” “upwards”; compare “anabolism”), a generalization of unfolds over regular trees (and datatypes isomorphic to them). The initial seed is used as the annotation of the returned value. The continuation of the structure is unpacked by applying `annotate` to the seed and mapping the resulting syntax’s values recursively. In this manner, the structure is unfolded bottom-up, starting with `seed` and ending at the leaves.
 	///
 	/// As this is the dual of `Free.iterate`, it’s unsurprising that we have a similar guarantee: coiteration is linear in the size of the constructed tree.
-	public static func coiterate(unfold: Annotation -> Syntax<Annotation, Leaf>)(_ seed: Annotation) -> Self {
-		return (Introduce(seed) <<< { $0.map(coiterate(unfold)) } <<< unfold) <| seed
+	public static func ana(unfold: Annotation -> Syntax<Annotation, Leaf>)(_ seed: Annotation) -> Self {
+		return (Introduce(seed) <<< { $0.map(ana(unfold)) } <<< unfold) <| seed
 	}
 
 	/// `Zip` two `CofreeType` values into a single `Cofree`, pairing their annotations.
