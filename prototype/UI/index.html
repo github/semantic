@@ -140,7 +140,7 @@
                 element.classList.add("pure");
                 element.appendChild(toDOM(model.pure[stateName], stateName, source));
             } else if(model.roll != null) {
-                element = rangeAndSyntaxToDOM(model.ranges[stateName], mapped, source, function(child) { return toDOM(child, stateName, source); });
+                element = rangeAndSyntaxToDOM(model.roll.extract[stateName], model.roll.unwrap, source, function(child) { return toDOM(child, stateName, source); });
                 element.classList.add("diff");
                 element.classList.add("roll");
             }
