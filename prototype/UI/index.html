@@ -80,16 +80,6 @@
         return this;
     }
 
-    // forall a. Term -> (Syntax a -> a) -> a
-    Term.prototype.cata = function(transform) {
-        return transform(this.unwrap.map(function(term) { term.cata(transform) }))
-    }
-
-    // forall a. Term -> (Syntax (Term, a) -> a) -> a
-    Term.prototype.para = function(transform) {
-        return transform(this.unwrap.map(function(term) { [ term, term.para(transform) ] }))
-    }
-
     function toDOM(model, stateName, source) {
         var element;
 
