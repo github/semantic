@@ -51,19 +51,15 @@ public struct Interpreter<Term: CofreeType> {
 		let algorithm: Algorithm<Term, Diff>
 		let annotations = (a.extract, b.extract)
 		
-		let rollByIndex = { (a, b) -> Algorithm<Term, Diff> in
-			.Roll(.ByIndex(a, b, Syntax.Indexed >>> Diff.Introduce(annotations) >>> Algorithm.Pure))
-		}
-		
 		switch (a.unwrap, b.unwrap) {
 		case let (.Leaf, .Leaf(leaf)) where equal(a, b):
 			return .Roll(annotations, .Leaf(leaf))
 		case let (.Keyed(a), .Keyed(b)):
 			algorithm = .Roll(.ByKey(a, b, Syntax.Keyed >>> Diff.Introduce(annotations) >>> Algorithm.Pure))
 		case let (.Indexed(a), .Indexed(b)):
-			algorithm = rollByIndex(a, b)
-		case let (.Fixed(a), .Fixed(b)):
-			algorithm = rollByIndex(a, b)
+			algorithm = .Roll(.ByIndex(a, b, Syntax.Indexed >>> Diff.Introduce(annotations) >>> Algorithm.Pure))
+		case (.Fixed(_), .Fixed(_)):
+			fallthrough
 		default:
 			algorithm = .Roll(.Recursive(a, b, Algorithm.Pure))
 		}
