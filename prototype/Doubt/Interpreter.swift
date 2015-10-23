@@ -42,6 +42,9 @@ public struct Interpreter<Term: CofreeType> {
 
 	/// Diff `a` against `b`, if comparable.
 	private func recur(a: Term, _ b: Term) -> Diff? {
+		// If both terms are equal, we don’t need to bother diffing.
+		//
+		// In that case, zip the two terms together (to pair their annotations), and then map the resulting `Term` (which, since the terms are equal, will be non-nil) into a `Diff`.
 		if equal(a, b) { return hylo(Diff.Roll, Cofree.eliminate)(Term.zip(a, b)!) }
 		guard comparable(a, b) else { return nil }
 
