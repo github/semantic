@@ -71,6 +71,8 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 				return initial
 			case let .Indexed(a):
 				return a.reduce(initial, combine: combine)
+			case let .Fixed(a):
+				return a.reduce(initial, combine: combine)
 			case let .Keyed(a):
 				return a.values.reduce(initial, combine: combine)
 			}
@@ -143,6 +145,8 @@ extension Free where Value: PatchType, Value.Element == Cofree<Leaf, ()> {
 			return Cofree((), .Leaf(a))
 		case let .Indexed(a):
 			return Cofree((), .Indexed(a.flatMap(id)))
+		case let .Fixed(a):
+			return Cofree((), .Fixed(a.flatMap(id)))
 		case let .Keyed(a):
 			return Cofree((), .Keyed(Dictionary(elements: a.flatMap { k, v in v.map { (k, $0) } })))
 		}
