@@ -3,6 +3,19 @@
   <head>
   	<title>semantic-diff</title>
     <style type="text/css">
+    #left, #right {
+        width: 50%;
+    }
+    #left {
+        margin-right: 50%;
+        float: left;
+        background-color: #ffecec;
+    }
+    #right {
+        margin-left: 50%;
+        float: right;
+        background-color: #eaffea;
+    }
     body {
         margin: 0;
         padding: 0;
@@ -235,6 +248,8 @@
   </head>
   <body>
     <div id="diff"></div>
+    <div id="left"></div>
+    <div id="right"></div>
     <script type="text/javascript">
     loadJSON('diff.json', function (json) {
         var model = new Diff(json.diff);
