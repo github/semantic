@@ -89,7 +89,7 @@
 
     function Term(json) {
         this.range = json.extract;
-        this.syntax = syntax(json.unwrap, function(x) { return new Term(x); });
+        this.unwrap = syntax(json.unwrap, function(x) { return new Term(x); });
         return this;
     }
 
@@ -125,7 +125,7 @@
         if (model instanceof Term) {
             element = document.createElement("div");
             element.classList.add("term");
-            element.appendChild(toDOM(model.syntax));
+            element.appendChild(toDOM(model.unwrap));
         }
 
         if (model instanceof Diff) {
