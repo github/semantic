@@ -226,7 +226,7 @@
     function Diff(json, a, b) {
         if (json.pure != null) { this.pure = patch(json.pure, a, b); }
         if (json.roll != null) {
-            this.roll = syntax(json.roll, function(x) { return new Diff(x, a, b); });
+            this.roll = syntax(json.roll.unwrap, function(x) { return new Diff(x, a, b); });
         }
         return this;
     }
