@@ -51,27 +51,19 @@
         return node;
     }
 
-    function Delete(before, a, b) {
-        this.before = new Term(before, a);
-        this.source = this.before.source;
-        this.range = this.before.range;
+    function Delete(before) {
+        this.before = new Term(before);
         return this;
     }
 
-    function Insert(after, a, b) {
-        this.after = new Term(after, b);
-        this.source = this.after.source;
-        this.range = this.after.range;
+    function Insert(after) {
+        this.after = new Term(after);
         return this;
     }
 
-    function Replace(before, after, a, b) {
-        this.before = new Term(before, a);
-        this.after = new Term(after, b);
-        this.sources = { "a": this.before.source, "b": this.after.source };
-        this.ranges = { "a": this.before.range, "b": this.after.range };
-        this.source = this.sources.a;
-        this.range = this.ranges.a;
+    function Replace(before, after) {
+        this.before = new Term(before);
+        this.after = new Term(after);
         return this;
     }
 
@@ -198,10 +190,10 @@
         return element;
     }
 
-    function patch(patch, a, b) {
-        if (patch.delete != null) { return new Delete(patch.delete, a, b); }
-        if (patch.insert != null) { return new Insert(patch.insert, a, b); }
-        if (patch.replace != null) { return new Replace(patch.replace.before, patch.replace.after, a, b); }
+    function patch(patch) {
+        if (patch.delete != null) { return new Delete(patch.delete); }
+        if (patch.insert != null) { return new Insert(patch.insert); }
+        if (patch.replace != null) { return new Replace(patch.replace.before, patch.replace.after); }
     }
 
     function Indexed(array, continuation) {
@@ -231,18 +223,13 @@
         return new Leaf(json);
     }
 
-    function Diff(json, a, b) {
+    function Diff(json) {
         if (json.pure != null) {
-            this.pure = patch(json.pure, a, b);
-            this.range = this.pure.range;
-            this.source = this.pure.source;
+            this.pure = patch(json.pure);
         }
         if (json.roll != null) {
             this.ranges = json.roll.extract;
-            this.sources = { "a": a, "b": b };
-            this.roll = syntax(json.roll.unwrap, function(x) { return new Diff(x, a, b); });
-            this.range = this.roll.range = this.ranges.a;
-            this.source = this.roll.source = this.sources.a;
+            this.roll = syntax(json.roll.unwrap, function(x) { return new Diff(x); });
         }
         return this;
     }
@@ -252,7 +239,7 @@
     <div id="diff"></div>
     <script type="text/javascript">
     loadJSON('diff.json', function (json) {
-        var model = new Diff(json.diff, json.a, json.b);
+        var model = new Diff(json.diff);
         var dom = toDOM(model);
         var root = document.getElementById("diff");
         root.appendChild(dom);
