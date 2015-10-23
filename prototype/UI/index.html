@@ -3,15 +3,15 @@
   <head>
   	<title>semantic-diff</title>
     <style type="text/css">
-    #left, #right {
+    #before, #after {
         width: 50%;
     }
-    #left {
+    #before {
         margin-right: 50%;
         float: left;
         background-color: #ffecec;
     }
-    #right {
+    #after {
         margin-left: 50%;
         float: right;
         background-color: #eaffea;
@@ -93,7 +93,7 @@
         return this;
     }
 
-    function toDOM(model) {
+    function toDOM(model, stateName, source) {
         var element;
 
         if (model instanceof Delete) {
@@ -247,15 +247,13 @@
     </script>
   </head>
   <body>
-    <div id="diff"></div>
-    <div id="left"></div>
-    <div id="right"></div>
+    <div id="before"></div>
+    <div id="after"></div>
     <script type="text/javascript">
     loadJSON('diff.json', function (json) {
         var model = new Diff(json.diff);
-        var dom = toDOM(model, json.a, json.b);
-        var root = document.getElementById("diff");
-        root.appendChild(dom);
+        document.getElementById("before").appendChild(toDOM(model, "before", json["before"]));
+        document.getElementById("after").appendChild(toDOM(model, "after", json["after"]));
     });
     </script>
   </body>
