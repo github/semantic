@@ -50,6 +50,7 @@ public struct Interpreter<Term: CofreeType> {
 
 		let algorithm: Algorithm<Term, Diff>
 		let annotations = (a.extract, b.extract)
+		
 		switch (a.unwrap, b.unwrap) {
 		case let (.Leaf, .Leaf(leaf)) where equal(a, b):
 			return .Roll(annotations, .Leaf(leaf))
@@ -57,6 +58,8 @@ public struct Interpreter<Term: CofreeType> {
 			algorithm = .Roll(.ByKey(a, b, Syntax.Keyed >>> Diff.Introduce(annotations) >>> Algorithm.Pure))
 		case let (.Indexed(a), .Indexed(b)):
 			algorithm = .Roll(.ByIndex(a, b, Syntax.Indexed >>> Diff.Introduce(annotations) >>> Algorithm.Pure))
+		case (.Fixed(_), .Fixed(_)):
+			fallthrough
 		default:
 			algorithm = .Roll(.Recursive(a, b, Algorithm.Pure))
 		}
@@ -74,6 +77,8 @@ public struct Interpreter<Term: CofreeType> {
 			switch (a.unwrap, b.unwrap) {
 			case let (.Indexed(a), .Indexed(b)) where a.count == b.count:
 				return recur(f(.Roll(annotations, .Indexed(zip(a, b).map(run)))))
+			case let (.Fixed(a), .Fixed(b)) where a.count == b.count:
+				return recur(f(.Roll(annotations, .Fixed(zip(a, b).map(run)))))
 
 			case let (.Keyed(a), .Keyed(b)) where Array(a.keys) == Array(b.keys):
 				return recur(f(.Roll(annotations, .Keyed(Dictionary(elements: b.keys.map { ($0, self.run(a[$0]!, b[$0]!)) })))))
