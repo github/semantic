@@ -232,7 +232,11 @@
     }
 
     function Diff(json, a, b) {
-        if (json.pure != null) { this.pure = patch(json.pure, a, b); }
+        if (json.pure != null) {
+            this.pure = patch(json.pure, a, b);
+            this.range = this.pure.range;
+            this.source = this.pure.source;
+        }
         if (json.roll != null) {
             this.ranges = json.roll.extract;
             this.sources = { "a": a, "b": b };
