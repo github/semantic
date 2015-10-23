@@ -10,7 +10,7 @@ import Foundation
 import Doubt
 
 typealias Term = Cofree<JSONLeaf, Range<String.Index>>
-typealias Diff = Free<JSONLeaf, Patch<Term>>
+typealias Diff = Free<JSONLeaf, Term.Annotation, Patch<Term>>
 
 enum JSONLeaf: CustomJSONConvertible, CustomStringConvertible, Equatable {
 	case Number(Double)

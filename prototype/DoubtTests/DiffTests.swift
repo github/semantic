@@ -4,13 +4,19 @@ final class DiffTests: XCTestCase {
 	}
 
 	typealias Term = RangedTerm.Term
-	typealias Diff = Free<String, Patch<Term>>
+	typealias Diff = Free<String, (Term.Annotation, Term.Annotation), Patch<Term>>
 
 	let interpreter = Interpreter<Term>(equal: ==, comparable: const(true), cost: Diff.sum(const(1)))
 
 	func testEqualTermsProduceIdentityDiffs() {
 		property("equal terms produce identity diffs") <- forAll { (term: RangedTerm) in
 			Diff.sum(const(1))(self.interpreter.run(term.term, term.term)) == 0
+		}
+	}
+
+	func testRecursivelyCopiedDiffsHaveNoPatches() {
+		property("recursively copying a term into a diff produces no patches") <- forAll { (term: RangedTerm) in
+			Free.sum(const(1))(Free<Term.Leaf, Term.Annotation, Patch<Term>>(term.term)) == 0
 		}
 	}
 
@@ -50,7 +56,7 @@ final class DiffTests: XCTestCase {
 
 
 private func equal(a: DiffTests.Diff, _ b: DiffTests.Diff) -> Bool {
-	return Free.equals(ifPure: Patch.equals(Cofree.equals(annotation: ==, leaf: ==)), ifRoll: ==)(a, b)
+	return Free.equals(pure: Patch.equals(Cofree.equals(annotation: ==, leaf: ==)), leaf: ==, annotation: const(true))(a, b)
 }
 
 

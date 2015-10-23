@@ -55,7 +55,12 @@ func diffAndSerialize(a aString: String, b bString: String, to: String) throws {
 		[
 			"a": .String(aString),
 			"b": .String(bString),
-			"diff": diff.JSON(ifPure: { $0.JSON { $0.JSON(annotation: range, leaf: { $0.JSON }) } }, ifLeaf: { $0.JSON }),
+			"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: range, leaf: { $0.JSON }) } }, leaf: { $0.JSON }, annotation: {
+				[
+					"a": range($0),
+					"b": range($1),
+				]
+			}),
 		]
 	}
 
@@ -64,10 +69,6 @@ func diffAndSerialize(a aString: String, b bString: String, to: String) throws {
 	}
 
 	try data.writeToFile(to, options: .DataWritingAtomic)
-
-	return benchmark("decoding data into string") {
-		NSString(data: data, encoding: NSUTF8StringEncoding) as String?
-	}
 }
 
 let readFile = { (path: String) -> String? in

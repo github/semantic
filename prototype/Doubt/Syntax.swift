@@ -18,6 +18,9 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible {
 		}
 	}
 
+
+	// MARK: CustomDebugStringConvertible
+
 	public var debugDescription: String {
 		switch self {
 		case let .Leaf(n):
@@ -28,6 +31,31 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible {
 			return ".Keyed(\(String(reflecting: d)))"
 		}
 	}
+}
+
+
+// MARK: - Hylomorphism
+
+/// Hylomorphism through `Syntax`.
+///
+/// A hylomorphism (from the Aristotelian philosophy that form and matter are one) is a function of type `A → B` whose call-tree is linear in the size of the nodes produced by `up`. Conceptually, it’s the composition of a catamorphism (see also `cata`) and an anamorphism (see also `ana`), but is implemented by [Stream fusion](http://lambda-the-ultimate.org/node/2192) and as such enjoys O(n) time complexity, O(1) size complexity, and small constant factors for both (modulo inadvisable implementations of `up` and `down`).
+///
+/// Hylomorphisms are used to construct diffs corresponding to equal terms; see also `CofreeType.zip`.
+///
+/// `hylo` can be used with arbitrary functors which can eliminate to and introduce with `Syntax` values.
+public func hylo<A, B, Leaf>(down: Syntax<B, Leaf> -> B, _ up: A -> Syntax<A, Leaf>) -> A -> B {
+	return up >>> { $0.map(hylo(down, up)) } >>> down
+}
+
+/// Reiteration through `Syntax`.
+///
+/// This is a form of hylomorphism (from the Aristotelian philosophy that form and matter are one). As such, it returns a function of type `A → B` whose call-tree is linear in the size of the nodes produced by `up`. Conceptually, it’s the composition of a catamorphism (see also `cata`) and an anamorphism (see also `ana`), but is implemented by [Stream fusion](http://lambda-the-ultimate.org/node/2192) and as such enjoys O(n) time complexity, O(1) size complexity, and small constant factors for both (modulo inadvisable implementations of `up` and `down`).
+///
+/// Hylomorphisms are used to construct diffs corresponding to equal terms; see also `CofreeType.zip`.
+///
+/// `hylo` can be used with arbitrary functors which can eliminate to and introduce with `Annotation` & `Syntax` pairs.
+public func hylo<A, B, Leaf, Annotation>(down: (Annotation, Syntax<B, Leaf>) -> B, _ up: A -> (Annotation, Syntax<A, Leaf>)) -> A -> B {
+	return up >>> { ($0, $1.map(hylo(down, up))) } >>> down
 }
 
 
@@ -52,14 +80,14 @@ extension Syntax: DictionaryLiteralConvertible {
 // MARK: - Equality
 
 extension Syntax {
-	public static func equals(ifLeaf ifLeaf: (A, A) -> Bool, ifRecur: (Recur, Recur) -> Bool)(_ left: Syntax<Recur, A>, _ right: Syntax<Recur, A>) -> Bool {
+	public static func equals(leaf leaf: (A, A) -> Bool, recur: (Recur, Recur) -> Bool)(_ left: Syntax<Recur, A>, _ right: Syntax<Recur, A>) -> Bool {
 		switch (left, right) {
 		case let (.Leaf(l1), .Leaf(l2)):
-			return ifLeaf(l1, l2)
+			return leaf(l1, l2)
 		case let (.Indexed(v1), .Indexed(v2)):
-			return v1.count == v2.count && zip(v1, v2).lazy.map(ifRecur).reduce(true) { $0 && $1 }
+			return v1.count == v2.count && zip(v1, v2).lazy.map(recur).reduce(true) { $0 && $1 }
 		case let (.Keyed(d1), .Keyed(d2)):
-			return Set(d1.keys) == Set(d2.keys) && d1.keys.map { ifRecur(d1[$0]!, d2[$0]!) }.reduce(true) { $0 && $1 }
+			return Set(d1.keys) == Set(d2.keys) && d1.keys.map { recur(d1[$0]!, d2[$0]!) }.reduce(true) { $0 && $1 }
 		default:
 			return false
 		}
@@ -67,46 +95,24 @@ extension Syntax {
 }
 
 public func == <F: Equatable, A: Equatable> (left: Syntax<F, A>, right: Syntax<F, A>) -> Bool {
-	return Syntax.equals(ifLeaf: ==, ifRecur: ==)(left, right)
+	return Syntax.equals(leaf: ==, recur: ==)(left, right)
 }
 
 
 // MARK: - JSON
 
 extension Syntax {
-	public func JSON(@noescape ifLeaf ifLeaf: A -> Doubt.JSON, @noescape ifRecur: Recur -> Doubt.JSON) -> Doubt.JSON {
+	public func JSON(@noescape leaf leaf: A -> Doubt.JSON, @noescape recur: Recur -> Doubt.JSON) -> Doubt.JSON {
 		switch self {
 		case let .Leaf(a):
-			return ifLeaf(a)
+			return leaf(a)
 		case let .Indexed(a):
-			return .Array(a.map(ifRecur))
+			return .Array(a.map(recur))
 		case let .Keyed(d):
-			return .Dictionary(Dictionary(elements: d.map { ($0, ifRecur($1)) }))
+			return .Dictionary(Dictionary(elements: d.map { ($0, recur($1)) }))
 		}
 	}
 }
 
 
-// MARK: - Construction
-
-/// SyntaxConvertible types can be constructed with the same constructors available on Syntax itself, as a convenience.
-public protocol SyntaxConvertible {
-	typealias RecurType
-	typealias LeafType
-
-	init(syntax: Syntax<RecurType, LeafType>)
-}
-
-extension SyntaxConvertible {
-	public static func Leaf(value: LeafType) -> Self {
-		return Self(syntax: .Leaf(value))
-	}
-
-	public static func Indexed(children: [RecurType]) -> Self {
-		return Self(syntax: .Indexed(children))
-	}
-
-	public static func Keyed(children: [String:RecurType]) -> Self {
-		return Self(syntax: .Keyed(children))
-	}
-}
+import Prelude

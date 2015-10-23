@@ -8,6 +8,12 @@ final class TermTests: XCTestCase {
 			Cofree.equals(annotation: ==, leaf: ==)(term.term, term.term)
 		}
 	}
+
+	func testEqualTermsZipCleanly() {
+		property("equal terms zip to a non-nil value") <- forAll { (term: RangedTerm) in
+			Cofree.zip(term.term, term.term) != nil
+		}
+	}
 }
 
 
