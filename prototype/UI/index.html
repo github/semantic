@@ -67,12 +67,9 @@
         return this;
     }
 
-    function Term(json, source) {
-        this.source = source;
+    function Term(json) {
         this.range = json.extract;
-        this.syntax = syntax(json.unwrap, function(x) { return new Term(x, source); });
-        this.syntax.source = source;
-        this.syntax.range = this.range;
+        this.syntax = syntax(json.unwrap, function(x) { return new Term(x); });
         return this;
     }
 
