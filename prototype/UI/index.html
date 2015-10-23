@@ -190,8 +190,8 @@
         var diff = diffFromJSON(json.diff);
         var mapped = diff.map(function(value) {
             return {
-                before: value.before != null ? toDOM(value.before, "before", source) : document.createTextNode(""),
-                before: value.after != null ? toDOM(value.after, "after", source) : document.createTextNode(""),
+                before: value.before != null ? toDOM(value.before, "before", json["before"]) : document.createTextNode(""),
+                after: value.after != null ? toDOM(value.after, "after", json["after"]) : document.createTextNode(""),
             };
         });
         document.getElementById("before").appendChild(toDOM(mapped, "before", json["before"]));
