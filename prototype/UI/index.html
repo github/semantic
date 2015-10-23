@@ -158,7 +158,7 @@
     function diffFromJSON(json) {
         if (json.pure != null) { return new Diff({ pure: new Patch(json.pure) }); }
         if (json.roll != null) {
-            return new Diff({ ranges: json.roll.extract, roll: new Syntax(json.roll.unwrap, function(x) { return diffFromJSON(x); }) });
+            return new Diff({ roll: { extract: json.roll.extract, unwrap: new Syntax(json.roll.unwrap, function(x) { return diffFromJSON(x); }) } });
         }
     }
 
