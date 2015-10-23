@@ -51,6 +51,12 @@
         return node;
     }
 
+    function patch(patch) {
+        if (patch.delete != null) { return new Delete(patch.delete); }
+        if (patch.insert != null) { return new Insert(patch.insert); }
+        if (patch.replace != null) { return new Replace(patch.replace.before, patch.replace.after); }
+    }
+
     function Delete(before) {
         this.before = new Term(before);
         return this;
@@ -185,12 +191,6 @@
         }
 
         return element;
-    }
-
-    function patch(patch) {
-        if (patch.delete != null) { return new Delete(patch.delete); }
-        if (patch.insert != null) { return new Insert(patch.insert); }
-        if (patch.replace != null) { return new Replace(patch.replace.before, patch.replace.after); }
     }
 
     function Indexed(array, continuation) {
