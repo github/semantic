@@ -89,7 +89,7 @@
 
     function Term(json) {
         this.range = json.extract;
-        this.unwrap = syntax(json.unwrap, function(x) { return new Term(x); });
+        this.unwrap = new Syntax(json.unwrap, function(x) { return new Term(x); });
         return this;
     }
 
