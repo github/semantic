@@ -207,14 +207,6 @@
         return element;
     }
 
-    function Indexed(array, continuation) {
-        this.values = [];
-        for (index in array) {
-            this.values.push(continuation(array[index]));
-        }
-        return this;
-    }
-
     function Dictionary(object) {
         this.values = {};
         for (key in object) {
