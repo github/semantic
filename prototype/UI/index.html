@@ -162,14 +162,9 @@
         }
     }
 
-    function Diff(json) {
-        if (json.pure != null) {
-            this.pure = new Patch(json.pure);
-        }
-        if (json.roll != null) {
-            this.ranges = json.roll.extract;
-            this.roll = new Syntax(json.roll.unwrap, function(x) { return new Diff(x); });
-        }
+    function Diff(object) {
+        if (object.pure != null) { this.pure = object.pure; }
+        if (object.roll != null) { this.roll = object.roll; }
         return this;
     }
     </script>
