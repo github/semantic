@@ -227,7 +227,7 @@
         if (json.pure != null) { this.pure = patch(json.pure, a, b); }
         if (json.roll != null) {
             this.ranges = json.roll.extract;
-            this.sources = [ a, b ];
+            this.sources = { "a": a, "b": b };
             this.roll = syntax(json.roll.unwrap, function(x) { return new Diff(x, a, b); });
             this.roll.range = this.ranges.b;
             this.roll.source = this.sources.b;
