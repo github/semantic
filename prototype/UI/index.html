@@ -70,8 +70,8 @@
         this.after = new Term(after, b);
         this.sources = { "a": this.before.source, "b": this.after.source };
         this.ranges = { "a": this.before.range, "b": this.after.range };
-        this.source = this.sources.b;
-        this.range = this.ranges.b;
+        this.source = this.sources.a;
+        this.range = this.ranges.a;
         return this;
     }
 
@@ -241,8 +241,8 @@
             this.ranges = json.roll.extract;
             this.sources = { "a": a, "b": b };
             this.roll = syntax(json.roll.unwrap, function(x) { return new Diff(x, a, b); });
-            this.range = this.roll.range = this.ranges.b;
-            this.source = this.roll.source = this.sources.b;
+            this.range = this.roll.range = this.ranges.a;
+            this.source = this.roll.source = this.sources.a;
         }
         return this;
     }
