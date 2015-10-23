@@ -165,6 +165,19 @@
         if (object.roll != null) { this.roll = object.roll; }
         return this;
     }
+
+    // forall a b. Diff a -> (a -> b) -> Diff b
+    Diff.prototype.map = function(transform) {
+        if (this.pure != null) { return new Diff({ pure: transform(this.pure) }); }
+        if (this.roll != null) {
+            return new Diff({
+                roll: {
+                    extract: roll.extract,
+                    unwrap: roll.unwrap.map(function(x) { return x.map(transform); })
+                }
+            });
+        }
+    }
     </script>
   </head>
   <body>
