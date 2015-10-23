@@ -229,8 +229,8 @@
             this.ranges = json.roll.extract;
             this.sources = { "a": a, "b": b };
             this.roll = syntax(json.roll.unwrap, function(x) { return new Diff(x, a, b); });
-            this.roll.range = this.ranges.b;
-            this.roll.source = this.sources.b;
+            this.range = this.roll.range = this.ranges.b;
+            this.source = this.roll.source = this.sources.b;
         }
         return this;
     }
