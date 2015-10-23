@@ -14,6 +14,12 @@ final class DiffTests: XCTestCase {
 		}
 	}
 
+	func testRecursivelyCopiedDiffsHaveNoPatches() {
+		property("recursively copying a term into a diff produces no patches") <- forAll { (term: RangedTerm) in
+			Free.sum(const(1))(Free<Term.Leaf, Term.Annotation, Patch<Term>>(term.term)) == 0
+		}
+	}
+
 	func testInequalTermsProduceNonIdentityDiffs() {
 		property("inequal terms produce non-identity diffs") <- forAll { (diff: RangedDiff) in
 			(!Term.equals(annotation: const(true), leaf: ==)(diff.a.term, diff.b.term)) ==> Diff.sum(const(1))(diff.diff) > 0

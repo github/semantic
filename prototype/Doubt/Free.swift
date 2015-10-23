@@ -13,6 +13,14 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	indirect case Roll(Annotation, Syntax<Free, Leaf>)
 
 
+	/// Construct a `Free` from a `CofreeType` with matching `Leaf` and `Annotation` types, copying the recursive structure of the term in via hylomorphism.
+	///
+	/// The resulting `Free` value will not have any `Pure` cases.
+	public init<Term: CofreeType where Term.Leaf == Leaf, Term.Annotation == Annotation>(_ term: Term) {
+		self = hylo(Free.Roll, Term.eliminate)(term)
+	}
+
+
 	public func analysis<C>(@noescape ifPure ifPure: Value -> C, @noescape ifRoll: (Annotation, Syntax<Free, Leaf>) -> C) -> C {
 		switch self {
 		case let .Pure(b):
@@ -26,14 +34,14 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	///
 	/// `Pure` values are simply unpacked. `Roll` values are mapped recursively, and then have `transform` applied to them.
 	///
-	/// This forms a _catamorphism_ (from the Greek “cata”, “downwards”; compare “catastrophe”), a generalization of folds over regular trees (and datatypes isomorphic to them). It operates at the leaves first, and then branches near the periphery, recursively collapsing values by whatever is computed by `transform`. Catamorphisms are themselves an example of _recursion schemes_, which characterize specific well-behaved patterns of recursion. This gives `iterate` some useful properties for computations performed over trees.
+	/// This forms a _catamorphism_ (from the Greek “cata”, “downwards”; compare “catastrophe”), a generalization of folds over regular trees (and datatypes isomorphic to them). It operates at the leaves first, and then branches near the periphery, recursively collapsing values by whatever is computed by `transform`. Catamorphisms are themselves an example of _recursion schemes_, which characterize specific well-behaved patterns of recursion. This gives `cata` some useful properties for computations performed over trees.
 	///
-	/// Due to the character of recursion captured by catamorphisms, `iterate` ensures that computation will not only halt, but will further be linear in the size of the receiver. (Nesting a call to `iterate` will therefore result in O(n²) complexity.) This guarantee is achieved by careful composition of calls to `map` with recursive calls to `iterate`, only calling `transform` once the recursive call has completed. `transform` is itself non-recursive, receiving a `Syntax` whose recurrences have already been flattened to `Value`.
+	/// Due to the character of recursion captured by catamorphisms, `cata` ensures that computation will not only halt, but will further be linear in the size of the receiver. (Nesting a call to `cata` will therefore result in O(n²) complexity.) This guarantee is achieved by careful composition of calls to `map` with recursive calls to `cata`, only calling `transform` once the recursive call has completed. `transform` is itself non-recursive, receiving a `Syntax` whose recurrences have already been flattened to `Value`.
 	///
-	/// The linearity of `iterate` in the size of the receiver makes it trivial to compute said size, by counting leaves as 1 and summing branches’ children:
+	/// The linearity of `cata` in the size of the receiver makes it trivial to compute said size, by counting leaves as 1 and summing branches’ children:
 	///
 	///		func size<Leaf, Annotation, Value>(free: Free<Leaf, Annotation, Value>) -> Int {
-	///			return free.iterate { flattenedSyntax in
+	///			return free.cata { flattenedSyntax in
 	///				switch flattenedSyntax {
 	///				case .Leaf:
 	///					return 1
@@ -45,19 +53,19 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	///			}
 	///		}
 	///
-	/// While not every function on a given `Free` can be computed using `iterate`, these guarantees of termination and complexity, as well as the brevity and focus on the operation being performed n times, make it a desirable scaffolding for any function which can.
+	/// While not every function on a given `Free` can be computed using `cata`, these guarantees of termination and complexity, as well as the brevity and focus on the operation being performed n times, make it a desirable scaffolding for any function which can.
 	///
 	/// For a lucid, in-depth tutorial on recursion schemes, I recommend [Patrick Thomson](https://twitter.com/importantshock)’s _[An Introduction to Recursion Schemes](http://patrickthomson.ghost.io/an-introduction-to-recursion-schemes/)_ and _[Recursion Schemes, Part 2: A Mob of Morphisms](http://patrickthomson.ghost.io/recursion-schemes-part-2/)_.
-	public func iterate(transform: Syntax<Value, Leaf> -> Value) -> Value {
+	public func cata(transform: Syntax<Value, Leaf> -> Value) -> Value {
 		return analysis(
 			ifPure: id,
-			ifRoll: { $1.map { $0.iterate(transform) } } >>> transform)
+			ifRoll: { $1.map { $0.cata(transform) } } >>> transform)
 	}
 
 
 	/// Reduces the receiver top-down, left-to-right, starting from an `initial` value, and applying `combine` to successive values.
 	public func reduce(initial: Value, combine: (Value, Value) -> Value) -> Value {
-		return iterate {
+		return cata {
 			switch $0 {
 			case .Leaf:
 				return initial
@@ -112,8 +120,8 @@ extension Free {
 	/// Anamorphism over `Free`.
 	///
 	/// Unfolds a tree bottom-up by recursively applying `transform` to a series of values starting with `seed`. Since `Syntax.Leaf` does not recur, this will halt when it has produced leaves for every branch.
-	public static func coiterate(unfold: Annotation -> Syntax<Annotation, Leaf>)(_ seed: Annotation) -> Free {
-		return (Introduce(seed) <<< { $0.map(coiterate(unfold)) } <<< unfold) <| seed
+	public static func ana(unfold: Annotation -> Syntax<Annotation, Leaf>)(_ seed: Annotation) -> Free {
+		return (Introduce(seed) <<< { $0.map(ana(unfold)) } <<< unfold) <| seed
 	}
 }
 
@@ -122,11 +130,11 @@ extension Free where Value: PatchType, Value.Element == Cofree<Leaf, ()> {
 	public typealias Term = Value.Element
 
 	public func merge(transform: Value -> Term) -> Term {
-		return map(transform).iterate { Cofree((), $0) }
+		return map(transform).cata { Cofree((), $0) }
 	}
 
 	public func merge(transform: Value -> Term?) -> Term? {
-		return map(transform).iterate(Free.discardNullTerms)
+		return map(transform).cata(Free.discardNullTerms)
 	}
 
 	private static func discardNullTerms(syntax: Syntax<Term?, Leaf>) -> Term? {

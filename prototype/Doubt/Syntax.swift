@@ -38,7 +38,7 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible {
 
 /// Hylomorphism through `Syntax`.
 ///
-/// A hylomorphism (from the Aristotelian philosophy that form and matter are one) is a function of type `A → B` whose call-tree is linear in the size of the nodes produced by `up`. Conceptually, it’s the composition of a catamorphism (see also `TermType.cata`, `Free.iterate`) and an anamorphism (see also `Free.ana`, `CofreeType.coiterate`), but is implemented by [Stream fusion](http://lambda-the-ultimate.org/node/2192) and as such enjoys O(n) time complexity, O(1) size complexity, and small constant factors for both (modulo inadvisable implementations of `up` and `down`).
+/// A hylomorphism (from the Aristotelian philosophy that form and matter are one) is a function of type `A → B` whose call-tree is linear in the size of the nodes produced by `up`. Conceptually, it’s the composition of a catamorphism (see also `cata`) and an anamorphism (see also `ana`), but is implemented by [Stream fusion](http://lambda-the-ultimate.org/node/2192) and as such enjoys O(n) time complexity, O(1) size complexity, and small constant factors for both (modulo inadvisable implementations of `up` and `down`).
 ///
 /// Hylomorphisms are used to construct diffs corresponding to equal terms; see also `CofreeType.zip`.
 ///
@@ -49,13 +49,13 @@ public func hylo<A, B, Leaf>(down: Syntax<B, Leaf> -> B, _ up: A -> Syntax<A, Le
 
 /// Reiteration through `Syntax`.
 ///
-/// This is a form of hylomorphism (from the Aristotelian philosophy that form and matter are one). As such, it returns a function of type `A → B` whose call-tree is linear in the size of the nodes produced by `up`. Conceptually, it’s the composition of a catamorphism (see also `TermType.cata`, `Free.iterate`) and an anamorphism (see also `Free.ana`, `CofreeType.coiterate`), but is implemented by [Stream fusion](http://lambda-the-ultimate.org/node/2192) and as such enjoys O(n) time complexity, O(1) size complexity, and small constant factors for both (modulo inadvisable implementations of `up` and `down`).
+/// This is a form of hylomorphism (from the Aristotelian philosophy that form and matter are one). As such, it returns a function of type `A → B` whose call-tree is linear in the size of the nodes produced by `up`. Conceptually, it’s the composition of a catamorphism (see also `cata`) and an anamorphism (see also `ana`), but is implemented by [Stream fusion](http://lambda-the-ultimate.org/node/2192) and as such enjoys O(n) time complexity, O(1) size complexity, and small constant factors for both (modulo inadvisable implementations of `up` and `down`).
 ///
 /// Hylomorphisms are used to construct diffs corresponding to equal terms; see also `CofreeType.zip`.
 ///
-/// `reiterate` can be used with arbitrary functors which can eliminate to and introduce with `Annotation` & `Syntax` pairs.
-public func reiterate<A, B, Leaf, Annotation>(down: (Annotation, Syntax<B, Leaf>) -> B, _ up: A -> (Annotation, Syntax<A, Leaf>)) -> A -> B {
-	return up >>> { ($0, $1.map(reiterate(down, up))) } >>> down
+/// `hylo` can be used with arbitrary functors which can eliminate to and introduce with `Annotation` & `Syntax` pairs.
+public func hylo<A, B, Leaf, Annotation>(down: (Annotation, Syntax<B, Leaf>) -> B, _ up: A -> (Annotation, Syntax<A, Leaf>)) -> A -> B {
+	return up >>> { ($0, $1.map(hylo(down, up))) } >>> down
 }
 
 
