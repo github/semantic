@@ -111,6 +111,7 @@
             var previous = range[0];
             for (i in syntax.indexed) {
                 var child = syntax.indexed[i];
+                if (child.pure == "") continue;
                 var childRange = getRange(child);
                 element.appendChild(document.createTextNode(source.substr(previous, childRange[0] - previous)));
                 element.appendChild(wrap("li", recur(child)));
@@ -121,6 +122,7 @@
             element = document.createElement("dl");
             var values = [];
             for (k in syntax.keyed.values) {
+                if (syntax.keyed.values[k].pure == "") continue;
                 values.push([ k, syntax.keyed.values[k] ]);
             }
             values.sort(function(a, b) {
