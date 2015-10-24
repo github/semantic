@@ -220,10 +220,10 @@
     loadJSON('diff.json', function (json) {
         var diff = diffFromJSON(json.diff);
         var before = diff.map(function(value) {
-            return value.before != null ? termToDOM(value.before, "before", json["before"]) : null;
+            return value.before != null ? termToDOM(value.before, "before", json["before"]) : "";
         });
         var after = diff.map(function(value) {
-            return value.after != null ? termToDOM(value.after, "after", json["after"]) : null;
+            return value.after != null ? termToDOM(value.after, "after", json["after"]) : "";
         });
         document.getElementById("before").appendChild(diffToDOM(before, "before", json["before"]));
         document.getElementById("after").appendChild(diffToDOM(after, "after", json["after"]));
