@@ -82,6 +82,7 @@
 
     /// Range -> Syntax a -> String, (a -> DOM) -> DOM
     function rangeAndSyntaxToDOM(range, syntax, source, recur) {
+        recur = recur || function (term) { return rangeAndSyntaxToDOM(term.range, term.unwrap, source); }
         var element;
         if (syntax.leaf != null) {
             element = document.createElement("span");
