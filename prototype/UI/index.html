@@ -33,14 +33,14 @@
         background-color: #eee;
     }
 
-    #diff div, #diff ul, #diff li, #diff dl, #diff dd, #diff span {
+    .diff div, .diff ul, .diff li, .diff dl, .diff dd, .diff span {
         white-space: pre-wrap;
         display: inline;
         margin: 0;
         padding: 0;
     }
 
-    #diff dt {
+    .diff dt {
         display: none;
     }
     </style>
@@ -214,8 +214,8 @@
     </script>
   </head>
   <body>
-    <div id="before"></div>
-    <div id="after"></div>
+    <div id="before" class="diff"></div>
+    <div id="after" class="diff"></div>
     <script type="text/javascript">
     loadJSON('diff.json', function (json) {
         var diff = diffFromJSON(json.diff);
