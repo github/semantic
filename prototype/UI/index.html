@@ -91,10 +91,12 @@
 
     /// Diff -> String -> String -> DOM
     function diffToDOM(diff, which, source) {
-        return rangeAndSyntaxToDOM(diff.roll.extract[which], diff.roll.unwrap, source, function(diff) {
+        if (diff.pure != null) { return diff.pure; }
+        function getRange(diff) {
             if (diff.pure != null) { return diff.pure["data-range"]; }
             if (diff.roll != null) { return diff.roll.extract[which]; }
-        }, function(diff) { return diffToDOM(diff, which, source); })
+        }
+        return rangeAndSyntaxToDOM(getRange(diff), diff.roll.unwrap, source, getRange, function(diff) { return diffToDOM(diff, which, source); })
     }
 
     /// Range -> Syntax a -> String -> (a -> Range) -> (a -> DOM) -> DOM
