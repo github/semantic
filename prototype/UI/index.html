@@ -228,7 +228,12 @@
             return element || "";
         });
         var after = diff.map(function(value) {
-            return value.after != null ? termToDOM(value.after, "after", json["after"]) : "";
+            var element;
+            if (value.after != null) {
+                element = termToDOM(value.after, "after", json["after"]);
+                element.classList.add("insert")
+            }
+            return element || "";
         });
         document.getElementById("before").appendChild(diffToDOM(before, "before", json["before"]));
         document.getElementById("after").appendChild(diffToDOM(after, "after", json["after"]));
