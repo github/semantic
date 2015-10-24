@@ -65,18 +65,22 @@
     }
 
     function Patch(patch) {
-        if (patch.delete != null) { this.before = new Term(patch.delete); }
-        if (patch.insert != null) { this.after = new Term(patch.insert); }
+        if (patch.delete != null) { this.before = termFromJSON(patch.delete); }
+        if (patch.insert != null) { this.after = termFromJSON(patch.insert); }
         if (patch.replace != null) {
-            this.before = new Term(patch.replace.before);
-            this.after = new Term(patch.replace.after);
+            this.before = termFromJSON(patch.replace.before);
+            this.after = termFromJSON(patch.replace.after);
         }
         return this;
     }
 
-    function Term(json) {
-        this.range = json.extract;
-        this.unwrap = new Syntax(json.unwrap, function(x) { return new Term(x); });
+    function termFromJSON(json) {
+        return new Term({ extract: json.extract, unwrap: new Syntax(json.unwrap, function(x) { return termFromJSON(json); }) });
+    }
+
+    function Term(object) {
+        this.range = object.extract;
+        this.unwrap = object.unwrap;
         return this;
     }
 
