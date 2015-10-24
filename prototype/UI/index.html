@@ -225,6 +225,9 @@
             if (value.before != null) {
                 element = termToDOM(value.before, "before", json["before"]);
                 element.classList.add("delete");
+                if (value.after != null) {
+                    element.classList.add("replace");
+                }
             }
             return element || "";
         });
@@ -233,6 +236,9 @@
             if (value.after != null) {
                 element = termToDOM(value.after, "after", json["after"]);
                 element.classList.add("insert")
+                if (value.before != null) {
+                    element.classList.add("replace");
+                }
             }
             return element || "";
         });
