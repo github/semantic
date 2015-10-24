@@ -80,6 +80,11 @@
         return this;
     }
 
+    /// Term -> String -> DOM
+    function termToDOM(term, source) {
+        return rangeAndSyntaxToDOM(term.range, term.unwrap, source, function(term) { return termToDOM(term, source); });
+    }
+
     /// Range -> Syntax a -> String, (a -> DOM) -> DOM
     function rangeAndSyntaxToDOM(range, syntax, source, recur) {
         recur = recur || function (term) { return rangeAndSyntaxToDOM(term.range, term.unwrap, source); }
@@ -131,7 +136,7 @@
         var element;
 
         if (model instanceof Term) {
-            element = rangeAndSyntaxToDOM(model.range, model.unwrap, source, function(child) { return toDOM(child, stateName, source); });
+            element = rangeAndSyntaxToDOM(model.range, model.unwrap, source);
         }
 
         if (model instanceof Diff) {
@@ -141,7 +146,7 @@
                 element.classList.add("pure");
                 element.appendChild(toDOM(model.pure[stateName], stateName, source));
             } else if(model.roll != null) {
-                element = rangeAndSyntaxToDOM(model.roll.extract[stateName], model.roll.unwrap, source, function(child) { return toDOM(child, stateName, source); });
+                element = rangeAndSyntaxToDOM(model.roll.extract[stateName], model.roll.unwrap, source);
                 element.classList.add("diff");
                 element.classList.add("roll");
             }
@@ -216,8 +221,8 @@
         var diff = diffFromJSON(json.diff);
         var mapped = diff.map(function(value) {
             return {
-                before: value.before != null ? toDOM(value.before, "before", json["before"]) : document.createTextNode(""),
-                after: value.after != null ? toDOM(value.after, "after", json["after"]) : document.createTextNode(""),
+                before: value.before != null ? termToDOM(value.before, "before", json["before"]) : document.createTextNode(""),
+                after: value.after != null ? termToDOM(value.after, "after", json["after"]) : document.createTextNode(""),
             };
         });
         document.getElementById("before").appendChild(toDOM(mapped, "before", json["before"]));
