@@ -75,7 +75,7 @@
     }
 
     function termFromJSON(json) {
-        return new Term({ extract: json.extract, unwrap: new Syntax(json.unwrap, function(x) { return termFromJSON(json); }) });
+        return new Term({ extract: json.extract, unwrap: new Syntax(json.unwrap, function(x) { return termFromJSON(x); }) });
     }
 
     function Term(object) {
