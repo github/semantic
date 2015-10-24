@@ -211,6 +211,14 @@
             });
         }
     }
+
+    // forall a. Diff a -> (Syntax a -> a) -> a
+    Diff.prototype.cata = function(transform) {
+        if (this.pure != null) { return this.pure; }
+        if (this.roll != null) {
+            return transform(this.roll.unwrap.map(function(diff) { return diff.cata(transform); }))
+        }
+    }
     </script>
   </head>
   <body>
