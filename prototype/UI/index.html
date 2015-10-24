@@ -143,29 +143,7 @@
             }
             element.appendChild(document.createTextNode(source.substr(previous, range[0] + range[1] - previous)));
         }
-        return element;
-    }
-
-    function toDOM(model, stateName, source) {
-        var element;
-
-        if (model instanceof Term) {
-            element = rangeAndSyntaxToDOM(model.range, model.unwrap, source);
-        }
-
-        if (model instanceof Diff) {
-            if (model.pure != null) {
-                element = document.createElement("div");
-                element.classList.add("diff");
-                element.classList.add("pure");
-                element.appendChild(toDOM(model.pure[stateName], stateName, source));
-            } else if(model.roll != null) {
-                element = rangeAndSyntaxToDOM(model.roll.extract[stateName], model.roll.unwrap, source);
-                element.classList.add("diff");
-                element.classList.add("roll");
-            }
-        }
-
+        element["data-range"] = range;
         return element;
     }
 
