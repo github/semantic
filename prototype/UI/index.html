@@ -103,11 +103,12 @@
         if (syntax.leaf != null) {
             element = document.createElement("span");
             element.textContent = source.substr(range[0], range[1]);
-        } else if (syntax.indexed != null) {
+        } else if (syntax.indexed != null || syntax.fixed != null) {
+            var values = syntax.indexed || syntax.fixed;
             element = document.createElement("ul");
             var previous = range[0];
-            for (i in syntax.indexed) {
-                var child = syntax.indexed[i];
+            for (i in values) {
+                var child = values[i];
                 if (child.pure == "") continue;
                 var childRange = getRange(child);
                 element.appendChild(document.createTextNode(source.substr(previous, childRange[0] - previous)));
