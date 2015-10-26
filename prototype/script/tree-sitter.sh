@@ -3,7 +3,7 @@
 cd `dirname $0`/../External/tree-sitter
 
 case "$1" in
-build)
+""|build)
 	script/configure.sh
 	make "$PRODUCT_NAME"
 	;;
