@@ -52,14 +52,7 @@ func members(json: JSONParser) -> MembersParser {
 			Cofree(range, .Keyed(Dictionary(dictionaryLiteral: values)))
 		}
 
-	let separatedPairs: MembersParser  = (%"," *> whitespace *> pairs <* whitespace)*
-
-	let oneOrMore: MembersParser = curry { [$0] + $1 } <^>
-		pairs
-		<* whitespace
-		<*> separatedPairs
-
-	return oneOrMore <|> pure([])
+	return sepBy(pairs, %",")
 }
 
 typealias ValuesParser = Parser<String, [CofreeJSON]>.Function;
