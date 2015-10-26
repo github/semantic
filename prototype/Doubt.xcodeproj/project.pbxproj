@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		D18FF8821BD0404700D18F2D /* Madness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D18FF8811BD0404700D18F2D /* Madness.framework */; };
-		D1A0934E1BD18969005A6326 /* JSONLeaf.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A0934C1BD188F5005A6326 /* JSONLeaf.swift */; };
 		D1F5FE201BDE891F0048BAE4 /* JSONParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F5FE1F1BDE891F0048BAE4 /* JSONParserTests.swift */; };
 		D1F5FE211BDE9C450048BAE4 /* JSONLeaf.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A0934C1BD188F5005A6326 /* JSONLeaf.swift */; };
 		D1F5FE221BDE9CC10048BAE4 /* JSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A0934A1BD188CA005A6326 /* JSONParser.swift */; };
@@ -420,7 +419,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4DF970A1BC5DF800040F41F /* main.swift in Sources */,
-				D1A0934E1BD18969005A6326 /* JSONLeaf.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
