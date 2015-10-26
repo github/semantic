@@ -252,7 +252,7 @@
 /* Begin PBXLegacyTarget section */
 		D485A7841BDEB6C5003A17B6 /* runtime */ = {
 			isa = PBXLegacyTarget;
-			buildArgumentsString = runtime;
+			buildArgumentsString = "$(ACTION)";
 			buildConfigurationList = D485A7871BDEB6C5003A17B6 /* Build configuration list for PBXLegacyTarget "runtime" */;
 			buildPhases = (
 			);
