@@ -92,7 +92,13 @@ let json: JSONParser = fix { json in
 		<* %"}"
 		<* whitespace
 		--> { (_, range, values) in
-			Cofree(range, .Keyed(Dictionary(elements: values)))
+			let vs: [CofreeJSON] = values.map({ (string, value) in
+				let valueRange = value.extract
+				let newRange = Range(start: range.startIndex, end: valueRange.endIndex)
+				return Cofree(newRange, .Keyed([string: value]))
+			})
+
+			return Cofree(range, .Fixed(vs))
 		} <?> "object"
 
 	let doubleParser: DoubleParser = number
