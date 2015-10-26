@@ -6,15 +6,23 @@ import XCTest
 
 final class JSONParserTests: XCTestCase {
 	func testCapturesKeysInKeyedElements() {
-		let dictWithArray = "{\"hello\": [\"world\"],\"sup\": [\"cat\", \"dog\", \"keith\"] }"
+		let dictWithArray = "{ \"hello\":\n    [\"world\",\n    \"sailor\"\n  ]}"
+		let array: Cofree<JSONLeaf, Range<Int>> = Cofree(15..<41, .Indexed([
+				Cofree(16..<23, .Leaf(.String("world"))),
+				Cofree(29..<37, .Leaf(.String("sailor")))
+			]))
 		
-		let expected: Cofree<JSONLeaf, Range<String.CharacterView.Index>> = Cofree(0..<61, .Keyed([
-			"hello": Cofree(11..<42, .Indexed([
-				Cofree(17..<24, "world"),
-				Cofree(30..<38, "sailor")
-			])),
-			"goodbye": Cofree(57..<59, .Indexed([]))
-		]))
+		let fixedPairs: Cofree<JSONLeaf, Range<Int>> = Cofree(2..<41, .Keyed(["hello": array]))
 
-//		assert(Madness.parse(Doubt.json, input: dictWithArray).right, == , )
+		let expected: Cofree<JSONLeaf, Range<Int>> = Cofree(0..<42, .Fixed([fixedPairs]))
+		let actual = Madness.parse(json, input: dictWithArray).right!
+		let firstIndex = actual.extract
+		let new: Cofree<JSONLeaf, Range<Int>> = actual.map({ range in
+			let startI: Int = firstIndex.startIndex.distanceTo(range.startIndex)
+			let endI: Int = firstIndex.startIndex.distanceTo(range.endIndex)
+			return Range(start: startI, end: endI)
+		})
+		
+		assert(new, == , expected)
 	}
+}
