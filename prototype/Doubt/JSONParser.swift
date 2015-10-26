@@ -58,7 +58,7 @@ func members(json: JSONParser) -> MembersParser {
 			Cofree(range, .Keyed(Dictionary(dictionaryLiteral: values)))
 		}
 
-	return sepBy(pairs, %",")
+	return sepBy(pairs, whitespace <* %"," <* whitespace)
 }
 
 typealias ValuesParser = Parser<String, [CofreeJSON]>.Function;
@@ -66,7 +66,7 @@ typealias ValuesParser = Parser<String, [CofreeJSON]>.Function;
 // Parses an array of CofreeJSON array values
 func elements(json: JSONParser) -> ValuesParser {
 	let value: Parser<String, CofreeJSON>.Function = whitespace *> json
-	return sepBy(value, %",")
+	return sepBy(value, whitespace <* %"," <* whitespace)
 }
 
 public let json: JSONParser = fix { json in
