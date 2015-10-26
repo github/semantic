@@ -256,7 +256,7 @@
 			buildConfigurationList = D485A7871BDEB6C5003A17B6 /* Build configuration list for PBXLegacyTarget "runtime" */;
 			buildPhases = (
 			);
-			buildToolPath = /usr/bin/make;
+			buildToolPath = "$(SRCROOT)/script/tree-sitter.sh";
 			buildWorkingDirectory = "$(SRCROOT)/External/tree-sitter";
 			dependencies = (
 			);
