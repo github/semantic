@@ -264,6 +264,20 @@
 			passBuildSettingsInEnvironment = 1;
 			productName = "tree-sitter";
 		};
+		D4FB2CC11BDEBBDB00B3CCE0 /* compiler */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = D4FB2CC41BDEBBDB00B3CCE0 /* Build configuration list for PBXLegacyTarget "compiler" */;
+			buildPhases = (
+			);
+			buildToolPath = "$(SRCROOT)/script/tree-sitter.sh";
+			buildWorkingDirectory = "$(SRCROOT)/External/tree-sitter";
+			dependencies = (
+			);
+			name = compiler;
+			passBuildSettingsInEnvironment = 1;
+			productName = compiler;
+		};
 /* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
@@ -342,6 +356,9 @@
 					D4DF96FA1BC5DF050040F41F = {
 						CreatedOnToolsVersion = 7.0.1;
 					};
+					D4FB2CC11BDEBBDB00B3CCE0 = {
+						CreatedOnToolsVersion = 7.1;
+					};
 				};
 			};
 			buildConfigurationList = D4AAE4F71B5AE22E004E581F /* Build configuration list for PBXProject "Doubt" */;
@@ -361,6 +378,7 @@
 				D4AAE50C1B5AE22E004E581F /* DoubtTests */,
 				D4DF96FA1BC5DF050040F41F /* doubt-json */,
 				D485A7841BDEB6C5003A17B6 /* runtime */,
+				D4FB2CC11BDEBBDB00B3CCE0 /* compiler */,
 			);
 		};
 /* End PBXProject section */
@@ -662,6 +680,30 @@
 			};
 			name = Release;
 		};
+		D4FB2CC21BDEBBDB00B3CCE0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D4FB2CC31BDEBBDB00B3CCE0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -672,6 +714,7 @@
 				D485A7861BDEB6C5003A17B6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		D4AAE4F71B5AE22E004E581F /* Build configuration list for PBXProject "Doubt" */ = {
 			isa = XCConfigurationList;
@@ -708,6 +751,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		D4FB2CC41BDEBBDB00B3CCE0 /* Build configuration list for PBXLegacyTarget "compiler" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D4FB2CC21BDEBBDB00B3CCE0 /* Debug */,
+				D4FB2CC31BDEBBDB00B3CCE0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
