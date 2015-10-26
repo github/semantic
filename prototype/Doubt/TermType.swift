@@ -36,6 +36,8 @@ extension TermType {
 				return 1
 			case let .Indexed(i):
 				return i.reduce(1, combine: +)
+			case let .Fixed(i):
+				return i.reduce(1, combine: +)
 			case let .Keyed(k):
 				return k.values.reduce(1, combine: +)
 			}

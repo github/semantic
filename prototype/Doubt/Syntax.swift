@@ -2,6 +2,7 @@
 public enum Syntax<Recur, A>: CustomDebugStringConvertible {
 	case Leaf(A)
 	case Indexed([Recur])
+	case Fixed([Recur])
 	case Keyed([String:Recur])
 
 
@@ -13,6 +14,8 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible {
 			return .Leaf(n)
 		case let .Indexed(x):
 			return .Indexed(x.map(transform))
+		case let .Fixed(x):
+			return .Fixed(x.map(transform))
 		case let .Keyed(d):
 			return .Keyed(Dictionary(elements: d.map { ($0, transform($1)) }))
 		}
@@ -27,6 +30,8 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible {
 			return ".Leaf(\(n))"
 		case let .Indexed(x):
 			return ".Indexed(\(String(reflecting: x)))"
+		case let .Fixed(x):
+			return ".Fixed(\(String(reflecting: x)))"
 		case let .Keyed(d):
 			return ".Keyed(\(String(reflecting: d)))"
 		}
@@ -108,6 +113,8 @@ extension Syntax {
 			return [ "leaf": leaf(a) ]
 		case let .Indexed(a):
 			return [ "indexed": .Array(a.map(recur)) ]
+		case let .Fixed(a):
+			return [ "fixed": .Array(a.map(recur)) ]
 		case let .Keyed(d):
 			return [ "keyed": .Dictionary(Dictionary(elements: d.map { ($0, recur($1)) })) ]
 		}

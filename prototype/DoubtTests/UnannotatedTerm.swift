@@ -3,17 +3,21 @@ struct UnannotatedTerm {
 	let term: Term
 
 	static let indexed = (prefix: "[\n\t", separator: ",\n\t", suffix: "\n]")
+	static let fixed = (prefix: "(\n\t", separator: ",\n\t", suffix: "\n)")
 	static let keyed = (prefix: "[\n\t", separator: ",\n\t", suffix: "\n}")
 
 	var source: String {
 		let indexed = UnannotatedTerm.indexed
 		let keyed = UnannotatedTerm.keyed
+		let fixed = UnannotatedTerm.fixed
 		return term.cata {
 			switch $0 {
 			case let .Leaf(s):
 				return s
 			case let .Indexed(s):
 				return indexed.prefix + s.joinWithSeparator(indexed.separator) + indexed.suffix
+			case let .Fixed(s):
+				return fixed.prefix + s.joinWithSeparator(fixed.separator) + fixed.suffix
 			case let .Keyed(s):
 				return keyed.prefix + s.map { "\"\($0)\": \($1)" }.joinWithSeparator(keyed.separator) + keyed.suffix
 			}
@@ -23,6 +27,8 @@ struct UnannotatedTerm {
 	var ranged: Cofree<String, Range<Int>> {
 		let indexed = UnannotatedTerm.indexed
 		let keyed = UnannotatedTerm.keyed
+		let fixed = UnannotatedTerm.fixed
+		
 		return term.cata {
 			switch $0 {
 			case let .Leaf(s):
@@ -40,6 +46,19 @@ struct UnannotatedTerm {
 					length += value.extract.count
 				}
 				return Cofree(0..<(length + indexed.suffix.characters.count), .Indexed(results))
+			case let .Fixed(i):
+				var length = fixed.prefix.characters.count
+				var results: [Cofree<String, Range<Int>>] = []
+				for value in i {
+					if results.count > 0 {
+						length += fixed.separator.characters.count
+					}
+					results.append(value.map {
+						($0.startIndex + length)..<($0.endIndex + length)
+					})
+					length += value.extract.count
+				}
+				return Cofree(0..<(length + fixed.suffix.characters.count), .Fixed(results))
 			case let .Keyed(k):
 				var length = keyed.prefix.characters.count
 				var results: [(String, Cofree<String, Range<Int>>)] = []
@@ -103,6 +122,10 @@ extension UnannotatedTerm: Arbitrary {
 				return Cofree((), .Leaf(a))
 			case let .Indexed(i):
 				return Cofree((), .Indexed(i.reduce(true) { $0 && equal($1) }
+					? i.dropLast().map { $1 }
+					: i.map { $1 }))
+			case let .Fixed(i):
+				return Cofree((), .Fixed(i.reduce(true) { $0 && equal($1) }
 					? i.dropLast().map { $1 }
 					: i.map { $1 }))
 			case let .Keyed(k):

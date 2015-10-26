@@ -139,6 +139,8 @@ extension CofreeType {
 			return Cofree(annotations, .Leaf(b))
 		case let (.Indexed(a), .Indexed(b)):
 			return Cofree(annotations, .Indexed(Swift.zip(a, b).flatMap(zip)))
+		case let (.Fixed(a), .Fixed(b)):
+			return Cofree(annotations, .Fixed(Swift.zip(a, b).flatMap(zip)))
 		case let (.Keyed(a), .Keyed(b)):
 			return Cofree(annotations, .Keyed(Dictionary(elements: b.keys.flatMap { key in zip(a[key]!, b[key]!).map { (key, $0) } })))
 		default:
