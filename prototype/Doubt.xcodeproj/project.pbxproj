@@ -132,6 +132,7 @@
 		D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D4FB2CDD1BDEBD1C00B3CCE0 /* libcompiler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcompiler.a; path = "External/tree-sitter/out/Release/libcompiler.a"; sourceTree = SOURCE_ROOT; };
 		D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libruntime.a; path = "External/tree-sitter/out/Release/libruntime.a"; sourceTree = SOURCE_ROOT; };
+		D4FB2CE51BDEBE7900B3CCE0 /* doubt-difftool-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "doubt-difftool-Bridging-Header.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -283,6 +284,7 @@
 			isa = PBXGroup;
 			children = (
 				D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */,
+				D4FB2CE51BDEBE7900B3CCE0 /* doubt-difftool-Bridging-Header.h */,
 				D4FB2CDD1BDEBD1C00B3CCE0 /* libcompiler.a */,
 				D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */,
 			);
@@ -821,6 +823,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.antitypical.doubt-difftool";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "doubt-difftool/doubt-difftool-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -843,6 +846,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.antitypical.doubt-difftool";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "doubt-difftool/doubt-difftool-Bridging-Header.h";
 			};
 			name = Release;
 		};
