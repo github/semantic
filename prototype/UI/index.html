@@ -177,6 +177,7 @@
     Syntax.prototype.map = function(transform) {
         if (this.leaf != null) { return new Syntax({ leaf: this.leaf }, transform); }
         if (this.indexed != null) { return new Syntax({ indexed: this.indexed }, transform); }
+        if (this.fixed != null) { return new Syntax({ fixed: this.fixed }, transform); }
         if (this.keyed != null) { return new Syntax({ keyed: this.keyed.values }, transform); }
     }
 
