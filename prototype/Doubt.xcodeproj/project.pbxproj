@@ -249,6 +249,23 @@
 		};
 /* End PBXHeadersBuildPhase section */
 
+/* Begin PBXLegacyTarget section */
+		D485A7841BDEB6C5003A17B6 /* runtime */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = runtime;
+			buildConfigurationList = D485A7871BDEB6C5003A17B6 /* Build configuration list for PBXLegacyTarget "runtime" */;
+			buildPhases = (
+			);
+			buildToolPath = /usr/bin/make;
+			buildWorkingDirectory = "$(SRCROOT)/External/tree-sitter";
+			dependencies = (
+			);
+			name = runtime;
+			passBuildSettingsInEnvironment = 1;
+			productName = "tree-sitter";
+		};
+/* End PBXLegacyTarget section */
+
 /* Begin PBXNativeTarget section */
 		D4AAE4FC1B5AE22E004E581F /* Doubt */ = {
 			isa = PBXNativeTarget;
@@ -313,6 +330,9 @@
 				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = GitHub;
 				TargetAttributes = {
+					D485A7841BDEB6C5003A17B6 = {
+						CreatedOnToolsVersion = 7.1;
+					};
 					D4AAE4FC1B5AE22E004E581F = {
 						CreatedOnToolsVersion = 7.0;
 					};
@@ -340,6 +360,7 @@
 				D4AAE4FC1B5AE22E004E581F /* Doubt */,
 				D4AAE50C1B5AE22E004E581F /* DoubtTests */,
 				D4DF96FA1BC5DF050040F41F /* doubt-json */,
+				D485A7841BDEB6C5003A17B6 /* runtime */,
 			);
 		};
 /* End PBXProject section */
@@ -429,6 +450,30 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		D485A7851BDEB6C5003A17B6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D485A7861BDEB6C5003A17B6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		D4AAE5151B5AE22E004E581F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -620,6 +665,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		D485A7871BDEB6C5003A17B6 /* Build configuration list for PBXLegacyTarget "runtime" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D485A7851BDEB6C5003A17B6 /* Debug */,
+				D485A7861BDEB6C5003A17B6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		D4AAE4F71B5AE22E004E581F /* Build configuration list for PBXProject "Doubt" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
