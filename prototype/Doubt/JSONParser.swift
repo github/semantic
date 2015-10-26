@@ -35,9 +35,8 @@ let whitespace: CharacterParser = String.lift(satisfy({ whitespaceChars.contains
 
 // Quoted strings parser
 // TODO: Improve string parsing
-let stringBody: StringParser = { $0.map({ String($0) }).joinWithSeparator("") } <^>
-		String.lift(noneOf("\"")*)
-let quoted = %"\"" *> stringBody <* %"\"" <* whitespace
+let stringBody: StringParser = { $0.joinWithSeparator("") } <^> many(charP)
+let quoted = %"\"" *> stringBody <* %"\""
 
 typealias MembersParser = Parser<String, [CofreeJSON]>.Function;
 
@@ -59,8 +58,7 @@ typealias ValuesParser = Parser<String, [CofreeJSON]>.Function;
 
 // Parses an array of CofreeJSON array values
 func elements(json: JSONParser) -> ValuesParser {
-	let value: Parser<String, CofreeJSON>.Function = whitespace *> json <* whitespace
-
+	let value: Parser<String, CofreeJSON>.Function = whitespace *> json
 	return sepBy(value, %",")
 }
 
@@ -74,8 +72,9 @@ public let json: JSONParser = fix { json in
 	let array: JSONParser =  %"["
 		<* whitespace
 		*> elements(json)
+		<* whitespace
 		<* %"]"
-		<* whitespace --> {
+		--> {
 			Cofree($1, .Indexed($2))
 		} <?> "array"
 
@@ -84,7 +83,6 @@ public let json: JSONParser = fix { json in
 		*> members(json)
 		<* whitespace
 		<* %"}"
-		<* whitespace
 		--> { (_, range, values) in
 			Cofree(range, .Fixed(values))
 		} <?> "object"
@@ -106,5 +104,5 @@ public let json: JSONParser = fix { json in
 
 	// TODO: This should be JSON = dict <|> array and
 	// Value = dict | array | string | number | null | bool
-	return object <|> array <|> string <|> numberParser <|> boolean <|> null
+	return (object <|> array <|> string <|> numberParser <|> boolean <|> null) <* whitespace
 }
