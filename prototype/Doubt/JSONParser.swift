@@ -10,10 +10,9 @@ import Foundation
 import Madness
 import Either
 import Prelude
-import Doubt
 
-typealias CofreeJSON = Cofree<JSONLeaf, Range<String.CharacterView.Index>>
-typealias JSONParser = Parser<String, CofreeJSON>.Function
+public typealias CofreeJSON = Cofree<JSONLeaf, Range<String.CharacterView.Index>>
+public typealias JSONParser = Parser<String, CofreeJSON>.Function
 
 extension String: CollectionType {
 	public var count: Index.Distance {
@@ -70,7 +69,7 @@ func elements(json: JSONParser) -> ValuesParser {
 	return sepBy(value, %",")
 }
 
-let json: JSONParser = fix { json in
+public let json: JSONParser = fix { json in
 	// TODO: Parse backslashed escape characters
 
 	let string: JSONParser = quoted --> {

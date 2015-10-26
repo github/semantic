@@ -9,8 +9,9 @@
 /* Begin PBXBuildFile section */
 		D18FF8821BD0404700D18F2D /* Madness.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D18FF8811BD0404700D18F2D /* Madness.framework */; };
 		D1A0934E1BD18969005A6326 /* JSONLeaf.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A0934C1BD188F5005A6326 /* JSONLeaf.swift */; };
-		D1A0934F1BD189B4005A6326 /* JSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A0934A1BD188CA005A6326 /* JSONParser.swift */; };
 		D1F5FE201BDE891F0048BAE4 /* JSONParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1F5FE1F1BDE891F0048BAE4 /* JSONParserTests.swift */; };
+		D1F5FE211BDE9C450048BAE4 /* JSONLeaf.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A0934C1BD188F5005A6326 /* JSONLeaf.swift */; };
+		D1F5FE221BDE9CC10048BAE4 /* JSONParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A0934A1BD188CA005A6326 /* JSONParser.swift */; };
 		D40B89C41BC319070078E098 /* Matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40B89C31BC319070078E098 /* Matrix.swift */; };
 		D40B89C81BC439000078E098 /* Assertions.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D40B89C71BC439000078E098 /* Assertions.framework */; };
 		D40D72541BCEEB1F001B7A9E /* InterpreterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40D72531BCEEB1F001B7A9E /* InterpreterTests.swift */; };
@@ -382,6 +383,7 @@
 				D42F097E1BCEAEDA00B95610 /* Operation.swift in Sources */,
 				D45A36C91BBC667D00BE3DDE /* Categorizable.swift in Sources */,
 				D4DF96ED1BC46B630040F41F /* SES.swift in Sources */,
+				D1F5FE221BDE9CC10048BAE4 /* JSONParser.swift in Sources */,
 				D42F09801BCECB7900B95610 /* TermType.swift in Sources */,
 				D4AAE5401B5AE2D0004E581F /* RangeReplaceableCollectionType.swift in Sources */,
 				D49FCBC41BBEF98E00C5E9C3 /* Free.swift in Sources */,
@@ -393,6 +395,7 @@
 				D40B89C41BC319070078E098 /* Matrix.swift in Sources */,
 				D4AAE5491B5AE2D0004E581F /* StringLiteralConvertible.swift in Sources */,
 				D4413FF11BB08FDC00E3C3C1 /* JSON.swift in Sources */,
+				D1F5FE211BDE9C450048BAE4 /* JSONLeaf.swift in Sources */,
 				D4AAE5451B5AE2D0004E581F /* Operators.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -418,7 +421,6 @@
 			files = (
 				D4DF970A1BC5DF800040F41F /* main.swift in Sources */,
 				D1A0934E1BD18969005A6326 /* JSONLeaf.swift in Sources */,
-				D1A0934F1BD189B4005A6326 /* JSONParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
