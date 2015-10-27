@@ -33,29 +33,31 @@ func readFile(path: String) -> String? {
 	return data as String?
 }
 
-func termWithInput(input: TSInput) -> Cofree<String, Range<Int>>? {
+func termWithInput(string: String) -> Cofree<String, Range<Int>>? {
 	let document = ts_document_make()
 	defer { ts_document_free(document) }
-	ts_document_set_language(document, ts_language_javascript())
-	ts_document_set_input(document, input)
-	ts_document_parse(document)
-	let root = ts_document_root_node(document)
+	return string.withCString {
+		ts_document_set_language(document, ts_language_javascript())
+		ts_document_set_input_string(document, $0)
+		ts_document_parse(document)
+		let root = ts_document_root_node(document)
 
-	return Cofree
-		.ana { node in
-			let count = ts_node_named_child_count(node)
-			guard count > 0 else {
-				return String.fromCString(ts_node_name(node, document)).map(Syntax.Leaf)!
+		return Cofree
+			.ana { node in
+				let count = ts_node_named_child_count(node)
+				guard count > 0 else {
+					return String.fromCString(ts_node_name(node, document)).map(Syntax.Leaf)!
+				}
+				return .Indexed((0..<count).map { ts_node_named_child(node, $0) })
+			} (root)
+			.map {
+				let start = ts_node_pos($0).chars
+				return start..<(start + ts_node_size($0).chars)
 			}
-			return .Indexed((0..<count).map { ts_node_named_child(node, $0) })
-		} (root)
-		.map {
-			let start = ts_node_pos($0).chars
-			return start..<(start + ts_node_size($0).chars)
-		}
+	}
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
-if let a = arguments[1].flatMap(TSInput.init).flatMap(termWithInput) {
+if let a = arguments[1].flatMap(readFile).flatMap(termWithInput) {
 	print(a)
 }
