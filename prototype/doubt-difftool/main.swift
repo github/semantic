@@ -39,6 +39,14 @@ if let a = arguments[1] {
 	ts_document_set_input(document, a)
 	ts_document_parse(document)
 	let root = ts_document_root_node(document)
-	print(String.fromCString(ts_node_name(root, document)))
+
+	print(Cofree<String, TSNode>.ana { node in
+		let count = ts_node_child_count(node)
+		if count == 0 {
+			return String.fromCString(ts_node_string(node, document)).map(Syntax.Leaf)!
+		}
+		return String.fromCString(ts_node_string(node, document)).map(Syntax.Leaf)!
+	} (root))
+
 	ts_document_free(document)
 }
