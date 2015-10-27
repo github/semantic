@@ -78,10 +78,8 @@ public let json: JSONParser = fix { json in
 			Cofree(range, .Keyed(Dictionary(elements: values)))
 		} <?> "object"
 
-	let doubleParser: DoubleParser = number
-	let numberParser: JSONParser = (doubleParser --> { _, range, value in
-		let num = JSONLeaf.Number(value)
-		return Cofree(range, .Leaf(num))
+	let numberParser: JSONParser = (number --> { _, range, value in
+		Cofree(range, .Leaf(JSONLeaf.Number(value)))
 	}) <?> "number"
 	
 	let null: JSONParser = %"null" --> { (_, range, value) in
