@@ -8,7 +8,6 @@
 
 import Foundation
 import Madness
-import Either
 import Prelude
 
 public typealias CofreeJSON = Cofree<JSONLeaf, Range<String.CharacterView.Index>>
