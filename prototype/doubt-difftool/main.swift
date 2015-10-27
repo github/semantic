@@ -55,6 +55,7 @@ if let aString = arguments[1].flatMap(readFile), bString = arguments[2].flatMap(
 				]
 			}),
 		]
-		JSON.serialize()
+		let data = JSON.serialize()
+		try data.writeToFile(c, options: .DataWritingAtomic)
 	}
 }
