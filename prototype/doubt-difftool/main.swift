@@ -17,6 +17,13 @@ extension TSInput {
 	}
 }
 
-
-let document = ts_document_make()
-ts_document_set_language(document, ts_language_javascript())
+let arguments = BoundsCheckedArray(array: Process.arguments)
+if let a = arguments[0].map(TSInput.init) {
+	let document = ts_document_make()
+	ts_document_set_language(document, ts_language_javascript())
+	ts_document_set_input(document, a)
+	ts_document_parse(document)
+	let root = ts_document_root_node(document)
+	print(ts_node_name(root, document))
+	ts_document_free(document)
+}
