@@ -10,7 +10,8 @@ extension TSInput {
 			payload: file,
 			read_fn: { (payload: UnsafeMutablePointer<Void>, bytesRead: UnsafeMutablePointer<Int>) -> UnsafePointer<Int8> in
 				var string: UnsafeMutablePointer<Int8> = nil
-				bytesRead.memory = getline(&string, nil, UnsafeMutablePointer<FILE>(payload))
+				var capacity = 0
+				bytesRead.memory = getline(&string, &capacity, UnsafeMutablePointer<FILE>(payload))
 				return UnsafePointer<Int8>(string)
 			},
 			seek_fn: { (payload: UnsafeMutablePointer<Void>, position: TSLength) -> Int32 in
