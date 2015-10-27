@@ -42,11 +42,11 @@ if let a = arguments[1] {
 
 	let term: Cofree<String, Range<Int>> = Cofree
 		.ana { node in
-			let count = ts_node_child_count(node)
+			let count = ts_node_named_child_count(node)
 			guard count > 0 else {
 				return String.fromCString(ts_node_name(node, document)).map(Syntax.Leaf)!
 			}
-			return .Indexed((0..<count).map { ts_node_child(node, $0) })
+			return .Indexed((0..<count).map { ts_node_named_child(node, $0) })
 		} (root)
 		.map {
 			let start = ts_node_pos($0).chars
