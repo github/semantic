@@ -14,7 +14,7 @@ final class JSONParserTests: XCTestCase {
 		
 		let fixedPairs: Cofree<JSONLeaf, Range<Int>> = Cofree(2..<41, .Keyed(["hello": array]))
 
-		let expected: Cofree<JSONLeaf, Range<Int>> = Cofree(0..<42, .Fixed([fixedPairs]))
+		let expected: Cofree<JSONLeaf, Range<Int>> = Cofree(0..<42, .Keyed(["hello": fixedPairs]))
 		let actual = Madness.parse(json, input: dictWithArray).right!
 		let firstIndex = actual.extract
 		let new: Cofree<JSONLeaf, Range<Int>> = actual.map({ range in
