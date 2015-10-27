@@ -84,7 +84,7 @@ public enum JSON: ArrayLiteralConvertible, BooleanLiteralConvertible, Dictionary
 	}
 
 	public func serialize() -> NSData {
-		return try! NSJSONSerialization.dataWithJSONObject(object, options: .PrettyPrinted)
+		return try! NSJSONSerialization.dataWithJSONObject(object, options: [])
 	}
 
 
