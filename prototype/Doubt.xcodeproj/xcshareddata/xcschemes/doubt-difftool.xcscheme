@@ -74,6 +74,10 @@
             argument = "$(SRCROOT)/UI/diff.json"
             isEnabled = "YES">
          </CommandLineArgument>
+         <CommandLineArgument
+            argument = "$(SRCROOT)/UI/index.html"
+            isEnabled = "YES">
+         </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
