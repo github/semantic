@@ -54,8 +54,6 @@ func elements(json: JSONParser) -> ValuesParser {
 }
 
 public let json: JSONParser = fix { json in
-	// TODO: Parse backslashed escape characters
-
 	let string: JSONParser = quoted --> {
 		Cofree($1, .Leaf(.String($2)))
 	} <?> "string"
