@@ -3,8 +3,9 @@ import Darwin
 import Doubt
 
 extension TSInput {
-	init(path: String) {
+	init?(path: String) {
 		let file = fopen(path, "r")
+		guard file != nil else { return nil }
 		self.init(
 			payload: file,
 			read_fn: { (payload: UnsafeMutablePointer<Void>, bytesRead: UnsafeMutablePointer<Int>) -> UnsafePointer<Int8> in
@@ -28,12 +29,7 @@ extension TSInput {
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
-if let a = arguments[1] {
-	guard NSFileManager.defaultManager().fileExistsAtPath(a) else {
-		print("\(a): No such file or directory")
-		exit(1)
-	}
-	let a = TSInput(path: a)
+if let a = arguments[1].flatMap(TSInput.init) {
 	let document = ts_document_make()
 	ts_document_set_language(document, ts_language_javascript())
 	ts_document_set_input(document, a)
