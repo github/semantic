@@ -38,8 +38,7 @@ func members(json: JSONParser) -> MembersParser {
 		<* %":"
 		<* whitespace
 		<*> json) --> { (_, range, values) in
-			let key = values.0.0
-			return (key, Cofree(range, .Fixed([values.0.1, values.1])))
+			(values.0.0, Cofree(range, .Fixed([values.0.1, values.1])))
 		}
 
 	return sepBy(pairs, whitespace <* %"," <* whitespace)
