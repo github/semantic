@@ -8,80 +8,53 @@
 
 import Foundation
 import Madness
-import Either
 import Prelude
-import Doubt
 
-typealias CofreeJSON = Cofree<JSONLeaf, Range<String.CharacterView.Index>>
-typealias JSONParser = Parser<String, CofreeJSON>.Function
-
-extension String: CollectionType {
-	public var count: Index.Distance {
-		return characters.count
-	}
-	
-	public static func lift<A>(parser: Parser<String.CharacterView, A>.Function) -> Parser<String, A>.Function {
-		return {
-			parser($0.characters, $1)
-		}
-	}
-}
-
-typealias StringParser = Parser<String, String>.Function
-typealias CharacterParser = Parser<String, [Character]>.Function
+public typealias CofreeJSON = Cofree<JSONLeaf, Range<String.CharacterView.Index>>
+public typealias JSONParser = Parser<String.CharacterView, CofreeJSON>.Function
 
 // Inlined for performance reasons
-let whitespaceChars: [Character] = [" ", "\n", "\t", "\r"]
-let whitespace: CharacterParser = String.lift(satisfy({ whitespaceChars.contains($0) })*)
+let whitespace = oneOf(" \n\r\t")*
+
+// TODO: Parse unicode escape sequence
+let escapeChar: StringParser = curry(+) <^> %"\\" <*> ({ String($0) } <^> oneOf("\\\"bfnrt"))
+let otherChar: StringParser = { String($0) } <^> noneOf("\"\\")
 
 // Quoted strings parser
 // TODO: Improve string parsing
-let stringBody: StringParser = { $0.map({ String($0) }).joinWithSeparator("") } <^>
-		String.lift(noneOf("\"")*)
-let quoted = %"\"" *> stringBody <* %"\"" <* whitespace
+let stringBody: StringParser = { $0.joinWithSeparator("") } <^> many(escapeChar <|> otherChar)
+let quoted = %"\"" *> stringBody <* %"\""
 
-typealias MembersParser = Parser<String, [(String, CofreeJSON)]>.Function;
+typealias MembersParser = Parser<String.CharacterView, [(String, CofreeJSON)]>.Function;
 
 // Parses an array of (String, CofreeJSON) object members
 func members(json: JSONParser) -> MembersParser {
-	let pairs: Parser<String, (String, CofreeJSON)>.Function = (curry(pair) <^>
-		quoted
+	let keyAndKeyTerm: Parser<String.CharacterView, (String, CofreeJSON)>.Function = quoted --> { (_, range, key) in
+		(key, Cofree(range, .Leaf(.String(key))))
+	}
+	let pairs: Parser<String.CharacterView, (String, CofreeJSON)>.Function = (curry(pair) <^>
+		keyAndKeyTerm
 		<* whitespace
 		<* %":"
 		<* whitespace
-		<*> json)
+		<*> json) --> { (_, range, values) in
+			(values.0.0, Cofree(range, .Fixed([values.0.1, values.1])))
+		}
 
-	let separatedPairs: MembersParser  = (%"," *> whitespace *> pairs <* whitespace)*
-
-	let oneOrMore: MembersParser = curry { [$0] + $1 } <^>
-		pairs
-		<* whitespace
-		<*> separatedPairs
-
-	return oneOrMore <|> pure([])
+	return sepBy(pairs, whitespace <* %"," <* whitespace)
 }
 
-typealias ValuesParser = Parser<String, [CofreeJSON]>.Function;
-
-// Parses an array of CofreeJSON array values
-func elements(json: JSONParser) -> ValuesParser {
-	let value: Parser<String, CofreeJSON>.Function = whitespace *> json <* whitespace
-
-	return sepBy(value, %",")
-}
-
-let json: JSONParser = fix { json in
-	// TODO: Parse backslashed escape characters
-
+public let json: JSONParser = fix { json in
 	let string: JSONParser = quoted --> {
 		Cofree($1, .Leaf(.String($2)))
 	} <?> "string"
 
 	let array: JSONParser =  %"["
 		<* whitespace
-		*> elements(json)
+		*> sepBy(whitespace *> json, whitespace <* %"," <* whitespace)
+		<* whitespace
 		<* %"]"
-		<* whitespace --> {
+		--> {
 			Cofree($1, .Indexed($2))
 		} <?> "array"
 
@@ -90,15 +63,12 @@ let json: JSONParser = fix { json in
 		*> members(json)
 		<* whitespace
 		<* %"}"
-		<* whitespace
-		--> { (_, range, values) in
+		--> { (_, range, values: [(String, CofreeJSON)]) in
 			Cofree(range, .Keyed(Dictionary(elements: values)))
 		} <?> "object"
 
-	let doubleParser: DoubleParser = number
-	let numberParser: JSONParser = String.lift(doubleParser --> { _, range, value in
-		let num = JSONLeaf.Number(value)
-		return Cofree(range, .Leaf(num))
+	let numberParser: JSONParser = (number --> { _, range, value in
+		Cofree(range, .Leaf(JSONLeaf.Number(value)))
 	}) <?> "number"
 	
 	let null: JSONParser = %"null" --> { (_, range, value) in
@@ -112,5 +82,5 @@ let json: JSONParser = fix { json in
 
 	// TODO: This should be JSON = dict <|> array and
 	// Value = dict | array | string | number | null | bool
-	return object <|> array <|> string <|> numberParser <|> boolean <|> null
+	return (object <|> array <|> string <|> numberParser <|> boolean <|> null) <* whitespace
 }
