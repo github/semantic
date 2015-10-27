@@ -54,9 +54,12 @@ func members(json: JSONParser) -> MembersParser {
 		<* whitespace
 		<* %":"
 		<* whitespace
-		<*> json) --> { (_, range: Range<String.Index>, values: (String, CofreeJSON)) in
-			let dict = Dictionary(dictionaryLiteral: values)
-			return (values.0, Cofree(range, .Keyed(dict)))
+		<*> json) --> { (_, range, values) in
+			let key = values.0
+			let keyRange = Range(start: range.startIndex, end: range.startIndex.advancedBy(key.characters.count))
+			let cofreeKey: CofreeJSON = Cofree(keyRange, .Leaf(.String(key)))
+
+			return (key, Cofree(range, .Fixed([cofreeKey, values.1])))
 		}
 
 	return sepBy(pairs, whitespace <* %"," <* whitespace)
