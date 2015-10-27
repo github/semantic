@@ -13,12 +13,6 @@ import Prelude
 public typealias CofreeJSON = Cofree<JSONLeaf, Range<String.CharacterView.Index>>
 public typealias JSONParser = Parser<String.CharacterView, CofreeJSON>.Function
 
-extension String: CollectionType {
-	public var count: Index.Distance {
-		return characters.count
-	}
-}
-
 typealias StringParser = Parser<String.CharacterView, String>.Function
 typealias CharacterParser = Parser<String.CharacterView, [Character]>.Function
 
