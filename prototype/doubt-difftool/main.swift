@@ -1,5 +1,6 @@
 import Cocoa
 import Doubt
+import Prelude
 
 func readFile(path: String) -> String? {
 	guard let data = try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) else { return nil }
@@ -33,6 +34,8 @@ func termWithInput(string: String) -> Term? {
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
-if let a = arguments[1].flatMap(readFile).flatMap(termWithInput) {
-	print(a)
+if let aString = arguments[1].flatMap(readFile), bString = arguments[2].flatMap(readFile), c = arguments[3] {
+	if let a = termWithInput(aString), b = termWithInput(bString) {
+		let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: const(true), cost: Free.sum(Patch.difference)).run(a, b)
+	}
 }
