@@ -8,7 +8,7 @@ func readFile(path: String) -> String? {
 
 typealias Term = Cofree<String, Range<Int>>
 
-func termWithInput(string: String) -> Cofree<String, Range<Int>>? {
+func termWithInput(string: String) -> Term? {
 	let document = ts_document_make()
 	defer { ts_document_free(document) }
 	return string.withCString {
