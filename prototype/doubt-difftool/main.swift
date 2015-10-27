@@ -61,6 +61,7 @@ if let aString = arguments[1].flatMap(readFile), bString = arguments[2].flatMap(
 		let components = NSURLComponents()
 		components.scheme = "file"
 		components.path = ui
+		components.query = c
 		if let URL = components.URL {
 			NSWorkspace.sharedWorkspace().openURL(URL)
 		}
