@@ -45,17 +45,18 @@ let charP: StringParser = escapeChar <|> otherChar
 let stringBody: StringParser = { $0.joinWithSeparator("") } <^> many(charP)
 let quoted = %"\"" *> stringBody <* %"\""
 
-typealias MembersParser = Parser<String, [CofreeJSON]>.Function;
+typealias MembersParser = Parser<String, [(String, CofreeJSON)]>.Function;
 
 // Parses an array of (String, CofreeJSON) object members
 func members(json: JSONParser) -> MembersParser {
-	let pairs: Parser<String, CofreeJSON>.Function = (curry(pair) <^>
+	let pairs: Parser<String, (String, CofreeJSON)>.Function = (curry(pair) <^>
 		quoted
 		<* whitespace
 		<* %":"
 		<* whitespace
-		<*> json) --> { (_, range, values) in
-			Cofree(range, .Keyed(Dictionary(dictionaryLiteral: values)))
+		<*> json) --> { (_, range: Range<String.Index>, values: (String, CofreeJSON)) in
+			let dict = Dictionary(dictionaryLiteral: values)
+			return (values.0, Cofree(range, .Keyed(dict)))
 		}
 
 	return sepBy(pairs, whitespace <* %"," <* whitespace)
@@ -90,8 +91,8 @@ public let json: JSONParser = fix { json in
 		*> members(json)
 		<* whitespace
 		<* %"}"
-		--> { (_, range, values) in
-			Cofree(range, .Fixed(values))
+		--> { (_, range, values: [(String, CofreeJSON)]) in
+			Cofree(range, .Keyed(Dictionary(elements: values)))
 		} <?> "object"
 
 	let doubleParser: DoubleParser = number
