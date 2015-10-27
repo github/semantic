@@ -40,13 +40,16 @@ if let a = arguments[1] {
 	ts_document_parse(document)
 	let root = ts_document_root_node(document)
 
-	print(Cofree<String, TSNode>.ana { node in
-		let count = ts_node_child_count(node)
-		guard count > 0 else {
-			return String.fromCString(ts_node_name(node, document)).map(Syntax.Leaf)!
-		}
-		return .Indexed((0..<count).map { ts_node_child(node, $0) })
-	} (root))
+	let term = Cofree<String, TSNode>
+		.ana { node in
+			let count = ts_node_child_count(node)
+			guard count > 0 else {
+				return String.fromCString(ts_node_name(node, document)).map(Syntax.Leaf)!
+			}
+			return .Indexed((0..<count).map { ts_node_child(node, $0) })
+		} (root)
+
+	print(term)
 
 	ts_document_free(document)
 }
