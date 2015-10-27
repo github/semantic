@@ -45,7 +45,7 @@ if let a = arguments[1] {
 		guard count > 0 else {
 			return String.fromCString(ts_node_string(node, document)).map(Syntax.Leaf)!
 		}
-		return String.fromCString(ts_node_string(node, document)).map(Syntax.Leaf)!
+		return .Indexed((0..<count).map { ts_node_child(node, $0) })
 	} (root))
 
 	ts_document_free(document)
