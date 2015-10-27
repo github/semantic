@@ -29,8 +29,7 @@ typealias StringParser = Parser<String, String>.Function
 typealias CharacterParser = Parser<String, [Character]>.Function
 
 // Inlined for performance reasons
-let whitespaceChars: [Character] = [" ", "\n", "\t", "\r"]
-let whitespace: CharacterParser = String.lift(satisfy({ whitespaceChars.contains($0) })*)
+let whitespace: CharacterParser = oneOf(" \n\r\t")*
 
 // TODO: Parse unicode escape sequence
 let escapeChar: StringParser = %"\\\\" <|> %"\\\"" <|> %"\\b" <|> %"\\f" <|> %"\\n" <|> %"\\r" <|> %"\\t"
