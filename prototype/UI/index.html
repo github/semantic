@@ -42,6 +42,7 @@
     }
     </style>
     <script type="text/javascript" src="term.js"></script>
+    <script type="text/javascript" src="patch.js"></script>
     <script type="text/javascript">
     function loadJSON(path, callback) {
         var request = new XMLHttpRequest();
@@ -60,16 +61,6 @@
         var node = document.createElement(tagName);
         node.appendChild(element);
         return node;
-    }
-
-    function Patch(patch) {
-        if (patch.delete != null) { this.before = termFromJSON(patch.delete); }
-        if (patch.insert != null) { this.after = termFromJSON(patch.insert); }
-        if (patch.replace != null) {
-            this.before = termFromJSON(patch.replace.before);
-            this.after = termFromJSON(patch.replace.after);
-        }
-        return this;
     }
 
     /// Diff -> String -> String -> DOM
