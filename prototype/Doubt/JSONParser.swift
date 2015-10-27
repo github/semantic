@@ -47,10 +47,11 @@ typealias MembersParser = Parser<String, [(String, CofreeJSON)]>.Function;
 
 // Parses an array of (String, CofreeJSON) object members
 func members(json: JSONParser) -> MembersParser {
+	let keyAndKeyTerm: Parser<String, (String, CofreeJSON)>.Function = quoted --> { (_, range, key) in
+		(key, Cofree(range, .Leaf(.String(key))))
+	}
 	let pairs: Parser<String, (String, CofreeJSON)>.Function = (curry(pair) <^>
-		(quoted --> { (_, range, key) -> (String, CofreeJSON) in
-			return (key, Cofree(range, .Leaf(.String(key))))
-		})
+		keyAndKeyTerm
 		<* whitespace
 		<* %":"
 		<* whitespace
