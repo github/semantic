@@ -7,12 +7,11 @@
 //
 
 import Foundation
-import Doubt
 
 typealias Term = Cofree<JSONLeaf, Range<String.Index>>
 typealias Diff = Free<JSONLeaf, Term.Annotation, Patch<Term>>
 
-enum JSONLeaf: CustomJSONConvertible, CustomStringConvertible, Equatable {
+public enum JSONLeaf: CustomJSONConvertible, CustomStringConvertible, Equatable {
 	case Number(Double)
 	case Boolean(Bool)
 	case String(Swift.String)
@@ -21,7 +20,7 @@ enum JSONLeaf: CustomJSONConvertible, CustomStringConvertible, Equatable {
 
 	// MARK: CustomJSONConvertible
 
-	var JSON: Doubt.JSON {
+	public var JSON: Doubt.JSON {
 		switch self {
 		case let .Number(n):
 			return .Number(n)
@@ -37,7 +36,7 @@ enum JSONLeaf: CustomJSONConvertible, CustomStringConvertible, Equatable {
 
 	// MARK: CustomStringConvertible
 
-	var description: Swift.String {
+	public var description: Swift.String {
 		switch self {
 		case let .Number(n):
 			return Swift.String(n)
@@ -51,7 +50,7 @@ enum JSONLeaf: CustomJSONConvertible, CustomStringConvertible, Equatable {
 	}
 }
 
-func == (left: JSONLeaf, right: JSONLeaf) -> Bool {
+public func == (left: JSONLeaf, right: JSONLeaf) -> Bool {
 	switch (left, right) {
 	case let (.Number(a), .Number(b)):
 		return a == b
