@@ -58,7 +58,6 @@
 		D4FB2CD91BDEBC9D00B3CCE0 /* Prelude.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09691BCCC41600B95610 /* Prelude.framework */; };
 		D4FB2CDA1BDEBC9D00B3CCE0 /* Stream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F096A1BCCC41600B95610 /* Stream.framework */; };
 		D4FB2CDC1BDEBCCD00B3CCE0 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */; };
-		D4FB2CDF1BDEBD1C00B3CCE0 /* libcompiler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D4FB2CDD1BDEBD1C00B3CCE0 /* libcompiler.a */; };
 		D4FB2CE01BDEBD1C00B3CCE0 /* libruntime.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */; };
 		D4FB2CEA1BDEC7FA00B3CCE0 /* javascript.c in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CE91BDEC7FA00B3CCE0 /* javascript.c */; };
 /* End PBXBuildFile section */
@@ -70,13 +69,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = D4AAE4FC1B5AE22E004E581F;
 			remoteInfo = Doubt;
-		};
-		D4FB2CE11BDEBD3E00B3CCE0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D4AAE4F41B5AE22E004E581F /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D4FB2CC11BDEBBDB00B3CCE0;
-			remoteInfo = compiler;
 		};
 		D4FB2CE31BDEBD4200B3CCE0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -131,7 +123,6 @@
 		D4DF97091BC5DF800040F41F /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D4FB2CC91BDEBC6300B3CCE0 /* doubt-difftool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "doubt-difftool.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
-		D4FB2CDD1BDEBD1C00B3CCE0 /* libcompiler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcompiler.a; path = "External/tree-sitter/out/Release/libcompiler.a"; sourceTree = SOURCE_ROOT; };
 		D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libruntime.a; path = "External/tree-sitter/out/Release/libruntime.a"; sourceTree = SOURCE_ROOT; };
 		D4FB2CE51BDEBE7900B3CCE0 /* doubt-difftool-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "doubt-difftool-Bridging-Header.h"; sourceTree = "<group>"; };
 		D4FB2CE91BDEC7FA00B3CCE0 /* javascript.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = javascript.c; sourceTree = "<group>"; };
@@ -185,7 +176,6 @@
 				D4FB2CD81BDEBC9D00B3CCE0 /* Memo.framework in Frameworks */,
 				D4FB2CE01BDEBD1C00B3CCE0 /* libruntime.a in Frameworks */,
 				D4FB2CD91BDEBC9D00B3CCE0 /* Prelude.framework in Frameworks */,
-				D4FB2CDF1BDEBD1C00B3CCE0 /* libcompiler.a in Frameworks */,
 				D4FB2CDA1BDEBC9D00B3CCE0 /* Stream.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -288,7 +278,6 @@
 				D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */,
 				D4FB2CE91BDEC7FA00B3CCE0 /* javascript.c */,
 				D4FB2CE51BDEBE7900B3CCE0 /* doubt-difftool-Bridging-Header.h */,
-				D4FB2CDD1BDEBD1C00B3CCE0 /* libcompiler.a */,
 				D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */,
 			);
 			path = "doubt-difftool";
@@ -320,20 +309,6 @@
 			name = runtime;
 			passBuildSettingsInEnvironment = 1;
 			productName = "tree-sitter";
-		};
-		D4FB2CC11BDEBBDB00B3CCE0 /* compiler */ = {
-			isa = PBXLegacyTarget;
-			buildArgumentsString = "$(ACTION)";
-			buildConfigurationList = D4FB2CC41BDEBBDB00B3CCE0 /* Build configuration list for PBXLegacyTarget "compiler" */;
-			buildPhases = (
-			);
-			buildToolPath = "$(SRCROOT)/script/tree-sitter.sh";
-			buildWorkingDirectory = "$(SRCROOT)/External/tree-sitter";
-			dependencies = (
-			);
-			name = compiler;
-			passBuildSettingsInEnvironment = 1;
-			productName = compiler;
 		};
 /* End PBXLegacyTarget section */
 
@@ -403,7 +378,6 @@
 			);
 			dependencies = (
 				D4FB2CE41BDEBD4200B3CCE0 /* PBXTargetDependency */,
-				D4FB2CE21BDEBD3E00B3CCE0 /* PBXTargetDependency */,
 			);
 			name = "doubt-difftool";
 			productName = "doubt-difftool";
@@ -432,9 +406,6 @@
 					D4DF96FA1BC5DF050040F41F = {
 						CreatedOnToolsVersion = 7.0.1;
 					};
-					D4FB2CC11BDEBBDB00B3CCE0 = {
-						CreatedOnToolsVersion = 7.1;
-					};
 					D4FB2CC81BDEBC6300B3CCE0 = {
 						CreatedOnToolsVersion = 7.1;
 					};
@@ -458,7 +429,6 @@
 				D4DF96FA1BC5DF050040F41F /* doubt-json */,
 				D4FB2CC81BDEBC6300B3CCE0 /* doubt-difftool */,
 				D485A7841BDEB6C5003A17B6 /* runtime */,
-				D4FB2CC11BDEBBDB00B3CCE0 /* compiler */,
 			);
 		};
 /* End PBXProject section */
@@ -560,11 +530,6 @@
 			isa = PBXTargetDependency;
 			target = D4AAE4FC1B5AE22E004E581F /* Doubt */;
 			targetProxy = D4AAE50F1B5AE22E004E581F /* PBXContainerItemProxy */;
-		};
-		D4FB2CE21BDEBD3E00B3CCE0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D4FB2CC11BDEBBDB00B3CCE0 /* compiler */;
-			targetProxy = D4FB2CE11BDEBD3E00B3CCE0 /* PBXContainerItemProxy */;
 		};
 		D4FB2CE41BDEBD4200B3CCE0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -786,30 +751,6 @@
 			};
 			name = Release;
 		};
-		D4FB2CC21BDEBBDB00B3CCE0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DEBUGGING_SYMBOLS = YES;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		D4FB2CC31BDEBBDB00B3CCE0 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 		D4FB2CD41BDEBC6300B3CCE0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -902,14 +843,6 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		D4FB2CC41BDEBBDB00B3CCE0 /* Build configuration list for PBXLegacyTarget "compiler" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D4FB2CC21BDEBBDB00B3CCE0 /* Debug */,
-				D4FB2CC31BDEBBDB00B3CCE0 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-		};
 		D4FB2CD31BDEBC6300B3CCE0 /* Build configuration list for PBXNativeTarget "doubt-difftool" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -917,6 +850,7 @@
 				D4FB2CD51BDEBC6300B3CCE0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
