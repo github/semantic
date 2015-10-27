@@ -1,6 +1,8 @@
 import Cocoa
 import Darwin
 import Doubt
+
+
 extension TSInput {
 	init(path: String) {
 		let file = fopen(path, "r")
