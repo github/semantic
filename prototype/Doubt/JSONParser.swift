@@ -50,16 +50,15 @@ typealias MembersParser = Parser<String, [(String, CofreeJSON)]>.Function;
 // Parses an array of (String, CofreeJSON) object members
 func members(json: JSONParser) -> MembersParser {
 	let pairs: Parser<String, (String, CofreeJSON)>.Function = (curry(pair) <^>
-		quoted
+		(quoted --> { (_, range, key) -> (String, CofreeJSON) in
+			return (key, Cofree(range, .Leaf(.String(key))))
+		})
 		<* whitespace
 		<* %":"
 		<* whitespace
 		<*> json) --> { (_, range, values) in
-			let key = values.0
-			let keyRange = Range(start: range.startIndex, end: range.startIndex.advancedBy(key.characters.count))
-			let cofreeKey: CofreeJSON = Cofree(keyRange, .Leaf(.String(key)))
-
-			return (key, Cofree(range, .Fixed([cofreeKey, values.1])))
+			let key = values.0.0
+			return (key, Cofree(range, .Fixed([values.0.1, values.1])))
 		}
 
 	return sepBy(pairs, whitespace <* %"," <* whitespace)
