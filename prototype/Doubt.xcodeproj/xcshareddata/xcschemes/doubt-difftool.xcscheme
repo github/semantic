@@ -63,7 +63,15 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "$(SRCROOT)/UI/term.js"
+            argument = "$(SRCROOT)/doubt-difftool/Fixtures/before.js"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "$(SRCROOT)/doubt-difftool/Fixtures/after.js"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "$(SRCROOT)/UI/diff.json"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
