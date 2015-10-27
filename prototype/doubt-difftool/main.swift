@@ -42,7 +42,7 @@ if let a = arguments[1] {
 
 	print(Cofree<String, TSNode>.ana { node in
 		let count = ts_node_child_count(node)
-		if count == 0 {
+		guard count > 0 else {
 			return String.fromCString(ts_node_string(node, document)).map(Syntax.Leaf)!
 		}
 		return String.fromCString(ts_node_string(node, document)).map(Syntax.Leaf)!
