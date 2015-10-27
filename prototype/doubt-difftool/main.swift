@@ -1,32 +1,5 @@
 import Cocoa
-import Darwin
 import Doubt
-
-extension TSInput {
-	init?(path: String) {
-		let file = fopen(path, "r")
-		guard file != nil else { return nil }
-		self.init(
-			payload: file,
-			read_fn: { (payload: UnsafeMutablePointer<Void>, bytesRead: UnsafeMutablePointer<Int>) -> UnsafePointer<Int8> in
-				errno = 0
-				var string: UnsafeMutablePointer<Int8> = nil
-				var capacity = 0
-				var length = getline(&string, &capacity, UnsafeMutablePointer<FILE>(payload))
-				if length < 0 {
-					if errno == 0 { length = 0 }
-					else {
-						return nil
-					}
-				}
-				bytesRead.memory = length
-				return UnsafePointer<Int8>(string)
-			},
-			seek_fn: { (payload: UnsafeMutablePointer<Void>, position: TSLength) -> Int32 in
-				fseek(UnsafeMutablePointer<FILE>(payload), position.bytes, SEEK_CUR) == 0 ? 1 : 0
-			})
-	}
-}
 
 func readFile(path: String) -> String? {
 	guard let data = try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) else { return nil }
