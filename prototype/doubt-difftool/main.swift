@@ -9,9 +9,17 @@ extension TSInput {
 		self.init(
 			payload: file,
 			read_fn: { (payload: UnsafeMutablePointer<Void>, bytesRead: UnsafeMutablePointer<Int>) -> UnsafePointer<Int8> in
+				errno = 0
 				var string: UnsafeMutablePointer<Int8> = nil
 				var capacity = 0
-				bytesRead.memory = getline(&string, &capacity, UnsafeMutablePointer<FILE>(payload))
+				var length = getline(&string, &capacity, UnsafeMutablePointer<FILE>(payload))
+				if length < 0 {
+					if errno == 0 { length = 0 }
+					else {
+						return nil
+					}
+				}
+				bytesRead.memory = length
 				return UnsafePointer<Int8>(string)
 			},
 			seek_fn: { (payload: UnsafeMutablePointer<Void>, position: TSLength) -> Int32 in
