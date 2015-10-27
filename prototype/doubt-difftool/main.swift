@@ -34,7 +34,7 @@ func termWithInput(string: String) -> Term? {
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
-if let aString = arguments[1].flatMap(readFile), bString = arguments[2].flatMap(readFile), c = arguments[3] {
+if let aString = arguments[1].flatMap(readFile), bString = arguments[2].flatMap(readFile), c = arguments[3], ui = arguments[4] {
 	if let a = termWithInput(aString), b = termWithInput(bString) {
 		let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: const(true), cost: Free.sum(Patch.difference)).run(a, b)
 		let range: Range<Int> -> Doubt.JSON = {
@@ -57,5 +57,12 @@ if let aString = arguments[1].flatMap(readFile), bString = arguments[2].flatMap(
 		]
 		let data = JSON.serialize()
 		try data.writeToFile(c, options: .DataWritingAtomic)
+
+		let components = NSURLComponents()
+		components.scheme = "file"
+		components.path = ui
+		if let URL = components.URL {
+			NSWorkspace.sharedWorkspace().openURL(URL)
+		}
 	}
 }
