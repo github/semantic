@@ -6,6 +6,8 @@ func readFile(path: String) -> String? {
 	return data as String?
 }
 
+typealias Term = Cofree<String, Range<Int>>
+
 func termWithInput(string: String) -> Cofree<String, Range<Int>>? {
 	let document = ts_document_make()
 	defer { ts_document_free(document) }
