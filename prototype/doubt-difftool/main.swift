@@ -20,7 +20,12 @@ extension TSInput {
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
-if let a = arguments[1].map(TSInput.init) {
+if let a = arguments[1] {
+	guard NSFileManager.defaultManager().fileExistsAtPath(a) else {
+		print("\(a): No such file or directory")
+		exit(1)
+	}
+	let a = TSInput(path: a)
 	let document = ts_document_make()
 	ts_document_set_language(document, ts_language_javascript())
 	ts_document_set_input(document, a)
