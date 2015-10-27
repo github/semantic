@@ -17,12 +17,6 @@ extension String: CollectionType {
 	public var count: Index.Distance {
 		return characters.count
 	}
-
-	public static func lift<A>(parser: Parser<String.CharacterView, A>.Function) -> Parser<String, A>.Function {
-		return {
-			parser($0.characters, $1)
-		}
-	}
 }
 
 typealias StringParser = Parser<String.CharacterView, String>.Function
