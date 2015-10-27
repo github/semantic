@@ -9,9 +9,9 @@ extension TSInput {
 		self.init(
 			payload: file,
 			read_fn: { (payload: UnsafeMutablePointer<Void>, bytesRead: UnsafeMutablePointer<Int>) -> UnsafePointer<Int8> in
-				let result = UnsafePointer<Int8>(fgets(nil, 100, UnsafeMutablePointer<FILE>(payload)))
-				bytesRead.memory = Int(strlen(result))
-				return result
+				var string: UnsafeMutablePointer<Int8> = nil
+				bytesRead.memory = getline(&string, nil, UnsafeMutablePointer<FILE>(payload))
+				return UnsafePointer<Int8>(string)
 			},
 			seek_fn: { (payload: UnsafeMutablePointer<Void>, position: TSLength) -> Int32 in
 				fseek(UnsafeMutablePointer<FILE>(payload), position.bytes, SEEK_CUR)
