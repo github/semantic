@@ -355,7 +355,6 @@
 			buildPhases = (
 				D4DF96F71BC5DF050040F41F /* Sources */,
 				D4DF96F81BC5DF050040F41F /* Frameworks */,
-				D4DF96F91BC5DF050040F41F /* Resources */,
 			);
 			buildRules = (
 			);
@@ -372,7 +371,6 @@
 			buildPhases = (
 				D4FB2CC51BDEBC6300B3CCE0 /* Sources */,
 				D4FB2CC61BDEBC6300B3CCE0 /* Frameworks */,
-				D4FB2CC71BDEBC6300B3CCE0 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -442,20 +440,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		D4AAE50B1B5AE22E004E581F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D4DF96F91BC5DF050040F41F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D4FB2CC71BDEBC6300B3CCE0 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
