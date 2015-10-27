@@ -13,9 +13,6 @@ import Prelude
 public typealias CofreeJSON = Cofree<JSONLeaf, Range<String.CharacterView.Index>>
 public typealias JSONParser = Parser<String.CharacterView, CofreeJSON>.Function
 
-typealias StringParser = Parser<String.CharacterView, String>.Function
-typealias CharacterParser = Parser<String.CharacterView, [Character]>.Function
-
 // Inlined for performance reasons
 let whitespace = oneOf(" \n\r\t")*
 
