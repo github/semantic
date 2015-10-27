@@ -28,15 +28,15 @@ extension TSInput {
 	}
 }
 
-let arguments = BoundsCheckedArray(array: Process.arguments)
-if let a = arguments[1].flatMap(TSInput.init) {
+func termWithInput(input: TSInput) -> Cofree<String, Range<Int>>? {
 	let document = ts_document_make()
+	defer { ts_document_free(document) }
 	ts_document_set_language(document, ts_language_javascript())
-	ts_document_set_input(document, a)
+	ts_document_set_input(document, input)
 	ts_document_parse(document)
 	let root = ts_document_root_node(document)
 
-	let term: Cofree<String, Range<Int>> = Cofree
+	return Cofree
 		.ana { node in
 			let count = ts_node_named_child_count(node)
 			guard count > 0 else {
@@ -48,8 +48,9 @@ if let a = arguments[1].flatMap(TSInput.init) {
 			let start = ts_node_pos($0).chars
 			return start..<(start + ts_node_size($0).chars)
 		}
+}
 
-	print(term)
-
-	ts_document_free(document)
+let arguments = BoundsCheckedArray(array: Process.arguments)
+if let a = arguments[1].flatMap(TSInput.init).flatMap(termWithInput) {
+	print(a)
 }
