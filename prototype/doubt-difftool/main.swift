@@ -28,6 +28,11 @@ extension TSInput {
 	}
 }
 
+func readFile(path: String) -> String? {
+	guard let data = try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) else { return nil }
+	return data as String?
+}
+
 func termWithInput(input: TSInput) -> Cofree<String, Range<Int>>? {
 	let document = ts_document_make()
 	defer { ts_document_free(document) }
