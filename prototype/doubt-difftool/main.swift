@@ -40,6 +40,6 @@ if let a = arguments[1] {
 	ts_document_set_input(document, a)
 	ts_document_parse(document)
 	let root = ts_document_root_node(document)
-	print(ts_node_name(root, document))
+	print(String.fromCString(ts_node_name(root, document)))
 	ts_document_free(document)
 }
