@@ -14,7 +14,7 @@ extension TSInput {
 				return UnsafePointer<Int8>(string)
 			},
 			seek_fn: { (payload: UnsafeMutablePointer<Void>, position: TSLength) -> Int32 in
-				fseek(UnsafeMutablePointer<FILE>(payload), position.bytes, SEEK_CUR)
+				fseek(UnsafeMutablePointer<FILE>(payload), position.bytes, SEEK_CUR) == 0 ? 1 : 0
 			})
 	}
 }
