@@ -37,11 +37,10 @@ let escapeChar: StringParser = %"\\\\" <|> %"\\\"" <|> %"\\b" <|> %"\\f" <|> %"\
 let otherChar: StringParser = { String($0) } <^> satisfy { c in
 	c != "\"" && c != "\\"
 }
-let charP: StringParser = escapeChar <|> otherChar
 
 // Quoted strings parser
 // TODO: Improve string parsing
-let stringBody: StringParser = { $0.joinWithSeparator("") } <^> many(charP)
+let stringBody: StringParser = { $0.joinWithSeparator("") } <^> many(escapeChar <|> otherChar)
 let quoted = %"\"" *> stringBody <* %"\""
 
 typealias MembersParser = Parser<String, [(String, CofreeJSON)]>.Function;
