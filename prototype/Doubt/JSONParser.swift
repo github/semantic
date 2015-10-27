@@ -17,7 +17,7 @@ typealias StringParser = Parser<String.CharacterView, String>.Function
 typealias CharacterParser = Parser<String.CharacterView, [Character]>.Function
 
 // Inlined for performance reasons
-let whitespace: CharacterParser = oneOf(" \n\r\t")*
+let whitespace = oneOf(" \n\r\t")*
 
 // TODO: Parse unicode escape sequence
 let escapeChar: StringParser = curry(+) <^> %"\\" <*> ({ String($0) } <^> oneOf("\\\"bfnrt"))
