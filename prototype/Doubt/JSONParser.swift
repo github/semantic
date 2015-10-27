@@ -32,10 +32,8 @@ typealias CharacterParser = Parser<String, [Character]>.Function
 let whitespace: CharacterParser = oneOf(" \n\r\t")*
 
 // TODO: Parse unicode escape sequence
-let escapeChar: StringParser = %"\\\\" <|> %"\\\"" <|> %"\\b" <|> %"\\f" <|> %"\\n" <|> %"\\r" <|> %"\\t"
-let otherChar: StringParser = { String($0) } <^> satisfy { c in
-	c != "\"" && c != "\\"
-}
+let escapeChar: StringParser = curry(+) <^> %"\\" <*> ({ String($0) } <^> oneOf("\\\"bfnrt"))
+let otherChar: StringParser = { String($0) } <^> String.lift(noneOf("\"\\"))
 
 // Quoted strings parser
 // TODO: Improve string parsing
