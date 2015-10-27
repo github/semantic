@@ -47,12 +47,6 @@ func members(json: JSONParser) -> MembersParser {
 
 typealias ValuesParser = Parser<String.CharacterView, [CofreeJSON]>.Function;
 
-// Parses an array of CofreeJSON array values
-func elements(json: JSONParser) -> ValuesParser {
-	let value: Parser<String.CharacterView, CofreeJSON>.Function = whitespace *> json
-	return sepBy(value, whitespace <* %"," <* whitespace)
-}
-
 public let json: JSONParser = fix { json in
 	let string: JSONParser = quoted --> {
 		Cofree($1, .Leaf(.String($2)))
@@ -60,7 +54,7 @@ public let json: JSONParser = fix { json in
 
 	let array: JSONParser =  %"["
 		<* whitespace
-		*> elements(json)
+		*> sepBy(whitespace *> json, whitespace <* %"," <* whitespace)
 		<* whitespace
 		<* %"]"
 		--> {
