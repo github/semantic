@@ -11,7 +11,7 @@ import Madness
 import Prelude
 
 public typealias CofreeJSON = Cofree<JSONLeaf, Range<String.CharacterView.Index>>
-public typealias JSONParser = Parser<String, CofreeJSON>.Function
+public typealias JSONParser = Parser<String.CharacterView, CofreeJSON>.Function
 
 extension String: CollectionType {
 	public var count: Index.Distance {
@@ -25,29 +25,29 @@ extension String: CollectionType {
 	}
 }
 
-typealias StringParser = Parser<String, String>.Function
-typealias CharacterParser = Parser<String, [Character]>.Function
+typealias StringParser = Parser<String.CharacterView, String>.Function
+typealias CharacterParser = Parser<String.CharacterView, [Character]>.Function
 
 // Inlined for performance reasons
 let whitespace: CharacterParser = oneOf(" \n\r\t")*
 
 // TODO: Parse unicode escape sequence
 let escapeChar: StringParser = curry(+) <^> %"\\" <*> ({ String($0) } <^> oneOf("\\\"bfnrt"))
-let otherChar: StringParser = { String($0) } <^> String.lift(noneOf("\"\\"))
+let otherChar: StringParser = { String($0) } <^> noneOf("\"\\")
 
 // Quoted strings parser
 // TODO: Improve string parsing
 let stringBody: StringParser = { $0.joinWithSeparator("") } <^> many(escapeChar <|> otherChar)
 let quoted = %"\"" *> stringBody <* %"\""
 
-typealias MembersParser = Parser<String, [(String, CofreeJSON)]>.Function;
+typealias MembersParser = Parser<String.CharacterView, [(String, CofreeJSON)]>.Function;
 
 // Parses an array of (String, CofreeJSON) object members
 func members(json: JSONParser) -> MembersParser {
-	let keyAndKeyTerm: Parser<String, (String, CofreeJSON)>.Function = quoted --> { (_, range, key) in
+	let keyAndKeyTerm: Parser<String.CharacterView, (String, CofreeJSON)>.Function = quoted --> { (_, range, key) in
 		(key, Cofree(range, .Leaf(.String(key))))
 	}
-	let pairs: Parser<String, (String, CofreeJSON)>.Function = (curry(pair) <^>
+	let pairs: Parser<String.CharacterView, (String, CofreeJSON)>.Function = (curry(pair) <^>
 		keyAndKeyTerm
 		<* whitespace
 		<* %":"
@@ -60,11 +60,11 @@ func members(json: JSONParser) -> MembersParser {
 	return sepBy(pairs, whitespace <* %"," <* whitespace)
 }
 
-typealias ValuesParser = Parser<String, [CofreeJSON]>.Function;
+typealias ValuesParser = Parser<String.CharacterView, [CofreeJSON]>.Function;
 
 // Parses an array of CofreeJSON array values
 func elements(json: JSONParser) -> ValuesParser {
-	let value: Parser<String, CofreeJSON>.Function = whitespace *> json
+	let value: Parser<String.CharacterView, CofreeJSON>.Function = whitespace *> json
 	return sepBy(value, whitespace <* %"," <* whitespace)
 }
 
@@ -94,7 +94,7 @@ public let json: JSONParser = fix { json in
 		} <?> "object"
 
 	let doubleParser: DoubleParser = number
-	let numberParser: JSONParser = String.lift(doubleParser --> { _, range, value in
+	let numberParser: JSONParser = (doubleParser --> { _, range, value in
 		let num = JSONLeaf.Number(value)
 		return Cofree(range, .Leaf(num))
 	}) <?> "number"
