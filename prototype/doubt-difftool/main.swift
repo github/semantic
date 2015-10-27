@@ -37,5 +37,24 @@ let arguments = BoundsCheckedArray(array: Process.arguments)
 if let aString = arguments[1].flatMap(readFile), bString = arguments[2].flatMap(readFile), c = arguments[3] {
 	if let a = termWithInput(aString), b = termWithInput(bString) {
 		let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: const(true), cost: Free.sum(Patch.difference)).run(a, b)
+		let range: Range<Int> -> Doubt.JSON = {
+			let start = $0.startIndex
+			let end = $0.endIndex
+			return [
+				.Number(Double(start)),
+				.Number(Double(end - start)),
+			]
+		}
+		let JSON: Doubt.JSON = [
+			"before": .String(aString),
+			"after": .String(bString),
+			"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: range, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
+				[
+					"before": range($0),
+					"after": range($1),
+				]
+			}),
+		]
+		JSON.serialize()
 	}
 }
