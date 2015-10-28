@@ -4,7 +4,7 @@ typealias TSDocument = COpaquePointer
 
 extension TSNode {
 	func category(document: TSDocument) throws -> String {
-		guard let category = String.fromCString(ts_node_name(self, document)) else { throw E() }
+		guard let category = String.fromCString(ts_node_name(self, document)) else { throw "couldn’t make a String from the node name" }
 		return category
 	}
 
@@ -36,6 +36,4 @@ extension TSNode {
 			return count(node)
 		}
 	}
-
-	private struct E: ErrorType {}
 }
