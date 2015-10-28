@@ -43,7 +43,6 @@ func termWithInput(string: String) -> Term? {
 		ts_document_parse(document)
 		let root = ts_document_root_node(document)
 
-		struct E: ErrorType {}
 		return try? Cofree
 			.ana { node, category in
 				let count = node.namedChildren.count
