@@ -46,14 +46,14 @@ public enum Patch<A>: CustomDebugStringConvertible {
 // MARK: - Functor
 
 extension Patch {
-	public func map<B>(@noescape transform: A -> B) -> Patch<B> {
+	public func map<B>(@noescape transform: A throws -> B) rethrows -> Patch<B> {
 		switch self {
 		case let .Replace(a, b):
-			return .Replace(transform(a), transform(b))
+			return try .Replace(transform(a), transform(b))
 		case let .Delete(a):
-			return .Delete(transform(a))
+			return try .Delete(transform(a))
 		case let .Insert(b):
-			return .Insert(transform(b))
+			return try .Insert(transform(b))
 		}
 	}
 }
@@ -73,13 +73,13 @@ extension Patch {
 
 extension Patch {
 	/// Returns a function which computes the size of a `patch` as the sum of the sizes of its terms, as computed by `size`.
-	public static func sum(size: A -> Int)(_ patch: Patch) -> Int {
-		return (patch.state.before.map(size) ?? 0) + (patch.state.after.map(size) ?? 0)
+	public static func sum(@noescape size: A throws -> Int)(_ patch: Patch) rethrows -> Int {
+		return try (patch.state.before.map(size) ?? 0) + (patch.state.after.map(size) ?? 0)
 	}
 
 	/// Returns a function which computes the size of a `patch` as the absolute difference of the sizes of its terms, as computed by `size`.
-	public static func difference(size: A -> Int)(_ patch: Patch) -> Int {
-		return abs((patch.state.before.map(size) ?? 0) - (patch.state.after.map(size) ?? 0))
+	public static func difference(@noescape size: A throws -> Int)(_ patch: Patch) rethrows -> Int {
+		return try abs((patch.state.before.map(size) ?? 0) - (patch.state.after.map(size) ?? 0))
 	}
 }
 
