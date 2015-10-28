@@ -64,7 +64,7 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 
 
 	/// Reduces the receiver top-down, left-to-right, starting from an `initial` value, and applying `combine` to successive values.
-	public func reduce(initial: Value, combine: (Value, Value) -> Value) -> Value {
+	public func reduce(initial: Value, @noescape combine: (Value, Value) -> Value) -> Value {
 		return cata {
 			switch $0 {
 			case .Leaf:
