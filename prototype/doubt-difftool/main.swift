@@ -18,11 +18,14 @@ func termWithInput(string: String) -> Term? {
 		ts_document_parse(document)
 		let root = ts_document_root_node(document)
 
+		var histogram: [String:Int] = [:]
+
 		struct E: ErrorType {}
-		return try? Cofree
+		let result: Term? = try? Cofree
 			.ana { node in
 				let count = ts_node_named_child_count(node)
 				guard let name = String.fromCString(ts_node_name(node, document)) else { throw E() }
+				histogram[name] = (histogram[name] ?? 0) + 1
 				guard count > 0 else { return Syntax.Leaf(name) }
 				return .Indexed((0..<count).map { ts_node_named_child(node, $0) })
 			} (root)
@@ -30,6 +33,10 @@ func termWithInput(string: String) -> Term? {
 				let start = ts_node_pos($0).chars
 				return start..<(start + ts_node_size($0).chars)
 			}
+
+		print(histogram)
+
+		return result
 	}
 }
 
