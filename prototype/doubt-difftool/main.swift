@@ -95,8 +95,7 @@ func termWithInput(string: String) -> Term? {
 				}
 			} (root, Info.Category.Program)
 			.map { node, category in
-				let start = ts_node_pos(node).chars
-				return start..<(start + ts_node_size(node).chars)
+				node.range
 			}
 	}
 }
