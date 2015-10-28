@@ -61,6 +61,7 @@
 		D4FB2CDC1BDEBCCD00B3CCE0 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */; };
 		D4FB2CE01BDEBD1C00B3CCE0 /* libruntime.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */; };
 		D4FB2CEA1BDEC7FA00B3CCE0 /* javascript.c in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CE91BDEC7FA00B3CCE0 /* javascript.c */; };
+		D4FB2CF81BE1560400B3CCE0 /* TSNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -128,6 +129,7 @@
 		D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libruntime.a; path = "External/tree-sitter/out/Release/libruntime.a"; sourceTree = SOURCE_ROOT; };
 		D4FB2CE51BDEBE7900B3CCE0 /* doubt-difftool-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "doubt-difftool-Bridging-Header.h"; sourceTree = "<group>"; };
 		D4FB2CE91BDEC7FA00B3CCE0 /* javascript.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = javascript.c; sourceTree = "<group>"; };
+		D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSNode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -279,6 +281,7 @@
 			isa = PBXGroup;
 			children = (
 				D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */,
+				D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */,
 				D4FB2CE91BDEC7FA00B3CCE0 /* javascript.c */,
 				D4FB2CE51BDEBE7900B3CCE0 /* doubt-difftool-Bridging-Header.h */,
 				D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */,
@@ -507,6 +510,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D4FB2CEA1BDEC7FA00B3CCE0 /* javascript.c in Sources */,
+				D4FB2CF81BE1560400B3CCE0 /* TSNode.swift in Sources */,
 				D4FB2CDC1BDEBCCD00B3CCE0 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
