@@ -76,7 +76,7 @@ func termWithInput(string: String) -> Term? {
 		struct E: ErrorType {}
 		return try? Cofree
 			.ana { node, category in
-				let count = ts_node_named_child_count(node)
+				let count = node.namedChildren.count
 				guard count > 0 else { return Syntax.Leaf(category.rawValue) }
 				switch category {
 				default:
