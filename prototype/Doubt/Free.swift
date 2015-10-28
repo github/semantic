@@ -21,12 +21,12 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	}
 
 
-	public func analysis<C>(@noescape ifPure ifPure: Value -> C, @noescape ifRoll: (Annotation, Syntax<Free, Leaf>) -> C) -> C {
+	public func analysis<C>(@noescape ifPure ifPure: Value throws -> C, @noescape ifRoll: (Annotation, Syntax<Free, Leaf>) throws -> C) rethrows -> C {
 		switch self {
 		case let .Pure(b):
-			return ifPure(b)
+			return try ifPure(b)
 		case let .Roll(s):
-			return ifRoll(s)
+			return try ifRoll(s)
 		}
 	}
 
