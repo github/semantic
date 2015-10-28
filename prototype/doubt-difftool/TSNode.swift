@@ -13,6 +13,11 @@ extension TSNode {
 		return category
 	}
 
+	var range: Range<Int> {
+		let start = ts_node_pos(self).chars
+		return start..<(start + ts_node_size(self).chars)
+	}
+
 	var children: AnyRandomAccessCollection<TSNode> {
 		return AnyRandomAccessCollection(ChildrenCollection(node: self, count: ts_node_child_count, child: ts_node_child))
 	}
