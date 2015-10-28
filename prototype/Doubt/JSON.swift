@@ -10,6 +10,11 @@ public enum JSON: ArrayLiteralConvertible, BooleanLiteralConvertible, Dictionary
 	case Null
 
 
+	public init<T: CustomJSONConvertible>(_ convertible: T) {
+		self = convertible.JSON
+	}
+
+
 	public var number: Double? {
 		if case let .Number(d) = self { return d }
 		return nil
