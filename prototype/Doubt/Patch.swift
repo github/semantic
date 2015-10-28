@@ -73,7 +73,7 @@ extension Patch {
 
 extension Patch {
 	/// Returns a function which computes the size of a `patch` as the sum of the sizes of its terms, as computed by `size`.
-	public static func sum(size: A -> Int)(_ patch: Patch) -> Int {
+	public static func sum(@noescape size: A -> Int)(_ patch: Patch) -> Int {
 		return (patch.state.before.map(size) ?? 0) + (patch.state.after.map(size) ?? 0)
 	}
 
