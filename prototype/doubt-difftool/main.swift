@@ -81,16 +81,16 @@ func termWithInput(string: String) -> Term? {
 				switch category {
 				case .Pair:
 					return try .Fixed(node.namedChildren.map {
-						($0, try node.category(document))
+						($0, try $0.category(document))
 					})
 				case .Object:
 					return try .Keyed(Dictionary(elements: node.namedChildren.map {
 						// fixme: this should return the key in the pair.
-						try (node.name(document), ($0, node.category(document)))
+						try ($0.name(document), ($0, $0.category(document)))
 					}))
 				default:
 					return try .Indexed(node.namedChildren.map {
-						($0, try node.category(document))
+						($0, try $0.category(document))
 					})
 				}
 			} (root, Info.Category.Program)
