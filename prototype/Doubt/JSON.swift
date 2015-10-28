@@ -10,7 +10,7 @@ public enum JSON: ArrayLiteralConvertible, BooleanLiteralConvertible, Dictionary
 	case Null
 
 
-	public init<T: CustomJSONConvertible>(_ convertible: T) {
+	public init(_ convertible: CustomJSONConvertible) {
 		self = convertible.JSON
 	}
 
