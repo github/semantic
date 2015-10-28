@@ -3,6 +3,12 @@
 typealias TSDocument = COpaquePointer
 
 extension TSNode {
+	func name(document: TSDocument) throws -> String {
+		struct E: ErrorType {}
+		guard let name = String.fromCString(ts_node_name(self, document)) else { throw E() }
+		return name
+	}
+
 	var children: AnyRandomAccessCollection<TSNode> {
 		return AnyRandomAccessCollection(ChildrenCollection(node: self, count: ts_node_child_count, child: ts_node_child))
 	}
