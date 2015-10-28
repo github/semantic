@@ -123,7 +123,7 @@ extension Free {
 	///
 	/// Unfolds a tree bottom-up by recursively applying `transform` to a series of values starting with `seed`. Since `Syntax.Leaf` does not recur, this will halt when it has produced leaves for every branch.
 	public static func ana(unfold: Annotation -> Syntax<Annotation, Leaf>)(_ seed: Annotation) -> Free {
-		return (Introduce(seed) <<< { $0.map(ana(unfold)) } <<< unfold) <| seed
+		return Roll(seed, unfold(seed).map(ana(unfold)))
 	}
 }
 
