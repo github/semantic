@@ -7,7 +7,7 @@ func readFile(path: String) -> String? {
 	return data as String?
 }
 
-typealias Term = Cofree<String, Info>
+typealias Term = Cofree<String, Range<Int>>
 
 struct Info: Categorizable, CustomJSONConvertible, Equatable {
 	let range: Range<Int>
@@ -87,7 +87,7 @@ func termWithInput(string: String) -> Term? {
 			} (root, Info.Category.Program)
 			.map { node, category in
 				let start = ts_node_pos(node).chars
-				return Info(range: start..<(start + ts_node_size(node).chars), category: category)
+				return start..<(start + ts_node_size(node).chars)
 			}
 	}
 }
@@ -105,10 +105,10 @@ if let aString = arguments[1].flatMap(readFile), bString = arguments[2].flatMap(
 		let JSON: Doubt.JSON = [
 			"before": .String(aString),
 			"after": .String(bString),
-			"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: Doubt.JSON.init, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
+			"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: range, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
 				[
-					"before": $0.JSON,
-					"after": $1.JSON,
+					"before": range($0),
+					"after": range($1),
 				]
 			}),
 		]
