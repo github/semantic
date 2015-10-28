@@ -131,11 +131,11 @@ extension Free {
 extension Free where Value: PatchType, Value.Element == Cofree<Leaf, ()> {
 	public typealias Term = Value.Element
 
-	public func merge(transform: Value -> Term) -> Term {
+	public func merge(@noescape transform: Value -> Term) -> Term {
 		return map(transform).cata { Cofree((), $0) }
 	}
 
-	public func merge(transform: Value -> Term?) -> Term? {
+	public func merge(@noescape transform: Value -> Term?) -> Term? {
 		return map(transform).cata(Free.discardNullTerms)
 	}
 
