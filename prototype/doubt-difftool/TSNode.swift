@@ -9,6 +9,12 @@ extension TSNode {
 		return name
 	}
 
+	func category(document: TSDocument) throws -> Info.Category {
+		struct E: ErrorType {}
+		guard let category = Info.Category(rawValue: try name(document)) else { throw E() }
+		return category
+	}
+
 	var children: AnyRandomAccessCollection<TSNode> {
 		return AnyRandomAccessCollection(ChildrenCollection(node: self, count: ts_node_child_count, child: ts_node_child))
 	}
