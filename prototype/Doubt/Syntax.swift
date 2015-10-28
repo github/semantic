@@ -8,16 +8,16 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible {
 
 	// MARK: Functor
 
-	public func map<T>(@noescape transform: Recur -> T) -> Syntax<T, A> {
+	public func map<T>(@noescape transform: Recur throws -> T) rethrows -> Syntax<T, A> {
 		switch self {
 		case let .Leaf(n):
 			return .Leaf(n)
 		case let .Indexed(x):
-			return .Indexed(x.map(transform))
+			return try .Indexed(x.map(transform))
 		case let .Fixed(x):
-			return .Fixed(x.map(transform))
+			return try .Fixed(x.map(transform))
 		case let .Keyed(d):
-			return .Keyed(Dictionary(elements: d.map { ($0, transform($1)) }))
+			return try .Keyed(Dictionary(elements: d.map { try ($0, transform($1)) }))
 		}
 	}
 
