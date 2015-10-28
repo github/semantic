@@ -197,6 +197,15 @@ extension Array where Element: CustomJSONConvertible {
 	}
 }
 
+extension Range where Element: CustomJSONConvertible, Element.Distance: CustomJSONConvertible {
+	public var JSON: Doubt.JSON {
+		return [
+			startIndex.JSON,
+			count.JSON,
+		]
+	}
+}
+
 
 /// A type which can be converted to and from JSON.
 public protocol JSONConvertible: CustomJSONConvertible {
