@@ -61,6 +61,7 @@ func termWithInput(string: String) -> Term? {
 							guard let name = String(string.utf16[String.UTF16View.Index(_offset: range.startIndex)..<String.UTF16View.Index(_offset: range.endIndex)]) else { throw "could not make a string from utf16 range '\(range)'" }
 							return (name, ($0, "pair"))
 						default:
+							// We might have a comment inside an object literal. It should still be assigned a key, however.
 							return try (String($0.range), ($0, $0.category(document)))
 						}
 					}))
