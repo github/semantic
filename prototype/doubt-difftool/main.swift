@@ -49,7 +49,7 @@ func termWithInput(string: String) -> Term? {
 				let count = node.namedChildren.count
 				guard count > 0 else { return Syntax.Leaf(category) }
 				switch category {
-				case "pair":
+				case "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary":
 					return try .Fixed(node.namedChildren.map {
 						($0, try $0.category(document))
 					})
