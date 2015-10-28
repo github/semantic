@@ -85,8 +85,8 @@ func termWithInput(string: String) -> Term? {
 					})
 				case .Object:
 					return try .Keyed(Dictionary(elements: node.namedChildren.map {
-						// fixme: this should return the key in the pair.
-						try ($0.name(document), ($0, $0.category(document)))
+						guard let name = try $0.namedChildren.first?.name(document) else { throw E() }
+						return try (name, ($0, $0.category(document)))
 					}))
 				default:
 					return try .Indexed(node.namedChildren.map {
