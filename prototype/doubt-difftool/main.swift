@@ -9,9 +9,16 @@ func readFile(path: String) -> String? {
 
 typealias Term = Cofree<String, Range<Int>>
 
-struct Info: CustomJSONConvertible, Equatable {
+struct Info: Categorizable, CustomJSONConvertible, Equatable {
 	let range: Range<Int>
 	let category: Category
+
+
+	// MARK: Categorizable
+
+	var categories: Set<Category> {
+		return [ category ]
+	}
 
 
 	// MARK: CustomJSONConvertible
