@@ -79,6 +79,12 @@ func termWithInput(string: String) -> Term? {
 				let count = node.namedChildren.count
 				guard count > 0 else { return Syntax.Leaf(category.rawValue) }
 				switch category {
+				case .Pair:
+					return try .Fixed(node.namedChildren.map {
+						guard let name = String.fromCString(ts_node_name($0, document)) else { throw E() }
+						guard let category = Info.Category(rawValue: name) else { throw E() }
+						return ($0, category)
+					})
 				case .Object:
 					return try .Keyed(Dictionary(elements: node.namedChildren.map {
 						guard let name = String.fromCString(ts_node_name($0, document)) else { throw E() }
