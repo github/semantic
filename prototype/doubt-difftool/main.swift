@@ -80,11 +80,10 @@ func termWithInput(string: String) -> Term? {
 				guard count > 0 else { return Syntax.Leaf(category.rawValue) }
 				switch category {
 				default:
-					return try .Indexed((0..<count).map { index in
-						let child = ts_node_named_child(node, index)
-						guard let name = String.fromCString(ts_node_name(child, document)) else { throw E() }
+					return try .Indexed(node.namedChildren.map {
+						guard let name = String.fromCString(ts_node_name($0, document)) else { throw E() }
 						guard let category = Info.Category(rawValue: name) else { throw E() }
-						return (child, category)
+						return ($0, category)
 					})
 				}
 			} (root, Info.Category.Program)
