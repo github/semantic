@@ -90,11 +90,9 @@ if let aString = arguments[1].flatMap(readFile), bString = arguments[2].flatMap(
 	if let a = termWithInput(aString), b = termWithInput(bString) {
 		let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: const(true), cost: Free.sum(Patch.difference)).run(a, b)
 		let range: Range<Int> -> Doubt.JSON = {
-			let start = $0.startIndex
-			let end = $0.endIndex
-			return [
-				.Number(Double(start)),
-				.Number(Double(end - start)),
+			[
+				$0.startIndex.JSON,
+				($0.endIndex - $0.startIndex).JSON,
 			]
 		}
 		let JSON: Doubt.JSON = [
