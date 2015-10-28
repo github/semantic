@@ -55,9 +55,14 @@ func termWithInput(string: String) -> Term? {
 					})
 				case "object":
 					return try .Keyed(Dictionary(elements: node.namedChildren.map {
-						guard let range = $0.namedChildren.first?.range else { throw E() }
-						guard let name = String(string.utf16[String.UTF16View.Index(_offset: range.startIndex)..<String.UTF16View.Index(_offset: range.endIndex)]) else { throw E() }
-						return try (name, ($0, $0.category(document)))
+						switch try $0.category(document) {
+						case "pair":
+							let range = $0.namedChildren[0].range
+							guard let name = String(string.utf16[String.UTF16View.Index(_offset: range.startIndex)..<String.UTF16View.Index(_offset: range.endIndex)]) else { throw "could not make a string from utf16 range '\(range)'" }
+							return (name, ($0, "pair"))
+						default:
+							return try (String($0.range), ($0, $0.category(document)))
+						}
 					}))
 				default:
 					return try .Indexed(node.namedChildren.map {
