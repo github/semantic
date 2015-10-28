@@ -11,14 +11,11 @@ typealias Term = Cofree<String, Range<Int>>
 
 struct Info: Categorizable, CustomJSONConvertible, Equatable {
 	let range: Range<Int>
-	let category: Category
 
 
 	// MARK: Categorizable
 
-	var categories: Set<Category> {
-		return [ category ]
-	}
+	let categories: Set<String>
 
 
 	// MARK: CustomJSONConvertible
@@ -29,39 +26,13 @@ struct Info: Categorizable, CustomJSONConvertible, Equatable {
 				range.startIndex.JSON,
 				(range.endIndex - range.startIndex).JSON,
 			],
-			"category": category.rawValue.JSON
+			"categories": Array(categories).JSON
 		]
-	}
-
-
-	// MARK: Categories
-
-	enum Category: String {
-		case Arguments = "arguments"
-		case Assignment = "assignment"
-		case Comment = "comment"
-		case ExpressionStatement = "expression_statement"
-		case FormalParameters = "formal_parameters"
-		case Function = "function"
-		case FunctionCall = "function_call"
-		case Identifier = "identifier"
-		case IfStatement = "if_statement"
-		case MemberAccess = "member_access"
-		case NewExpression = "new_expression"
-		case NullLiteral = "null"
-		case Object = "object"
-		case Pair = "pair"
-		case Program = "program"
-		case RelationalOperator = "rel_op"
-		case ReturnStatement = "return_statement"
-		case StatementBlock = "statement_block"
-		case StringLiteral = "string"
-		case SubscriptAccess = "subscript_access"
 	}
 }
 
 func == (left: Info, right: Info) -> Bool {
-	return left.range == right.range && left.category == right.category
+	return left.range == right.range && left.categories == right.categories
 }
 
 func termWithInput(string: String) -> Term? {
