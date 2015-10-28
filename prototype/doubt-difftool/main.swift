@@ -9,32 +9,32 @@ func readFile(path: String) -> String? {
 
 typealias Term = Cofree<String, Range<Int>>
 
-enum Category: String {
-	case Arguments = "arguments"
-	case Assignment = "assignment"
-	case Comment = "comment"
-	case ExpressionStatement = "expression_statement"
-	case FormalParameters = "formal_parameters"
-	case Function = "function"
-	case FunctionCall = "function_call"
-	case Identifier = "identifier"
-	case IfStatement = "if_statement"
-	case MemberAccess = "member_access"
-	case NewExpression = "new_expression"
-	case NullLiteral = "null"
-	case Object = "object"
-	case Pair = "pair"
-	case Program = "program"
-	case RelationalOperator = "rel_op"
-	case ReturnStatement = "return_statement"
-	case StatementBlock = "statement_block"
-	case StringLiteral = "string"
-	case SubscriptAccess = "subscript_access"
-}
-
 struct Info {
 	let range: Range<Int>
 	let category: Category
+
+	enum Category: String {
+		case Arguments = "arguments"
+		case Assignment = "assignment"
+		case Comment = "comment"
+		case ExpressionStatement = "expression_statement"
+		case FormalParameters = "formal_parameters"
+		case Function = "function"
+		case FunctionCall = "function_call"
+		case Identifier = "identifier"
+		case IfStatement = "if_statement"
+		case MemberAccess = "member_access"
+		case NewExpression = "new_expression"
+		case NullLiteral = "null"
+		case Object = "object"
+		case Pair = "pair"
+		case Program = "program"
+		case RelationalOperator = "rel_op"
+		case ReturnStatement = "return_statement"
+		case StatementBlock = "statement_block"
+		case StringLiteral = "string"
+		case SubscriptAccess = "subscript_access"
+	}
 }
 
 func termWithInput(string: String) -> Term? {
@@ -54,10 +54,10 @@ func termWithInput(string: String) -> Term? {
 				return try .Indexed((0..<count).map { index in
 					let child = ts_node_named_child(node, index)
 					guard let name = String.fromCString(ts_node_name(child, document)) else { throw E() }
-					guard let category = Category(rawValue: name) else { throw E() }
+					guard let category = Info.Category(rawValue: name) else { throw E() }
 					return (child, category)
 				})
-			} (root, Category.Program)
+			} (root, Info.Category.Program)
 			.map { node, category in
 				let start = ts_node_pos(node).chars
 				return start..<(start + ts_node_size(node).chars)
