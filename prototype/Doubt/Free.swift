@@ -87,8 +87,8 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 
 	// MARK: Functor
 
-	public func map<C>(@noescape transform: Value -> C) -> Free<Leaf, Annotation, C> {
-		return analysis(ifPure: { .Pure(transform($0)) }, ifRoll: { .Roll($0, $1.map { $0.map(transform) }) })
+	public func map<C>(@noescape transform: Value throws -> C) rethrows -> Free<Leaf, Annotation, C> {
+		return try analysis(ifPure: { try .Pure(transform($0)) }, ifRoll: { try .Roll($0, $1.map { try $0.map(transform) }) })
 	}
 
 
