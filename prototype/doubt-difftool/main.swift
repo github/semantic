@@ -32,6 +32,11 @@ enum Category: String {
 	case SubscriptAccess = "subscript_access"
 }
 
+struct Info {
+	let range: Range<Int>
+	let category: Category
+}
+
 func termWithInput(string: String) -> Term? {
 	let document = ts_document_make()
 	defer { ts_document_free(document) }
