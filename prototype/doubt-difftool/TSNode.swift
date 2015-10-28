@@ -14,17 +14,17 @@ extension TSNode {
 	}
 
 	var children: AnyRandomAccessCollection<TSNode> {
-		return AnyRandomAccessCollection(ChildrenCollection(node: self, count: ts_node_child_count, child: ts_node_child))
+		return AnyRandomAccessCollection(ChildrenCollection(node: self, count: ts_node_child_count(self), child: ts_node_child))
 	}
 
 	var namedChildren: AnyRandomAccessCollection<TSNode> {
-		return AnyRandomAccessCollection(ChildrenCollection(node: self, count: ts_node_named_child_count, child: ts_node_named_child))
+		return AnyRandomAccessCollection(ChildrenCollection(node: self, count: ts_node_named_child_count(self), child: ts_node_named_child))
 	}
 
 
 	private struct ChildrenCollection: CollectionType {
 		let node: TSNode
-		let count: TSNode -> Int
+		let count: Int
 		let child: (TSNode, Int) -> TSNode
 
 		subscript (index: Int) -> TSNode {
@@ -33,7 +33,7 @@ extension TSNode {
 
 		let startIndex = 0
 		var endIndex: Int {
-			return count(node)
+			return count
 		}
 	}
 }
