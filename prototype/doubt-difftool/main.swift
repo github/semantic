@@ -85,7 +85,8 @@ func termWithInput(string: String) -> Term? {
 					})
 				case .Object:
 					return try .Keyed(Dictionary(elements: node.namedChildren.map {
-						guard let name = try $0.namedChildren.first?.name(document) else { throw E() }
+						guard let range = $0.namedChildren.first?.range else { throw E() }
+						guard let name = String(string.utf16[String.UTF16View.Index(_offset: range.startIndex)..<String.UTF16View.Index(_offset: range.endIndex)]) else { throw E() }
 						return try (name, ($0, $0.category(document)))
 					}))
 				default:
