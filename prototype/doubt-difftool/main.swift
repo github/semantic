@@ -7,6 +7,8 @@ func readFile(path: String) -> String? {
 	return data as String?
 }
 
+extension String: ErrorType {}
+
 typealias Term = Cofree<String, Info>
 
 struct Info: Categorizable, CustomJSONConvertible, Equatable {
