@@ -80,7 +80,7 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	}
 
 	/// Returns a function which sums `Free`s by first `transform`ing `Pure` values into integers, and then summing these.
-	public static func sum(transform: Value -> Int)(_ free: Free) -> Int {
+	public static func sum(@noescape transform: Value -> Int)(_ free: Free) -> Int {
 		return free.map(transform).reduce(0, combine: +)
 	}
 
