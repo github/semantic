@@ -15,4 +15,8 @@ extension TSNode {
 			return count(node)
 		}
 	}
+
+	var children: AnyRandomAccessCollection<TSNode> {
+		return AnyRandomAccessCollection(ChildrenCollection(node: self, count: ts_node_child_count, child: ts_node_child))
+	}
 }
