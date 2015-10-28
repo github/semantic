@@ -191,6 +191,12 @@ extension Int: CustomJSONConvertible {
 	}
 }
 
+extension Array where Element: CustomJSONConvertible {
+	public var JSON: Doubt.JSON {
+		return .Array(map(Doubt.JSON.init))
+	}
+}
+
 
 /// A type which can be converted to and from JSON.
 public protocol JSONConvertible: CustomJSONConvertible {
