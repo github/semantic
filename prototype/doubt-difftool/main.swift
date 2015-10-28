@@ -22,10 +22,7 @@ struct Info: Categorizable, CustomJSONConvertible, Equatable {
 
 	var JSON: Doubt.JSON {
 		return [
-			"range": [
-				range.startIndex.JSON,
-				(range.endIndex - range.startIndex).JSON,
-			],
+			"range": range.JSON,
 			"categories": Array(categories).JSON
 		]
 	}
