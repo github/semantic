@@ -1,5 +1,7 @@
 //  Copyright © 2015 GitHub. All rights reserved.
 
+typealias TSDocument = COpaquePointer
+
 extension TSNode {
 	var children: AnyRandomAccessCollection<TSNode> {
 		return AnyRandomAccessCollection(ChildrenCollection(node: self, count: ts_node_child_count, child: ts_node_child))
