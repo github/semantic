@@ -32,7 +32,7 @@ extension Cofree: CustomDebugStringConvertible {
 // MARK: - Functor
 
 extension Cofree {
-	public func map<Other>(transform: Annotation -> Other) -> Cofree<Leaf, Other> {
+	public func map<Other>(@noescape transform: Annotation -> Other) -> Cofree<Leaf, Other> {
 		return .Unroll(transform(extract), unwrap.map { $0.map(transform) })
 	}
 }
