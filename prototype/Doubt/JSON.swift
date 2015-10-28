@@ -193,7 +193,7 @@ extension Int: CustomJSONConvertible {
 
 extension Array where Element: CustomJSONConvertible {
 	public var JSON: Doubt.JSON {
-		return .Array(map(Doubt.JSON.init))
+		return .Array(map { Doubt.JSON($0) })
 	}
 }
 
