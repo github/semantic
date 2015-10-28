@@ -13,16 +13,16 @@ extension TSNode {
 		return start..<(start + ts_node_size(self).chars)
 	}
 
-	var children: AnyRandomAccessCollection<TSNode> {
-		return AnyRandomAccessCollection(ChildrenCollection(node: self, count: ts_node_child_count(self), child: ts_node_child))
+	var children: ChildrenCollection {
+		return ChildrenCollection(node: self, count: ts_node_child_count(self), child: ts_node_child)
 	}
 
-	var namedChildren: AnyRandomAccessCollection<TSNode> {
-		return AnyRandomAccessCollection(ChildrenCollection(node: self, count: ts_node_named_child_count(self), child: ts_node_named_child))
+	var namedChildren: ChildrenCollection {
+		return ChildrenCollection(node: self, count: ts_node_named_child_count(self), child: ts_node_named_child)
 	}
 
 
-	private struct ChildrenCollection: CollectionType {
+	struct ChildrenCollection: CollectionType {
 		let node: TSNode
 		let count: Int
 		let child: (TSNode, Int) -> TSNode
