@@ -95,8 +95,8 @@ public enum JSON: ArrayLiteralConvertible, BooleanLiteralConvertible, Dictionary
 
 	// MARK: ArrayLiteralConvertible
 
-	public init(arrayLiteral: Doubt.JSON...) {
-		self = .Array(arrayLiteral)
+	public init(arrayLiteral: CustomJSONConvertible...) {
+		self = .Array(arrayLiteral.map(Doubt.JSON.init))
 	}
 
 
