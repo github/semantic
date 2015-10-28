@@ -3,13 +3,8 @@
 typealias TSDocument = COpaquePointer
 
 extension TSNode {
-	func name(document: TSDocument) throws -> String {
-		guard let name = String.fromCString(ts_node_name(self, document)) else { throw E() }
-		return name
-	}
-
-	func category(document: TSDocument) throws -> Info.Category {
-		guard let category = Info.Category(rawValue: try name(document)) else { throw E() }
+	func category(document: TSDocument) throws -> String {
+		guard let category = String.fromCString(ts_node_name(self, document)) else { throw E() }
 		return category
 	}
 

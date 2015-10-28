@@ -77,13 +77,13 @@ func termWithInput(string: String) -> Term? {
 		return try? Cofree
 			.ana { node, category in
 				let count = node.namedChildren.count
-				guard count > 0 else { return Syntax.Leaf(category.rawValue) }
+				guard count > 0 else { return Syntax.Leaf(category) }
 				switch category {
-				case .Pair:
+				case "pair":
 					return try .Fixed(node.namedChildren.map {
 						($0, try $0.category(document))
 					})
-				case .Object:
+				case "object":
 					return try .Keyed(Dictionary(elements: node.namedChildren.map {
 						guard let range = $0.namedChildren.first?.range else { throw E() }
 						guard let name = String(string.utf16[String.UTF16View.Index(_offset: range.startIndex)..<String.UTF16View.Index(_offset: range.endIndex)]) else { throw E() }
@@ -94,7 +94,7 @@ func termWithInput(string: String) -> Term? {
 						($0, try $0.category(document))
 					})
 				}
-			} (root, Info.Category.Program)
+			} (root, "program")
 			.map { node, category in
 				node.range
 			}
