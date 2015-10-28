@@ -18,11 +18,12 @@ func termWithInput(string: String) -> Term? {
 		ts_document_parse(document)
 		let root = ts_document_root_node(document)
 
-		return Cofree
+		struct E: ErrorType {}
+		return try? Cofree
 			.ana { node in
 				let count = ts_node_named_child_count(node)
-				let name = String.fromCString(ts_node_name(node, document))
-				guard count > 0 else { return name.map(Syntax.Leaf)! }
+				guard let name = String.fromCString(ts_node_name(node, document)) else { throw E() }
+				guard count > 0 else { return Syntax.Leaf(name) }
 				return .Indexed((0..<count).map { ts_node_named_child(node, $0) })
 			} (root)
 			.map {
