@@ -65,7 +65,7 @@
     <div id="before" class="diff"></div>
     <div id="after" class="diff"></div>
     <script type="text/javascript">
-    loadJSON('diff.json', function (json) {
+    loadJSON((window.location.search || '?diff.json').substr(1), function (json) {
         var diff = diffFromJSON(json.diff);
         var before = diff.map(function(value) {
             var element;
