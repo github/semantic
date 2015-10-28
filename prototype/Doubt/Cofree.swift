@@ -126,7 +126,7 @@ extension CofreeType {
 	///
 	/// As this is the dual of `cata`, it’s unsurprising that we have a similar guarantee: coiteration is linear in the size of the constructed tree.
 	public static func ana(unfold: Annotation -> Syntax<Annotation, Leaf>)(_ seed: Annotation) -> Self {
-		return (Introduce(seed) <<< { $0.map(ana(unfold)) } <<< unfold) <| seed
+		return Self(seed, unfold(seed).map(ana(unfold)))
 	}
 
 	/// `Zip` two `CofreeType` values into a single `Cofree`, pairing their annotations.
