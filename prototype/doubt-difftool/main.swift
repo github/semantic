@@ -81,21 +81,19 @@ func termWithInput(string: String) -> Term? {
 				switch category {
 				case .Pair:
 					return try .Fixed(node.namedChildren.map {
-						guard let name = String.fromCString(ts_node_name($0, document)) else { throw E() }
-						guard let category = Info.Category(rawValue: name) else { throw E() }
+						guard let category = Info.Category(rawValue: try node.name(document)) else { throw E() }
 						return ($0, category)
 					})
 				case .Object:
 					return try .Keyed(Dictionary(elements: node.namedChildren.map {
-						guard let name = String.fromCString(ts_node_name($0, document)) else { throw E() }
+						let name = try node.name(document)
 						guard let category = Info.Category(rawValue: name) else { throw E() }
 						// fixme: this should return the key in the pair.
 						return (name, ($0, category))
 					}))
 				default:
 					return try .Indexed(node.namedChildren.map {
-						guard let name = String.fromCString(ts_node_name($0, document)) else { throw E() }
-						guard let category = Info.Category(rawValue: name) else { throw E() }
+						guard let category = Info.Category(rawValue: try node.name(document)) else { throw E() }
 						return ($0, category)
 					})
 				}
