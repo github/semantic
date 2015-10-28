@@ -56,10 +56,10 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	/// While not every function on a given `Free` can be computed using `cata`, these guarantees of termination and complexity, as well as the brevity and focus on the operation being performed n times, make it a desirable scaffolding for any function which can.
 	///
 	/// For a lucid, in-depth tutorial on recursion schemes, I recommend [Patrick Thomson](https://twitter.com/importantshock)’s _[An Introduction to Recursion Schemes](http://patrickthomson.ghost.io/an-introduction-to-recursion-schemes/)_ and _[Recursion Schemes, Part 2: A Mob of Morphisms](http://patrickthomson.ghost.io/recursion-schemes-part-2/)_.
-	public func cata(@noescape transform: Syntax<Value, Leaf> -> Value) -> Value {
-		return analysis(
+	public func cata(@noescape transform: Syntax<Value, Leaf> throws -> Value) rethrows -> Value {
+		return try analysis(
 			ifPure: id,
-			ifRoll: { transform($1.map { $0.cata(transform) }) })
+			ifRoll: { try transform($1.map { try $0.cata(transform) }) })
 	}
 
 
