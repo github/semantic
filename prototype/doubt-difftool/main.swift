@@ -9,7 +9,7 @@ func readFile(path: String) -> String? {
 
 typealias Term = Cofree<String, Range<Int>>
 
-struct Info {
+struct Info: Equatable {
 	let range: Range<Int>
 	let category: Category
 
@@ -35,6 +35,10 @@ struct Info {
 		case StringLiteral = "string"
 		case SubscriptAccess = "subscript_access"
 	}
+}
+
+func == (left: Info, right: Info) -> Bool {
+	return left.range == right.range && left.category == right.category
 }
 
 func termWithInput(string: String) -> Term? {
