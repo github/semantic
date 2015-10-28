@@ -78,12 +78,15 @@ func termWithInput(string: String) -> Term? {
 			.ana { node, category in
 				let count = ts_node_named_child_count(node)
 				guard count > 0 else { return Syntax.Leaf(category.rawValue) }
-				return try .Indexed((0..<count).map { index in
-					let child = ts_node_named_child(node, index)
-					guard let name = String.fromCString(ts_node_name(child, document)) else { throw E() }
-					guard let category = Info.Category(rawValue: name) else { throw E() }
-					return (child, category)
-				})
+				switch category {
+				default:
+					return try .Indexed((0..<count).map { index in
+						let child = ts_node_named_child(node, index)
+						guard let name = String.fromCString(ts_node_name(child, document)) else { throw E() }
+						guard let category = Info.Category(rawValue: name) else { throw E() }
+						return (child, category)
+					})
+				}
 			} (root, Info.Category.Program)
 			.map { node, category in
 				let start = ts_node_pos(node).chars
