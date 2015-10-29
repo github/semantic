@@ -34,6 +34,14 @@ func == (left: Info, right: Info) -> Bool {
 	return left.range == right.range && left.categories == right.categories
 }
 
+
+extension String.UTF16View {
+	subscript (range: Range<Int>) -> String.UTF16View {
+		return self[Index(_offset: range.startIndex)..<Index(_offset: range.endIndex)]
+	}
+}
+
+
 func termWithInput(string: String) -> Term? {
 	let document = ts_document_make()
 	defer { ts_document_free(document) }
