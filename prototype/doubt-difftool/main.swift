@@ -74,32 +74,30 @@ let aString = try NSString(contentsOfURL: aURL, encoding: NSUTF8StringEncoding) 
 let bString = try NSString(contentsOfURL: bURL, encoding: NSUTF8StringEncoding) as String
 guard let jsonPath = arguments[3] else { throw "need json path" }
 guard let uiPath = arguments[4] else { throw "need ui path" }
-if let jsonPath = arguments[3], uiPath = arguments[4] {
-	guard let aType = aURL.pathExtension, bType = bURL.pathExtension else { throw "can’t tell what type we have here" }
-	guard aType == bType else { throw "can’t compare files of different types" }
-	guard let language = languagesByFileExtension[aType] else { throw "don’t know how to parse files of type \(aType)" }
-	let parser: String -> Term? = termWithInput(language)
-	if let a = parser(aString), b = parser(bString) {
-		let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
-		let JSON: Doubt.JSON = [
-			"before": .String(aString),
-			"after": .String(bString),
-			"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: { $0.range.JSON }, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
-				[
-					"before": $0.range.JSON,
-					"after": $1.range.JSON,
-				]
-			}),
-		]
-		let data = JSON.serialize()
-		try data.writeToFile(jsonPath, options: .DataWritingAtomic)
+guard let aType = aURL.pathExtension, bType = bURL.pathExtension else { throw "can’t tell what type we have here" }
+guard aType == bType else { throw "can’t compare files of different types" }
+guard let language = languagesByFileExtension[aType] else { throw "don’t know how to parse files of type \(aType)" }
+let parser: String -> Term? = termWithInput(language)
+if let a = parser(aString), b = parser(bString) {
+	let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
+	let JSON: Doubt.JSON = [
+		"before": .String(aString),
+		"after": .String(bString),
+		"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: { $0.range.JSON }, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
+			[
+				"before": $0.range.JSON,
+				"after": $1.range.JSON,
+			]
+		}),
+	]
+	let data = JSON.serialize()
+	try data.writeToFile(jsonPath, options: .DataWritingAtomic)
 
-		let components = NSURLComponents()
-		components.scheme = "file"
-		components.path = uiPath
-		components.query = jsonPath
-		if let URL = components.URL {
-			NSWorkspace.sharedWorkspace().openURL(URL)
-		}
+	let components = NSURLComponents()
+	components.scheme = "file"
+	components.path = uiPath
+	components.query = jsonPath
+	if let URL = components.URL {
+		NSWorkspace.sharedWorkspace().openURL(URL)
 	}
 }
