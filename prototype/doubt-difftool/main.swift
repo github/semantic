@@ -73,7 +73,9 @@ func termWithInput(language: TSLanguage)(_ string: String) -> Term? {
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
-if let aURL = arguments[1].flatMap(NSURL.init), aString = readFile(aURL), bURL = arguments[2].flatMap(NSURL.init), bString = readFile(bURL), c = arguments[3], ui = arguments[4] {
+guard let aURL = arguments[1].flatMap(NSURL.init) else { throw "need state A" }
+guard let bURL = arguments[2].flatMap(NSURL.init) else { throw "need state B" }
+if let aString = readFile(aURL), bString = readFile(bURL), c = arguments[3], ui = arguments[4] {
 	guard let aType = aURL.pathExtension, bType = bURL.pathExtension else { throw "can’t tell what type we have here" }
 	guard aType == bType else { throw "can’t compare files of different types" }
 	guard let language = languagesByFileExtension[aType] else { throw "don’t know how to parse files of type \(aType)" }
