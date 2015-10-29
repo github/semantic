@@ -285,8 +285,7 @@
 				D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */,
 				D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */,
 				D4FB2CE51BDEBE7900B3CCE0 /* doubt-difftool-Bridging-Header.h */,
-				D4FB2CFF1BE2934E00B3CCE0 /* JavaScript */,
-				D4FB2CFE1BE2934A00B3CCE0 /* C */,
+				D4FB2D001BE2936800B3CCE0 /* Parsers */,
 				D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */,
 			);
 			path = "doubt-difftool";
@@ -306,6 +305,15 @@
 				D4FB2CF91BE28F6D00B3CCE0 /* parser.c */,
 			);
 			name = JavaScript;
+			sourceTree = "<group>";
+		};
+		D4FB2D001BE2936800B3CCE0 /* Parsers */ = {
+			isa = PBXGroup;
+			children = (
+				D4FB2CFF1BE2934E00B3CCE0 /* JavaScript */,
+				D4FB2CFE1BE2934A00B3CCE0 /* C */,
+			);
+			name = Parsers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
