@@ -7,6 +7,12 @@ extension String: ErrorType {}
 typealias Term = Cofree<String, Info>
 
 struct Source {
+	init?(_ argument: String) {
+		URL = NSURL(string: argument) ?? NSURL(fileURLWithPath: argument)
+		guard let type = URL.pathExtension else { return nil }
+		self.type = type
+	}
+
 	let URL: NSURL
 	let type: String
 }
