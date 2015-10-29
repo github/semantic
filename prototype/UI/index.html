@@ -62,35 +62,38 @@
     </script>
   </head>
   <body>
-    <div id="before" class="diff"></div>
-    <div id="after" class="diff"></div>
+		<div id="before" class="diff"></div>
+		<div id="after" class="diff"></div>
+
     <script type="text/javascript">
     loadJSON((window.location.search || '?diff.json').substr(1), function (json) {
         var diff = diffFromJSON(json.diff);
-        var before = diff.map(function(value) {
-            var element;
-            if (value.before != null) {
-                element = termToDOM(value.before, "before", json["before"]);
-                element.classList.add("delete");
-                if (value.after != null) {
-                    element.classList.add("replace");
-                }
-            }
-            return element || "";
-        });
-        var after = diff.map(function(value) {
-            var element;
-            if (value.after != null) {
-                element = termToDOM(value.after, "after", json["after"]);
-                element.classList.add("insert")
-                if (value.before != null) {
-                    element.classList.add("replace");
-                }
-            }
-            return element || "";
-        });
-        document.getElementById("before").appendChild(diffToDOM(before, "before", json["before"]));
-        document.getElementById("after").appendChild(diffToDOM(after, "after", json["after"]));
+
+        // var before = diff.map(function(value) {
+        //     var element;
+        //     if (value.before != null) {
+        //         element = termToDOM(value.before, "before", json["before"]);
+        //         element.classList.add("delete");
+        //         if (value.after != null) {
+        //             element.classList.add("replace");
+        //         }
+        //     }
+        //     return element || "";
+        // });
+        // var after = diff.map(function(value) {
+        //     var element;
+        //     if (value.after != null) {
+        //         element = termToDOM(value.after, "after", json["after"]);
+        //         element.classList.add("insert")
+        //         if (value.before != null) {
+        //             element.classList.add("replace");
+        //         }
+        //     }
+        //     return element || "";
+        // });
+				var dom = diffToDOM(diff, json["before"])
+				document.getElementById("before").appendChild(dom.before);
+				document.getElementById("after").appendChild(dom.after);
     });
     </script>
   </body>
