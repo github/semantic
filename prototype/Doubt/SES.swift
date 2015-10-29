@@ -34,6 +34,9 @@ public func SES<Term, Leaf, Annotation>(a: [Term], _ b: [Term], cost: Free<Leaf,
 
 		if let right = right, down = down, diagonal = diagonal {
 			let here = recur(a[i], b[j])
+			// If the diff at this vertex is zero-cost, we’re not going to find a cheaper one either rightwards or downwards. We can therefore short-circuit selecting the best outgoing edge and save ourselves evaluating the entire row rightwards and the entire column downwards from this point.
+			//
+			// Thus, in the best case (two equal sequences), we now complete in O(n + m). However, this optimization only applies to equalities at the beginning of the edit graph; once inequalities are encountered, the remainder of the diff is effectively O(nm).
 			if let here = here where cost(here) == 0 { return cons(here, rest: diagonal) }
 			let right = (right, Diff.Delete(a[i]), costOfStream(right))
 			let down = (down, Diff.Insert(b[j]), costOfStream(down))
