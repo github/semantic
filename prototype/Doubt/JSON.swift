@@ -10,6 +10,11 @@ public enum JSON: ArrayLiteralConvertible, BooleanLiteralConvertible, Dictionary
 	case Null
 
 
+	public init(_ convertible: CustomJSONConvertible) {
+		self = convertible.JSON
+	}
+
+
 	public var number: Double? {
 		if case let .Number(d) = self { return d }
 		return nil
@@ -183,6 +188,21 @@ extension String: CustomJSONConvertible {
 extension Int: CustomJSONConvertible {
 	public var JSON: Doubt.JSON {
 		return .Number(Double(self))
+	}
+}
+
+extension Array where Element: CustomJSONConvertible {
+	public var JSON: Doubt.JSON {
+		return .Array(map { Doubt.JSON($0) })
+	}
+}
+
+extension Range where Element: CustomJSONConvertible, Element.Distance: CustomJSONConvertible {
+	public var JSON: Doubt.JSON {
+		return [
+			startIndex.JSON,
+			count.JSON,
+		]
 	}
 }
 

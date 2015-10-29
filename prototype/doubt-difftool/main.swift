@@ -7,7 +7,32 @@ func readFile(path: String) -> String? {
 	return data as String?
 }
 
-typealias Term = Cofree<String, Range<Int>>
+extension String: ErrorType {}
+
+typealias Term = Cofree<String, Info>
+
+struct Info: Categorizable, CustomJSONConvertible, Equatable {
+	let range: Range<Int>
+
+
+	// MARK: Categorizable
+
+	let categories: Set<String>
+
+
+	// MARK: CustomJSONConvertible
+
+	var JSON: Doubt.JSON {
+		return [
+			"range": range.JSON,
+			"categories": Array(categories).JSON
+		]
+	}
+}
+
+func == (left: Info, right: Info) -> Bool {
+	return left.range == right.range && left.categories == right.categories
+}
 
 func termWithInput(string: String) -> Term? {
 	let document = ts_document_make()
@@ -18,17 +43,35 @@ func termWithInput(string: String) -> Term? {
 		ts_document_parse(document)
 		let root = ts_document_root_node(document)
 
-		return Cofree
-			.ana { node in
-				let count = ts_node_named_child_count(node)
-				guard count > 0 else {
-					return String.fromCString(ts_node_name(node, document)).map(Syntax.Leaf)!
+		return try? Cofree
+			.ana { node, category in
+				let count = node.namedChildren.count
+				guard count > 0 else { return Syntax.Leaf(category) }
+				switch category {
+				case "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary":
+					return try .Fixed(node.namedChildren.map {
+						($0, try $0.category(document))
+					})
+				case "object":
+					return try .Keyed(Dictionary(elements: node.namedChildren.map {
+						switch try $0.category(document) {
+						case "pair":
+							let range = $0.namedChildren[0].range
+							guard let name = String(string.utf16[String.UTF16View.Index(_offset: range.startIndex)..<String.UTF16View.Index(_offset: range.endIndex)]) else { throw "could not make a string from utf16 range '\(range)'" }
+							return (name, ($0, "pair"))
+						default:
+							// We might have a comment inside an object literal. It should still be assigned a key, however.
+							return try (String($0.range), ($0, $0.category(document)))
+						}
+					}))
+				default:
+					return try .Indexed(node.namedChildren.map {
+						($0, try $0.category(document))
+					})
 				}
-				return .Indexed((0..<count).map { ts_node_named_child(node, $0) })
-			} (root)
-			.map {
-				let start = ts_node_pos($0).chars
-				return start..<(start + ts_node_size($0).chars)
+			} (root, "program")
+			.map { node, category in
+				Info(range: node.range, categories: [ category ])
 			}
 	}
 }
@@ -36,22 +79,14 @@ func termWithInput(string: String) -> Term? {
 let arguments = BoundsCheckedArray(array: Process.arguments)
 if let aString = arguments[1].flatMap(readFile), bString = arguments[2].flatMap(readFile), c = arguments[3], ui = arguments[4] {
 	if let a = termWithInput(aString), b = termWithInput(bString) {
-		let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: const(true), cost: Free.sum(Patch.difference)).run(a, b)
-		let range: Range<Int> -> Doubt.JSON = {
-			let start = $0.startIndex
-			let end = $0.endIndex
-			return [
-				.Number(Double(start)),
-				.Number(Double(end - start)),
-			]
-		}
+		let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.difference)).run(a, b)
 		let JSON: Doubt.JSON = [
 			"before": .String(aString),
 			"after": .String(bString),
-			"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: range, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
+			"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: { $0.range.JSON }, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
 				[
-					"before": range($0),
-					"after": range($1),
+					"before": $0.range.JSON,
+					"after": $1.range.JSON,
 				]
 			}),
 		]
