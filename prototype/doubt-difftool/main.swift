@@ -20,7 +20,7 @@ struct Source {
 		return try NSString(contentsOfURL: URL, encoding: NSUTF8StringEncoding) as String
 	}
 
-	private static let languagesByFileExtension: [String:TSLanguage] = [
+	private static let languagesByType: [String:TSLanguage] = [
 		"js": ts_language_javascript(),
 		"c": ts_language_c(),
 		"h": ts_language_c(),
@@ -93,7 +93,7 @@ guard let jsonPath = arguments[3] else { throw "need json path" }
 guard let uiPath = arguments[4] else { throw "need ui path" }
 guard let aType = aURL.pathExtension, bType = bURL.pathExtension else { throw "can’t tell what type we have here" }
 guard aType == bType else { throw "can’t compare files of different types" }
-guard let language = Source.languagesByFileExtension[aType] else { throw "don’t know how to parse files of type \(aType)" }
+guard let language = Source.languagesByType[aType] else { throw "don’t know how to parse files of type \(aType)" }
 
 let parser: String -> Term? = termWithInput(language)
 guard let a = parser(aString) else { throw "couldn’t parse \(aURL)" }
