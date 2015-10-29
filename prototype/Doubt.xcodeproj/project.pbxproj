@@ -60,8 +60,8 @@
 		D4FB2CDA1BDEBC9D00B3CCE0 /* Stream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F096A1BCCC41600B95610 /* Stream.framework */; };
 		D4FB2CDC1BDEBCCD00B3CCE0 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */; };
 		D4FB2CE01BDEBD1C00B3CCE0 /* libruntime.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */; };
-		D4FB2CEA1BDEC7FA00B3CCE0 /* javascript.c in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CE91BDEC7FA00B3CCE0 /* javascript.c */; };
 		D4FB2CF81BE1560400B3CCE0 /* TSNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */; };
+		D4FB2CFA1BE28F6D00B3CCE0 /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CF91BE28F6D00B3CCE0 /* parser.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -128,8 +128,8 @@
 		D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libruntime.a; path = "External/tree-sitter/out/Release/libruntime.a"; sourceTree = SOURCE_ROOT; };
 		D4FB2CE51BDEBE7900B3CCE0 /* doubt-difftool-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "doubt-difftool-Bridging-Header.h"; sourceTree = "<group>"; };
-		D4FB2CE91BDEC7FA00B3CCE0 /* javascript.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = javascript.c; sourceTree = "<group>"; };
 		D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSNode.swift; sourceTree = "<group>"; };
+		D4FB2CF91BE28F6D00B3CCE0 /* parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = parser.c; path = "External/node-tree-sitter-javascript/src/parser.c"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -282,8 +282,8 @@
 			children = (
 				D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */,
 				D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */,
-				D4FB2CE91BDEC7FA00B3CCE0 /* javascript.c */,
 				D4FB2CE51BDEBE7900B3CCE0 /* doubt-difftool-Bridging-Header.h */,
+				D4FB2CF91BE28F6D00B3CCE0 /* parser.c */,
 				D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */,
 			);
 			path = "doubt-difftool";
@@ -509,8 +509,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D4FB2CEA1BDEC7FA00B3CCE0 /* javascript.c in Sources */,
 				D4FB2CF81BE1560400B3CCE0 /* TSNode.swift in Sources */,
+				D4FB2CFA1BE28F6D00B3CCE0 /* parser.c in Sources */,
 				D4FB2CDC1BDEBCCD00B3CCE0 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
