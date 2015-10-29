@@ -64,9 +64,7 @@ func termWithInput(string: String) -> Term? {
 					return try .Keyed(Dictionary(elements: node.namedChildren.map {
 						switch try $0.category(document) {
 						case "pair":
-							let range = $0.namedChildren[0].range
-							guard let key = String(string.utf16[range]) else { throw "could not make a string from utf16 range '\(range)'" }
-							return (key, ($0, "pair"))
+							return try ($0.namedChildren[0].substring(string), ($0, "pair"))
 						default:
 							// We might have a comment inside an object literal. It should still be assigned a key, however.
 							return try (String($0.range), ($0, $0.category(document)))
