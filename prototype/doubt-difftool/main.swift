@@ -79,26 +79,26 @@ guard aType == bType else { throw "can’t compare files of different types" }
 guard let language = languagesByFileExtension[aType] else { throw "don’t know how to parse files of type \(aType)" }
 
 let parser: String -> Term? = termWithInput(language)
-if let a = parser(aString), b = parser(bString) {
-	let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
-	let JSON: Doubt.JSON = [
-		"before": .String(aString),
-		"after": .String(bString),
-		"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: { $0.range.JSON }, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
-			[
-				"before": $0.range.JSON,
-				"after": $1.range.JSON,
-			]
-		}),
-	]
-	let data = JSON.serialize()
-	try data.writeToFile(jsonPath, options: .DataWritingAtomic)
+guard let a = parser(aString) else { throw "couldn’t parse \(aURL)" }
+guard let b = parser(bString) else { throw "couldn’t parse \(bURL)" }
+let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
+let JSON: Doubt.JSON = [
+	"before": .String(aString),
+	"after": .String(bString),
+	"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: { $0.range.JSON }, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
+		[
+			"before": $0.range.JSON,
+			"after": $1.range.JSON,
+		]
+	}),
+]
+let data = JSON.serialize()
+try data.writeToFile(jsonPath, options: .DataWritingAtomic)
 
-	let components = NSURLComponents()
-	components.scheme = "file"
-	components.path = uiPath
-	components.query = jsonPath
-	if let URL = components.URL {
-		NSWorkspace.sharedWorkspace().openURL(URL)
-	}
+let components = NSURLComponents()
+components.scheme = "file"
+components.path = uiPath
+components.query = jsonPath
+if let URL = components.URL {
+	NSWorkspace.sharedWorkspace().openURL(URL)
 }
