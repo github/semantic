@@ -49,7 +49,7 @@ func termWithInput(string: String) -> Term? {
 					return try .Fixed(node.namedChildren.map {
 						($0, try $0.category(document))
 					})
-				case "object":
+				case keyedProductions.contains:
 					return try .Keyed(Dictionary(elements: node.namedChildren.map {
 						switch try $0.category(document) {
 						case "pair":
