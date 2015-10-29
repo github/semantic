@@ -54,7 +54,8 @@ func termWithInput(string: String) -> Term? {
 		return try? Cofree
 			.ana { node, category in
 				let count = node.namedChildren.count
-				guard count > 0 else { return Syntax.Leaf(category) }
+				let substring = try node.substring(string)
+				guard count > 0 else { return Syntax.Leaf(substring) }
 				switch category {
 				case "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary":
 					return try .Fixed(node.namedChildren.map {
