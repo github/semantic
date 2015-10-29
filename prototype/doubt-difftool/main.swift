@@ -32,11 +32,11 @@ func ~= <A> (left: A -> Bool, right: A) -> Bool {
 }
 
 
-func termWithInput(string: String) -> Term? {
+func termWithInput(language: TSLanguage)(_ string: String) -> Term? {
 	let document = ts_document_make()
 	defer { ts_document_free(document) }
 	return string.withCString {
-		ts_document_set_language(document, ts_language_javascript())
+		ts_document_set_language(document, language)
 		ts_document_set_input_string(document, $0)
 		ts_document_parse(document)
 		let root = ts_document_root_node(document)
@@ -74,7 +74,7 @@ func termWithInput(string: String) -> Term? {
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
 if let aPath = arguments[1], aString = readFile(aPath), bPath = arguments[2], bString = readFile(bPath), c = arguments[3], ui = arguments[4] {
-	let parser: String -> Term? = termWithInput
+	let parser: String -> Term? = termWithInput(ts_language_javascript())
 	if let a = parser(aString), b = parser(bString) {
 		let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
 		let JSON: Doubt.JSON = [
