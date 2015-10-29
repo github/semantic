@@ -8,7 +8,7 @@ typealias Term = Cofree<String, Info>
 
 struct Source {
 	let URL: NSURL
-	let type: String?
+	let type: String
 }
 
 
