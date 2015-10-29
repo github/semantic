@@ -1,6 +1,7 @@
 //  Copyright © 2015 GitHub. All rights reserved.
 
 typealias TSDocument = COpaquePointer
+typealias TSLanguage = COpaquePointer
 
 extension TSNode {
 	func category(document: TSDocument) throws -> String {
