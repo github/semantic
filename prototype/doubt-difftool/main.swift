@@ -74,7 +74,8 @@ func termWithInput(language: TSLanguage)(_ string: String) -> Term? {
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
 if let aURL = arguments[1].flatMap(NSURL.init), aString = readFile(aURL), bURL = arguments[2].flatMap(NSURL.init), bString = readFile(bURL), c = arguments[3], ui = arguments[4] {
-	guard aURL.pathExtension == bURL.pathExtension else { throw "can’t compare files of different types" }
+	guard let aType = aURL.pathExtension, bType = bURL.pathExtension else { throw "can’t tell what type we have here" }
+	guard aType == bType else { throw "can’t compare files of different types" }
 	let parser: String -> Term? = termWithInput(ts_language_javascript())
 	if let a = parser(aString), b = parser(bString) {
 		let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
