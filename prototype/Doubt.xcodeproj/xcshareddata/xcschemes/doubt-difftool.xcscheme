@@ -71,10 +71,6 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "$(SRCROOT)/UI/doubt-difftool.js.json"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
             argument = "$(SRCROOT)/UI/index.html"
             isEnabled = "YES">
          </CommandLineArgument>
