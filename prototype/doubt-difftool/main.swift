@@ -15,6 +15,10 @@ struct Source {
 
 	let URL: NSURL
 	let type: String
+
+	func load() throws -> String {
+		return try NSString(contentsOfURL: URL, encoding: NSUTF8StringEncoding) as String
+	}
 }
 
 
