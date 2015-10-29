@@ -72,6 +72,8 @@ guard let aURL = arguments[1].flatMap(NSURL.init) else { throw "need state A" }
 guard let bURL = arguments[2].flatMap(NSURL.init) else { throw "need state B" }
 let aString = try NSString(contentsOfURL: aURL, encoding: NSUTF8StringEncoding) as String
 let bString = try NSString(contentsOfURL: bURL, encoding: NSUTF8StringEncoding) as String
+guard let jsonPath = arguments[3] else { throw "need json path" }
+guard let uiPath = arguments[4] else { throw "need ui path" }
 if let jsonPath = arguments[3], uiPath = arguments[4] {
 	guard let aType = aURL.pathExtension, bType = bURL.pathExtension else { throw "can’t tell what type we have here" }
 	guard aType == bType else { throw "can’t compare files of different types" }
