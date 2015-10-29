@@ -24,6 +24,7 @@ let languagesByFileExtension: [String:TSLanguage] = [
 ]
 
 let keyedProductions: Set<String> = [ "object" ]
+let fixedProductions: Set<String> = [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
 /// Allow predicates to occur in pattern matching.
 func ~= <A> (left: A -> Bool, right: A) -> Bool {
