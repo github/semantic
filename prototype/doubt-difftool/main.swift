@@ -72,7 +72,7 @@ guard let aURL = arguments[1].flatMap(NSURL.init) else { throw "need state A" }
 guard let bURL = arguments[2].flatMap(NSURL.init) else { throw "need state B" }
 let aString = try NSString(contentsOfURL: aURL, encoding: NSUTF8StringEncoding) as String
 let bString = try NSString(contentsOfURL: bURL, encoding: NSUTF8StringEncoding) as String
-if let c = arguments[3], ui = arguments[4] {
+if let jsonPath = arguments[3], uiPath = arguments[4] {
 	guard let aType = aURL.pathExtension, bType = bURL.pathExtension else { throw "can’t tell what type we have here" }
 	guard aType == bType else { throw "can’t compare files of different types" }
 	guard let language = languagesByFileExtension[aType] else { throw "don’t know how to parse files of type \(aType)" }
@@ -90,12 +90,12 @@ if let c = arguments[3], ui = arguments[4] {
 			}),
 		]
 		let data = JSON.serialize()
-		try data.writeToFile(c, options: .DataWritingAtomic)
+		try data.writeToFile(jsonPath, options: .DataWritingAtomic)
 
 		let components = NSURLComponents()
 		components.scheme = "file"
-		components.path = ui
-		components.query = c
+		components.path = uiPath
+		components.query = jsonPath
 		if let URL = components.URL {
 			NSWorkspace.sharedWorkspace().openURL(URL)
 		}
