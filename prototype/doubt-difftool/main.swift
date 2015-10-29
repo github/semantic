@@ -23,6 +23,7 @@ let languagesByFileExtension: [String:TSLanguage] = [
 	"c": ts_language_c(),
 ]
 
+/// Allow predicates to occur in pattern matching.
 func ~= <A> (left: A -> Bool, right: A) -> Bool {
 	return left(right)
 }
