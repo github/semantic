@@ -87,7 +87,7 @@ guard let aSource = try arguments[1].map(Source.init) else { throw "need source 
 guard let bSource = try arguments[2].map(Source.init) else { throw "need source B" }
 let temporary = try NSFileManager.defaultManager().URLForDirectory(.ItemReplacementDirectory, inDomain: .UserDomainMask, appropriateForURL: NSURL(fileURLWithPath: Process.arguments[0]).URLByDeletingLastPathComponent!, create: true)
 let jsonURL = temporary.URLByAppendingPathComponent("diff.json")
-guard let uiPath = arguments[4] else { throw "need ui path" }
+guard let uiPath = arguments[3] else { throw "need ui path" }
 guard aSource.type == bSource.type else { throw "can’t compare files of different types" }
 guard let parser = Source.languagesByType[aSource.type].map(termWithInput) else { throw "don’t know how to parse files of type \(aSource.type)" }
 
