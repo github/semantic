@@ -42,18 +42,18 @@ func ~= <A> (left: A -> Bool, right: A) -> Bool {
 }
 
 
-func termWithInput(language: TSLanguage)(_ string: String) -> Term? {
+func termWithInput(language: TSLanguage)(_ string: String) throws -> Term {
 	let keyedProductions: Set<String> = [ "object" ]
 	let fixedProductions: Set<String> = [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 	let document = ts_document_make()
 	defer { ts_document_free(document) }
-	return string.withCString {
+	return try string.withCString {
 		ts_document_set_language(document, language)
 		ts_document_set_input_string(document, $0)
 		ts_document_parse(document)
 		let root = ts_document_root_node(document)
 
-		return try? Cofree
+		return try Cofree
 			.ana { node, category in
 				let count = node.namedChildren.count
 				guard count > 0 else { return try Syntax.Leaf(node.substring(string)) }
@@ -95,9 +95,9 @@ guard let language = Source.languagesByType[aSource.type] else { throw "don’t 
 let aString = try aSource.load()
 let bString = try bSource.load()
 
-let parser: String -> Term? = termWithInput(language)
-guard let a = parser(aString) else { throw "couldn’t parse \(aSource.URL)" }
-guard let b = parser(bString) else { throw "couldn’t parse \(bSource.URL)" }
+let parser: String throws -> Term = termWithInput(language)
+let a = try parser(aString)
+let b = try parser(bString)
 let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
 let JSON: Doubt.JSON = [
 	"before": .String(aString),
