@@ -12,14 +12,12 @@ struct Source {
 		URL = NSURL(string: argument) ?? NSURL(fileURLWithPath: argument)
 		guard let type = URL.pathExtension else { throw "cannot tell the type of \(URL)" }
 		self.type = type
+		contents = try NSString(contentsOfURL: URL, encoding: NSUTF8StringEncoding) as String
 	}
 
 	let URL: NSURL
 	let type: String
-
-	func load() throws -> String {
-		return try NSString(contentsOfURL: URL, encoding: NSUTF8StringEncoding) as String
-	}
+	let contents: String
 
 	private static let languagesByType: [String:TSLanguage] = [
 		"js": ts_language_javascript(),
@@ -92,15 +90,12 @@ guard let uiPath = arguments[4] else { throw "need ui path" }
 guard aSource.type == bSource.type else { throw "can’t compare files of different types" }
 guard let parser = Source.languagesByType[aSource.type].map(termWithInput) else { throw "don’t know how to parse files of type \(aSource.type)" }
 
-let aString = try aSource.load()
-let bString = try bSource.load()
-
-let a = try parser(aString)
-let b = try parser(bString)
+let a = try parser(aSource.contents)
+let b = try parser(bSource.contents)
 let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
 let JSON: Doubt.JSON = [
-	"before": .String(aString),
-	"after": .String(bString),
+	"before": .String(aSource.contents),
+	"after": .String(bSource.contents),
 	"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: { $0.range.JSON }, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
 		[
 			"before": $0.range.JSON,
