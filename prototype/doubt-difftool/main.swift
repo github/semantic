@@ -35,9 +35,6 @@ extension String.UTF16View {
 }
 
 
-let keyedProductions: Set<String> = [ "object" ]
-let fixedProductions: Set<String> = [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
-
 /// Allow predicates to occur in pattern matching.
 func ~= <A> (left: A -> Bool, right: A) -> Bool {
 	return left(right)
@@ -45,6 +42,8 @@ func ~= <A> (left: A -> Bool, right: A) -> Bool {
 
 
 func termWithInput(language: TSLanguage)(_ string: String) -> Term? {
+	let keyedProductions: Set<String> = [ "object" ]
+	let fixedProductions: Set<String> = [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 	let document = ts_document_make()
 	defer { ts_document_free(document) }
 	return string.withCString {
