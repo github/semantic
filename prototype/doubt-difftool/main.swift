@@ -73,7 +73,7 @@ func termWithInput(string: String) -> Term? {
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
-if let aString = arguments[1].flatMap(readFile), bString = arguments[2].flatMap(readFile), c = arguments[3], ui = arguments[4] {
+if let aPath = arguments[1], aString = readFile(aPath), bPath = arguments[2], bString = readFile(bPath), c = arguments[3], ui = arguments[4] {
 	if let a = termWithInput(aString), b = termWithInput(bString) {
 		let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
 		let JSON: Doubt.JSON = [
