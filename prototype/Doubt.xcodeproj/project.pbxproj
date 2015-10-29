@@ -63,6 +63,7 @@
 		D4FB2CF81BE1560400B3CCE0 /* TSNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */; };
 		D4FB2CFA1BE28F6D00B3CCE0 /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CF91BE28F6D00B3CCE0 /* parser.c */; };
 		D4FB2CFC1BE292BB00B3CCE0 /* parser.c in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CFB1BE292BB00B3CCE0 /* parser.c */; };
+		D4FB2D021BE2943A00B3CCE0 /* Info.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2D011BE2943A00B3CCE0 /* Info.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -132,6 +133,7 @@
 		D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSNode.swift; sourceTree = "<group>"; };
 		D4FB2CF91BE28F6D00B3CCE0 /* parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = parser.c; path = "External/node-tree-sitter-javascript/src/parser.c"; sourceTree = SOURCE_ROOT; };
 		D4FB2CFB1BE292BB00B3CCE0 /* parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = parser.c; path = "External/tree-sitter-c/src/parser.c"; sourceTree = SOURCE_ROOT; };
+		D4FB2D011BE2943A00B3CCE0 /* Info.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Info.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -283,6 +285,7 @@
 			isa = PBXGroup;
 			children = (
 				D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */,
+				D4FB2D011BE2943A00B3CCE0 /* Info.swift */,
 				D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */,
 				D4FB2CE51BDEBE7900B3CCE0 /* doubt-difftool-Bridging-Header.h */,
 				D4FB2D001BE2936800B3CCE0 /* Parsers */,
@@ -539,6 +542,7 @@
 				D4FB2CF81BE1560400B3CCE0 /* TSNode.swift in Sources */,
 				D4FB2CFA1BE28F6D00B3CCE0 /* parser.c in Sources */,
 				D4FB2CFC1BE292BB00B3CCE0 /* parser.c in Sources */,
+				D4FB2D021BE2943A00B3CCE0 /* Info.swift in Sources */,
 				D4FB2CDC1BDEBCCD00B3CCE0 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
