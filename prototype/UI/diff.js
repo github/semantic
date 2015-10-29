@@ -77,7 +77,7 @@ function rangeAndSyntaxToDOM(source, syntax, range, getRange, recur) {
 		element.textContent = source.substr(range[0], range[1]);
 	} else if (syntax.indexed != null || syntax.fixed != null) {
 		var values = syntax.indexed || syntax.fixed;
-		elementA = document.createElement("ul");
+		element = document.createElement("ul");
 		var previous = range[0];
 		for (i in values) {
 			var child = values[i];
@@ -131,35 +131,71 @@ function rangeAndSyntaxToDOM(source, syntax, range, getRange, recur) {
 }
 
 /// Diff -> String -> DOM
-function diffToDOM(diff, source) {
-	if (diff.pure != null) {
-		return diff.pure;
+function diffToDOM(diff, sources) {
+
+	function getRange(diffOrTerm) {
+		if (diffOrTerm.pure != null) {
+			var beforeRange, afterRange;
+			if (diffOrTerm.pure.before != null) {
+				beforeRange = diffOrTerm.pure.before.extract
+			}
+
+			if (diffOrTerm.pure.after != null) {
+				afterRange = diffOrTerm.pure.after.extract
+			}
+			return { "before": beforeRange, "after": afterRange };
+		}
+		if (diffOrTerm.roll != null) {
+			return diffOrTerm.roll.extract;
+		}
+		if (diffOrTerm.extract != null) {
+			return diffOrTerm.extract;
+		}
 	}
 
-	function getRange(diff) {
-		if (diff.pure != null) {
-			return { "before": diff.pure.before.range, "after": diff.pure.after.range };
-		}
-		if (diff.roll != null) {
-			return diff.roll.extract;
-		}
+	if (diff.pure != null) {
+		return pureToDOM(sources, diff.pure, getRange, function(diff) {
+			return diffToDOM(diff, sources);
+		})
 	}
-	return rollToDOM(source, diff.roll, getRange, function(diff) {
-		return diffToDOM(diff, source);
+
+	return rollToDOM(sources, diff.roll, getRange, function(diff) {
+		return diffToDOM(diff, sources);
 	})
 }
 
-function rollToDOM(source, roll, getRangeFun, diffToDOMFun) {
-	var syntax = roll.unwrap
-	var range = roll.extract
+function pureToDOM(sources, patch, getRangeFun, diffToDOMFun) {
+	var elementA, elementB;
+	if (patch.before != null) {
+		elementA = rangeAndSyntaxToDOM(sources.before, patch.before.unwrap, patch.before.extract, getRangeFun, diffToDOMFun);
+		elementA.classList.add("delete");
+		if (patch.after != null) {
+			elementA.classList.add("replace");
+		}
+	}
+
+	if (patch.after != null) {
+		elementB = rangeAndSyntaxToDOM(sources.after, patch.after.unwrap, patch.after.extract, getRangeFun, diffToDOMFun);
+		elementB.classList.add("insert");
+		if (patch.before != null) {
+			elementB.classList.add("replace");
+		}
+	}
+
+	return { "before": elementA || "", "after": elementB || "" };
+}
+
+function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
+	var syntax = rollOrTerm.unwrap
+	var range = rollOrTerm.extract
 
 	var elementA;
 	var elementB;
 	if (syntax.leaf != null) {
 		elementA = document.createElement("span");
-		elementA.textContent = source.substr(range.before[0], range.before[1]);
+		elementA.textContent = sources.before.substr(range.before[0], range.before[1]);
 		elementB = document.createElement("span");
-		elementB.textContent = source.substr(range.after[0], range.after[1]);
+		elementB.textContent = sources.after.substr(range.after[0], range.after[1]);
 	} else if (syntax.indexed != null || syntax.fixed != null) {
 		var values = syntax.indexed || syntax.fixed;
 		elementA = document.createElement("ul");
@@ -171,11 +207,10 @@ function rollToDOM(source, roll, getRangeFun, diffToDOMFun) {
 			if (child.pure == "") continue;
 
 			var childRange = getRangeFun(child);
+			var beforeAfterChild = diffToDOMFun(child)
 			if (childRange.before != null) {
 				var beforeRange = childRange.before;
 
-				var beforeAfterChild = diffToDOMFun(child)
-				elementA.appendChild(document.createTextNode(source.substr(previousBefore, beforeRange[0] - previousBefore)));
 				elementA.appendChild(wrap("li", beforeAfterChild.before));
 
 				previousBefore = beforeRange[0] + beforeRange[1];
@@ -183,14 +218,13 @@ function rollToDOM(source, roll, getRangeFun, diffToDOMFun) {
 			if (childRange.after != null) {
 				var afterRange = childRange.after;
 
-				elementB.appendChild(document.createTextNode(source.substr(previousAfter, afterRange[0] - previousAfter)));
 				elementB.appendChild(wrap("li", beforeAfterChild.after));
 
-				previousAfter = beforeRange[0] + beforeRange[1];
+				previousAfter = afterRange[0] + afterRange[1];
 			}
 		}
-		var beforeText = source.substr(previousBefore, range.before[0] + range.before[1] - previousBefore);
-		var afterText = source.substr(previousAfter, range.after[0] + range.after[1] - previousAfter);
+		var beforeText = sources.before.substr(previousBefore, range.before[0] + range.before[1] - previousBefore);
+		var afterText = sources.after.substr(previousAfter, range.after[0] + range.after[1] - previousAfter);
 
 		elementA.appendChild(document.createTextNode(beforeText));
 		elementB.appendChild(document.createTextNode(afterText));

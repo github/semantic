@@ -91,7 +91,7 @@
         //     }
         //     return element || "";
         // });
-				var dom = diffToDOM(diff, json["before"])
+				var dom = diffToDOM(diff, { "before": json["before"] , "after": json["after"] })
 				document.getElementById("before").appendChild(dom.before);
 				document.getElementById("after").appendChild(dom.after);
     });
