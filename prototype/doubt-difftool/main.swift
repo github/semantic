@@ -6,6 +6,11 @@ extension String: ErrorType {}
 
 typealias Term = Cofree<String, Info>
 
+struct Source {
+	let URL: NSURL
+	let type: String?
+}
+
 
 extension String.UTF16View {
 	subscript (range: Range<Int>) -> String.UTF16View {
