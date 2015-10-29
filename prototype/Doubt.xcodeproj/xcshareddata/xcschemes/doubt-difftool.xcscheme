@@ -70,10 +70,6 @@
             argument = "https://raw.githubusercontent.com/jquery/jquery/2.1.4/src/effects.js"
             isEnabled = "YES">
          </CommandLineArgument>
-         <CommandLineArgument
-            argument = "$(SRCROOT)/UI/index.html"
-            isEnabled = "YES">
-         </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
