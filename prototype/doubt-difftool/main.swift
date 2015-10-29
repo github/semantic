@@ -68,7 +68,7 @@ func termWithInput(string: String) -> Term? {
 							return try ($0.namedChildren[0].substring(string), ($0, "pair"))
 						default:
 							// We might have a comment inside an object literal. It should still be assigned a key, however.
-							return try (String($0.range), ($0, $0.category(document)))
+							return try (substring, ($0, $0.category(document)))
 						}
 					}))
 				default:
