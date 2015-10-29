@@ -65,8 +65,8 @@ func termWithInput(string: String) -> Term? {
 						switch try $0.category(document) {
 						case "pair":
 							let range = $0.namedChildren[0].range
-							guard let name = String(string.utf16[range]) else { throw "could not make a string from utf16 range '\(range)'" }
-							return (name, ($0, "pair"))
+							guard let key = String(string.utf16[range]) else { throw "could not make a string from utf16 range '\(range)'" }
+							return (key, ($0, "pair"))
 						default:
 							// We might have a comment inside an object literal. It should still be assigned a key, however.
 							return try (String($0.range), ($0, $0.category(document)))
