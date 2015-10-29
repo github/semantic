@@ -18,6 +18,10 @@ extension String.UTF16View {
 	}
 }
 
+let languagesByFileExtension: [String:TSLanguage] = [
+	"js": ts_language_javascript(),
+]
+
 
 func termWithInput(string: String) -> Term? {
 	let document = ts_document_make()
