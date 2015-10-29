@@ -68,8 +68,8 @@ func termWithInput(language: TSLanguage)(_ string: String) -> Term? {
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
-guard let aURL = arguments[1].flatMap(NSURL.init) else { throw "need state A" }
-guard let bURL = arguments[2].flatMap(NSURL.init) else { throw "need state B" }
+guard let aURL = arguments[1].map(NSURL.init) else { throw "need state A" }
+guard let bURL = arguments[2].map(NSURL.init) else { throw "need state B" }
 let aString = try NSString(contentsOfURL: aURL, encoding: NSUTF8StringEncoding) as String
 let bString = try NSString(contentsOfURL: bURL, encoding: NSUTF8StringEncoding) as String
 guard let jsonPath = arguments[3] else { throw "need json path" }
