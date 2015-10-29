@@ -90,12 +90,11 @@ guard let bSource = try arguments[2].map(Source.init) else { throw "need source 
 guard let jsonPath = arguments[3] else { throw "need json path" }
 guard let uiPath = arguments[4] else { throw "need ui path" }
 guard aSource.type == bSource.type else { throw "can’t compare files of different types" }
-guard let language = Source.languagesByType[aSource.type] else { throw "don’t know how to parse files of type \(aSource.type)" }
+guard let parser = Source.languagesByType[aSource.type].map(termWithInput) else { throw "don’t know how to parse files of type \(aSource.type)" }
 
 let aString = try aSource.load()
 let bString = try bSource.load()
 
-let parser: String throws -> Term = termWithInput(language)
 let a = try parser(aString)
 let b = try parser(bString)
 let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
