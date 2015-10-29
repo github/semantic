@@ -13,6 +13,11 @@ extension TSNode {
 		return start..<(start + ts_node_size(self).chars)
 	}
 
+	func substring(string: String) throws -> String {
+		guard let result = String(string.utf16[range]) else { throw "could not make a string from utf16 range '\(range)'" }
+		return result
+	}
+
 	var children: ChildrenCollection {
 		return ChildrenCollection(node: self, count: ts_node_child_count(self), child: ts_node_child)
 	}

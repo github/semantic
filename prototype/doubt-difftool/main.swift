@@ -34,6 +34,14 @@ func == (left: Info, right: Info) -> Bool {
 	return left.range == right.range && left.categories == right.categories
 }
 
+
+extension String.UTF16View {
+	subscript (range: Range<Int>) -> String.UTF16View {
+		return self[Index(_offset: range.startIndex)..<Index(_offset: range.endIndex)]
+	}
+}
+
+
 func termWithInput(string: String) -> Term? {
 	let document = ts_document_make()
 	defer { ts_document_free(document) }
@@ -46,7 +54,7 @@ func termWithInput(string: String) -> Term? {
 		return try? Cofree
 			.ana { node, category in
 				let count = node.namedChildren.count
-				guard count > 0 else { return Syntax.Leaf(category) }
+				guard count > 0 else { return try Syntax.Leaf(node.substring(string)) }
 				switch category {
 				case "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary":
 					return try .Fixed(node.namedChildren.map {
@@ -56,12 +64,10 @@ func termWithInput(string: String) -> Term? {
 					return try .Keyed(Dictionary(elements: node.namedChildren.map {
 						switch try $0.category(document) {
 						case "pair":
-							let range = $0.namedChildren[0].range
-							guard let name = String(string.utf16[String.UTF16View.Index(_offset: range.startIndex)..<String.UTF16View.Index(_offset: range.endIndex)]) else { throw "could not make a string from utf16 range '\(range)'" }
-							return (name, ($0, "pair"))
+							return try ($0.namedChildren[0].substring(string), ($0, "pair"))
 						default:
 							// We might have a comment inside an object literal. It should still be assigned a key, however.
-							return try (String($0.range), ($0, $0.category(document)))
+							return try (try node.substring(string), ($0, $0.category(document)))
 						}
 					}))
 				default:
@@ -79,7 +85,7 @@ func termWithInput(string: String) -> Term? {
 let arguments = BoundsCheckedArray(array: Process.arguments)
 if let aString = arguments[1].flatMap(readFile), bString = arguments[2].flatMap(readFile), c = arguments[3], ui = arguments[4] {
 	if let a = termWithInput(aString), b = termWithInput(bString) {
-		let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.difference)).run(a, b)
+		let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
 		let JSON: Doubt.JSON = [
 			"before": .String(aString),
 			"after": .String(bString),
