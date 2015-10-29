@@ -33,9 +33,11 @@ public func SES<Term, Leaf, Annotation>(a: [Term], _ b: [Term], cost: Free<Leaf,
 		let diagonal = matrix[i + 1, j + 1]
 
 		if let right = right, down = down, diagonal = diagonal {
+			let here = recur(a[i], b[j])
+			if let here = here where cost(here) == 0 { return cons(here, rest: diagonal) }
 			let right = (right, Diff.Delete(a[i]), costOfStream(right))
 			let down = (down, Diff.Insert(b[j]), costOfStream(down))
-			let diagonal = recur(a[i], b[j]).map { (diagonal, $0, costOfStream(diagonal)) }
+			let diagonal = here.map { (diagonal, $0, costOfStream(diagonal)) }
 			// nominate the best edge to continue along, not considering diagonal if `recur` returned `nil`.
 			let (best, diff, _) = diagonal
 				.map { min($0, right, down) { $0.2 < $1.2 } }
