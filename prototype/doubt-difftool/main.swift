@@ -54,8 +54,7 @@ func termWithInput(string: String) -> Term? {
 		return try? Cofree
 			.ana { node, category in
 				let count = node.namedChildren.count
-				let substring = try node.substring(string)
-				guard count > 0 else { return Syntax.Leaf(substring) }
+				guard count > 0 else { return try Syntax.Leaf(node.substring(string)) }
 				switch category {
 				case "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary":
 					return try .Fixed(node.namedChildren.map {
@@ -68,7 +67,7 @@ func termWithInput(string: String) -> Term? {
 							return try ($0.namedChildren[0].substring(string), ($0, "pair"))
 						default:
 							// We might have a comment inside an object literal. It should still be assigned a key, however.
-							return try (substring, ($0, $0.category(document)))
+							return try (try node.substring(string), ($0, $0.category(document)))
 						}
 					}))
 				default:
