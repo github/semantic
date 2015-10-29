@@ -10,3 +10,6 @@
 [submodule "prototype/External/SwiftCheck"]
 	path = prototype/External/SwiftCheck
 	url = https://github.com/typelift/SwiftCheck.git
+[submodule "prototype/External/tree-sitter"]
+	path = prototype/External/tree-sitter
+	url = https://github.com/maxbrunsfeld/tree-sitter.git

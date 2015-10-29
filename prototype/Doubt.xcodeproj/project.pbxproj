@@ -53,6 +53,15 @@
 		D4DF970A1BC5DF800040F41F /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DF97091BC5DF800040F41F /* main.swift */; };
 		D4DF970C1BC5DF9E0040F41F /* BoundsCheckedArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = D435B7521BB31BBC000902F6 /* BoundsCheckedArray.swift */; };
 		D4DF970D1BC5E1B40040F41F /* Doubt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4AAE4FD1B5AE22E004E581F /* Doubt.framework */; };
+		D4FB2CD61BDEBC9000B3CCE0 /* Doubt.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4AAE4FD1B5AE22E004E581F /* Doubt.framework */; };
+		D4FB2CD71BDEBC9D00B3CCE0 /* Either.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09671BCCC41600B95610 /* Either.framework */; };
+		D4FB2CD81BDEBC9D00B3CCE0 /* Memo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09681BCCC41600B95610 /* Memo.framework */; };
+		D4FB2CD91BDEBC9D00B3CCE0 /* Prelude.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F09691BCCC41600B95610 /* Prelude.framework */; };
+		D4FB2CDA1BDEBC9D00B3CCE0 /* Stream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D42F096A1BCCC41600B95610 /* Stream.framework */; };
+		D4FB2CDC1BDEBCCD00B3CCE0 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */; };
+		D4FB2CE01BDEBD1C00B3CCE0 /* libruntime.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */; };
+		D4FB2CEA1BDEC7FA00B3CCE0 /* javascript.c in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CE91BDEC7FA00B3CCE0 /* javascript.c */; };
+		D4FB2CF81BE1560400B3CCE0 /* TSNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +71,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = D4AAE4FC1B5AE22E004E581F;
 			remoteInfo = Doubt;
+		};
+		D4FB2CE31BDEBD4200B3CCE0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D4AAE4F41B5AE22E004E581F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D485A7841BDEB6C5003A17B6;
+			remoteInfo = runtime;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -108,6 +124,12 @@
 		D4DF96F01BC54C970040F41F /* Doubt.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = Doubt.modulemap; sourceTree = "<group>"; };
 		D4DF96FB1BC5DF050040F41F /* doubt-json.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "doubt-json.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D4DF97091BC5DF800040F41F /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		D4FB2CC91BDEBC6300B3CCE0 /* doubt-difftool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "doubt-difftool.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libruntime.a; path = "External/tree-sitter/out/Release/libruntime.a"; sourceTree = SOURCE_ROOT; };
+		D4FB2CE51BDEBE7900B3CCE0 /* doubt-difftool-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "doubt-difftool-Bridging-Header.h"; sourceTree = "<group>"; };
+		D4FB2CE91BDEC7FA00B3CCE0 /* javascript.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = javascript.c; sourceTree = "<group>"; };
+		D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSNode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -149,6 +171,19 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D4FB2CC61BDEBC6300B3CCE0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4FB2CD61BDEBC9000B3CCE0 /* Doubt.framework in Frameworks */,
+				D4FB2CD71BDEBC9D00B3CCE0 /* Either.framework in Frameworks */,
+				D4FB2CD81BDEBC9D00B3CCE0 /* Memo.framework in Frameworks */,
+				D4FB2CE01BDEBD1C00B3CCE0 /* libruntime.a in Frameworks */,
+				D4FB2CD91BDEBC9D00B3CCE0 /* Prelude.framework in Frameworks */,
+				D4FB2CDA1BDEBC9D00B3CCE0 /* Stream.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -158,6 +193,7 @@
 				D4AAE4FF1B5AE22E004E581F /* Doubt */,
 				D4AAE5111B5AE22E004E581F /* DoubtTests */,
 				D4DF96FC1BC5DF050040F41F /* doubt-json */,
+				D4FB2CCA1BDEBC6300B3CCE0 /* doubt-difftool */,
 				D4AAE4FE1B5AE22E004E581F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -168,6 +204,7 @@
 				D4AAE4FD1B5AE22E004E581F /* Doubt.framework */,
 				D4AAE50D1B5AE22E004E581F /* DoubtTests.xctest */,
 				D4DF96FB1BC5DF050040F41F /* doubt-json.app */,
+				D4FB2CC91BDEBC6300B3CCE0 /* doubt-difftool.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -240,6 +277,18 @@
 			path = "doubt-json";
 			sourceTree = "<group>";
 		};
+		D4FB2CCA1BDEBC6300B3CCE0 /* doubt-difftool */ = {
+			isa = PBXGroup;
+			children = (
+				D4FB2CDB1BDEBCCD00B3CCE0 /* main.swift */,
+				D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */,
+				D4FB2CE91BDEC7FA00B3CCE0 /* javascript.c */,
+				D4FB2CE51BDEBE7900B3CCE0 /* doubt-difftool-Bridging-Header.h */,
+				D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */,
+			);
+			path = "doubt-difftool";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -251,6 +300,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
+
+/* Begin PBXLegacyTarget section */
+		D485A7841BDEB6C5003A17B6 /* runtime */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = D485A7871BDEB6C5003A17B6 /* Build configuration list for PBXLegacyTarget "runtime" */;
+			buildPhases = (
+			);
+			buildToolPath = "$(SRCROOT)/script/tree-sitter.sh";
+			buildWorkingDirectory = "$(SRCROOT)/External/tree-sitter";
+			dependencies = (
+			);
+			name = runtime;
+			passBuildSettingsInEnvironment = 1;
+			productName = "tree-sitter";
+		};
+/* End PBXLegacyTarget section */
 
 /* Begin PBXNativeTarget section */
 		D4AAE4FC1B5AE22E004E581F /* Doubt */ = {
@@ -295,7 +361,6 @@
 			buildPhases = (
 				D4DF96F71BC5DF050040F41F /* Sources */,
 				D4DF96F81BC5DF050040F41F /* Frameworks */,
-				D4DF96F91BC5DF050040F41F /* Resources */,
 			);
 			buildRules = (
 			);
@@ -306,16 +371,36 @@
 			productReference = D4DF96FB1BC5DF050040F41F /* doubt-json.app */;
 			productType = "com.apple.product-type.application";
 		};
+		D4FB2CC81BDEBC6300B3CCE0 /* doubt-difftool */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D4FB2CD31BDEBC6300B3CCE0 /* Build configuration list for PBXNativeTarget "doubt-difftool" */;
+			buildPhases = (
+				D4FB2CC51BDEBC6300B3CCE0 /* Sources */,
+				D4FB2CC61BDEBC6300B3CCE0 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D4FB2CE41BDEBD4200B3CCE0 /* PBXTargetDependency */,
+			);
+			name = "doubt-difftool";
+			productName = "doubt-difftool";
+			productReference = D4FB2CC91BDEBC6300B3CCE0 /* doubt-difftool.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		D4AAE4F41B5AE22E004E581F /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0700;
+				LastSwiftUpdateCheck = 0710;
 				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = GitHub;
 				TargetAttributes = {
+					D485A7841BDEB6C5003A17B6 = {
+						CreatedOnToolsVersion = 7.1;
+					};
 					D4AAE4FC1B5AE22E004E581F = {
 						CreatedOnToolsVersion = 7.0;
 					};
@@ -324,6 +409,9 @@
 					};
 					D4DF96FA1BC5DF050040F41F = {
 						CreatedOnToolsVersion = 7.0.1;
+					};
+					D4FB2CC81BDEBC6300B3CCE0 = {
+						CreatedOnToolsVersion = 7.1;
 					};
 				};
 			};
@@ -343,6 +431,8 @@
 				D4AAE4FC1B5AE22E004E581F /* Doubt */,
 				D4AAE50C1B5AE22E004E581F /* DoubtTests */,
 				D4DF96FA1BC5DF050040F41F /* doubt-json */,
+				D4FB2CC81BDEBC6300B3CCE0 /* doubt-difftool */,
+				D485A7841BDEB6C5003A17B6 /* runtime */,
 			);
 		};
 /* End PBXProject section */
@@ -356,13 +446,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		D4AAE50B1B5AE22E004E581F /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		D4DF96F91BC5DF050040F41F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -422,6 +505,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D4FB2CC51BDEBC6300B3CCE0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D4FB2CEA1BDEC7FA00B3CCE0 /* javascript.c in Sources */,
+				D4FB2CF81BE1560400B3CCE0 /* TSNode.swift in Sources */,
+				D4FB2CDC1BDEBCCD00B3CCE0 /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -430,9 +523,38 @@
 			target = D4AAE4FC1B5AE22E004E581F /* Doubt */;
 			targetProxy = D4AAE50F1B5AE22E004E581F /* PBXContainerItemProxy */;
 		};
+		D4FB2CE41BDEBD4200B3CCE0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D485A7841BDEB6C5003A17B6 /* runtime */;
+			targetProxy = D4FB2CE31BDEBD4200B3CCE0 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		D485A7851BDEB6C5003A17B6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUGGING_SYMBOLS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		D485A7861BDEB6C5003A17B6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		D4AAE5151B5AE22E004E581F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -621,9 +743,62 @@
 			};
 			name = Release;
 		};
+		D4FB2CD41BDEBC6300B3CCE0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/External/tree-sitter/include/";
+				INFOPLIST_FILE = "doubt-difftool/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/External/tree-sitter/out/Release",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.antitypical.doubt-difftool";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "doubt-difftool/doubt-difftool-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		D4FB2CD51BDEBC6300B3CCE0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				HEADER_SEARCH_PATHS = "$(SRCROOT)/External/tree-sitter/include/";
+				INFOPLIST_FILE = "doubt-difftool/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/External/tree-sitter/out/Release",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.antitypical.doubt-difftool";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "doubt-difftool/doubt-difftool-Bridging-Header.h";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		D485A7871BDEB6C5003A17B6 /* Build configuration list for PBXLegacyTarget "runtime" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D485A7851BDEB6C5003A17B6 /* Debug */,
+				D485A7861BDEB6C5003A17B6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		D4AAE4F71B5AE22E004E581F /* Build configuration list for PBXProject "Doubt" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -656,6 +831,15 @@
 			buildConfigurations = (
 				D4DF97051BC5DF050040F41F /* Debug */,
 				D4DF97061BC5DF050040F41F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D4FB2CD31BDEBC6300B3CCE0 /* Build configuration list for PBXNativeTarget "doubt-difftool" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D4FB2CD41BDEBC6300B3CCE0 /* Debug */,
+				D4FB2CD51BDEBC6300B3CCE0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

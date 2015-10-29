@@ -21,12 +21,12 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	}
 
 
-	public func analysis<C>(@noescape ifPure ifPure: Value -> C, @noescape ifRoll: (Annotation, Syntax<Free, Leaf>) -> C) -> C {
+	public func analysis<C>(@noescape ifPure ifPure: Value throws -> C, @noescape ifRoll: (Annotation, Syntax<Free, Leaf>) throws -> C) rethrows -> C {
 		switch self {
 		case let .Pure(b):
-			return ifPure(b)
+			return try ifPure(b)
 		case let .Roll(s):
-			return ifRoll(s)
+			return try ifRoll(s)
 		}
 	}
 
@@ -56,15 +56,15 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	/// While not every function on a given `Free` can be computed using `cata`, these guarantees of termination and complexity, as well as the brevity and focus on the operation being performed n times, make it a desirable scaffolding for any function which can.
 	///
 	/// For a lucid, in-depth tutorial on recursion schemes, I recommend [Patrick Thomson](https://twitter.com/importantshock)’s _[An Introduction to Recursion Schemes](http://patrickthomson.ghost.io/an-introduction-to-recursion-schemes/)_ and _[Recursion Schemes, Part 2: A Mob of Morphisms](http://patrickthomson.ghost.io/recursion-schemes-part-2/)_.
-	public func cata(transform: Syntax<Value, Leaf> -> Value) -> Value {
-		return analysis(
+	public func cata(@noescape transform: Syntax<Value, Leaf> throws -> Value) rethrows -> Value {
+		return try analysis(
 			ifPure: id,
-			ifRoll: { $1.map { $0.cata(transform) } } >>> transform)
+			ifRoll: { try transform($1.map { try $0.cata(transform) }) })
 	}
 
 
 	/// Reduces the receiver top-down, left-to-right, starting from an `initial` value, and applying `combine` to successive values.
-	public func reduce(initial: Value, combine: (Value, Value) -> Value) -> Value {
+	public func reduce(initial: Value, @noescape combine: (Value, Value) -> Value) -> Value {
 		return cata {
 			switch $0 {
 			case .Leaf:
@@ -80,22 +80,22 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	}
 
 	/// Returns a function which sums `Free`s by first `transform`ing `Pure` values into integers, and then summing these.
-	public static func sum(transform: Value -> Int)(_ free: Free) -> Int {
+	public static func sum(@noescape transform: Value -> Int)(_ free: Free) -> Int {
 		return free.map(transform).reduce(0, combine: +)
 	}
 
 
 	// MARK: Functor
 
-	public func map<C>(@noescape transform: Value -> C) -> Free<Leaf, Annotation, C> {
-		return analysis(ifPure: { .Pure(transform($0)) }, ifRoll: { .Roll($0, $1.map { $0.map(transform) }) })
+	public func map<C>(@noescape transform: Value throws -> C) rethrows -> Free<Leaf, Annotation, C> {
+		return try analysis(ifPure: { try .Pure(transform($0)) }, ifRoll: { try .Roll($0, $1.map { try $0.map(transform) }) })
 	}
 
 
 	// MARK: Monad
 
-	public func flatMap<C>(@noescape transform: Value -> Free<Leaf, Annotation, C>) -> Free<Leaf, Annotation, C> {
-		return analysis(ifPure: transform, ifRoll: { .Roll($0, $1.map { $0.flatMap(transform) }) })
+	public func flatMap<C>(@noescape transform: Value throws -> Free<Leaf, Annotation, C>) rethrows -> Free<Leaf, Annotation, C> {
+		return try analysis(ifPure: transform, ifRoll: { try .Roll($0, $1.map { try $0.flatMap(transform) }) })
 	}
 
 
@@ -122,8 +122,8 @@ extension Free {
 	/// Anamorphism over `Free`.
 	///
 	/// Unfolds a tree bottom-up by recursively applying `transform` to a series of values starting with `seed`. Since `Syntax.Leaf` does not recur, this will halt when it has produced leaves for every branch.
-	public static func ana(unfold: Annotation -> Syntax<Annotation, Leaf>)(_ seed: Annotation) -> Free {
-		return (Introduce(seed) <<< { $0.map(ana(unfold)) } <<< unfold) <| seed
+	public static func ana(@noescape unfold: Annotation throws -> Syntax<Annotation, Leaf>)(_ seed: Annotation) rethrows -> Free {
+		return try Roll(seed, unfold(seed).map { try ana(unfold)($0) })
 	}
 }
 
@@ -131,11 +131,11 @@ extension Free {
 extension Free where Value: PatchType, Value.Element == Cofree<Leaf, ()> {
 	public typealias Term = Value.Element
 
-	public func merge(transform: Value -> Term) -> Term {
+	public func merge(@noescape transform: Value -> Term) -> Term {
 		return map(transform).cata { Cofree((), $0) }
 	}
 
-	public func merge(transform: Value -> Term?) -> Term? {
+	public func merge(@noescape transform: Value -> Term?) -> Term? {
 		return map(transform).cata(Free.discardNullTerms)
 	}
 
