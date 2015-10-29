@@ -2,8 +2,8 @@ import Cocoa
 import Doubt
 import Prelude
 
-func readFile(path: String) -> String? {
-	guard let data = try? NSString(contentsOfFile: path, encoding: NSUTF8StringEncoding) else { return nil }
+func readFile(URL: NSURL) -> String? {
+	guard let data = try? NSString(contentsOfURL: URL, encoding: NSUTF8StringEncoding) else { return nil }
 	return data as String?
 }
 
@@ -73,7 +73,7 @@ func termWithInput(language: TSLanguage)(_ string: String) -> Term? {
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
-if let aPath = arguments[1], aString = readFile(aPath), bPath = arguments[2], bString = readFile(bPath), c = arguments[3], ui = arguments[4] {
+if let aURL = arguments[1].flatMap(NSURL.init), aString = readFile(aURL), bURL = arguments[2].flatMap(NSURL.init), bString = readFile(bURL), c = arguments[3], ui = arguments[4] {
 	let parser: String -> Term? = termWithInput(ts_language_javascript())
 	if let a = parser(aString), b = parser(bString) {
 		let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
