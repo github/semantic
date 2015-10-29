@@ -23,6 +23,10 @@ let languagesByFileExtension: [String:TSLanguage] = [
 	"c": ts_language_c(),
 ]
 
+func ~= <A> (left: A -> Bool, right: A) -> Bool {
+	return left(right)
+}
+
 
 func termWithInput(string: String) -> Term? {
 	let document = ts_document_make()
