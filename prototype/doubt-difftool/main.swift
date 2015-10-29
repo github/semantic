@@ -16,6 +16,7 @@ extension String.UTF16View {
 let languagesByFileExtension: [String:TSLanguage] = [
 	"js": ts_language_javascript(),
 	"c": ts_language_c(),
+	"h": ts_language_c(),
 ]
 
 let keyedProductions: Set<String> = [ "object" ]
