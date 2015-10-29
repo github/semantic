@@ -16,3 +16,6 @@
 [submodule "prototype/External/node-tree-sitter-javascript"]
 	path = prototype/External/node-tree-sitter-javascript
 	url = https://github.com/maxbrunsfeld/node-tree-sitter-javascript.git
+[submodule "prototype/External/tree-sitter-c"]
+	path = prototype/External/tree-sitter-c
+	url = https://github.com/maxbrunsfeld/tree-sitter-c.git
