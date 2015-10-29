@@ -5,6 +5,7 @@ import Prelude
 extension String: ErrorType {}
 
 typealias Term = Cofree<String, Info>
+typealias Parser = String throws -> Term
 
 struct Source {
 	init(_ argument: String) throws {
