@@ -7,9 +7,9 @@ extension String: ErrorType {}
 typealias Term = Cofree<String, Info>
 
 struct Source {
-	init?(_ argument: String) {
+	init(_ argument: String) throws {
 		URL = NSURL(string: argument) ?? NSURL(fileURLWithPath: argument)
-		guard let type = URL.pathExtension else { return nil }
+		guard let type = URL.pathExtension else { throw "cannot tell the type of \(URL)" }
 		self.type = type
 	}
 
@@ -84,19 +84,19 @@ func termWithInput(language: TSLanguage)(_ string: String) -> Term? {
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
-guard let aURL = arguments[1].map(NSURL.init) else { throw "need path for state A" }
-guard let bURL = arguments[2].map(NSURL.init) else { throw "need path for state B" }
-let aString = try NSString(contentsOfURL: aURL, encoding: NSUTF8StringEncoding) as String
-let bString = try NSString(contentsOfURL: bURL, encoding: NSUTF8StringEncoding) as String
+guard let aSource = try arguments[1].map(Source.init) else { throw "need source A" }
+guard let bSource = try arguments[2].map(Source.init) else { throw "need source B" }
 guard let jsonPath = arguments[3] else { throw "need json path" }
 guard let uiPath = arguments[4] else { throw "need ui path" }
-guard let aType = aURL.pathExtension, bType = bURL.pathExtension else { throw "can’t tell what type we have here" }
-guard aType == bType else { throw "can’t compare files of different types" }
-guard let language = Source.languagesByType[aType] else { throw "don’t know how to parse files of type \(aType)" }
+guard aSource.type == bSource.type else { throw "can’t compare files of different types" }
+guard let language = Source.languagesByType[aSource.type] else { throw "don’t know how to parse files of type \(aSource.type)" }
+
+let aString = try aSource.load()
+let bString = try bSource.load()
 
 let parser: String -> Term? = termWithInput(language)
-guard let a = parser(aString) else { throw "couldn’t parse \(aURL)" }
-guard let b = parser(bString) else { throw "couldn’t parse \(bURL)" }
+guard let a = parser(aString) else { throw "couldn’t parse \(aSource.URL)" }
+guard let b = parser(bString) else { throw "couldn’t parse \(bSource.URL)" }
 let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
 let JSON: Doubt.JSON = [
 	"before": .String(aString),
