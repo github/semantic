@@ -111,6 +111,19 @@ func toTerm(term: CofreeJSON) -> Term {
 	}
 }
 
+func lines(input: String) -> Term {
+	var lines: [Term] = []
+	var previous = 0
+	input.enumerateSubstringsInRange(input.characters.indices, options: .ByLines) { (line, _, enclosingRange, _) in
+		let range: Range<Int> = previous..<enclosingRange.count
+		previous = range.endIndex
+		if let line = line {
+			lines.append(Term(Info(range: range, categories: []), Syntax.Leaf(line)))
+		}
+	}
+	return Term(Info(range: 0..<input.utf16.count, categories: []), .Indexed(lines))
+}
+
 func parserForType(type: String) -> (String throws -> Term)? {
 	switch type {
 	case "json":
