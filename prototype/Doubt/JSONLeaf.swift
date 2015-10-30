@@ -1,13 +1,3 @@
-//
-//  JSONLeaf.swift
-//  Doubt
-//
-//  Created by Josh Vera on 10/16/15.
-//  Copyright © 2015 GitHub. All rights reserved.
-//
-
-import Foundation
-
 typealias Term = Cofree<JSONLeaf, Range<String.Index>>
 typealias Diff = Free<JSONLeaf, Term.Annotation, Patch<Term>>
 
