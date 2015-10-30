@@ -7,17 +7,7 @@ struct Info: Categorizable, CustomJSONConvertible, Equatable {
 	init(range: Range<String.CharacterView.Index>, leaf: JSONLeaf) {
 		// FIXME: this is terrible. see also https://github.com/github/semantic-diff/issues/136
 		self.range = Int(String(range.startIndex))!..<Int(String(range.endIndex))!
-
-		switch leaf {
-		case .Number:
-			self.categories = [ "number" ]
-		case .Boolean:
-			self.categories = [ "boolean" ]
-		case .String:
-			self.categories = [ "string" ]
-		case .Null:
-			self.categories = [ "null" ]
-		}
+		self.categories = leaf.categories
 	}
 
 	let range: Range<Int>
