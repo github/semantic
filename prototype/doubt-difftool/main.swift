@@ -25,7 +25,8 @@ struct Source {
 
 	let URL: NSURL
 	var type: String  {
-		return URL.pathExtension ?? URL.fragment ?? ""
+		if let pathExtension = URL.pathExtension where pathExtension != "" { return pathExtension }
+		return URL.fragment ?? ""
 	}
 	let contents: String
 
