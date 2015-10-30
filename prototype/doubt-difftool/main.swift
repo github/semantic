@@ -1,6 +1,7 @@
 import Cocoa
 import Doubt
 import Prelude
+import Madness
 
 func benchmark<T>(label: String? = nil, _ f: () -> T) -> T {
 	let start = NSDate.timeIntervalSinceReferenceDate()
@@ -106,6 +107,15 @@ func toTerm(term: CofreeJSON) -> Term {
 
 func parserForType(type: String) -> (String throws -> Term)? {
 	switch type {
+	case "json":
+		return { (input: String) throws -> Term in
+			switch parse(json, input: input.characters) {
+			case let .Right(term):
+				return toTerm(term)
+			case let .Left(error):
+				throw error.description
+			}
+		}
 	default:
 		return Source.languagesByType[type].map(termWithInput)
 	}
