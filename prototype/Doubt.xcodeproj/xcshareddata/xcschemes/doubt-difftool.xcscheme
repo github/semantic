@@ -63,19 +63,11 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "$(SRCROOT)/doubt-difftool/Fixtures/before.js"
+            argument = "https://raw.githubusercontent.com/jquery/jquery/2.1.0/src/effects.js"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "$(SRCROOT)/doubt-difftool/Fixtures/after.js"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "$(SRCROOT)/UI/doubt-difftool.js.json"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "$(SRCROOT)/UI/index.html"
+            argument = "https://raw.githubusercontent.com/jquery/jquery/2.1.4/src/effects.js"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
