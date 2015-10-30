@@ -4,10 +4,10 @@ struct Info: Categorizable, CustomJSONConvertible, Equatable {
 		self.categories = categories
 	}
 
-	init(range: Range<String.CharacterView.Index>, leaf: JSONLeaf) {
+	init(range: Range<String.CharacterView.Index>, categories: Set<String>) {
 		// FIXME: this is terrible. see also https://github.com/github/semantic-diff/issues/136
 		self.range = Int(String(range.startIndex))!..<Int(String(range.endIndex))!
-		self.categories = leaf.categories
+		self.categories = categories
 	}
 
 	let range: Range<Int>
