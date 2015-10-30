@@ -2,6 +2,14 @@ import Cocoa
 import Doubt
 import Prelude
 
+func benchmark<T>(label: String? = nil, _ f: () -> T) -> T {
+	let start = NSDate.timeIntervalSinceReferenceDate()
+	let result = f()
+	let end = NSDate.timeIntervalSinceReferenceDate()
+	print((label.map { "\($0): " } ?? "") + "\(end - start)s")
+	return result
+}
+
 extension String: ErrorType {}
 
 typealias Term = Cofree<String, Info>
