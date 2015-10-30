@@ -14,19 +14,6 @@ func benchmark<T>(label: String? = nil, _ f: () -> T) -> T {
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
 
-let empty = "{}\n"
-print(parse(json, input: empty))
-let dict = "{\"hello\":\"world\"}"
-print(parse(json, input: dict))
-let dictWithSpaces = "{ \"hello\" : \"world\" }"
-print(parse(json, input: dictWithSpaces))
-
-let dictWithMembers = "{\"hello\":\"world\",\"sup\":\"cat\"}"
-print(parse(json, input: dictWithMembers))
-
-let dictWithArray = "{\"hello\": [\"world\"],\"sup\": [\"cat\", \"dog\", \"keith\"] }"
-print(parse(json, input: dictWithArray))
-
 func diffAndSerialize(a aString: String, b bString: String, to: String) throws {
 	let aParsed = benchmark("parsing a") { curry(parse)(json)(aString) }
 	guard let a = aParsed.right else {
