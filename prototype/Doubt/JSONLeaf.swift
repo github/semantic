@@ -11,11 +11,27 @@ import Foundation
 typealias Term = Cofree<JSONLeaf, Range<String.Index>>
 typealias Diff = Free<JSONLeaf, Term.Annotation, Patch<Term>>
 
-public enum JSONLeaf: CustomJSONConvertible, CustomStringConvertible, Equatable {
+public enum JSONLeaf: Categorizable, CustomJSONConvertible, CustomStringConvertible, Equatable {
 	case Number(Double)
 	case Boolean(Bool)
 	case String(Swift.String)
 	case Null
+
+
+	// MARK: Categorizable
+
+	public var categories: Set<Swift.String> {
+		switch self {
+		case .Number:
+			return [ "number" ]
+		case .Boolean:
+			return [ "boolean" ]
+		case .String:
+			return [ "string" ]
+		case .Null:
+			return [ "null" ]
+		}
+	}
 
 
 	// MARK: CustomJSONConvertible
