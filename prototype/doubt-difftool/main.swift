@@ -90,6 +90,20 @@ func termWithInput(language: TSLanguage)(_ string: String) throws -> Term {
 	}
 }
 
+func toTerm(term: CofreeJSON) -> Term {
+	let annotation = Info(range: term.extract, categories: [])
+	switch term.unwrap {
+	case let .Leaf(a):
+		return Term(Info(range: term.extract, categories: a.categories), Syntax<Term, String>.Leaf(String(a)))
+	case let .Indexed(i):
+		return Term(annotation, .Indexed(i.map(toTerm)))
+	case let .Fixed(f):
+		return Term(annotation, .Fixed(f.map(toTerm)))
+	case let .Keyed(k):
+		return Term(annotation, .Keyed(Dictionary(elements: k.map { ($0, toTerm($1)) })))
+	}
+}
+
 func parserForType(type: String) -> (String throws -> Term)? {
 	return Source.languagesByType[type].map(termWithInput)
 }
