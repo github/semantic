@@ -85,8 +85,8 @@ func termWithInput(language: TSLanguage)(_ string: String) throws -> Term {
 let arguments = BoundsCheckedArray(array: Process.arguments)
 guard let aSource = try arguments[1].map(Source.init) else { throw "need source A" }
 guard let bSource = try arguments[2].map(Source.init) else { throw "need source B" }
-guard let jsonPath = arguments[3] else { throw "need json path" }
-guard let uiPath = arguments[4] else { throw "need ui path" }
+let jsonURL = NSURL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).URLByAppendingPathComponent("diff.json")
+guard let uiPath = arguments[3] else { throw "need ui path" }
 guard aSource.type == bSource.type else { throw "can’t compare files of different types" }
 guard let parser = Source.languagesByType[aSource.type].map(termWithInput) else { throw "don’t know how to parse files of type \(aSource.type)" }
 
@@ -104,12 +104,12 @@ let JSON: Doubt.JSON = [
 	}),
 ]
 let data = JSON.serialize()
-try data.writeToFile(jsonPath, options: .DataWritingAtomic)
+try data.writeToURL(jsonURL, options: .DataWritingAtomic)
 
 let components = NSURLComponents()
 components.scheme = "file"
 components.path = uiPath
-components.query = jsonPath
+components.query = jsonURL.absoluteString
 if let URL = components.URL {
 	NSWorkspace.sharedWorkspace().openURL(URL)
 }
