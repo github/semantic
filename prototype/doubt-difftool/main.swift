@@ -5,6 +5,26 @@ import Prelude
 extension String: ErrorType {}
 
 typealias Term = Cofree<String, Info>
+typealias Parser = String throws -> Term
+
+struct Source {
+	init(_ argument: String) throws {
+		URL = NSURL(string: argument) ?? NSURL(fileURLWithPath: argument)
+		guard let type = URL.pathExtension else { throw "cannot tell the type of \(URL)" }
+		self.type = type
+		contents = try NSString(contentsOfURL: URL, encoding: NSUTF8StringEncoding) as String
+	}
+
+	let URL: NSURL
+	let type: String
+	let contents: String
+
+	private static let languagesByType: [String:TSLanguage] = [
+		"js": ts_language_javascript(),
+		"c": ts_language_c(),
+		"h": ts_language_c(),
+	]
+}
 
 
 extension String.UTF16View {
@@ -13,14 +33,6 @@ extension String.UTF16View {
 	}
 }
 
-let languagesByFileExtension: [String:TSLanguage] = [
-	"js": ts_language_javascript(),
-	"c": ts_language_c(),
-	"h": ts_language_c(),
-]
-
-let keyedProductions: Set<String> = [ "object" ]
-let fixedProductions: Set<String> = [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
 /// Allow predicates to occur in pattern matching.
 func ~= <A> (left: A -> Bool, right: A) -> Bool {
@@ -28,16 +40,18 @@ func ~= <A> (left: A -> Bool, right: A) -> Bool {
 }
 
 
-func termWithInput(language: TSLanguage)(_ string: String) -> Term? {
+func termWithInput(language: TSLanguage)(_ string: String) throws -> Term {
+	let keyedProductions: Set<String> = [ "object" ]
+	let fixedProductions: Set<String> = [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 	let document = ts_document_make()
 	defer { ts_document_free(document) }
-	return string.withCString {
+	return try string.withCString {
 		ts_document_set_language(document, language)
 		ts_document_set_input_string(document, $0)
 		ts_document_parse(document)
 		let root = ts_document_root_node(document)
 
-		return try? Cofree
+		return try Cofree
 			.ana { node, category in
 				let count = node.namedChildren.count
 				guard count > 0 else { return try Syntax.Leaf(node.substring(string)) }
@@ -69,23 +83,19 @@ func termWithInput(language: TSLanguage)(_ string: String) -> Term? {
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
-guard let aURL = arguments[1].map(NSURL.init) else { throw "need state A" }
-guard let bURL = arguments[2].map(NSURL.init) else { throw "need state B" }
-let aString = try NSString(contentsOfURL: aURL, encoding: NSUTF8StringEncoding) as String
-let bString = try NSString(contentsOfURL: bURL, encoding: NSUTF8StringEncoding) as String
+guard let aSource = try arguments[1].map(Source.init) else { throw "need source A" }
+guard let bSource = try arguments[2].map(Source.init) else { throw "need source B" }
 guard let jsonPath = arguments[3] else { throw "need json path" }
 guard let uiPath = arguments[4] else { throw "need ui path" }
-guard let aType = aURL.pathExtension, bType = bURL.pathExtension else { throw "can’t tell what type we have here" }
-guard aType == bType else { throw "can’t compare files of different types" }
-guard let language = languagesByFileExtension[aType] else { throw "don’t know how to parse files of type \(aType)" }
+guard aSource.type == bSource.type else { throw "can’t compare files of different types" }
+guard let parser = Source.languagesByType[aSource.type].map(termWithInput) else { throw "don’t know how to parse files of type \(aSource.type)" }
 
-let parser: String -> Term? = termWithInput(language)
-guard let a = parser(aString) else { throw "couldn’t parse \(aURL)" }
-guard let b = parser(bString) else { throw "couldn’t parse \(bURL)" }
+let a = try parser(aSource.contents)
+let b = try parser(bSource.contents)
 let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
 let JSON: Doubt.JSON = [
-	"before": .String(aString),
-	"after": .String(bString),
+	"before": .String(aSource.contents),
+	"after": .String(bSource.contents),
 	"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: { $0.range.JSON }, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
 		[
 			"before": $0.range.JSON,
