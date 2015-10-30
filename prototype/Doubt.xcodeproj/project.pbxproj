@@ -131,7 +131,7 @@
 		D4FB2CDE1BDEBD1C00B3CCE0 /* libruntime.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libruntime.a; path = "External/tree-sitter/out/Release/libruntime.a"; sourceTree = SOURCE_ROOT; };
 		D4FB2CE51BDEBE7900B3CCE0 /* doubt-difftool-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "doubt-difftool-Bridging-Header.h"; sourceTree = "<group>"; };
 		D4FB2CF71BE1560400B3CCE0 /* TSNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TSNode.swift; sourceTree = "<group>"; };
-		D4FB2CF91BE28F6D00B3CCE0 /* parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = parser.c; path = "External/node-tree-sitter-javascript/src/parser.c"; sourceTree = SOURCE_ROOT; };
+		D4FB2CF91BE28F6D00B3CCE0 /* parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = parser.c; path = "External/tree-sitter-javascript/src/parser.c"; sourceTree = SOURCE_ROOT; };
 		D4FB2CFB1BE292BB00B3CCE0 /* parser.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = parser.c; path = "External/tree-sitter-c/src/parser.c"; sourceTree = SOURCE_ROOT; };
 		D4FB2D011BE2943A00B3CCE0 /* Info.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Info.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
