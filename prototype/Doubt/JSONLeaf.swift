@@ -1,6 +1,3 @@
-typealias Term = Cofree<JSONLeaf, Range<String.Index>>
-typealias Diff = Free<JSONLeaf, Term.Annotation, Patch<Term>>
-
 public enum JSONLeaf: Categorizable, CustomJSONConvertible, CustomStringConvertible, Equatable {
 	case Number(Double)
 	case Boolean(Bool)
