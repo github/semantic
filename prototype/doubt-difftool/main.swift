@@ -92,7 +92,7 @@ guard let bSource = try arguments[2].map(Source.init) else { throw "need source 
 let jsonURL = NSURL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).URLByAppendingPathComponent("diff.json")
 guard let uiPath = NSBundle.mainBundle().infoDictionary?["PathToUISource"] as? String else { throw "need ui path" }
 guard aSource.type == bSource.type else { throw "can’t compare files of different types" }
-guard let parser = Source.languagesByType[aSource.type].map(termWithInput) else { throw "don’t know how to parse files of type \(aSource.type)" }
+guard let parser = parserForType(aSource.type) else { throw "don’t know how to parse files of type \(aSource.type)" }
 
 let a = try parser(aSource.contents)
 let b = try parser(bSource.contents)
