@@ -115,7 +115,7 @@ func lines(input: String) -> Term {
 	var lines: [Term] = []
 	var previous = 0
 	input.enumerateSubstringsInRange(input.characters.indices, options: .ByLines) { (line, _, enclosingRange, _) in
-		let range: Range<Int> = previous..<enclosingRange.count
+		let range: Range<Int> = previous..<(previous + enclosingRange.count)
 		previous = range.endIndex
 		if let line = line {
 			lines.append(Term(Info(range: range, categories: []), Syntax.Leaf(line)))
