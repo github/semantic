@@ -18,8 +18,12 @@ typealias Parser = String throws -> Term
 
 struct Source {
 	init(_ argument: String) throws {
-		let URL = NSURL(string: argument) ?? NSURL(fileURLWithPath: argument)
-		self.URL = URL
+		let supportedSchemes = [ "http", "https", "file" ]
+		if let URL = NSURL(string: argument) where supportedSchemes.contains(URL.scheme) {
+			self.URL = URL
+		} else {
+			self.URL = NSURL(fileURLWithPath: argument)
+		}
 		contents = try NSString(contentsOfURL: URL, encoding: NSUTF8StringEncoding) as String
 	}
 
