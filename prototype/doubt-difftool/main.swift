@@ -19,14 +19,14 @@ typealias Parser = String throws -> Term
 struct Source {
 	init(_ argument: String) throws {
 		let URL = NSURL(string: argument) ?? NSURL(fileURLWithPath: argument)
-		guard let type = URL.pathExtension ?? URL.fragment else { throw "cannot tell the type of \(URL)" }
 		self.URL = URL
-		self.type = type
 		contents = try NSString(contentsOfURL: URL, encoding: NSUTF8StringEncoding) as String
 	}
 
 	let URL: NSURL
-	let type: String
+	var type: String  {
+		return URL.pathExtension ?? URL.fragment ?? ""
+	}
 	let contents: String
 
 	private static let languagesByType: [String:TSLanguage] = [
