@@ -105,7 +105,10 @@ func toTerm(term: CofreeJSON) -> Term {
 }
 
 func parserForType(type: String) -> (String throws -> Term)? {
-	return Source.languagesByType[type].map(termWithInput)
+	switch type {
+	default:
+		return Source.languagesByType[type].map(termWithInput)
+	}
 }
 
 let arguments = BoundsCheckedArray(array: Process.arguments)
