@@ -82,6 +82,10 @@ func termWithInput(language: TSLanguage)(_ string: String) throws -> Term {
 	}
 }
 
+func parserForType(type: String) -> (String throws -> Term)? {
+	return Source.languagesByType[type].map(termWithInput)
+}
+
 let arguments = BoundsCheckedArray(array: Process.arguments)
 guard let aSource = try arguments[1].map(Source.init) else { throw "need source A" }
 guard let bSource = try arguments[2].map(Source.init) else { throw "need source B" }
