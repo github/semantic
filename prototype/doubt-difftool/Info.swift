@@ -1,4 +1,9 @@
 struct Info: Categorizable, CustomJSONConvertible, Equatable {
+	init(range: Range<Int>, categories: Set<String>) {
+		self.range = range
+		self.categories = categories
+	}
+
 	let range: Range<Int>
 
 
