@@ -7,8 +7,13 @@ private func unified(term: Term, source: String) -> String {
 			return (unified(info.range, children: i, source: source), info.range)
 		case let .Fixed(f):
 			return (unified(info.range, children: f, source: source), info.range)
-		default:
-			return ("", info.range)
+		case let .Keyed(k):
+			return (unified(info.range, children: k.values.sort { a, b in
+				if let a = a.1, b = b.1 {
+					return a.startIndex < b.startIndex
+				}
+				return false
+			}, source: source), info.range)
 		}
 	}.0
 }
