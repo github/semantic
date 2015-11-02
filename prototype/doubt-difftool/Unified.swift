@@ -1,4 +1,4 @@
-func unified(diff: Interpreter<Term>.Diff, before: String, after: String) -> String {
+func unified(diff: Diff, before: String, after: String) -> String {
 	switch diff {
 	case let .Pure(patch):
 		return (patch.state.before.map { "{-\($0)-}" } ?? "")
