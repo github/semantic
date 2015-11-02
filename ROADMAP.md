@@ -14,4 +14,4 @@ This is a living document and will be updated as necessary.
 
 ## Q1 2016
 
-1. 
+1. Semantic diffing on .com.
