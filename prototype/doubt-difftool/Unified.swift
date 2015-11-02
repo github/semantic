@@ -1,5 +1,12 @@
 func unified(diff: Interpreter<Term>.Diff, before: String, after: String) -> String {
-	return ""
+	switch diff {
+	case let .Pure(patch):
+		return (patch.state.before.map { "{-\($0)-}" } ?? "")
+			+ (patch.state.after.map { "{+\($0)+}" } ?? "")
+
+	case .Roll:
+		return ""
+	}
 }
 
 
