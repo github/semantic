@@ -1,3 +1,4 @@
+/// A list of arguments for the difftool.
 enum Argument {
 	indirect case File(Source, Argument)
 	indirect case OutputFlag(Output, Argument)
