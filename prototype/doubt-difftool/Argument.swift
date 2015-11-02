@@ -1,10 +1,13 @@
 enum Argument {
 	indirect case File(Source, Argument)
+	indirect case OutputFlag(Output, Argument)
 	case End
 
 	var rest: Argument? {
 		switch self {
 		case let .File(_, rest):
+			return rest
+		case let .OutputFlag(_, rest):
 			return rest
 		case .End:
 			return nil
