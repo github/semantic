@@ -20,6 +20,8 @@ private func isOrderedBefore(a: (String, Range<Int>?), _ b: (String, Range<Int>?
 	return false
 }
 
+private var isTTY = isatty(STDOUT_FILENO) != 0
+
 private func unified(patch: Patch<Term>, before: String, after: String) -> String {
 	return (patch.state.before.map { "{-\(unified($0, source: before))-}" } ?? "")
 		+ (patch.state.after.map { "{+\(unified($0, source: after))+}" } ?? "")
