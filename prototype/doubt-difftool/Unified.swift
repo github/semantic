@@ -21,7 +21,7 @@ private func isOrderedBefore(a: (String, Range<Int>?), _ b: (String, Range<Int>?
 }
 
 private var isTTY = isatty(STDOUT_FILENO) != 0
-private var isDumb = String.fromCString(getenv("TERM")).map { !$0.hasPrefix("dumb") } ?? false
+private var isDumb = String.fromCString(getenv("TERM")).map { !$0.hasPrefix("dumb") } ?? true
 private var shouldFormat = isTTY && !isDumb
 
 private struct Attribute {
