@@ -143,6 +143,14 @@ function diffToDOM(diff, sources) {
 			if (diffOrTerm.pure.after != null) {
 				afterRange = diffOrTerm.pure.after.extract
 			}
+
+			if (beforeRange == null) {
+				beforeRange = afterRange;
+			}
+
+			if (afterRange == null) {
+				afterRange = beforeRange;
+			}
 			return { "before": beforeRange, "after": afterRange };
 		}
 		if (diffOrTerm.roll != null) {
@@ -180,6 +188,16 @@ function pureToDOM(sources, patch, getRangeFun, diffToDOMFun) {
 		if (patch.before != null) {
 			elementB.classList.add("replace");
 		}
+	}
+
+	if (elementA == null) {
+		elementA = elementB.cloneNode(true)
+		elementA.classList.add("invisible")
+	}
+
+	if (elementB == null) {
+		elementB = elementA.cloneNode(true)
+		elementB.classList.add("invisible")
 	}
 
 	return { "before": elementA || "", "after": elementB || "" };
@@ -253,41 +271,157 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 			}
 		}
 
-		var sortByRange = function(a, b) {
-			if (a.range[0] < b.range[0]) {
-				return -1;
-			} else if (a.range[0] > b.range[0]) {
-				return 1;
+		var sortByRange = function (array) {
+			return function(a, b) {
+				// if a is invisible, sort it based on its range vs. bs opposite range
+				function sortByOppositeRange(el) {
+					var opArray = array === befores ? afters : befores;
+					var opEl = opArray.find(function (e) { return el.key === e.key; });
+					var otherEl = el === a ? b : a;
+					var opOtherEl = opArray.find(function (e) { return otherEl.key === e.key; });
+
+
+					if (el.child.classList.contains("delete") && otherEl.child.classList.contains("insert")) {
+						return -1;
+					}
+					if (el.child.classList.contains("insert") && otherEl.child.classList.contains("delete")) {
+						return 1;
+					}
+
+					if (opEl.range[0] < opOtherEl.range[0]) {
+						return -1;
+					} else if (opEl.range[0] > opOtherEl.range[0]) {
+						return 1;
+					}
+
+
+					return 0;
+				}
+
+				return sortByOppositeRange(a);
+			}
+		}
+
+		befores.sort(sortByRange(befores));
+		afters.sort(sortByRange(afters));
+
+		var previousA = range.before[0];
+		var previousB = range.after[0];
+
+		zip(befores, afters, function (a, b) {
+			var key = a.key
+			var childElA = a.child
+			var childRangeA = a.range
+			var childElB = b.child
+			var childRangeB = b.range
+
+			var isFirst = elementA.childNodes.length == 0;
+
+			function penultimateNode(el) {
+				var nodes = Array.prototype.slice.call(el.childNodes).reverse();
+
+				var lastVisibleNode;
+				for (i in nodes) {
+					var node = nodes[i];
+					if (node.nodeType != 3 && node.classList.contains("invisible")) {
+						var nextIndex = parseInt(i, 10) + 1;
+						if (nextIndex < nodes.length) {
+							var nextNode = nodes[nextIndex];
+							if (nextNode.nodeType != 3 && !nextNode.classList.contains("invisible")) {
+								return node;
+							}
+						}
+					}
+				}
 			}
 
-			return 0;
-		}
+			if (isFirst || !childElA.classList.contains("invisible")) {
+				var text = sources.before.substr(previousA, childRangeA[0] - previousA);
 
-		befores.sort(sortByRange);
-		afters.sort(sortByRange);
+				var beforeNode = penultimateNode(elementA)
+				if (beforeNode != null) {
+					elementA.insertBefore(document.createTextNode(text), beforeNode);
+				} else {
+					elementA.appendChild(document.createTextNode(text));
+				}
+			}
 
-		var addChildren = function (children, initialRange, element, source) {
-			var previous = initialRange[0];
-			children.forEach(function (value) {
-				var key = value.key
-				var childEl = value.child
-				var childRange = value.range
+			if (isFirst || !childElB.classList.contains("invisible")) {
+				var text = sources.after.substr(previousB, childRangeB[0] - previousB);
 
-				var text = source.substr(previous, childRange[0] - previous);
-				element.appendChild(document.createTextNode(text));
-				element.appendChild(wrap("dt", document.createTextNode(key)));
-				element.appendChild(wrap("dd", childEl));
+				var beforeNode = penultimateNode(elementB)
+				if (beforeNode != null) {
+					elementB.insertBefore(document.createTextNode(text), beforeNode);
+				} else {
+					elementB.appendChild(document.createTextNode(text));
+				}
+			}
 
-				previous = childRange[0] + childRange[1]
-			});
+			var dtA = wrap("dt", document.createTextNode(key));
+			elementA.appendChild(dtA);
+			var ddA = wrap("dd", childElA)
+			elementA.appendChild(ddA);
+			if (childElA.classList.contains("invisible")) {
+				dtA.classList.add("invisible");
+				ddA.classList.add("invisible");
+			}
 
-			var text = source.substr(previous, initialRange[0] + initialRange[1] - previous);
-			element.appendChild(document.createTextNode(text));
-		}
+			var dtB = wrap("dt", document.createTextNode(key));
+			elementB.appendChild(dtB);
+			var ddB = wrap("dd", childElB);
+			elementB.appendChild(ddB);
+			if (childElB.classList.contains("invisible")) {
+				dtB.classList.add("invisible");
+				ddB.classList.add("invisible");
+			}
 
-		addChildren(befores, range.before, elementA, sources.before);
-		addChildren(afters, range.after, elementB, sources.after);
+
+			if (isFirst || !childElA.classList.contains("invisible")) {
+				previousA = childRangeA[0] + childRangeA[1]
+			}
+			if (isFirst || !childElB.classList.contains("invisible")) {
+				previousB = childRangeB[0] + childRangeB[1]
+			}
+
+			var nextIndex = befores.indexOf(a) + 1;
+			if (childElA.classList.contains("invisible") && nextIndex < afters.length) {
+				var beginningOfNextElement = afters[nextIndex].range[0];
+
+				var text = sources.after.substr(previousB, beginningOfNextElement - previousB);
+				var node = wrap("span", document.createTextNode(text));
+				node.classList.add("invisible");
+				elementA.appendChild(node);
+			}
+
+			if (childElB.classList.contains("invisible") && nextIndex < befores.length) {
+				var beginningOfNextElement = befores[nextIndex].range[0];
+
+				var text = sources.before.substr(previousA, beginningOfNextElement - previousA);
+				var node = wrap("span", document.createTextNode(text));
+				node.classList.add("invisible");
+				elementB.appendChild(node);
+			}
+		});
+
+		var textA = sources.before.substr(previousA, range.before[0] + range.before[1] - previousA);
+		elementA.appendChild(document.createTextNode(textA));
+		var textB = sources.after.substr(previousB, range.after[0] + range.after[1] - previousB);
+		elementB.appendChild(document.createTextNode(textB));
 	}
 
 	return { "before": elementA, "after": elementB }
+}
+
+
+/// ([a], [b]) -> [(a, b)]
+function zip (a, b, callback) {
+	if (a.length > b.length) {
+		return b.map(function(b, index) {
+			return callback(a[index], b);
+		});
+	} else {
+		return a.map(function(a, index) {
+			return callback(a, b[index]) ;
+		});
+	}
 }
