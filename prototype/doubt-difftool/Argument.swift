@@ -33,6 +33,9 @@ private let flag: Madness.Parser<[String], Argument.Output>.Function =
 		const(Argument.Output.Unified) <^> satisfy { $0 == "--unified" }
 	<|> const(Argument.Output.Split) <^> satisfy { $0 == "--split" }
 
+private let source: Madness.Parser<[String], Source>.Function =
+	{ try! Source($0) } <^> satisfy { !$0.hasPrefix("--") }
+
 let argumentsParser: Madness.Parser<[String], Argument>.Function =
 	curry(Argument.OutputFlag) <^> flag <*> pure(Argument.End)
 
