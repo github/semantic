@@ -8,8 +8,10 @@ This is a living document and will be updated as necessary.
 
 1. A semantic diff prototyping toolkit. Library & wrapper tool for experimentation with diffing algorithms & spitting out actual diffs so we can evaluate alternatives more easily.
 
-2. [Table of contents for .com diffs](https://github.com/github/semantic-diff/issues/16), linking to defined symbols in Ruby sources.
+2. A prototype of user-facing semantic diff presentation and interaction.
+
+3. [Table of contents for .com diffs](https://github.com/github/semantic-diff/issues/16), linking to defined symbols in supported sources.
 
 ## Q1 2016
 
-1. A prototype of user-facing semantic diff presentation and interaction.
+1. [Semantic diffing on .com](https://github.com/github/semantic-diff/milestones/Dot%20Calm).
