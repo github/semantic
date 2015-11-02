@@ -62,13 +62,6 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 			ifRoll: { try transform($0, $1.map { try $0.cata(transform) }) })
 	}
 
-	/// Like `cata`, except the `Syntax` values are parameterized by the `Free` values as well as the reduced form.
-	public func para(@noescape transform: (Annotation, Syntax<(Free, Value), Leaf>) throws -> Value) rethrows -> Value {
-		return try analysis(
-			ifPure: id,
-			ifRoll: { try transform($0, $1.map { try ($0, $0.para(transform)) }) })
-	}
-
 
 	/// Reduces the receiver top-down, left-to-right, starting from an `initial` value, and applying `combine` to successive values.
 	public func reduce(initial: Value, @noescape combine: (Value, Value) -> Value) -> Value {
