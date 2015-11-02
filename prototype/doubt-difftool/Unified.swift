@@ -3,6 +3,8 @@ private func unified(term: Term, source: String) -> String {
 		switch syntax {
 		case .Leaf:
 			return (String(source.utf16[info.range]), info.range)
+		case let .Indexed(i):
+			return (unified(info.range, children: i, source: source), info.range)
 		default:
 			return ("", info.range)
 		}
