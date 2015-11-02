@@ -3,6 +3,10 @@ func unified(patch: Patch<Term>, source: String) -> String {
 		+ (patch.state.after.map { "{+\($0)+}" } ?? "")
 }
 
+private func range(patch: Patch<Term>) -> Range<Int> {
+	return 0..<0
+}
+
 func unified(diff: Diff, before: String, after: String) -> String {
 	switch diff {
 	case let .Pure(patch):
