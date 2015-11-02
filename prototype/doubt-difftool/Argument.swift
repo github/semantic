@@ -3,7 +3,7 @@ enum Argument {
 	indirect case OutputFlag(Output, Argument)
 	case End
 
-	var rest: Argument? {
+	private var rest: Argument? {
 		switch self {
 		case let .File(_, rest):
 			return rest
