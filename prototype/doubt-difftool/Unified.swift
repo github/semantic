@@ -8,13 +8,6 @@ private func range(patch: Patch<Term>) -> Range<Int> {
 }
 
 func unified(diff: Diff, before: String, after: String) -> String {
-	switch diff {
-	case let .Pure(patch):
-		return unified(patch, source: after)
-
-	case .Roll:
-		return ""
-	}
 	return diff.map { (unified($0, source: after), range($0)) }.cata { info, syntax in
 		switch syntax {
 		case .Leaf:
