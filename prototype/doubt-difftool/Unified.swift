@@ -47,7 +47,7 @@ private struct Attribute {
 
 	func wrap(string: String) -> String {
 		return shouldFormat
-			? "\u{001B}[\(style);\(colour)m\(string)\u{001B}[0m"
+			? "\u{001B}[\(style.rawValue);\(colour.rawValue)m\(string)\u{001B}[0m"
 			: string
 	}
 }
