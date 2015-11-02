@@ -2,6 +2,15 @@ enum Argument {
 	indirect case File(Source, Argument)
 	case End
 
+	var rest: Argument? {
+		switch self {
+		case let .File(_, rest):
+			return rest
+		case .End:
+			return nil
+		}
+	}
+
 	var files: [Source] {
 		switch self {
 		case let .File(a, rest):
