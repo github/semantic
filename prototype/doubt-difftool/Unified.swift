@@ -1,12 +1,12 @@
 private func unified(term: Term, source: String) -> String {
-	return term.cata { info, syntax in
+	return term.cata { info, syntax -> (String, Range<Int>?) in
 		switch syntax {
 		case .Leaf:
-			return String(source.utf16[info.range])
+			return (String(source.utf16[info.range]), info.range)
 		default:
-			return ""
+			return ("", info.range)
 		}
-	}
+	}.0
 }
 
 private func unified(patch: Patch<Term>, before: String, after: String) -> String {
