@@ -288,6 +288,15 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 						return 1;
 					}
 
+					if (!el.child.classList.contains("invisible") && !otherEl.child.classList.contains("invisible")) {
+						if (el.range[0] < otherEl.range[0]) {
+							return -1;
+						} else if (el.range[0] > otherEl.range[0]) {
+							return 1;
+						}
+					}
+
+
 					if (opEl.range[0] < opOtherEl.range[0]) {
 						return -1;
 					} else if (opEl.range[0] > opOtherEl.range[0]) {
@@ -393,17 +402,20 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 
 				var beginningOfNextElement = nextVisibleElement.range[0];
 				var text = sources.after.substr(previousB, beginningOfNextElement - previousB);
+				console.log(text);
 				var node = wrap("span", document.createTextNode(text));
 				node.classList.add("invisible");
 				elementA.appendChild(node);
 			}
 
-			if (childElB.classList.contains("invisible") && nextIndex < befores.length) {
-				var nextVisibleElement = befores[nextIndex]
-				while (nextVisibleElement.child.classList.contains("invisible") && nextIndex++ < befores.length) {
-					nextVisibleElement = befores[nextIndex]
-				}
-				if (nextVisibleElement == null) break;
+			if (childElB.classList.contains("invisible") && nextIndex + 1 < befores.length) {
+				console.log("Right Element: " + key + " is invisible")
+				console.log("Adding invisible separator text:");
+				var nextVisibleElement = befores[++nextIndex]
+				// while (nextVisibleElement.child.classList.contains("invisible") && ++nextIndex < befores.length) {
+				// 	nextVisibleElement = befores[nextIndex]
+				// }
+				// if (nextVisibleElement == null) return;
 
 				var beginningOfNextElement = nextVisibleElement.range[0];
 				var text = sources.before.substr(previousA, beginningOfNextElement - previousA);
