@@ -3,8 +3,8 @@ func unified(patch: Patch<Term>, source: String) -> String {
 		+ (patch.state.after.map { "{+\($0)+}" } ?? "")
 }
 
-private func range(patch: Patch<Term>) -> Range<Int> {
-	return 0..<0
+private func range(patch: Patch<Term>) -> Range<Int>? {
+	return nil
 }
 
 func unified(diff: Diff, before: String, after: String) -> String {
@@ -16,9 +16,11 @@ func unified(diff: Diff, before: String, after: String) -> String {
 			var previous = info.1.range.startIndex
 			var out: String = ""
 			for (string, range) in i {
-				out += String(after.utf16[previous..<range.startIndex])
+				if let range = range {
+					out += String(after.utf16[previous..<range.startIndex])
+					previous = range.endIndex
+				}
 				out += string
-				previous = range.endIndex
 			}
 			return (out + String(after.utf16[previous..<info.1.range.endIndex]), info.1.range)
 		case let .Fixed(f):
