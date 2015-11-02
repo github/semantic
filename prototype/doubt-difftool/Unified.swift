@@ -30,7 +30,12 @@ func unified(diff: Diff, before: String, after: String) -> String {
 		case let .Fixed(f):
 			return (unified(info.1.range, children: f, source: after), info.1.range)
 		case let .Keyed(k):
-			return (k.values.map { $0.0 }.joinWithSeparator(""), info.1.range)
+			return (unified(info.1.range, children: k.values.sort { a, b in
+				if let a = a.1, b = b.1 {
+					return a.startIndex < b.startIndex
+				}
+				return false
+			}, source: after), info.1.range)
 		}
 	}.0
 }
