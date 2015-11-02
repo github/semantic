@@ -36,9 +36,9 @@ private let flag: Madness.Parser<[String], Argument.Output>.Function =
 private let source: Madness.Parser<[String], Source>.Function =
 	{ try! Source($0) } <^> satisfy { !$0.hasPrefix("--") }
 
-let argumentsParser: Madness.Parser<[String], Argument>.Function =
-	curry(Argument.OutputFlag) <^> flag <*> pure(Argument.End)
-
+let argumentsParser: Madness.Parser<[String], Argument>.Function = fix { rest in
+	(curry(Argument.OutputFlag) <^> flag) <*> rest
+}
 
 import Madness
 import Prelude
