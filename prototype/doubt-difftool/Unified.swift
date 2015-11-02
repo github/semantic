@@ -37,7 +37,7 @@ func unified(diff: Diff, before: String, after: String) -> String {
 			}
 			return (out + String(after.utf16[previous..<info.1.range.endIndex]), info.1.range)
 		case let .Fixed(f):
-			return (f.map { $0.0 }.joinWithSeparator(""), info.1.range)
+			return (unified(info.1.range, children: f, source: after), info.1.range)
 		case let .Keyed(k):
 			return (k.values.map { $0.0 }.joinWithSeparator(""), info.1.range)
 		}
