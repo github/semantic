@@ -22,6 +22,7 @@ private func isOrderedBefore(a: (String, Range<Int>?), _ b: (String, Range<Int>?
 
 private var isTTY = isatty(STDOUT_FILENO) != 0
 private var isDumb = String.fromCString(getenv("TERM")).map { !$0.hasPrefix("dumb") } ?? false
+private var shouldFormat = isTTY && !isDumb
 
 private func unified(patch: Patch<Term>, before: String, after: String) -> String {
 	return (patch.state.before.map { "{-\(unified($0, source: before))-}" } ?? "")
