@@ -22,15 +22,12 @@ enum Argument {
 	}
 
 	var output: Output {
-		func output(argument: Argument, defaultingTo: Output = .Split) -> Output {
-			switch argument {
-			case let .OutputFlag(f, rest):
-				return output(rest, defaultingTo: f)
-			default:
-				return rest.map { output($0, defaultingTo: defaultingTo) } ?? defaultingTo
-			}
+		switch self {
+		case let .OutputFlag(output, _):
+			return output
+		default:
+			return .Split
 		}
-		return output(self)
 	}
 
 	enum Output {
