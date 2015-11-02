@@ -1,4 +1,4 @@
-func unified(patch: Patch<Term>, source: String) -> String {
+private func unified(patch: Patch<Term>, source: String) -> String {
 	return (patch.state.before.map { "{-\($0)-}" } ?? "")
 		+ (patch.state.after.map { "{+\($0)+}" } ?? "")
 }
