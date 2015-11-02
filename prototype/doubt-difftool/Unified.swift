@@ -53,8 +53,8 @@ private struct Attribute {
 }
 
 private func unified(patch: Patch<Term>, before: String, after: String) -> String {
-	return (patch.state.before.map { "{-\(unified($0, source: before))-}" } ?? "")
-		+ (patch.state.after.map { "{+\(unified($0, source: after))+}" } ?? "")
+	return (patch.state.before.map { Attribute(colour: .Red, style: .Bold).wrap("{-\(unified($0, source: before))-}") } ?? "")
+		+ (patch.state.after.map { Attribute(colour: .Green, style: .Bold).wrap("{+\(unified($0, source: after))+}") } ?? "")
 }
 
 private func range(patch: Patch<Term>) -> Range<Int>? {
