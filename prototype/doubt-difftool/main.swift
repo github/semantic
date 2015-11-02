@@ -1,6 +1,15 @@
 import Cocoa
 import Doubt
 import Prelude
+import Madness
+
+func benchmark<T>(label: String? = nil, _ f: () -> T) -> T {
+	let start = NSDate.timeIntervalSinceReferenceDate()
+	let result = f()
+	let end = NSDate.timeIntervalSinceReferenceDate()
+	print((label.map { "\($0): " } ?? "") + "\(end - start)s")
+	return result
+}
 
 extension String: ErrorType {}
 
@@ -9,14 +18,20 @@ typealias Parser = String throws -> Term
 
 struct Source {
 	init(_ argument: String) throws {
-		URL = NSURL(string: argument) ?? NSURL(fileURLWithPath: argument)
-		guard let type = URL.pathExtension else { throw "cannot tell the type of \(URL)" }
-		self.type = type
+		let supportedSchemes = [ "http", "https", "file" ]
+		if let URL = NSURL(string: argument) where supportedSchemes.contains(URL.scheme) {
+			self.URL = URL
+		} else {
+			self.URL = NSURL(fileURLWithPath: argument)
+		}
 		contents = try NSString(contentsOfURL: URL, encoding: NSUTF8StringEncoding) as String
 	}
 
 	let URL: NSURL
-	let type: String
+	var type: String  {
+		if let pathExtension = URL.pathExtension where pathExtension != "" { return pathExtension }
+		return URL.fragment ?? ""
+	}
 	let contents: String
 
 	private static let languagesByType: [String:TSLanguage] = [
@@ -82,13 +97,43 @@ func termWithInput(language: TSLanguage)(_ string: String) throws -> Term {
 	}
 }
 
+func toTerm(term: CofreeJSON) -> Term {
+	let annotation = Info(range: term.extract, categories: [])
+	switch term.unwrap {
+	case let .Leaf(a):
+		return Term(Info(range: term.extract, categories: a.categories), Syntax<Term, String>.Leaf(String(a)))
+	case let .Indexed(i):
+		return Term(annotation, .Indexed(i.map(toTerm)))
+	case let .Fixed(f):
+		return Term(annotation, .Fixed(f.map(toTerm)))
+	case let .Keyed(k):
+		return Term(annotation, .Keyed(Dictionary(elements: k.map { ($0, toTerm($1)) })))
+	}
+}
+
+func parserForType(type: String) -> (String throws -> Term)? {
+	switch type {
+	case "json":
+		return { (input: String) throws -> Term in
+			switch parse(json, input: input.characters) {
+			case let .Right(term):
+				return toTerm(term)
+			case let .Left(error):
+				throw error.description
+			}
+		}
+	default:
+		return Source.languagesByType[type].map(termWithInput)
+	}
+}
+
 let arguments = BoundsCheckedArray(array: Process.arguments)
 guard let aSource = try arguments[1].map(Source.init) else { throw "need source A" }
 guard let bSource = try arguments[2].map(Source.init) else { throw "need source B" }
 let jsonURL = NSURL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).URLByAppendingPathComponent("diff.json")
 guard let uiPath = NSBundle.mainBundle().infoDictionary?["PathToUISource"] as? String else { throw "need ui path" }
 guard aSource.type == bSource.type else { throw "can’t compare files of different types" }
-guard let parser = Source.languagesByType[aSource.type].map(termWithInput) else { throw "don’t know how to parse files of type \(aSource.type)" }
+guard let parser = parserForType(aSource.type) else { throw "don’t know how to parse files of type \(aSource.type)" }
 
 let a = try parser(aSource.contents)
 let b = try parser(bSource.contents)
