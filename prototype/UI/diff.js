@@ -385,8 +385,13 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 
 			var nextIndex = befores.indexOf(a) + 1;
 			if (childElA.classList.contains("invisible") && nextIndex < afters.length) {
-				var beginningOfNextElement = afters[nextIndex].range[0];
+				var nextVisibleElement = afters[nextIndex]
+				while (nextVisibleElement.child.classList.contains("invisible") && nextIndex++ < afters.length) {
+					nextVisibleElement = afters[nextIndex]
+				}
+				if (nextVisibleElement == null) break;
 
+				var beginningOfNextElement = nextVisibleElement.range[0];
 				var text = sources.after.substr(previousB, beginningOfNextElement - previousB);
 				var node = wrap("span", document.createTextNode(text));
 				node.classList.add("invisible");
@@ -394,8 +399,13 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 			}
 
 			if (childElB.classList.contains("invisible") && nextIndex < befores.length) {
-				var beginningOfNextElement = befores[nextIndex].range[0];
+				var nextVisibleElement = befores[nextIndex]
+				while (nextVisibleElement.child.classList.contains("invisible") && nextIndex++ < befores.length) {
+					nextVisibleElement = befores[nextIndex]
+				}
+				if (nextVisibleElement == null) break;
 
+				var beginningOfNextElement = nextVisibleElement.range[0];
 				var text = sources.before.substr(previousA, beginningOfNextElement - previousA);
 				var node = wrap("span", document.createTextNode(text));
 				node.classList.add("invisible");
