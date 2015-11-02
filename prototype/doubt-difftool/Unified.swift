@@ -1,4 +1,4 @@
-private func unified(patch: Patch<Term>, source: String) -> String {
+private func unified(patch: Patch<Term>, before: String, after: String) -> String {
 	return (patch.state.before.map { "{-\($0)-}" } ?? "")
 		+ (patch.state.after.map { "{+\($0)+}" } ?? "")
 }
@@ -21,7 +21,7 @@ private func unified(range: Range<Int>, children: [(String, Range<Int>?)], sourc
 }
 
 func unified(diff: Diff, before: String, after: String) -> String {
-	return diff.map { (unified($0, source: after), range($0)) }.cata { info, syntax in
+	return diff.map { (unified($0, before: before, after: after), range($0)) }.cata { info, syntax in
 		switch syntax {
 		case .Leaf:
 			return (String(after.utf16[info.1.range]), info.1.range)
