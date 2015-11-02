@@ -1,5 +1,6 @@
 enum Argument {
-	case File(Source)
+	indirect case File(Source, Argument)
+	case End
 }
 
 let argumentsParser: Madness.Parser<[String], Argument>.Function = none()
