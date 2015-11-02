@@ -145,7 +145,7 @@ func parserForType(type: String) -> String throws -> Term {
 
 let parsed = parse(argumentsParser, input: Process.arguments)
 let arguments: Argument = try parsed.either(ifLeft: { throw "\($0)" }, ifRight: { $0 })
-guard let (aSource, bSource) = arguments.sources else { throw "expected two sources" }
+let (aSource, bSource) = arguments.sources
 let jsonURL = NSURL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).URLByAppendingPathComponent("diff.json")
 guard let uiPath = NSBundle.mainBundle().infoDictionary?["PathToUISource"] as? String else { throw "need ui path" }
 guard aSource.type == bSource.type else { throw "can’t compare files of different types" }
