@@ -26,16 +26,7 @@ func unified(diff: Diff, before: String, after: String) -> String {
 		case .Leaf:
 			return (String(after.utf16[info.1.range]), info.1.range)
 		case let .Indexed(i):
-			var previous = info.1.range.startIndex
-			var out: String = ""
-			for (string, range) in i {
-				if let range = range {
-					out += String(after.utf16[previous..<range.startIndex])
-					previous = range.endIndex
-				}
-				out += string
-			}
-			return (out + String(after.utf16[previous..<info.1.range.endIndex]), info.1.range)
+			return (unified(info.1.range, children: i, source: after), info.1.range)
 		case let .Fixed(f):
 			return (unified(info.1.range, children: f, source: after), info.1.range)
 		case let .Keyed(k):
