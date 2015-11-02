@@ -63,10 +63,10 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	}
 
 	/// Like `cata`, except the `Syntax` values are parameterized by the `Free` values as well as the reduced form.
-	public func para(@noescape transform: Syntax<(Free, Value), Leaf> throws -> Value) rethrows -> Value {
+	public func para(@noescape transform: (Annotation, Syntax<(Free, Value), Leaf>) throws -> Value) rethrows -> Value {
 		return try analysis(
 			ifPure: id,
-			ifRoll: { try transform($1.map { try ($0, $0.para(transform)) }) })
+			ifRoll: { try transform($0, $1.map { try ($0, $0.para(transform)) }) })
 	}
 
 
