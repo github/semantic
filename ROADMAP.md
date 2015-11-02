@@ -14,4 +14,4 @@ This is a living document and will be updated as necessary.
 
 ## Q1 2016
 
-1. Semantic diffing on .com.
+1. [Semantic diffing on .com](https://github.com/github/semantic-diff/milestones/Dot%20Calm).
