@@ -45,6 +45,7 @@ enum Argument {
 private let flag: Madness.Parser<[String], Argument.Output>.Function =
 		const(Argument.Output.Unified) <^> satisfy { $0 == "--unified" }
 	<|> const(Argument.Output.Split) <^> satisfy { $0 == "--split" }
+	<|> pure(Argument.Output.Split)
 
 private let source: Madness.Parser<[String], Source>.Function =
 	{ try! Source($0) } <^> satisfy { !$0.hasPrefix("--") }
