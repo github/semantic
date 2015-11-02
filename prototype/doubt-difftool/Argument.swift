@@ -29,6 +29,8 @@ enum Argument {
 	}
 }
 
+private let validFlags: Set<String> = [ "--unified", "--split" ]
+
 let argumentsParser: Madness.Parser<[String], Argument>.Function = none()
 
 
