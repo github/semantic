@@ -56,10 +56,10 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	/// While not every function on a given `Free` can be computed using `cata`, these guarantees of termination and complexity, as well as the brevity and focus on the operation being performed n times, make it a desirable scaffolding for any function which can.
 	///
 	/// For a lucid, in-depth tutorial on recursion schemes, I recommend [Patrick Thomson](https://twitter.com/importantshock)’s _[An Introduction to Recursion Schemes](http://patrickthomson.ghost.io/an-introduction-to-recursion-schemes/)_ and _[Recursion Schemes, Part 2: A Mob of Morphisms](http://patrickthomson.ghost.io/recursion-schemes-part-2/)_.
-	public func cata(@noescape transform: Syntax<Value, Leaf> throws -> Value) rethrows -> Value {
+	public func cata(@noescape transform: (Annotation, Syntax<Value, Leaf>) throws -> Value) rethrows -> Value {
 		return try analysis(
 			ifPure: id,
-			ifRoll: { try transform($1.map { try $0.cata(transform) }) })
+			ifRoll: { try transform($0, $1.map { try $0.cata(transform) }) })
 	}
 
 	/// Like `cata`, except the `Syntax` values are parameterized by the `Free` values as well as the reduced form.
@@ -73,7 +73,7 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	/// Reduces the receiver top-down, left-to-right, starting from an `initial` value, and applying `combine` to successive values.
 	public func reduce(initial: Value, @noescape combine: (Value, Value) -> Value) -> Value {
 		return cata {
-			switch $0 {
+			switch $1 {
 			case .Leaf:
 				return initial
 			case let .Indexed(a):
@@ -139,11 +139,11 @@ extension Free where Value: PatchType, Value.Element == Cofree<Leaf, ()> {
 	public typealias Term = Value.Element
 
 	public func merge(@noescape transform: Value -> Term) -> Term {
-		return map(transform).cata { Cofree((), $0) }
+		return map(transform).cata { Cofree((), $1) }
 	}
 
 	public func merge(@noescape transform: Value -> Term?) -> Term? {
-		return map(transform).cata(Free.discardNullTerms)
+		return map(transform).cata { Free.discardNullTerms($1) }
 	}
 
 	private static func discardNullTerms(syntax: Syntax<Term?, Leaf>) -> Term? {
