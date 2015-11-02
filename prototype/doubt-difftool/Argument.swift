@@ -39,6 +39,7 @@ private let source: Madness.Parser<[String], Source>.Function =
 let argumentsParser: Madness.Parser<[String], Argument>.Function = fix { rest in
 	(curry(Argument.OutputFlag) <^> flag <|> curry(Argument.File) <^> source)
 		<*> rest
+		<|> pure(Argument.End)
 }
 
 import Madness
