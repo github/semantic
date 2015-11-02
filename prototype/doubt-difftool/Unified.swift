@@ -1,6 +1,8 @@
 private func unified(term: Term, source: String) -> String {
-	return term.cata {
-		switch $1 {
+	return term.cata { info, syntax in
+		switch syntax {
+		case .Leaf:
+			return String(source.utf16[info.range])
 		default:
 			return ""
 		}
