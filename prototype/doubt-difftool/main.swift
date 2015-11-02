@@ -178,5 +178,6 @@ case .Split:
 		NSWorkspace.sharedWorkspace().openURL(URL)
 	}
 case .Unified:
-	break
+	var previous = bSource.contents.startIndex
+	print(benchmark { unified(diff, before: aSource.contents, after: bSource.contents) })
 }
