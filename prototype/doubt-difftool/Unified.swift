@@ -1,3 +1,12 @@
+private func unified(term: Term, source: String) -> String {
+	return term.cata {
+		switch $1 {
+		default:
+			return ""
+		}
+	}
+}
+
 private func unified(patch: Patch<Term>, before: String, after: String) -> String {
 	return (patch.state.before.map { "{-\($0)-}" } ?? "")
 		+ (patch.state.after.map { "{+\($0)+}" } ?? "")
