@@ -24,6 +24,34 @@ private var isTTY = isatty(STDOUT_FILENO) != 0
 private var isDumb = String.fromCString(getenv("TERM")).map { !$0.hasPrefix("dumb") } ?? false
 private var shouldFormat = isTTY && !isDumb
 
+private struct Attribute {
+	let colour: Colour
+	let style: Style
+
+	enum Colour: Int {
+		case Black = 30
+		case Red
+		case Green
+		case Yellow
+		case Blue
+		case Purple
+		case Cyan
+		case White
+	}
+
+	enum Style: Int {
+		case Normal = 0
+		case Bold = 1
+		case Underline = 4
+	}
+
+	func wrap(string: String) -> String {
+		return shouldFormat
+			? "\u{001B}[\(style);\(colour)m\(string)\u{001B}[0m"
+			: string
+	}
+}
+
 private func unified(patch: Patch<Term>, before: String, after: String) -> String {
 	return (patch.state.before.map { "{-\(unified($0, source: before))-}" } ?? "")
 		+ (patch.state.after.map { "{+\(unified($0, source: after))+}" } ?? "")
