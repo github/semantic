@@ -19,6 +19,11 @@ enum Argument {
 			return rest?.files ?? []
 		}
 	}
+
+	enum Output {
+		case Unified
+		case Split
+	}
 }
 
 let argumentsParser: Madness.Parser<[String], Argument>.Function = none()
