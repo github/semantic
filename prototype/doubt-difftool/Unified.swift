@@ -21,8 +21,8 @@ private func isOrderedBefore(a: (String, Range<Int>?), _ b: (String, Range<Int>?
 }
 
 private func unified(patch: Patch<Term>, before: String, after: String) -> String {
-	return (patch.state.before.map { "{-\($0)-}" } ?? "")
-		+ (patch.state.after.map { "{+\($0)+}" } ?? "")
+	return (patch.state.before.map { "{-\(unified($0, source: before))-}" } ?? "")
+		+ (patch.state.after.map { "{+\(unified($0, source: after))+}" } ?? "")
 }
 
 private func range(patch: Patch<Term>) -> Range<Int>? {
