@@ -15,8 +15,8 @@ enum Argument {
 		switch self {
 		case let .File(a, rest):
 			return [a] + rest.files
-		case .End:
-			return []
+		default:
+			return rest?.files ?? []
 		}
 	}
 }
