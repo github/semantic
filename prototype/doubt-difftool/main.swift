@@ -14,6 +14,7 @@ func benchmark<T>(label: String? = nil, _ f: () -> T) -> T {
 extension String: ErrorType {}
 
 typealias Term = Cofree<String, Info>
+typealias Diff = Free<Term.Leaf, (Term.Annotation, Term.Annotation), Patch<Term>>
 typealias Parser = String throws -> Term
 
 struct Source {
