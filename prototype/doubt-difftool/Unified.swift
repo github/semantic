@@ -18,6 +18,13 @@ private func unified(term: Term, source: String) -> String {
 	}.0
 }
 
+private func isOrderedBefore(a: (String, Range<Int>?), _ b: (String, Range<Int>?)) -> Bool {
+	if let a = a.1, b = b.1 {
+		return a.startIndex < b.startIndex
+	}
+	return false
+}
+
 private func unified(patch: Patch<Term>, before: String, after: String) -> String {
 	return (patch.state.before.map { "{-\($0)-}" } ?? "")
 		+ (patch.state.after.map { "{+\($0)+}" } ?? "")
