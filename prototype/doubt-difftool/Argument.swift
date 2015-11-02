@@ -3,15 +3,6 @@ enum Argument {
 	indirect case OutputFlag(Output, Argument)
 	case Sources(Source, Source)
 
-	private var rest: Argument? {
-		switch self {
-		case let .OutputFlag(_, rest):
-			return rest
-		case .Sources:
-			return nil
-		}
-	}
-
 	var sources: (Source, Source) {
 		switch self {
 		case let .Sources(a, b):
