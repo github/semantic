@@ -8,12 +8,7 @@ private func unified(term: Term, source: String) -> String {
 		case let .Fixed(f):
 			return (unified(info.range, children: f, source: source), info.range)
 		case let .Keyed(k):
-			return (unified(info.range, children: k.values.sort { a, b in
-				if let a = a.1, b = b.1 {
-					return a.startIndex < b.startIndex
-				}
-				return false
-			}, source: source), info.range)
+			return (unified(info.range, children: k.values.sort(isOrderedBefore), source: source), info.range)
 		}
 	}.0
 }
@@ -57,12 +52,7 @@ func unified(diff: Diff, before: String, after: String) -> String {
 		case let .Fixed(f):
 			return (unified(info.1.range, children: f, source: after), info.1.range)
 		case let .Keyed(k):
-			return (unified(info.1.range, children: k.values.sort { a, b in
-				if let a = a.1, b = b.1 {
-					return a.startIndex < b.startIndex
-				}
-				return false
-			}, source: after), info.1.range)
+			return (unified(info.1.range, children: k.values.sort(isOrderedBefore), source: after), info.1.range)
 		}
 	}.0
 }
