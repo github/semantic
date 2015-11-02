@@ -29,9 +29,12 @@ enum Argument {
 	}
 }
 
-private let validFlags: Set<String> = [ "--unified", "--split" ]
+private let flag: Madness.Parser<[String], Argument.Output>.Function =
+		const(Argument.Output.Unified) <^> satisfy { $0 == "--unified" }
+	<|> const(Argument.Output.Split) <^> satisfy { $0 == "--split" }
 
 let argumentsParser: Madness.Parser<[String], Argument>.Function = none()
 
 
 import Madness
+import Prelude
