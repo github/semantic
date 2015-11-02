@@ -1,12 +1,12 @@
 /// A list of arguments for the difftool.
 enum Argument {
-	indirect case File(Source, Argument)
+	indirect case Sources(Source, Source, Argument)
 	indirect case OutputFlag(Output, Argument)
 	case End
 
 	private var rest: Argument? {
 		switch self {
-		case let .File(_, rest):
+		case let .Sources(_, _, rest):
 			return rest
 		case let .OutputFlag(_, rest):
 			return rest
@@ -15,12 +15,12 @@ enum Argument {
 		}
 	}
 
-	var files: [Source] {
+	var sources: (Source, Source)? {
 		switch self {
-		case let .File(a, rest):
-			return [a] + rest.files
+		case let .Sources(a, b, _):
+			return (a, b)
 		default:
-			return rest?.files ?? []
+			return rest?.sources
 		}
 	}
 
@@ -50,11 +50,9 @@ private let flag: Madness.Parser<[String], Argument.Output>.Function =
 private let source: Madness.Parser<[String], Source>.Function =
 	{ try! Source($0) } <^> satisfy { !$0.hasPrefix("--") }
 
-let argumentsParser: Madness.Parser<[String], Argument>.Function = satisfy(const(true)) *> fix { rest in
-	(curry(Argument.OutputFlag) <^> flag <|> curry(Argument.File) <^> source)
-		<*> rest
-		<|> pure(Argument.End)
-}
+let argumentsParser: Madness.Parser<[String], Argument>.Function = any // skip the path to the difftool
+	*> (curry(Argument.OutputFlag) <^> flag)
+		<*> (curry(Argument.Sources) <^> source <*> source <*> pure(Argument.End))
 
 import Madness
 import Prelude
