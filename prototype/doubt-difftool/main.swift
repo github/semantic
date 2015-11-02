@@ -154,23 +154,28 @@ let parser = parserForType(aSource.type)
 let a = try parser(aSource.contents)
 let b = try parser(bSource.contents)
 let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
-let JSON: Doubt.JSON = [
-	"before": .String(aSource.contents),
-	"after": .String(bSource.contents),
-	"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: { $0.range.JSON }, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
-		[
-			"before": $0.range.JSON,
-			"after": $1.range.JSON,
-		]
-	}),
-]
-let data = JSON.serialize()
-try data.writeToURL(jsonURL, options: .DataWritingAtomic)
+switch arguments.output {
+case .Split:
+	let JSON: Doubt.JSON = [
+		"before": .String(aSource.contents),
+		"after": .String(bSource.contents),
+		"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: { $0.range.JSON }, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
+			[
+				"before": $0.range.JSON,
+				"after": $1.range.JSON,
+			]
+		}),
+	]
+	let data = JSON.serialize()
+	try data.writeToURL(jsonURL, options: .DataWritingAtomic)
 
-let components = NSURLComponents()
-components.scheme = "file"
-components.path = uiPath
-components.query = jsonURL.absoluteString
-if let URL = components.URL {
-	NSWorkspace.sharedWorkspace().openURL(URL)
+	let components = NSURLComponents()
+	components.scheme = "file"
+	components.path = uiPath
+	components.query = jsonURL.absoluteString
+	if let URL = components.URL {
+		NSWorkspace.sharedWorkspace().openURL(URL)
+	}
+case .Unified:
+	break
 }
