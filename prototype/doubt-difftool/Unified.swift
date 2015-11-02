@@ -4,7 +4,7 @@ func unified(patch: Patch<Term>, source: String) -> String {
 }
 
 private func range(patch: Patch<Term>) -> Range<Int>? {
-	return nil
+	return patch.state.after?.extract.range
 }
 
 func unified(diff: Diff, before: String, after: String) -> String {
