@@ -120,6 +120,15 @@ extension CofreeType {
 		return (term.extract, term.unwrap)
 	}
 
+
+	/// Catamorphism over `TermType`s.
+	///
+	/// Folds the tree encoded by the receiver into a single value by recurring top-down through the tree, applying `transform` to leaves, then to branches, and so forth.
+	public func cata<Result>(transform: (Annotation, Syntax<Result, Leaf>) -> Result) -> Result {
+		return self |> (Self.eliminate >>> { ($0, $1.map { $0.cata(transform) }) } >>> transform)
+	}
+
+
 	/// Constructs a cofree by coiteration.
 	///
 	/// This is an _anamorphism_ (from the Greek “ana,” “upwards”; compare “anabolism”), a generalization of unfolds over regular trees (and datatypes isomorphic to them). The initial seed is used as the annotation of the returned value. The continuation of the structure is unpacked by applying `annotate` to the seed and mapping the resulting syntax’s values recursively. In this manner, the structure is unfolded bottom-up, starting with `seed` and ending at the leaves.

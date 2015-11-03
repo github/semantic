@@ -11,7 +11,7 @@ struct UnannotatedTerm {
 		let keyed = UnannotatedTerm.keyed
 		let fixed = UnannotatedTerm.fixed
 		return term.cata {
-			switch $0 {
+			switch $1 {
 			case let .Leaf(s):
 				return s
 			case let .Indexed(s):
@@ -30,7 +30,7 @@ struct UnannotatedTerm {
 		let fixed = UnannotatedTerm.fixed
 		
 		return term.cata {
-			switch $0 {
+			switch $1 {
 			case let .Leaf(s):
 				return Cofree(0..<s.characters.count, .Leaf(s))
 			case let .Indexed(i):
