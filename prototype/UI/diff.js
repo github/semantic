@@ -71,6 +71,7 @@ function rangeAndSyntaxToDOM(source, syntax, extract, getRange, recur) {
 	recur = recur || function(term) {
 		return rangeAndSyntaxToDOM(source, term.unwrap, term.extract, getRange);
 	}
+	var categories = extract.categories;
 	var range = extract.range;
 	var element;
 	if (syntax.leaf != null) {
@@ -128,6 +129,11 @@ function rangeAndSyntaxToDOM(source, syntax, extract, getRange, recur) {
 		element.appendChild(document.createTextNode(source.substr(previous, range[0] + range[1] - previous)));
 	}
 	element["data-range"] = range;
+
+	for (index in categories) {
+		element.classList.add('category-'+categories[index]);
+	}
+
 	return element;
 }
 
