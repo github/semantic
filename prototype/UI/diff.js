@@ -67,9 +67,9 @@ function wrap(tagName, element) {
 }
 
 /// String -> Syntax a -> Range -> (a -> Range) -> (a -> DOM) -> DOM
-function rangeAndSyntaxToDOM(source, syntax, extract, getRange, recur) {
+function termToDOM(source, syntax, extract, getRange, recur) {
 	recur = recur || function(term) {
-		return rangeAndSyntaxToDOM(source, term.unwrap, term.extract, getRange);
+		return termToDOM(source, term.unwrap, term.extract, getRange);
 	}
 	var categories = extract.categories;
 	var range = extract.range;
@@ -173,7 +173,7 @@ function diffToDOM(diff, sources) {
 function pureToDOM(sources, patch, getRangeFun, diffToDOMFun) {
 	var elementA, elementB;
 	if (patch.before != null) {
-		elementA = rangeAndSyntaxToDOM(sources.before, patch.before.unwrap, patch.before.extract, getRangeFun);
+		elementA = termToDOM(sources.before, patch.before.unwrap, patch.before.extract, getRangeFun);
 		elementA.classList.add("delete");
 		if (patch.after != null) {
 			elementA.classList.add("replace");
@@ -181,7 +181,7 @@ function pureToDOM(sources, patch, getRangeFun, diffToDOMFun) {
 	}
 
 	if (patch.after != null) {
-		elementB = rangeAndSyntaxToDOM(sources.after, patch.after.unwrap, patch.after.extract, getRangeFun);
+		elementB = termToDOM(sources.after, patch.after.unwrap, patch.after.extract, getRangeFun);
 		elementB.classList.add("insert");
 		if (patch.before != null) {
 			elementB.classList.add("replace");
