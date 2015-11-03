@@ -137,11 +137,11 @@ function diffToDOM(diff, sources) {
 		if (diffOrTerm.pure != null) {
 			var beforeRange, afterRange;
 			if (diffOrTerm.pure.before != null) {
-				beforeRange = diffOrTerm.pure.before.extract
+				beforeRange = diffOrTerm.pure.before.extract.range
 			}
 
 			if (diffOrTerm.pure.after != null) {
-				afterRange = diffOrTerm.pure.after.extract
+				afterRange = diffOrTerm.pure.after.extract.range
 			}
 
 			if (beforeRange == null) {
@@ -154,10 +154,10 @@ function diffToDOM(diff, sources) {
 			return { "before": beforeRange, "after": afterRange };
 		}
 		if (diffOrTerm.roll != null) {
-			return diffOrTerm.roll.extract;
+			return { before: diffOrTerm.roll.extract.before.range, after: diffOrTerm.roll.extract.after.range };
 		}
 		if (diffOrTerm.extract != null) {
-			return diffOrTerm.extract;
+			return diffOrTerm.extract.range;
 		}
 	}
 
