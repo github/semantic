@@ -21,8 +21,8 @@ extension TermType {
 	/// Paramorphism over `TermType`s.
 	///
 	/// Folds the tree encoded by the receiver into a single value by recurring top-down through the tree, applying `transform` to leaves, then to branches, and so forth. Each recursive instance is made available in the `Syntax` alongside the result value at that node.
-	public func para<Result>(transform: Syntax<(Self, Result), Leaf> -> Result) -> Result {
-		return self |> (Self.unwrap >>> { $0.map { ($0, $0.para(transform)) } } >>> transform)
+	public func para<Result>(transform: Syntax<(Self, Result), Leaf> throws -> Result) rethrows -> Result {
+		return try transform(unwrap.map { try ($0, $0.para(transform)) })
 	}
 
 
