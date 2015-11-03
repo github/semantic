@@ -154,7 +154,7 @@ let parser = parserForType(aSource.type)
 
 let a = try parser(aSource.contents)
 let b = try parser(bSource.contents)
-let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
+let diff = benchmark("diffing") { Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b) }
 switch arguments.output {
 case .Split:
 	let JSON: Doubt.JSON = [
