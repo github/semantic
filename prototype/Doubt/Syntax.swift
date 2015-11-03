@@ -48,8 +48,8 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible {
 /// Hylomorphisms are used to construct diffs corresponding to equal terms; see also `CofreeType.zip`.
 ///
 /// `hylo` can be used with arbitrary functors which can eliminate to and introduce with `Syntax` values.
-public func hylo<A, B, Leaf>(down: Syntax<B, Leaf> -> B, _ up: A -> Syntax<A, Leaf>) -> A -> B {
-	return up >>> { $0.map(hylo(down, up)) } >>> down
+public func hylo<A, B, Leaf>(down: Syntax<B, Leaf> -> B, _ up: A -> Syntax<A, Leaf>)(_ a: A) -> B {
+	return down(up(a).map(hylo(down, up)))
 }
 
 /// Reiteration through `Syntax`.
