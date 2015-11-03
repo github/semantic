@@ -205,7 +205,14 @@ function pureToDOM(sources, patch, getRangeFun, diffToDOMFun) {
 
 function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 	var syntax = rollOrTerm.unwrap
-	var range = rollOrTerm.extract
+	var categories = {
+		before: rollOrTerm.extract.before.categories,
+		after: rollOrTerm.extract.after.categories
+	}
+	var range = {
+		before: rollOrTerm.extract.before.range,
+		after: rollOrTerm.extract.after.range
+	}
 
 	var elementA;
 	var elementB;
