@@ -85,18 +85,9 @@ function rangeAndSyntaxToDOM(source, syntax, extract, getRange, recur) {
 			var child = values[i];
 			if (child.pure == "") continue;
 			var childRange = getRange(child);
-			if (childRange.before != null) {
-				var beforeRange = childRange.before;
-				element.appendChild(document.createTextNode(source.substr(previous, beforeRange[0] - previous)));
-				element.appendChild(wrap("li", recur(child)));
-				previous = beforeRange[0] + beforeRange[1];
-			}
-			if (childRange.after != null) {
-				var afterRange = childRange.before;
-				element.appendChild(document.createTextNode(source.substr(previous, afterRange[0] - previous)));
-				element.appendChild(wrap("td", recur(child)));
-				previous = afterRange[0] + afterRange[1];
-			}
+			element.appendChild(document.createTextNode(source.substr(previous, childRange[0] - previous)));
+			element.appendChild(wrap("li", recur(child)));
+			previous = childRange[0] + childRange[1];
 		}
 		element.appendChild(document.createTextNode(source.substr(previous, range[0] + range[1] - previous)));
 	} else if (syntax.keyed != null) {
