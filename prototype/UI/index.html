@@ -29,10 +29,11 @@
         background-color: #ffffec;
         outline: 1px solid #e9e9c0;
     }
-		.invisible {
-			background-color: #fff;
-			visibility: hidden;
-		}
+
+    .invisible {
+    	background-color: #fff;
+    	visibility: hidden;
+    }
 
     .diff div, .diff ul, .diff li, .diff dl, .diff dd, .diff span {
         white-space: pre-wrap;
@@ -65,16 +66,15 @@
     </script>
   </head>
   <body>
-		<div id="before" class="diff"></div>
-		<div id="after" class="diff"></div>
+	<div id="before" class="diff"></div>
+	<div id="after" class="diff"></div>
 
     <script type="text/javascript">
     loadJSON((window.location.search || '?diff.json').substr(1), function (json) {
         var diff = diffFromJSON(json.diff);
-
-				var dom = diffToDOM(diff, { "before": json["before"] , "after": json["after"] })
-				document.getElementById("before").appendChild(dom.before);
-				document.getElementById("after").appendChild(dom.after);
+		var dom = diffToDOM(diff, { "before": json["before"] , "after": json["after"] })
+		document.getElementById("before").appendChild(dom.before);
+		document.getElementById("after").appendChild(dom.after);
     });
     </script>
   </body>
