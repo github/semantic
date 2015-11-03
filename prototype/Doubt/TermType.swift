@@ -14,8 +14,8 @@ extension TermType {
 	/// Catamorphism over `TermType`s.
 	///
 	/// Folds the tree encoded by the receiver into a single value by recurring top-down through the tree, applying `transform` to leaves, then to branches, and so forth.
-	public func cata<Result>(transform: Syntax<Result, Leaf> -> Result) -> Result {
-		return self |> (Self.unwrap >>> { $0.map { $0.cata(transform) } } >>> transform)
+	public func cata<Result>(transform: Syntax<Result, Leaf> throws -> Result) rethrows -> Result {
+		return try transform(unwrap.map { try $0.cata(transform) })
 	}
 
 	/// Paramorphism over `TermType`s.
