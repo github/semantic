@@ -8,7 +8,7 @@ function termFromJSON(json) {
 }
 
 function Term(object) {
-	this.range = object.extract;
+	this.extract = object.extract;
 	this.unwrap = object.unwrap;
 	return this;
 }
