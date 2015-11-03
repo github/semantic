@@ -178,5 +178,5 @@ case .Split:
 		NSWorkspace.sharedWorkspace().openURL(URL)
 	}
 case .Unified:
-	print(benchmark { unified(diff, before: aSource.contents, after: bSource.contents) })
+	print(benchmark("formatting unified diff") { unified(diff, before: aSource.contents, after: bSource.contents) })
 }
