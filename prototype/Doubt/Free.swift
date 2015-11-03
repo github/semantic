@@ -21,15 +21,6 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	}
 
 
-	public func analysis<C>(@noescape ifPure ifPure: Value throws -> C, @noescape ifRoll: (Annotation, Syntax<Free, Leaf>) throws -> C) rethrows -> C {
-		switch self {
-		case let .Pure(b):
-			return try ifPure(b)
-		case let .Roll(s):
-			return try ifRoll(s)
-		}
-	}
-
 	/// Reduce the receiver by iteration.
 	///
 	/// `Pure` values are simply unpacked. `Roll` values are mapped recursively, and then have `transform` applied to them.
