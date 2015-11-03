@@ -17,29 +17,6 @@ public enum Algorithm<Term: CofreeType, Result> {
 
 	/// A recursive instantiation of `Operation`, unrolling another iteration of the recursive type.
 	indirect case Roll(Operation<Algorithm, Term, Diff>)
-
-	public func analysis<C>(@noescape ifPure ifPure: Result -> C, @noescape ifRoll: Operation<Algorithm, Term, Diff> -> C) -> C {
-		switch self {
-		case let .Pure(b):
-			return ifPure(b)
-		case let .Roll(a):
-			return ifRoll(a)
-		}
-	}
-
-
-	// MARK: Functor
-
-	public func map<Other>(transform: Result -> Other) -> Algorithm<Term, Other> {
-		return analysis(ifPure: transform >>> Algorithm<Term, Other>.Pure, ifRoll: { .Roll($0.map { $0.map(transform) }) })
-	}
-
-
-	// MARK: Monad
-
-	public func flatMap<C>(transform: Result -> Algorithm<Term, C>) -> Algorithm<Term, C> {
-		return analysis(ifPure: transform, ifRoll: { .Roll($0.map { $0.flatMap(transform) }) })
-	}
 }
 
 

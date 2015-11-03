@@ -26,20 +26,20 @@ extension TSNode {
 	var namedChildren: ChildrenCollection {
 		return ChildrenCollection(node: self, count: ts_node_named_child_count(self), child: ts_node_named_child)
 	}
+}
 
 
-	struct ChildrenCollection: CollectionType {
-		let node: TSNode
-		let count: Int
-		let child: (TSNode, Int) -> TSNode
+struct ChildrenCollection: CollectionType {
+	let node: TSNode
+	let count: Int
+	let child: (TSNode, Int) -> TSNode
 
-		subscript (index: Int) -> TSNode {
-			return child(node, index)
-		}
+	subscript (index: Int) -> TSNode {
+		return child(node, index)
+	}
 
-		let startIndex = 0
-		var endIndex: Int {
-			return count
-		}
+	let startIndex = 0
+	var endIndex: Int {
+		return count
 	}
 }
