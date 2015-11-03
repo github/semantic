@@ -93,7 +93,7 @@ extension Syntax {
 		case let (.Indexed(v1), .Indexed(v2)):
 			return v1.count == v2.count && zip(v1, v2).reduce(true) { $0 && recur($1) }
 		case let (.Fixed(v1), .Fixed(v2)):
-			return v1.count == v2.count && zip(v1, v2).lazy.map(recur).reduce(true) { $0 && $1 }
+			return v1.count == v2.count && zip(v1, v2).reduce(true) { $0 && recur($1) }
 		case let (.Keyed(d1), .Keyed(d2)):
 			return Set(d1.keys) == Set(d2.keys) && d1.keys.map { recur(d1[$0]!, d2[$0]!) }.reduce(true) { $0 && $1 }
 		default:
