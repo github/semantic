@@ -33,13 +33,6 @@ public enum Algorithm<Term: CofreeType, Result> {
 	public func map<Other>(transform: Result -> Other) -> Algorithm<Term, Other> {
 		return analysis(ifPure: transform >>> Algorithm<Term, Other>.Pure, ifRoll: { .Roll($0.map { $0.map(transform) }) })
 	}
-
-
-	// MARK: Monad
-
-	public func flatMap<C>(transform: Result -> Algorithm<Term, C>) -> Algorithm<Term, C> {
-		return analysis(ifPure: transform, ifRoll: { .Roll($0.map { $0.flatMap(transform) }) })
-	}
 }
 
 
