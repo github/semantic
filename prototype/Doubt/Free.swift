@@ -217,14 +217,17 @@ public func == <Term: CofreeType, Annotation where Term.Leaf: Equatable> (left: 
 
 extension Free {
 	public func JSON(pure pure: Value -> Doubt.JSON, leaf: Leaf -> Doubt.JSON, annotation: Annotation -> Doubt.JSON) -> Doubt.JSON {
-		return analysis(
-			ifPure: { [ "pure": pure($0) ] },
-			ifRoll: {
-				[ "roll": [
-					"extract": annotation($0),
-					"unwrap": $1.JSON(leaf: leaf, recur: { $0.JSON(pure: pure, leaf: leaf, annotation: annotation) })
-				] ]
-			})
+		switch self {
+		case let .Pure(a):
+			return [ "pure": pure(a) ]
+		case let .Roll(a, b):
+			return [
+				"roll": [
+					"extract": annotation(a),
+					"unwrap": b.JSON(leaf: leaf, recur: { $0.JSON(pure: pure, leaf: leaf, annotation: annotation) })
+				]
+			]
+		}
 	}
 }
 
