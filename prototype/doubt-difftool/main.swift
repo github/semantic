@@ -14,6 +14,7 @@ func benchmark<T>(label: String? = nil, _ f: () -> T) -> T {
 extension String: ErrorType {}
 
 typealias Term = Cofree<String, Info>
+typealias Diff = Free<Term.Leaf, (Term.Annotation, Term.Annotation), Patch<Term>>
 typealias Parser = String throws -> Term
 
 struct Source {
@@ -143,9 +144,9 @@ func parserForType(type: String) -> String throws -> Term {
 	}
 }
 
-let arguments = BoundsCheckedArray(array: Process.arguments)
-guard let aSource = try arguments[1].map(Source.init) else { throw "need source A" }
-guard let bSource = try arguments[2].map(Source.init) else { throw "need source B" }
+let parsed = parse(argumentsParser, input: Process.arguments)
+let arguments: Argument = try parsed.either(ifLeft: { throw "\($0)" }, ifRight: { $0 })
+let (aSource, bSource) = arguments.sources
 let jsonURL = NSURL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).URLByAppendingPathComponent("diff.json")
 guard let uiPath = NSBundle.mainBundle().infoDictionary?["PathToUISource"] as? String else { throw "need ui path" }
 guard aSource.type == bSource.type else { throw "can’t compare files of different types" }
@@ -154,23 +155,28 @@ let parser = parserForType(aSource.type)
 let a = try parser(aSource.contents)
 let b = try parser(bSource.contents)
 let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
-let JSON: Doubt.JSON = [
-	"before": .String(aSource.contents),
-	"after": .String(bSource.contents),
-	"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: { $0.range.JSON }, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
-		[
-			"before": $0.range.JSON,
-			"after": $1.range.JSON,
-		]
-	}),
-]
-let data = JSON.serialize()
-try data.writeToURL(jsonURL, options: .DataWritingAtomic)
+switch arguments.output {
+case .Split:
+	let JSON: Doubt.JSON = [
+		"before": .String(aSource.contents),
+		"after": .String(bSource.contents),
+		"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: { $0.range.JSON }, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
+			[
+				"before": $0.range.JSON,
+				"after": $1.range.JSON,
+			]
+		}),
+	]
+	let data = JSON.serialize()
+	try data.writeToURL(jsonURL, options: .DataWritingAtomic)
 
-let components = NSURLComponents()
-components.scheme = "file"
-components.path = uiPath
-components.query = jsonURL.absoluteString
-if let URL = components.URL {
-	NSWorkspace.sharedWorkspace().openURL(URL)
+	let components = NSURLComponents()
+	components.scheme = "file"
+	components.path = uiPath
+	components.query = jsonURL.absoluteString
+	if let URL = components.URL {
+		NSWorkspace.sharedWorkspace().openURL(URL)
+	}
+case .Unified:
+	print(benchmark { unified(diff, before: aSource.contents, after: bSource.contents) })
 }
