@@ -90,12 +90,12 @@ extension Syntax {
 		switch (left, right) {
 		case let (.Leaf(l1), .Leaf(l2)):
 			return leaf(l1, l2)
-		case let (.Indexed(v1), .Indexed(v2)):
-			return v1.count == v2.count && zip(v1, v2).reduce(true) { $0 && recur($1) }
-		case let (.Fixed(v1), .Fixed(v2)):
-			return v1.count == v2.count && zip(v1, v2).reduce(true) { $0 && recur($1) }
-		case let (.Keyed(d1), .Keyed(d2)):
-			return Set(d1.keys) == Set(d2.keys) && d1.keys.reduce(true) { $0 && recur(d1[$1]!, d2[$1]!) }
+		case let (.Indexed(v1), .Indexed(v2)) where v1.count == v2.count:
+			return zip(v1, v2).reduce(true) { $0 && recur($1) }
+		case let (.Fixed(v1), .Fixed(v2)) where v1.count == v2.count:
+			return zip(v1, v2).reduce(true) { $0 && recur($1) }
+		case let (.Keyed(d1), .Keyed(d2)) where Set(d1.keys) == Set(d2.keys):
+			return d1.keys.reduce(true) { $0 && recur(d1[$1]!, d2[$1]!) }
 		default:
 			return false
 		}
