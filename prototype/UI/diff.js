@@ -436,6 +436,14 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 		elementB.appendChild(document.createTextNode(textB));
 	}
 
+	for (index in categories.before) {
+		elementA.classList.add('category-'+categories.before[index]);
+	}
+
+	for (index in categories.after) {
+		elementB.classList.add('category-'+categories.after[index]);
+	}
+
 	return { "before": elementA, "after": elementB }
 }
 
