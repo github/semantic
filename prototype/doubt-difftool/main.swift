@@ -144,7 +144,7 @@ func parserForType(type: String) -> String throws -> Term {
 	}
 }
 
-let parsed = parse(argumentsParser, input: Process.arguments)
+let parsed = benchmark("parsing arguments & loading sources") { parse(argumentsParser, input: Process.arguments) }
 let arguments: Argument = try parsed.either(ifLeft: { throw "\($0)" }, ifRight: { $0 })
 let (aSource, bSource) = arguments.sources
 let jsonURL = NSURL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).URLByAppendingPathComponent("diff.json")
