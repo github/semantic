@@ -162,8 +162,8 @@ case .Split:
 		"after": .String(bSource.contents),
 		"diff": diff.JSON(pure: { $0.JSON { $0.JSON(annotation: { $0.range.JSON }, leaf: Doubt.JSON.String) } }, leaf: Doubt.JSON.String, annotation: {
 			[
-				"before": $0.range.JSON,
-				"after": $1.range.JSON,
+				"before": $0.JSON,
+				"after": $1.JSON,
 			]
 		}),
 	]
