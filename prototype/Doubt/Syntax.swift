@@ -59,8 +59,9 @@ public func hylo<A, B, Leaf>(down: Syntax<B, Leaf> -> B, _ up: A -> Syntax<A, Le
 /// Hylomorphisms are used to construct diffs corresponding to equal terms; see also `CofreeType.zip`.
 ///
 /// `hylo` can be used with arbitrary functors which can eliminate to and introduce with `Annotation` & `Syntax` pairs.
-public func hylo<A, B, Leaf, Annotation>(down: (Annotation, Syntax<B, Leaf>) -> B, _ up: A -> (Annotation, Syntax<A, Leaf>)) -> A -> B {
-	return up >>> { ($0, $1.map(hylo(down, up))) } >>> down
+public func hylo<A, B, Leaf, Annotation>(down: (Annotation, Syntax<B, Leaf>) -> B, _ up: A -> (Annotation, Syntax<A, Leaf>))(_ a: A) -> B {
+	let (annotation, syntax) = up(a)
+	return down(annotation, syntax.map(hylo(down, up)))
 }
 
 
