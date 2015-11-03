@@ -95,13 +95,6 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	}
 
 
-	// MARK: Monad
-
-	public func flatMap<C>(@noescape transform: Value throws -> Free<Leaf, Annotation, C>) rethrows -> Free<Leaf, Annotation, C> {
-		return try analysis(ifPure: transform, ifRoll: { try .Roll($0, $1.map { try $0.flatMap(transform) }) })
-	}
-
-
 	// MARK: CustomDebugStringConvertible
 
 	public var debugDescription: String {
