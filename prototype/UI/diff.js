@@ -78,7 +78,7 @@ function rangeAndSyntaxToDOM(source, syntax, range, getRange, recur) {
 	} else if (syntax.indexed != null || syntax.fixed != null) {
 		var values = syntax.indexed || syntax.fixed;
 		element = document.createElement("ul");
-		var previous = range[0];
+		var prevous = range[0];
 		for (i in values) {
 			var child = values[i];
 			if (child.pure == "") continue;
@@ -402,7 +402,6 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 
 				var beginningOfNextElement = nextVisibleElement.range[0];
 				var text = sources.after.substr(previousB, beginningOfNextElement - previousB);
-				console.log(text);
 				var node = wrap("span", document.createTextNode(text));
 				node.classList.add("invisible");
 				elementA.appendChild(node);
@@ -410,8 +409,6 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 
 			var nextIndex = afters.indexOf(b) + 1;
 			if (childElB.classList.contains("invisible") && nextIndex < befores.length) {
-				console.log("Right Element: " + key + " is invisible")
-				console.log("Adding invisible separator text:");
 				var nextVisibleElement = befores[nextIndex]
 				while (nextVisibleElement.child.classList.contains("invisible") && ++nextIndex < befores.length) {
 					nextVisibleElement = befores[nextIndex]
