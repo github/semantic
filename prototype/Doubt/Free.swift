@@ -91,7 +91,12 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	// MARK: Functor
 
 	public func map<C>(@noescape transform: Value throws -> C) rethrows -> Free<Leaf, Annotation, C> {
-		return try analysis(ifPure: { try .Pure(transform($0)) }, ifRoll: { try .Roll($0, $1.map { try $0.map(transform) }) })
+		switch self {
+		case let .Pure(a):
+			return try .Pure(transform(a))
+		case let .Roll(annotation, syntax):
+			return try .Roll(annotation, syntax.map { try $0.map(transform) })
+		}
 	}
 
 
