@@ -3,9 +3,9 @@ import Doubt
 import Prelude
 import Madness
 
-func benchmark<T>(label: String? = nil, _ f: () -> T) -> T {
+func benchmark<T>(label: String? = nil, _ f: () throws -> T) rethrows -> T {
 	let start = NSDate.timeIntervalSinceReferenceDate()
-	let result = f()
+	let result = try f()
 	let end = NSDate.timeIntervalSinceReferenceDate()
 	print((label.map { "\($0): " } ?? "") + "\(end - start)s")
 	return result
@@ -144,7 +144,7 @@ func parserForType(type: String) -> String throws -> Term {
 	}
 }
 
-let parsed = parse(argumentsParser, input: Process.arguments)
+let parsed = benchmark("parsing arguments & loading sources") { parse(argumentsParser, input: Process.arguments) }
 let arguments: Argument = try parsed.either(ifLeft: { throw "\($0)" }, ifRight: { $0 })
 let (aSource, bSource) = arguments.sources
 let jsonURL = NSURL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true).URLByAppendingPathComponent("diff.json")
@@ -152,9 +152,9 @@ guard let uiPath = NSBundle.mainBundle().infoDictionary?["PathToUISource"] as? S
 guard aSource.type == bSource.type else { throw "can’t compare files of different types" }
 let parser = parserForType(aSource.type)
 
-let a = try parser(aSource.contents)
-let b = try parser(bSource.contents)
-let diff = Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b)
+let a = try benchmark("parsing source a") { try parser(aSource.contents) }
+let b = try benchmark("parsing source b") { try parser(bSource.contents) }
+let diff = benchmark("diffing") { Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b) }
 switch arguments.output {
 case .Split:
 	let JSON: Doubt.JSON = [
@@ -178,5 +178,5 @@ case .Split:
 		NSWorkspace.sharedWorkspace().openURL(URL)
 	}
 case .Unified:
-	print(benchmark { unified(diff, before: aSource.contents, after: bSource.contents) })
+	print(benchmark("formatting unified diff") { unified(diff, before: aSource.contents, after: bSource.contents) })
 }

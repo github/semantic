@@ -21,15 +21,6 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	}
 
 
-	public func analysis<C>(@noescape ifPure ifPure: Value throws -> C, @noescape ifRoll: (Annotation, Syntax<Free, Leaf>) throws -> C) rethrows -> C {
-		switch self {
-		case let .Pure(b):
-			return try ifPure(b)
-		case let .Roll(s):
-			return try ifRoll(s)
-		}
-	}
-
 	/// Reduce the receiver by iteration.
 	///
 	/// `Pure` values are simply unpacked. `Roll` values are mapped recursively, and then have `transform` applied to them.
@@ -57,9 +48,12 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	///
 	/// For a lucid, in-depth tutorial on recursion schemes, I recommend [Patrick Thomson](https://twitter.com/importantshock)’s _[An Introduction to Recursion Schemes](http://patrickthomson.ghost.io/an-introduction-to-recursion-schemes/)_ and _[Recursion Schemes, Part 2: A Mob of Morphisms](http://patrickthomson.ghost.io/recursion-schemes-part-2/)_.
 	public func cata(@noescape transform: (Annotation, Syntax<Value, Leaf>) throws -> Value) rethrows -> Value {
-		return try analysis(
-			ifPure: id,
-			ifRoll: { try transform($0, $1.map { try $0.cata(transform) }) })
+		switch self {
+		case let .Pure(a):
+			return a
+		case let .Roll(annotation, syntax):
+			return try transform(annotation, syntax.map { try $0.cata(transform) })
+		}
 	}
 
 
@@ -88,14 +82,12 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	// MARK: Functor
 
 	public func map<C>(@noescape transform: Value throws -> C) rethrows -> Free<Leaf, Annotation, C> {
-		return try analysis(ifPure: { try .Pure(transform($0)) }, ifRoll: { try .Roll($0, $1.map { try $0.map(transform) }) })
-	}
-
-
-	// MARK: Monad
-
-	public func flatMap<C>(@noescape transform: Value throws -> Free<Leaf, Annotation, C>) rethrows -> Free<Leaf, Annotation, C> {
-		return try analysis(ifPure: transform, ifRoll: { try .Roll($0, $1.map { try $0.flatMap(transform) }) })
+		switch self {
+		case let .Pure(a):
+			return try .Pure(transform(a))
+		case let .Roll(annotation, syntax):
+			return try .Roll(annotation, syntax.map { try $0.map(transform) })
+		}
 	}
 
 
@@ -216,14 +208,17 @@ public func == <Term: CofreeType, Annotation where Term.Leaf: Equatable> (left: 
 
 extension Free {
 	public func JSON(pure pure: Value -> Doubt.JSON, leaf: Leaf -> Doubt.JSON, annotation: Annotation -> Doubt.JSON) -> Doubt.JSON {
-		return analysis(
-			ifPure: { [ "pure": pure($0) ] },
-			ifRoll: {
-				[ "roll": [
-					"extract": annotation($0),
-					"unwrap": $1.JSON(leaf: leaf, recur: { $0.JSON(pure: pure, leaf: leaf, annotation: annotation) })
-				] ]
-			})
+		switch self {
+		case let .Pure(a):
+			return [ "pure": pure(a) ]
+		case let .Roll(a, b):
+			return [
+				"roll": [
+					"extract": annotation(a),
+					"unwrap": b.JSON(leaf: leaf, recur: { $0.JSON(pure: pure, leaf: leaf, annotation: annotation) })
+				]
+			]
+		}
 	}
 }
 

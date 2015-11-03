@@ -121,11 +121,11 @@ extension CofreeType {
 	}
 
 
-	/// Catamorphism over `TermType`s.
+	/// Catamorphism over `CofreeType`s.
 	///
 	/// Folds the tree encoded by the receiver into a single value by recurring top-down through the tree, applying `transform` to leaves, then to branches, and so forth.
-	public func cata<Result>(transform: (Annotation, Syntax<Result, Leaf>) -> Result) -> Result {
-		return self |> (Self.eliminate >>> { ($0, $1.map { $0.cata(transform) }) } >>> transform)
+	public func cata<Result>(transform: (Annotation, Syntax<Result, Leaf>) throws -> Result) rethrows -> Result {
+		return try transform(extract, unwrap.map { try $0.cata(transform) })
 	}
 
 
