@@ -175,7 +175,7 @@ function diffToDOM(diff, sources) {
 function pureToDOM(sources, patch, getRangeFun, diffToDOMFun) {
 	var elementA, elementB;
 	if (patch.before != null) {
-		elementA = rangeAndSyntaxToDOM(sources.before, patch.before.unwrap, patch.before.extract, getRangeFun);
+		elementA = rangeAndSyntaxToDOM(sources.before, patch.before.unwrap, patch.before.extract.range, getRangeFun);
 		elementA.classList.add("delete");
 		if (patch.after != null) {
 			elementA.classList.add("replace");
@@ -183,7 +183,7 @@ function pureToDOM(sources, patch, getRangeFun, diffToDOMFun) {
 	}
 
 	if (patch.after != null) {
-		elementB = rangeAndSyntaxToDOM(sources.after, patch.after.unwrap, patch.after.extract, getRangeFun);
+		elementB = rangeAndSyntaxToDOM(sources.after, patch.after.unwrap, patch.after.extract.range, getRangeFun);
 		elementB.classList.add("insert");
 		if (patch.before != null) {
 			elementB.classList.add("replace");
