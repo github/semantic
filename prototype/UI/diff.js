@@ -78,7 +78,7 @@ function rangeAndSyntaxToDOM(source, syntax, range, getRange, recur) {
 	} else if (syntax.indexed != null || syntax.fixed != null) {
 		var values = syntax.indexed || syntax.fixed;
 		element = document.createElement("ul");
-		var prevous = range[0];
+		var previous = range[0];
 		for (i in values) {
 			var child = values[i];
 			if (child.pure == "") continue;
