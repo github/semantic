@@ -91,7 +91,7 @@ extension Syntax {
 		case let (.Leaf(l1), .Leaf(l2)):
 			return leaf(l1, l2)
 		case let (.Indexed(v1), .Indexed(v2)):
-			return v1.count == v2.count && zip(v1, v2).lazy.map(recur).reduce(true) { $0 && $1 }
+			return v1.count == v2.count && zip(v1, v2).reduce(true) { $0 && recur($1) }
 		case let (.Fixed(v1), .Fixed(v2)):
 			return v1.count == v2.count && zip(v1, v2).lazy.map(recur).reduce(true) { $0 && $1 }
 		case let (.Keyed(d1), .Keyed(d2)):
