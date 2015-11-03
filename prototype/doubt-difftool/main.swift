@@ -3,9 +3,9 @@ import Doubt
 import Prelude
 import Madness
 
-func benchmark<T>(label: String? = nil, _ f: () -> T) -> T {
+func benchmark<T>(label: String? = nil, _ f: () throws -> T) rethrows -> T {
 	let start = NSDate.timeIntervalSinceReferenceDate()
-	let result = f()
+	let result = try f()
 	let end = NSDate.timeIntervalSinceReferenceDate()
 	print((label.map { "\($0): " } ?? "") + "\(end - start)s")
 	return result
