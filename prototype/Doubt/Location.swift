@@ -22,22 +22,18 @@ public struct Location<A>: SequenceType {
 	/// The node currently in focus.
 	public let it: A
 
-	private let _down: A -> Location?
 	public var down: Location? {
 		return _down(it)
 	}
 
-	private let _up: A -> Location?
 	public var up: Location? {
 		return _up(it)
 	}
 
-	private let _left: A -> Location?
 	public var left: Location? {
 		return _left(it)
 	}
 
-	private let _right: A -> Location?
 	public var right: Location? {
 		return _right(it)
 	}
@@ -131,6 +127,12 @@ public struct Location<A>: SequenceType {
 		guard let location = into1(t1, t2, t3) else { return nil }
 		self = location
 	}
+
+
+	private let _down: A -> Location?
+	private let _up: A -> Location?
+	private let _left: A -> Location?
+	private let _right: A -> Location?
 
 
 	// MARK: SequenceType
