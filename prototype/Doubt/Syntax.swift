@@ -48,8 +48,8 @@ public enum Syntax<Recur, A>: CustomDebugStringConvertible {
 /// Hylomorphisms are used to construct diffs corresponding to equal terms; see also `CofreeType.zip`.
 ///
 /// `hylo` can be used with arbitrary functors which can eliminate to and introduce with `Syntax` values.
-public func hylo<A, B, Leaf>(down: Syntax<B, Leaf> -> B, _ up: A -> Syntax<A, Leaf>) -> A -> B {
-	return up >>> { $0.map(hylo(down, up)) } >>> down
+public func hylo<A, B, Leaf>(down: Syntax<B, Leaf> -> B, _ up: A -> Syntax<A, Leaf>)(_ a: A) -> B {
+	return down(up(a).map(hylo(down, up)))
 }
 
 /// Reiteration through `Syntax`.
@@ -59,8 +59,9 @@ public func hylo<A, B, Leaf>(down: Syntax<B, Leaf> -> B, _ up: A -> Syntax<A, Le
 /// Hylomorphisms are used to construct diffs corresponding to equal terms; see also `CofreeType.zip`.
 ///
 /// `hylo` can be used with arbitrary functors which can eliminate to and introduce with `Annotation` & `Syntax` pairs.
-public func hylo<A, B, Leaf, Annotation>(down: (Annotation, Syntax<B, Leaf>) -> B, _ up: A -> (Annotation, Syntax<A, Leaf>)) -> A -> B {
-	return up >>> { ($0, $1.map(hylo(down, up))) } >>> down
+public func hylo<A, B, Leaf, Annotation>(down: (Annotation, Syntax<B, Leaf>) -> B, _ up: A -> (Annotation, Syntax<A, Leaf>))(_ a: A) -> B {
+	let (annotation, syntax) = up(a)
+	return down(annotation, syntax.map(hylo(down, up)))
 }
 
 
@@ -89,12 +90,12 @@ extension Syntax {
 		switch (left, right) {
 		case let (.Leaf(l1), .Leaf(l2)):
 			return leaf(l1, l2)
-		case let (.Indexed(v1), .Indexed(v2)):
-			return v1.count == v2.count && zip(v1, v2).lazy.map(recur).reduce(true) { $0 && $1 }
-		case let (.Fixed(v1), .Fixed(v2)):
-			return v1.count == v2.count && zip(v1, v2).lazy.map(recur).reduce(true) { $0 && $1 }
-		case let (.Keyed(d1), .Keyed(d2)):
-			return Set(d1.keys) == Set(d2.keys) && d1.keys.map { recur(d1[$0]!, d2[$0]!) }.reduce(true) { $0 && $1 }
+		case let (.Indexed(v1), .Indexed(v2)) where v1.count == v2.count:
+			return zip(v1, v2).reduce(true) { $0 && recur($1) }
+		case let (.Fixed(v1), .Fixed(v2)) where v1.count == v2.count:
+			return zip(v1, v2).reduce(true) { $0 && recur($1) }
+		case let (.Keyed(d1), .Keyed(d2)) where Set(d1.keys) == Set(d2.keys):
+			return d1.keys.reduce(true) { $0 && recur(d1[$1]!, d2[$1]!) }
 		default:
 			return false
 		}

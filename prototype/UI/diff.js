@@ -67,10 +67,12 @@ function wrap(tagName, element) {
 }
 
 /// String -> Syntax a -> Range -> (a -> Range) -> (a -> DOM) -> DOM
-function rangeAndSyntaxToDOM(source, syntax, range, getRange, recur) {
+function termToDOM(source, syntax, extract, getRange, recur) {
 	recur = recur || function(term) {
-		return rangeAndSyntaxToDOM(source, term.unwrap, term.extract, getRange);
+		return termToDOM(source, term.unwrap, term.extract, getRange);
 	}
+	var categories = extract.categories;
+	var range = extract.range;
 	var element;
 	if (syntax.leaf != null) {
 		element = document.createElement("span");
@@ -83,18 +85,9 @@ function rangeAndSyntaxToDOM(source, syntax, range, getRange, recur) {
 			var child = values[i];
 			if (child.pure == "") continue;
 			var childRange = getRange(child);
-			if (childRange.before != null) {
-				var beforeRange = childRange.before;
-				element.appendChild(document.createTextNode(source.substr(previous, beforeRange[0] - previous)));
-				element.appendChild(wrap("li", recur(child)));
-				previous = beforeRange[0] + beforeRange[1];
-			}
-			if (childRange.after != null) {
-				var afterRange = childRange.before;
-				element.appendChild(document.createTextNode(source.substr(previous, afterRange[0] - previous)));
-				element.appendChild(wrap("td", recur(child)));
-				previous = afterRange[0] + afterRange[1];
-			}
+			element.appendChild(document.createTextNode(source.substr(previous, childRange[0] - previous)));
+			element.appendChild(wrap("li", recur(child)));
+			previous = childRange[0] + childRange[1];
 		}
 		element.appendChild(document.createTextNode(source.substr(previous, range[0] + range[1] - previous)));
 	} else if (syntax.keyed != null) {
@@ -127,6 +120,11 @@ function rangeAndSyntaxToDOM(source, syntax, range, getRange, recur) {
 		element.appendChild(document.createTextNode(source.substr(previous, range[0] + range[1] - previous)));
 	}
 	element["data-range"] = range;
+
+	for (index in categories) {
+		element.classList.add('category-'+categories[index]);
+	}
+
 	return element;
 }
 
@@ -137,11 +135,11 @@ function diffToDOM(diff, sources) {
 		if (diffOrTerm.pure != null) {
 			var beforeRange, afterRange;
 			if (diffOrTerm.pure.before != null) {
-				beforeRange = diffOrTerm.pure.before.extract
+				beforeRange = diffOrTerm.pure.before.extract.range
 			}
 
 			if (diffOrTerm.pure.after != null) {
-				afterRange = diffOrTerm.pure.after.extract
+				afterRange = diffOrTerm.pure.after.extract.range
 			}
 
 			if (beforeRange == null) {
@@ -154,10 +152,10 @@ function diffToDOM(diff, sources) {
 			return { "before": beforeRange, "after": afterRange };
 		}
 		if (diffOrTerm.roll != null) {
-			return diffOrTerm.roll.extract;
+			return { before: diffOrTerm.roll.extract.before.range, after: diffOrTerm.roll.extract.after.range };
 		}
 		if (diffOrTerm.extract != null) {
-			return diffOrTerm.extract;
+			return diffOrTerm.extract.range;
 		}
 	}
 
@@ -175,7 +173,7 @@ function diffToDOM(diff, sources) {
 function pureToDOM(sources, patch, getRangeFun, diffToDOMFun) {
 	var elementA, elementB;
 	if (patch.before != null) {
-		elementA = rangeAndSyntaxToDOM(sources.before, patch.before.unwrap, patch.before.extract, getRangeFun);
+		elementA = termToDOM(sources.before, patch.before.unwrap, patch.before.extract, getRangeFun);
 		elementA.classList.add("delete");
 		if (patch.after != null) {
 			elementA.classList.add("replace");
@@ -183,7 +181,7 @@ function pureToDOM(sources, patch, getRangeFun, diffToDOMFun) {
 	}
 
 	if (patch.after != null) {
-		elementB = rangeAndSyntaxToDOM(sources.after, patch.after.unwrap, patch.after.extract, getRangeFun);
+		elementB = termToDOM(sources.after, patch.after.unwrap, patch.after.extract, getRangeFun);
 		elementB.classList.add("insert");
 		if (patch.before != null) {
 			elementB.classList.add("replace");
@@ -205,7 +203,14 @@ function pureToDOM(sources, patch, getRangeFun, diffToDOMFun) {
 
 function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 	var syntax = rollOrTerm.unwrap
-	var range = rollOrTerm.extract
+	var categories = {
+		before: rollOrTerm.extract.before.categories,
+		after: rollOrTerm.extract.after.categories
+	}
+	var range = {
+		before: rollOrTerm.extract.before.range,
+		after: rollOrTerm.extract.after.range
+	}
 
 	var elementA;
 	var elementB;
@@ -427,6 +432,14 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 		elementA.appendChild(document.createTextNode(textA));
 		var textB = sources.after.substr(previousB, range.after[0] + range.after[1] - previousB);
 		elementB.appendChild(document.createTextNode(textB));
+	}
+
+	for (index in categories.before) {
+		elementA.classList.add('category-'+categories.before[index]);
+	}
+
+	for (index in categories.after) {
+		elementB.classList.add('category-'+categories.after[index]);
 	}
 
 	return { "before": elementA, "after": elementB }
