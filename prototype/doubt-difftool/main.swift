@@ -93,16 +93,19 @@ func termWithInput(language: TSLanguage)(_ string: String) throws -> Term {
 				}
 			} (root, "program")
 			.map { node, category in
-				Info(range: node.range, categories: [ category ])
+				// TODO: Calculate line and column from TSNodes
+				Info(range: node.range, line: 0, column: 0,	categories: [ category ])
 			}
 	}
 }
 
 func toTerm(term: CofreeJSON) -> Term {
-	let annotation = Info(range: term.extract, categories: [])
+	let pos = term.extract.0
+	let range = term.extract.1
+	let annotation = Info(range: range, line: pos.line, column: pos.column, categories: [])
 	switch term.unwrap {
 	case let .Leaf(a):
-		return Term(Info(range: term.extract, categories: a.categories), Syntax<Term, String>.Leaf(String(a)))
+		return Term(Info(range: range, line: pos.line, column: pos.column, categories: a.categories), Syntax<Term, String>.Leaf(String(a)))
 	case let .Indexed(i):
 		return Term(annotation, .Indexed(i.map(toTerm)))
 	case let .Fixed(f):
@@ -115,14 +118,16 @@ func toTerm(term: CofreeJSON) -> Term {
 func lines(input: String) -> Term {
 	var lines: [Term] = []
 	var previous = 0
+	var lineNumber = 0
 	input.enumerateSubstringsInRange(input.characters.indices, options: .ByLines) { (line, _, enclosingRange, _) in
 		let range: Range<Int> = previous..<(previous + enclosingRange.count)
 		previous = range.endIndex
 		if let line = line {
-			lines.append(Term(Info(range: range, categories: []), Syntax.Leaf(line)))
+			lineNumber += 1
+			lines.append(Term(Info(range: range, line: lineNumber, column: 0, categories: []), Syntax.Leaf(line)))
 		}
 	}
-	return Term(Info(range: 0..<input.utf16.count, categories: []), .Indexed(lines))
+	return Term(Info(range: 0..<input.utf16.count, line: 0, column: 0, categories: []), .Indexed(lines))
 }
 
 func parserForType(type: String) -> String throws -> Term {
