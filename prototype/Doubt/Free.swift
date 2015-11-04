@@ -235,6 +235,9 @@ extension Free {
 			case let .Roll(annotation, .Indexed(i)):
 				return Location.variadic(i, weave, { Free.Roll(annotation, .Indexed($0)) })
 
+			case let .Roll(annotation, .Fixed(f)):
+				return Location.variadic(f, weave, { Free.Roll(annotation, .Fixed($0)) })
+
 			default:
 				fatalError("unimplemented")
 			}
