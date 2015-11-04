@@ -82,6 +82,21 @@ public struct Location<A>: SequenceType {
 
 	// MARK: - Implementation details
 
+	private init?(_ weave: (A -> Location?) -> A -> Location?, _ up: [A] -> Location?, _ ts: [A]) {
+		func update(index: Int)(_ f: Int -> [A] -> Location?)(_ a: A) -> Location? {
+			guard index >= 0 && index < ts.count else { return nil }
+			var copy = ts
+			copy[index] = a
+			return f(index)(copy)
+		}
+		func into(index: Int)(_ ts: [A]) -> Location? {
+			guard index >= 0 && index < ts.count else { return nil }
+			return Location(it: ts[index], down: weave(update(index)(into)), up: update(index)(const(up)), left: update(index - 1)(into), right: update(index + 1)(into))
+		}
+		guard let location = into(0)(ts) else { return nil }
+		self = location
+	}
+
 	private init?(_ weave: (A -> Location?) -> A -> Location?, _ up: A -> Location?, _ a: A) {
 		func into(t1: A) -> Location? {
 			return Location(it: t1, down: weave(into), up: up, left: const(nil), right: const(nil))
