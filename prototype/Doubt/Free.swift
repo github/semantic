@@ -229,6 +229,9 @@ extension Free {
 	public func explore() -> Location<Free> {
 		func weave(free: Free) -> Location<Free>.Unweave {
 			switch free {
+			case .Pure, .Roll(_, .Leaf):
+				return Location.nullary
+
 			default:
 				fatalError("unimplemented")
 			}
