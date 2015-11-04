@@ -22,21 +22,13 @@ public struct Location<A>: SequenceType {
 	/// The node currently in focus.
 	public let it: A
 
-	public var down: Location? {
-		return _down(it)
-	}
+	public var down: Location? { return _down(it) }
 
-	public var up: Location? {
-		return _up(it)
-	}
+	public var up: Location? { return _up(it) }
 
-	public var left: Location? {
-		return _left(it)
-	}
+	public var left: Location? { return _left(it) }
 
-	public var right: Location? {
-		return _right(it)
-	}
+	public var right: Location? { return _right(it) }
 
 	/// The root `Location` in the current exploration.
 	public var root: Location {
