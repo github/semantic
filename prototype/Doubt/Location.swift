@@ -75,7 +75,7 @@ public struct Location<A>: SequenceType {
 		return Location(flip(weave), reconstruct >>> up, t1, t2, t3)
 	}
 
-	public static func variadic(ts: [A], _ weave: Weave, _ reconstruct: [A] -> A)(_ up: A -> Location?) -> Location? {
+	public static func variadic<C: MutableCollectionType where C.Generator.Element == A, C.Index: BidirectionalIndexType>(ts: C, _ weave: Weave, _ reconstruct: C -> A)(_ up: A -> Location?) -> Location? {
 		return Location(flip(weave), reconstruct >>> up, ts)
 	}
 
