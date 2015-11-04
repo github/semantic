@@ -1,3 +1,14 @@
+/// A `Location` is a structure similar to a `Lens` which allows introspection of & update to subtrees of some tree.
+///
+/// In the former case, a `Location` is essentially an implementation of a [Zipper][], allowing exploration into and out of nodes, as well as to adjacent nodes.
+///
+/// [Hinze & Jeuring][] then extended this to support replacing the focused node. `Location` implements their approach.
+///
+/// This is also closely related to [McBride][]’s observations about the derivative of regular types.
+///
+/// [Zipper]: https://www.st.cs.uni-saarland.de/edu/seminare/2005/advanced-fp/docs/huet-zipper.pdf
+/// [Hinze & Jeuring]: https://github.com/github/semantic-diff/files/27297/Weaving.a.Web.pdf
+/// [McBride]: http://strictlypositive.org/diff.pdf
 public struct Location<A>: SequenceType {
 	/// Construct a `Location` representing some position within a tree.
 	public init(it: A, down: A -> Location?, up: A -> Location?, left: A -> Location?, right: A -> Location?) {
