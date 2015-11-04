@@ -223,4 +223,19 @@ extension Free {
 }
 
 
+// MARK: - Weaving
+
+extension Free {
+	public func explore() -> Location<Free> {
+		func weave(free: Free) -> Location<Free>.Unweave {
+			switch free {
+			default:
+				fatalError("unimplemented")
+			}
+		}
+		return Location.explore(weave)(self)
+	}
+}
+
+
 import Prelude
