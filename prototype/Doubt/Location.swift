@@ -2,7 +2,7 @@
 ///
 /// In the former case, a `Location` is essentially an implementation of a [Zipper][], allowing exploration into and out of nodes, as well as to adjacent nodes.
 ///
-/// [Hinze & Jeuring][] then extended this to support replacing the focused node. `Location` implements their approach.
+/// [Hinze & Jeuring][] then extended this to support replacing the focused node. `Location` implements their approach (see §5, “A Read-write Web”).
 ///
 /// This is also closely related to [McBride][]’s observations about the derivative of regular types.
 ///
