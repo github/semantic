@@ -39,7 +39,7 @@ struct Info: Categorizable, CustomJSONConvertible, Equatable {
 }
 
 func == (left: Info, right: Info) -> Bool {
-	return left.range == right.range && left.categories == right.categories
+	return left.range == right.range && left.categories == right.categories && left.line == left.line && left.column == right.column
 }
 
 import Madness
