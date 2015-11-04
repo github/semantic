@@ -1,4 +1,5 @@
 public struct Location<A>: SequenceType {
+	/// Construct a `Location` representing some position within a tree.
 	public init(it: A, down: A -> Location?, up: A -> Location?, left: A -> Location?, right: A -> Location?) {
 		self.it = it
 		_left = left
@@ -7,6 +8,7 @@ public struct Location<A>: SequenceType {
 		_down = down
 	}
 
+	/// The node currently in focus.
 	public let it: A
 
 	private let _down: A -> Location?
