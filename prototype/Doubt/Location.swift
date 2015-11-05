@@ -25,6 +25,7 @@ public struct Location<A>: SequenceType {
 	/// Returns the `Location` representing the contents of `it`, or `nil` if `it` is a leaf.
 	public var into: Location? { return _into(it) }
 
+	/// Returns the `Location` representing the parent of `it` in the current exploration, or `nil` if the receiver is the `root`.
 	public var outOf: Location? { return _outOf(it) }
 
 	public var left: Location? { return _left(it) }
