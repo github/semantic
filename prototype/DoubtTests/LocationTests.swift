@@ -51,6 +51,10 @@ final class LocationTests: XCTestCase {
 	func testModifyReplacesSubtrees() {
 		assert(term.explore().down?.modify(const(leafB)).right?.up?.it, ==, Cofree(0, .Indexed([ leafB, leafB, keyed ])))
 	}
+
+	func testMultipleModificationsReplaceMultipleSubtrees() {
+		assert(term.explore().down?.modify(const(leafB)).right?.modify(const(leafA)).up?.it, ==, Cofree(0, .Indexed([ leafB, leafA, keyed ])))
+	}
 }
 
 
