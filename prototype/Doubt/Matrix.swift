@@ -8,6 +8,10 @@ public struct Matrix<A> {
 		self.init(width: width, height: height, values: constructRowMajor(0..<width, down: 0..<height, forEach: { i, j in Memo { compute(i, j) } }))
 	}
 
+	public init<I: ForwardIndexType>(across: Range<I>, down: Range<I>, compute: (I, I) -> A) {
+		self.init(width: Int(across.count.toIntMax()), height: Int(down.count.toIntMax()), values: constructRowMajor(across, down: down, forEach: { i, j in Memo { compute(i, j) } }))
+	}
+
 	public let width: Int
 	public let height: Int
 
