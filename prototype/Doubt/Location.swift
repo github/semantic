@@ -22,7 +22,7 @@ public struct Location<A>: SequenceType {
 	/// The node currently in focus.
 	public let it: A
 
-	public var down: Location? { return _down(it) }
+	public var into: Location? { return _down(it) }
 
 	public var up: Location? { return _up(it) }
 
@@ -38,7 +38,7 @@ public struct Location<A>: SequenceType {
 
 	/// Returns the logically next `Location` after the receiver in a pre-order depth-first traversal.
 	public var next: Location? {
-		return down ?? nextAfter
+		return into ?? nextAfter
 	}
 
 	/// Returns the logically next `Location` after the receiver and its children in a pre-order depth-first traversal.
