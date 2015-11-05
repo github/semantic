@@ -28,6 +28,7 @@ public struct Location<A>: SequenceType {
 	/// Returns the `Location` representing the parent of `it` in the current exploration, or `nil` if the receiver is the `root`.
 	public var outOf: Location? { return _outOf(it) }
 
+	/// Returns the `Location` which immediately precedes the receiver within its parent in the current exploration, or `nil` if the receiver is the `root` or the first child of its parent.
 	public var left: Location? { return _left(it) }
 
 	public var right: Location? { return _right(it) }
