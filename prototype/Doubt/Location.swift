@@ -64,15 +64,15 @@ public struct Location<A>: SequenceType {
 	}
 
 	public static func unary(t1: A, _ weave: Weave, _ reconstruct: A -> A)(_ up: A -> Location?) -> Location? {
-		return Location(flip(weave), reconstruct >>> up, t1)
+		return Location(flip(weave), { $0[0] } >>> reconstruct >>> up, [t1])
 	}
 
 	public static func binary(t1: A, _ t2: A, _ weave: Weave, _ reconstruct: (A, A) -> A)(_ up: A -> Location?) -> Location? {
-		return Location(flip(weave), reconstruct >>> up, t1, t2)
+		return Location(flip(weave), { ($0[0], $0[1]) } >>> reconstruct >>> up, [t1, t2])
 	}
 
 	public static func ternary(t1: A, _ t2: A, _ t3: A, _ weave: Weave, _ reconstruct:  (A, A, A) -> A)(_ up: A -> Location?) -> Location? {
-		return Location(flip(weave), reconstruct >>> up, t1, t2, t3)
+		return Location(flip(weave), { ($0[0], $0[1], $0[2]) } >>> reconstruct >>> up, [t1, t2, t3])
 	}
 
 	public static func variadic<C: MutableCollectionType where C.Generator.Element == A, C.Index: BidirectionalIndexType>(ts: C, _ weave: Weave, _ reconstruct: C -> A)(_ up: A -> Location?) -> Location? {
