@@ -106,7 +106,7 @@ public struct Location<A>: SequenceType {
 	}
 
 	private init?<C: MutableCollectionType, Key where C.Generator.Element == (Key, A), C.Index: BidirectionalIndexType>(_ weave: (A -> Location?) -> A -> Location?, _ up: C -> Location?, _ ts: C) {
-		func update(index: C.Index)(_ f: C -> Location?)(_ key: Key)(_ a: A) -> Location? {
+		func update(index: C.Index, _ ts: C)(_ f: C -> Location?)(_ key: Key)(_ a: A) -> Location? {
 			guard ts.indices.contains(index) else { return nil }
 			var copy = ts
 			copy[index] = (key, a)
@@ -115,7 +115,7 @@ public struct Location<A>: SequenceType {
 		func into(index: C.Index)(_ ts: C) -> Location? {
 			guard ts.indices.contains(index) else { return nil }
 			let (key, value) = ts[index]
-			return Location(it: value, down: weave(update(index)(into(index))(key)), up: update(index)(up)(key), left: update(index)(into(index.predecessor()))(key), right: update(index)(into(index.successor()))(key))
+			return Location(it: value, down: weave(update(index, ts)(into(index))(key)), up: update(index, ts)(up)(key), left: update(index, ts)(into(index.predecessor()))(key), right: update(index, ts)(into(index.successor()))(key))
 		}
 		guard let location = into(ts.startIndex)(ts) else { return nil }
 		self = location
