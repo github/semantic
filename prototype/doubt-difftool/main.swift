@@ -144,6 +144,13 @@ func parserForType(type: String) -> String throws -> Term {
 	}
 }
 
+func refineLeafReplacement(diff: Diff, aString: String, bString: String) -> Diff {
+	switch diff {
+	default:
+		return diff
+	}
+}
+
 let parsed = benchmark("parsing arguments & loading sources") { parse(argumentsParser, input: Process.arguments) }
 let arguments: Argument = try parsed.either(ifLeft: { throw "\($0)" }, ifRight: { $0 })
 let (aSource, bSource) = arguments.sources
