@@ -144,6 +144,13 @@ func parserForType(type: String) -> String throws -> Term {
 	}
 }
 
+extension ForwardIndexType {
+	/// The range encompassing a single index.
+	var range: Range<Self> {
+		return self..<self.successor()
+	}
+}
+
 func refineLeafReplacement(diff: Diff, aString: String, bString: String) -> Diff {
 	switch diff {
 	case let .Pure(.Replace(.Unroll(aExtract, .Leaf), .Unroll(bExtract, .Leaf))):
