@@ -149,9 +149,7 @@ func refineLeafReplacement(diff: Diff, aString: String, bString: String) -> Diff
 	case let .Pure(.Replace(.Unroll(aExtract, .Leaf), .Unroll(bExtract, .Leaf))):
 		let aSubstring = aString.utf16[aExtract.range]
 		let bSubstring = bString.utf16[bExtract.range]
-		let children = SES(aSubstring, bSubstring, cost: const(1)) { (a: (String.UTF16Index, UTF16.CodeUnit), b: (String.UTF16Index, UTF16.CodeUnit)) -> Free<UTF16.CodeUnit, (String.UTF16Index, String.UTF16Index), Patch<UTF16.CodeUnit>>? in
-			.Roll((a.0, b.0), .Leaf(b.1))
-		}
+		let children: [Free<UTF16.CodeUnit, (), Patch<UTF16.CodeUnit>>] = SES(aSubstring, bSubstring, cost: const(1), recur: const(nil))
 		return .Roll((aExtract, bExtract), .Indexed([]))
 	default:
 		return diff
