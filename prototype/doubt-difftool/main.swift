@@ -146,6 +146,8 @@ func parserForType(type: String) -> String throws -> Term {
 
 func refineLeafReplacement(diff: Diff, aString: String, bString: String) -> Diff {
 	switch diff {
+	case let .Pure(.Replace(a, b)):
+		return .Roll((a.extract, b.extract), .Indexed([]))
 	default:
 		return diff
 	}
