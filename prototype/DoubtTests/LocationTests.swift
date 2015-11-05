@@ -27,6 +27,10 @@ final class LocationTests: XCTestCase {
 	func testCannotMoveLeftwardsFromFirstChildOfBranch() {
 		assert(term.explore().down?.left?.it, ==, nil)
 	}
+
+	func testCanMoveRightwardsFromLeftmostChildOfLongBranch() {
+		assert(term.explore().down?.right?.it, ==, leafB)
+	}
 }
 
 
