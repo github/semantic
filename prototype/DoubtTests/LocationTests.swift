@@ -39,6 +39,10 @@ final class LocationTests: XCTestCase {
 	func testCanMoveBackUpwardsFromDeepExplorations() {
 		assert(term.explore().down?.right?.right?.down?.right?.up?.up?.it, ==, term)
 	}
+
+	func testCanReturnToStartOfExplorationFromArbitrarilyDeepNodes() {
+		assert(term.explore().down?.right?.right?.down?.right?.root.it, ==, term)
+	}
 }
 
 
