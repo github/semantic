@@ -37,9 +37,10 @@ final class LocationTests: XCTestCase {
 private let leafA = Cofree(1, .Leaf("a string"))
 private let leafB = Cofree(2, .Leaf("b string"))
 private let innerLeafA = Cofree(4, .Leaf("a nested string"))
+private let innerLeafB = Cofree(5, .Leaf("b nested string"))
 private let keyed = Cofree(3, .Keyed([
 	"a": innerLeafA,
-	"b": Cofree(5, .Leaf("b nested string")),
+	"b": innerLeafB,
 ]))
 private let term: Cofree<String, Int> = Cofree(0, .Indexed([
 	leafA,
