@@ -84,6 +84,17 @@ private let diff: Free<String, Int, Patch<Cofree<String, Int>>> = Free.Roll(0, .
 	Free.Roll(1, .Leaf("a string")),
 	Free.Pure(Patch.Replace(leafA, leafB)),
 ]))
+// fine-grained diff of same
+private let refined = Free.Roll(2, .Indexed([
+	Free.Pure(Patch.Replace(Cofree(1, .Leaf("a")), Cofree(2, .Leaf("b")))),
+	Free.Roll(4, .Leaf(" ")),
+	Free.Roll(5, .Leaf("s")),
+	Free.Roll(6, .Leaf("t")),
+	Free.Roll(7, .Leaf("r")),
+	Free.Roll(8, .Leaf("i")),
+	Free.Roll(9, .Leaf("n")),
+	Free.Roll(10, .Leaf("g")),
+]))
 
 
 import Assertions
