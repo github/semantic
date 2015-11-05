@@ -15,7 +15,7 @@ public struct Location<A>: SequenceType {
 		self.it = it
 		_left = left
 		_right = right
-		_up = up
+		_outOf = up
 		_into = into
 	}
 
@@ -24,7 +24,7 @@ public struct Location<A>: SequenceType {
 
 	public var into: Location? { return _into(it) }
 
-	public var outOf: Location? { return _up(it) }
+	public var outOf: Location? { return _outOf(it) }
 
 	public var left: Location? { return _left(it) }
 
@@ -49,7 +49,7 @@ public struct Location<A>: SequenceType {
 
 	/// Return a new `Location` by replacing the current value with a new one produced by `f`.
 	public func modify(@noescape f: A -> A) -> Location {
-		return Location(it: f(it), into: _into, up: _up, left: _left, right: _right)
+		return Location(it: f(it), into: _into, up: _outOf, left: _left, right: _right)
 	}
 
 
@@ -123,7 +123,7 @@ public struct Location<A>: SequenceType {
 
 
 	private let _into: A -> Location?
-	private let _up: A -> Location?
+	private let _outOf: A -> Location?
 	private let _left: A -> Location?
 	private let _right: A -> Location?
 
