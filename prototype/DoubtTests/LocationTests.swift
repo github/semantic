@@ -6,6 +6,11 @@ final class LocationTests: XCTestCase {
 	func testCannotMoveUpwardsAtTheStartOfAnExploration() {
 		assert(term.explore().up?.it, ==, nil)
 	}
+
+	func testCannotMoveSidewaysAtTheStartOfAnExploration() {
+		assert(term.explore().left?.it, ==, nil)
+		assert(term.explore().right?.it, ==, nil)
+	}
 }
 
 
