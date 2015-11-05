@@ -1,7 +1,7 @@
 /// Computes the SES (shortest edit script), i.e. the shortest sequence of diffs (`Free<Leaf, Annotation, Patch<Term>>`) for two arrays of `Term`s which would suffice to transform `a` into `b`.
 ///
 /// This is computed w.r.t. an `equals` function, which computes the equality of leaf nodes within terms, and a `recur` function, which produces diffs representing matched-up terms.
-public func SES<Leaf, Annotation, C: CollectionType>(a: C, _ b: C, cost: Free<Leaf, Annotation, Patch<C.Generator.Element>> -> Int, recur: ((C.Index, C.Generator.Element), (C.Index, C.Generator.Element)) -> Free<Leaf, Annotation, Patch<C.Generator.Element>>?) -> [Free<Leaf, Annotation, Patch<C.Generator.Element>>] {
+public func SES<Leaf, Annotation, C: CollectionType>(a: C, _ b: C, cost: Free<Leaf, Annotation, Patch<C.Generator.Element>> -> Int, recur: (C.Generator.Element, C.Generator.Element) -> Free<Leaf, Annotation, Patch<C.Generator.Element>>?) -> [Free<Leaf, Annotation, Patch<C.Generator.Element>>] {
 	typealias Diff = Free<Leaf, Annotation, Patch<C.Generator.Element>>
 
 	if a.isEmpty { return b.map { .Insert($0) } }
@@ -33,7 +33,7 @@ public func SES<Leaf, Annotation, C: CollectionType>(a: C, _ b: C, cost: Free<Le
 		let diagonal = matrix[i.successor(), j.successor()]
 
 		if let right = right, down = down, diagonal = diagonal {
-			let here = recur((i, a[i]), (j, b[j]))
+			let here = recur(a[i], b[j])
 			// If the diff at this vertex is zero-cost, we’re not going to find a cheaper one either rightwards or downwards. We can therefore short-circuit selecting the best outgoing edge and save ourselves evaluating the entire row rightwards and the entire column downwards from this point.
 			//
 			// Thus, in the best case (two equal sequences), we now complete in O(n + m). However, this optimization only applies to equalities at the beginning of the edit graph; once inequalities are encountered, the remainder of the diff is effectively O(nm).
@@ -63,10 +63,6 @@ public func SES<Leaf, Annotation, C: CollectionType>(a: C, _ b: C, cost: Free<Le
 	}
 
 	return Array(matrix[a.startIndex, b.startIndex]!.value.map { diff, _ in diff })
-}
-
-public func SES<Leaf, Annotation, C: CollectionType>(a: C, _ b: C, cost: Free<Leaf, Annotation, Patch<C.Generator.Element>> -> Int, recur: (C.Generator.Element, C.Generator.Element) -> Free<Leaf, Annotation, Patch<C.Generator.Element>>?) -> [Free<Leaf, Annotation, Patch<C.Generator.Element>>] {
-	return SES(a, b, cost: cost, recur: { recur($0.1, $1.1) })
 }
 
 
