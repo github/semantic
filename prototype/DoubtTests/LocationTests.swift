@@ -17,7 +17,7 @@ final class LocationTests: XCTestCase {
 	}
 
 	func testCanMoveBackUpwards() {
-		assert(term.explore().down?.up?.it, ==, leaf)
+		assert(term.explore().down?.up?.it, ==, term)
 	}
 }
 
