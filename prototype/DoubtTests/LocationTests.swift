@@ -23,6 +23,10 @@ final class LocationTests: XCTestCase {
 	func testCanMoveBackUpwards() {
 		assert(term.explore().down?.up?.it, ==, term)
 	}
+
+	func testCannotMoveLeftwardsFromFirstChildOfBranch() {
+		assert(term.explore().down?.left?.it, ==, nil)
+	}
 }
 
 
