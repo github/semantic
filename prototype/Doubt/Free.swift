@@ -240,9 +240,6 @@ extension Free {
 
 			case let .Roll(annotation, .Keyed(k)):
 				return Location.variadic(k, weave, { Free.Roll(annotation, .Keyed($0)) })
-
-			default:
-				fatalError("unimplemented")
 			}
 		}
 		return Location.explore(weave)(self)
