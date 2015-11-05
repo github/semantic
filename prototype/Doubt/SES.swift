@@ -1,8 +1,8 @@
 /// Computes the SES (shortest edit script), i.e. the shortest sequence of diffs (`Free<Leaf, Annotation, Patch<Term>>`) for two arrays of `Term`s which would suffice to transform `a` into `b`.
 ///
 /// This is computed w.r.t. an `equals` function, which computes the equality of leaf nodes within terms, and a `recur` function, which produces diffs representing matched-up terms.
-public func SES<Term, Leaf, Annotation>(a: [Term], _ b: [Term], cost: Free<Leaf, Annotation, Patch<Term>> -> Int, recur: (Term, Term) -> Free<Leaf, Annotation, Patch<Term>>?) -> [Free<Leaf, Annotation, Patch<Term>>] {
-	typealias Diff = Free<Leaf, Annotation, Patch<Term>>
+public func SES<Leaf, Annotation, C: CollectionType>(a: C, _ b: C, cost: Free<Leaf, Annotation, Patch<C.Generator.Element>> -> Int, recur: (C.Generator.Element, C.Generator.Element) -> Free<Leaf, Annotation, Patch<C.Generator.Element>>?) -> [Free<Leaf, Annotation, Patch<C.Generator.Element>>] {
+	typealias Diff = Free<Leaf, Annotation, Patch<C.Generator.Element>>
 
 	if a.isEmpty { return b.map { .Insert($0) } }
 	if b.isEmpty { return a.map { .Delete($0) } }
@@ -20,7 +20,7 @@ public func SES<Term, Leaf, Annotation>(a: [Term], _ b: [Term], cost: Free<Leaf,
 	}
 
 	// A matrix whose values are streams representing paths through the edit graph, carrying both the diff & the cost of the remainder of the path.
-	var matrix: Matrix<Stream<(Diff, Int)>, Int>!
+	var matrix: Matrix<Stream<(Diff, Int)>, C.Index>!
 	matrix = Matrix(across: a.startIndex..<a.endIndex.successor(), down: b.startIndex..<b.endIndex.successor()) { i, j in
 		// Some explanation is warranted:
 		//
