@@ -20,7 +20,7 @@ public func SES<Term, Leaf, Annotation>(a: [Term], _ b: [Term], cost: Free<Leaf,
 	}
 
 	// A matrix whose values are streams representing paths through the edit graph, carrying both the diff & the cost of the remainder of the path.
-	var matrix: Matrix<Stream<(Diff, Int)>>!
+	var matrix: Matrix<Stream<(Diff, Int)>, Int>!
 	matrix = Matrix(across: a.indices, down: b.indices) { i, j in
 		// Some explanation is warranted:
 		//
