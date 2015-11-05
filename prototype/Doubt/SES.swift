@@ -62,7 +62,7 @@ public func SES<Term, Leaf, Annotation>(a: [Term], _ b: [Term], cost: Free<Leaf,
 		return Stream.Nil
 	}
 
-	return Array(matrix[0, 0]!.value.map { diff, _ in diff })
+	return Array(matrix[a.startIndex, b.startIndex]!.value.map { diff, _ in diff })
 }
 
 
