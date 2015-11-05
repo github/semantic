@@ -43,6 +43,10 @@ final class LocationTests: XCTestCase {
 	func testCanReturnToStartOfExplorationFromArbitrarilyDeepNodes() {
 		assert(term.explore().down?.right?.right?.down?.right?.root.it, ==, term)
 	}
+
+	func testSequenceIsPreOrderDepthFirstTraversal() {
+		assert(term.explore().map { $0.it.extract }, ==, [ 0, 1, 2, 3, 5, 4 ])
+	}
 }
 
 
