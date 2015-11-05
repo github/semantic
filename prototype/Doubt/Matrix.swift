@@ -41,8 +41,8 @@ public struct Matrix<A, I: ForwardIndexType> {
 private func constructRowMajor<A, I: ForwardIndexType>(across: Range<I>, down: Range<I>, @noescape forEach: (I, I) -> A) -> [A] {
 	var values: [A] = []
 	values.reserveCapacity(Int(across.count.toIntMax()) * Int(down.count.toIntMax()))
-	for j in across {
-		for i in down {
+	for j in down {
+		for i in across {
 			values.append(forEach(i, j))
 		}
 	}
