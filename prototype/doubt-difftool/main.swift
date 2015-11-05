@@ -147,6 +147,11 @@ func parserForType(type: String) -> String throws -> Term {
 func refineLeafReplacement(diff: Diff, aString: String, bString: String) -> Diff {
 	switch diff {
 	case let .Pure(.Replace(.Unroll(aExtract, .Leaf), .Unroll(bExtract, .Leaf))):
+		let aSubstring = aString.utf16[aExtract.range]
+		let bSubstring = bString.utf16[bExtract.range]
+		let children = SES(aSubstring, bSubstring, cost: const(1)) { (a: (String.UTF16Index, UTF16.CodeUnit), b: (String.UTF16Index, UTF16.CodeUnit)) -> Free<UTF16.CodeUnit, String.UTF16Index, Patch<UTF16.CodeUnit>>? in
+			return nil
+		}
 		return .Roll((aExtract, bExtract), .Indexed([]))
 	default:
 		return diff
