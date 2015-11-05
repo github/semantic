@@ -56,6 +56,10 @@ final class LocationTests: XCTestCase {
 		assert(term.explore().down?.modify(const(leafB)).right?.modify(const(leafA)).up?.it, ==, Cofree(0, .Indexed([ leafB, leafA, keyed ])))
 	}
 
+	func testModificationsPreserveKeys() {
+		assert(keyed.explore().down?.modify(const(leafA)).root.it, ==, Cofree(3, .Keyed([ "a": innerLeafA, "b": leafA ])))
+	}
+
 	func testDeepModificationsReplaceDeepSubtrees() {
 		assert(term.explore().down?.modify(const(leafB)).right?.modify(const(leafA)).right?.down?.modify(const(innerLeafA)).right?.modify(const(innerLeafB)).root.it, ==, Cofree(0, .Indexed([ leafB, leafA, Cofree(3, .Keyed([ "a": innerLeafB, "b": innerLeafA ])) ])))
 	}
