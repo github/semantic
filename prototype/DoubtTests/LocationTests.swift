@@ -1,4 +1,7 @@
 final class LocationTests: XCTestCase {
+	func testExplorationOfATermBeginsAtTheExploredTerm() {
+		assert(term.explore().it, ==, term)
+	}
 }
 
 
@@ -13,5 +16,6 @@ private let term: Cofree<String, Int> = Cofree(0, .Indexed([
 ]))
 
 
+import Assertions
 @testable import Doubt
 import XCTest
