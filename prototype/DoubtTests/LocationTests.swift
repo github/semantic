@@ -16,6 +16,10 @@ final class LocationTests: XCTestCase {
 		assert(leaf.explore().down?.it, ==, nil)
 	}
 
+	func testCanMoveDownwardsIntoBranches() {
+		assert(term.explore().down?.it, ==, leaf)
+	}
+
 	func testCanMoveBackUpwards() {
 		assert(term.explore().down?.up?.it, ==, term)
 	}
