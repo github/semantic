@@ -47,6 +47,10 @@ final class LocationTests: XCTestCase {
 	func testSequenceIsPreOrderDepthFirstTraversal() {
 		assert(term.explore().map { $0.it.extract }, ==, [ 0, 1, 2, 3, 5, 4 ])
 	}
+
+	func testModifyReplacesSubtrees() {
+		assert(term.explore().down?.modify(const(leafB)).right?.up?.it, ==, Cofree(0, .Indexed([ leafB, leafB, keyed ])))
+	}
 }
 
 
@@ -67,4 +71,5 @@ private let term: Cofree<String, Int> = Cofree(0, .Indexed([
 
 import Assertions
 @testable import Doubt
+import Prelude
 import XCTest
