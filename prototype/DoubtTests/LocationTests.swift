@@ -13,11 +13,11 @@ final class LocationTests: XCTestCase {
 	}
 
 	func testCannotMoveDownwardsFromLeaves() {
-		assert(leaf.explore().down?.it, ==, nil)
+		assert(leafA.explore().down?.it, ==, nil)
 	}
 
 	func testCanMoveDownwardsIntoBranches() {
-		assert(term.explore().down?.it, ==, leaf)
+		assert(term.explore().down?.it, ==, leafA)
 	}
 
 	func testCanMoveBackUpwards() {
@@ -26,10 +26,10 @@ final class LocationTests: XCTestCase {
 }
 
 
-private let leaf = Cofree(1, .Leaf("a string"))
+private let leafA = Cofree(1, .Leaf("a string"))
 private let innerLeaf = Cofree(4, .Leaf("a nested string"))
 private let term: Cofree<String, Int> = Cofree(0, .Indexed([
-	leaf,
+	leafA,
 	Cofree(2, .Leaf("b string")),
 	Cofree(3, .Keyed([
 		"a": innerLeaf,
