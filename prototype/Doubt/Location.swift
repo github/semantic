@@ -22,6 +22,7 @@ public struct Location<A>: SequenceType {
 	/// The node currently in focus.
 	public let it: A
 
+	/// Returns the `Location` representing the contents of `it`, or `nil` if `it` is a leaf.
 	public var into: Location? { return _into(it) }
 
 	public var outOf: Location? { return _outOf(it) }
