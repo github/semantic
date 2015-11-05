@@ -80,6 +80,11 @@ private let term: Cofree<String, Int> = Cofree(0, .Indexed([
 	keyed,
 ]))
 
+private let diff: Free<String, Int, Patch<Cofree<String, Int>>> = Free.Roll(0, .Indexed([
+	Free.Roll(1, .Leaf("a string")),
+	Free.Pure(Patch.Replace(leafA, leafB)),
+]))
+
 
 import Assertions
 @testable import Doubt
