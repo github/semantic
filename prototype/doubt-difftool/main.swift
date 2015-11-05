@@ -151,7 +151,7 @@ extension ForwardIndexType {
 	}
 }
 
-func refineLeafReplacement(patch: Patch<Term>, aString: String, bString: String) -> Diff {
+func refineLeafReplacement(aString: String, _ bString: String)(_ patch: Patch<Term>) -> Diff {
 	switch patch {
 	case let .Replace(.Unroll(aExtract, .Leaf), .Unroll(bExtract, .Leaf)):
 		let a = aString.utf16[aExtract.range].enumerate().map { Term(Info(range: (aExtract.range.startIndex + 0).range, categories: aExtract.categories), .Leaf(String($1))) }
