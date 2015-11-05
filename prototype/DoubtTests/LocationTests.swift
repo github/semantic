@@ -2,6 +2,10 @@ final class LocationTests: XCTestCase {
 	func testExplorationOfATermBeginsAtTheExploredTerm() {
 		assert(term.explore().it, ==, term)
 	}
+
+	func testCannotMoveUpwardsAtTheStartOfAnExploration() {
+		assert(term.explore().up?.it, ==, nil)
+	}
 }
 
 
