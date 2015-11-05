@@ -21,7 +21,7 @@ public func SES<Term, Leaf, Annotation>(a: [Term], _ b: [Term], cost: Free<Leaf,
 
 	// A matrix whose values are streams representing paths through the edit graph, carrying both the diff & the cost of the remainder of the path.
 	var matrix: Matrix<Stream<(Diff, Int)>, Int>!
-	matrix = Matrix(across: a.indices, down: b.indices) { i, j in
+	matrix = Matrix(across: a.startIndex..<a.endIndex.successor(), down: b.startIndex..<b.endIndex.successor()) { i, j in
 		// Some explanation is warranted:
 		//
 		// 1. `matrix` captures itself during construction, because each vertex in the edit graph depends on other vertices. This is safe, because a) `Matrix` populates its fields lazily, and b) vertices only depend on those vertices downwards and rightwards of them.
