@@ -11,12 +11,12 @@
 /// [McBride]: http://strictlypositive.org/diff.pdf
 public struct Location<A>: SequenceType {
 	/// Construct a `Location` representing some position within a tree.
-	public init(it: A, down: A -> Location?, up: A -> Location?, left: A -> Location?, right: A -> Location?) {
+	public init(it: A, into: A -> Location?, up: A -> Location?, left: A -> Location?, right: A -> Location?) {
 		self.it = it
 		_left = left
 		_right = right
 		_up = up
-		_into = down
+		_into = into
 	}
 
 	/// The node currently in focus.
@@ -49,7 +49,7 @@ public struct Location<A>: SequenceType {
 
 	/// Return a new `Location` by replacing the current value with a new one produced by `f`.
 	public func modify(@noescape f: A -> A) -> Location {
-		return Location(it: f(it), down: _into, up: _up, left: _left, right: _right)
+		return Location(it: f(it), into: _into, up: _up, left: _left, right: _right)
 	}
 
 
@@ -84,7 +84,7 @@ public struct Location<A>: SequenceType {
 	}
 
 	public static func explore(weave: Weave)(_ a : A) -> Location {
-		return Location(it: a, down: flip(weave)(explore(weave) >>> Optional.Some), up: const(nil), left: const(nil), right: const(nil))
+		return Location(it: a, into: flip(weave)(explore(weave) >>> Optional.Some), up: const(nil), left: const(nil), right: const(nil))
 	}
 
 
@@ -99,7 +99,7 @@ public struct Location<A>: SequenceType {
 		}
 		func into(index: C.Index)(_ ts: C) -> Location? {
 			guard ts.indices.contains(index) else { return nil }
-			return Location(it: ts[index], down: weave(update(index, ts)(into(index))), up: update(index, ts)(up), left: update(index, ts)(into(index.predecessor())), right: update(index, ts)(into(index.successor())))
+			return Location(it: ts[index], into: weave(update(index, ts)(into(index))), up: update(index, ts)(up), left: update(index, ts)(into(index.predecessor())), right: update(index, ts)(into(index.successor())))
 		}
 		guard let location = into(ts.startIndex)(ts) else { return nil }
 		self = location
@@ -115,7 +115,7 @@ public struct Location<A>: SequenceType {
 		func into(index: C.Index)(_ ts: C) -> Location? {
 			guard ts.indices.contains(index) else { return nil }
 			let (key, value) = ts[index]
-			return Location(it: value, down: weave(update(index, ts)(into(index))(key)), up: update(index, ts)(up)(key), left: update(index, ts)(into(index.predecessor()))(key), right: update(index, ts)(into(index.successor()))(key))
+			return Location(it: value, into: weave(update(index, ts)(into(index))(key)), up: update(index, ts)(up)(key), left: update(index, ts)(into(index.predecessor()))(key), right: update(index, ts)(into(index.successor()))(key))
 		}
 		guard let location = into(ts.startIndex)(ts) else { return nil }
 		self = location
