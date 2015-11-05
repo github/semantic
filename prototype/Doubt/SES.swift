@@ -28,9 +28,9 @@ public func SES<Term, Leaf, Annotation>(a: [Term], _ b: [Term], cost: Free<Leaf,
 		//
 		// 2. `matrix` is sized bigger than `a.count` x `b.count`. This is safe, because a) we only get a[i]/b[j] when right/down are non-nil (respectively), and b) right/down are found by looking up elements (i + 1, j) & (i, j + 1) in the matrix, which returns `nil` when out of bounds. So we only access a[i] and b[j] when i and j are in bounds.
 
-		let right = matrix[i + 1, j]
-		let down = matrix[i, j + 1]
-		let diagonal = matrix[i + 1, j + 1]
+		let right = matrix[i.successor(), j]
+		let down = matrix[i, j.successor()]
+		let diagonal = matrix[i.successor(), j.successor()]
 
 		if let right = right, down = down, diagonal = diagonal {
 			let here = recur(a[i], b[j])
