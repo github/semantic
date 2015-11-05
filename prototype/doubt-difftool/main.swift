@@ -154,10 +154,9 @@ extension ForwardIndexType {
 func refineLeafReplacement(diff: Diff, aString: String, bString: String) -> Diff {
 	switch diff {
 	case let .Pure(.Replace(.Unroll(aExtract, .Leaf), .Unroll(bExtract, .Leaf))):
-		let aSubstring = aString.utf16[aExtract.range]
-		let bSubstring = bString.utf16[bExtract.range]
-		let children: [Free<UTF16.CodeUnit, (), Patch<UTF16.CodeUnit>>] = SES(aSubstring, bSubstring, cost: const(1), recur: const(nil))
-		return .Roll((aExtract, bExtract), .Indexed([]))
+		let a = aString.utf16[aExtract.range].enumerate().map { Term(Info(range: (aExtract.range.startIndex + 0).range, categories: aExtract.categories), .Leaf(String($1))) }
+		let b = bString.utf16[bExtract.range].enumerate().map { Term(Info(range: (bExtract.range.startIndex + 0).range, categories: bExtract.categories), .Leaf(String($1))) }
+		return .Roll((aExtract, bExtract), .Indexed(SES(a, b, cost: const(1), recur: const(nil))))
 	default:
 		return diff
 	}
