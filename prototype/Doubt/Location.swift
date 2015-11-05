@@ -11,11 +11,11 @@
 /// [McBride]: http://strictlypositive.org/diff.pdf
 public struct Location<A>: SequenceType {
 	/// Construct a `Location` representing some position within a tree.
-	public init(it: A, into: A -> Location?, up: A -> Location?, left: A -> Location?, right: A -> Location?) {
+	public init(it: A, into: A -> Location?, outOf: A -> Location?, left: A -> Location?, right: A -> Location?) {
 		self.it = it
 		_left = left
 		_right = right
-		_outOf = up
+		_outOf = outOf
 		_into = into
 	}
 
@@ -49,7 +49,7 @@ public struct Location<A>: SequenceType {
 
 	/// Return a new `Location` by replacing the current value with a new one produced by `f`.
 	public func modify(@noescape f: A -> A) -> Location {
-		return Location(it: f(it), into: _into, up: _outOf, left: _left, right: _right)
+		return Location(it: f(it), into: _into, outOf: _outOf, left: _left, right: _right)
 	}
 
 
@@ -59,38 +59,38 @@ public struct Location<A>: SequenceType {
 
 	// MARK: - Constructors
 
-	public static func nullary(up: A -> Location?) -> Location? {
+	public static func nullary(outOf: A -> Location?) -> Location? {
 		return nil
 	}
 
-	public static func unary(t1: A, _ weave: Weave, _ reconstruct: A -> A)(_ up: A -> Location?) -> Location? {
-		return Location(flip(weave), { $0[0] } >>> reconstruct >>> up, [t1])
+	public static func unary(t1: A, _ weave: Weave, _ reconstruct: A -> A)(_ outOf: A -> Location?) -> Location? {
+		return Location(flip(weave), { $0[0] } >>> reconstruct >>> outOf, [t1])
 	}
 
-	public static func binary(t1: A, _ t2: A, _ weave: Weave, _ reconstruct: (A, A) -> A)(_ up: A -> Location?) -> Location? {
-		return Location(flip(weave), { ($0[0], $0[1]) } >>> reconstruct >>> up, [t1, t2])
+	public static func binary(t1: A, _ t2: A, _ weave: Weave, _ reconstruct: (A, A) -> A)(_ outOf: A -> Location?) -> Location? {
+		return Location(flip(weave), { ($0[0], $0[1]) } >>> reconstruct >>> outOf, [t1, t2])
 	}
 
-	public static func ternary(t1: A, _ t2: A, _ t3: A, _ weave: Weave, _ reconstruct:  (A, A, A) -> A)(_ up: A -> Location?) -> Location? {
-		return Location(flip(weave), { ($0[0], $0[1], $0[2]) } >>> reconstruct >>> up, [t1, t2, t3])
+	public static func ternary(t1: A, _ t2: A, _ t3: A, _ weave: Weave, _ reconstruct:  (A, A, A) -> A)(_ outOf: A -> Location?) -> Location? {
+		return Location(flip(weave), { ($0[0], $0[1], $0[2]) } >>> reconstruct >>> outOf, [t1, t2, t3])
 	}
 
-	public static func variadic<C: MutableCollectionType where C.Generator.Element == A, C.Index: BidirectionalIndexType>(ts: C, _ weave: Weave, _ reconstruct: C -> A)(_ up: A -> Location?) -> Location? {
-		return Location(flip(weave), reconstruct >>> up, ts)
+	public static func variadic<C: MutableCollectionType where C.Generator.Element == A, C.Index: BidirectionalIndexType>(ts: C, _ weave: Weave, _ reconstruct: C -> A)(_ outOf: A -> Location?) -> Location? {
+		return Location(flip(weave), reconstruct >>> outOf, ts)
 	}
 
-	public static func variadic<Key>(ts: [Key:A], _ weave: Weave, _ reconstruct: [Key:A] -> A)(_ up: A -> Location?) -> Location? {
-		return Location(flip(weave), Dictionary.init >>> reconstruct >>> up, Array(ts))
+	public static func variadic<Key>(ts: [Key:A], _ weave: Weave, _ reconstruct: [Key:A] -> A)(_ outOf: A -> Location?) -> Location? {
+		return Location(flip(weave), Dictionary.init >>> reconstruct >>> outOf, Array(ts))
 	}
 
 	public static func explore(weave: Weave)(_ a : A) -> Location {
-		return Location(it: a, into: flip(weave)(explore(weave) >>> Optional.Some), up: const(nil), left: const(nil), right: const(nil))
+		return Location(it: a, into: flip(weave)(explore(weave) >>> Optional.Some), outOf: const(nil), left: const(nil), right: const(nil))
 	}
 
 
 	// MARK: - Implementation details
 
-	private init?<C: MutableCollectionType where C.Generator.Element == A, C.Index: BidirectionalIndexType>(_ weave: (A -> Location?) -> A -> Location?, _ up: C -> Location?, _ ts: C) {
+	private init?<C: MutableCollectionType where C.Generator.Element == A, C.Index: BidirectionalIndexType>(_ weave: (A -> Location?) -> A -> Location?, _ outOf: C -> Location?, _ ts: C) {
 		func update(index: C.Index, _ ts: C)(_ f: C -> Location?)(_ a: A) -> Location? {
 			guard ts.indices.contains(index) else { return nil }
 			var copy = ts
@@ -99,13 +99,13 @@ public struct Location<A>: SequenceType {
 		}
 		func into(index: C.Index)(_ ts: C) -> Location? {
 			guard ts.indices.contains(index) else { return nil }
-			return Location(it: ts[index], into: weave(update(index, ts)(into(index))), up: update(index, ts)(up), left: update(index, ts)(into(index.predecessor())), right: update(index, ts)(into(index.successor())))
+			return Location(it: ts[index], into: weave(update(index, ts)(into(index))), outOf: update(index, ts)(outOf), left: update(index, ts)(into(index.predecessor())), right: update(index, ts)(into(index.successor())))
 		}
 		guard let location = into(ts.startIndex)(ts) else { return nil }
 		self = location
 	}
 
-	private init?<C: MutableCollectionType, Key where C.Generator.Element == (Key, A), C.Index: BidirectionalIndexType>(_ weave: (A -> Location?) -> A -> Location?, _ up: C -> Location?, _ ts: C) {
+	private init?<C: MutableCollectionType, Key where C.Generator.Element == (Key, A), C.Index: BidirectionalIndexType>(_ weave: (A -> Location?) -> A -> Location?, _ outOf: C -> Location?, _ ts: C) {
 		func update(index: C.Index, _ ts: C)(_ f: C -> Location?)(_ key: Key)(_ a: A) -> Location? {
 			guard ts.indices.contains(index) else { return nil }
 			var copy = ts
@@ -115,7 +115,7 @@ public struct Location<A>: SequenceType {
 		func into(index: C.Index)(_ ts: C) -> Location? {
 			guard ts.indices.contains(index) else { return nil }
 			let (key, value) = ts[index]
-			return Location(it: value, into: weave(update(index, ts)(into(index))(key)), up: update(index, ts)(up)(key), left: update(index, ts)(into(index.predecessor()))(key), right: update(index, ts)(into(index.successor()))(key))
+			return Location(it: value, into: weave(update(index, ts)(into(index))(key)), outOf: update(index, ts)(outOf)(key), left: update(index, ts)(into(index.predecessor()))(key), right: update(index, ts)(into(index.successor()))(key))
 		}
 		guard let location = into(ts.startIndex)(ts) else { return nil }
 		self = location
