@@ -24,7 +24,7 @@ public struct Location<A>: SequenceType {
 
 	public var into: Location? { return _into(it) }
 
-	public var up: Location? { return _up(it) }
+	public var outOf: Location? { return _up(it) }
 
 	public var left: Location? { return _left(it) }
 
@@ -32,7 +32,7 @@ public struct Location<A>: SequenceType {
 
 	/// The root `Location` in the current exploration.
 	public var root: Location {
-		return up?.root ?? self
+		return outOf?.root ?? self
 	}
 
 
@@ -43,7 +43,7 @@ public struct Location<A>: SequenceType {
 
 	/// Returns the logically next `Location` after the receiver and its children in a pre-order depth-first traversal.
 	private var nextAfter: Location? {
-		return right ?? up?.nextAfter
+		return right ?? outOf?.nextAfter
 	}
 
 

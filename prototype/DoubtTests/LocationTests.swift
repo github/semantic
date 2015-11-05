@@ -4,7 +4,7 @@ final class LocationTests: XCTestCase {
 	}
 
 	func testCannotMoveUpwardsAtTheStartOfAnExploration() {
-		assert(term.explore().up?.it, ==, nil)
+		assert(term.explore().outOf?.it, ==, nil)
 	}
 
 	func testCannotMoveSidewaysAtTheStartOfAnExploration() {
@@ -21,7 +21,7 @@ final class LocationTests: XCTestCase {
 	}
 
 	func testCanMoveBackUpwards() {
-		assert(term.explore().into?.up?.it, ==, term)
+		assert(term.explore().into?.outOf?.it, ==, term)
 	}
 
 	func testCannotMoveLeftwardsFromFirstChildOfBranch() {
@@ -37,7 +37,7 @@ final class LocationTests: XCTestCase {
 	}
 
 	func testCanMoveBackUpwardsFromDeepExplorations() {
-		assert(term.explore().into?.right?.right?.into?.right?.up?.up?.it, ==, term)
+		assert(term.explore().into?.right?.right?.into?.right?.outOf?.outOf?.it, ==, term)
 	}
 
 	func testCanReturnToStartOfExplorationFromArbitrarilyDeepNodes() {
@@ -49,11 +49,11 @@ final class LocationTests: XCTestCase {
 	}
 
 	func testModifyReplacesSubtrees() {
-		assert(term.explore().into?.modify(const(leafB)).right?.up?.it, ==, Cofree(0, .Indexed([ leafB, leafB, keyed ])))
+		assert(term.explore().into?.modify(const(leafB)).right?.outOf?.it, ==, Cofree(0, .Indexed([ leafB, leafB, keyed ])))
 	}
 
 	func testMultipleModificationsReplaceMultipleSubtrees() {
-		assert(term.explore().into?.modify(const(leafB)).right?.modify(const(leafA)).up?.it, ==, Cofree(0, .Indexed([ leafB, leafA, keyed ])))
+		assert(term.explore().into?.modify(const(leafB)).right?.modify(const(leafA)).outOf?.it, ==, Cofree(0, .Indexed([ leafB, leafA, keyed ])))
 	}
 
 	func testModificationsPreserveKeys() {
