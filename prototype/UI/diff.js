@@ -239,10 +239,11 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 				var li = wrap("li", beforeAfterChild.before);
 				if (beforeAfterChild.before.classList.contains("invisible")) {
 					li.classList.add("invisible");
+				} else {
+					previousBefore = beforeRange[0] + beforeRange[1];
 				}
 				elementA.appendChild(li);
 
-				previousBefore = beforeRange[0] + beforeRange[1];
 			}
 			if (childRange.after != null) {
 				var afterRange = childRange.after;
@@ -252,10 +253,10 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 				var li = wrap("li", beforeAfterChild.after);
 				if (beforeAfterChild.after.classList.contains("invisible")) {
 					li.classList.add("invisible");
+				} else {
+					previousAfter = afterRange[0] + afterRange[1];
 				}
 				elementB.appendChild(li);
-
-				previousAfter = afterRange[0] + afterRange[1];
 			}
 		}
 		var beforeText = sources.before.substr(previousBefore, range.before[0] + range.before[1] - previousBefore);
