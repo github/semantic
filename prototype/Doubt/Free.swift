@@ -104,6 +104,20 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 }
 
 
+// MARK: - Monad
+
+extension Free {
+	public func flatMap<Other>(@noescape transform: Value throws -> Free<Leaf, Annotation, Other>) rethrows -> Free<Leaf, Annotation, Other> {
+		switch self {
+		case let .Pure(a):
+			return try transform(a)
+		case let .Roll(annotation, rest):
+			return try .Roll(annotation, rest.map { try $0.flatMap(transform) })
+		}
+	}
+}
+
+
 // MARK: - Anamorphism
 
 extension Free {
