@@ -16,10 +16,10 @@ final class JSONParserTests: XCTestCase {
 
 		let expected: Cofree<JSONLeaf, Range<Int>> = Cofree(0..<42, .Keyed(["hello": fixedPairs]))
 		let actual = Madness.parse(json, input: dictWithArray).right!
-		let firstIndex = actual.extract
-		let new: Cofree<JSONLeaf, Range<Int>> = actual.map({ range in
-			let startI: Int = firstIndex.startIndex.distanceTo(range.startIndex)
-			let endI: Int = firstIndex.startIndex.distanceTo(range.endIndex)
+		let firstIndex = actual.extract.1
+		let new: Cofree<JSONLeaf, Range<Int>> = actual.map({ tuple in
+			let startI: Int = firstIndex.startIndex.distanceTo(tuple.1.startIndex)
+			let endI: Int = firstIndex.startIndex.distanceTo(tuple.1.endIndex)
 			return Range(start: startI, end: endI)
 		})
 		
