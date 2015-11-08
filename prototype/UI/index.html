@@ -43,6 +43,13 @@
         color: initial;
     }
 
+		ul.line-numbers {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			float: left;
+		}
+
     .diff dt {
         display: none;
     }
@@ -110,15 +117,36 @@
     </script>
   </head>
   <body>
-	<div id="before" class="diff"></div>
-	<div id="after" class="diff"></div>
+	<div id="before">
+		<ul id="before-lines" class="line-numbers"></ul>
+		<div id="before-diff" class="diff"></div>
+	</div>
+	<div id="after">
+		<ul id="after-lines" class="line-numbers"></ul>
+		<div id="after-diff" class="diff"></div>
+	</div>
 
     <script type="text/javascript">
     loadJSON((window.location.search || '?diff.json').substr(1), function (json) {
-        var diff = diffFromJSON(json.diff);
+    var diff = diffFromJSON(json.diff);
+
+		var beforeLines = diff.roll.extract.before.lines
+		var afterLines = diff.roll.extract.after.lines
+
+		var beforeLinesEl = document.getElementById("before-lines")
+		var afterLinesEl = document.getElementById("after-lines")
+		for (var i = beforeLines[0]; i <= beforeLines[1]; i++) {
+			var node = wrap("li", document.createTextNode(i));
+			beforeLinesEl.appendChild(node)
+		}
+
+		for (var i = afterLines[0]; i <= afterLines[1]; i++) {
+			afterLinesEl.appendChild(wrap("li", document.createTextNode(i)))
+		}
+
 		var dom = diffToDOM(diff, { "before": json["before"] , "after": json["after"] })
-		document.getElementById("before").appendChild(dom.before);
-		document.getElementById("after").appendChild(dom.after);
+		document.getElementById("before-diff").appendChild(dom.before);
+		document.getElementById("after-diff").appendChild(dom.after);
     });
     </script>
   </body>
