@@ -129,7 +129,7 @@ function termToDOM(source, syntax, extract, getRange, recur) {
 }
 
 /// Diff -> String -> DOM
-function diffToDOM(diff, sources) {
+function diffToDOM(diff, sources, lineNumbers) {
 
 	function getRange(diffOrTerm) {
 		if (diffOrTerm.pure != null) {
@@ -160,17 +160,17 @@ function diffToDOM(diff, sources) {
 	}
 
 	if (diff.pure != null) {
-		return pureToDOM(sources, diff.pure, getRange, function(diff) {
-			return diffToDOM(diff, sources);
+		return pureToDOM(sources, diff.pure, lineNumbers, getRange, function(diff) {
+			return diffToDOM(diff, sources, lineNumbers);
 		})
 	}
 
-	return rollToDOM(sources, diff.roll, getRange, function(diff) {
-		return diffToDOM(diff, sources);
+	return rollToDOM(sources, diff.roll, lineNumbers, getRange, function(diff) {
+		return diffToDOM(diff, sources, lineNumbers);
 	})
 }
 
-function pureToDOM(sources, patch, getRangeFun, diffToDOMFun) {
+function pureToDOM(sources, patch, lineNumbers, getRangeFun, diffToDOMFun) {
 	var elementA, elementB;
 	if (patch.before != null) {
 		elementA = termToDOM(sources.before, patch.before.unwrap, patch.before.extract, getRangeFun);
@@ -178,6 +178,9 @@ function pureToDOM(sources, patch, getRangeFun, diffToDOMFun) {
 		if (patch.after != null) {
 			elementA.classList.add("replace");
 		}
+
+		var lineNode = wrap("li", document.createTextNode(patch.before.extract.lines[0]));
+		lineNumbers.before.appendChild(lineNode);
 	}
 
 	if (patch.after != null) {
@@ -186,22 +189,33 @@ function pureToDOM(sources, patch, getRangeFun, diffToDOMFun) {
 		if (patch.before != null) {
 			elementB.classList.add("replace");
 		}
+
+		var lineNode = wrap("li", document.createTextNode(patch.after.extract.lines[0]));
+		lineNumbers.after.appendChild(lineNode);
 	}
 
 	if (elementA == null) {
-		elementA = elementB.cloneNode(true)
-		elementA.classList.add("invisible")
+		elementA = elementB.cloneNode(true);
+		elementA.classList.add("invisible");
+
+
+		var lineNode = wrap("li", document.createTextNode('\u00A0'));
+		var index = patch.after.extract.lines[0] - 1;
+		lineNumbers.before.insertBefore(lineNode, lineNumbers.before.childNodes[index]);
 	}
 
 	if (elementB == null) {
-		elementB = elementA.cloneNode(true)
-		elementB.classList.add("invisible")
+		elementB = elementA.cloneNode(true);
+		elementB.classList.add("invisible");
+
+		var lineNode = wrap("li", document.createTextNode('\u00A0'));
+		lineNumbers.after.appendChild(lineNode);
 	}
 
 	return { "before": elementA || "", "after": elementB || "" };
 }
 
-function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
+function rollToDOM(sources, rollOrTerm, lineNumbers, getRangeFun, diffToDOMFun) {
 	var syntax = rollOrTerm.unwrap
 	var categories = {
 		before: rollOrTerm.extract.before.categories,
@@ -212,6 +226,11 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 		after: rollOrTerm.extract.after.range
 	}
 
+	var lines = {
+		before: rollOrTerm.extract.before.lines[0],
+		after: rollOrTerm.extract.after.lines[0]
+	}
+
 	var elementA;
 	var elementB;
 	if (syntax.leaf != null) {
@@ -219,6 +238,7 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 		elementA.textContent = sources.before.substr(range.before[0], range.before[1]);
 		elementB = document.createElement("span");
 		elementB.textContent = sources.after.substr(range.after[0], range.after[1]);
+
 	} else if (syntax.indexed != null || syntax.fixed != null) {
 		var values = syntax.indexed || syntax.fixed;
 		elementA = document.createElement("ul");
@@ -255,9 +275,22 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 
 		elementA.appendChild(document.createTextNode(beforeText));
 		elementB.appendChild(document.createTextNode(afterText));
+
+		var lineNode = wrap("li", document.createTextNode(lines.before));
+		lineNumbers.before.appendChild(lineNode);
+
+		var lineNode = wrap("li", document.createTextNode(lines.after));
+		lineNumbers.after.appendChild(lineNode);
+
 	} else if (syntax.keyed != null) {
 		elementA = document.createElement("dl");
 		elementB = document.createElement("dl");
+
+		var lineNode = wrap("li", document.createTextNode(lines.before));
+		lineNumbers.before.appendChild(lineNode);
+
+		var lineNode = wrap("li", document.createTextNode(lines.after));
+		lineNumbers.after.appendChild(lineNode);
 
 		var befores = [];
 		var afters = [];
@@ -432,6 +465,12 @@ function rollToDOM(sources, rollOrTerm, getRangeFun, diffToDOMFun) {
 		elementA.appendChild(document.createTextNode(textA));
 		var textB = sources.after.substr(previousB, range.after[0] + range.after[1] - previousB);
 		elementB.appendChild(document.createTextNode(textB));
+
+		var lineNode = wrap("li", document.createTextNode(rollOrTerm.extract.before.lines[1]));
+		lineNumbers.before.appendChild(lineNode);
+
+		var lineNode = wrap("li", document.createTextNode(rollOrTerm.extract.after.lines[1]));
+		lineNumbers.after.appendChild(lineNode);
 	}
 
 	for (index in categories.before) {

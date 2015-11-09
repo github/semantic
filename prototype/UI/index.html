@@ -135,16 +135,11 @@
 
 		var beforeLinesEl = document.getElementById("before-lines")
 		var afterLinesEl = document.getElementById("after-lines")
-		for (var i = beforeLines[0]; i <= beforeLines[1]; i++) {
-			var node = wrap("li", document.createTextNode(i));
-			beforeLinesEl.appendChild(node)
-		}
 
-		for (var i = afterLines[0]; i <= afterLines[1]; i++) {
-			afterLinesEl.appendChild(wrap("li", document.createTextNode(i)))
-		}
+		var dom = diffToDOM(diff,
+			{ "before": json["before"] , "after": json["after"] },
+			{ "before": beforeLinesEl, "after": afterLinesEl });
 
-		var dom = diffToDOM(diff, { "before": json["before"] , "after": json["after"] })
 		document.getElementById("before-diff").appendChild(dom.before);
 		document.getElementById("after-diff").appendChild(dom.after);
     });
