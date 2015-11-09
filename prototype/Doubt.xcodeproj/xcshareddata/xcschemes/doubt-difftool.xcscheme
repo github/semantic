@@ -63,15 +63,15 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "--split"
+            argument = "--unified"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "file:///Users/vera/Library/Developer/Xcode/DerivedData/Doubt-gibmbsxjgxflybarnuoisglmgdll/Build/Products/Debug/before.json"
+            argument = "https://raw.githubusercontent.com/jquery/jquery/2.1.0/src/effects.js"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "file:///Users/vera/Library/Developer/Xcode/DerivedData/Doubt-gibmbsxjgxflybarnuoisglmgdll/Build/Products/Debug/after.json"
+            argument = "https://raw.githubusercontent.com/jquery/jquery/2.1.4/src/effects.js"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
