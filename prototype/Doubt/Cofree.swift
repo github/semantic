@@ -177,4 +177,28 @@ extension CofreeType where Self.Annotation == Range<String.Index> {
 }
 
 
+// MARK: - Weaving
+
+extension Cofree {
+	public func explore() -> Location<Cofree> {
+		func weave(cofree: Cofree) -> Location<Cofree>.Unweave {
+			switch cofree {
+			case .Unroll(_, .Leaf):
+				return Location.nullary
+
+			case let .Unroll(annotation, .Indexed(i)):
+				return Location.variadic(i, weave, { Cofree(annotation, .Indexed($0)) })
+
+			case let .Unroll(annotation, .Fixed(f)):
+				return Location.variadic(f, weave, { Cofree(annotation, .Fixed($0)) })
+
+			case let .Unroll(annotation, .Keyed(k)):
+				return Location.variadic(k, weave, { Cofree(annotation, .Keyed($0)) })
+			}
+		}
+		return Location.explore(weave)(self)
+	}
+}
+
+
 import Prelude

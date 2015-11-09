@@ -1,8 +1,8 @@
 /// Computes the SES (shortest edit script), i.e. the shortest sequence of diffs (`Free<Leaf, Annotation, Patch<Term>>`) for two arrays of `Term`s which would suffice to transform `a` into `b`.
 ///
 /// This is computed w.r.t. an `equals` function, which computes the equality of leaf nodes within terms, and a `recur` function, which produces diffs representing matched-up terms.
-public func SES<Term, Leaf, Annotation>(a: [Term], _ b: [Term], cost: Free<Leaf, Annotation, Patch<Term>> -> Int, recur: (Term, Term) -> Free<Leaf, Annotation, Patch<Term>>?) -> [Free<Leaf, Annotation, Patch<Term>>] {
-	typealias Diff = Free<Leaf, Annotation, Patch<Term>>
+public func SES<Leaf, Annotation, C: CollectionType>(a: C, _ b: C, cost: Free<Leaf, Annotation, Patch<C.Generator.Element>> -> Int, recur: (C.Generator.Element, C.Generator.Element) -> Free<Leaf, Annotation, Patch<C.Generator.Element>>?) -> [Free<Leaf, Annotation, Patch<C.Generator.Element>>] {
+	typealias Diff = Free<Leaf, Annotation, Patch<C.Generator.Element>>
 
 	if a.isEmpty { return b.map { .Insert($0) } }
 	if b.isEmpty { return a.map { .Delete($0) } }
@@ -20,17 +20,17 @@ public func SES<Term, Leaf, Annotation>(a: [Term], _ b: [Term], cost: Free<Leaf,
 	}
 
 	// A matrix whose values are streams representing paths through the edit graph, carrying both the diff & the cost of the remainder of the path.
-	var matrix: Matrix<Stream<(Diff, Int)>>!
-	matrix = Matrix(width: a.count + 1, height: b.count + 1) { i, j in
+	var matrix: Matrix<Stream<(Diff, Int)>, C.Index>!
+	matrix = Matrix(across: a.startIndex..<a.endIndex.successor(), down: b.startIndex..<b.endIndex.successor()) { i, j in
 		// Some explanation is warranted:
 		//
 		// 1. `matrix` captures itself during construction, because each vertex in the edit graph depends on other vertices. This is safe, because a) `Matrix` populates its fields lazily, and b) vertices only depend on those vertices downwards and rightwards of them.
 		//
 		// 2. `matrix` is sized bigger than `a.count` x `b.count`. This is safe, because a) we only get a[i]/b[j] when right/down are non-nil (respectively), and b) right/down are found by looking up elements (i + 1, j) & (i, j + 1) in the matrix, which returns `nil` when out of bounds. So we only access a[i] and b[j] when i and j are in bounds.
 
-		let right = matrix[i + 1, j]
-		let down = matrix[i, j + 1]
-		let diagonal = matrix[i + 1, j + 1]
+		let right = matrix[i.successor(), j]
+		let down = matrix[i, j.successor()]
+		let diagonal = matrix[i.successor(), j.successor()]
 
 		if let right = right, down = down, diagonal = diagonal {
 			let here = recur(a[i], b[j])
@@ -62,7 +62,7 @@ public func SES<Term, Leaf, Annotation>(a: [Term], _ b: [Term], cost: Free<Leaf,
 		return Stream.Nil
 	}
 
-	return Array(matrix[0, 0]!.value.map { diff, _ in diff })
+	return Array(matrix[a.startIndex, b.startIndex]!.value.map { diff, _ in diff })
 }
 
 

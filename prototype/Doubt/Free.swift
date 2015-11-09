@@ -104,6 +104,20 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 }
 
 
+// MARK: - Monad
+
+extension Free {
+	public func flatMap<Other>(@noescape transform: Value throws -> Free<Leaf, Annotation, Other>) rethrows -> Free<Leaf, Annotation, Other> {
+		switch self {
+		case let .Pure(a):
+			return try transform(a)
+		case let .Roll(annotation, rest):
+			return try .Roll(annotation, rest.map { try $0.flatMap(transform) })
+		}
+	}
+}
+
+
 // MARK: - Anamorphism
 
 extension Free {
@@ -219,6 +233,30 @@ extension Free {
 				]
 			]
 		}
+	}
+}
+
+
+// MARK: - Weaving
+
+extension Free {
+	public func explore() -> Location<Free> {
+		func weave(free: Free) -> Location<Free>.Unweave {
+			switch free {
+			case .Pure, .Roll(_, .Leaf):
+				return Location.nullary
+
+			case let .Roll(annotation, .Indexed(i)):
+				return Location.variadic(i, weave, { Free.Roll(annotation, .Indexed($0)) })
+
+			case let .Roll(annotation, .Fixed(f)):
+				return Location.variadic(f, weave, { Free.Roll(annotation, .Fixed($0)) })
+
+			case let .Roll(annotation, .Keyed(k)):
+				return Location.variadic(k, weave, { Free.Roll(annotation, .Keyed($0)) })
+			}
+		}
+		return Location.explore(weave)(self)
 	}
 }
 

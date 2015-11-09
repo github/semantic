@@ -254,20 +254,28 @@ function rollToDOM(sources, rollOrTerm, lineNumbers, getRangeFun, diffToDOMFun) 
 			if (childRange.before != null) {
 				var beforeRange = childRange.before;
 
-				var beforeSeparator = sources.before.substr(previousBefore, beforeRange[0] - previousBefore);
-				elementA.appendChild(document.createTextNode(beforeSeparator));
-				elementA.appendChild(wrap("li", beforeAfterChild.before));
-
-				previousBefore = beforeRange[0] + beforeRange[1];
+				var li = wrap("li", beforeAfterChild.before);
+				if (beforeAfterChild.before.classList.contains("invisible")) {
+					li.classList.add("invisible");
+				} else {
+					var beforeSeparator = sources.before.substr(previousBefore, beforeRange[0] - previousBefore);
+					elementA.appendChild(document.createTextNode(beforeSeparator));
+					previousBefore = beforeRange[0] + beforeRange[1];
+				}
+				elementA.appendChild(li);
 			}
 			if (childRange.after != null) {
 				var afterRange = childRange.after;
 
-				var afterSeparator = sources.after.substr(previousAfter, afterRange[0] - previousAfter);
-				elementB.appendChild(document.createTextNode(afterSeparator));
-				elementB.appendChild(wrap("li", beforeAfterChild.after));
-
-				previousAfter = afterRange[0] + afterRange[1];
+				var li = wrap("li", beforeAfterChild.after);
+				if (beforeAfterChild.after.classList.contains("invisible")) {
+					li.classList.add("invisible");
+				} else {
+					var afterSeparator = sources.after.substr(previousAfter, afterRange[0] - previousAfter);
+					elementB.appendChild(document.createTextNode(afterSeparator));
+					previousAfter = afterRange[0] + afterRange[1];
+				}
+				elementB.appendChild(li);
 			}
 		}
 		var beforeText = sources.before.substr(previousBefore, range.before[0] + range.before[1] - previousBefore);
