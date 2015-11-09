@@ -126,12 +126,18 @@
 		<div id="after-diff" class="diff"></div>
 	</div>
 
-    <script type="text/javascript">
-    loadJSON((window.location.search || '?diff.json').substr(1), function (json) {
-    var diff = diffFromJSON(json.diff);
+	<script type="text/javascript">
+	var unique = function(array) {
+		return array.reduce(function(accum, current) {
+			if (accum.indexOf(current) < 0) {
+				accum.push(current);
+			}
+			return accum;
+		}, []);
+	}
 
-		var beforeLines = diff.roll.extract.before.lines
-		var afterLines = diff.roll.extract.after.lines
+	loadJSON((window.location.search || '?diff.json').substr(1), function (json) {
+		var diff = diffFromJSON(json.diff);
 
 		var beforeLinesEl = document.getElementById("before-lines")
 		var afterLinesEl = document.getElementById("after-lines")
@@ -140,9 +146,21 @@
 			{ "before": json["before"] , "after": json["after"] },
 			{ "before": beforeLinesEl, "after": afterLinesEl });
 
-		document.getElementById("before-diff").appendChild(dom.before);
-		document.getElementById("after-diff").appendChild(dom.after);
-    });
-    </script>
-  </body>
-</html>
+			var beforeLines = dom.before.getAttribute("data-line-number").split(",")
+			unique(beforeLines).forEach(function(lineNumber) {
+				var node = wrap("li", document.createTextNode(lineNumber));
+				beforeLinesEl.appendChild(node);
+			});
+			var afterLines = dom.after.getAttribute("data-line-number").split(",")
+			unique(afterLines).forEach(function(lineNumber) {
+				var node = wrap("li", document.createTextNode(lineNumber));
+				afterLinesEl.appendChild(node);
+			});
+
+
+			document.getElementById("before-diff").appendChild(dom.before);
+			document.getElementById("after-diff").appendChild(dom.after);
+		});
+		</script>
+	</body>
+	</html>
