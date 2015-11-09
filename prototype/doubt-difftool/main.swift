@@ -160,8 +160,8 @@ extension ForwardIndexType {
 func refineLeafReplacement(aString: String, _ bString: String)(_ patch: Patch<Term>) -> Diff {
 	switch patch {
 	case let .Replace(.Unroll(aExtract, .Leaf), .Unroll(bExtract, .Leaf)):
-		let a = aString.utf16[aExtract.range].enumerate().map { Term(Info(range: (aExtract.range.startIndex + $0).range, categories: aExtract.categories), .Leaf(String($1))) }
-		let b = bString.utf16[bExtract.range].enumerate().map { Term(Info(range: (bExtract.range.startIndex + $0).range, categories: bExtract.categories), .Leaf(String($1))) }
+		let a = aString.utf16[aExtract.range].enumerate().map { Term(Info(range: (aExtract.range.startIndex + $0).range, lines: aExtract.lines, columns: aExtract.columns, categories: aExtract.categories), .Leaf(String($1))) }
+		let b = bString.utf16[bExtract.range].enumerate().map { Term(Info(range: (bExtract.range.startIndex + $0).range, lines: bExtract.lines, columns: bExtract.columns, categories: bExtract.categories), .Leaf(String($1))) }
 		return .Roll((aExtract, bExtract), .Indexed(SES(a, b, cost: Diff.sum(Patch.sum), recur: { Term.equals(annotation: const(true), leaf: ==)($0, $1) ? Term.zip($0, $1).map(Diff.init) : Diff.Replace($0, $1) })))
 	default:
 		return .Pure(patch)
