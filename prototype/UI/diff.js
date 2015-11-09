@@ -179,8 +179,7 @@ function pureToDOM(sources, patch, lineNumbers, getRangeFun, diffToDOMFun) {
 			elementA.classList.add("replace");
 		}
 
-		var lineNode = wrap("li", document.createTextNode(patch.before.extract.lines[0]));
-		lineNumbers.before.appendChild(lineNode);
+		elementA.setAttribute("data-line-number", patch.before.extract.lines[0])
 	}
 
 	if (patch.after != null) {
@@ -190,26 +189,21 @@ function pureToDOM(sources, patch, lineNumbers, getRangeFun, diffToDOMFun) {
 			elementB.classList.add("replace");
 		}
 
-		var lineNode = wrap("li", document.createTextNode(patch.after.extract.lines[0]));
-		lineNumbers.after.appendChild(lineNode);
+		elementB.setAttribute("data-line-number", patch.after.extract.lines[0])
 	}
 
 	if (elementA == null) {
 		elementA = elementB.cloneNode(true);
 		elementA.classList.add("invisible");
 
-
-		var lineNode = wrap("li", document.createTextNode('\u00A0'));
-		var index = patch.after.extract.lines[0] - 1;
-		lineNumbers.before.insertBefore(lineNode, lineNumbers.before.childNodes[index]);
+		elementA.setAttribute("data-line-number", patch.after.extract.lines[0])
 	}
 
 	if (elementB == null) {
 		elementB = elementA.cloneNode(true);
 		elementB.classList.add("invisible");
 
-		var lineNode = wrap("li", document.createTextNode('\u00A0'));
-		lineNumbers.after.appendChild(lineNode);
+		elementB.setAttribute("data-line-number", patch.before.extract.lines[0])
 	}
 
 	return { "before": elementA || "", "after": elementB || "" };
@@ -239,12 +233,16 @@ function rollToDOM(sources, rollOrTerm, lineNumbers, getRangeFun, diffToDOMFun) 
 		elementB = document.createElement("span");
 		elementB.textContent = sources.after.substr(range.after[0], range.after[1]);
 
+		elementA.setAttribute("data-line-number", lines.before)
+		elementB.setAttribute("data-line-number", lines.after)
 	} else if (syntax.indexed != null || syntax.fixed != null) {
 		var values = syntax.indexed || syntax.fixed;
 		elementA = document.createElement("ul");
 		elementB = document.createElement("ul");
 		var previousBefore = range.before[0];
 		var previousAfter = range.after[0];
+
+		var lineNumbers = { "before": [], "after": [] };
 		for (i in values) {
 			var child = values[i];
 			if (child.pure == "") continue;
@@ -263,6 +261,11 @@ function rollToDOM(sources, rollOrTerm, lineNumbers, getRangeFun, diffToDOMFun) 
 					previousBefore = beforeRange[0] + beforeRange[1];
 				}
 				elementA.appendChild(li);
+
+				var lineNumber = beforeAfterChild.before.getAttribute("data-line-number")
+				if (lineNumber != null) {
+					lineNumbers.before.push(lineNumber)
+				}
 			}
 			if (childRange.after != null) {
 				var afterRange = childRange.after;
@@ -276,6 +279,11 @@ function rollToDOM(sources, rollOrTerm, lineNumbers, getRangeFun, diffToDOMFun) 
 					previousAfter = afterRange[0] + afterRange[1];
 				}
 				elementB.appendChild(li);
+
+				var lineNumber = beforeAfterChild.after.getAttribute("data-line-number");
+				if (lineNumber != null) {
+					lineNumbers.after.push(lineNumber)
+				}
 			}
 		}
 		var beforeText = sources.before.substr(previousBefore, range.before[0] + range.before[1] - previousBefore);
@@ -284,21 +292,14 @@ function rollToDOM(sources, rollOrTerm, lineNumbers, getRangeFun, diffToDOMFun) 
 		elementA.appendChild(document.createTextNode(beforeText));
 		elementB.appendChild(document.createTextNode(afterText));
 
-		var lineNode = wrap("li", document.createTextNode(lines.before));
-		lineNumbers.before.appendChild(lineNode);
-
-		var lineNode = wrap("li", document.createTextNode(lines.after));
-		lineNumbers.after.appendChild(lineNode);
-
+		elementA.setAttribute("data-line-number", lineNumbers.before)
+		elementB.setAttribute("data-line-number", lineNumbers.after)
 	} else if (syntax.keyed != null) {
 		elementA = document.createElement("dl");
 		elementB = document.createElement("dl");
 
-		var lineNode = wrap("li", document.createTextNode(lines.before));
-		lineNumbers.before.appendChild(lineNode);
-
-		var lineNode = wrap("li", document.createTextNode(lines.after));
-		lineNumbers.after.appendChild(lineNode);
+		elementA.setAttribute("data-line-number", lines.before)
+		elementB.setAttribute("data-line-number", lines.after)
 
 		var befores = [];
 		var afters = [];
@@ -474,11 +475,8 @@ function rollToDOM(sources, rollOrTerm, lineNumbers, getRangeFun, diffToDOMFun) 
 		var textB = sources.after.substr(previousB, range.after[0] + range.after[1] - previousB);
 		elementB.appendChild(document.createTextNode(textB));
 
-		var lineNode = wrap("li", document.createTextNode(rollOrTerm.extract.before.lines[1]));
-		lineNumbers.before.appendChild(lineNode);
-
-		var lineNode = wrap("li", document.createTextNode(rollOrTerm.extract.after.lines[1]));
-		lineNumbers.after.appendChild(lineNode);
+		elementA.setAttribute("data-line-number", lines[1])
+		elementB.setAttribute("data-line-number", lines[1])
 	}
 
 	for (index in categories.before) {
