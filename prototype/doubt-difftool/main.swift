@@ -93,16 +93,20 @@ func termWithInput(language: TSLanguage)(_ string: String) throws -> Term {
 				}
 			} (root, "program")
 			.map { node, category in
-				Info(range: node.range, categories: [ category ])
+				// TODO: Calculate line and column from TSNodes
+				Info(range: node.range, lines: 0..<1, columns: 0..<1, categories: [ category ])
 			}
 	}
 }
 
 func toTerm(term: CofreeJSON) -> Term {
-	let annotation = Info(range: term.extract, categories: [])
+	let lines = term.extract.0
+	let columns = term.extract.1
+	let range = term.extract.2
+	let annotation = Info(range: range, lines: lines, columns: columns, categories: [])
 	switch term.unwrap {
 	case let .Leaf(a):
-		return Term(Info(range: term.extract, categories: a.categories), Syntax<Term, String>.Leaf(String(a)))
+		return Term(Info(range: range, lines: lines, columns: columns, categories: a.categories), Syntax<Term, String>.Leaf(String(a)))
 	case let .Indexed(i):
 		return Term(annotation, .Indexed(i.map(toTerm)))
 	case let .Fixed(f):
@@ -115,14 +119,16 @@ func toTerm(term: CofreeJSON) -> Term {
 func lines(input: String) -> Term {
 	var lines: [Term] = []
 	var previous = 0
+	var lineNumber = 0
 	input.enumerateSubstringsInRange(input.characters.indices, options: .ByLines) { (line, _, enclosingRange, _) in
 		let range: Range<Int> = previous..<(previous + enclosingRange.count)
 		previous = range.endIndex
 		if let line = line {
-			lines.append(Term(Info(range: range, categories: []), Syntax.Leaf(line)))
+			lineNumber += 1
+			lines.append(Term(Info(range: range, lines: 0..<lineNumber, columns: 0..<1, categories: []), Syntax.Leaf(line)))
 		}
 	}
-	return Term(Info(range: 0..<input.utf16.count, categories: []), .Indexed(lines))
+	return Term(Info(range: 0..<input.utf16.count, lines: 0..<lineNumber, columns: 0..<1, categories: []), .Indexed(lines))
 }
 
 func parserForType(type: String) -> String throws -> Term {
@@ -154,8 +160,8 @@ extension ForwardIndexType {
 func refineLeafReplacement(aString: String, _ bString: String)(_ patch: Patch<Term>) -> Diff {
 	switch patch {
 	case let .Replace(.Unroll(aExtract, .Leaf), .Unroll(bExtract, .Leaf)):
-		let a = aString.utf16[aExtract.range].enumerate().map { Term(Info(range: (aExtract.range.startIndex + $0).range, categories: aExtract.categories), .Leaf(String($1))) }
-		let b = bString.utf16[bExtract.range].enumerate().map { Term(Info(range: (bExtract.range.startIndex + $0).range, categories: bExtract.categories), .Leaf(String($1))) }
+		let a = aString.utf16[aExtract.range].enumerate().map { Term(Info(range: (aExtract.range.startIndex + $0).range, lines: aExtract.lines, columns: aExtract.columns, categories: aExtract.categories), .Leaf(String($1))) }
+		let b = bString.utf16[bExtract.range].enumerate().map { Term(Info(range: (bExtract.range.startIndex + $0).range, lines: bExtract.lines, columns: bExtract.columns, categories: bExtract.categories), .Leaf(String($1))) }
 		return .Roll((aExtract, bExtract), .Indexed(SES(a, b, cost: Diff.sum(Patch.sum), recur: { Term.equals(annotation: const(true), leaf: ==)($0, $1) ? Term.zip($0, $1).map(Diff.init) : Diff.Replace($0, $1) })))
 	default:
 		return .Pure(patch)
