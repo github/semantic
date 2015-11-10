@@ -29,7 +29,7 @@ typealias MembersParser = Parser<String.CharacterView, [(String, CofreeJSON)]>.F
 
 // Parses an array of (String, CofreeJSON) object members
 func members(json: JSONParser) -> MembersParser {
-	let keyAndKeyTerm: Parser<String.CharacterView, (String, CofreeJSON)>.Function = quoted --> { (lines, columns, range, key) in
+	let keyAndKeyTerm: Parser<String.CharacterView, (String, CofreeJSON)>.Function = quoted --> { _, lines, columns, range, key in
 		(key, Cofree((lines, columns, range), .Leaf(.String(key))))
 	}
 	let pairs: Parser<String.CharacterView, (String, CofreeJSON)>.Function = (curry(pair) <^>
@@ -37,7 +37,7 @@ func members(json: JSONParser) -> MembersParser {
 		<* whitespace
 		<* %":"
 		<* whitespace
-		<*> json) --> { lines, columns, range, values in
+		<*> json) --> { _, lines, columns, range, values in
 			(values.0.0, Cofree((lines, columns, range), .Fixed([values.0.1, values.1])))
 		}
 
@@ -46,7 +46,7 @@ func members(json: JSONParser) -> MembersParser {
 
 public let json: JSONParser = fix { json in
 	let string: JSONParser = quoted --> {
-		Cofree(($0, $1, $2), .Leaf(.String($3)))
+		Cofree(($1, $2, $3), .Leaf(.String($4)))
 	} <?> "string"
 
 	let array: JSONParser =  %"["
@@ -55,7 +55,7 @@ public let json: JSONParser = fix { json in
 		<* whitespace
 		<* %"]"
 		--> {
-			Cofree(($0, $1, $2), .Indexed($3))
+			Cofree(($1, $2, $3), .Indexed($4))
 		} <?> "array"
 
 	let object: JSONParser = %"{"
@@ -63,19 +63,19 @@ public let json: JSONParser = fix { json in
 		*> members(json)
 		<* whitespace
 		<* %"}"
-		--> { (lines, columns, range, values: [(String, CofreeJSON)]) in
+		--> { (_, lines, columns, range, values: [(String, CofreeJSON)]) in
 			Cofree((lines, columns, range), .Keyed(Dictionary(elements: values)))
 		} <?> "object"
 
-	let numberParser: JSONParser = (number --> { lines, columns, range, value in
+	let numberParser: JSONParser = (number --> { _, lines, columns, range, value in
 		Cofree((lines, columns, range), .Leaf(JSONLeaf.Number(value)))
 	}) <?> "number"
 	
-	let null: JSONParser = %"null" --> { lines, columns, range, value in
+	let null: JSONParser = %"null" --> { _, lines, columns, range, value in
 		return Cofree((lines, columns, range), .Leaf(.Null))
 	} <?> "null"
 	
-	let boolean: JSONParser = %"false" <|> %"true" --> { lines, columns, range, value in
+	let boolean: JSONParser = %"false" <|> %"true" --> { _, lines, columns, range, value in
 		let boolean = value == "true"
 		return Cofree((lines, columns, range), .Leaf(.Boolean(boolean)))
 	} <?> "boolean"
