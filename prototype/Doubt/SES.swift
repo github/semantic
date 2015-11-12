@@ -62,12 +62,16 @@ public func SES<Leaf, Annotation, C: CollectionType>(a: C, _ b: C, cost: Free<Le
 
 		// right extent of the edit graph; can only move down
 		if let down = down {
-			return cons(Diff.Insert(b[j]), rest: down)
+			let diff = Diff.Insert(b[j])
+			let cost = cost(diff) + (down.value.first?.1 ?? 0)
+			return .Cons((diff, cost), down)
 		}
 
 		// bottom extent of the edit graph; can only move right
 		if let right = right {
-			return cons(Diff.Delete(a[i]), rest: right)
+			let diff = Diff.Delete(a[i])
+			let cost = cost(diff) + (right.value.first?.1 ?? 0)
+			return .Cons((diff, cost), right)
 		}
 
 		// bottom-right corner of the edit graph
