@@ -32,7 +32,7 @@ public func SES<Leaf, Annotation, C: CollectionType>(a: C, _ b: C, cost: Free<Le
 		let down = matrix[i, j.successor()]
 		let diagonal = matrix[i.successor(), j.successor()]
 
-		if let right = right, down = down, diagonal = diagonal {
+		if let diagonal = diagonal, right = right, down = down {
 			let here = recur(a[i], b[j])
 			// If the diff at this vertex is zero-cost, we’re not going to find a cheaper one either rightwards or downwards. We can therefore short-circuit selecting the best outgoing edge and save ourselves evaluating the entire row rightwards and the entire column downwards from this point.
 			//
