@@ -69,8 +69,6 @@ extension Cofree {
 		case let (.Unroll(a, s), .Unroll(b, t)):
 			return annotation(a, b) && Syntax.equals(leaf: leaf, recur: Cofree.equals(annotation: annotation, leaf: leaf))(s, t)
 		}
-		return annotation(left.extract, right.extract)
-			&& Syntax.equals(leaf: leaf, recur: Cofree.equals(annotation: annotation, leaf: leaf))(left.unwrap, right.unwrap)
 	}
 }
 
