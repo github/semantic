@@ -11,13 +11,14 @@ public struct Matrix<A, I: ForwardIndexType> {
 	public let across: Range<I>
 	public let down: Range<I>
 
+	private let width: I.Distance
 	private let values: [Memo<A>]
 
 	public subscript (i: I, j: I) -> Memo<A>? {
 		guard i != across.endIndex && j != down.endIndex else { return nil }
 		let i = across.startIndex.distanceTo(i)
 		let j = down.startIndex.distanceTo(j)
-		return values[Int((i + j * across.count).toIntMax())]
+		return values[Int((i + j * width).toIntMax())]
 	}
 
 
@@ -34,6 +35,7 @@ public struct Matrix<A, I: ForwardIndexType> {
 		self.across = across
 		self.down = down
 		self.values = values
+		self.width = across.count
 	}
 }
 
