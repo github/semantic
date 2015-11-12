@@ -208,14 +208,14 @@ extension Cofree {
 	///
 	/// This is used to compute the cost of patches, such that a patch inserting a very large tree will be charged approximately the same as a very large tree consisting of many small patches.
 	public static func size(term: Cofree) -> Int {
-		switch term.unwrap {
-		case .Leaf:
+		switch term {
+		case .Unroll(_, .Leaf):
 			return 1
-		case let .Indexed(a):
+		case let .Unroll(_, .Indexed(a)):
 			return a.reduce(0) { $0 + size($1) }
-		case let .Fixed(a):
+		case let .Unroll(_, .Fixed(a)):
 			return a.reduce(0) { $0 + size($1) }
-		case let .Keyed(a):
+		case let .Unroll(_, .Keyed(a)):
 			return a.reduce(0) { $0 + size($1.1) }
 		}
 	}
