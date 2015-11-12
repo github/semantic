@@ -14,7 +14,7 @@ public struct Matrix<A, I: ForwardIndexType> {
 	private let values: [Memo<A>]
 
 	public subscript (i: I, j: I) -> Memo<A>? {
-		guard across.contains(i) && down.contains(j) else { return nil }
+		guard i != across.endIndex && j != down.endIndex else { return nil }
 		let i = across.startIndex.distanceTo(i)
 		let j = down.startIndex.distanceTo(j)
 		return values[Int((i + j * across.count).toIntMax())]
