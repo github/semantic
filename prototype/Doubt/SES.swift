@@ -7,10 +7,6 @@ public func SES<Leaf, Annotation, C: CollectionType>(a: C, _ b: C, cost: Free<Le
 	if a.isEmpty { return b.map { .Insert($0) } }
 	if b.isEmpty { return a.map { .Delete($0) } }
 
-	func cons(diff: Diff, rest: Memo<Stream<(Diff, Int)>>) -> Stream<(Diff, Int)> {
-		return .Cons((diff, cost(diff) + (rest.value.first?.1 ?? 0)), rest)
-	}
-
 	// A matrix whose values are streams representing paths through the edit graph, carrying both the diff & the cost of the remainder of the path.
 	var matrix: Matrix<Stream<(Diff, Int)>, C.Index>!
 	matrix = Matrix(across: a.startIndex..<a.endIndex.successor(), down: b.startIndex..<b.endIndex.successor()) { i, j in
