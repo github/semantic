@@ -24,11 +24,6 @@ public struct Interpreter<Term: CofreeType> {
 		return c0 == c1 || !categorize(a).intersect(categorize(b)).isEmpty
 	}
 
-	/// Computes a diff cost function from a patch cost function.
-	public static func cost(cost: Patch<Term> -> Int)(_ diff: Diff) -> Int {
-		return diff.map(cost).reduce(0, combine: +)
-	}
-
 
 	/// Run the interpreter over a given pair of `Term`s, producing a `Diff` as its result.
 	public func run(a: Term, _ b: Term) -> Diff {
