@@ -8,7 +8,7 @@ public func SES<Leaf, Annotation, C: CollectionType>(a: C, _ b: C, cost: Free<Le
 	if b.isEmpty { return a.map { .Delete($0) } }
 
 	func cons(diff: Diff, rest: Memo<Stream<(Diff, Int)>>) -> Stream<(Diff, Int)> {
-		return .Cons((diff, cost(diff) + costOfStream(rest)), rest)
+		return .Cons((diff, cost(diff) + (rest.value.first?.1 ?? 0)), rest)
 	}
 
 	func costOfStream(stream: Memo<Stream<(Diff, Int)>>) -> Int {
