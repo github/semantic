@@ -57,22 +57,6 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 	}
 
 
-	/// Reduces the receiver top-down, left-to-right, starting from an `initial` value, and applying `combine` to successive values.
-	public func reduce(initial: Value, @noescape combine: (Value, Value) -> Value) -> Value {
-		return cata {
-			switch $1 {
-			case .Leaf:
-				return initial
-			case let .Indexed(a):
-				return a.reduce(initial, combine: combine)
-			case let .Fixed(a):
-				return a.reduce(initial, combine: combine)
-			case let .Keyed(a):
-				return a.values.reduce(initial, combine: combine)
-			}
-		}
-	}
-
 	/// Returns a function which sums `Free`s by first `transform`ing `Pure` values into integers, and then summing these.
 	public static func sum(@noescape transform: Value -> Int)(_ free: Free) -> Int {
 		return free.map(transform).cata {
