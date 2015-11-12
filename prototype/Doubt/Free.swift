@@ -58,19 +58,22 @@ public enum Free<Leaf, Annotation, Value>: CustomDebugStringConvertible {
 
 
 	/// Returns a function which sums `Free`s by first `transform`ing `Pure` values into integers, and then summing these.
-	public static func sum(@noescape transform: Value -> Int)(_ free: Free) -> Int {
-		return free.map(transform).cata {
-			switch $1 {
-			case .Leaf:
+	public static func sum(transform: Value -> Int) -> Free -> Int {
+		func sum(free: Free) -> Int {
+			switch free {
+			case let .Pure(a):
+				return transform(a)
+			case .Roll(_, .Leaf):
 				return 0
-			case let .Indexed(a):
-				return a.reduce(0, combine: +)
-			case let .Fixed(a):
-				return a.reduce(0, combine: +)
-			case let .Keyed(a):
-				return a.values.reduce(0, combine: +)
+			case let .Roll(_, .Indexed(a)):
+				return a.reduce(0) { into, each in into + sum(each) }
+			case let .Roll(_, .Fixed(a)):
+				return a.reduce(0) { into, each in into + sum(each) }
+			case let .Roll(_, .Keyed(a)):
+				return a.reduce(0) { into, each in into + sum(each.1) }
 			}
 		}
+		return sum
 	}
 
 
