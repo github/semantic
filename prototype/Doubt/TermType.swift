@@ -30,18 +30,19 @@ extension TermType {
 	///
 	/// This is used to compute the cost of patches, such that a patch inserting a very large tree will be charged approximately the same as a very large tree consisting of many small patches.
 	public var size: Int {
-		return cata {
-			switch $0 {
+		func size(term: Self) -> Int {
+			switch term.unwrap {
 			case .Leaf:
 				return 1
-			case let .Indexed(i):
-				return i.reduce(1, combine: +)
-			case let .Fixed(i):
-				return i.reduce(1, combine: +)
-			case let .Keyed(k):
-				return k.values.reduce(1, combine: +)
+			case let .Indexed(a):
+				return a.reduce(0) { $0 + size($1) }
+			case let .Fixed(a):
+				return a.reduce(0) { $0 + size($1) }
+			case let .Keyed(a):
+				return a.reduce(0) { $0 + size($1.1) }
 			}
 		}
+		return size(self)
 	}
 }
 

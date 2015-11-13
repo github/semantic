@@ -73,13 +73,20 @@ extension Patch {
 
 extension Patch {
 	/// Returns a function which computes the size of a `patch` as the sum of the sizes of its terms, as computed by `size`.
-	public static func sum(@noescape size: A throws -> Int)(_ patch: Patch) rethrows -> Int {
-		return try (patch.state.before.map(size) ?? 0) + (patch.state.after.map(size) ?? 0)
+	public static func sum(@noescape size: A -> Int)(_ patch: Patch) -> Int {
+		switch patch {
+		case let .Replace(a, b):
+			return size(a) + size(b)
+		case let .Insert(b):
+			return size(b)
+		case let .Delete(a):
+			return size(a)
+		}
 	}
 
 	/// Returns a function which computes the size of a `patch` as the absolute difference of the sizes of its terms, as computed by `size`.
-	public static func difference(@noescape size: A throws -> Int)(_ patch: Patch) rethrows -> Int {
-		return try abs((patch.state.before.map(size) ?? 0) - (patch.state.after.map(size) ?? 0))
+	public static func difference(@noescape size: A -> Int)(_ patch: Patch) -> Int {
+		return abs((patch.state.before.map(size) ?? 0) - (patch.state.after.map(size) ?? 0))
 	}
 }
 

@@ -7,18 +7,6 @@ public func SES<Leaf, Annotation, C: CollectionType>(a: C, _ b: C, cost: Free<Le
 	if a.isEmpty { return b.map { .Insert($0) } }
 	if b.isEmpty { return a.map { .Delete($0) } }
 
-	func cons(diff: Diff, rest: Memo<Stream<(Diff, Int)>>) -> Stream<(Diff, Int)> {
-		return .Cons((diff, cost(diff) + costOfStream(rest)), rest)
-	}
-
-	func costOfStream(stream: Memo<Stream<(Diff, Int)>>) -> Int {
-		return stream.value.first?.1 ?? 0
-	}
-
-	func min<A>(a: A, _ rest: A..., _ isLessThan: (A, A) -> Bool) -> A {
-		return rest.reduce(a, combine: { isLessThan($0, $1) ? $0 : $1 })
-	}
-
 	// A matrix whose values are streams representing paths through the edit graph, carrying both the diff & the cost of the remainder of the path.
 	var matrix: Matrix<Stream<(Diff, Int)>, C.Index>!
 	matrix = Matrix(across: a.startIndex..<a.endIndex.successor(), down: b.startIndex..<b.endIndex.successor()) { i, j in
@@ -32,30 +20,54 @@ public func SES<Leaf, Annotation, C: CollectionType>(a: C, _ b: C, cost: Free<Le
 		let down = matrix[i, j.successor()]
 		let diagonal = matrix[i.successor(), j.successor()]
 
-		if let right = right, down = down, diagonal = diagonal {
+		if let diagonal = diagonal, right = right, down = down {
 			let here = recur(a[i], b[j])
-			// If the diff at this vertex is zero-cost, we’re not going to find a cheaper one either rightwards or downwards. We can therefore short-circuit selecting the best outgoing edge and save ourselves evaluating the entire row rightwards and the entire column downwards from this point.
-			//
-			// Thus, in the best case (two equal sequences), we now complete in O(n + m). However, this optimization only applies to equalities at the beginning of the edit graph; once inequalities are encountered, the remainder of the diff is effectively O(nm).
-			if let here = here where cost(here) == 0 { return cons(here, rest: diagonal) }
-			let right = (right, Diff.Delete(a[i]), costOfStream(right))
-			let down = (down, Diff.Insert(b[j]), costOfStream(down))
-			let diagonal = here.map { (diagonal, $0, costOfStream(diagonal)) }
-			// nominate the best edge to continue along, not considering diagonal if `recur` returned `nil`.
-			let (best, diff, _) = diagonal
-				.map { min($0, right, down) { $0.2 < $1.2 } }
-				?? min(right, down) { $0.2 < $1.2 }
-			return cons(diff, rest: best)
+			if let diagonalDiff = here {
+				let hereCost = cost(diagonalDiff)
+				let diagonalCost = hereCost + (diagonal.value.first?.1 ?? 0)
+				// If the diff at this vertex is zero-cost, we’re not going to find a cheaper one either rightwards or downwards. We can therefore short-circuit selecting the best outgoing edge and save ourselves evaluating the entire row rightwards and the entire column downwards from this point.
+				//
+				// Thus, in the best case (two equal sequences), we now complete in O(n + m). However, this optimization only applies to equalities at the beginning of the edit graph; once inequalities are encountered, the remainder of the diff is effectively O(nm).
+				guard hereCost != 0 else { return .Cons((diagonalDiff, diagonalCost), diagonal) }
+
+				let rightDiff = Diff.Delete(a[i])
+				let rightCost = cost(rightDiff) + (right.value.first?.1 ?? 0)
+				let downDiff = Diff.Insert(b[j])
+				let downCost = cost(downDiff) + (down.value.first?.1 ?? 0)
+
+				if rightCost < downCost && rightCost < diagonalCost {
+					return .Cons((rightDiff, rightCost), right)
+				} else if downCost < diagonalCost {
+					return .Cons((downDiff, downCost), down)
+				} else {
+					return .Cons((diagonalDiff, diagonalCost), diagonal)
+				}
+			} else {
+				let rightDiff = Diff.Delete(a[i])
+				let rightCost = cost(rightDiff) + (right.value.first?.1 ?? 0)
+				let downDiff = Diff.Insert(b[j])
+				let downCost = cost(downDiff) + (down.value.first?.1 ?? 0)
+
+				if rightCost < downCost {
+					return .Cons((rightDiff, rightCost), right)
+				} else {
+					return .Cons((downDiff, downCost), down)
+				}
+			}
 		}
 
 		// right extent of the edit graph; can only move down
 		if let down = down {
-			return cons(Diff.Insert(b[j]), rest: down)
+			let diff = Diff.Insert(b[j])
+			let cost = cost(diff) + (down.value.first?.1 ?? 0)
+			return .Cons((diff, cost), down)
 		}
 
 		// bottom extent of the edit graph; can only move right
 		if let right = right {
-			return cons(Diff.Delete(a[i]), rest: right)
+			let diff = Diff.Delete(a[i])
+			let cost = cost(diff) + (right.value.first?.1 ?? 0)
+			return .Cons((diff, cost), right)
 		}
 
 		// bottom-right corner of the edit graph

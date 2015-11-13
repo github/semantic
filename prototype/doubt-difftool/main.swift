@@ -157,15 +157,13 @@ extension ForwardIndexType {
 	}
 }
 
+let cost = Diff.sum(Patch.sum(Term.size))
+
 func refineLeafReplacement(aString: String, _ bString: String)(_ patch: Patch<Term>) -> Diff {
-	switch patch {
-	case let .Replace(.Unroll(aExtract, .Leaf), .Unroll(bExtract, .Leaf)):
-		let a = aString.utf16[aExtract.range].enumerate().map { Term(Info(range: (aExtract.range.startIndex + $0).range, lines: aExtract.lines, columns: aExtract.columns, categories: aExtract.categories), .Leaf(String($1))) }
-		let b = bString.utf16[bExtract.range].enumerate().map { Term(Info(range: (bExtract.range.startIndex + $0).range, lines: bExtract.lines, columns: bExtract.columns, categories: bExtract.categories), .Leaf(String($1))) }
-		return .Roll((aExtract, bExtract), .Indexed(SES(a, b, cost: Diff.sum(Patch.sum), recur: { Term.equals(annotation: const(true), leaf: ==)($0, $1) ? Term.zip($0, $1).map(Diff.init) : Diff.Replace($0, $1) })))
-	default:
-		return .Pure(patch)
-	}
+	guard case let .Replace(.Unroll(aExtract, .Leaf), .Unroll(bExtract, .Leaf)) = patch else { return .Pure(patch) }
+	let a = aString.utf16[aExtract.range].enumerate().map { Term(Info(range: (aExtract.range.startIndex + $0).range, lines: aExtract.lines, columns: aExtract.columns, categories: aExtract.categories), .Leaf(String($1))) }
+	let b = bString.utf16[bExtract.range].enumerate().map { Term(Info(range: (bExtract.range.startIndex + $0).range, lines: bExtract.lines, columns: bExtract.columns, categories: bExtract.categories), .Leaf(String($1))) }
+	return .Roll((aExtract, bExtract), .Indexed(SES(a, b, cost: cost, recur: { Term.equals(annotation: const(true), leaf: ==)($0, $1) ? Term.zip($0, $1).map(Diff.init) : Diff.Replace($0, $1) })))
 }
 
 let parsed = benchmark("parsing arguments & loading sources") { parse(argumentsParser, input: Process.arguments) }
@@ -178,7 +176,8 @@ let parser = parserForType(aSource.type)
 
 let a = try benchmark("parsing source a") { try parser(aSource.contents) }
 let b = try benchmark("parsing source b") { try parser(bSource.contents) }
-let diff = benchmark("diffing") { Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: Free.sum(Patch.sum)).run(a, b).flatMap(refineLeafReplacement(aSource.contents, bSource.contents)) }
+let initialDiff = benchmark("diffing") { Interpreter<Term>(equal: Term.equals(annotation: const(true), leaf: ==), comparable: Interpreter<Term>.comparable { $0.extract.categories }, cost: cost).run(a, b) }
+let diff = benchmark("diffing within leaves") { initialDiff.flatMap(refineLeafReplacement(aSource.contents, bSource.contents)) }
 switch arguments.output {
 case .Split:
 	let JSON: Doubt.JSON = [

@@ -65,8 +65,10 @@ extension Cofree {
 
 extension Cofree {
 	public static func equals(annotation annotation: (Annotation, Annotation) -> Bool, leaf: (Leaf, Leaf) -> Bool)(_ left: Cofree, _ right: Cofree) -> Bool {
-		return annotation(left.extract, right.extract)
-			&& Syntax.equals(leaf: leaf, recur: Cofree.equals(annotation: annotation, leaf: leaf))(left.unwrap, right.unwrap)
+		switch (left, right) {
+		case let (.Unroll(a, s), .Unroll(b, t)):
+			return annotation(a, b) && Syntax.equals(leaf: leaf, recur: Cofree.equals(annotation: annotation, leaf: leaf))(s, t)
+		}
 	}
 }
 
@@ -197,6 +199,27 @@ extension Cofree {
 			}
 		}
 		return Location.explore(weave)(self)
+	}
+}
+
+
+// MARK: - Size
+
+extension Cofree {
+	/// The count of nodes in the receiver.
+	///
+	/// This is used to compute the cost of patches, such that a patch inserting a very large tree will be charged approximately the same as a very large tree consisting of many small patches.
+	public static func size(term: Cofree) -> Int {
+		switch term {
+		case .Unroll(_, .Leaf):
+			return 1
+		case let .Unroll(_, .Indexed(a)):
+			return a.reduce(0) { $0 + size($1) }
+		case let .Unroll(_, .Fixed(a)):
+			return a.reduce(0) { $0 + size($1) }
+		case let .Unroll(_, .Keyed(a)):
+			return a.reduce(0) { $0 + size($1.1) }
+		}
 	}
 }
 
