@@ -9,4 +9,4 @@ data Syntax f a =
 	| Indexed [f]
 	| Fixed [f]
 	| Keyed (Map String f)
-	deriving Functor
+	deriving Functor, Show, Eq
