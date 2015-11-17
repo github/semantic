@@ -47,7 +47,7 @@ type Algorithm a = Free (Operation a)
 cost :: Diff a -> Integer
 cost f = iter c $ fmap g f where
     c (Leaf _) = 0
-    c (Keyed xs) = sum $ snd <$> xs
+    c (Keyed xs) = sum $ snd <$> (toList xs)
     c (Indexed xs) = sum xs
     c (Fixed xs) = sum xs
     g _ = 1
