@@ -3,9 +3,8 @@ module Diff where
 {-# LANGUAGE DeriveFunctor #-}
 
 import Data.Maybe
+import Control.Monad.Free
 
-data Free f a = Pure a | Roll (f (Free f a))
-    deriving Functor
 newtype Fix f = In { out :: f (Fix f) }
 data Cofree f a = Unroll a (f (Cofree f a))
     deriving Functor
