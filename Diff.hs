@@ -32,8 +32,8 @@ b = In $ Keyed [
   ("goodbye", In $ Indexed []) ]
 
 d :: Diff String
-d = Roll $ Keyed [
-  ("hello", Roll $ Indexed [ Just (In $ Leaf "hi") </> Nothing ]),
+d = Free $ Keyed [
+  ("hello", Free $ Indexed [ Just (In $ Leaf "hi") </> Nothing ]),
   ("goodbye", Just (In $ Leaf "goodbye") </> Just (In $ Indexed [])) ]
 
 data Operation a f
@@ -45,7 +45,7 @@ type Algorithm a = Free (Operation a)
 
 iter :: Functor f => (f a -> a) -> Free f a -> a
 iter _ (Pure a) = a
-iter phi (Roll m) = phi $ iter phi <$> m
+iter phi (Free m) = phi $ iter phi <$> m
 
 cost :: Diff a -> Integer
 cost f = iter c $ fmap g f where
@@ -56,7 +56,7 @@ cost f = iter c $ fmap g f where
 
 -- interpret :: Algorithm a b -> b
 -- interpret (Pure b) = b
--- interpret (Roll (Recur a b f)) = f $ Pure (Patch { old = Just (In a), new = Just (In b) })
+-- interpret (Free (Recur a b f)) = f $ Pure (Patch { old = Just (In a), new = Just (In b) })
 
 type RangedTerm a = Cofree (Syntax a) Int
 -- data Difff a f = Difff (Either (Patch (Term a)) (Syntax a f))
