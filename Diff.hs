@@ -6,8 +6,8 @@ import Syntax
 import Data.Maybe
 import Data.Map
 import Control.Monad.Free
+import Data.Fix
 
-newtype Fix f = In { out :: f (Fix f) }
 data Cofree f a = Unroll a (f (Cofree f a))
     deriving Functor
 
@@ -23,19 +23,19 @@ type Diff a = Free (Syntax a) (Patch (Term a))
 (</>) a b = Pure $ Patch { old = a, new = b }
 
 a :: Term String
-a = In $ Keyed $ fromList [
-  ("hello", In $ Indexed [ In $ Leaf "hi" ]),
-  ("goodbye", In $ Leaf "goodbye") ]
+a = Fix $ Keyed $ fromList [
+  ("hello", Fix $ Indexed [ Fix $ Leaf "hi" ]),
+  ("goodbye", Fix $ Leaf "goodbye") ]
 
 b :: Term String
-b = In $ Keyed $ fromList [
-  ("hello", In $ Indexed []),
-  ("goodbye", In $ Indexed []) ]
+b = Fix $ Keyed $ fromList [
+  ("hello", Fix $ Indexed []),
+  ("goodbye", Fix $ Indexed []) ]
 
 d :: Diff String
 d = Free $ Keyed $ fromList [
-  ("hello", Free $ Indexed [ Just (In $ Leaf "hi") </> Nothing ]),
-  ("goodbye", Just (In $ Leaf "goodbye") </> Just (In $ Indexed [])) ]
+  ("hello", Free $ Indexed [ Just (Fix $ Leaf "hi") </> Nothing ]),
+  ("goodbye", Just (Fix $ Leaf "goodbye") </> Just (Fix $ Indexed [])) ]
 
 data Operation a f
   = Recur (Term a) (Term a) (Diff a -> f)
