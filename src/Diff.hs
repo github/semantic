@@ -21,19 +21,19 @@ type Diff a = Free (Syntax a) (Patch (Term a Info))
 (</>) a b = Pure $ Patch { old = a, new = b }
 
 a :: Term String Info
-a = Info :< Keyed $ fromList [
-  ("hello", Info :< Indexed [ Fix $ Leaf "hi" ]),
-  ("goodbye", Info :< Leaf "goodbye") ]
+a = Info :< (Keyed $ fromList [
+  ("hello", Info :< (Indexed [ Info :< (Leaf "hi") ])),
+  ("goodbye", Info :< (Leaf "goodbye")) ])
 
 b :: Term String Info
-b = Info :< Keyed $ fromList [
-  ("hello", Info :< Indexed []),
-  ("goodbye", Info :< Indexed []) ]
+b = Info :< (Keyed $ fromList [
+  ("hello", Info :< (Indexed [])),
+  ("goodbye", Info :< (Indexed [])) ])
 
 d :: Diff String
 d = Free $ Keyed $ fromList [
-  ("hello", Free $ Indexed [ Just (Info :< Leaf "hi") </> Nothing ]),
-  ("goodbye", Just (Info :< Leaf "goodbye") </> Just (Info :< Indexed [])) ]
+  ("hello", Free $ Indexed [ Just (Info :< (Leaf "hi")) </> Nothing ]),
+  ("goodbye", Just (Info :< (Leaf "goodbye")) </> Just (Info :< (Indexed []))) ]
 
 data Operation a f
   = Recur (Term a Info) (Term a Info) (Diff a -> f)
