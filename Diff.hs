@@ -11,7 +11,7 @@ import Control.Comonad.Cofree
 
 data Range = Range { start :: Int, end :: Int }
 
-type Info = String
+data Info = Info Range [String]
 
 type Term a = Fix (Syntax a)
 data Patch a = Patch { old :: Maybe a, new :: Maybe a }
