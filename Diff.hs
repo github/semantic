@@ -2,6 +2,7 @@ module Diff where
 
 {-# LANGUAGE DeriveFunctor #-}
 
+import Syntax
 import Data.Maybe
 import Control.Monad.Free
 
