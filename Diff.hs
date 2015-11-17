@@ -14,9 +14,9 @@ data Range = Range { start :: Int, end :: Int }
 
 type Info = String
 
-type Term a = Fix (AST a)
+type Term a = Fix (Syntax a)
 data Patch a = Patch { old :: Maybe a, new :: Maybe a }
-type Diff a = Free (AST a) (Patch (Term a))
+type Diff a = Free (Syntax a) (Patch (Term a))
 
 (</>) :: Maybe (Term a) -> Maybe (Term a) -> Diff a
 (</>) a b = Pure $ Patch { old = a, new = b }
@@ -58,8 +58,8 @@ cost f = iter c $ fmap g f where
 -- interpret (Pure b) = b
 -- interpret (Roll (Recur a b f)) = f $ Pure (Patch { old = Just (In a), new = Just (In b) })
 
-type RangedTerm a = Cofree (AST a) Int
--- data Difff a f = Difff (Either (Patch (Term a)) (AST a f))
+type RangedTerm a = Cofree (Syntax a) Int
+-- data Difff a f = Difff (Either (Patch (Term a)) (Syntax a f))
 -- type RangedDiff a = Cofree (Difff a) Range
-data AnnotatedAST a f = AnnotatedAST (Range, AST a f)
-type RangedDiff a = Free (AnnotatedAST a) (Patch (Term a))
+data AnnotatedSyntax a f = AnnotatedSyntax (Range, Syntax a f)
+type RangedDiff a = Free (AnnotatedSyntax a) (Patch (Term a))
