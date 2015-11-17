@@ -4,6 +4,7 @@ module Diff where
 
 import Syntax
 import Data.Maybe
+import Data.Map
 import Control.Monad.Free
 
 newtype Fix f = In { out :: f (Fix f) }
@@ -22,17 +23,17 @@ type Diff a = Free (Syntax a) (Patch (Term a))
 (</>) a b = Pure $ Patch { old = a, new = b }
 
 a :: Term String
-a = In $ Keyed [
+a = In $ Keyed $ fromList [
   ("hello", In $ Indexed [ In $ Leaf "hi" ]),
   ("goodbye", In $ Leaf "goodbye") ]
 
 b :: Term String
-b = In $ Keyed [
+b = In $ Keyed $ fromList [
   ("hello", In $ Indexed []),
   ("goodbye", In $ Indexed []) ]
 
 d :: Diff String
-d = Free $ Keyed [
+d = Free $ Keyed $ fromList [
   ("hello", Free $ Indexed [ Just (In $ Leaf "hi") </> Nothing ]),
   ("goodbye", Just (In $ Leaf "goodbye") </> Just (In $ Indexed [])) ]
 
