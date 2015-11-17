@@ -7,9 +7,7 @@ import Data.Maybe
 import Data.Map
 import Control.Monad.Free
 import Data.Fix
-
-data Cofree f a = Unroll a (f (Cofree f a))
-    deriving Functor
+import Control.Comonad.Cofree
 
 data Range = Range { start :: Int, end :: Int }
 
