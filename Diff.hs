@@ -13,11 +13,6 @@ data Cofree f a = Unroll a (f (Cofree f a))
 data Range = Range { start :: Int, end :: Int }
 
 type Info = String
-data AST a f
-  = Leaf a
-  | Keyed [(String, f)]
-  | Indexed [f]
-  deriving Functor
 
 type Term a = Fix (AST a)
 data Patch a = Patch { old :: Maybe a, new :: Maybe a }
