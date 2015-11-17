@@ -1,6 +1,7 @@
 module Main where
 
-import Lib
+import Diff
+import Syntax
 
 main :: IO ()
-main = someFunc
+main = putStrLn "hello world"
