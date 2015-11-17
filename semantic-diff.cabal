@@ -15,6 +15,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Diff
                      , Syntax
+                     , Operation
   build-depends:       base >= 4.8 && < 5
                      , containers
                      , data-fix == 0.0.1
