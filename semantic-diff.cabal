@@ -4,7 +4,7 @@ synopsis:            Initial project template from stack
 description:         Please see README.md
 homepage:            http://github.com/github/semantic-diff#readme
 author:              Rob Rix, Josh Vera
-maintainer:          robrix@github.com
+maintainer:          rob.rix@github.com
 copyright:           2015 GitHub
 category:            Web
 build-type:          Simple
