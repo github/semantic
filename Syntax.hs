@@ -1,5 +1,7 @@
 module Syntax where
 
+{-# LANGUAGE DeriveFunctor #-}
+
 import Data.Map
 
 data Syntax f a =
@@ -7,3 +9,4 @@ data Syntax f a =
 	| Indexed [f]
 	| Fixed [f]
 	| Keyed (Map String f)
+	deriving Functor
