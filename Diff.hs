@@ -44,10 +44,6 @@ data Operation a f
 
 type Algorithm a = Free (Operation a)
 
-iter :: Functor f => (f a -> a) -> Free f a -> a
-iter _ (Pure a) = a
-iter phi (Free m) = phi $ iter phi <$> m
-
 cost :: Diff a -> Integer
 cost f = iter c $ fmap g f where
     c (Leaf _) = 0
