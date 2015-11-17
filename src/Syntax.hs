@@ -1,7 +1,5 @@
 module Syntax where
 
-{-# LANGUAGE DeriveFunctor #-}
-
 import Data.Map
 
 data Syntax a f =
