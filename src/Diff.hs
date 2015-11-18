@@ -33,8 +33,6 @@ d = Free $ Keyed $ fromList [
   ("hello", Free $ Indexed [ Just (Info :< Leaf "hi") </> Nothing ]),
   ("goodbye", Just (Info :< Leaf "goodbye") </> Just (Info :< Indexed [])) ]
 
--- type Algorithm a = Free (Operation a)
-
 cost :: Diff a -> Integer
 cost f = iter c $ fmap g f where
   c (Leaf _) = 0
