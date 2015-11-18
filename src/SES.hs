@@ -2,8 +2,10 @@ module SES (ses) where
 
 import Patch
 import Diff
+import Control.Monad.Free
 
-ses :: Eq a => [a] -> [a] -> [Either (Patch a) (a, a)]
-ses [] b = (Left . Insert) <$> b
-ses a [] = (Left . Delete) <$> a
-ses (a : as) (b : bs) | a == b = Right (a, b) : ses as bs
+ses :: Functor f => Eq a => [a] -> [a] -> [Free f (Patch a)]
+ses [] b = (Pure . Insert) <$> b
+ses a [] = (Pure . Delete) <$> a
+ses (a : as) (b : bs) = case recur a b of
+  Just f -> f : ses as bs
