@@ -37,11 +37,11 @@ d = Free $ Keyed $ fromList [
 
 cost :: Diff a -> Integer
 cost f = iter c $ fmap g f where
-    c (Leaf _) = 0
-    c (Keyed xs) = sum $ snd <$> toList xs
-    c (Indexed xs) = sum xs
-    c (Fixed xs) = sum xs
-    g _ = 1
+  c (Leaf _) = 0
+  c (Keyed xs) = sum $ snd <$> toList xs
+  c (Indexed xs) = sum xs
+  c (Fixed xs) = sum xs
+  g _ = 1
 
 -- interpret :: Algorithm a b -> b
 -- interpret (Pure b) = b
