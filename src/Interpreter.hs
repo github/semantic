@@ -41,7 +41,7 @@ run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
 
 run comparable (Free (ByIndex a b f)) = run comparable . f $ ses (constructAndRun comparable) cost a b
 
-type Comparable a = a -> a -> Bool
+type Comparable a = Term a Info -> Term a Info -> Bool
 
 interpret :: Eq a => Comparable a -> Term a Info -> Term a Info -> Diff a
 interpret comparable a b = maybeReplace $ constructAndRun comparable a b where
