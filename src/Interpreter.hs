@@ -21,10 +21,9 @@ run (Free (Recursive a b f)) = run . f $ recur a b where
   recur (_ :< Fixed a') (_ :< Fixed b') | length a' == length b' =
     Free . Fixed $ zipWith interpret a' b'
   recur (_ :< Keyed a') (_ :< Keyed b') | keys a' == keys b' =
-    Free . Keyed . fromList . fmap (\ x -> (x, interpretInBoth x a' b')) $ keys b' where
-      interpretInBoth :: String -> Map String (Term a Info) -> Map String (Term a Info) -> Diff a
+    Free . Keyed . fromList . fmap repack $ keys b' where
+      repack key = (key, interpretInBoth key a' b')
       interpretInBoth key a' b' = maybeInterpret (Data.Map.lookup key a') (Data.Map.lookup key b')
-      maybeInterpret :: Maybe (Term a Info) -> Maybe (Term a Info) -> Diff a
       maybeInterpret (Just a) (Just b) = interpret a b
   recur _ _ = Pure Patch { old = Just a, new = Just b }
 
