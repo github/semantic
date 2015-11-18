@@ -4,6 +4,7 @@ import Patch
 import Diff
 import Control.Monad.Free
 import Control.Comonad.Cofree
+import Term
 
 type Compare a = Term a Info -> Term a Info -> Maybe (Diff a)
 type Cost a = Diff a -> Integer

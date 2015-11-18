@@ -7,13 +7,13 @@ import Control.Monad.Free
 import Data.Fix
 import Control.Comonad.Cofree
 import Patch
+import Term
 
 data Range = Range { start :: Int, end :: Int }
 
 data Info = Info -- Range [String]
   deriving Eq
 
-type Term a annotation = Cofree (Syntax a) annotation
 type Diff a = Free (Syntax a) (Patch (Term a Info))
 
 a :: Term String Info

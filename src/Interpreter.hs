@@ -9,6 +9,7 @@ import Syntax
 import Data.Map
 import Patch
 import SES
+import Term
 
 constructAndRun :: Eq a => Comparable a -> Term a Info -> Term a Info -> Maybe (Diff a)
 constructAndRun _ a b | a == b = Just $ termToDiff b where
