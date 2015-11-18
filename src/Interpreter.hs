@@ -13,6 +13,8 @@ constructAndRun a b =
 
 run :: Algorithm a (Diff a) -> Maybe (Diff a)
 run (Pure diff) = Just diff
+run (Free (Recursive a b f)) = recur a b where
+  recur _ _ = run $ f $ Pure Patch { old = Just a, new = Just b }
 
 interpret :: Term a Info -> Term a Info -> Diff a
 interpret a b = maybeReplace $ constructAndRun a b where
