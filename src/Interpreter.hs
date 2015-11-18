@@ -29,6 +29,12 @@ run (Free (Recursive a b f)) = run . f $ recur a b where
       maybeInterpret (Just a) (Just b) = interpret a b
   recur _ _ = Pure $ Replace a b
 
+run (Free (ByKey a b f)) = run $ f byKey where
+  byKey = unions [ deleted, inserted, patched ]
+  deleted = (Pure . Delete) <$> difference a b
+  inserted = (Pure . Insert) <$> difference b a
+  patched = intersectionWith interpret a b
+
 interpret :: Term a Info -> Term a Info -> Diff a
 interpret a b = maybeReplace $ constructAndRun a b where
   maybeReplace (Just a) = a
