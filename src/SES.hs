@@ -1,11 +1,13 @@
-module SES (ses) where
+module SES (ses, Compare) where
 
 import Patch
 import Diff
 import Control.Monad.Free
 import Control.Comonad.Cofree
 
-ses :: (Term a Info -> Term a Info -> Maybe (Diff a)) -> [Term a Info] -> [Term a Info] -> [Diff a]
+type Compare a = Term a Info -> Term a Info -> Maybe (Diff a)
+
+ses :: Compare a -> [Term a Info] -> [Term a Info] -> [Diff a]
 ses _ [] b = (Pure . Insert) <$> b
 ses _ a [] = (Pure . Delete) <$> a
 ses recur (a : as) (b : bs) = case recur a b of
