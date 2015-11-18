@@ -36,7 +36,7 @@ run (Free (ByKey a b f)) = run $ f byKey where
   inserted = (Pure . Insert) <$> difference b a
   patched = intersectionWith interpret a b
 
-run (Free (ByIndex a b f)) = run . f $ ses constructAndRun a b
+run (Free (ByIndex a b f)) = run . f $ ses constructAndRun cost a b
 
 interpret :: Term a Info -> Term a Info -> Diff a
 interpret a b = maybeReplace $ constructAndRun a b where
