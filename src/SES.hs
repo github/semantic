@@ -16,7 +16,8 @@ ses recur (a : as) (b : bs) = case recur a b of
          | otherwise -> copy
     where
       copy = f : ses recur as bs
-  Nothing -> if SES.cost delete < SES.cost insert then delete else insert
+  Nothing | SES.cost delete < SES.cost insert -> delete
+          | otherwise -> insert
   where
     delete = (Pure . Delete $ a) : ses recur as (b : bs)
     insert = (Pure . Insert $ b) : ses recur (a : as) bs
