@@ -11,7 +11,7 @@ import Patch
 import SES
 import Term
 
-constructAndRun :: Eq a => Comparable a -> Term a Info -> Term a Info -> Maybe (Diff a)
+constructAndRun :: Eq a => Eq annotation => Comparable a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
 constructAndRun _ a b | a == b = Just $ termToDiff b where
   termToDiff term = Free $ termToDiff <$> unwrap term
 constructAndRun comparable a b | not $ comparable a b = Nothing
@@ -22,7 +22,7 @@ constructAndRun comparable a b =
     algorithm (_ :< Leaf a) (_ :< Leaf b) | a == b = Pure . Free $ Leaf b
     algorithm a b = Free $ Recursive a b Pure
 
-run :: Eq a => Comparable a -> Algorithm a (Diff a) -> Maybe (Diff a)
+run :: Eq a => Eq annotation => Comparable a annotation -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
 run _ (Pure diff) = Just diff
 
 run comparable (Free (Recursive a b f)) = run comparable . f $ recur a b where
@@ -45,9 +45,9 @@ run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
 
 run comparable (Free (ByIndex a b f)) = run comparable . f $ ses (constructAndRun comparable) cost a b
 
-type Comparable a = Term a Info -> Term a Info -> Bool
+type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
 
-interpret :: Eq a => Comparable a -> Term a Info -> Term a Info -> Diff a
+interpret :: Eq a => Eq annotation => Comparable a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
 interpret comparable a b = maybeReplace $ constructAndRun comparable a b where
   maybeReplace (Just a) = a
   maybeReplace Nothing = Pure $ Replace a b

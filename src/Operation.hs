@@ -4,8 +4,8 @@ import Diff
 import Data.Map
 import Term
 
-data Operation a f
-  = Recursive (Term a Info) (Term a Info) (Diff a -> f)
-  | ByKey (Map String (Term a Info)) (Map String (Term a Info)) (Map String (Diff a) -> f)
-  | ByIndex [Term a Info] [Term a Info] ([Diff a] -> f)
+data Operation a annotation f
+  = Recursive (Term a annotation) (Term a annotation) (Diff a annotation -> f)
+  | ByKey (Map String (Term a annotation)) (Map String (Term a annotation)) (Map String (Diff a annotation) -> f)
+  | ByIndex [Term a annotation] [Term a annotation] ([Diff a annotation] -> f)
   deriving Functor

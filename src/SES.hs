@@ -6,10 +6,10 @@ import Control.Monad.Free
 import Control.Comonad.Cofree
 import Term
 
-type Compare a = Term a Info -> Term a Info -> Maybe (Diff a)
-type Cost a = Diff a -> Integer
+type Compare a annotation = Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
+type Cost a annotation = Diff a annotation -> Integer
 
-ses :: Compare a -> Cost a -> [Term a Info] -> [Term a Info] -> [Diff a]
+ses :: Compare a annotation -> Cost a annotation -> [Term a annotation] -> [Term a annotation] -> [Diff a annotation]
 ses _ _ [] b = (Pure . Insert) <$> b
 ses _ _ a [] = (Pure . Delete) <$> a
 ses recur cost (a : as) (b : bs) = case recur a b of

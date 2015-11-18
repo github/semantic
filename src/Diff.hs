@@ -13,9 +13,9 @@ data Range = Range { start :: Int, end :: Int }
 data Info = Info -- Range [String]
   deriving Eq
 
-type Diff a = Free (Syntax a) (Patch (Term a Info))
+type Diff a annotation = Free (Syntax a) (Patch (Term a annotation))
 
-cost :: Diff a -> Integer
+cost :: Diff a annotation -> Integer
 cost f = iter c $ fmap (const 1) f where
   c (Leaf _) = 0
   c (Keyed xs) = sum $ snd <$> toList xs

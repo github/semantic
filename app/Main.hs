@@ -18,7 +18,7 @@ b = Info :< (Keyed $ fromList [
   ("hello", Info :< Indexed []),
   ("goodbye", Info :< Indexed []) ])
 
-d :: Diff String
+d :: Diff String Info
 d = Free $ Keyed $ fromList [
   ("hello", Free $ Indexed [ Pure . Delete $ Info :< Leaf "hi" ]),
   ("goodbye", Pure $ Replace (Info :< Leaf "goodbye") (Info :< Indexed [])) ]
