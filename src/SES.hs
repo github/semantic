@@ -1,4 +1,4 @@
-module SES where
+module SES (ses) where
 
 import Patch
 import Diff
