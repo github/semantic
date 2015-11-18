@@ -1,4 +1,4 @@
-module Interpreter where
+module Interpreter (interpret) where
 
 import Algorithm
 import Control.Monad.Free
