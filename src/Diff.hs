@@ -41,10 +41,6 @@ cost f = iter c $ fmap g f where
   c (Fixed xs) = sum xs
   g _ = 1
 
--- interpret :: Algorithm a b -> b
--- interpret (Pure b) = b
--- interpret (Free (Recur a b f)) = f $ Pure (Patch { old = Just (In a), new = Just (In b) })
-
 type RangedTerm a = Cofree (Syntax a) Int
 -- data Difff a f = Difff (Either (Patch (Term a)) (Syntax a f))
 -- type RangedDiff a = Cofree (Difff a) Range
