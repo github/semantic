@@ -11,6 +11,7 @@ import Patch
 import SES
 
 constructAndRun :: Eq a => Comparable a -> Term a Info -> Term a Info -> Maybe (Diff a)
+constructAndRun comparable a b | not $ comparable a b = Nothing
 constructAndRun comparable a b =
   run comparable $ algorithm a b where
     algorithm (_ :< Indexed a) (_ :< Indexed b) = Free $ ByIndex a b (Pure . Free . Indexed)
