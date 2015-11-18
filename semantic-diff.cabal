@@ -27,7 +27,7 @@ library
                      , data-fix == 0.0.1
                      , free
   default-language:    Haskell2010
-  default-extensions: DeriveFunctor
+  default-extensions: DeriveFunctor, FlexibleInstances
 
 executable semantic-diff-exe
   hs-source-dirs:      app
