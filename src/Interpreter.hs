@@ -35,6 +35,10 @@ run (Free (ByKey a b f)) = run $ f byKey where
   inserted = (Pure . Insert) <$> difference b a
   patched = intersectionWith interpret a b
 
+run (Free (ByIndex a b f)) = run $ f $ ses a b where
+  ses a b | Prelude.null a = (Pure . Insert) <$> b
+  ses a b | Prelude.null b = (Pure . Delete) <$> a
+
 interpret :: Term a Info -> Term a Info -> Diff a
 interpret a b = maybeReplace $ constructAndRun a b where
   maybeReplace (Just a) = a
