@@ -1,3 +1,6 @@
 module Patch where
 
-data Patch a = Patch { old :: Maybe a, new :: Maybe a }
+data Patch a =
+  Replace a a
+  | Insert a
+  | Delete a

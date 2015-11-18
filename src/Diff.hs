@@ -15,9 +15,6 @@ data Info = Info -- Range [String]
 type Term a annotation = Cofree (Syntax a) annotation
 type Diff a = Free (Syntax a) (Patch (Term a Info))
 
-(</>) :: Maybe (Term a Info) -> Maybe (Term a Info) -> Diff a
-(</>) a b = Pure Patch { old = a, new = b }
-
 a :: Term String Info
 a = Info :< (Keyed $ fromList [
   ("hello", Info :< Indexed [ Info :< Leaf "hi" ]),
@@ -30,8 +27,8 @@ b = Info :< (Keyed $ fromList [
 
 d :: Diff String
 d = Free $ Keyed $ fromList [
-  ("hello", Free $ Indexed [ Just (Info :< Leaf "hi") </> Nothing ]),
-  ("goodbye", Just (Info :< Leaf "goodbye") </> Just (Info :< Indexed [])) ]
+  ("hello", Free $ Indexed [ Pure . Delete $ Info :< Leaf "hi" ]),
+  ("goodbye", Pure $ Replace (Info :< Leaf "goodbye") (Info :< Indexed [])) ]
 
 cost :: Diff a -> Integer
 cost f = iter c $ fmap g f where
