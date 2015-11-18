@@ -10,14 +10,15 @@ import Data.Map
 import Patch
 import SES
 
-constructAndRun :: Term a Info -> Term a Info -> Maybe (Diff a)
+constructAndRun :: Eq a => Term a Info -> Term a Info -> Maybe (Diff a)
 constructAndRun a b =
   run $ algorithm a b where
     algorithm (_ :< Indexed a) (_ :< Indexed b) = Free $ ByIndex a b (Pure . Free . Indexed)
     algorithm (_ :< Keyed a) (_ :< Keyed b) = Free $ ByKey a b (Pure . Free . Keyed)
+    algorithm (_ :< Leaf a) (_ :< Leaf b) | a == b = Pure . Free $ Leaf b
     algorithm a b = Free $ Recursive a b Pure
 
-run :: Algorithm a (Diff a) -> Maybe (Diff a)
+run :: Eq a => Algorithm a (Diff a) -> Maybe (Diff a)
 run (Pure diff) = Just diff
 
 run (Free (Recursive a b f)) = run . f $ recur a b where
@@ -40,7 +41,7 @@ run (Free (ByKey a b f)) = run $ f byKey where
 
 run (Free (ByIndex a b f)) = run . f $ ses constructAndRun cost a b
 
-interpret :: Term a Info -> Term a Info -> Diff a
+interpret :: Eq a => Term a Info -> Term a Info -> Diff a
 interpret a b = maybeReplace $ constructAndRun a b where
   maybeReplace (Just a) = a
   maybeReplace Nothing = Pure $ Replace a b
