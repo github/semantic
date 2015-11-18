@@ -11,6 +11,8 @@ import Patch
 import SES
 
 constructAndRun :: Eq a => Comparable a -> Term a Info -> Term a Info -> Maybe (Diff a)
+constructAndRun _ a b | a == b = Just $ termToDiff b where
+  termToDiff term = Free $ termToDiff <$> unwrap term
 constructAndRun comparable a b | not $ comparable a b = Nothing
 constructAndRun comparable a b =
   run comparable $ algorithm a b where
