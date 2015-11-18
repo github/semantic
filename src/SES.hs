@@ -13,8 +13,8 @@ ses (a : as) (b : bs) = case recur a b of
     delete = (Pure . Delete $ a) : ses as (b : bs)
     insert = (Pure . Insert $ b) : ses (a : as) bs
 
-cost :: Functor f => [Free f (Patch a)] -> Integer
-cost = _
+cost :: [Diff a] -> Integer
+cost as = sum $ Diff.cost <$> as
 
 recur :: Functor f => Eq a => a -> a -> Maybe (Free f (Patch a))
 recur a b = _
