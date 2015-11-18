@@ -2,8 +2,7 @@ module SES where
 
 import Patch
 import Diff
-import Control.Monad.Free
 
-ses :: Functor f => Eq a => [a] -> [a] -> [Free f (Patch a)]
-ses a b | Prelude.null a = (Pure . Insert) <$> b
-ses a b | Prelude.null b = (Pure . Delete) <$> a
+ses :: Eq a => [a] -> [a] -> [Either (Patch a) a]
+ses a b | Prelude.null a = (Left . Insert) <$> b
+ses a b | Prelude.null b = (Left . Delete) <$> a
