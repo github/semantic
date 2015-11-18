@@ -11,18 +11,19 @@ ses :: Compare a -> [Term a Info] -> [Term a Info] -> [Diff a]
 ses _ [] b = (Pure . Insert) <$> b
 ses _ a [] = (Pure . Delete) <$> a
 ses recur (a : as) (b : bs) = case recur a b of
-  Just f | deleteCost < insertCost && deleteCost < SES.cost copy -> delete
-         | insertCost < SES.cost copy -> insert
+  Just f | deleteCost < insertCost && deleteCost < copyCost -> delete
+         | insertCost < copyCost -> insert
          | otherwise -> copy
     where
       copy = f : ses recur as bs
+      copyCost = SES.cost copy
   Nothing | deleteCost < insertCost -> delete
           | otherwise -> insert
   where
-    deleteCost = SES.cost delete
-    insertCost = SES.cost insert
     delete = (Pure . Delete $ a) : ses recur as (b : bs)
     insert = (Pure . Insert $ b) : ses recur (a : as) bs
+    deleteCost = SES.cost delete
+    insertCost = SES.cost insert
 
 cost :: [Diff a] -> Integer
 cost as = sum $ Diff.cost <$> as
