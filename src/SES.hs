@@ -4,7 +4,7 @@ import Patch
 import Diff
 import Control.Monad.Free
 
-ses :: Functor f => Eq a => [a] -> [a] -> [Free f (Patch a)]
+ses :: Eq a => [Term a Info] -> [Term a Info] -> [Diff a]
 ses [] b = (Pure . Insert) <$> b
 ses a [] = (Pure . Delete) <$> a
 ses (a : as) (b : bs) = case recur a b of
@@ -16,5 +16,5 @@ ses (a : as) (b : bs) = case recur a b of
 cost :: [Diff a] -> Integer
 cost as = sum $ Diff.cost <$> as
 
-recur :: Functor f => Eq a => a -> a -> Maybe (Free f (Patch a))
+recur :: Term a Info -> Term a Info -> Maybe (Diff a)
 recur a b = _
