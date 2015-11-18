@@ -6,13 +6,13 @@ import Data.Map
 import Control.Monad.Free
 import Data.Fix
 import Control.Comonad.Cofree
+import Patch
 
 data Range = Range { start :: Int, end :: Int }
 
 data Info = Info -- Range [String]
 
 type Term a annotation = Cofree (Syntax a) annotation
-data Patch a = Patch { old :: Maybe a, new :: Maybe a }
 type Diff a = Free (Syntax a) (Patch (Term a Info))
 
 (</>) :: Maybe (Term a Info) -> Maybe (Term a Info) -> Diff a

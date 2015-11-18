@@ -7,6 +7,7 @@ import Operation
 import Diff
 import Syntax
 import Data.Map
+import Patch
 
 constructAndRun :: Term a Info -> Term a Info -> Maybe (Diff a)
 constructAndRun a b =
