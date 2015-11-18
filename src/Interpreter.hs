@@ -16,6 +16,7 @@ constructAndRun a b =
 
 run :: Algorithm a (Diff a) -> Maybe (Diff a)
 run (Pure diff) = Just diff
+
 run (Free (Recursive a b f)) = run . f $ recur a b where
   recur (_ :< Indexed a') (_ :< Indexed b') | length a' == length b' =
     Free . Indexed $ zipWith interpret a' b'
