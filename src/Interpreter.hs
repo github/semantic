@@ -12,8 +12,8 @@ import SES
 
 constructAndRun :: Term a Info -> Term a Info -> Maybe (Diff a)
 constructAndRun a b =
-  run algorithm where
-    algorithm = Free $ Recursive a b Pure
+  run $ algorithm a b where
+    algorithm (_ :< Indexed a) (_ :< Indexed b) = Free $ ByIndex a b (Pure . Free . Indexed)
 
 run :: Algorithm a (Diff a) -> Maybe (Diff a)
 run (Pure diff) = Just diff
