@@ -15,6 +15,7 @@ constructAndRun a b =
   run $ algorithm a b where
     algorithm (_ :< Indexed a) (_ :< Indexed b) = Free $ ByIndex a b (Pure . Free . Indexed)
     algorithm (_ :< Keyed a) (_ :< Keyed b) = Free $ ByKey a b (Pure . Free . Keyed)
+    algorithm a b = Free $ Recursive a b Pure
 
 run :: Algorithm a (Diff a) -> Maybe (Diff a)
 run (Pure diff) = Just diff
