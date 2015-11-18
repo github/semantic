@@ -16,7 +16,7 @@ run :: Algorithm a (Diff a) -> Maybe (Diff a)
 run (Pure diff) = Just diff
 run (Free (Recursive a b f)) = recur a b where
   recur (_ :< Indexed a') (_ :< Indexed b') | length a' == length b' =
-    run $ f $ Pure Patch { old = Just a, new = Just b }
+    run $ f $ Free $ Indexed $ zipWith interpret a' b'
   recur _ _ = run $ f $ Pure Patch { old = Just a, new = Just b }
 
 interpret :: Term a Info -> Term a Info -> Diff a
