@@ -24,7 +24,6 @@ library
                      , Term
   build-depends:       base >= 4.8 && < 5
                      , containers
-                     , data-fix == 0.0.1
                      , free
   default-language:    Haskell2010
   default-extensions: DeriveFunctor, FlexibleInstances
