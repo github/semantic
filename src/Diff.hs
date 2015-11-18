@@ -4,7 +4,6 @@ import Syntax
 import Data.Maybe
 import Data.Map
 import Control.Monad.Free
-import Data.Fix
 import Control.Comonad.Cofree
 import Patch
 import Term
