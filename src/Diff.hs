@@ -11,6 +11,7 @@ import Patch
 data Range = Range { start :: Int, end :: Int }
 
 data Info = Info -- Range [String]
+  deriving Eq
 
 type Term a annotation = Cofree (Syntax a) annotation
 type Diff a = Free (Syntax a) (Patch (Term a Info))
