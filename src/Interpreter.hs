@@ -15,18 +15,18 @@ constructAndRun a b =
 
 run :: Algorithm a (Diff a) -> Maybe (Diff a)
 run (Pure diff) = Just diff
-run (Free (Recursive a b f)) = recur a b where
+run (Free (Recursive a b f)) = run . f $ recur a b where
   recur (_ :< Indexed a') (_ :< Indexed b') | length a' == length b' =
-    run $ f $ Free $ Indexed $ zipWith interpret a' b'
+    Free . Indexed $ zipWith interpret a' b'
   recur (_ :< Fixed a') (_ :< Fixed b') | length a' == length b' =
-    run $ f $ Free $ Fixed $ zipWith interpret a' b'
+    Free . Fixed $ zipWith interpret a' b'
   recur (_ :< Keyed a') (_ :< Keyed b') | keys a' == keys b' =
-    run $ f $ Free $ Keyed $ fromList $ fmap (\ x -> (x, interpretInBoth x a' b')) $ keys b' where
+    Free . Keyed . fromList . fmap (\ x -> (x, interpretInBoth x a' b')) $ keys b' where
       interpretInBoth :: String -> Map String (Term a Info) -> Map String (Term a Info) -> Diff a
       interpretInBoth key a' b' = maybeInterpret (Data.Map.lookup key a') (Data.Map.lookup key b')
       maybeInterpret :: Maybe (Term a Info) -> Maybe (Term a Info) -> Diff a
       maybeInterpret (Just a) (Just b) = interpret a b
-  recur _ _ = run $ f $ Pure Patch { old = Just a, new = Just b }
+  recur _ _ = Pure Patch { old = Just a, new = Just b }
 
 interpret :: Term a Info -> Term a Info -> Diff a
 interpret a b = maybeReplace $ constructAndRun a b where
