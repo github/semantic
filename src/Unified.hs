@@ -19,8 +19,13 @@ unified diff before after =
 
     unifiedPatch :: Patch (Term a annotation) -> String
     unifiedPatch _ = ""
+
     unifiedRange :: Range -> [(String, Maybe Range)] -> String -> String
-    unifiedRange _ _ _ = ""
+    unifiedRange range children source = out ++ substring Range { start = previous, end = end range } after where
+      (out, previous) = foldl accumulateContext ("", start range) children
+      accumulateContext (out, previous) (source, Just range) = (out ++ source, end range)
+      accumulateContext (out, previous) (source, _) = (out, previous)
+
 
 substring :: Range -> String -> String
 substring range = take (end range) . drop (start range)
