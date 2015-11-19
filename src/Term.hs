@@ -16,4 +16,5 @@ zipTerms (annotation1 :< a) (annotation2 :< b) = zipUnwrap a b
     annotations = (annotation1, annotation2)
     zipUnwrap (Leaf a) (Leaf b) = Just $ annotations :< Leaf b
     zipUnwrap (Indexed a) (Indexed b) = Just $ annotations :< (Indexed . catMaybes $ zipWith zipTerms a b)
+    zipUnwrap (Fixed a) (Fixed b) = Just $ annotations :< (Fixed . catMaybes $ zipWith zipTerms a b)
     zipUnwrap a b = Nothing
