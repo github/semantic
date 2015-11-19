@@ -4,16 +4,19 @@ import Diff
 import Patch
 import Syntax
 import Term
+import Control.Arrow
 import Control.Monad.Free
+import Control.Comonad.Cofree
 
 unified :: Diff a Info -> String -> String -> String
 unified diff before after =
-  iter f mapped where
-    mapped = fmap unifiedPatch diff
-    f (Annotated (_, Info range _) (Leaf _)) = substring range after
-    f (Annotated annotations (Indexed i)) = ""
-    f (Annotated annotations (Fixed f)) = ""
-    f (Annotated annotations (Keyed k)) = ""
+  fst $ iter f mapped where
+    mapped = fmap (unifiedPatch &&& range) diff
+    f (Annotated (_, Info range _) (Leaf _)) = (substring range after, Just range)
+    f (Annotated (_, Info range _) (Indexed i)) = ("", Just range)
+    f (Annotated (_, Info range _) (Fixed f)) = ("", Just range)
+    f (Annotated (_, Info range _) (Keyed k)) = ("", Just range)
+
     unifiedPatch :: Patch (Term a annotation) -> String
     unifiedPatch _ = ""
     unifiedRange :: Range -> [(String, Maybe Range)] -> String -> String
