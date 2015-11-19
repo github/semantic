@@ -16,11 +16,11 @@ data Range = Range { start :: Integer, end :: Integer }
 data Info = Info -- Range [String]
   deriving Eq
 
-type Diff a annotation = Free (Syntax a) (Patch (Term a annotation))
+type Diff a annotation = Free (Annotated a (annotation, annotation)) (Patch (Term a annotation))
 
 cost :: Diff a annotation -> Integer
 cost f = iter c $ fmap (const 1) f where
-  c (Leaf _) = 0
-  c (Keyed xs) = sum $ snd <$> toList xs
-  c (Indexed xs) = sum xs
-  c (Fixed xs) = sum xs
+  c (Annotated _ (Leaf _)) = 0
+  c (Annotated _ (Keyed xs)) = sum $ snd <$> toList xs
+  c (Annotated _ (Indexed xs)) = sum xs
+  c (Annotated _ (Fixed xs)) = sum xs
