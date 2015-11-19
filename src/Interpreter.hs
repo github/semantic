@@ -13,12 +13,12 @@ import Term
 
 constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
 constructAndRun comparable a b | not $ comparable a b = Nothing
-constructAndRun comparable a b =
+constructAndRun comparable (annotation1 :< a) (annotation2 :< b) =
   run comparable $ algorithm a b where
-    algorithm (annotation1 :< Indexed a) (annotation2 :< Indexed b) = Free $ ByIndex a b (Pure . Free . Annotated (annotation1, annotation2) . Indexed)
-    algorithm (annotation1 :< Keyed a) (annotation2 :< Keyed b) = Free $ ByKey a b (Pure . Free . Annotated (annotation1, annotation2) . Keyed)
-    algorithm (annotation1 :< Leaf a) (annotation2 :< Leaf b) | a == b = Pure . Free . Annotated (annotation1, annotation2) $ Leaf b
-    algorithm a b = Free $ Recursive a b Pure
+    algorithm (Indexed a) (Indexed b) = Free $ ByIndex a b (Pure . Free . Annotated (annotation1, annotation2) . Indexed)
+    algorithm (Keyed a) (Keyed b) = Free $ ByKey a b (Pure . Free . Annotated (annotation1, annotation2) . Keyed)
+    algorithm (Leaf a) (Leaf b) | a == b = Pure . Free . Annotated (annotation1, annotation2) $ Leaf b
+    algorithm a b = Free $ Recursive (annotation1 :< a) (annotation2 :< b) Pure
 
 run :: (Eq a, Eq annotation) => Comparable a annotation -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
 run _ (Pure diff) = Just diff
