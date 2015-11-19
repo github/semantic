@@ -15,7 +15,7 @@ data Range = Range { start :: Integer, end :: Integer }
   deriving (Eq, Show)
 
 type Category = String
-data Info = Info Range (Set String)
+data Info = Info Range (Set Category)
   deriving (Eq, Show)
 
 instance Categorizable Info where
