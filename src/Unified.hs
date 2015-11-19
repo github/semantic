@@ -13,7 +13,7 @@ unified diff before after =
   fst $ iter f mapped where
     mapped = fmap (unifiedPatch &&& range) diff
     f (Annotated (_, Info range _) (Leaf _)) = (substring range after, Just range)
-    f (Annotated (_, Info range _) (Indexed i)) = ("", Just range)
+    f (Annotated (_, Info range _) (Indexed i)) = (unifiedRange range i after, Just range)
     f (Annotated (_, Info range _) (Fixed f)) = ("", Just range)
     f (Annotated (_, Info range _) (Keyed k)) = ("", Just range)
 
