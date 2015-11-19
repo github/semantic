@@ -2,10 +2,8 @@ module Diff where
 
 import Syntax
 import Data.Map
-import Data.Maybe
 import Data.Set
 import Control.Monad.Free
-import Control.Comonad.Cofree
 import Patch
 import Term
 import Categorizable
