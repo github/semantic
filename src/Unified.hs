@@ -16,3 +16,6 @@ unified diff before after =
     f (Annotated annotations (Keyed k)) = ""
     unifiedPatch :: Patch (Term a annotation) -> String
     unifiedPatch _ = ""
+
+substring :: Range -> String -> String
+substring range = take (end range) . drop (start range)
