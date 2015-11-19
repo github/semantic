@@ -21,3 +21,8 @@ unified diff before after =
 
 substring :: Range -> String -> String
 substring range = take (end range) . drop (start range)
+
+range :: Patch (Term a Info) -> Maybe Range
+range patch = range . extract <$> after patch where
+  extract (annotation :< _) = annotation
+  range (Info range _) = range
