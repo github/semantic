@@ -14,6 +14,7 @@ data Annotated a annotation f = Annotated annotation (Syntax a f)
 data Range = Range { start :: Integer, end :: Integer }
   deriving (Eq, Show)
 
+type Category = String
 data Info = Info Range (Set String)
   deriving (Eq, Show)
 
