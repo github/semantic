@@ -18,4 +18,6 @@ zipTerms (annotation1 :< a) (annotation2 :< b) = annotate $ zipUnwrap a b
     zipUnwrap (Leaf a) (Leaf b) = Just $ Leaf b
     zipUnwrap (Indexed a) (Indexed b) = Just . Indexed . catMaybes $ zipWith zipTerms a b
     zipUnwrap (Fixed a) (Fixed b) = Just . Fixed . catMaybes $ zipWith zipTerms a b
+    zipUnwrap (Keyed a) (Keyed b) | keys a == keys b = Just . Keyed . fromList . catMaybes $ zipUnwrapMaps a b <$> keys a
     zipUnwrap a b = Nothing
+    zipUnwrapMaps a b key = (,) key <$> zipTerms (a ! key) (b ! key)
