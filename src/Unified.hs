@@ -6,7 +6,7 @@ import Syntax
 import Term
 import Control.Monad.Free
 
-unified :: Diff a annotation -> String -> String -> String
+unified :: Diff a Info -> String -> String -> String
 unified diff before after =
   iter f mapped where
     mapped = fmap unifiedPatch diff
