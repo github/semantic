@@ -11,7 +11,7 @@ import Categorizable
 data Annotated a annotation f = Annotated annotation (Syntax a f)
   deriving (Functor, Eq, Show)
 
-data Range = Range { start :: Integer, end :: Integer }
+data Range = Range { start :: Int, end :: Int }
   deriving (Eq, Show)
 
 type Category = String
