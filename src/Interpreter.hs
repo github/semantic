@@ -11,6 +11,10 @@ import Patch
 import SES
 import Term
 
+hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
+hylo down up a = down annotation $ hylo down up <$> syntax where
+  (annotation, syntax) = up a
+
 constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
 constructAndRun comparable a b | not $ comparable a b = Nothing
 constructAndRun comparable (annotation1 :< a) (annotation2 :< b) =
