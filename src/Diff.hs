@@ -8,7 +8,7 @@ import Control.Comonad.Cofree
 import Patch
 import Term
 
-data Range = Range { start :: Int, end :: Int }
+data Range = Range { start :: Integer, end :: Integer }
 
 data Info = Info -- Range [String]
   deriving Eq
