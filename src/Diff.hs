@@ -15,8 +15,8 @@ data Annotated a annotation f = Annotated annotation (Syntax a f)
 data Range = Range { start :: Integer, end :: Integer }
   deriving (Eq, Show)
 
-data Info = Info -- Range [String]
-  deriving Eq
+data Info = Info Range (Set String)
+  deriving (Eq, Show)
 
 type Diff a annotation = Free (Annotated a (annotation, annotation)) (Patch (Term a annotation))
 
