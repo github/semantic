@@ -8,6 +8,7 @@ import Control.Monad.Free
 import Control.Comonad.Cofree
 import Patch
 import Term
+import Categorizable
 
 data Annotated a annotation f = Annotated annotation (Syntax a f)
   deriving (Functor, Eq, Show)
@@ -17,6 +18,9 @@ data Range = Range { start :: Integer, end :: Integer }
 
 data Info = Info Range (Set String)
   deriving (Eq, Show)
+
+instance Categorizable Info where
+  categories (Info _ c) = c
 
 type Diff a annotation = Free (Annotated a (annotation, annotation)) (Patch (Term a annotation))
 
