@@ -10,7 +10,7 @@ unified :: Diff a Info -> String -> String -> String
 unified diff before after =
   iter f mapped where
     mapped = fmap unifiedPatch diff
-    f (Annotated annotations (Leaf _)) = ""
+    f (Annotated (_, Info range _) (Leaf _)) = substring range after
     f (Annotated annotations (Indexed i)) = ""
     f (Annotated annotations (Fixed f)) = ""
     f (Annotated annotations (Keyed k)) = ""
