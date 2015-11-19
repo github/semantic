@@ -13,4 +13,5 @@ zipTerms :: Term a annotation -> Term a annotation -> Maybe (Cofree (Syntax a) (
 zipTerms (annotation1 :< a) (annotation2 :< b) = zipUnwrap a b
   where
     annotations = (annotation1, annotation2)
+    zipUnwrap (Leaf a) (Leaf b) = Just $ annotations :< Leaf b
     zipUnwrap a b = Nothing
