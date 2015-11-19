@@ -23,17 +23,17 @@ constructAndRun comparable (annotation1 :< a) (annotation2 :< b) =
 run :: (Eq a, Eq annotation) => Comparable a annotation -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
 run _ (Pure diff) = Just diff
 
-run comparable (Free (Recursive a b f)) = run comparable . f $ recur a b where
-  recur (annotation1 :< Indexed a') (annotation2 :< Indexed b') | length a' == length b' =
+run comparable (Free (Recursive (annotation1 :< a) (annotation2 :< b) f)) = run comparable . f $ recur a b where
+  recur (Indexed a') (Indexed b') | length a' == length b' =
     Free . Annotated (annotation1, annotation2) . Indexed $ zipWith (interpret comparable) a' b'
-  recur (annotation1 :< Fixed a') (annotation2 :< Fixed b') | length a' == length b' =
+  recur (Fixed a') (Fixed b') | length a' == length b' =
     Free . Annotated (annotation1, annotation2) . Fixed $ zipWith (interpret comparable) a' b'
-  recur (annotation1 :< Keyed a') (annotation2 :< Keyed b') | keys a' == keys b' =
+  recur (Keyed a') (Keyed b') | keys a' == keys b' =
     Free . Annotated (annotation1, annotation2) . Keyed . fromList . fmap repack $ keys b' where
       repack key = (key, interpretInBoth key a' b')
       interpretInBoth key a' b' = maybeInterpret (Data.Map.lookup key a') (Data.Map.lookup key b')
       maybeInterpret (Just a) (Just b) = interpret comparable a b
-  recur _ _ = Pure $ Replace a b
+  recur _ _ = Pure $ Replace (annotation1 :< a) (annotation2 :< b)
 
 run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
   byKey = unions [ deleted, inserted, patched ]
