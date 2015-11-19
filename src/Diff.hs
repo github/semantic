@@ -8,6 +8,9 @@ import Control.Comonad.Cofree
 import Patch
 import Term
 
+data Annotated a annotation f = Annotated annotation (Syntax a f)
+  deriving (Functor, Eq, Show)
+
 data Range = Range { start :: Integer, end :: Integer }
 
 data Info = Info -- Range [String]
