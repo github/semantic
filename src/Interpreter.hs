@@ -16,6 +16,11 @@ hylo down up a = down annotation $ hylo down up <$> syntax where
   (annotation, syntax) = up a
 
 constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
+constructAndRun _ a b | a == b = hylo introduce eliminate <$> zipTerms a b where
+  eliminate :: Cofree f a -> (a, f (Cofree f a))
+  eliminate (extract :< unwrap) = (extract, unwrap)
+  introduce :: (annotation, annotation) -> Syntax a (Diff a annotation) -> Diff a annotation
+  introduce ann syntax = Free $ Annotated ann syntax
 constructAndRun comparable a b | not $ comparable a b = Nothing
 constructAndRun comparable (annotation1 :< a) (annotation2 :< b) =
   run comparable $ algorithm a b where
