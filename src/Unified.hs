@@ -14,7 +14,7 @@ unified diff before after =
     mapped = fmap (unifiedPatch &&& range) diff
     f (Annotated (_, Info range _) (Leaf _)) = (substring range after, Just range)
     f (Annotated (_, Info range _) (Indexed i)) = (unifiedRange range i after, Just range)
-    f (Annotated (_, Info range _) (Fixed f)) = ("", Just range)
+    f (Annotated (_, Info range _) (Fixed f)) = (unifiedRange range f after, Just range)
     f (Annotated (_, Info range _) (Keyed k)) = ("", Just range)
 
     unifiedPatch :: Patch (Term a annotation) -> String
