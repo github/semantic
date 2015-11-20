@@ -23,8 +23,8 @@ unified diff before after =
     unifiedPatch :: Patch (Term a annotation) -> String
     unifiedPatch _ = ""
 
-    unifiedTerm :: Term a annotation -> String -> String
-    unifiedTerm _ _ = ""
+    unifiedTerm :: Term a Info -> String -> String
+    unifiedTerm term source = fst $ cata f term
 
     unifiedRange :: Range -> [(String, Maybe Range)] -> String -> String
     unifiedRange range children source = out ++ substring Range { start = previous, end = end range } after where
