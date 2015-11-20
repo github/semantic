@@ -25,6 +25,7 @@ main = do
 data Leaf =
   HsQName HsQName
   | HsCName HsCName
+  | HsImportDecl HsImportDecl
 
 parseModuleFile :: FilePath -> IO (ParseResult HsModule)
 parseModuleFile file = do
@@ -53,7 +54,7 @@ componentNameToTerm :: HsCName -> Term Leaf Info
 componentNameToTerm name = _info :< Leaf (HsCName name)
 
 importDeclarationToTerm :: HsImportDecl -> Term Leaf Info
-importDeclarationToTerm declaration = _
+importDeclarationToTerm declaration = _info :< Leaf (Main.HsImportDecl declaration)
 
 declarationToTerm :: HsDecl -> Term Leaf Info
 declarationToTerm declaration = _
