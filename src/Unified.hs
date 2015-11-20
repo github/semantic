@@ -21,7 +21,9 @@ unified diff before after =
     f (Info range _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) after, Just range)
 
     unifiedPatch :: Patch (Term a Info) -> String
-    unifiedPatch patch = maybe "" (change "-" . unifiedTerm before) $ Patch.before patch
+    unifiedPatch patch = before ++ after where
+      before = maybe "" (change "-" . unifiedTerm before) $ Patch.before patch
+      after = maybe "" (change "+" . unifiedTerm after) $ Patch.after patch
 
     unifiedTerm :: String -> Term a Info -> String
     unifiedTerm source term = fst $ cata f term
