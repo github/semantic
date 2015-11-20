@@ -1,5 +1,7 @@
 module Console where
 
+import Data.Char
+
 data Colour = Black | Red | Green | Yellow | Blue | Purple | Cyan | White
   deriving Bounded
 
@@ -36,3 +38,6 @@ instance Enum Style where
   toEnum 4 = Underline
 
 data Attribute = Attribute { colour :: Colour, style :: Style }
+
+applyAttribute :: Attribute -> String -> String
+applyAttribute attribute string = "\x001b[" ++ [ chr . fromEnum $ style attribute ] ++ ";" ++ [ chr . fromEnum $ colour attribute ] ++ "m" ++ string ++ "\x001b[0m"
