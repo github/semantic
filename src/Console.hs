@@ -25,3 +25,12 @@ instance Enum Colour where
 
 data Style = Normal | Bold | Underline
   deriving Bounded
+
+instance Enum Style where
+  fromEnum Normal = 0
+  fromEnum Bold = 1
+  fromEnum Underline = 4
+
+  toEnum 0 = Normal
+  toEnum 1 = Bold
+  toEnum 4 = Underline
