@@ -1,5 +1,6 @@
 module Unified (unified) where
 
+import Console
 import Diff
 import Patch
 import Syntax
@@ -22,8 +23,11 @@ unified diff before after =
 
     unifiedPatch :: Patch (Term a Info) -> String
     unifiedPatch patch = before ++ after where
-      before = maybe "" (change "-" . unifiedTerm before) $ Patch.before patch
-      after = maybe "" (change "+" . unifiedTerm after) $ Patch.after patch
+      before = maybe "" (applyAttribute beforeAttribute . change "-" . unifiedTerm before) $ Patch.before patch
+      after = maybe "" (applyAttribute afterAttribute . change "+" . unifiedTerm after) $ Patch.after patch
+
+    beforeAttribute = Attribute { colour = Red, style = Bold }
+    afterAttribute = Attribute { colour = Green, style = Bold }
 
     unifiedTerm :: String -> Term a Info -> String
     unifiedTerm source term = fst $ cata f term
