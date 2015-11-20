@@ -34,3 +34,7 @@ range :: Patch (Term a Info) -> Maybe Range
 range patch = range . extract <$> after patch where
   extract (annotation :< _) = annotation
   range (Info range _) = range
+
+instance Ord (String, Maybe Range) where
+  (_, Just a) <= (_, Just b) = start a <= start b
+  _ <= _ = False
