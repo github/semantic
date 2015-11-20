@@ -24,3 +24,4 @@ instance Enum Colour where
   toEnum _ = error "unknown colour code"
 
 data Style = Normal | Bold | Underline
+  deriving Bounded
