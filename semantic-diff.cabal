@@ -52,4 +52,4 @@ test-suite semantic-diff-test
 
 source-repository head
   type:     git
-  location: https://github.com/githubuser/semantic-diff
+  location: https://github.com/github/semantic-diff
