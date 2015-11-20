@@ -35,6 +35,9 @@ range patch = range . extract <$> after patch where
   extract (annotation :< _) = annotation
   range (Info range _) = range
 
+instance Ord Range where
+  a <= b = start a <= start b
+
 instance Ord (String, Maybe Range) where
   (_, Just a) <= (_, Just b) = start a <= start b
   _ <= _ = False
