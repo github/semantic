@@ -31,5 +31,14 @@ moduleToTerm :: HsModule -> Term a Info
 moduleToTerm (HsModule loc name exports imports declarations) = info :< Indexed [] where
   info = Info Range { start = 0, end = 0 } Data.Set.empty
 
+exportSpecToTerm :: HsExportSpec -> Term a Info
+exportSpecToTerm spec = _
+
+importDeclarationToTerm :: HsImportDecl -> Term a Info
+importDeclarationToTerm declaration = _
+
+declarationToTerm :: HsDecl -> Term a Info
+declarationToTerm declaration = _
+
 files (a : as) = (a, file as) where
   file (a : as) = a
