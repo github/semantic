@@ -28,8 +28,12 @@ parseModuleFile file = do
   return $ parseModule contents
 
 moduleToTerm :: HsModule -> Term a Info
-moduleToTerm (HsModule loc name exports imports declarations) = info :< Indexed [] where
+moduleToTerm (HsModule loc name exports imports declarations) = info :< Indexed terms where
   info = Info Range { start = 0, end = 0 } Data.Set.empty
+  exportTerms = exportSpecToTerm <$> maybe [] id exports
+  importTerms = importDeclarationToTerm <$> imports
+  declarationTerms = declarationToTerm <$> declarations
+  terms = exportTerms ++ importTerms ++ declarationTerms
 
 exportSpecToTerm :: HsExportSpec -> Term a Info
 exportSpecToTerm spec = _
