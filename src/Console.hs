@@ -22,3 +22,5 @@ instance Enum Colour where
   toEnum 36 = Cyan
   toEnum 37 = White
   toEnum _ = error "unknown colour code"
+
+data Style = Normal | Bold | Underline
