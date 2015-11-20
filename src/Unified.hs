@@ -1,4 +1,4 @@
-module Unified where
+module Unified (unified) where
 
 import Diff
 import Patch
