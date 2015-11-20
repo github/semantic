@@ -34,3 +34,5 @@ instance Enum Style where
   toEnum 0 = Normal
   toEnum 1 = Bold
   toEnum 4 = Underline
+
+data Attribute = Attribute { colour :: Colour, style :: Style }
