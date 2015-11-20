@@ -7,6 +7,7 @@ import Syntax
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Map
+import Data.Maybe
 import Data.Set
 import Language.Haskell.Parser
 import Language.Haskell.Syntax
@@ -36,7 +37,7 @@ _info = Info Range { start = 0, end = 0 } Data.Set.empty
 
 moduleToTerm :: HsModule -> Term Leaf Info
 moduleToTerm (HsModule loc name exports imports declarations) = _info :< Indexed terms where
-  exportTerms = exportSpecToTerm <$> maybe [] id exports
+  exportTerms = exportSpecToTerm <$> fromMaybe [] exports
   importTerms = importDeclarationToTerm <$> imports
   declarationTerms = declarationToTerm <$> declarations
   terms = exportTerms ++ importTerms ++ declarationTerms
