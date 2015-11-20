@@ -40,5 +40,8 @@ range patch = range . extract <$> after patch where
   extract (annotation :< _) = annotation
   range (Info range _) = range
 
+change :: String -> String -> String
+change bound content = "{" ++ bound ++ content ++ bound ++ "}"
+
 instance Ord Range where
   a <= b = start a <= start b
