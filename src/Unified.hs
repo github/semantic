@@ -8,16 +8,17 @@ import Control.Arrow
 import Control.Monad.Free
 import Control.Comonad.Cofree
 import Data.List
-import Data.Map
+import qualified Data.Map as Map
 
 unified :: Diff a Info -> String -> String -> String
 unified diff before after =
-  fst $ iter f mapped where
+  fst $ iter g mapped where
     mapped = fmap (unifiedPatch &&& range) diff
-    f (Annotated (_, Info range _) (Leaf _)) = (substring range after, Just range)
-    f (Annotated (_, Info range _) (Indexed i)) = (unifiedRange range i after, Just range)
-    f (Annotated (_, Info range _) (Fixed f)) = (unifiedRange range f after, Just range)
-    f (Annotated (_, Info range _) (Keyed k)) = (unifiedRange range (sort $ snd <$> toList k) after, Just range)
+    g (Annotated (_, info) syntax) = f info syntax
+    f (Info range _) (Leaf _) = (substring range after, Just range)
+    f (Info range _) (Indexed i) = (unifiedRange range i after, Just range)
+    f (Info range _) (Fixed f) = (unifiedRange range f after, Just range)
+    f (Info range _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) after, Just range)
 
     unifiedPatch :: Patch (Term a annotation) -> String
     unifiedPatch _ = ""
