@@ -31,21 +31,31 @@ parseModuleFile file = do
   contents <- readFile file
   return $ parseModule contents
 
-moduleToTerm :: HsModule -> Term a Info
-moduleToTerm (HsModule loc name exports imports declarations) = info :< Indexed terms where
-  info = Info Range { start = 0, end = 0 } Data.Set.empty
+_info = Info Range { start = 0, end = 0 } Data.Set.empty
+
+moduleToTerm :: HsModule -> Term Leaf Info
+moduleToTerm (HsModule loc name exports imports declarations) = _info :< Indexed terms where
   exportTerms = exportSpecToTerm <$> maybe [] id exports
   importTerms = importDeclarationToTerm <$> imports
   declarationTerms = declarationToTerm <$> declarations
   terms = exportTerms ++ importTerms ++ declarationTerms
 
-exportSpecToTerm :: HsExportSpec -> Term a Info
-exportSpecToTerm spec = _
+exportSpecToTerm :: HsExportSpec -> Term Leaf Info
+exportSpecToTerm (HsEVar name) = qualifiedNameToTerm name
+exportSpecToTerm (HsEAbs name) = qualifiedNameToTerm name
+exportSpecToTerm (HsEThingAll name) = qualifiedNameToTerm name
+exportSpecToTerm (HsEThingWith name components) = _info :< (Fixed $ qualifiedNameToTerm name : (componentNameToTerm <$> components))
 
-importDeclarationToTerm :: HsImportDecl -> Term a Info
+qualifiedNameToTerm :: HsQName -> Term Leaf Info
+qualifiedNameToTerm name = _info :< Leaf (HsQName name)
+
+componentNameToTerm :: HsCName -> Term Leaf Info
+componentNameToTerm name = _info :< Leaf (HsCName name)
+
+importDeclarationToTerm :: HsImportDecl -> Term Leaf Info
 importDeclarationToTerm declaration = _
 
-declarationToTerm :: HsDecl -> Term a Info
+declarationToTerm :: HsDecl -> Term Leaf Info
 declarationToTerm declaration = _
 
 files (a : as) = (a, file as) where
