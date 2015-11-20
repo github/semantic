@@ -20,7 +20,7 @@ unified diff before after =
     f (Info range _) (Fixed f) = (unifiedRange range f after, Just range)
     f (Info range _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) after, Just range)
 
-    unifiedPatch :: Patch (Term a annotation) -> String
+    unifiedPatch :: Patch (Term a Info) -> String
     unifiedPatch _ = ""
 
     unifiedTerm :: Term a Info -> String -> String
