@@ -21,3 +21,6 @@ zipTerms (annotation1 :< a) (annotation2 :< b) = annotate $ zipUnwrap a b
     zipUnwrap (Keyed a) (Keyed b) | keys a == keys b = Just . Keyed . fromList . catMaybes $ zipUnwrapMaps a b <$> keys a
     zipUnwrap a b = Nothing
     zipUnwrapMaps a b key = (,) key <$> zipTerms (a ! key) (b ! key)
+
+cata :: (annotation -> Syntax a b -> b) -> Term a annotation -> b
+cata f (annotation :< syntax) = f annotation $ cata f <$> syntax
