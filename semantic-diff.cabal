@@ -23,6 +23,7 @@ library
                      , Categorizable
                      , Term
                      , Unified
+                     , Console
   build-depends:       base >= 4.8 && < 5
                      , containers
                      , free
