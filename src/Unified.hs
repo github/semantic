@@ -7,7 +7,7 @@ import Term
 import Control.Arrow
 import Control.Monad.Free
 import Control.Comonad.Cofree
-import Data.List
+import Data.List hiding (foldl)
 import qualified Data.Map as Map
 
 unified :: Diff a Info -> String -> String -> String
@@ -28,7 +28,7 @@ unified diff before after =
 
     unifiedRange :: Range -> [(String, Maybe Range)] -> String -> String
     unifiedRange range children source = out ++ substring Range { start = previous, end = end range } after where
-      (out, previous) = Prelude.foldl accumulateContext ("", start range) children
+      (out, previous) = foldl accumulateContext ("", start range) children
       accumulateContext (out, previous) (child, Just range) = (out ++ substring Range { start = previous, end = start range } source ++ child, end range)
       accumulateContext (out, previous) (child, _) = (out ++ child, previous)
 
