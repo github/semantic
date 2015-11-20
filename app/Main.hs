@@ -22,6 +22,10 @@ main = do
     return (a', b')
   return ()
 
+data Leaf =
+  HsQName HsQName
+  | HsCName HsCName
+
 parseModuleFile :: FilePath -> IO (ParseResult HsModule)
 parseModuleFile file = do
   contents <- readFile file
