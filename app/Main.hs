@@ -40,3 +40,4 @@ parseModuleFile file = do
 
 files (a : as) = (a, file as) where
   file (a : as) = a
+files [] = error "expected two files to diff"
