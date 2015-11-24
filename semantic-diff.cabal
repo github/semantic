@@ -40,6 +40,9 @@ executable semantic-diff-exe
                      , semantic-diff
                      , haskell-src
   default-language:    Haskell2010
+  includes: prototype/External/tree-sitter/include/tree_sitter/runtime.h
+  extra-libraries: runtime
+                 , tree-sitter-c
 
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
