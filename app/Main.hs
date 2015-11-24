@@ -35,6 +35,7 @@ main = do
   --   return f
   -- return ()
   document <- ts_document_make
+  language <- ts_language_c
   putStrLn $ "cSizeOf " ++ show (cSizeOf document)
 
 parseModuleFile :: FilePath -> IO (ParseResult HsModule)
