@@ -32,7 +32,7 @@ foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime
 data TSLength = TsLength { bytes :: CSize, chars :: CSize }
   deriving (Show, Eq, Generic, CStorable)
 data TSNode = TsNode deriving (Show, Eq, Generic, CStorable)
-foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_root_node" ts_document_root_node :: Foreign.Ptr TSDocument -> IO (Foreign.Ptr TSNode)
+foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_root_node" ts_document_root_node :: Foreign.Ptr TSDocument -> IO TSNode
 
 main :: IO ()
 main = do
