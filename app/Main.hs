@@ -17,6 +17,7 @@ import GHC.Generics
 import Foreign
 import Foreign.CStorable
 import Foreign.C.Types
+import Foreign.C.String
 
 data TSLanguage = TsLanguage deriving (Show, Eq, Generic, CStorable)
 foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_c" ts_language_c :: IO (Foreign.Ptr TSLanguage)
@@ -24,6 +25,7 @@ foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h 
 data TSDocument = TsDocument deriving (Show, Eq, Generic, CStorable)
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_make" ts_document_make :: IO (Foreign.Ptr TSDocument)
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_set_language" ts_document_set_language :: Foreign.Ptr TSDocument -> Foreign.Ptr TSLanguage -> IO ()
+foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_set_input_string" ts_document_set_input_string :: Foreign.Ptr TSDocument -> CString -> IO ()
 
 main :: IO ()
 main = do
