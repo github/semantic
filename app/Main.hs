@@ -40,7 +40,14 @@ instance Storable TSLength where
 
 data TSNode = TsNode !(Foreign.Ptr ()) !TSLength
   deriving (Show, Eq, Generic, CStorable)
-foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_root_node" ts_document_root_node :: Foreign.Ptr TSDocument -> IO TSNode
+
+instance Storable TSNode where
+  alignment n = cAlignment n
+  sizeOf n = cSizeOf n
+  peek p = cPeek p
+  poke p n = cPoke p n
+
+foreign import ccall "app/bridge.h ts_document_root_node_p" ts_document_root_node_p :: Ptr TSDocument -> Ptr TSNode -> IO ()
 
 main :: IO ()
 main = do
