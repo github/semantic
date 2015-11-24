@@ -54,17 +54,20 @@ foreign import ccall "app/bridge.h ts_document_root_node_p" ts_document_root_nod
 
 main :: IO ()
 main = do
---   args <- getArgs
---   return f
-  -- let (a, b) = files args in do
-  --   -- a' <- parseModuleFile a
-  --   -- b' <- parseModuleFile b
-  --   return f
-  -- return ()
+  args <- getArgs
+  let (a, b) = files args in do
+    a' <- parseTreeSitterFile a
+    b' <- parseTreeSitterFile b
+    return (a', b')
+  return ()
+
+parseTreeSitterFile :: FilePath -> IO ()
+parseTreeSitterFile file = do
   document <- ts_document_make
   language <- ts_language_c
   ts_document_set_language document language
-  source <- newCString ""
+  contents <- readFile file
+  source <- newCString contents
   ts_document_set_input_string document source
   ts_document_parse document
   root <- (mallocForeignPtr :: IO (ForeignPtr TSNode))
