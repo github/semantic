@@ -26,12 +26,15 @@ foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime
 
 main :: IO ()
 main = do
-  args <- getArgs
-  let (a, b) = files args in do
-    a' <- parseModuleFile a
-    b' <- parseModuleFile b
-    return (a', b')
-  return ()
+--   args <- getArgs
+--   return f
+  -- let (a, b) = files args in do
+  --   -- a' <- parseModuleFile a
+  --   -- b' <- parseModuleFile b
+  --   return f
+  -- return ()
+  document <- ts_document_make
+  putStrLn $ "cSizeOf" ++ show (cSizeOf document)
 
 parseModuleFile :: FilePath -> IO (ParseResult HsModule)
 parseModuleFile file = do
