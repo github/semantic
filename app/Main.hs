@@ -27,6 +27,7 @@ data Leaf =
   HsQName HsQName
   | HsCName HsCName
   | HsImportDecl HsImportDecl
+  | HsName HsName
 
 parseModuleFile :: FilePath -> IO (ParseResult HsModule)
 parseModuleFile file = do
