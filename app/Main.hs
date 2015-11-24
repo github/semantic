@@ -13,6 +13,13 @@ import Language.Haskell.Parser
 import Language.Haskell.Syntax
 import System.Environment
 
+import GHC.Generics
+import Foreign
+import Foreign.CStorable
+import Foreign.C.Types
+
+data TSLanguageC = TsLanguageC deriving (Show, Eq, Generic, CStorable)
+foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_c" ts_language_c :: IO (Foreign.Ptr TSLanguageC)
 
 main :: IO ()
 main = do
