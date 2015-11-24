@@ -59,7 +59,7 @@ importDeclarationToTerm :: HsImportDecl -> Term Leaf Info
 importDeclarationToTerm declaration = _info :< Leaf (Main.HsImportDecl declaration)
 
 declarationToTerm :: HsDecl -> Term Leaf Info
-declarationToTerm declaration = _
+declarationToTerm (HsTypeDecl location name names ty) = _info :< Fixed [ _info :< Leaf (HsName name) ]
 
 files (a : as) = (a, file as) where
   file (a : as) = a
