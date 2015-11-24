@@ -71,9 +71,11 @@ parseTreeSitterFile file = do
   ts_document_set_input_string document source
   ts_document_parse document
   root <- (mallocForeignPtr :: IO (ForeignPtr TSNode))
-  withForeignPtr root (\root -> do
+  term <- withForeignPtr root (\root -> do
     ts_document_root_node_p document root
-    putStrLn $ "cSizeOf " ++ show (cSizeOf root))
+    unfoldM toTerm (root, "program") where
+      toTerm (node, "program") = do
+        _
   ts_document_free document
   free source
   putStrLn $ "cSizeOf " ++ show (cSizeOf document)
