@@ -67,8 +67,10 @@ main = do
   source <- newCString ""
   ts_document_set_input_string document source
   ts_document_parse document
-  root <- unsafeForeignPtrToPtr <$> (mallocForeignPtr :: IO (ForeignPtr TSNode))
-  ts_document_root_node_p document root
+  root <- (mallocForeignPtr :: IO (ForeignPtr TSNode))
+  withForeignPtr root (\root -> do
+    ts_document_root_node_p document root
+    putStrLn $ "cSizeOf " ++ show (cSizeOf root))
   ts_document_free document
   free source
   putStrLn $ "cSizeOf " ++ show (cSizeOf document)
