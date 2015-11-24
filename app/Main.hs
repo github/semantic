@@ -23,44 +23,10 @@ main = do
     return (a', b')
   return ()
 
-data Leaf =
-  HsQName HsQName
-  | HsCName HsCName
-  | HsImportDecl HsImportDecl
-  | HsName HsName
-
 parseModuleFile :: FilePath -> IO (ParseResult HsModule)
 parseModuleFile file = do
   contents <- readFile file
   return $ parseModule contents
-
-_info = Info Range { start = 0, end = 0 } Data.Set.empty
-
-moduleToTerm :: HsModule -> Term Leaf Info
-moduleToTerm (HsModule loc name exports imports declarations) = _info :< Indexed terms where
-  exportTerms = exportSpecToTerm <$> fromMaybe [] exports
-  importTerms = importDeclarationToTerm <$> imports
-  declarationTerms = declarationToTerm <$> declarations
-  terms = exportTerms ++ importTerms ++ declarationTerms
-
-exportSpecToTerm :: HsExportSpec -> Term Leaf Info
-exportSpecToTerm (HsEVar name) = qualifiedNameToTerm name
-exportSpecToTerm (HsEAbs name) = qualifiedNameToTerm name
-exportSpecToTerm (HsEThingAll name) = qualifiedNameToTerm name
-exportSpecToTerm (HsEThingWith name components) = _info :< (Fixed $ qualifiedNameToTerm name : (componentNameToTerm <$> components))
-
-qualifiedNameToTerm :: HsQName -> Term Leaf Info
-qualifiedNameToTerm name = _info :< Leaf (HsQName name)
-
-componentNameToTerm :: HsCName -> Term Leaf Info
-componentNameToTerm name = _info :< Leaf (HsCName name)
-
-importDeclarationToTerm :: HsImportDecl -> Term Leaf Info
-importDeclarationToTerm declaration = _info :< Leaf (Main.HsImportDecl declaration)
-
-declarationToTerm :: HsDecl -> Term Leaf Info
-declarationToTerm (HsTypeDecl location name names ty) = _info :< Fixed [ _info :< Leaf (HsName name) ]
-declarationToTerm (HsDataDecl location context name names constructors names2) = _info :< Fixed []
 
 files (a : as) = (a, file as) where
   file (a : as) = a
