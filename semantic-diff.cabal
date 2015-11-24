@@ -29,6 +29,12 @@ library
                      , free
   default-language:    Haskell2010
   default-extensions: DeriveFunctor, FlexibleInstances
+  c-sources: app/bridge.c
+  install-includes: app/bridge.h
+  include-dirs: prototype/External/tree-sitter/include
+  includes: prototype/External/tree-sitter/include/tree_sitter/runtime.h
+  extra-libraries: runtime
+                 , tree-sitter-c
 
 executable semantic-diff-exe
   hs-source-dirs:      app
