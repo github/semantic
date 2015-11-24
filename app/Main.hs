@@ -47,6 +47,7 @@ main = do
   source <- newCString ""
   ts_document_set_input_string document source
   ts_document_parse document
+  root <- ts_document_root_node document
   ts_document_free document
   free source
   putStrLn $ "cSizeOf " ++ show (cSizeOf document)
