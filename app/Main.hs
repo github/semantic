@@ -31,6 +31,13 @@ foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime
 
 data TSLength = TsLength !CSize !CSize
   deriving (Show, Eq, Generic, CStorable)
+
+instance Storable TSLength where
+  alignment l = cAlignment l
+  sizeOf l = cSizeOf l
+  peek p = cPeek p
+  poke p l = cPoke p l
+
 data TSNode = TsNode !(Foreign.Ptr ()) !TSLength
   deriving (Show, Eq, Generic, CStorable)
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_root_node" ts_document_root_node :: Foreign.Ptr TSDocument -> IO TSNode
