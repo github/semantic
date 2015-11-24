@@ -26,6 +26,7 @@ data TSDocument = TsDocument deriving (Show, Eq, Generic, CStorable)
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_make" ts_document_make :: IO (Foreign.Ptr TSDocument)
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_set_language" ts_document_set_language :: Foreign.Ptr TSDocument -> Foreign.Ptr TSLanguage -> IO ()
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_set_input_string" ts_document_set_input_string :: Foreign.Ptr TSDocument -> CString -> IO ()
+foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_parse" ts_document_parse :: Foreign.Ptr TSDocument -> IO ()
 
 main :: IO ()
 main = do
