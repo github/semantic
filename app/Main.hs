@@ -14,10 +14,13 @@ import Language.Haskell.Syntax
 import System.Environment
 
 import GHC.Generics
+import GHC.Prim
 import Foreign
+import Foreign.C
 import Foreign.CStorable
 import Foreign.C.Types
 import Foreign.C.String
+import Foreign.ForeignPtr.Unsafe
 
 data TSLanguage = TsLanguage deriving (Show, Eq, Generic, CStorable)
 foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_c" ts_language_c :: IO (Foreign.Ptr TSLanguage)
@@ -64,7 +67,8 @@ main = do
   source <- newCString ""
   ts_document_set_input_string document source
   ts_document_parse document
-  root <- ts_document_root_node document
+  root <- (mallocForeignPtr :: IO (ForeignPtr TSNode))
+  ts_document_root_node_p document $ unsafeForeignPtrToPtr root
   ts_document_free document
   free source
   putStrLn $ "cSizeOf " ++ show (cSizeOf document)
