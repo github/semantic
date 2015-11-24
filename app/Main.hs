@@ -45,6 +45,7 @@ main = do
   ts_document_set_input_string document source
   ts_document_parse document
   free source
+  ts_document_free document
   putStrLn $ "cSizeOf " ++ show (cSizeOf document)
 
 parseModuleFile :: FilePath -> IO (ParseResult HsModule)
