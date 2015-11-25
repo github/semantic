@@ -73,7 +73,7 @@ parseTreeSitterFile file = do
   source <- newCString contents
   ts_document_set_input_string document source
   ts_document_parse document
-  withNode (\root -> do
+  withAlloc (\root -> do
     ts_document_root_node_p document root
     unfoldM (toTerm document) (root, "program"))
   ts_document_free document
@@ -88,15 +88,15 @@ toTerm document (node, category) = do
     keyedProductions = Data.Set.fromList [ "object" ]
     fixedProductions = Data.Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
-withNode :: (Ptr TSNode -> IO a) -> IO a
-withNode writer = do
-  node <- (mallocForeignPtr :: IO (ForeignPtr TSNode))
+withAlloc :: Storable a => (Ptr a -> IO b) -> IO b
+withAlloc writer = do
+  node <- mallocForeignPtr
   withForeignPtr node writer
 
 namedChildren :: Ptr TSNode -> IO [Ptr TSNode]
 namedChildren node = do
   count <- ts_node_p_named_child_count node
-  mapM (withNode . getChild) [0..count] where
+  mapM (withAlloc . getChild) [0..count] where
     getChild n out = do
       ts_node_p_named_child node n out
       return out
