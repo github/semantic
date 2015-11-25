@@ -5,7 +5,6 @@ import Patch
 import Term
 import Syntax
 import Control.Comonad.Cofree
-import Control.Monad ((>=>))
 import Control.Monad.Free hiding (unfoldM)
 import Data.Map
 import Data.Maybe
