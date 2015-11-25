@@ -77,13 +77,13 @@ parseTreeSitterFile file = do
   ts_document_parse document
   withAlloc (\root -> do
     ts_document_root_node_p document root
-    unfoldM (toTerm document) (root, "program"))
+    unfoldM (toTerm document contents) (root, "program"))
   ts_document_free document
   free source
   putStrLn $ "cSizeOf " ++ show (cSizeOf document)
 
-toTerm :: Ptr TSDocument -> (Ptr TSNode, String) -> IO (Info, Syntax String (Ptr TSNode, String))
-toTerm document (node, category) = do
+toTerm :: Ptr TSDocument -> String -> (Ptr TSNode, String) -> IO (Info, Syntax String (Ptr TSNode, String))
+toTerm document contents (node, category) = do
   name <- ts_node_p_name node document
   children <- namedChildren node
   return (Info (Range { start = 0, end = 0 }) $ Data.Set.fromList [ category ], Leaf "") where
