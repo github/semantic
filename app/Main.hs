@@ -54,6 +54,8 @@ foreign import ccall "app/bridge.h ts_document_root_node_p" ts_document_root_nod
 foreign import ccall "app/bridge.h ts_node_p_name" ts_node_p_name :: Ptr TSNode -> Ptr TSDocument -> IO CString
 foreign import ccall "app/bridge.h ts_node_p_named_child_count" ts_node_p_named_child_count :: Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child :: Ptr TSNode -> CSize -> Ptr TSNode -> IO CSize
+foreign import ccall "app/bridge.h ts_node_p_pos_p" ts_node_p_pos_p :: Ptr TSNode -> Ptr TSLength -> IO ()
+foreign import ccall "app/bridge.h ts_node_p_size_p" ts_node_p_size_p :: Ptr TSNode -> Ptr TSLength -> IO ()
 
 main :: IO ()
 main = do
