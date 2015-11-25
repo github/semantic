@@ -70,8 +70,7 @@ parseTreeSitterFile file = do
   source <- newCString contents
   ts_document_set_input_string document source
   ts_document_parse document
-  root <- (mallocForeignPtr :: IO (ForeignPtr TSNode))
-  term <- withForeignPtr root (\root -> do
+  withNode (\root -> do
     ts_document_root_node_p document root
     Control.Comonad.Cofree.unfoldM toTerm (root, "program"))
   ts_document_free document
