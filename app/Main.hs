@@ -90,7 +90,10 @@ toTerm document contents (node, category) = do
   annotation <- return . Info range $ Data.Set.fromList [ category ]
   case children of
     [] -> return (annotation, Leaf $ substring range contents)
-    _ -> do
+    _ | member name fixedProductions -> do
+      children <- mapM nodeAndCategory children
+      return (annotation, Fixed children)
+    _ | otherwise -> do
       children <- mapM nodeAndCategory children
       return (annotation, Indexed children)
   where
