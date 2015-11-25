@@ -85,6 +85,7 @@ parseTreeSitterFile file = do
 toTerm :: Ptr TSDocument -> String -> (Ptr TSNode, String) -> IO (Info, Syntax String (Ptr TSNode, String))
 toTerm document contents (node, category) = do
   name <- ts_node_p_name node document
+  name <- peekCString name
   children <- namedChildren node
   range <- range node
   annotation <- return . Info range $ Data.Set.fromList [ category ]
