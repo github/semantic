@@ -79,6 +79,11 @@ parseTreeSitterFile file = do
   putStrLn $ "cSizeOf " ++ show (cSizeOf document) where
     toTerm (node, "program") = _
 
+withNode :: (Ptr TSNode -> IO a) -> IO a
+withNode writer = do
+  node <- (mallocForeignPtr :: IO (ForeignPtr TSNode))
+  withForeignPtr node writer
+
 parseModuleFile :: FilePath -> IO (ParseResult HsModule)
 parseModuleFile file = do
   contents <- readFile file
