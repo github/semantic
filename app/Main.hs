@@ -96,9 +96,9 @@ toTerm document contents node = do
     fixedProductions = Data.Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
 withAlloc :: Storable a => (Ptr a -> IO b) -> IO b
-withAlloc writer = do
-  node <- mallocForeignPtr
-  withForeignPtr node writer
+withAlloc f = do
+  bytes <- malloc
+  f bytes
 
 namedChildren :: Ptr TSNode -> IO [Ptr TSNode]
 namedChildren node = do
