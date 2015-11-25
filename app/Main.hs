@@ -72,7 +72,7 @@ parseTreeSitterFile file = do
   ts_document_parse document
   withNode (\root -> do
     ts_document_root_node_p document root
-    Control.Comonad.Cofree.unfoldM toTerm (root, "program"))
+    unfoldM toTerm (root, "program"))
   ts_document_free document
   free source
   putStrLn $ "cSizeOf " ++ show (cSizeOf document) where
