@@ -9,8 +9,6 @@ import Control.Monad.Free hiding (unfoldM)
 import Data.Map
 import Data.Maybe
 import Data.Set
-import Language.Haskell.Parser
-import Language.Haskell.Syntax
 import System.Environment
 
 import GHC.Generics
@@ -119,11 +117,6 @@ range node = do
   pos <- ts_node_p_pos_chars node
   size <- ts_node_p_size_chars node
   return Range { start = fromEnum $ toInteger pos, end = (fromEnum $ toInteger pos) + (fromEnum $ toInteger size) }
-
-parseModuleFile :: FilePath -> IO (ParseResult HsModule)
-parseModuleFile file = do
-  contents <- readFile file
-  return $ parseModule contents
 
 files (a : as) = (a, file as) where
   file (a : as) = a
