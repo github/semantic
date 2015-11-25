@@ -8,6 +8,9 @@ void ts_document_root_node_p(TSDocument *document, TSNode *outNode) {
 	*outNode = ts_document_root_node(document);
 }
 
+TSLanguage *ts_language_c_use() {
+	return ts_language_c();
+}
 
 const char *ts_node_p_name(const TSNode *node, const TSDocument *document) {
 	assert(node != NULL);
