@@ -89,7 +89,7 @@ toTerm document contents (node, category) = do
   range <- range node
   annotation <- return . Info range $ Data.Set.fromList [ category ]
   case children of
-    _ -> return (annotation, Leaf $ substring range contents)
+    [] -> return (annotation, Leaf $ substring range contents)
   where
     nodeAndCategory :: Ptr TSNode -> IO (Ptr TSNode, String)
     nodeAndCategory node = do
