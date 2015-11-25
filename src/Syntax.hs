@@ -7,4 +7,4 @@ data Syntax a f =
   | Indexed [f]
   | Fixed [f]
   | Keyed (Map String f)
-  deriving (Functor, Show, Eq)
+  deriving (Functor, Show, Eq, Foldable)
