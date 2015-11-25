@@ -1,5 +1,6 @@
 #include "bridge.h"
 #include <assert.h>
+#include <stdio.h>
 
 void ts_document_root_node_p(TSDocument *document, TSNode *outNode) {
 	assert(document != NULL);
@@ -26,7 +27,12 @@ void ts_node_p_named_child(const TSNode *node, size_t index, TSNode *outNode) {
 	assert(node != NULL);
 	assert(node->data != NULL);
 	assert(outNode != NULL);
-	*outNode = ts_node_named_child(*node, index);
+	TSNode temp = ts_node_named_child(*node, index);
+	if (temp.data == NULL) {
+		printf("got broken child for index %ld\n", index);
+	}
+	assert(temp.data != NULL);
+	*outNode = temp;
 }
 
 
