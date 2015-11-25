@@ -87,12 +87,10 @@ toTerm document contents node = do
   children <- namedChildren node
   range <- range node
   annotation <- return . Info range $ Data.Set.fromList [ name ]
-  case children of
-    [] -> return (annotation, Leaf $ substring range contents)
-    _ | Data.Set.member name fixedProductions -> do
-      return (annotation, Fixed children)
-    _ | otherwise -> do
-      return (annotation, Indexed children)
+  return (annotation, case children of
+    [] -> Leaf $ substring range contents
+    _ | Data.Set.member name fixedProductions -> Fixed children
+    _ | otherwise -> Indexed children)
   where
     keyedProductions = Data.Set.fromList [ "object" ]
     fixedProductions = Data.Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
