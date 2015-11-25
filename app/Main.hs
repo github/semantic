@@ -87,7 +87,7 @@ toTerm document contents (node, category) = do
   name <- ts_node_p_name node document
   children <- namedChildren node
   range <- range node
-  return (Info (Range { start = 0, end = 0 }) $ Data.Set.fromList [ category ], Leaf $ substring range contents) where
+  return (Info range $ Data.Set.fromList [ category ], Leaf $ substring range contents) where
     keyedProductions = Data.Set.fromList [ "object" ]
     fixedProductions = Data.Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
