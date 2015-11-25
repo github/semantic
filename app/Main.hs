@@ -30,7 +30,7 @@ foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_parse" ts_document_parse :: Ptr TSDocument -> IO ()
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_free" ts_document_free :: Ptr TSDocument -> IO ()
 
-data TSLength = TsLength !CSize !CSize
+data TSLength = TsLength { bytes :: CSize, chars :: CSize }
   deriving (Show, Eq, Generic, CStorable)
 
 instance Storable TSLength where
@@ -39,7 +39,7 @@ instance Storable TSLength where
   peek p = cPeek p
   poke p l = cPoke p l
 
-data TSNode = TsNode !(Ptr ()) !TSLength
+data TSNode = TsNode { _data :: Ptr (), offset :: TSLength }
   deriving (Show, Eq, Generic, CStorable)
 
 instance Storable TSNode where
