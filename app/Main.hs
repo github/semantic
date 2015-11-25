@@ -34,19 +34,19 @@ data TSLength = TsLength { bytes :: CSize, chars :: CSize }
   deriving (Show, Eq, Generic, CStorable)
 
 instance Storable TSLength where
-  alignment l = cAlignment l
-  sizeOf l = cSizeOf l
-  peek p = cPeek p
-  poke p l = cPoke p l
+  alignment n = 16
+  sizeOf n = 16
+  peek p = return $ TsLength { bytes = 0, chars = 0 }
+  poke p n = return ()
 
 data TSNode = TsNode { _data :: Ptr (), offset :: TSLength }
   deriving (Show, Eq, Generic, CStorable)
 
 instance Storable TSNode where
-  alignment n = cAlignment n
-  sizeOf n = cSizeOf n
-  peek p = cPeek p
-  poke p n = cPoke p n
+  alignment n = 24
+  sizeOf n = 24
+  peek p = error "why are you reading from this"
+  poke p n = error "why are you writing to this"
 
 foreign import ccall "app/bridge.h ts_document_root_node_p" ts_document_root_node_p :: Ptr TSDocument -> Ptr TSNode -> IO ()
 foreign import ccall "app/bridge.h ts_node_p_name" ts_node_p_name :: Ptr TSNode -> Ptr TSDocument -> IO CString
