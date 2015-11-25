@@ -11,3 +11,7 @@ const char *ts_node_p_name(const TSNode *node, const TSDocument *document) {
 size_t ts_node_p_named_child_count(const TSNode *node) {
 	return ts_node_named_child_count(*node);
 }
+
+void ts_node_p_named_child(const TSNode *node, size_t index, TSNode *outNode) {
+	*outNode = ts_node_named_child(*node, index);
+}
