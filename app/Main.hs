@@ -103,6 +103,12 @@ namedChildren node = do
       ts_node_p_named_child node n out
       return out
 
+range :: Ptr TSNode -> IO Range
+range node = do
+  pos <- ts_node_p_pos_chars node
+  size <- ts_node_p_size_chars node
+  return Range { start = fromEnum $ toInteger pos, end = (fromEnum $ toInteger pos) + (fromEnum $ toInteger size) }
+
 parseModuleFile :: FilePath -> IO (ParseResult HsModule)
 parseModuleFile file = do
   contents <- readFile file
