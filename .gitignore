@@ -4,3 +4,4 @@ xcuserdata
 *.pbxuser
 *.xcuserdatad
 *.xccheckout
+.stack-work
