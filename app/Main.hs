@@ -75,32 +75,25 @@ parseTreeSitterFile file = do
   ts_document_parse document
   alloca (\root -> do
     ts_document_root_node_p document root
-    unfoldM (toTerm document contents) (root, "program"))
+    unfoldM (toTerm document contents) root)
   ts_document_free document
   free source
   putStrLn $ "cSizeOf " ++ show (cSizeOf document)
 
-toTerm :: Ptr TSDocument -> String -> (Ptr TSNode, String) -> IO (Info, Syntax String (Ptr TSNode, String))
-toTerm document contents (node, category) = do
+toTerm :: Ptr TSDocument -> String -> Ptr TSNode -> IO (Info, Syntax String (Ptr TSNode))
+toTerm document contents node = do
   name <- ts_node_p_name node document
   name <- peekCString name
   children <- namedChildren node
   range <- range node
-  annotation <- return . Info range $ Data.Set.fromList [ category ]
+  annotation <- return . Info range $ Data.Set.fromList [ name ]
   case children of
     [] -> return (annotation, Leaf $ substring range contents)
     _ | Data.Set.member name fixedProductions -> do
-      children <- mapM nodeAndCategory children
       return (annotation, Fixed children)
     _ | otherwise -> do
-      children <- mapM nodeAndCategory children
       return (annotation, Indexed children)
   where
-    nodeAndCategory :: Ptr TSNode -> IO (Ptr TSNode, String)
-    nodeAndCategory node = do
-      name <- ts_node_p_name node document
-      name <- peekCString name
-      return (node, name)
     keyedProductions = Data.Set.fromList [ "object" ]
     fixedProductions = Data.Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
