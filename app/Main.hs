@@ -73,15 +73,16 @@ parseTreeSitterFile file = do
   ts_document_parse document
   withNode (\root -> do
     ts_document_root_node_p document root
-    unfoldM toTerm (root, "program"))
+    unfoldM (toTerm document) (root, "program"))
   ts_document_free document
   free source
   putStrLn $ "cSizeOf " ++ show (cSizeOf document) where
     keyedProductions = Data.Set.fromList [ "object" ]
     fixedProductions = Data.Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
-    toTerm (node, category) = do
-      name <- ts_node_p_name node document
-      return ()
+
+toTerm document (node, category) = do
+  name <- ts_node_p_name node document
+  return ()
 
 withNode :: (Ptr TSNode -> IO a) -> IO a
 withNode writer = do
