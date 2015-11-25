@@ -23,14 +23,14 @@ import Foreign.C.String
 import Foreign.ForeignPtr.Unsafe
 
 data TSLanguage = TsLanguage deriving (Show, Eq, Generic, CStorable)
-foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_c" ts_language_c :: IO (Foreign.Ptr TSLanguage)
+foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_c" ts_language_c :: IO (Ptr TSLanguage)
 
 data TSDocument = TsDocument deriving (Show, Eq, Generic, CStorable)
-foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_make" ts_document_make :: IO (Foreign.Ptr TSDocument)
-foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_set_language" ts_document_set_language :: Foreign.Ptr TSDocument -> Foreign.Ptr TSLanguage -> IO ()
-foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_set_input_string" ts_document_set_input_string :: Foreign.Ptr TSDocument -> CString -> IO ()
-foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_parse" ts_document_parse :: Foreign.Ptr TSDocument -> IO ()
-foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_free" ts_document_free :: Foreign.Ptr TSDocument -> IO ()
+foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_make" ts_document_make :: IO (Ptr TSDocument)
+foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_set_language" ts_document_set_language :: Ptr TSDocument -> Ptr TSLanguage -> IO ()
+foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_set_input_string" ts_document_set_input_string :: Ptr TSDocument -> CString -> IO ()
+foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_parse" ts_document_parse :: Ptr TSDocument -> IO ()
+foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_free" ts_document_free :: Ptr TSDocument -> IO ()
 
 data TSLength = TsLength !CSize !CSize
   deriving (Show, Eq, Generic, CStorable)
@@ -41,7 +41,7 @@ instance Storable TSLength where
   peek p = cPeek p
   poke p l = cPoke p l
 
-data TSNode = TsNode !(Foreign.Ptr ()) !TSLength
+data TSNode = TsNode !(Ptr ()) !TSLength
   deriving (Show, Eq, Generic, CStorable)
 
 instance Storable TSNode where
