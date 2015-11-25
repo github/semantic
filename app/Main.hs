@@ -94,6 +94,14 @@ withNode writer = do
   node <- (mallocForeignPtr :: IO (ForeignPtr TSNode))
   withForeignPtr node writer
 
+namedChildren :: Ptr TSNode -> IO [Ptr TSNode]
+namedChildren node = do
+  count <- ts_node_p_named_child_count node
+  mapM (withNode . getChild) [0..count] where
+    getChild n out = do
+      ts_node_p_named_child node n out
+      return out
+
 parseModuleFile :: FilePath -> IO (ParseResult HsModule)
 parseModuleFile file = do
   contents <- readFile file
