@@ -75,7 +75,7 @@ parseTreeSitterFile file = do
   source <- newCString contents
   ts_document_set_input_string document source
   ts_document_parse document
-  withAlloc (\root -> do
+  alloca (\root -> do
     ts_document_root_node_p document root
     unfoldM (toTerm document contents) (root, "program"))
   ts_document_free document
@@ -110,7 +110,7 @@ withAlloc writer = do
 namedChildren :: Ptr TSNode -> IO [Ptr TSNode]
 namedChildren node = do
   count <- ts_node_p_named_child_count node
-  mapM (withAlloc . getChild) [0..count] where
+  mapM (alloca . getChild) [0..count] where
     getChild n out = do
       ts_node_p_named_child node n out
       return out
