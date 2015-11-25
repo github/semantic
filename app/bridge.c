@@ -7,3 +7,7 @@ void ts_document_root_node_p(TSDocument *document, TSNode *outNode) {
 const char *ts_node_p_name(const TSNode *node, const TSDocument *document) {
 	return ts_node_name(*node, document);
 }
+
+size_t ts_node_p_named_child_count(const TSNode *node) {
+	return ts_node_named_child_count(*node);
+}
