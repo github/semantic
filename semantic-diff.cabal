@@ -44,7 +44,6 @@ executable semantic-diff-exe
                      , containers
                      , free
                      , semantic-diff
-                     , haskell-src
                      , c-storable-deriving
                      , ghc-prim
   default-language:    Haskell2010
