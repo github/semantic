@@ -73,12 +73,11 @@ parseTreeSitterFile file = do
   root <- (mallocForeignPtr :: IO (ForeignPtr TSNode))
   term <- withForeignPtr root (\root -> do
     ts_document_root_node_p document root
-    unfoldM toTerm (root, "program") where
-      toTerm (node, "program") = do
-        _
+    Control.Comonad.Cofree.unfoldM toTerm (root, "program"))
   ts_document_free document
   free source
-  putStrLn $ "cSizeOf " ++ show (cSizeOf document)
+  putStrLn $ "cSizeOf " ++ show (cSizeOf document) where
+    toTerm (node, "program") = _
 
 parseModuleFile :: FilePath -> IO (ParseResult HsModule)
 parseModuleFile file = do
