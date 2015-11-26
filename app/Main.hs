@@ -35,8 +35,8 @@ data TSNode = TsNode { _data :: Ptr (), offset :: TSLength }
 instance Storable TSNode where
   alignment n = 24
   sizeOf n = 24
-  peek p = error "why are you reading from this"
-  poke p n = error "why are you writing to this"
+  peek p = error "Haskell code should never read TSNode values directly."
+  poke p n = error "Haskell code should never write TSNode values directly."
 
 foreign import ccall "app/bridge.h ts_document_root_node_p" ts_document_root_node_p :: Ptr TSDocument -> Ptr TSNode -> IO ()
 foreign import ccall "app/bridge.h ts_node_p_name" ts_node_p_name :: Ptr TSNode -> Ptr TSDocument -> IO CString
