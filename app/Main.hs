@@ -20,10 +20,10 @@ import Foreign.C.Types
 import Foreign.C.String
 import Foreign.ForeignPtr.Unsafe
 
-data TSLanguage = TsLanguage deriving (Show, Eq, Generic, CStorable)
+data TSLanguage = TsLanguage deriving (Show, Eq, Generic)
 foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_c" ts_language_c :: IO (Ptr TSLanguage)
 
-data TSDocument = TsDocument deriving (Show, Eq, Generic, CStorable)
+data TSDocument = TsDocument deriving (Show, Eq, Generic)
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_make" ts_document_make :: IO (Ptr TSDocument)
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_set_language" ts_document_set_language :: Ptr TSDocument -> Ptr TSLanguage -> IO ()
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_set_input_string" ts_document_set_input_string :: Ptr TSDocument -> CString -> IO ()
@@ -31,7 +31,7 @@ foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_free" ts_document_free :: Ptr TSDocument -> IO ()
 
 data TSLength = TsLength { bytes :: CSize, chars :: CSize }
-  deriving (Show, Eq, Generic, CStorable)
+  deriving (Show, Eq, Generic)
 
 instance Storable TSLength where
   alignment n = 16
@@ -40,7 +40,7 @@ instance Storable TSLength where
   poke p n = return ()
 
 data TSNode = TsNode { _data :: Ptr (), offset :: TSLength }
-  deriving (Show, Eq, Generic, CStorable)
+  deriving (Show, Eq, Generic)
 
 instance Storable TSNode where
   alignment n = 24
