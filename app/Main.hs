@@ -96,11 +96,6 @@ parse document contents = do
 keyedProductions = Data.Set.fromList [ "object" ]
 fixedProductions = Data.Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
-withAlloc :: Storable a => (Ptr a -> IO b) -> IO b
-withAlloc writeTo = do
-  bytes <- malloc
-  writeTo bytes
-
 withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO a) -> IO [a]
 withNamedChildren node f = do
   count <- ts_node_p_named_child_count node
