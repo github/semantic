@@ -38,7 +38,6 @@ executable semantic-diff-exe
                      , containers
                      , free
                      , semantic-diff
-                     , c-storable-deriving
                      , ghc-prim
   default-language:    Haskell2010
   default-extensions: DeriveGeneric, DeriveAnyClass
