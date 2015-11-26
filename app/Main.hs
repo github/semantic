@@ -63,13 +63,13 @@ parseTreeSitterFile file = do
   source <- newCString contents
   ts_document_set_input_string document source
   ts_document_parse document
-  term <- alloca $ parse document contents
+  term <- parse document contents
   ts_document_free document
   free source
   putStrLn $ "hooray"
 
-parse :: Ptr TSDocument -> String -> Ptr TSNode -> IO (Term String Info)
-parse document contents root = do
+parse :: Ptr TSDocument -> String -> IO (Term String Info)
+parse document contents = alloca $ \root -> do
   ts_document_root_node_p document root
   toTerm root where
     toTerm :: Ptr TSNode -> IO (Term String Info)
