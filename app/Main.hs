@@ -94,8 +94,7 @@ withNamedChildren node f = do
     else mapM (alloca . getChild f) [0..pred count] where
       getChild f n out = do
         ts_node_p_named_child node n out
-        out <- f out
-        return out
+        f out
 
 range :: Ptr TSNode -> IO Range
 range node = do
