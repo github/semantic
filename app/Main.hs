@@ -60,12 +60,11 @@ parseTreeSitterFile file = do
   language <- ts_language_c
   ts_document_set_language document language
   contents <- readFile file
-  source <- newCString contents
-  ts_document_set_input_string document source
-  ts_document_parse document
-  term <- documentToTerm document contents
-  ts_document_free document
-  free source
+  withCString contents (\source -> do
+    ts_document_set_input_string document source
+    ts_document_parse document
+    term <- documentToTerm document contents
+    ts_document_free document)
   putStrLn $ "hooray"
 
 documentToTerm :: Ptr TSDocument -> String -> IO (Term String Info)
