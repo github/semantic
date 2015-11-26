@@ -15,7 +15,6 @@ import GHC.Generics
 import GHC.Prim
 import Foreign
 import Foreign.C
-import Foreign.CStorable
 import Foreign.C.Types
 import Foreign.C.String
 import Foreign.ForeignPtr.Unsafe
