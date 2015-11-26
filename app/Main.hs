@@ -84,7 +84,7 @@ parse document contents root = do
       name <- peekCString name
       children <- withNamedChildren node toTerm
       range <- range node
-      annotation <- return . Info range $ fromList [ name ]
+      annotation <- return . Info range $ singleton name
       return $ annotation :< case children of
         [] -> Leaf $ substring range contents
         _ | member name fixedProductions -> Fixed children
