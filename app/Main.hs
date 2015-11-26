@@ -54,7 +54,7 @@ main = do
     return (a', b')
   return ()
 
-parseTreeSitterFile :: FilePath -> IO ()
+parseTreeSitterFile :: FilePath -> IO (Term String Info)
 parseTreeSitterFile file = do
   document <- ts_document_make
   language <- ts_language_c
@@ -64,8 +64,8 @@ parseTreeSitterFile file = do
     ts_document_set_input_string document source
     ts_document_parse document
     term <- documentToTerm document contents
-    ts_document_free document)
-  putStrLn $ "hooray"
+    ts_document_free document
+    return term)
 
 documentToTerm :: Ptr TSDocument -> String -> IO (Term String Info)
 documentToTerm document contents = alloca $ \root -> do
