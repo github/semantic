@@ -70,17 +70,15 @@ parseTreeSitterFile file = do
   source <- newCString contents
   ts_document_set_input_string document source
   ts_document_parse document
-  term <- parse document contents
+  term <- alloca $ parse document contents
   ts_document_free document
   free source
   putStrLn $ "hooray"
 
-parse :: Ptr TSDocument -> String -> IO (Term String Info)
-parse document contents = do
-  alloca unpack where
-    unpack root = do
-      ts_document_root_node_p document root
-      toTerm root
+parse :: Ptr TSDocument -> String -> Ptr TSNode -> IO (Term String Info)
+parse document contents root = do
+  ts_document_root_node_p document root
+  toTerm root where
     toTerm :: Ptr TSNode -> IO (Term String Info)
     toTerm node = do
       name <- ts_node_p_name node document
