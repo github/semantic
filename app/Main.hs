@@ -11,7 +11,6 @@ import Data.Maybe
 import Data.Set
 import System.Environment
 
-import GHC.Generics
 import Foreign
 import Foreign.C
 import Foreign.C.Types
