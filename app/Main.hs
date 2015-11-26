@@ -12,7 +12,6 @@ import Data.Set
 import System.Environment
 
 import GHC.Generics
-import GHC.Prim
 import Foreign
 import Foreign.C
 import Foreign.C.Types
