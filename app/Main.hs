@@ -29,12 +29,6 @@ foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime
 data TSLength = TsLength { bytes :: CSize, chars :: CSize }
   deriving (Show, Eq)
 
-instance Storable TSLength where
-  alignment n = 16
-  sizeOf n = 16
-  peek p = return $ TsLength { bytes = 0, chars = 0 }
-  poke p n = return ()
-
 data TSNode = TsNode { _data :: Ptr (), offset :: TSLength }
   deriving (Show, Eq)
 
