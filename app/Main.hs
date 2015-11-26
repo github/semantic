@@ -91,8 +91,8 @@ withNamedChildren node f = do
   count <- ts_node_p_named_child_count node
   if count == 0
     then return []
-    else mapM (alloca . getChild f) [0..pred count] where
-      getChild f n out = do
+    else mapM (alloca . getChild) [0..pred count] where
+      getChild n out = do
         ts_node_p_named_child node n out
         f out
 
