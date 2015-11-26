@@ -78,7 +78,7 @@ parseTreeSitterFile file = do
     unfoldM (toTerm document contents) root)
   ts_document_free document
   free source
-  putStrLn $ "cSizeOf " ++ show (cSizeOf document)
+  putStrLn $ "hooray"
 
 toTerm :: Ptr TSDocument -> String -> Ptr TSNode -> IO (Info, Syntax String (Ptr TSNode))
 toTerm document contents node = do
