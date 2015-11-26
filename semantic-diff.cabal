@@ -39,7 +39,6 @@ executable semantic-diff-exe
                      , free
                      , semantic-diff
   default-language:    Haskell2010
-  default-extensions: DeriveGeneric, DeriveAnyClass
   extra-libraries: bridge
   extra-lib-dirs: prototype/External/tree-sitter/out/Release, prototype/External/tree-sitter-c, .
 
