@@ -84,14 +84,14 @@ parse document contents root = do
       name <- peekCString name
       children <- withNamedChildren node toTerm
       range <- range node
-      annotation <- return . Info range $ Data.Set.fromList [ name ]
+      annotation <- return . Info range $ fromList [ name ]
       return $ annotation :< case children of
         [] -> Leaf $ substring range contents
-        _ | Data.Set.member name fixedProductions -> Fixed children
+        _ | member name fixedProductions -> Fixed children
         _ | otherwise -> Indexed children
 
-keyedProductions = Data.Set.fromList [ "object" ]
-fixedProductions = Data.Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
+keyedProductions = fromList [ "object" ]
+fixedProductions = fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
 withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO a) -> IO [a]
 withNamedChildren node f = do
