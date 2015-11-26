@@ -6,7 +6,6 @@ import Term
 import Syntax
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfoldM)
-import Data.Map
 import Data.Maybe
 import Data.Set
 import System.Environment
