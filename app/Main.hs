@@ -87,14 +87,14 @@ keyedProductions = fromList [ "object" ]
 fixedProductions = fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
 withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO a) -> IO [a]
-withNamedChildren node f = do
+withNamedChildren node transformNode = do
   count <- ts_node_p_named_child_count node
   if count == 0
     then return []
     else mapM (alloca . getChild) [0..pred count] where
       getChild n out = do
         ts_node_p_named_child node n out
-        f out
+        transformNode out
 
 range :: Ptr TSNode -> IO Range
 range node = do
