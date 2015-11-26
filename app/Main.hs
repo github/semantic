@@ -70,41 +70,46 @@ parseTreeSitterFile file = do
   source <- newCString contents
   ts_document_set_input_string document source
   ts_document_parse document
-  alloca (\root -> do
-    ts_document_root_node_p document root
-    unfoldM (toTerm document contents) root)
+  term <- parse document contents
   ts_document_free document
   free source
   putStrLn $ "hooray"
 
-toTerm :: Ptr TSDocument -> String -> Ptr TSNode -> IO (Info, Syntax String (Ptr TSNode))
-toTerm document contents node = do
-  name <- ts_node_p_name node document
-  name <- peekCString name
-  children <- namedChildren node
-  range <- range node
-  annotation <- return . Info range $ Data.Set.fromList [ name ]
-  return (annotation, case children of
-    [] -> Leaf $ substring range contents
-    _ | Data.Set.member name fixedProductions -> Fixed children
-    _ | otherwise -> Indexed children)
-  where
-    keyedProductions = Data.Set.fromList [ "object" ]
-    fixedProductions = Data.Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
+parse :: Ptr TSDocument -> String -> IO (Term String Info)
+parse document contents = do
+  alloca unpack where
+    unpack root = do
+      ts_document_root_node_p document root
+      toTerm root
+    toTerm :: Ptr TSNode -> IO (Term String Info)
+    toTerm node = do
+      name <- ts_node_p_name node document
+      name <- peekCString name
+      children <- withNamedChildren node toTerm
+      range <- range node
+      annotation <- return . Info range $ Data.Set.fromList [ name ]
+      return $ annotation :< case children of
+        [] -> Leaf $ substring range contents
+        _ | Data.Set.member name fixedProductions -> Fixed children
+        _ | otherwise -> Indexed children
+
+keyedProductions = Data.Set.fromList [ "object" ]
+fixedProductions = Data.Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
 withAlloc :: Storable a => (Ptr a -> IO b) -> IO b
 withAlloc writeTo = do
   bytes <- malloc
   writeTo bytes
 
-namedChildren :: Ptr TSNode -> IO [Ptr TSNode]
-namedChildren node = do
+withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO a) -> IO [a]
+withNamedChildren node f = do
   count <- ts_node_p_named_child_count node
   if count == 0
     then return []
-    else mapM (withAlloc . getChild) [0..pred count] where
-      getChild n out = do
+    else mapM (withAlloc . getChild f) [0..pred count] where
+      getChild f n out = do
         ts_node_p_named_child node n out
+        out <- f out
         return out
 
 range :: Ptr TSNode -> IO Range
