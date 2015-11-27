@@ -40,7 +40,6 @@ executable semantic-diff-exe
                      , rainbow
   default-language:    Haskell2010
   other-modules:       Unified
-                     , Console
 
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
