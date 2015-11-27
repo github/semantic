@@ -27,8 +27,6 @@ unified diff before after =
       before = maybe "" (applyAttribute beforeAttribute . change "-" . unifiedTerm before) $ Patch.before patch
       after = maybe "" (applyAttribute afterAttribute . change "+" . unifiedTerm after) $ Patch.after patch
 
-    format string = chunk string & fore red & bold
-
     beforeAttribute = Attribute { colour = Red, style = Bold }
     afterAttribute = Attribute { colour = Green, style = Bold }
 
