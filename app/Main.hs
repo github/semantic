@@ -70,23 +70,23 @@ parseTreeSitterFile file = do
 documentToTerm :: Ptr TSDocument -> String -> IO (Term String Info)
 documentToTerm document contents = alloca $ \root -> do
   ts_document_root_node_p document root
-  toTerm root where
-    toTerm :: Ptr TSNode -> IO (Term String Info)
+  snd <$> toTerm root where
+    toTerm :: Ptr TSNode -> IO (String, Term String Info)
     toTerm node = do
       name <- ts_node_p_name node document
       name <- peekCString name
       children <- withNamedChildren node toTerm
       range <- range node
       annotation <- return . Info range $ singleton name
-      return $ annotation :< case children of
+      return (name, annotation :< case children of
         [] -> Leaf $ substring range contents
-        _ | member name fixedProductions -> Fixed children
-        _ | otherwise -> Indexed children
+        _ | member name fixedProductions -> Fixed $ fmap snd children
+        _ | otherwise -> Indexed $ fmap snd children)
 
 keyedProductions = fromList [ "object" ]
 fixedProductions = fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
-withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO a) -> IO [a]
+withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO (String, a)) -> IO [(String, a)]
 withNamedChildren node transformNode = do
   count <- ts_node_p_named_child_count node
   if count == 0
