@@ -2,9 +2,9 @@ module SES where
 
 import Patch
 import Diff
+import Term
 import Control.Monad.Free
 import Control.Comonad.Cofree
-import Term
 
 type Compare a annotation = Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
 type Cost a annotation = Diff a annotation -> Integer
