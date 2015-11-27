@@ -15,9 +15,7 @@ ses :: Compare a annotation -> Cost a annotation -> [Term a annotation] -> [Term
 ses _ _ [] b = (Pure . Insert) <$> b
 ses _ _ a [] = (Pure . Delete) <$> a
 ses diffTerms cost (a : as) (b : bs) = case diffTerms a b of
-  Just f -> minimumBy (comparing sumCost) [ delete, insert, copy ]
-    where
-      copy = f : ses diffTerms cost as bs
+  Just f -> minimumBy (comparing sumCost) [ delete, insert, copy f ]
   Nothing -> minimumBy (comparing sumCost) [ delete, insert ]
   where
     delete = (Pure . Delete $ a) : ses diffTerms cost as (b : bs)
@@ -25,3 +23,4 @@ ses diffTerms cost (a : as) (b : bs) = case diffTerms a b of
     deleteCost = sumCost delete
     insertCost = sumCost insert
     sumCost a = sum $ cost <$> a
+    copy head = head : ses diffTerms cost as bs
