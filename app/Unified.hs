@@ -10,6 +10,7 @@ import Control.Monad.Free
 import Control.Comonad.Cofree
 import Data.List hiding (foldl)
 import qualified Data.Map as Map
+import Rainbow
 
 unified :: Diff a Info -> String -> String -> String
 unified diff before after =
@@ -25,6 +26,8 @@ unified diff before after =
     unifiedPatch patch = before ++ after where
       before = maybe "" (applyAttribute beforeAttribute . change "-" . unifiedTerm before) $ Patch.before patch
       after = maybe "" (applyAttribute afterAttribute . change "+" . unifiedTerm after) $ Patch.after patch
+
+    format string = chunk string & fore red & bold
 
     beforeAttribute = Attribute { colour = Red, style = Bold }
     afterAttribute = Attribute { colour = Green, style = Bold }
