@@ -28,9 +28,6 @@ unified diff before after = do
       beforeChunk = maybe (chunk "") (change "-" . unifiedTerm before) $ Patch.before patch
       afterChunk = maybe (chunk "") (change "+" . unifiedTerm after) $ Patch.after patch
 
-    beforeAttribute = Attribute { colour = Red, style = Bold }
-    afterAttribute = Attribute { colour = Green, style = Bold }
-
     unifiedTerm :: String -> Term a Info -> Chunk String
     unifiedTerm source term = fst $ cata f term
 
