@@ -17,7 +17,7 @@ unified diff before after = do
   return . mconcat . chunksToByteStrings renderer . pure . fst $ iter g mapped where
     mapped = fmap (unifiedPatch &&& range) diff
     g (Annotated (_, info) syntax) = f info syntax
-    f (Info range _) (Leaf _) = (substring range after, Just range)
+    f (Info range _) (Leaf _) = (chunk $ substring range after, Just range)
     f (Info range _) (Indexed i) = (unifiedRange range i after, Just range)
     f (Info range _) (Fixed f) = (unifiedRange range f after, Just range)
     f (Info range _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) after, Just range)
@@ -31,13 +31,13 @@ unified diff before after = do
     unifiedTerm source term = fst $ cata f term
 
     unifiedRange :: Range -> [(Chunk String, Maybe Range)] -> String -> Chunk String
-    unifiedRange range children source = out <> substring Range { start = previous, end = end range } after where
+    unifiedRange range children source = out <> (chunk $ substring Range { start = previous, end = end range } after) where
       (out, previous) = foldl accumulateContext (chunk "", start range) children
-      accumulateContext (out, previous) (child, Just range) = (mconcat [ out, substring Range { start = previous, end = start range } source, child ], end range)
+      accumulateContext (out, previous) (child, Just range) = (mconcat [ out, chunk $ substring Range { start = previous, end = start range } source, child ], end range)
       accumulateContext (out, previous) (child, _) = (out <> child, previous)
 
-substring :: Range -> String -> Chunk String
-substring range = chunk . take (end range) . drop (start range)
+substring :: Range -> String -> String
+substring range = take (end range) . drop (start range)
 
 range :: Patch (Term a Info) -> Maybe Range
 range patch = range . extract <$> after patch where
