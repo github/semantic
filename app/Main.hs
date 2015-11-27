@@ -113,6 +113,3 @@ range node = do
 files (a : as) = (a, file as) where
   file (a : as) = a
 files [] = error "expected two files to diff"
-
-substring :: Range -> String -> String
-substring range = take (end range) . drop (start range)
