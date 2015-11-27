@@ -25,10 +25,11 @@ constructAndRun _ a b | a == b = hylo introduce eliminate <$> zipTerms a b where
 constructAndRun comparable a b | not $ comparable a b = Nothing
 constructAndRun comparable (annotation1 :< a) (annotation2 :< b) =
   run comparable $ algorithm a b where
-    algorithm (Indexed a) (Indexed b) = Free $ ByIndex a b (Pure . Free . Annotated (annotation1, annotation2) . Indexed)
-    algorithm (Keyed a) (Keyed b) = Free $ ByKey a b (Pure . Free . Annotated (annotation1, annotation2) . Keyed)
-    algorithm (Leaf a) (Leaf b) | a == b = Pure . Free . Annotated (annotation1, annotation2) $ Leaf b
+    algorithm (Indexed a') (Indexed b') = Free $ ByIndex a' b' (annotate . Indexed)
+    algorithm (Keyed a) (Keyed b) = Free $ ByKey a b (annotate . Keyed)
+    algorithm (Leaf a) (Leaf b) | a == b = annotate $ Leaf b
     algorithm a b = Free $ Recursive (annotation1 :< a) (annotation2 :< b) Pure
+    annotate = Pure . Free . Annotated (annotation1, annotation2)
 
 run :: (Eq a, Eq annotation) => Comparable a annotation -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
 run _ (Pure diff) = Just diff
