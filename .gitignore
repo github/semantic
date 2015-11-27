@@ -5,3 +5,4 @@ xcuserdata
 *.xcuserdatad
 *.xccheckout
 .stack-work
+libbridge.dylib
