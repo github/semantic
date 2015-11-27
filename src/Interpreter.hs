@@ -41,6 +41,7 @@ run comparable (Free (Recursive (annotation1 :< a) (annotation2 :< b) f)) = run 
       repack key = (key, interpretInBoth key a' b')
       interpretInBoth key a' b' = maybeInterpret (Data.Map.lookup key a') (Data.Map.lookup key b')
       maybeInterpret (Just a) (Just b) = interpret comparable a b
+      maybeInterpret _ _ = error "maybeInterpret assumes that its operands are `Just`s."
   recur _ _ = Pure $ Replace (annotation1 :< a) (annotation2 :< b)
 
 run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
