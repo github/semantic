@@ -10,6 +10,7 @@ import Term
 import Control.Monad.Free
 import Control.Comonad.Cofree
 import Data.Map
+import Data.Maybe
 
 hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
 hylo down up a = down annotation $ hylo down up <$> syntax where
@@ -55,6 +56,4 @@ run comparable (Free (ByIndex a b f)) = run comparable . f $ ses (constructAndRu
 type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
 
 interpret :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
-interpret comparable a b = maybeReplace $ constructAndRun comparable a b where
-  maybeReplace (Just a) = a
-  maybeReplace Nothing = Pure $ Replace a b
+interpret comparable a b = fromMaybe (Pure $ Replace a b) $ constructAndRun comparable a b
