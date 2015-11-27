@@ -52,7 +52,7 @@ run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
   inserted = (Pure . Insert) <$> difference b a
   patched = intersectionWith (interpret comparable) a b
 
-run comparable (Free (ByIndex a b f)) = run comparable . f $ ses (constructAndRun comparable) cost a b
+run comparable (Free (ByIndex a b f)) = run comparable . f $ ses (constructAndRun comparable) diffCost a b
 
 type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
 
