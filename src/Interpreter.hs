@@ -1,15 +1,16 @@
 module Interpreter (interpret, Comparable) where
 
 import Algorithm
-import Control.Monad.Free
-import Control.Comonad.Cofree
-import Operation
 import Diff
-import Syntax
-import Data.Map
+import Operation
 import Patch
 import SES
+import Syntax
 import Term
+import Control.Monad.Free
+import Control.Comonad.Cofree
+import Data.Map
+import Data.Maybe
 
 hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
 hylo down up a = down annotation $ hylo down up <$> syntax where
@@ -33,16 +34,17 @@ run :: (Eq a, Eq annotation) => Comparable a annotation -> Algorithm a annotatio
 run _ (Pure diff) = Just diff
 
 run comparable (Free (Recursive (annotation1 :< a) (annotation2 :< b) f)) = run comparable . f $ recur a b where
-  recur (Indexed a') (Indexed b') | length a' == length b' =
-    Free . Annotated (annotation1, annotation2) . Indexed $ zipWith (interpret comparable) a' b'
-  recur (Fixed a') (Fixed b') | length a' == length b' =
-    Free . Annotated (annotation1, annotation2) . Fixed $ zipWith (interpret comparable) a' b'
-  recur (Keyed a') (Keyed b') | keys a' == keys b' =
-    Free . Annotated (annotation1, annotation2) . Keyed . fromList . fmap repack $ keys b' where
+  recur (Indexed a') (Indexed b') | length a' == length b' = annotate . Indexed $ zipWith (interpret comparable) a' b'
+  recur (Fixed a') (Fixed b') | length a' == length b' = annotate . Fixed $ zipWith (interpret comparable) a' b'
+  recur (Keyed a') (Keyed b') | keys a' == keys b' = annotate . Keyed . fromList . fmap repack $ keys b'
+    where
       repack key = (key, interpretInBoth key a' b')
       interpretInBoth key a' b' = maybeInterpret (Data.Map.lookup key a') (Data.Map.lookup key b')
       maybeInterpret (Just a) (Just b) = interpret comparable a b
+      maybeInterpret _ _ = error "maybeInterpret assumes that its operands are `Just`s."
   recur _ _ = Pure $ Replace (annotation1 :< a) (annotation2 :< b)
+
+  annotate = Free . Annotated (annotation1, annotation2)
 
 run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
   byKey = unions [ deleted, inserted, patched ]
@@ -55,6 +57,4 @@ run comparable (Free (ByIndex a b f)) = run comparable . f $ ses (constructAndRu
 type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
 
 interpret :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
-interpret comparable a b = maybeReplace $ constructAndRun comparable a b where
-  maybeReplace (Just a) = a
-  maybeReplace Nothing = Pure $ Replace a b
+interpret comparable a b = fromMaybe (Pure $ Replace a b) $ constructAndRun comparable a b
