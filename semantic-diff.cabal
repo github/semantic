@@ -38,8 +38,6 @@ executable semantic-diff-exe
                      , semantic-diff
                      , haskell-src
                      , rainbow
-                     , bytestring
-                     , utf8-string
   default-language:    Haskell2010
   other-modules:       Unified
                      , Console
