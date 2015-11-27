@@ -26,9 +26,9 @@ constructAndRun comparable a b | not $ comparable a b = Nothing
 constructAndRun comparable (annotation1 :< a) (annotation2 :< b) =
   run comparable $ algorithm a b where
     algorithm (Indexed a') (Indexed b') = Free $ ByIndex a' b' (annotate . Indexed)
-    algorithm (Keyed a) (Keyed b) = Free $ ByKey a b (annotate . Keyed)
-    algorithm (Leaf a) (Leaf b) | a == b = annotate $ Leaf b
-    algorithm a b = Free $ Recursive (annotation1 :< a) (annotation2 :< b) Pure
+    algorithm (Keyed a') (Keyed b') = Free $ ByKey a' b' (annotate . Keyed)
+    algorithm (Leaf a') (Leaf b') | a' == b' = annotate $ Leaf b'
+    algorithm a' b' = Free $ Recursive (annotation1 :< a') (annotation2 :< b') Pure
     annotate = Pure . Free . Annotated (annotation1, annotation2)
 
 run :: (Eq a, Eq annotation) => Comparable a annotation -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
@@ -40,8 +40,8 @@ run comparable (Free (Recursive (annotation1 :< a) (annotation2 :< b) f)) = run 
   recur (Keyed a') (Keyed b') | keys a' == keys b' = annotate . Keyed . fromList . fmap repack $ keys b'
     where
       repack key = (key, interpretInBoth key a' b')
-      interpretInBoth key a' b' = maybeInterpret (Data.Map.lookup key a') (Data.Map.lookup key b')
-      maybeInterpret (Just a) (Just b) = interpret comparable a b
+      interpretInBoth key x y = maybeInterpret (Data.Map.lookup key x) (Data.Map.lookup key y)
+      maybeInterpret (Just x) (Just y) = interpret comparable x y
       maybeInterpret _ _ = error "maybeInterpret assumes that its operands are `Just`s."
   recur _ _ = Pure $ Replace (annotation1 :< a) (annotation2 :< b)
 
