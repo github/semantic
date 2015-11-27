@@ -4,7 +4,6 @@ import Patch
 import Diff
 import Term
 import Control.Monad.Free
-import Control.Comonad.Cofree
 import Data.Foldable (minimumBy)
 import Data.Ord (comparing)
 
