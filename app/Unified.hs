@@ -37,7 +37,7 @@ unified diff before after = do
       accumulateContext (out, previous) (child, _) = (out <> child, previous)
 
 substring :: Range -> String -> String
-substring range = take (end range) . drop (start range)
+substring range = take (end range - start range) . drop (start range)
 
 range :: Patch (Term a Info) -> Maybe Range
 range patch = range . extract <$> after patch where
