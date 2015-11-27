@@ -38,6 +38,8 @@ executable semantic-diff-exe
                      , semantic-diff
                      , haskell-src
   default-language:    Haskell2010
+  other-modules:       Unified
+                     , Console
 
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
