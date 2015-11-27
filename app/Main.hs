@@ -1,6 +1,8 @@
 module Main where
 
+import Categorizable
 import Diff
+import Interpreter
 import Patch
 import Term
 import Syntax
@@ -52,7 +54,7 @@ main = do
   let (a, b) = files args in do
     a' <- parseTreeSitterFile a
     b' <- parseTreeSitterFile b
-    return (a', b')
+    return $ interpret comparable a' b'
   return ()
 
 parseTreeSitterFile :: FilePath -> IO (Term String Info)
