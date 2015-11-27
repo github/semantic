@@ -4,8 +4,8 @@ import Categorizable
 import Diff
 import Interpreter
 import Patch
-import Term
 import Syntax
+import Term
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfoldM)
 import qualified Data.Map as Map
