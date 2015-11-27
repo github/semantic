@@ -1,6 +1,5 @@
 module Unified (unified) where
 
-import Console
 import Diff
 import Patch
 import Syntax
