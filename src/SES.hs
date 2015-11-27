@@ -18,7 +18,6 @@ ses diffTerms cost (a : as) (b : bs) = case diffTerms a b of
   Just f -> minimumBy (comparing sumCost) [ delete, insert, copy ]
     where
       copy = f : ses diffTerms cost as bs
-      copyCost = sumCost copy
   Nothing -> minimumBy (comparing sumCost) [ delete, insert ]
   where
     delete = (Pure . Delete $ a) : ses diffTerms cost as (b : bs)
