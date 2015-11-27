@@ -15,7 +15,7 @@ zipTerms :: Term a annotation -> Term a annotation -> Maybe (Term a (annotation,
 zipTerms (annotation1 :< a) (annotation2 :< b) = annotate $ zipUnwrap a b
   where
     annotate = fmap ((annotation1, annotation2) :<)
-    zipUnwrap (Leaf a) (Leaf b) = Just $ Leaf b
+    zipUnwrap (Leaf _) (Leaf b) = Just $ Leaf b
     zipUnwrap (Indexed a) (Indexed b) = Just . Indexed . catMaybes $ zipWith zipTerms a b
     zipUnwrap (Fixed a) (Fixed b) = Just . Fixed . catMaybes $ zipWith zipTerms a b
     zipUnwrap (Keyed a) (Keyed b) | keys a == keys b = Just . Keyed . fromList . catMaybes $ zipUnwrapMaps a b <$> keys a
