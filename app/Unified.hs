@@ -23,7 +23,7 @@ unified diff before after = do
     f (Info range _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) after, Just range)
 
     unifiedPatch :: Patch (Term a Info) -> Chunk String
-    unifiedPatch patch = mappend (beforeChunk & fore red & bold) (afterChunk & fore green & bold) where
+    unifiedPatch patch = (beforeChunk & fore red & bold) <> (afterChunk & fore green & bold) where
       beforeChunk = maybe (chunk "") (change "-" . unifiedTerm before) $ Patch.before patch
       afterChunk = maybe (chunk "") (change "+" . unifiedTerm after) $ Patch.after patch
 
@@ -31,10 +31,10 @@ unified diff before after = do
     unifiedTerm source term = fst $ cata f term
 
     unifiedRange :: Range -> [(Chunk String, Maybe Range)] -> String -> Chunk String
-    unifiedRange range children source = mappend out $ substring Range { start = previous, end = end range } after where
+    unifiedRange range children source = out <> substring Range { start = previous, end = end range } after where
       (out, previous) = foldl accumulateContext (chunk "", start range) children
       accumulateContext (out, previous) (child, Just range) = (mconcat [ out, substring Range { start = previous, end = start range } source, child ], end range)
-      accumulateContext (out, previous) (child, _) = (mappend out child, previous)
+      accumulateContext (out, previous) (child, _) = (out <> child, previous)
 
 substring :: Range -> String -> Chunk String
 substring range = chunk . take (end range) . drop (start range)
