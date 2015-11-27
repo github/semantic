@@ -8,7 +8,7 @@ import SES
 import Syntax
 import Term
 import Control.Monad.Free
-import Control.Comonad.Cofree
+import Control.Comonad.Cofree hiding (unwrap)
 import Data.Map
 import Data.Maybe
 
