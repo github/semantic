@@ -15,6 +15,10 @@ data Unified =
   One (Chunk String)
   | Many [Unified]
 
+chunks :: Unified -> [Chunk String]
+chunks (One s) = [s]
+chunks (Many s) = concatMap chunks s
+
 unified :: Diff a Info -> String -> String -> IO ByteString
 unified diff before after = do
   renderer <- byteStringMakerFromEnvironment
