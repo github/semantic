@@ -44,6 +44,8 @@ run comparable (Free (Recursive (annotation1 :< a) (annotation2 :< b) f)) = run 
       maybeInterpret _ _ = error "maybeInterpret assumes that its operands are `Just`s."
   recur _ _ = Pure $ Replace (annotation1 :< a) (annotation2 :< b)
 
+  annotate = Free . Annotated (annotation1, annotation2)
+
 run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
   byKey = unions [ deleted, inserted, patched ]
   deleted = (Pure . Delete) <$> difference a b
