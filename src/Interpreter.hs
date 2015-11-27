@@ -1,15 +1,15 @@
 module Interpreter (interpret, Comparable) where
 
 import Algorithm
-import Control.Monad.Free
-import Control.Comonad.Cofree
-import Operation
 import Diff
-import Syntax
-import Data.Map
+import Operation
 import Patch
 import SES
+import Syntax
 import Term
+import Control.Monad.Free
+import Control.Comonad.Cofree
+import Data.Map
 
 hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
 hylo down up a = down annotation $ hylo down up <$> syntax where
