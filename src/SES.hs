@@ -20,4 +20,4 @@ ses diffTerms cost (a : as) (b : bs) = case diffTerms a b of
     delete = (Pure . Delete $ a) : ses diffTerms cost as (b : bs)
     insert = (Pure . Insert $ b) : ses diffTerms cost (a : as) bs
     sumCost script = sum $ cost <$> script
-    copy head = head : ses diffTerms cost as bs
+    copy diff = diff : ses diffTerms cost as bs
