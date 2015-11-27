@@ -15,4 +15,4 @@ data Syntax
   | Fixed [f]
   -- | A branch of child nodes indexed by some String identity. This is useful for identifying e.g. methods & properties in a class scope by their names. Note that comments can generally occur in these scopes as well; one strategy for dealing with this is to identify comments by their text in the source.
   | Keyed (Map String f)
-  deriving (Functor, Show, Eq)
+  deriving (Functor, Show, Eq, Foldable, Traversable)
