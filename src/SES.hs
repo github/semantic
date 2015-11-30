@@ -37,3 +37,4 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
       return []
   where
     sumCost script = sum $ cost <$> script
+    best options = minimumBy (comparing sumCost) options
