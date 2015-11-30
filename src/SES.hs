@@ -28,4 +28,6 @@ diffAt :: (Integer, Integer) -> [Term String Info] -> [Term String Info] -> Stat
 diffAt _ [] [] = return []
 diffAt (i, j) [] bs = return $ (Pure . Insert) <$> bs
 diffAt (i, j) as [] = return $ (Pure . Delete) <$> as
-diffAt (i, j) as bs = _
+diffAt (i, j) as bs = do
+  state <- get
+  return _
