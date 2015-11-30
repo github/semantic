@@ -25,7 +25,7 @@ ses diffTerms cost (a : as) (b : bs) = case diffTerms a b of
     sumCost script = sum $ cost <$> script
     copy diff = diff : ses diffTerms cost as bs
 
-diffAt :: Compare String Info -> Cost String Info -> (Integer, Integer) -> [Term String Info] -> [Term String Info] -> State (Map.Map (Integer, Integer) [(Diff String Info, Integer)]) [(Diff String Info, Integer)]
+diffAt :: Compare a annotation -> Cost a annotation -> (Integer, Integer) -> [Term a annotation] -> [Term a annotation] -> State (Map.Map (Integer, Integer) [(Diff a annotation, Integer)]) [(Diff a annotation, Integer)]
 diffAt _ _ _ [] [] = return []
 diffAt _ cost _ [] bs = return $ foldr toInsertions [] bs where
   toInsertions each rest = consWithCost cost (Pure . Insert $ each) rest
