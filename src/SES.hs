@@ -34,7 +34,7 @@ diffAt _ cost _ as [] = return $ foldr toDeletions [] as where
 diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
   cachedDiffs <- get
   case Map.lookup (i, j) cachedDiffs of
-    Just diffs -> return $ diffs
+    Just diffs -> return diffs
     Nothing -> do
       put $ Map.insert (i, j) [] cachedDiffs
       return []
