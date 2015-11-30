@@ -32,4 +32,6 @@ diffAt (i, j) as bs = do
   state <- get
   maybe $ (compute state) (return . fmap fst) $ fetch state where
     fetch state = Map.lookup (i, j) state
-    compute state = _
+    compute state = do
+      put $ Map.insert (i, j) []
+      return []
