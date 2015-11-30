@@ -6,6 +6,7 @@ import Term
 import Control.Monad.Free
 import Control.Monad.State
 import Data.Foldable (minimumBy)
+import Data.List (uncons)
 import qualified Data.Map as Map
 import Data.Ord (comparing)
 
@@ -42,3 +43,6 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
     sumCost script = sum $ snd <$> script
     best options = minimumBy (comparing sumCost) options
     recur = diffAt diffTerms cost
+
+consWithCost :: Cost a annotation -> Diff a annotation -> [(Diff a annotation, Integer)] -> [(Diff a annotation, Integer)]
+consWithCost cost diff rest = (diff, cost diff + (maybe 0 snd $ fst <$> uncons rest)) : rest
