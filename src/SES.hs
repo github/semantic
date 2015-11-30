@@ -14,16 +14,8 @@ type Compare a annotation = Term a annotation -> Term a annotation -> Maybe (Dif
 type Cost a annotation = Diff a annotation -> Integer
 
 ses :: Compare a annotation -> Cost a annotation -> [Term a annotation] -> [Term a annotation] -> [Diff a annotation]
-ses _ _ [] b = (Pure . Insert) <$> b
-ses _ _ a [] = (Pure . Delete) <$> a
-ses diffTerms cost (a : as) (b : bs) = case diffTerms a b of
-  Just f -> minimumBy (comparing sumCost) [ delete, insert, copy f ]
-  Nothing -> minimumBy (comparing sumCost) [ delete, insert ]
-  where
-    delete = (Pure . Delete $ a) : ses diffTerms cost as (b : bs)
-    insert = (Pure . Insert $ b) : ses diffTerms cost (a : as) bs
-    sumCost script = sum $ cost <$> script
-    copy diff = diff : ses diffTerms cost as bs
+ses diffTerms cost as bs = fmap fst $ evalState diffState Map.empty where
+  diffState = diffAt diffTerms cost (0, 0) as bs
 
 diffAt :: Compare a annotation -> Cost a annotation -> (Integer, Integer) -> [Term a annotation] -> [Term a annotation] -> State (Map.Map (Integer, Integer) [(Diff a annotation, Integer)]) [(Diff a annotation, Integer)]
 diffAt _ _ _ [] [] = return []
