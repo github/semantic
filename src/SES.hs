@@ -35,3 +35,5 @@ diffAt (i, j) cost (a : as) (b : bs) = do
     Nothing -> do
       put $ Map.insert (i, j) [] cachedDiffs
       return []
+  where
+    sumCost script = sum $ cost <$> script
