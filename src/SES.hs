@@ -27,8 +27,10 @@ ses diffTerms cost (a : as) (b : bs) = case diffTerms a b of
 
 diffAt :: Compare String Info -> Cost String Info -> (Integer, Integer) -> [Term String Info] -> [Term String Info] -> State (Map.Map (Integer, Integer) [(Diff String Info, Integer)]) [(Diff String Info, Integer)]
 diffAt _ _ _ [] [] = return []
-diffAt _ _ _ [] bs = return $ (Pure . Insert) <$> bs
-diffAt _ _ _ as [] = return $ (Pure . Delete) <$> as
+diffAt _ cost _ [] bs = return $ foldr toInsertions [] bs where
+  toInsertions each rest = consWithCost cost (Pure . Insert $ each) rest
+diffAt _ cost _ as [] = return $ foldr toDeletions [] as where
+  toDeletions each rest = consWithCost cost (Pure . Delete $ each) rest
 diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
   cachedDiffs <- get
   case Map.lookup (i, j) cachedDiffs of
