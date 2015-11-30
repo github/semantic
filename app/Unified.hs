@@ -16,11 +16,11 @@ unified diff before after = do
   renderer <- byteStringMakerFromEnvironment
   return . mconcat . chunksToByteStrings renderer . fst $ iter g mapped where
     mapped = fmap (unifiedPatch &&& range) diff
-    g (Annotated (_, info) syntax) = annotationAndSyntaxToChunks info syntax
-    annotationAndSyntaxToChunks (Info range _) (Leaf _) = (pure . chunk $ substring range after, Just range)
-    annotationAndSyntaxToChunks (Info range _) (Indexed i) = (unifiedRange range i after, Just range)
-    annotationAndSyntaxToChunks (Info range _) (Fixed f) = (unifiedRange range f after, Just range)
-    annotationAndSyntaxToChunks (Info range _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) after, Just range)
+    g (Annotated (_, info) syntax) = annotationAndSyntaxToChunks after info syntax
+    annotationAndSyntaxToChunks source (Info range _) (Leaf _) = (pure . chunk $ substring range source, Just range)
+    annotationAndSyntaxToChunks source (Info range _) (Indexed i) = (unifiedRange range i source, Just range)
+    annotationAndSyntaxToChunks source (Info range _) (Fixed f) = (unifiedRange range f source, Just range)
+    annotationAndSyntaxToChunks source (Info range _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) source, Just range)
 
     unifiedPatch :: Patch (Term a Info) -> [Chunk String]
     unifiedPatch patch = (fore red . bold <$> beforeChunk) <> (fore green . bold <$> afterChunk) where
@@ -28,7 +28,7 @@ unified diff before after = do
       afterChunk = maybe [] (change "+" . unifiedTerm after) $ Patch.after patch
 
     unifiedTerm :: String -> Term a Info -> [Chunk String]
-    unifiedTerm source term = fst $ cata annotationAndSyntaxToChunks term
+    unifiedTerm source term = fst $ cata (annotationAndSyntaxToChunks source) term
 
     unifiedRange :: Range -> [([Chunk String], Maybe Range)] -> String -> [Chunk String]
     unifiedRange range children source = out <> (pure . chunk $ substring Range { start = previous, end = end range } after) where
