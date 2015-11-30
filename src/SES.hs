@@ -36,8 +36,15 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
   case Map.lookup (i, j) cachedDiffs of
     Just diffs -> return diffs
     Nothing -> do
-      put $ Map.insert (i, j) [] cachedDiffs
-      return []
+      down <- recur (i, succ j) as (b : bs)
+      right <- recur (succ i, j) (a : as) bs
+      nomination <- fmap best $ case diffTerms a b of
+        Just diff -> do
+          diagonal <- recur (succ i, succ j) as bs
+          return $ [ delete down, insert right, consWithCost cost diff diagonal ]
+        Nothing -> return [ delete down, insert right ]
+      put $ Map.insert (i, j) nomination cachedDiffs
+      return nomination
   where
     delete = consWithCost cost (Pure . Delete $ a)
     insert = consWithCost cost (Pure . Insert $ b)
