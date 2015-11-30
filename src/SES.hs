@@ -30,4 +30,6 @@ diffAt (i, j) [] bs = return $ (Pure . Insert) <$> bs
 diffAt (i, j) as [] = return $ (Pure . Delete) <$> as
 diffAt (i, j) as bs = do
   state <- get
-  return _
+  return . maybe $ (compute state) (fmap fst) $ fetch state where
+    fetch state = Map.lookup (i, j) state
+    compute state = _
