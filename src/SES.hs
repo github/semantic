@@ -36,5 +36,5 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
       put $ Map.insert (i, j) [] cachedDiffs
       return []
   where
-    sumCost script = sum $ cost <$> script
+    sumCost script = sum $ snd <$> script
     best options = minimumBy (comparing sumCost) options
