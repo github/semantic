@@ -41,7 +41,6 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
   where
     delete = consWithCost cost (Pure . Delete $ a)
     insert = consWithCost cost (Pure . Insert $ b)
-    copy diff = (id &&& cost) diff
     sumCost script = sum $ snd <$> script
     best options = minimumBy (comparing sumCost) options
     recur = diffAt diffTerms cost
