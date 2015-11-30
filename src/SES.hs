@@ -37,8 +37,8 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
       put $ Map.insert (i, j) [] cachedDiffs
       return []
   where
-    delete = (id &&& cost) (Pure . Delete $ a)
-    insert = (id &&& cost) (Pure . Insert $ b)
+    delete = consWithCost cost (Pure . Delete $ a)
+    insert = consWithCost cost (Pure . Insert $ b)
     copy diff = (id &&& cost) diff
     sumCost script = sum $ snd <$> script
     best options = minimumBy (comparing sumCost) options
