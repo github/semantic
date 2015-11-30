@@ -24,11 +24,11 @@ ses diffTerms cost (a : as) (b : bs) = case diffTerms a b of
     sumCost script = sum $ cost <$> script
     copy diff = diff : ses diffTerms cost as bs
 
-diffAt :: (Integer, Integer) -> [Term String Info] -> [Term String Info] -> State (Map.Map (Integer, Integer) [(Diff String Info, Integer)]) [Diff String Info]
-diffAt _ [] [] = return []
-diffAt _ [] bs = return $ (Pure . Insert) <$> bs
-diffAt _ as [] = return $ (Pure . Delete) <$> as
-diffAt (i, j) (a : as) (b : bs) = do
+diffAt :: (Integer, Integer) -> Cost String Info -> [Term String Info] -> [Term String Info] -> State (Map.Map (Integer, Integer) [(Diff String Info, Integer)]) [Diff String Info]
+diffAt _ _ [] [] = return []
+diffAt _ _ [] bs = return $ (Pure . Insert) <$> bs
+diffAt _ _ as [] = return $ (Pure . Delete) <$> as
+diffAt (i, j) cost (a : as) (b : bs) = do
   cachedDiffs <- get
   case Map.lookup (i, j) cachedDiffs of
     Just diffs -> return $ fmap fst diffs
