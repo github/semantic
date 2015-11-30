@@ -35,7 +35,8 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
           diagonal <- recur (succ i, succ j) as bs
           return $ [ delete down, insert right, consWithCost cost diff diagonal ]
         Nothing -> return [ delete down, insert right ]
-      put $ Map.insert (i, j) nomination cachedDiffs
+      cachedDiffs' <- get
+      put $ Map.insert (i, j) nomination cachedDiffs'
       return nomination
   where
     delete = consWithCost cost (Pure . Delete $ a)
