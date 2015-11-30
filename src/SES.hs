@@ -28,7 +28,7 @@ diffAt :: (Integer, Integer) -> [Term String Info] -> [Term String Info] -> Stat
 diffAt _ [] [] = return []
 diffAt _ [] bs = return $ (Pure . Insert) <$> bs
 diffAt _ as [] = return $ (Pure . Delete) <$> as
-diffAt (i, j) as bs = do
+diffAt (i, j) (a : as) (b : bs) = do
   state <- get
   case Map.lookup (i, j) state of
     Just diffs -> return $ fmap fst diffs
