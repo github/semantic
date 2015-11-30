@@ -4,7 +4,9 @@ import Patch
 import Diff
 import Term
 import Control.Monad.Free
+import Control.Monad.State
 import Data.Foldable (minimumBy)
+import Data.Map
 import Data.Ord (comparing)
 
 type Compare a annotation = Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
@@ -21,3 +23,6 @@ ses diffTerms cost (a : as) (b : bs) = case diffTerms a b of
     insert = (Pure . Insert $ b) : ses diffTerms cost (a : as) bs
     sumCost script = sum $ cost <$> script
     copy diff = diff : ses diffTerms cost as bs
+
+diffAt :: (Integer, Integer) -> [(Term String Info)] -> [(Term String Info)] -> State (Map (Integer, Integer) [(Diff String Info, Integer)]) [Diff String Info]
+diffAt (i, j) as bs = _
