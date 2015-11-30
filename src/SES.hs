@@ -29,9 +29,9 @@ diffAt _ [] [] = return []
 diffAt _ [] bs = return $ (Pure . Insert) <$> bs
 diffAt _ as [] = return $ (Pure . Delete) <$> as
 diffAt (i, j) (a : as) (b : bs) = do
-  state <- get
-  case Map.lookup (i, j) state of
+  cachedDiffs <- get
+  case Map.lookup (i, j) cachedDiffs of
     Just diffs -> return $ fmap fst diffs
     Nothing -> do
-      put $ Map.insert (i, j) [] state
+      put $ Map.insert (i, j) [] cachedDiffs
       return []
