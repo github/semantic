@@ -25,4 +25,5 @@ ses diffTerms cost (a : as) (b : bs) = case diffTerms a b of
     copy diff = diff : ses diffTerms cost as bs
 
 diffAt :: (Integer, Integer) -> [Term String Info] -> [Term String Info] -> State (Map.Map (Integer, Integer) [(Diff String Info, Integer)]) [Diff String Info]
+diffAt _ [] [] = return []
 diffAt (i, j) as bs = _
