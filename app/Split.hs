@@ -6,6 +6,7 @@ import Syntax
 import Term
 import Unified
 import Control.Comonad.Cofree
+import Control.Monad.Free
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import Rainbow
@@ -24,14 +25,18 @@ data HTML =
 split :: Diff a Info -> String -> String -> IO ByteString
 split _ _ _ = return mempty
 
-splitDiff :: Diff a Info -> String -> String -> [(String, String)]
-splitDiff _ _ _ = []
+splitDiff :: Diff a Info -> String -> String -> (Maybe (HTML, Range), Maybe (HTML, Range))
+splitDiff diff before after = iter toElements $ fmap (splitPatch before after) diff
+  where
+    toElements (Annotated (left, right) (Leaf _)) = (Just $ leafToElement before left, Just $ leafToElement after right)
 
-splitPatch :: String -> String -> Patch (Term a Info) -> (Maybe HTML, Maybe HTML)
+    leafToElement source (Info range _ categories) = (Span (classify categories) $ substring range source, range)
+
+splitPatch :: String -> String -> Patch (Term a Info) -> (Maybe (HTML, Range), Maybe (HTML, Range))
 splitPatch before after patch = (fmap (splitTerm before) $ Patch.before patch, fmap (splitTerm after) $ Patch.after patch)
 
-splitTerm :: String -> Term a Info -> HTML
-splitTerm source term = fst $ cata toElement term where
+splitTerm :: String -> Term a Info -> (HTML, Range)
+splitTerm source term = cata toElement term where
   toElement (Info range lineRange categories) (Leaf _) = (Span (classify categories) $ substring range source, range)
   toElement (Info range lineRange categories) (Indexed i) = makeList i range categories
   toElement (Info range lineRange categories) (Fixed i) = makeList i range categories
