@@ -33,6 +33,7 @@ splitTerm :: String -> Term a Info -> HTML
 splitTerm source term = fst $ cata toElement term where
   toElement (Info range lineRange categories) (Leaf _) = (Span (classify categories) $ substring range source, range)
   toElement (Info range lineRange categories) (Indexed i) = makeList i range categories
+  toElement (Info range lineRange categories) (Fixed i) = makeList i range categories
 
   accumulate (children, previous) (child, range) = (children ++ [ subtext previous $ start range, child ], end range)
 
