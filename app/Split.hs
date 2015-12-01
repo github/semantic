@@ -30,8 +30,11 @@ splitPatch :: String -> String -> Patch (Term a Info) -> (Maybe HTML, Maybe HTML
 splitPatch before after patch = (fmap (splitTerm before) $ Patch.before patch, fmap (splitTerm after) $ Patch.after patch)
 
 splitTerm :: String -> Term a Info -> HTML
-splitTerm source term = cata toElement term where
-  toElement (Info range lineRange categories) (Leaf _) = Span (classify categories) $ substring range source
+splitTerm source term = fst $ cata toElement term where
+  toElement (Info range lineRange categories) (Leaf _) = (Span (classify categories) $ substring range source, range)
+  toElement (Info range lineRange categories) (Indexed i) = (Ul (classify categories) $ children ++ [ Text $ substring Range { start = previous, end = end range } source ], range) where
+    (children, previous) = foldl accumulate ([], start range) i
+  accumulate (children, previous) (child, range) = (children ++ [ Text $ substring Range { start = previous, end = start range } source, child ], end range)
 
 classify :: Set.Set Category -> Maybe ClassName
 classify categories = foldr (const . Just) Nothing categories
