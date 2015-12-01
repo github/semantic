@@ -1,6 +1,6 @@
 module Term where
 
-import Data.Map
+import Data.Map hiding (size)
 import Data.Maybe
 import Control.Comonad.Cofree
 import Syntax
@@ -20,3 +20,10 @@ zipTerms (annotation1 :< a) (annotation2 :< b) = annotate $ zipUnwrap a b
 
 cata :: (annotation -> Syntax a b -> b) -> Term a annotation -> b
 cata f (annotation :< syntax) = f annotation $ cata f <$> syntax
+
+termSize :: Term a annotation -> Integer
+termSize term = cata size term where
+  size _ (Leaf _) = 1
+  size _ (Indexed i) = sum i
+  size _ (Fixed f) = sum f
+  size _ (Keyed k) = sum $ snd <$> toList k
