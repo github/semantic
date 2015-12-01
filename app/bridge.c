@@ -50,3 +50,15 @@ size_t ts_node_p_size_chars(const TSNode *node) {
 	assert(node->data != NULL);
 	return ts_node_size(*node).chars;
 }
+
+size_t ts_node_p_start_point(const TSNode *node) {
+	assert(node != NULL);
+	assert(node->data != NULL);
+	return ts_node_start_point(*node).row;
+}
+
+size_t ts_node_p_end_point(const TSNode *node) {
+	assert(node != NULL);
+	assert(node->data != NULL);
+	return ts_node_end_point(*node).row;
+}

@@ -11,3 +11,6 @@ void ts_node_p_named_child(const TSNode *node, size_t index, TSNode *outNode);
 
 size_t ts_node_p_pos_chars(const TSNode *node);
 size_t ts_node_p_size_chars(const TSNode *node);
+
+size_t ts_node_p_start_point(const TSNode *node);
+size_t ts_node_p_end_point(const TSNode *node);
