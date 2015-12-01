@@ -65,10 +65,9 @@ arguments = Argument
 main :: IO ()
 main = do
   arguments <- execParser opts
-  args <- getArgs
-  output <- let (a, b) = files args in do
-    aContents <- readFile a
-    bContents <- readFile b
+  output <- do
+    aContents <- readFile $ sourceA arguments
+    bContents <- readFile $ sourceB arguments
     aTerm <- parseTreeSitterFile aContents
     bTerm <- parseTreeSitterFile bContents
     unified (interpret comparable aTerm bTerm) aContents bContents
