@@ -64,6 +64,7 @@ arguments = Argument
 
 main :: IO ()
 main = do
+  arguments <- execParser opts
   args <- getArgs
   output <- let (a, b) = files args in do
     aContents <- readFile a
@@ -71,7 +72,9 @@ main = do
     aTerm <- parseTreeSitterFile aContents
     bTerm <- parseTreeSitterFile bContents
     unified (interpret comparable aTerm bTerm) aContents bContents
-  ByteString.putStr output
+  ByteString.putStr output where
+    opts = info (helper <*> arguments)
+      (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
 parseTreeSitterFile :: String -> IO (Term String Info)
 parseTreeSitterFile contents = do
