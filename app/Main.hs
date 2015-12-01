@@ -70,9 +70,10 @@ main = do
     bContents <- readFile $ sourceB arguments
     aTerm <- parseTreeSitterFile aContents
     bTerm <- parseTreeSitterFile bContents
-    case output arguments of
-      Unified -> unified (interpret comparable aTerm bTerm) aContents bContents
-      Split -> return mempty
+    let diff = interpret comparable aTerm bTerm in
+      case output arguments of
+        Unified -> unified diff aContents bContents
+        Split -> return mempty
   ByteString.putStr output where
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
