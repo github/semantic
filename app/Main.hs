@@ -13,7 +13,7 @@ import Control.Monad.Free hiding (unfoldM)
 import qualified Data.Map as Map
 import qualified Data.ByteString.Char8 as ByteString
 import Data.Maybe
-import Data.Set
+import Data.Set hiding (split)
 import Options.Applicative
 import System.Environment
 
