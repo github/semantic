@@ -16,6 +16,7 @@ hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
 hylo down up a = down annotation $ hylo down up <$> syntax where
   (annotation, syntax) = up a
 
+-- | Constructs an algorithm and runs it
 constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
 constructAndRun _ a b | a == b = hylo introduce eliminate <$> zipTerms a b where
   eliminate :: Cofree f a -> (a, f (Cofree f a))
@@ -31,6 +32,7 @@ constructAndRun comparable (annotation1 :< a) (annotation2 :< b) =
     algorithm a' b' = Free $ Recursive (annotation1 :< a') (annotation2 :< b') Pure
     annotate = Pure . Free . Annotated (annotation1, annotation2)
 
+-- | Runs the diff algorithm
 run :: (Eq a, Eq annotation) => Comparable a annotation -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
 run _ (Pure diff) = Just diff
 

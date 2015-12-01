@@ -1,12 +1,17 @@
 module Main where
 
+import Categorizable
 import Diff
+import Interpreter
 import Patch
-import Term
 import Syntax
+import Term
+import Unified
 import Control.Comonad.Cofree
+import Control.Monad
 import Control.Monad.Free hiding (unfoldM)
 import qualified Data.Map as Map
+import qualified Data.ByteString.Char8 as ByteString
 import Data.Maybe
 import Data.Set
 import System.Environment
@@ -49,18 +54,19 @@ foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars ::
 main :: IO ()
 main = do
   args <- getArgs
-  let (a, b) = files args in do
-    a' <- parseTreeSitterFile a
-    b' <- parseTreeSitterFile b
-    return (a', b')
-  return ()
+  output <- let (a, b) = files args in do
+    aContents <- readFile a
+    bContents <- readFile b
+    aTerm <- parseTreeSitterFile aContents
+    bTerm <- parseTreeSitterFile bContents
+    unified (interpret comparable aTerm bTerm) aContents bContents
+  ByteString.putStr output
 
-parseTreeSitterFile :: FilePath -> IO (Term String Info)
-parseTreeSitterFile file = do
+parseTreeSitterFile :: String -> IO (Term String Info)
+parseTreeSitterFile contents = do
   document <- ts_document_make
   language <- ts_language_c
   ts_document_set_language document language
-  contents <- readFile file
   withCString contents (\source -> do
     ts_document_set_input_string document source
     ts_document_parse document
@@ -107,6 +113,3 @@ range node = do
 files (a : as) = (a, file as) where
   file (a : as) = a
 files [] = error "expected two files to diff"
-
-substring :: Range -> String -> String
-substring range = take (end range) . drop (start range)

@@ -15,3 +15,6 @@ before :: Patch a -> Maybe a
 before (Replace a _) = Just a
 before (Delete a) = Just a
 before _ = Nothing
+
+patchSum :: (a -> Integer) -> Patch a -> Integer
+patchSum termCost patch = (maybe 0 termCost $ before patch) + (maybe 0 termCost $ after patch)
