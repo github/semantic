@@ -26,14 +26,14 @@ split :: Diff a Info -> String -> String -> IO ByteString
 split _ _ _ = return mempty
 
 splitDiff :: Diff a Info -> String -> String -> (Maybe (HTML, Range), Maybe (HTML, Range))
-splitDiff diff before after = iter toElements $ fmap (splitPatch before after) diff
+splitDiff diff before after = iter toElements $ splitPatch before after <$> diff
   where
     toElements (Annotated (left, right) (Leaf _)) = (Just $ leafToElement before left, Just $ leafToElement after right)
 
     leafToElement source (Info range _ categories) = (Span (classify categories) $ substring range source, range)
 
 splitPatch :: String -> String -> Patch (Term a Info) -> (Maybe (HTML, Range), Maybe (HTML, Range))
-splitPatch before after patch = (fmap (splitTerm before) $ Patch.before patch, fmap (splitTerm after) $ Patch.after patch)
+splitPatch before after patch = (splitTerm before <$> Patch.before patch, splitTerm after <$> Patch.after patch)
 
 splitTerm :: String -> Term a Info -> (HTML, Range)
 splitTerm source term = cata toElement term where
