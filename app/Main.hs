@@ -14,6 +14,7 @@ import qualified Data.Map as Map
 import qualified Data.ByteString.Char8 as ByteString
 import Data.Maybe
 import Data.Set
+import Options.Applicative
 import System.Environment
 
 import Foreign
@@ -54,6 +55,12 @@ foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars ::
 data Output = Unified | Split
 
 data Argument = Argument { output :: Output, sourceA :: FilePath, sourceB :: FilePath }
+
+arguments :: Parser Argument
+arguments = Argument
+  <$> (flag Split Unified (long "unified" <> help "output a unified diff"))
+  <*> argument str (metavar "FILE a")
+  <*> argument str (metavar "FILE b")
 
 main :: IO ()
 main = do
