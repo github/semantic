@@ -18,6 +18,7 @@ data HTML =
   | Span (Maybe ClassName) String
   | Ul (Maybe ClassName) [HTML]
   | Dl (Maybe ClassName) (Map.Map String HTML)
+  | Dt String
   deriving (Eq, Show)
 
 split :: Diff a Info -> String -> String -> IO ByteString
