@@ -35,6 +35,8 @@ splitTerm source term = fst $ cata toElement term where
   toElement (Info range lineRange categories) (Indexed i) = (Ul (classify categories) $ children ++ [ Text $ substring Range { start = previous, end = end range } source ], range) where
     (children, previous) = foldl accumulate ([], start range) i
   accumulate (children, previous) (child, range) = (children ++ [ Text $ substring Range { start = previous, end = start range } source, child ], end range)
+  subtext :: Int -> Int -> HTML
+  subtext start end = Text $ substring (Range start end) source
 
 classify :: Set.Set Category -> Maybe ClassName
 classify categories = foldr (const . Just) Nothing categories
