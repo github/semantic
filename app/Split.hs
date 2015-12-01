@@ -26,12 +26,12 @@ split _ _ _ = return mempty
 splitDiff :: Diff a Info -> String -> String -> [(String, String)]
 splitDiff _ _ _ = []
 
-splitPatch :: String -> String -> Patch (Term a Info) -> (Maybe (Element a), Maybe (Element a))
+splitPatch :: String -> String -> Patch (Term a Info) -> (Maybe HTML, Maybe HTML)
 splitPatch before after patch = (fmap (splitTerm before) $ Patch.before patch, fmap (splitTerm after) $ Patch.after patch)
 
-splitTerm :: String -> Term a Info -> Element a
-splitTerm source term = toElement term where
-  toElement ((Info range lineRange categories) :< syntax) = (foldr (const . Just) Nothing categories, substring range source) :< fmap toElement syntax
+splitTerm :: String -> Term a Info -> HTML
+splitTerm source term = cata toElement term where
+  toElement (Info range lineRange categories) (Leaf _) = Span (classify categories) $ substring range source
 
 classify :: Set.Set Category -> Maybe ClassName
 classify categories = foldr (const . Just) Nothing categories
