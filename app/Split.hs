@@ -44,6 +44,11 @@ splitTerm source term = fst $ cata toElement term where
       (children, previous) = foldl accumulate ([], start range) i
       items = children ++ [ subtext previous $ end range ]
 
+  makeMap k range categories = (Dl (classify categories) items, range)
+    where
+      (children, previous) = foldl accumulateFromMap ([], start range) k
+      items = children ++ [ subtext previous $ end range ]
+
   subtext :: Int -> Int -> HTML
   subtext start end = Text $ substring (Range start end) source
 
