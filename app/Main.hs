@@ -122,7 +122,3 @@ range node = do
   pos <- ts_node_p_pos_chars node
   size <- ts_node_p_size_chars node
   return Range { start = fromEnum $ toInteger pos, end = (fromEnum $ toInteger pos) + (fromEnum $ toInteger size) }
-
-files (a : as) = (a, file as) where
-  file (a : as) = a
-files [] = error "expected two files to diff"
