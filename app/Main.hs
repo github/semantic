@@ -58,7 +58,8 @@ data Argument = Argument { output :: Output, sourceA :: FilePath, sourceB :: Fil
 
 arguments :: Parser Argument
 arguments = Argument
-  <$> (flag Split Unified (long "unified" <> help "output a unified diff"))
+  <$> (flag Split Unified (long "unified" <> help "output a unified diff")
+  <|> flag' Split (long "split" <> help "output a split diff"))
   <*> argument str (metavar "FILE a")
   <*> argument str (metavar "FILE b")
 
