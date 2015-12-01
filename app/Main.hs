@@ -52,6 +52,8 @@ foreign import ccall "app/bridge.h ts_node_p_named_child_count" ts_node_p_named_
 foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child :: Ptr TSNode -> CSize -> Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_pos_chars" ts_node_p_pos_chars :: Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars :: Ptr TSNode -> IO CSize
+foreign import ccall "app/bridge.h ts_node_p_start_point" ts_node_p_start_point :: Ptr TSNode -> IO CSize
+foreign import ccall "app/bridge.h ts_node_p_end_point" ts_node_p_end_point :: Ptr TSNode -> IO CSize
 
 data Output = Unified | Split
 
@@ -102,7 +104,8 @@ documentToTerm document contents = alloca $ \root -> do
       name <- peekCString name
       children <- withNamedChildren node toTerm
       range <- range node
-      annotation <- return . Info range (Range { start = 0, end = 0 }) $ singleton name
+      lineRange <- getLineRange node
+      annotation <- return . Info range lineRange $ singleton name
       return (name, annotation :< case children of
         [] -> Leaf $ substring range contents
         _ | member name keyedProductions -> Keyed $ Map.fromList children
@@ -127,3 +130,9 @@ range node = do
   pos <- ts_node_p_pos_chars node
   size <- ts_node_p_size_chars node
   return Range { start = fromEnum $ toInteger pos, end = (fromEnum $ toInteger pos) + (fromEnum $ toInteger size) }
+
+getLineRange :: Ptr TSNode -> IO Range
+getLineRange node = do
+  startLine <- ts_node_p_start_point node
+  endLine <- ts_node_p_end_point node
+  return Range { start = fromEnum $ toInteger startLine, end = fromEnum $ toInteger endLine }
