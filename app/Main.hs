@@ -5,6 +5,7 @@ import Diff
 import Interpreter
 import Patch
 import Syntax
+import Split
 import Term
 import Unified
 import Control.Comonad.Cofree
@@ -74,7 +75,7 @@ main = do
     let diff = interpret comparable aTerm bTerm in
       case output arguments of
         Unified -> unified diff aContents bContents
-        Split -> return mempty
+        Split -> split diff aContents bContents
   ByteString.putStr output where
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
