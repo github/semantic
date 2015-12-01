@@ -41,7 +41,7 @@ executable semantic-diff-exe
                      , rainbow
                      , bytestring
   default-language:    Haskell2010
-  other-modules:       Unified
+  other-modules:       Unified, Split
   extra-libraries:     bridge
   extra-lib-dirs:      prototype/External/tree-sitter/out/Release, prototype/External/tree-sitter-c, .
 
