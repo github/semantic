@@ -37,6 +37,7 @@ splitTerm source term = fst $ cata toElement term where
   toElement (Info range lineRange categories) (Fixed i) = makeList i range categories
 
   accumulate (children, previous) (child, range) = (children ++ [ subtext previous $ start range, child ], end range)
+  accumulateFromMap (children, previous) (key, (child, range)) = (children ++ [ subtext previous $ start range, Dt key, child ], end range)
 
   makeList i range categories = (Ul (classify categories) items, range)
     where
