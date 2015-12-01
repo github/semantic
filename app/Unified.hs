@@ -31,7 +31,7 @@ unified diff before after = do
     unifiedTerm source term = fst $ cata (annotationAndSyntaxToChunks source) term
 
     unifiedRange :: Range -> [([Chunk String], Maybe Range)] -> String -> [Chunk String]
-    unifiedRange range children source = out <> (pure . chunk $ substring Range { start = previous, end = end range } after) where
+    unifiedRange range children source = out <> (pure . chunk $ substring Range { start = previous, end = end range } source) where
       (out, previous) = foldl accumulateContext ([], start range) children
       accumulateContext (out, previous) (child, Just range) = (mconcat [ out, pure . chunk $ substring Range { start = previous, end = start range } source, child ], end range)
       accumulateContext (out, previous) (child, _) = (out <> child, previous)
