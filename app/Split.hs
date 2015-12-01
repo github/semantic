@@ -17,7 +17,7 @@ data HTML =
   Text String
   | Span (Maybe ClassName) String
   | Ul (Maybe ClassName) [HTML]
-  | Dl (Maybe ClassName) (Map.Map String HTML)
+  | Dl (Maybe ClassName) [HTML]
   | Dt String
   deriving (Eq, Show)
 
