@@ -22,4 +22,4 @@ splitPatch before after patch = (fmap (splitTerm before) $ Patch.before patch, f
 
 splitTerm :: String -> Term a Info -> Element a
 splitTerm source term = toElement term where
-  toElement ((Info range categories) :< syntax) = (foldr (const . Just) Nothing categories, substring range source) :< fmap toElement syntax
+  toElement ((Info range _ categories) :< syntax) = (foldr (const . Just) Nothing categories, substring range source) :< fmap toElement syntax

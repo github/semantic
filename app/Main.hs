@@ -102,7 +102,7 @@ documentToTerm document contents = alloca $ \root -> do
       name <- peekCString name
       children <- withNamedChildren node toTerm
       range <- range node
-      annotation <- return . Info range $ singleton name
+      annotation <- return . Info range (Range { start = 0, end = 0 }) $ singleton name
       return (name, annotation :< case children of
         [] -> Leaf $ substring range contents
         _ | member name keyedProductions -> Keyed $ Map.fromList children

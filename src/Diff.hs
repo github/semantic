@@ -13,12 +13,13 @@ data Annotated a annotation f = Annotated annotation (Syntax a f)
 data Range = Range { start :: Int, end :: Int }
   deriving (Eq, Show)
 
+
 type Category = String
-data Info = Info Range (Set Category)
+data Info = Info { characterRange:: Range, lineRange ::  Range, categories :: (Set Category) }
   deriving (Eq, Show)
 
 instance Categorizable Info where
-  categories (Info _ c) = c
+  categories info = Diff.categories info
 
 type Diff a annotation = Free (Annotated a (annotation, annotation)) (Patch (Term a annotation))
 
