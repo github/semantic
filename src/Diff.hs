@@ -1,7 +1,6 @@
 module Diff where
 
 import Syntax
-import Data.Map
 import Data.Set
 import Control.Monad.Free
 import Patch
@@ -24,12 +23,7 @@ instance Categorizable Info where
 type Diff a annotation = Free (Annotated a (annotation, annotation)) (Patch (Term a annotation))
 
 diffSum :: (Patch (Term a annotation) -> Integer) -> Diff a annotation -> Integer
-diffSum patchCost diff = iter (c . unwrap) $ fmap patchCost diff where
-  c (Leaf _) = 0
-  c (Keyed xs) = sum $ snd <$> Data.Map.toList xs
-  c (Indexed xs) = sum xs
-  c (Fixed xs) = sum xs
-  unwrap (Annotated _ syntax) = syntax
+diffSum patchCost diff = sum $ fmap patchCost diff
 
 diffCost :: Diff a annotation -> Integer
 diffCost = diffSum $ patchSum termSize
