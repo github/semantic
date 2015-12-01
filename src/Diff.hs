@@ -9,7 +9,7 @@ import Term
 import Categorizable
 
 data Annotated a annotation f = Annotated annotation (Syntax a f)
-  deriving (Functor, Eq, Show)
+  deriving (Functor, Eq, Show, Foldable)
 
 data Range = Range { start :: Int, end :: Int }
   deriving (Eq, Show)
