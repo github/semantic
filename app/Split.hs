@@ -32,9 +32,9 @@ splitPatch before after patch = (fmap (splitTerm before) $ Patch.before patch, f
 splitTerm :: String -> Term a Info -> HTML
 splitTerm source term = fst $ cata toElement term where
   toElement (Info range lineRange categories) (Leaf _) = (Span (classify categories) $ substring range source, range)
-  toElement (Info range lineRange categories) (Indexed i) = (Ul (classify categories) $ children ++ [ Text $ substring Range { start = previous, end = end range } source ], range) where
+  toElement (Info range lineRange categories) (Indexed i) = (Ul (classify categories) $ children ++ [ subtext previous $ end range ], range) where
     (children, previous) = foldl accumulate ([], start range) i
-  accumulate (children, previous) (child, range) = (children ++ [ Text $ substring Range { start = previous, end = start range } source, child ], end range)
+  accumulate (children, previous) (child, range) = (children ++ [ subtext previous $ start range, child ], end range)
   subtext :: Int -> Int -> HTML
   subtext start end = Text $ substring (Range start end) source
 
