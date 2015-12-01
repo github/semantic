@@ -53,7 +53,7 @@ foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars ::
 
 data Output = Unified | Split
 
-data Argument = Argument { output :: Output, sources :: (FilePath, FilePath) }
+data Argument = Argument { output :: Output, sourceA :: FilePath, sourceB :: FilePath }
 
 main :: IO ()
 main = do
