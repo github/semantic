@@ -23,6 +23,14 @@ instance Categorizable Info where
 
 type Diff a annotation = Free (Annotated a (annotation, annotation)) (Patch (Term a annotation))
 
+diffSum :: (Patch (Term a annotation) -> Integer) -> Diff a annotation -> Integer
+diffSum patchCost diff = iter (c . unwrap) $ fmap patchCost diff where
+  c (Leaf _) = 0
+  c (Keyed xs) = sum $ snd <$> Data.Map.toList xs
+  c (Indexed xs) = sum xs
+  c (Fixed xs) = sum xs
+  unwrap (Annotated _ syntax) = syntax
+
 diffCost :: Diff a annotation -> Integer
 diffCost f = iter (c . unwrap) $ fmap (const 1) f where
   c (Leaf _) = 0
