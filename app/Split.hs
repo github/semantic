@@ -7,6 +7,7 @@ import Term
 import Unified
 import Control.Comonad.Cofree
 import qualified Data.Map as Map
+import qualified Data.Set as Set
 import Rainbow
 
 type ClassName = String
@@ -31,3 +32,6 @@ splitPatch before after patch = (fmap (splitTerm before) $ Patch.before patch, f
 splitTerm :: String -> Term a Info -> Element a
 splitTerm source term = toElement term where
   toElement ((Info range lineRange categories) :< syntax) = (foldr (const . Just) Nothing categories, substring range source) :< fmap toElement syntax
+
+classify :: Set.Set Category -> Maybe ClassName
+classify categories = foldr (const . Just) Nothing categories
