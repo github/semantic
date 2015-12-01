@@ -6,9 +6,12 @@ import Syntax
 import Term
 import Unified
 import qualified Data.Set as Set
+import Control.Comonad.Cofree
 import Rainbow
 
 data Node = Node String (Set.Set Category)
+type ClassName = String
+type Element a = Cofree (Syntax a) (Maybe ClassName, String)
 
 split :: Diff a Info -> String -> String -> IO ByteString
 split _ _ _ = return mempty
