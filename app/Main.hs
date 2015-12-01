@@ -51,6 +51,10 @@ foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child 
 foreign import ccall "app/bridge.h ts_node_p_pos_chars" ts_node_p_pos_chars :: Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars :: Ptr TSNode -> IO CSize
 
+data Output = Unified | Split
+
+data Argument = Argument { output :: Output, sources :: (FilePath, FilePath) }
+
 main :: IO ()
 main = do
   args <- getArgs
