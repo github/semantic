@@ -14,9 +14,9 @@ type Element a = Cofree (Syntax a) (Maybe ClassName, String)
 
 data HTML =
   Text String
-  | Span ClassName String
-  | Ul ClassName [HTML]
-  | Dl ClassName (Map.Map String HTML)
+  | Span (Maybe ClassName) String
+  | Ul (Maybe ClassName) [HTML]
+  | Dl (Maybe ClassName) (Map.Map String HTML)
   deriving (Eq, Show)
 
 split :: Diff a Info -> String -> String -> IO ByteString
