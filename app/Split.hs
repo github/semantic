@@ -1,4 +1,4 @@
-module Split where
+module Split (split) where
 
 import Diff
 import Rainbow
