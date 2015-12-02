@@ -25,15 +25,17 @@ data HTML =
 split :: Diff a Info -> String -> String -> IO ByteString
 split _ _ _ = return mempty
 
-splitDiff :: Diff a Info -> String -> String -> (Maybe (HTML, Range), Maybe (HTML, Range))
+splitDiff :: Diff a Info -> String -> String -> Patch (HTML, Range)
 splitDiff diff before after = iter toElements $ splitPatch before after <$> diff
   where
-    toElements (Annotated (left, right) (Leaf _)) = (Just $ leafToElement before left, Just $ leafToElement after right)
+    toElements (Annotated (left, right) (Leaf _)) = Replace (leafToElement before left) (leafToElement after right)
 
     leafToElement source (Info range _ categories) = (Span (classify categories) $ substring range source, range)
 
-splitPatch :: String -> String -> Patch (Term a Info) -> (Maybe (HTML, Range), Maybe (HTML, Range))
-splitPatch before after patch = (splitTerm before <$> Patch.before patch, splitTerm after <$> Patch.after patch)
+splitPatch :: String -> String -> Patch (Term a Info) -> Patch (HTML, Range)
+splitPatch before after (Replace a b) = Replace (splitTerm before a) (splitTerm after b)
+splitPatch _ after (Insert b) = Insert $ splitTerm after b
+splitPatch before _ (Delete a) = Delete $ splitTerm before a
 
 splitTerm :: String -> Term a Info -> (HTML, Range)
 splitTerm source = cata toElement where
