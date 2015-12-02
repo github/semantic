@@ -36,7 +36,7 @@ splitPatch :: String -> String -> Patch (Term a Info) -> (Maybe (HTML, Range), M
 splitPatch before after patch = (splitTerm before <$> Patch.before patch, splitTerm after <$> Patch.after patch)
 
 splitTerm :: String -> Term a Info -> (HTML, Range)
-splitTerm source term = cata toElement term where
+splitTerm source = cata toElement where
   toElement (Info range lineRange categories) (Leaf _) = (Span (classify categories) $ substring range source, range)
   toElement (Info range lineRange categories) (Indexed i) = makeList i range categories
   toElement (Info range lineRange categories) (Fixed i) = makeList i range categories
@@ -59,4 +59,4 @@ splitTerm source term = cata toElement term where
   subtext start end = Text $ substring (Range start end) source
 
 classify :: Set.Set Category -> Maybe ClassName
-classify categories = foldr (const . Just) Nothing categories
+classify = foldr (const . Just) Nothing
