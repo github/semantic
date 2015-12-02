@@ -66,5 +66,9 @@ splitHTMLIntoLines (Span className string) = Span className <$> lines string
 splitHTMLIntoLines (Ul className children) = Ul className . splitHTMLIntoLines <$> children
 splitHTMLIntoLines (Dt string) = [ Dt string ]
 
+appendOntoLastLine :: HTML -> [[HTML]] -> [[HTML]]
+appendOntoLastLine line [ x ] = [ line : x ]
+appendOntoLastLine line (x : xs) = x : appendOntoLastLine line xs
+
 classify :: Set.Set Category -> Maybe ClassName
 classify = foldr (const . Just) Nothing
