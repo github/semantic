@@ -28,7 +28,7 @@ library
                      , mtl
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable
-  ghc-options:        -Wall -Werror
+  ghc-options:        -Wall -Werror -fno-warn-name-shadowing
 
 executable semantic-diff-exe
   hs-source-dirs:      app
