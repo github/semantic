@@ -62,6 +62,7 @@ splitTerm source = cata toElement where
 
 splitHTMLIntoLines :: HTML -> [HTML]
 splitHTMLIntoLines (Text string) = Text <$> lines string
+splitHTMLIntoLines (Span className string) = Span className <$> lines string
 
 classify :: Set.Set Category -> Maybe ClassName
 classify = foldr (const . Just) Nothing
