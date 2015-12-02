@@ -60,5 +60,8 @@ splitTerm source = cata toElement where
   subtext :: Int -> Int -> HTML
   subtext start end = Text $ substring (Range start end) source
 
+splitHTMLIntoLines :: HTML -> [HTML]
+splitHTMLIntoLines (Text string) = Text <$> lines string
+
 classify :: Set.Set Category -> Maybe ClassName
 classify = foldr (const . Just) Nothing
