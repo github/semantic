@@ -66,6 +66,10 @@ splitHTMLIntoLines (Span className string) = Span className <$> lines string
 splitHTMLIntoLines (Ul className children) = Ul className . splitHTMLIntoLines <$> children
 splitHTMLIntoLines (Dt string) = [ Dt string ]
 
+combineLines :: HTML -> [[HTML]] -> [[HTML]]
+combineLines child out = case splitHTMLIntoLines child of
+  (first : rest) -> appendOntoLastLine first out ++ ((: []) <$> rest)
+
 appendOntoLastLine :: HTML -> [[HTML]] -> [[HTML]]
 appendOntoLastLine line [ x ] = [ line : x ]
 appendOntoLastLine line (x : xs) = x : appendOntoLastLine line xs
