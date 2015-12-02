@@ -33,12 +33,12 @@ splitDiff diff before after = iter toElements $ splitPatch before after <$> diff
     leafToElement source (Info range _ categories) = (Span (classify categories) $ substring range source, range)
 
 splitPatch :: String -> String -> Patch (Term a Info) -> Patch (HTML, Range)
-splitPatch before after (Replace a b) = Replace (splitTerm before a) (splitTerm after b)
-splitPatch _ after (Insert b) = Insert $ splitTerm after b
-splitPatch before _ (Delete a) = Delete $ splitTerm before a
+splitPatch before after (Replace a b) = Replace (termToHTML before a) (termToHTML after b)
+splitPatch _ after (Insert b) = Insert $ termToHTML after b
+splitPatch before _ (Delete a) = Delete $ termToHTML before a
 
-splitTerm :: String -> Term a Info -> (HTML, Range)
-splitTerm source = cata toElement where
+termToHTML :: String -> Term a Info -> (HTML, Range)
+termToHTML source = cata toElement where
   toElement (Info range lineRange categories) (Leaf _) = (Span (classify categories) $ substring range source, range)
   toElement (Info range lineRange categories) (Indexed i) = makeList i range categories
   toElement (Info range lineRange categories) (Fixed i) = makeList i range categories
