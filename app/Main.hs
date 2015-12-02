@@ -129,10 +129,12 @@ range :: Ptr TSNode -> IO Range
 range node = do
   pos <- ts_node_p_pos_chars node
   size <- ts_node_p_size_chars node
-  return Range { start = fromEnum $ toInteger pos, end = (fromEnum $ toInteger pos) + (fromEnum $ toInteger size) }
+  let start = fromIntegral pos
+      end = start + fromIntegral size
+  return Range { start = start, end = end }
 
 getLineRange :: Ptr TSNode -> IO Range
 getLineRange node = do
   startLine <- ts_node_p_start_point node
   endLine <- ts_node_p_end_point node
-  return Range { start = fromEnum $ toInteger startLine, end = fromEnum $ toInteger endLine }
+  return Range { start = fromIntegral startLine, end = fromIntegral endLine }
