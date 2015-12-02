@@ -63,6 +63,7 @@ splitTerm source = cata toElement where
 splitHTMLIntoLines :: HTML -> [HTML]
 splitHTMLIntoLines (Text string) = Text <$> lines string
 splitHTMLIntoLines (Span className string) = Span className <$> lines string
+splitHTMLIntoLines (Ul className children) = Ul className . splitHTMLIntoLines <$> children
 splitHTMLIntoLines (Dt string) = [ Dt string ]
 
 classify :: Set.Set Category -> Maybe ClassName
