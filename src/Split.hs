@@ -101,20 +101,5 @@ termToHTML source = cata toElement where
   subtext :: Int -> Int -> HTML
   subtext start end = Text $ substring (Range start end) source
 
-splitHTMLIntoLines :: HTML -> [HTML]
-splitHTMLIntoLines (Text string) = Text <$> lines string
-splitHTMLIntoLines (Span className string) = Span className <$> lines string
-splitHTMLIntoLines (Ul className children) = Ul className <$> foldr combineLines [[]] children
-splitHTMLIntoLines (Dl className children) = Dl className <$> foldr combineLines [[]] children
-splitHTMLIntoLines (Dt string) = [ Dt string ]
-
-combineLines :: HTML -> [[HTML]] -> [[HTML]]
-combineLines child out = case splitHTMLIntoLines child of
-  (first : rest) -> appendOntoLastLine first out ++ ((: []) <$> rest)
-
-appendOntoLastLine :: HTML -> [[HTML]] -> [[HTML]]
-appendOntoLastLine line [ x ] = [ line : x ]
-appendOntoLastLine line (x : xs) = x : appendOntoLastLine line xs
-
 classify :: Set.Set Category -> Maybe ClassName
 classify = foldr (const . Just) Nothing
