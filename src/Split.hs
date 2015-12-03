@@ -1,4 +1,4 @@
-module Split (split) where
+module Split (split, adjoinLines) where
 
 import Diff
 import Patch
