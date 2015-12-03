@@ -24,11 +24,7 @@ data HTML =
 split :: Diff a Info -> String -> String -> IO ByteString
 split _ _ _ = return mempty
 
-data Row =
-  ContextRow HTML HTML
-  | ReplaceRow HTML HTML
-  | InsertRow HTML
-  | DeleteRow HTML
+data Row = Row (Maybe HTML, Maybe HTML)
 
 straightToSplit :: Diff a Info -> String -> String -> [Row]
 straightToSplit (Free (Annotated (left, right) syntax)) = freeSyntaxToSplit (left, right) syntax
