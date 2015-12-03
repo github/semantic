@@ -10,4 +10,4 @@ main = hspec $ do
       adjoinLines ([], []) ([ Line "a" ], [ Line "b" ]) `shouldBe` ([ Line "a" ], [ Line "b" ])
 
     it "two single line elements should concatenate into a single line" $
-      adjoinLines ([], []) ([], []) `shouldBe` ([], [])
+      adjoinLines ([ Line "a" ], [ Line "b" ]) ([ Line "a" ], [ Line "b" ]) `shouldBe` ([ Line "aa" ], [ Line "bb" ])
