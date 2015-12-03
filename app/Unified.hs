@@ -4,6 +4,7 @@ import Diff
 import Patch
 import Syntax
 import Term
+import Range
 import Control.Arrow
 import Control.Monad.Free
 import Control.Comonad.Cofree
@@ -36,9 +37,6 @@ unified diff before after = do
       accumulateContext (out, previous) (child, Just range) = (mconcat [ out, pure . chunk $ substring Range { start = previous, end = start range } source, child ], end range)
       accumulateContext (out, previous) (child, _) = (out <> child, previous)
 
-substring :: Range -> String -> String
-substring range = take (end range - start range) . drop (start range)
-
 range :: Patch (Term a Info) -> Maybe Range
 range patch = range . extract <$> after patch where
   extract (annotation :< _) = annotation
@@ -47,5 +45,3 @@ range patch = range . extract <$> after patch where
 change :: String -> [Chunk String] -> [Chunk String]
 change bound content = [ chunk "{", chunk bound ] ++ content ++ [ chunk bound, chunk "}" ]
 
-instance Ord Range where
-  a <= b = start a <= start b

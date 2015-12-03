@@ -4,7 +4,7 @@ import Diff
 import Patch
 import Syntax
 import Term
-import Unified
+import Range
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import qualified Data.Map as Map
