@@ -31,10 +31,10 @@ data Row =
   | DeleteRow HTML
 
 straightToSplit :: Diff a Info -> String -> String -> [Row]
-straightToSplit (Free (Annotated (left, right) syntax)) = freeSyntaxToSplit syntax
+straightToSplit (Free (Annotated (left, right) syntax)) = freeSyntaxToSplit (left, right) syntax
 
-freeSyntaxToSplit :: Syntax a (Diff a Info) -> String -> String -> [Row]
-freeSyntaxToSplit (Leaf _) before after = []
+freeSyntaxToSplit :: (Info, Info) -> Syntax a (Diff a Info) -> String -> String -> [Row]
+freeSyntaxToSplit (left, right) (Leaf _) before after = []
 
 splitDiff :: Diff a Info -> String -> String -> Patch (HTML, Range)
 splitDiff diff before after = iter toElements $ splitPatch before after <$> diff
