@@ -45,7 +45,7 @@ annotationAndSyntaxToRows left leftCategories right rightCategories (Indexed i) 
           leftElements = Text <$> lines (substring (Range previousLeft $ start left) before)
           rightElements = Text <$> lines (substring (Range previousRight $ start right) before)
 
-data Line = Line String
+data Line = Line String deriving (Eq, Show)
 
 adjoinLines :: ([Line], [Line]) -> ([Line], [Line]) -> ([Line], [Line])
 adjoinLines _ _ = ([], [])
