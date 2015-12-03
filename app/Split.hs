@@ -26,8 +26,8 @@ split _ _ _ = return mempty
 
 data Row = Row (Maybe HTML) (Maybe HTML)
 
-straightToSplit :: Diff a Info -> String -> String -> [Row]
-straightToSplit (Free (Annotated (left, right) syntax)) = freeSyntaxToSplit (left, right) syntax
+diffToRows :: Diff a Info -> String -> String -> [Row]
+diffToRows (Free (Annotated (left, right) syntax)) = freeSyntaxToSplit (left, right) syntax
 
 freeSyntaxToSplit :: (Info, Info) -> Syntax a (Diff a Info) -> String -> String -> [Row]
 freeSyntaxToSplit (left, right) (Leaf _) before after = []
