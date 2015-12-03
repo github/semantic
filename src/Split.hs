@@ -49,7 +49,7 @@ annotationAndSyntaxToRows left leftCategories right rightCategories (Indexed i) 
           contextRows :: [Row]
           contextRows = uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements
           leftElements = Text <$> lines (substring (Range previousLeft $ start left) before)
-          rightElements = Text <$> lines (substring (Range previousRight $ start right) before)
+          rightElements = Text <$> lines (substring (Range previousRight $ start right) after)
 
 rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row
 rowFromMaybeRows a b = Row (Maybe.maybeToList a) (Maybe.maybeToList b)
