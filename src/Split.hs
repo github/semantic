@@ -7,6 +7,7 @@ import Term
 import Range
 import Control.Monad.Free
 import qualified Data.Map as Map
+import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 import Rainbow
 
@@ -23,15 +24,19 @@ data HTML =
 split :: Diff a Info -> String -> String -> IO ByteString
 split _ _ _ = return mempty
 
-data Row = Row (Maybe HTML) (Maybe HTML)
+data Row = Row [HTML] [HTML]
   deriving (Eq, Show)
+
+instance Monoid Row where
+  mempty = Row [] []
+  mappend (Row x1 y1) (Row x2 y2) = Row (x1 <> x2) (y1 <> y2)
 
 diffToRows :: Diff a Info -> String -> String -> ([Row], Range, Range)
 diffToRows (Free (Annotated (Info leftRange _ leftCategories, Info rightRange _ rightCategories) syntax)) before after = (annotationAndSyntaxToRows leftRange leftCategories rightRange rightCategories syntax before after, leftRange, rightRange)
 
 -- | Given annotations, a syntax node, and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotationAndSyntaxToRows :: Range -> Set.Set Category -> Range -> Set.Set Category -> Syntax a (Diff a Info) -> String -> String -> [Row]
-annotationAndSyntaxToRows left leftCategories right rightCategories (Leaf _) before after = uncurry Row <$> zipMaybe leftElements rightElements
+annotationAndSyntaxToRows left leftCategories right rightCategories (Leaf _) before after = uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements
   where
     leftElements = Span (classify leftCategories) <$> lines (substring left before)
     rightElements = Span (classify rightCategories) <$> lines (substring right after)
@@ -42,9 +47,12 @@ annotationAndSyntaxToRows left leftCategories right rightCategories (Indexed i) 
       | (childRows, left, right) <- diffToRows child before after = ((end left, end right), rows ++ contextRows ++ childRows)
         where
           contextRows :: [Row]
-          contextRows = uncurry Row <$> zipMaybe leftElements rightElements
+          contextRows = uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements
           leftElements = Text <$> lines (substring (Range previousLeft $ start left) before)
           rightElements = Text <$> lines (substring (Range previousRight $ start right) before)
+
+rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row
+rowFromMaybeRows a b = Row (Maybe.maybeToList a) (Maybe.maybeToList b)
 
 data Line = Line String deriving (Eq, Show)
 
