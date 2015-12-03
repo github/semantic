@@ -57,6 +57,8 @@ adjoinLines :: ([Line], [Line]) -> ([Line], [Line]) -> ([Line], [Line])
 adjoinLines ([], []) (currentLeft, currentRight) = (currentLeft, currentRight)
 adjoinLines (accumLeft, accumRight) ((x : xs), (y : ys)) = (init accumLeft ++ [ last accumLeft <> x ] ++ xs, init accumRight ++ [ last accumRight <> y ] ++ ys)
 
+adjoinRows :: [Row] -> [Row] -> [Row]
+adjoinRows [] rows = rows
 {-
 
 in: ([ Line "a.b" ], [ Line "a.b" ]) ([ Line "(c, d, [", Line "  e,", Line "  f", Line "])" ], [ Line "(c, d, [", Line "  ", Line "  e,", Line "  ", Line "  f", Line "])" ])
