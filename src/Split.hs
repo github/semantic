@@ -49,7 +49,7 @@ data Line = Line String deriving (Eq, Show)
 
 -- | Adjoin a new pair of lines onto an existing pair of lines left-associatively.
 adjoinLines :: ([Line], [Line]) -> ([Line], [Line]) -> ([Line], [Line])
-adjoinLines _ _ = ([], [])
+adjoinLines (accumLeft, accumRight) (currentLeft, currentRight) = (currentLeft, currentRight)
 
 {-
 
