@@ -25,8 +25,6 @@ split _ _ _ = return mempty
 
 data Row = Row (Maybe HTML) (Maybe HTML)
 
--- data Line = Line
-
 diffToRows :: Diff a Info -> String -> String -> ([Row], Range, Range)
 diffToRows (Free (Annotated (Info leftRange _ leftCategories, Info rightRange _ rightCategories) syntax)) before after = (annotationAndSyntaxToRows leftRange leftCategories rightRange rightCategories syntax before after, leftRange, rightRange)
 
@@ -46,6 +44,8 @@ annotationAndSyntaxToRows left leftCategories right rightCategories (Indexed i) 
           contextRows = uncurry Row <$> zipMaybe leftElements rightElements
           leftElements = Text <$> lines (substring (Range previousLeft $ start left) before)
           rightElements = Text <$> lines (substring (Range previousRight $ start right) before)
+
+data Line = Line String
 
 {-
 
