@@ -24,6 +24,7 @@ split :: Diff a Info -> String -> String -> IO ByteString
 split _ _ _ = return mempty
 
 data Row = Row (Maybe HTML) (Maybe HTML)
+  deriving (Eq, Show)
 
 diffToRows :: Diff a Info -> String -> String -> ([Row], Range, Range)
 diffToRows (Free (Annotated (Info leftRange _ leftCategories, Info rightRange _ rightCategories) syntax)) before after = (annotationAndSyntaxToRows leftRange leftCategories rightRange rightCategories syntax before after, leftRange, rightRange)
