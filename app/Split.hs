@@ -37,10 +37,10 @@ splitPatch before after patch = (splitTerm before <$> Patch.before patch, splitT
 
 splitTerm :: String -> Term a Info -> (HTML, Range)
 splitTerm source = cata toElement where
-  toElement (Info range lineRange categories) (Leaf _) = (Span (classify categories) $ substring range source, range)
-  toElement (Info range lineRange categories) (Indexed i) = makeList i range categories
-  toElement (Info range lineRange categories) (Fixed i) = makeList i range categories
-  toElement (Info range lineRange categories) (Keyed k) = makeMap (Map.toList k) range categories
+  toElement (Info range _ categories) (Leaf _) = (Span (classify categories) $ substring range source, range)
+  toElement (Info range _ categories) (Indexed i) = makeList i range categories
+  toElement (Info range _ categories) (Fixed i) = makeList i range categories
+  toElement (Info range _ categories) (Keyed k) = makeMap (Map.toList k) range categories
 
   accumulate (children, previous) (child, range) = (children ++ [ subtext previous $ start range, child ], end range)
   accumulateFromMap (children, previous) (key, (child, range)) = (children ++ [ subtext previous $ start range, Dt key, child ], end range)
