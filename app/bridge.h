@@ -1,6 +1,7 @@
 #include "tree_sitter/runtime.h"
 
 extern TSLanguage *ts_language_c();
+extern TSLanguage *ts_language_javascript();
 
 void ts_document_root_node_p(TSDocument *document, TSNode *outNode);
 

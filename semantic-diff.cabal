@@ -45,9 +45,13 @@ executable semantic-diff-exe
                      , semantic-diff
                      , bytestring
                      , optparse-applicative
+                     , filepath
   default-language:    Haskell2010
   extra-libraries:     bridge
-  extra-lib-dirs:      prototype/External/tree-sitter/out/Release, prototype/External/tree-sitter-c, .
+  extra-lib-dirs:      prototype/External/tree-sitter/out/Release
+                     , prototype/External/tree-sitter-c
+                     , prototype/External/tree-sitter-javascript
+                     , .
 
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0

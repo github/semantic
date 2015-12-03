@@ -13,6 +13,7 @@ import qualified Data.Map as Map
 import qualified Data.ByteString.Char8 as ByteString
 import Data.Set hiding (split)
 import Options.Applicative
+import System.FilePath
 
 import Foreign
 import Foreign.C
@@ -20,6 +21,7 @@ import Foreign.C.Types
 
 data TSLanguage = TsLanguage deriving (Show, Eq)
 foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_c" ts_language_c :: IO (Ptr TSLanguage)
+foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_javascript" ts_language_javascript :: IO (Ptr TSLanguage)
 
 data TSDocument = TsDocument deriving (Show, Eq)
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_make" ts_document_make :: IO (Ptr TSDocument)
@@ -64,10 +66,15 @@ main :: IO ()
 main = do
   arguments <- execParser opts
   output <- do
-    aContents <- readFile $ sourceA arguments
-    bContents <- readFile $ sourceB arguments
-    aTerm <- parseTreeSitterFile aContents
-    bTerm <- parseTreeSitterFile bContents
+    let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
+    aContents <- readFile sourceAPath
+    bContents <- readFile sourceBPath
+    language <- (parserForType . takeExtension) sourceAPath
+    (aTerm, bTerm) <- case language of
+      Just lang -> do aTerm <- parseTreeSitterFile lang aContents
+                      bTerm <- parseTreeSitterFile lang bContents
+                      return (aTerm, bTerm)
+      Nothing -> error ("Unsupported language extension in path: " ++ sourceAPath)
     let diff = interpret comparable aTerm bTerm in
       case output arguments of
         Unified -> unified diff aContents bContents
@@ -76,10 +83,15 @@ main = do
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
-parseTreeSitterFile :: String -> IO (Term String Info)
-parseTreeSitterFile contents = do
+parserForType mediaType = sequence $ case mediaType of
+    "h" -> Just ts_language_c
+    "c" -> Just ts_language_c
+    "js" -> Just ts_language_javascript
+    _ -> Nothing
+
+parseTreeSitterFile :: Ptr TSLanguage -> String -> IO (Term String Info)
+parseTreeSitterFile language contents = do
   document <- ts_document_make
-  language <- ts_language_c
   ts_document_set_language document language
   withCString contents (\source -> do
     ts_document_set_input_string document source
