@@ -83,8 +83,6 @@ main = do
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
-data ParserType = ParserC | ParserJS
-
 parserForType mediaType = sequence $ case mediaType of
     "h" -> Just ts_language_c
     "c" -> Just ts_language_c
