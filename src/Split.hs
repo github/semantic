@@ -60,11 +60,7 @@ instance Monoid Line where
   mempty = Line ""
   mappend (Line x) (Line y) = Line $ x ++ y
 
--- | Adjoin a new pair of lines onto an existing pair of lines left-associatively.
-adjoinLines :: ([Line], [Line]) -> ([Line], [Line]) -> ([Line], [Line])
-adjoinLines ([], []) (currentLeft, currentRight) = (currentLeft, currentRight)
-adjoinLines (accumLeft, accumRight) ((x : xs), (y : ys)) = (init accumLeft ++ [ last accumLeft <> x ] ++ xs, init accumRight ++ [ last accumRight <> y ] ++ ys)
-
+-- | Adjoin a list of rows onto an existing list of rows.
 adjoinRows :: [Row] -> [Row] -> [Row]
 adjoinRows [] rows = rows
 adjoinRows accum (row : rows) = init accum ++ [ last accum <> row ] ++ rows
