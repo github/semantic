@@ -55,6 +55,7 @@ test-suite semantic-diff-test
   main-is:             Spec.hs
   build-depends:       base
                      , semantic-diff
+                     , hspec
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
 
