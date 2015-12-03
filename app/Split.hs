@@ -33,6 +33,13 @@ annotationAndSyntaxToRows (Info left _ leftCategories, Info right _ rightCategor
   leftElements = Span (classify leftCategories) <$> lines (substring left before)
   rightElements = Span (classify rightCategories) <$> lines (substring right after)
 
+zipMaybe :: [a] -> [b] -> [(Maybe a, Maybe b)]
+zipMaybe la lb = take len $ zip la' lb'
+  where
+    len = max (length la) (length lb)
+    la' = (Just <$> la) ++ (repeat Nothing)
+    lb' = (Just <$> lb) ++ (repeat Nothing)
+
 splitDiff :: Diff a Info -> String -> String -> Patch (HTML, Range)
 splitDiff diff before after = iter toElements $ splitPatch before after <$> diff
   where
