@@ -59,40 +59,6 @@ adjoinLines (accumLeft, accumRight) ((x : xs), (y : ys)) = (init accumLeft ++ [ 
 
 adjoinRows :: [Row] -> [Row] -> [Row]
 adjoinRows [] rows = rows
-{-
-
-in: ([ Line "a.b" ], [ Line "a.b" ]) ([ Line "(c, d, [", Line "  e,", Line "  f", Line "])" ], [ Line "(c, d, [", Line "  ", Line "  e,", Line "  ", Line "  f", Line "])" ])
-out: ([ Line "a.b(c, d, [", Line "  e,", Line "  f", Line "])" ], [ Line "a.b(c, d, [", Line "  ", Line "  e,", Line "  ", Line "  f", Line "])" ])
-
-a.b(c, d, [
-  e,
-  f
-])
-
-a.b(c, d, [
-
-  e,
-
-  f
-])
-
-
-
-[
-  123, false,
-  { "x": null
-  }
-]
-
-[
-  123,
-
-  false,
-  { "x": null
-  }
-]
-
--}
 
 zipMaybe :: [a] -> [b] -> [(Maybe a, Maybe b)]
 zipMaybe la lb = take len $ zip la' lb'
