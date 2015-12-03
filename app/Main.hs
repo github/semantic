@@ -28,7 +28,7 @@ import Foreign.ForeignPtr.Unsafe
 
 data TSLanguage = TsLanguage deriving (Show, Eq)
 foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_c" ts_language_c :: IO (Ptr TSLanguage)
-foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_js" ts_language_js :: IO (Ptr TSLanguage)
+foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_javascript" ts_language_javascript :: IO (Ptr TSLanguage)
 
 data TSDocument = TsDocument deriving (Show, Eq)
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_make" ts_document_make :: IO (Ptr TSDocument)
@@ -95,7 +95,7 @@ data ParserType = ParserC | ParserJS
 parserForType mediaType = sequence $ case mediaType of
     "h" -> Just ts_language_c
     "c" -> Just ts_language_c
-    "js" -> Just ts_language_js
+    "js" -> Just ts_language_javascript
     _ -> Nothing
 
 parseTreeSitterFile :: Ptr TSLanguage -> String -> IO (Term String Info)
