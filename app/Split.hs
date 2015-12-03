@@ -30,7 +30,7 @@ diffToRows :: Diff a Info -> String -> String -> [Row]
 diffToRows (Free (Annotated (left, right) syntax)) = annotationAndSyntaxToRows (left, right) syntax
 
 annotationAndSyntaxToRows :: (Info, Info) -> Syntax a (Diff a Info) -> String -> String -> [Row]
-annotationAndSyntaxToRows (left, right) (Leaf _) before after = []
+annotationAndSyntaxToRows (Info left _ leftCategories, Info right _ rightCategories) (Leaf _) before after = []
 
 splitDiff :: Diff a Info -> String -> String -> Patch (HTML, Range)
 splitDiff diff before after = iter toElements $ splitPatch before after <$> diff
