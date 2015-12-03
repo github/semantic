@@ -5,7 +5,6 @@ import Patch
 import Syntax
 import Term
 import Range
-import Control.Comonad.Cofree
 import Control.Monad.Free
 import qualified Data.Map as Map
 import qualified Data.Set as Set
