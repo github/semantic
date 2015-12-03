@@ -12,6 +12,10 @@ TSLanguage *ts_language_c_use() {
 	return ts_language_c();
 }
 
+TSLanguage *ts_language_javascript_use() {
+	return ts_language_javascript();
+}
+
 const char *ts_node_p_name(const TSNode *node, const TSDocument *document) {
 	assert(node != NULL);
 	assert(node->data != NULL);
