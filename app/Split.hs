@@ -27,10 +27,10 @@ split _ _ _ = return mempty
 data Row = Row (Maybe HTML) (Maybe HTML)
 
 diffToRows :: Diff a Info -> String -> String -> [Row]
-diffToRows (Free (Annotated (left, right) syntax)) = freeSyntaxToSplit (left, right) syntax
+diffToRows (Free (Annotated (left, right) syntax)) = annotationAndSyntaxToRows (left, right) syntax
 
-freeSyntaxToSplit :: (Info, Info) -> Syntax a (Diff a Info) -> String -> String -> [Row]
-freeSyntaxToSplit (left, right) (Leaf _) before after = []
+annotationAndSyntaxToRows :: (Info, Info) -> Syntax a (Diff a Info) -> String -> String -> [Row]
+annotationAndSyntaxToRows (left, right) (Leaf _) before after = []
 
 splitDiff :: Diff a Info -> String -> String -> Patch (HTML, Range)
 splitDiff diff before after = iter toElements $ splitPatch before after <$> diff
