@@ -32,16 +32,16 @@ instance Monoid Row where
   mappend (Row x1 y1) (Row x2 y2) = Row (x1 <> x2) (y1 <> y2)
 
 diffToRows :: Diff a Info -> String -> String -> ([Row], Range, Range)
-diffToRows (Free annotated) = annotationAndSyntaxToRows annotated
+diffToRows (Free annotated) = annotatedToRows annotated
 
--- | Given annotations, a syntax node, and before/after strings, returns a list of `Row`s representing the newline-separated diff.
-annotationAndSyntaxToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], Range, Range)
-annotationAndSyntaxToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Leaf _)) before after = (uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements, left, right)
+-- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
+annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], Range, Range)
+annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Leaf _)) before after = (uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements, left, right)
   where
     leftElements = Span (classify leftCategories) <$> lines (substring left before)
     rightElements = Span (classify rightCategories) <$> lines (substring right after)
 
-annotationAndSyntaxToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (snd $ foldl sumRows ((start left, start right), []) i, left, right)
+annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (snd $ foldl sumRows ((start left, start right), []) i, left, right)
   where
     sumRows ((previousLeft, previousRight), rows) child = ((end left, end right), rows ++ contextRows ++ childRows)
         where
