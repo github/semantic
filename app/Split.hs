@@ -33,6 +33,9 @@ data Row =
 straightToSplit :: Diff a Info -> String -> String -> [(HTML, HTML)]
 straightToSplit diff before after = []
 
+freeSyntaxToSplit :: Syntax a (Diff a Info) -> String -> String -> [Row]
+freeSyntaxToSplit (Leaf _) before after = []
+
 splitDiff :: Diff a Info -> String -> String -> Patch (HTML, Range)
 splitDiff diff before after = iter toElements $ splitPatch before after <$> diff
   where
