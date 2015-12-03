@@ -54,12 +54,6 @@ annotationAndSyntaxToRows left leftCategories right rightCategories (Indexed i) 
 rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row
 rowFromMaybeRows a b = Row (Maybe.maybeToList a) (Maybe.maybeToList b)
 
-data Line = Line String deriving (Eq, Show)
-
-instance Monoid Line where
-  mempty = Line ""
-  mappend (Line x) (Line y) = Line $ x ++ y
-
 -- | Adjoin a list of rows onto an existing list of rows.
 adjoinRows :: [Row] -> [Row] -> [Row]
 adjoinRows [] rows = rows
