@@ -25,12 +25,12 @@ split _ _ _ = return mempty
 
 data Row = Row (Maybe HTML) (Maybe HTML)
 
-diffToRows :: Diff a Info -> String -> String -> [Row]
-diffToRows (Free (Annotated (left, right) syntax)) = annotationAndSyntaxToRows (left, right) syntax
+diffToRows :: Diff a Info -> String -> String -> ([Row], Range, Range)
+diffToRows (Free (Annotated (Info leftRange _ leftCategories, Info rightRange _ rightCategories) syntax)) before after = (annotationAndSyntaxToRows leftRange leftCategories rightRange rightCategories syntax before after, leftRange, rightRange)
 
 -- | Given annotations, a syntax node, and before/after strings, returns a list of `Row`s representing the newline-separated diff.
-annotationAndSyntaxToRows :: (Info, Info) -> Syntax a (Diff a Info) -> String -> String -> [Row]
-annotationAndSyntaxToRows (Info left _ leftCategories, Info right _ rightCategories) (Leaf _) before after = uncurry Row <$> zipMaybe leftElements rightElements
+annotationAndSyntaxToRows :: Range -> Set.Set Category -> Range -> Set.Set Category -> Syntax a (Diff a Info) -> String -> String -> [Row]
+annotationAndSyntaxToRows left leftCategories right rightCategories (Leaf _) before after = uncurry Row <$> zipMaybe leftElements rightElements
   where
     leftElements = Span (classify leftCategories) <$> lines (substring left before)
     rightElements = Span (classify rightCategories) <$> lines (substring right after)
