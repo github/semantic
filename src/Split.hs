@@ -47,6 +47,9 @@ annotationAndSyntaxToRows left leftCategories right rightCategories (Indexed i) 
 
 data Line = Line String
 
+adjoinLines :: ([Line], [Line]) -> ([Line], [Line]) -> ([Line], [Line])
+adjoinLines _ _ = ([], [])
+
 {-
 
 in: ([ Line "a.b" ], [ Line "a.b" ]) ([ Line "(c, d, [", Line "  e,", Line "  f", Line "])" ], [ Line "(c, d, [", Line "  ", Line "  e,", Line "  ", Line "  f", Line "])" ])
