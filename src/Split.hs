@@ -43,9 +43,9 @@ annotationAndSyntaxToRows left leftCategories right rightCategories (Leaf _) bef
 
 annotationAndSyntaxToRows left leftCategories right rightCategories (Indexed i) before after = snd $ foldl accumulateContext ((start left, start right), []) i
   where
-    accumulateContext ((previousLeft, previousRight), rows) child
-      | (childRows, left, right) <- diffToRows child before after = ((end left, end right), rows ++ contextRows ++ childRows)
+    accumulateContext ((previousLeft, previousRight), rows) child = ((end left, end right), rows ++ contextRows ++ childRows)
         where
+          (childRows, left, right) = diffToRows child before after
           contextRows :: [Row]
           contextRows = uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements
           leftElements = Text <$> lines (substring (Range previousLeft $ start left) before)
