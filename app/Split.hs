@@ -4,7 +4,7 @@ import Diff
 import Patch
 import Syntax
 import Term
-import Unified
+import Range
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import qualified Data.Map as Map
@@ -12,7 +12,6 @@ import qualified Data.Set as Set
 import Rainbow
 
 type ClassName = String
-type Element a = Cofree (Syntax a) (Maybe ClassName, String)
 
 data HTML =
   Text String
@@ -39,10 +38,10 @@ splitPatch before _ (Delete a) = Delete $ termToHTML before a
 
 termToHTML :: String -> Term a Info -> (HTML, Range)
 termToHTML source = cata toElement where
-  toElement (Info range lineRange categories) (Leaf _) = (Span (classify categories) $ substring range source, range)
-  toElement (Info range lineRange categories) (Indexed i) = makeList i range categories
-  toElement (Info range lineRange categories) (Fixed i) = makeList i range categories
-  toElement (Info range lineRange categories) (Keyed k) = makeMap (Map.toList k) range categories
+  toElement (Info range _ categories) (Leaf _) = (Span (classify categories) $ substring range source, range)
+  toElement (Info range _ categories) (Indexed i) = makeList i range categories
+  toElement (Info range _ categories) (Fixed i) = makeList i range categories
+  toElement (Info range _ categories) (Keyed k) = makeMap (Map.toList k) range categories
 
   accumulate (children, previous) (child, range) = (children ++ [ subtext previous $ start range, child ], end range)
   accumulateFromMap (children, previous) (key, (child, range)) = (children ++ [ subtext previous $ start range, Dt key, child ], end range)

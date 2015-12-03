@@ -5,13 +5,11 @@ import Data.Set
 import Control.Monad.Free
 import Patch
 import Term
+import Range
 import Categorizable
 
 data Annotated a annotation f = Annotated annotation (Syntax a f)
   deriving (Functor, Eq, Show, Foldable)
-
-data Range = Range { start :: Int, end :: Int }
-  deriving (Eq, Show)
 
 
 type Category = String

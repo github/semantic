@@ -5,6 +5,7 @@ import Diff
 import Interpreter
 import Patch
 import Syntax
+import Range
 import Split
 import Term
 import Unified
