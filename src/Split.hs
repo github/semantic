@@ -41,9 +41,9 @@ annotationAndSyntaxToRows left leftCategories right rightCategories (Leaf _) bef
     leftElements = Span (classify leftCategories) <$> lines (substring left before)
     rightElements = Span (classify rightCategories) <$> lines (substring right after)
 
-annotationAndSyntaxToRows left leftCategories right rightCategories (Indexed i) before after = snd $ foldl accumulateContext ((start left, start right), []) i
+annotationAndSyntaxToRows left leftCategories right rightCategories (Indexed i) before after = snd $ foldl sumRows ((start left, start right), []) i
   where
-    accumulateContext ((previousLeft, previousRight), rows) child = ((end left, end right), rows ++ contextRows ++ childRows)
+    sumRows ((previousLeft, previousRight), rows) child = ((end left, end right), rows ++ contextRows ++ childRows)
         where
           (childRows, left, right) = diffToRows child before after
           contextRows :: [Row]
