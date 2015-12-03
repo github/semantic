@@ -35,6 +35,16 @@ annotationAndSyntaxToRows left leftCategories right rightCategories (Leaf _) bef
     leftElements = Span (classify leftCategories) <$> lines (substring left before)
     rightElements = Span (classify rightCategories) <$> lines (substring right after)
 
+annotationAndSyntaxToRows left leftCategories right rightCategories (Indexed i) before after = snd $ foldl accumulateContext ((start left, start right), []) i
+  where
+    accumulateContext ((previousLeft, previousRight), rows) child
+      | (childRows, left, right) <- diffToRows child before after = ((end left, end right), rows ++ contextRows ++ childRows)
+        where
+          contextRows :: [Row]
+          contextRows = uncurry Row <$> zipMaybe leftElements rightElements
+          leftElements = Text <$> lines (substring (Range previousLeft $ start left) before)
+          rightElements = Text <$> lines (substring (Range previousRight $ start right) before)
+
 zipMaybe :: [a] -> [b] -> [(Maybe a, Maybe b)]
 zipMaybe la lb = take len $ zip la' lb'
   where
