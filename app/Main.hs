@@ -3,28 +3,21 @@ module Main where
 import Categorizable
 import Diff
 import Interpreter
-import Patch
 import Syntax
 import Range
 import Split
 import Term
 import Unified
 import Control.Comonad.Cofree
-import Control.Monad
-import Control.Monad.Free hiding (unfoldM)
 import qualified Data.Map as Map
 import qualified Data.ByteString.Char8 as ByteString
-import Data.Maybe
 import Data.Set hiding (split)
 import Options.Applicative
-import System.Environment
 import System.FilePath
 
 import Foreign
 import Foreign.C
 import Foreign.C.Types
-import Foreign.C.String
-import Foreign.ForeignPtr.Unsafe
 
 data TSLanguage = TsLanguage deriving (Show, Eq)
 foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_c" ts_language_c :: IO (Ptr TSLanguage)
