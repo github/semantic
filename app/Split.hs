@@ -24,6 +24,10 @@ data HTML =
 split :: Diff a Info -> String -> String -> IO ByteString
 split _ _ _ = return mempty
 
+
+straightToSplit :: Diff a Info -> String -> String -> [(HTML, HTML)]
+straightToSplit diff before after = []
+
 splitDiff :: Diff a Info -> String -> String -> Patch (HTML, Range)
 splitDiff diff before after = iter toElements $ splitPatch before after <$> diff
   where
