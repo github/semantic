@@ -67,6 +67,7 @@ adjoinLines (accumLeft, accumRight) ((x : xs), (y : ys)) = (init accumLeft ++ [ 
 
 adjoinRows :: [Row] -> [Row] -> [Row]
 adjoinRows [] rows = rows
+adjoinRows accum (row : rows) = init accum ++ [ last accum <> row ] ++ rows
 
 zipMaybe :: [a] -> [b] -> [(Maybe a, Maybe b)]
 zipMaybe la lb = take len $ zip la' lb'
