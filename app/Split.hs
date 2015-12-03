@@ -30,8 +30,8 @@ data Row =
   | InsertRow HTML
   | DeleteRow HTML
 
-straightToSplit :: Diff a Info -> String -> String -> [(HTML, HTML)]
-straightToSplit diff before after = []
+straightToSplit :: Diff a Info -> String -> String -> [Row]
+straightToSplit (Free (Annotated (left, right) syntax)) = freeSyntaxToSplit syntax
 
 freeSyntaxToSplit :: Syntax a (Diff a Info) -> String -> String -> [Row]
 freeSyntaxToSplit (Leaf _) before after = []
