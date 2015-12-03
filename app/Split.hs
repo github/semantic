@@ -28,10 +28,12 @@ data Row = Row (Maybe HTML) (Maybe HTML)
 diffToRows :: Diff a Info -> String -> String -> [Row]
 diffToRows (Free (Annotated (left, right) syntax)) = annotationAndSyntaxToRows (left, right) syntax
 
+-- | Given annotations, a syntax node, and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotationAndSyntaxToRows :: (Info, Info) -> Syntax a (Diff a Info) -> String -> String -> [Row]
-annotationAndSyntaxToRows (Info left _ leftCategories, Info right _ rightCategories) (Leaf _) before after = [] where
-  leftElements = Span (classify leftCategories) <$> lines (substring left before)
-  rightElements = Span (classify rightCategories) <$> lines (substring right after)
+annotationAndSyntaxToRows (Info left _ leftCategories, Info right _ rightCategories) (Leaf _) before after = uncurry Row <$> zipMaybe leftElements rightElements
+  where
+    leftElements = Span (classify leftCategories) <$> lines (substring left before)
+    rightElements = Span (classify rightCategories) <$> lines (substring right after)
 
 zipMaybe :: [a] -> [b] -> [(Maybe a, Maybe b)]
 zipMaybe la lb = take len $ zip la' lb'
