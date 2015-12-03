@@ -9,5 +9,8 @@ main = hspec $ do
     it "empty lines are the left unit" $
       adjoinLines ([], []) ([ Line "a" ], [ Line "b" ]) `shouldBe` ([ Line "a" ], [ Line "b" ])
 
+    it "empty lines are the left unit for multiple lines" $
+      adjoinLines ([], []) ([ Line "a", Line "a" ], [ Line "b", Line "b" ]) `shouldBe` ([ Line "a", Line "a" ], [ Line "b", Line "b" ])
+
     it "two single line elements should concatenate into a single line" $
       adjoinLines ([ Line "a" ], [ Line "b" ]) ([ Line "a" ], [ Line "b" ]) `shouldBe` ([ Line "aa" ], [ Line "bb" ])
