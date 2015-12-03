@@ -53,7 +53,7 @@ instance Monoid Line where
 
 -- | Adjoin a new pair of lines onto an existing pair of lines left-associatively.
 adjoinLines :: ([Line], [Line]) -> ([Line], [Line]) -> ([Line], [Line])
-adjoinLines (accumLeft, accumRight) (currentLeft, currentRight) = (currentLeft, currentRight)
+adjoinLines (accumLeft, accumRight) (currentLeft, currentRight) = ([mconcat $ accumLeft ++ currentLeft], [mconcat $ accumRight ++ currentRight])
 
 {-
 
