@@ -47,7 +47,7 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
 annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (bimap (Ul $ classify leftCategories) (Ul $ classify rightCategories) <$> rows, left, right)
   where
     rows = appendRemainder $ foldl sumRows ((start left, start right), []) i
-    appendRemainder ((previousLeft, previousRight), rows) = rows ++ [ Row (Text <$> lines (substring (Range previousLeft $ end left) before)) (Text <$> lines (substring (Range previousRight $ end right) after)) ]
+    appendRemainder ((previousLeft, previousRight), rows) = adjoinRows rows [ Row (Text <$> lines (substring (Range previousLeft $ end left) before)) (Text <$> lines (substring (Range previousRight $ end right) after)) ]
     sumRows ((previousLeft, previousRight), rows) child = ((end left, end right), rows ++ contextRows ++ childRows)
         where
           (childRows, left, right) = diffToRows child before after
