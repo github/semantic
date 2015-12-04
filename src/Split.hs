@@ -12,6 +12,7 @@ import Control.Monad.Free
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 import Rainbow
+import Data.ByteString.Char8 (pack)
 
 type ClassName = String
 
@@ -24,7 +25,7 @@ data HTML =
   deriving (Eq, Show)
 
 split :: Diff a Info -> String -> String -> IO ByteString
-split _ _ _ = return mempty
+split diff before after = return . pack . show $ diffToRows diff (0, 0) before after
 
 data Row = Row [HTML] [HTML]
   deriving (Eq, Show)
