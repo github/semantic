@@ -118,6 +118,11 @@ adjoin2 (Row lefts [] : Row lefts' rights : init) (Row xs ys) =
   Row (lefts <> xs) [] : Row lefts' (rights <> ys) : init
 adjoin2 (last:init) row = (last <> row) : init
 
+adjoinLines :: [Line] -> [Line] -> [Line]
+adjoinLines [] lines = lines
+adjoinLines lines [] = lines
+adjoinLines accum (line : lines) = init accum ++ [ last accum <> line ] ++ lines
+
 zipWithMaybe :: (Maybe a -> Maybe b -> c) -> [a] -> [b] -> [c]
 zipWithMaybe f la lb = take len $ zipWith f la' lb'
   where
