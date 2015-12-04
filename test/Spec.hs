@@ -5,7 +5,7 @@ import Test.Hspec
 
 main :: IO ()
 main = hspec $ do
-  describe "split" $ do
+  describe "adjoinRows" $ do
     it "empty lines are the left unit" $
       adjoinRows [ Row [] [] ] [ Row [ Text "a" ] [ Text "b" ] ] `shouldBe` [ Row [ Text "a" ] [ Text "b" ] ]
 
