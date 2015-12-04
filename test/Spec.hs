@@ -35,12 +35,21 @@ main = hspec $ do
 
     it "outputs one row for single-line non-empty unchanged indexed nodes" $
       annotatedToRows (unchanged "[ a, b ]" "branch" (Indexed [
-        Free . offsetAnnotated 2 $ unchanged "a" "leaf" (Leaf ""),
-        Free . offsetAnnotated 5 $ unchanged "b" "leaf" (Leaf "")
+        Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
+        Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
       ])) "[ a, b ]" "[ a, b ]" `shouldBe` ([ Row [ Ul (Just "branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ] [ Ul (Just "branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ] ], (Range 0 8, Range 0 8))
+
+    it "outputs one row for single-line non-empty formatted indexed nodes" $
+      annotatedToRows (formatted "[ a, b ]" "[ a,  b ]" "branch" (Indexed [
+        Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
+        Free . offsetAnnotated 5 6 $ unchanged "b" "leaf" (Leaf "")
+      ])) "[ a, b ]" "[ a,  b ]" `shouldBe` ([ Row [ Ul (Just "branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ] [ Ul (Just "branch") [ Text "[ ", span "a", Text ",  ", span "b", Text " ]" ] ] ], (Range 0 8, Range 0 9))
+
     where
       info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
-      unchanged source category = Annotated (info source category, info source category)
+      unchanged source category = formatted source source category
+      formatted source1 source2 category = Annotated (info source1 category, info source2 category)
       offsetInfo by (Info (Range start end) lineRange categories) = Info (Range (start + by) (end + by)) lineRange categories
-      offsetAnnotated by (Annotated (left, right) syntax) = Annotated (offsetInfo by left, offsetInfo by right) syntax
+      offsetAnnotated by1 by2 (Annotated (left, right) syntax) = Annotated (offsetInfo by1 left, offsetInfo by2 right) syntax
       span = Span (Just "leaf")
+
