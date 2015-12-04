@@ -41,8 +41,8 @@ diffToRows (Free annotated) = annotatedToRows annotated
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], (Range, Range))
 annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Leaf _)) before after = (zipWithMaybe rowFromMaybeRows leftElements rightElements, (left, right))
   where
-    leftElements = Span (classify leftCategories) <$> lines (substring left before)
-    rightElements = Span (classify rightCategories) <$> lines (substring right after)
+    leftElements = Span (classify leftCategories) <$> actualLines (substring left before)
+    rightElements = Span (classify rightCategories) <$> actualLines (substring right after)
 
 annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (bimap (Ul $ classify leftCategories) (Ul $ classify rightCategories) <$> rows, ranges)
   where
@@ -58,8 +58,8 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
 contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row]
 contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows leftElements rightElements
   where
-    leftElements = Text <$> lines (substring (Range (fst previousIndices) (fst childIndices)) (fst sources))
-    rightElements = Text <$> lines (substring (Range (snd previousIndices) (snd childIndices)) (snd sources))
+    leftElements = Text <$> actualLines (substring (Range (fst previousIndices) (fst childIndices)) (fst sources))
+    rightElements = Text <$> actualLines (substring (Range (snd previousIndices) (snd childIndices)) (snd sources))
 
 starts :: (Range , Range) -> (Int, Int)
 starts (left, right) = (start left, start right)
@@ -120,3 +120,10 @@ termToHTML source = cata toElement where
 
 classify :: Set.Set Category -> Maybe ClassName
 classify = foldr (const . Just) Nothing
+
+actualLines :: String -> [String]
+actualLines "" = [""]
+actualLines lines = case break (== '\n') lines of
+  (l, lines') -> l : (case lines' of
+                       [] -> []
+                       _:lines' -> actualLines lines')
