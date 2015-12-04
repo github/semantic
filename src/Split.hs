@@ -27,6 +27,9 @@ split _ _ _ = return mempty
 data Row = Row [HTML] [HTML]
   deriving (Eq, Show)
 
+bimap :: ([HTML] -> HTML) -> Row -> Row
+bimap f (Row a b) = Row [ f a ] [ f b ]
+
 instance Monoid Row where
   mempty = Row [] []
   mappend (Row x1 y1) (Row x2 y2) = Row (x1 <> x2) (y1 <> y2)
