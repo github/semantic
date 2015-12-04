@@ -34,3 +34,5 @@ main = hspec $ do
     where
       info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
       unchanged source category = Annotated (info source category, info source category)
+      offsetInfo by (Info (Range start end) lineRange categories) = Info (Range (start + by) end) lineRange categories
+      offsetAnnotated by (Annotated (left, right) syntax) = Annotated (offsetInfo by left, offsetInfo by right) syntax
