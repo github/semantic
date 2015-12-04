@@ -27,6 +27,6 @@ main = hspec $ do
 
   describe "annotatedToRows" $ do
     it "outputs one row for single-line unchanged leaves" $
-      annotatedToRows (Annotated (Info (Range 0 1) r $ Set.fromList [ "leaf" ], Info (Range 0 1) r $ Set.fromList [ "leaf" ]) (Leaf "")) "a" "a" `shouldBe` ([ Row [ Span (Just "leaf") "a" ] [ Span (Just "leaf") "a" ] ], Range 0 1, Range 0 1)
+      annotatedToRows (Annotated (Info (Range 0 1) lineRange $ Set.fromList [ "leaf" ], Info (Range 0 1) lineRange $ Set.fromList [ "leaf" ]) (Leaf "")) "a" "a" `shouldBe` ([ Row [ Span (Just "leaf") "a" ] [ Span (Just "leaf") "a" ] ], Range 0 1, Range 0 1)
     where
-      r = Range 0 0
+      lineRange = Range 0 0
