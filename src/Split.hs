@@ -52,8 +52,8 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     appendRemainder (rows, previousIndices) = adjoinRows rows $ contextRows (ends ranges) previousIndices sources
     sumRows (rows, previousIndices) child = (rows `adjoinRows` (contextRows (starts childRanges) previousIndices sources) `adjoinRows` childRows
                                             , ends childRanges)
-        where
-          (childRows, childRanges) = diffToRows child before after
+      where
+        (childRows, childRanges) = diffToRows child before after
 
 contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row]
 contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows leftElements rightElements
