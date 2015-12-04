@@ -59,6 +59,12 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
           leftElements = Text <$> lines (substring (Range previousLeft $ start left) before)
           rightElements = Text <$> lines (substring (Range previousRight $ start right) after)
 
+starts :: Range -> Range -> (Int, Int)
+starts left right = (start left, start right)
+
+ends :: Range -> Range -> (Int, Int)
+ends left right = (end left, end right)
+
 rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row
 rowFromMaybeRows a b = Row (Maybe.maybeToList a) (Maybe.maybeToList b)
 
