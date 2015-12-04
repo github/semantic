@@ -34,27 +34,27 @@ instance Monoid Row where
   mempty = Row [] []
   mappend (Row x1 y1) (Row x2 y2) = Row (x1 <> x2) (y1 <> y2)
 
-diffToRows :: Diff a Info -> String -> String -> ([Row], Range, Range)
+diffToRows :: Diff a Info -> String -> String -> ([Row], (Range, Range))
 diffToRows (Free annotated) = annotatedToRows annotated
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
-annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], Range, Range)
-annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Leaf _)) before after = (uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements, left, right)
+annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], (Range, Range))
+annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Leaf _)) before after = (uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements, (left, right))
   where
     leftElements = Span (classify leftCategories) <$> lines (substring left before)
     rightElements = Span (classify rightCategories) <$> lines (substring right after)
 
-annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (bimap (Ul $ classify leftCategories) (Ul $ classify rightCategories) <$> rows, left, right)
+annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (bimap (Ul $ classify leftCategories) (Ul $ classify rightCategories) <$> rows, (left, right))
   where
-    rows = appendRemainder $ foldl sumRows ([], start left, start right) i
-    appendRemainder (rows, previousLeft, previousRight) = adjoinRows rows contextRows
+    rows = appendRemainder $ foldl sumRows ([], (start left, start right)) i
+    appendRemainder (rows, (previousLeft, previousRight)) = adjoinRows rows contextRows
       where
         contextRows = uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements
         leftElements = Text <$> lines (substring (Range previousLeft $ end left) before)
         rightElements = Text <$> lines (substring (Range previousRight $ end right) after)
-    sumRows (rows, previousLeft, previousRight) child = (rows `adjoinRows` contextRows `adjoinRows` childRows, end leftChildRange, end rightChildRange)
+    sumRows (rows, (previousLeft, previousRight)) child = (rows `adjoinRows` contextRows `adjoinRows` childRows, (end leftChildRange, end rightChildRange))
         where
-          (childRows, leftChildRange, rightChildRange) = diffToRows child before after
+          (childRows, (leftChildRange, rightChildRange)) = diffToRows child before after
           contextRows = uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements
           leftElements = Text <$> lines (substring (Range previousLeft $ start left) before)
           rightElements = Text <$> lines (substring (Range previousRight $ start right) after)
