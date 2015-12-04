@@ -32,3 +32,4 @@ main = hspec $ do
       oneLineUnchangedIndexedSource = "[ a, b, c ]"
       oneLineUnchangedIndexedRange = totalRange oneLineUnchangedIndexedSource
       lineRange = Range 0 0
+      cats string = Set.fromList [ string ]
