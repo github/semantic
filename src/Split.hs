@@ -1,12 +1,12 @@
 module Split where
 
 import Diff
-import Patch
+
 import Syntax
-import Term
+
 import Range
 import Control.Monad.Free
-import qualified Data.Map as Map
+
 import qualified Data.Maybe as Maybe
 import qualified Data.Set as Set
 import Rainbow
