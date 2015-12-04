@@ -27,8 +27,8 @@ split _ _ _ = return mempty
 data Row = Row [HTML] [HTML]
   deriving (Eq, Show)
 
-bimap :: ([HTML] -> HTML) -> Row -> Row
-bimap f (Row a b) = Row [ f a ] [ f b ]
+bimap :: ([HTML] -> HTML) -> ([HTML] -> HTML) -> Row -> Row
+bimap f g (Row a b) = Row [ f a ] [ g b ]
 
 instance Monoid Row where
   mempty = Row [] []
@@ -44,7 +44,7 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     leftElements = Span (classify leftCategories) <$> lines (substring left before)
     rightElements = Span (classify rightCategories) <$> lines (substring right after)
 
-annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (bimap (Ul $ classify leftCategories) <$> rows, left, right)
+annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (bimap (Ul $ classify leftCategories) (Ul $ classify rightCategories) <$> rows, left, right)
   where
     rows = snd $ foldl sumRows ((start left, start right), []) i
     sumRows ((previousLeft, previousRight), rows) child = ((end left, end right), rows ++ contextRows ++ childRows)
