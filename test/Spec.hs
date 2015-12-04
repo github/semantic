@@ -31,6 +31,4 @@ main = hspec $ do
     where
       oneLineUnchangedIndexedSource = "[ a, b, c ]"
       oneLineUnchangedIndexedRange = totalRange oneLineUnchangedIndexedSource
-      lineRange = Range 0 0
-      cats string = Set.fromList [ string ]
       info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
