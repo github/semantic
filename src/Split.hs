@@ -48,9 +48,9 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
   where
     rows = appendRemainder $ foldl sumRows ((start left, start right), []) i
     appendRemainder ((previousLeft, previousRight), rows) = adjoinRows rows [ Row (Text <$> lines (substring (Range previousLeft $ end left) before)) (Text <$> lines (substring (Range previousRight $ end right) after)) ]
-    sumRows ((previousLeft, previousRight), rows) child = ((end left, end right), rows ++ contextRows ++ childRows)
+    sumRows ((previousLeft, previousRight), rows) child = ((end leftChildRange, end rightChildRange), rows ++ contextRows ++ childRows)
         where
-          (childRows, left, right) = diffToRows child before after
+          (childRows, leftChildRange, rightChildRange) = diffToRows child before after
           contextRows :: [Row]
           contextRows = uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements
           leftElements = Text <$> lines (substring (Range previousLeft $ start left) before)
