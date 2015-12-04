@@ -44,26 +44,28 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     leftElements = Span (classify leftCategories) <$> lines (substring left before)
     rightElements = Span (classify rightCategories) <$> lines (substring right after)
 
-annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (bimap (Ul $ classify leftCategories) (Ul $ classify rightCategories) <$> rows, (left, right))
+annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (bimap (Ul $ classify leftCategories) (Ul $ classify rightCategories) <$> rows, ranges)
   where
-    rows = appendRemainder $ foldl sumRows ([], starts left right) i
-    appendRemainder (rows, (previousLeft, previousRight)) = adjoinRows rows contextRows
-      where
-        contextRows = zipWithMaybe rowFromMaybeRows leftElements rightElements
-        leftElements = Text <$> lines (substring (Range previousLeft $ end left) before)
-        rightElements = Text <$> lines (substring (Range previousRight $ end right) after)
-    sumRows (rows, (previousLeft, previousRight)) child = (rows `adjoinRows` contextRows `adjoinRows` childRows, ends leftChildRange rightChildRange)
+    ranges = (left, right)
+    rows = appendRemainder $ foldl sumRows ([], starts ranges) i
+    sources = (before, after)
+    appendRemainder (rows, previousIndices) = adjoinRows rows $ contextRows (ends ranges) previousIndices sources
+    sumRows (rows, previousIndices) child = (rows `adjoinRows` (contextRows (starts childRanges) previousIndices sources) `adjoinRows` childRows
+                                            , ends childRanges)
         where
-          (childRows, (leftChildRange, rightChildRange)) = diffToRows child before after
-          contextRows = zipWithMaybe rowFromMaybeRows leftElements rightElements
-          leftElements = Text <$> lines (substring (Range previousLeft $ start leftChildRange) before)
-          rightElements = Text <$> lines (substring (Range previousRight $ start rightChildRange) after)
+          (childRows, childRanges) = diffToRows child before after
 
-starts :: Range -> Range -> (Int, Int)
-starts left right = (start left, start right)
+contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row]
+contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows leftElements rightElements
+  where
+    leftElements = Text <$> lines (substring (Range (fst previousIndices) (fst childIndices)) (fst sources))
+    rightElements = Text <$> lines (substring (Range (snd previousIndices) (snd childIndices)) (snd sources))
 
-ends :: Range -> Range -> (Int, Int)
-ends left right = (end left, end right)
+starts :: (Range , Range) -> (Int, Int)
+starts (left, right) = (start left, start right)
+
+ends :: (Range, Range) -> (Int, Int)
+ends (left, right) = (end left, end right)
 
 rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row
 rowFromMaybeRows a b = Row (Maybe.maybeToList a) (Maybe.maybeToList b)
