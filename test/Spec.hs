@@ -28,16 +28,16 @@ main = hspec $ do
 
   describe "annotatedToRows" $ do
     it "outputs one row for single-line unchanged leaves" $
-      annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` ([ Row [ span "a" ] [ span "a" ] ], Range 0 1, Range 0 1)
+      annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` ([ Row [ span "a" ] [ span "a" ] ], (Range 0 1, Range 0 1))
 
     it "outputs one row for single-line empty unchanged indexed nodes" $
-      annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` ([ Row [ Ul (Just "branch") [ Text "[]" ] ] [ Ul (Just "branch") [ Text "[]" ] ] ], Range 0 2, Range 0 2)
+      annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` ([ Row [ Ul (Just "branch") [ Text "[]" ] ] [ Ul (Just "branch") [ Text "[]" ] ] ], (Range 0 2, Range 0 2))
 
     it "outputs one row for single-line non-empty unchanged indexed nodes" $
       annotatedToRows (unchanged "[ a, b ]" "branch" (Indexed [
         Free . offsetAnnotated 2 $ unchanged "a" "leaf" (Leaf ""),
         Free . offsetAnnotated 5 $ unchanged "b" "leaf" (Leaf "")
-      ])) "[ a, b ]" "[ a, b ]" `shouldBe` ([ Row [ Ul (Just "branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ] [ Ul (Just "branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ] ], Range 0 8, Range 0 8)
+      ])) "[ a, b ]" "[ a, b ]" `shouldBe` ([ Row [ Ul (Just "branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ] [ Ul (Just "branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ] ], (Range 0 8, Range 0 8))
     where
       info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
       unchanged source category = Annotated (info source category, info source category)
