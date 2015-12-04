@@ -37,22 +37,30 @@ instance Monoid Row where
 
 diffToRows :: Diff a Info -> (Int, Int) -> String -> String -> ([Row], (Range, Range))
 diffToRows (Free annotated) _ before after = annotatedToRows annotated before after
-diffToRows (Pure (Insert term)) indices _ after = insertToRows term indices after
+diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLine <$> afterLines, (range, Range previousIndex previousIndex))
+  where
+    (afterLines, range) = termToLines term after
+    rowWithInsertedLine (Line elements) = Row [] elements
+diffToRows (Pure (Delete term)) (_, previousIndex) before _ = (rowWithDeletedLine <$> lines, (range, Range previousIndex previousIndex))
+  where
+    (lines, range) = termToLines term before
+    rowWithDeletedLine (Line elements) = Row elements []
 
-insertToRows :: Term a Info -> (Int, Int) -> String -> ([Row], (Range, Range))
-insertToRows (Info range _ categories :< syntax) (previous, _) source = (rows syntax, (Range previous previous, range))
+data Line = Line [HTML] deriving (Show, Eq)
+
+termToLines :: Term a Info -> String -> ([Line], Range)
+termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
   where
     rows (Leaf _) = zipWithMaybe rowFromMaybeRows [] rightElements
     rows (Indexed i) = bimap id ((:[]) . Ul (classify categories)) <$> childRows i
 
-    childRows i = appendRemainder $ foldl sumRows ([], (previous, start range)) i
-    sources = ([], source)
-    appendRemainder (rows, previousIndices) = adjoinRows rows $ contextRows (previous, end range) previousIndices sources
-    sumRows (rows, previousIndices) child = (allRows, ends childRanges)
+    childRows i = appendRemainder $ foldl sumLines ([], start range) i
+    appendRemainder (lines, previous) = adjoinRows lines $ textElements (Range previous (end range)) source
+    sumLines (lines, previous) child = (allLines, end childRange)
       where
-        separatorRows = contextRows (starts childRanges) previousIndices sources
-        allRows = rows `adjoinRows` separatorRows `adjoinRows` childRows
-        (childRows, childRanges) = insertToRows child previousIndices source
+        separatorLines = textElements (Range previous $ start childRange) source
+        allLines = lines `adjoinRows` separatorLines `adjoinRows` childLines
+        (childLines, childRange) = termToLines child source
     rightElements = Span (classify categories) <$> actualLines (substring range source)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
@@ -77,8 +85,10 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
 contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row]
 contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows leftElements rightElements
   where
-    leftElements = Text <$> actualLines (substring (Range (fst previousIndices) (fst childIndices)) (fst sources))
-    rightElements = Text <$> actualLines (substring (Range (snd previousIndices) (snd childIndices)) (snd sources))
+    leftElements = textElements (Range (fst previousIndices) (fst childIndices)) (fst sources)
+    rightElements = textElements (Range (snd previousIndices) (snd childIndices)) (snd sources)
+
+textElements range source = Text <$> actualLines (substring range source)
 
 starts :: (Range , Range) -> (Int, Int)
 starts (left, right) = (start left, start right)
