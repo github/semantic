@@ -74,7 +74,16 @@ rowFromMaybeRows a b = Row (Maybe.maybeToList a) (Maybe.maybeToList b)
 adjoinRows :: [Row] -> [Row] -> [Row]
 adjoinRows [] rows = rows
 adjoinRows rows [] = rows
-adjoinRows accum (row : rows) = init accum ++ [ last accum <> row ] ++ rows
+adjoinRows accum (row : rows) = reverse (adjoin2 (reverse accum) row) ++ rows
+
+adjoin2 :: [Row] -> Row -> [Row]
+adjoin2 [] row = [row]
+adjoin2 (Row [] [] : init) row = adjoin2 init row
+adjoin2 (Row [] rights : Row lefts rights' : init) (Row xs ys) =
+  Row [] (rights <> ys) : Row (lefts <> xs) rights' : init
+adjoin2 (Row lefts [] : Row lefts' rights : init) (Row xs ys) =
+  Row (lefts <> xs) [] : Row lefts' (rights <> ys) : init
+adjoin2 (last:init) row = (last <> row) : init
 
 zipWithMaybe :: (Maybe a -> Maybe b -> c) -> [a] -> [b] -> [c]
 zipWithMaybe f la lb = take len $ zipWith f la' lb'
