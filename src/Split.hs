@@ -40,7 +40,10 @@ diffToRows (Free annotated) _ before after = annotatedToRows annotated before af
 diffToRows (Pure (Insert term)) indices _ after = insertToRows term indices after
 
 insertToRows :: Term a Info -> (Int, Int) -> String -> ([Row], (Range, Range))
-insertToRows (Info range _ categories :< syntax) (previous, _) source = ([], (Range previous previous, range))
+insertToRows (Info range _ categories :< syntax) (previous, _) source = (rows syntax, (Range previous previous, range))
+  where
+    rows (Leaf _) = zipWithMaybe rowFromMaybeRows [] rightElements
+    rightElements = Span (classify categories) <$> actualLines (substring range source)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], (Range, Range))
