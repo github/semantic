@@ -84,9 +84,9 @@ main = do
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
 parserForType mediaType = sequence $ case mediaType of
-    "h" -> Just ts_language_c
-    "c" -> Just ts_language_c
-    "js" -> Just ts_language_javascript
+    ".h" -> Just ts_language_c
+    ".c" -> Just ts_language_c
+    ".js" -> Just ts_language_javascript
     _ -> Nothing
 
 parseTreeSitterFile :: Ptr TSLanguage -> String -> IO (Term String Info)
