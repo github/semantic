@@ -30,7 +30,7 @@ main = hspec $ do
       annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` ([ Row [ Span (Just "leaf") "a" ] [ Span (Just "leaf") "a" ] ], Range 0 1, Range 0 1)
 
     it "outputs one row for single-line empty unchanged indexed nodes" $
-      annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` ([ Row [ Ul (Just "branch") [] ] [ Ul (Just "branch") [] ] ], Range 0 2, Range 0 2)
+      annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` ([ Row [ Ul (Just "branch") [ Text "[]" ] ] [ Ul (Just "branch") [ Text "[]" ] ] ], Range 0 2, Range 0 2)
     where
       info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
       unchanged source category = Annotated (info source category, info source category)
