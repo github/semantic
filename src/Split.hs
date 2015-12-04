@@ -44,8 +44,9 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     leftElements = Span (classify leftCategories) <$> lines (substring left before)
     rightElements = Span (classify rightCategories) <$> lines (substring right after)
 
-annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (snd $ foldl sumRows ((start left, start right), []) i, left, right)
+annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (bimap (Ul $ classify leftCategories) <$> rows, left, right)
   where
+    rows = snd $ foldl sumRows ((start left, start right), []) i
     sumRows ((previousLeft, previousRight), rows) child = ((end left, end right), rows ++ contextRows ++ childRows)
         where
           (childRows, left, right) = diffToRows child before after
