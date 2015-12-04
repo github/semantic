@@ -32,7 +32,5 @@ main = hspec $ do
     it "outputs one row for single-line empty unchanged indexed nodes" $
       annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` ([ Row [ Ul (Just "branch") [] ] [ Ul (Just "branch") [] ] ], Range 0 2, Range 0 2)
     where
-      oneLineUnchangedIndexedSource = "[ a, b, c ]"
-      oneLineUnchangedIndexedRange = totalRange oneLineUnchangedIndexedSource
       info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
       unchanged source category = Annotated (info source category, info source category)
