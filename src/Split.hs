@@ -39,7 +39,7 @@ diffToRows (Free annotated) = annotatedToRows annotated
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], (Range, Range))
-annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Leaf _)) before after = (uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements, (left, right))
+annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Leaf _)) before after = (zipWithMaybe rowFromMaybeRows leftElements rightElements, (left, right))
   where
     leftElements = Span (classify leftCategories) <$> lines (substring left before)
     rightElements = Span (classify rightCategories) <$> lines (substring right after)
@@ -49,13 +49,13 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     rows = appendRemainder $ foldl sumRows ([], starts left right) i
     appendRemainder (rows, (previousLeft, previousRight)) = adjoinRows rows contextRows
       where
-        contextRows = uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements
+        contextRows = zipWithMaybe rowFromMaybeRows leftElements rightElements
         leftElements = Text <$> lines (substring (Range previousLeft $ end left) before)
         rightElements = Text <$> lines (substring (Range previousRight $ end right) after)
     sumRows (rows, (previousLeft, previousRight)) child = (rows `adjoinRows` contextRows `adjoinRows` childRows, ends leftChildRange rightChildRange)
         where
           (childRows, (leftChildRange, rightChildRange)) = diffToRows child before after
-          contextRows = uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements
+          contextRows = zipWithMaybe rowFromMaybeRows leftElements rightElements
           leftElements = Text <$> lines (substring (Range previousLeft $ start leftChildRange) before)
           rightElements = Text <$> lines (substring (Range previousRight $ start rightChildRange) after)
 
@@ -74,8 +74,8 @@ adjoinRows [] rows = rows
 adjoinRows rows [] = rows
 adjoinRows accum (row : rows) = init accum ++ [ last accum <> row ] ++ rows
 
-zipMaybe :: [a] -> [b] -> [(Maybe a, Maybe b)]
-zipMaybe la lb = take len $ zip la' lb'
+zipWithMaybe :: (Maybe a -> Maybe b -> c) -> [a] -> [b] -> [c]
+zipWithMaybe f la lb = take len $ zipWith f la' lb'
   where
     len = max (length la) (length lb)
     la' = (Just <$> la) ++ (repeat Nothing)
