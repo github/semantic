@@ -28,8 +28,8 @@ split _ _ _ = return mempty
 data Row = Row [HTML] [HTML]
   deriving (Eq, Show)
 
-bimap :: ([HTML] -> HTML) -> ([HTML] -> HTML) -> Row -> Row
-bimap f g (Row a b) = Row [ f a ] [ g b ]
+bimap :: ([HTML] -> [HTML]) -> ([HTML] -> [HTML]) -> Row -> Row
+bimap f g (Row a b) = Row (f a) (g b)
 
 instance Monoid Row where
   mempty = Row [] []
@@ -43,6 +43,16 @@ insertToRows :: Term a Info -> (Int, Int) -> String -> ([Row], (Range, Range))
 insertToRows (Info range _ categories :< syntax) (previous, _) source = (rows syntax, (Range previous previous, range))
   where
     rows (Leaf _) = zipWithMaybe rowFromMaybeRows [] rightElements
+    rows (Indexed i) = bimap id ((:[]) . Ul (classify categories)) <$> childRows i
+
+    childRows i = appendRemainder $ foldl sumRows ([], (previous, start range)) i
+    sources = ([], source)
+    appendRemainder (rows, previousIndices) = adjoinRows rows $ contextRows (previous, end range) previousIndices sources
+    sumRows (rows, previousIndices) child = (allRows, ends childRanges)
+      where
+        separatorRows = contextRows (starts childRanges) previousIndices sources
+        allRows = rows `adjoinRows` separatorRows `adjoinRows` childRows
+        (childRows, childRanges) = insertToRows child previousIndices source
     rightElements = Span (classify categories) <$> actualLines (substring range source)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
@@ -52,7 +62,7 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     leftElements = Span (classify leftCategories) <$> actualLines (substring left before)
     rightElements = Span (classify rightCategories) <$> actualLines (substring right after)
 
-annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (bimap (Ul $ classify leftCategories) (Ul $ classify rightCategories) <$> rows, ranges)
+annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (bimap ((:[]) . Ul (classify leftCategories)) ((:[]) . Ul (classify rightCategories)) <$> rows, ranges)
   where
     ranges = (left, right)
     rows = appendRemainder $ foldl sumRows ([], starts ranges) i
