@@ -55,15 +55,17 @@ instance Monoid Line where
 termToLines :: Term a Info -> String -> ([Line], Range)
 termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
   where
-    rows (Leaf _) = zipWithMaybe rowFromMaybeRows [] rightElements
-    rows (Indexed i) = bimap id ((:[]) . Ul (classify categories)) <$> childRows i
+    rows (Leaf _) = Line . (:[]) <$> rightElements
+    rows (Indexed i) = rewrapLineContentsInUl <$> childLines i
 
-    childRows i = appendRemainder $ foldl sumLines ([], start range) i
-    appendRemainder (lines, previous) = adjoinRows lines $ textElements (Range previous (end range)) source
+    rewrapLineContentsInUl (Line elements) = Line [ Ul (classify categories) elements ]
+    lineElements r s = Line . (:[]) <$> textElements r s
+    childLines i = appendRemainder $ foldl sumLines ([], start range) i
+    appendRemainder (lines, previous) = adjoinLines lines $ lineElements (Range previous (end range)) source
     sumLines (lines, previous) child = (allLines, end childRange)
       where
-        separatorLines = textElements (Range previous $ start childRange) source
-        allLines = lines `adjoinRows` separatorLines `adjoinRows` childLines
+        separatorLines = lineElements (Range previous $ start childRange) source
+        allLines = lines `adjoinLines` separatorLines `adjoinLines` childLines
         (childLines, childRange) = termToLines child source
     rightElements = Span (classify categories) <$> actualLines (substring range source)
 
