@@ -50,9 +50,10 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     rows = appendRemainder $ foldl sumRows ([], starts ranges) i
     sources = (before, after)
     appendRemainder (rows, previousIndices) = adjoinRows rows $ contextRows (ends ranges) previousIndices sources
-    sumRows (rows, previousIndices) child = (rows `adjoinRows` (contextRows (starts childRanges) previousIndices sources) `adjoinRows` childRows
-                                            , ends childRanges)
+    sumRows (rows, previousIndices) child = (allRows, ends childRanges)
       where
+        separatorRows = contextRows (starts childRanges) previousIndices sources
+        allRows = rows `adjoinRows` separatorRows `adjoinRows` childRows
         (childRows, childRanges) = diffToRows child before after
 
 contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row]
