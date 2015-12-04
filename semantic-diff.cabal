@@ -59,6 +59,7 @@ test-suite semantic-diff-test
   main-is:             Spec.hs
   build-depends:       base
                      , containers
+                     , free
                      , hspec
                      , semantic-diff
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
