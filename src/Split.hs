@@ -48,6 +48,10 @@ diffToRows (Pure (Delete term)) (_, previousIndex) before _ = (rowWithDeletedLin
 
 data Line = Line [HTML] deriving (Show, Eq)
 
+instance Monoid Line where
+ mempty = Line []
+ mappend (Line xs) (Line ys) = Line (xs <> ys)
+
 termToLines :: Term a Info -> String -> ([Line], Range)
 termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
   where
