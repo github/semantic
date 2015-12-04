@@ -56,8 +56,8 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
         where
           (childRows, (leftChildRange, rightChildRange)) = diffToRows child before after
           contextRows = uncurry rowFromMaybeRows <$> zipMaybe leftElements rightElements
-          leftElements = Text <$> lines (substring (Range previousLeft $ start left) before)
-          rightElements = Text <$> lines (substring (Range previousRight $ start right) after)
+          leftElements = Text <$> lines (substring (Range previousLeft $ start leftChildRange) before)
+          rightElements = Text <$> lines (substring (Range previousRight $ start rightChildRange) after)
 
 starts :: Range -> Range -> (Int, Int)
 starts left right = (start left, start right)
