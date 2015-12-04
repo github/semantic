@@ -63,6 +63,20 @@ main = hspec $ do
               [ Ul (Just "branch") [ Text "", span "b", Text " ]" ] ]
        ], (Range 0 8, Range 0 8))
 
+    it "outputs two rows for two-line non-empty formatted indexed nodes" $
+      annotatedToRows (formatted "[ a,\nb ]" "[\na,\nb ]" "branch" (Indexed [
+        Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
+        Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
+      ])) "[ a,\nb ]" "[\na,\nb ]" `shouldBe`
+      ([
+          Row [ Ul (Just "branch") [ Text "[ ", span "a", Text "," ] ]
+              [ Ul (Just "branch") [ Text "[" ] ],
+          Row [ Ul (Just "branch") [] ]
+              [ Ul (Just "branch") [ Text "", span "a", Text "," ] ],
+          Row [ Ul (Just "branch") [ Text "", span "b", Text " ]" ] ]
+              [ Ul (Just "branch") [ Text "", span "b", Text " ]" ] ]
+       ], (Range 0 8, Range 0 8))
+
     where
       info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
       unchanged source category = formatted source source category
