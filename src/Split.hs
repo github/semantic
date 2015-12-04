@@ -1,9 +1,10 @@
 module Split where
 
 import Diff
-
+import Patch
+import Term
 import Syntax
-
+import Control.Comonad.Cofree
 import Range
 import Control.Monad.Free
 
@@ -34,8 +35,12 @@ instance Monoid Row where
   mempty = Row [] []
   mappend (Row x1 y1) (Row x2 y2) = Row (x1 <> x2) (y1 <> y2)
 
-diffToRows :: Diff a Info -> String -> String -> ([Row], (Range, Range))
-diffToRows (Free annotated) = annotatedToRows annotated
+diffToRows :: Diff a Info -> (Int, Int) -> String -> String -> ([Row], (Range, Range))
+diffToRows (Free annotated) _ before after = annotatedToRows annotated before after
+diffToRows (Pure (Insert term)) indices _ after = insertToRows term indices after
+
+insertToRows :: Term a Info -> (Int, Int) -> String -> ([Row], (Range, Range))
+insertToRows (Info range _ categories :< syntax) (previous, _) source = ([], (Range previous previous, range))
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], (Range, Range))
@@ -54,7 +59,7 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
       where
         separatorRows = contextRows (starts childRanges) previousIndices sources
         allRows = rows `adjoinRows` separatorRows `adjoinRows` childRows
-        (childRows, childRanges) = diffToRows child before after
+        (childRows, childRanges) = diffToRows child previousIndices before after
 
 contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row]
 contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows leftElements rightElements
