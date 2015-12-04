@@ -36,3 +36,4 @@ main = hspec $ do
       unchanged source category = Annotated (info source category, info source category)
       offsetInfo by (Info (Range start end) lineRange categories) = Info (Range (start + by) end) lineRange categories
       offsetAnnotated by (Annotated (left, right) syntax) = Annotated (offsetInfo by left, offsetInfo by right) syntax
+      span = Span (Just "leaf")
