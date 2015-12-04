@@ -4,6 +4,7 @@ import Diff
 import Patch
 import Term
 import Syntax
+import Control.Monad
 import Control.Comonad.Cofree
 import Range
 import Control.Monad.Free
@@ -45,8 +46,15 @@ diffToRows (Pure (Delete term)) (_, previousIndex) before _ = (rowWithDeletedLin
   where
     (lines, range) = termToLines term before
     rowWithDeletedLine (Line elements) = Row elements []
+diffToRows (Pure (Replace a b)) _ before after =  (zipWithMaybe rowFromMaybeRows (unLine <$> leftElements) (unLine <$> rightElements), (leftRange, rightRange))
+  where
+    rowFromMaybeRows :: Maybe [HTML] -> Maybe [HTML] -> Row
+    rowFromMaybeRows a b = Row (join $ Maybe.maybeToList a) (join $ Maybe.maybeToList b)
+    (leftElements, leftRange) = termToLines a before
+    (rightElements, rightRange) = termToLines b after
+    rowWithReplacedLine (Line elements) = Row elements []
 
-data Line = Line [HTML] deriving (Show, Eq)
+newtype Line = Line { unLine :: [HTML] } deriving (Show, Eq)
 
 instance Monoid Line where
  mempty = Line []
