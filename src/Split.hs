@@ -62,6 +62,7 @@ rowFromMaybeRows a b = Row (Maybe.maybeToList a) (Maybe.maybeToList b)
 -- | Adjoin a list of rows onto an existing list of rows.
 adjoinRows :: [Row] -> [Row] -> [Row]
 adjoinRows [] rows = rows
+adjoinRows rows [] = rows
 adjoinRows accum (row : rows) = init accum ++ [ last accum <> row ] ++ rows
 
 zipMaybe :: [a] -> [b] -> [(Maybe a, Maybe b)]
