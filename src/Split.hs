@@ -53,7 +53,7 @@ data Row = Row [HTML] [HTML]
   deriving Eq
 
 instance Show Row where
-  show (Row left right) = tag "tr" (tag "td" $ show <$> left) (tag "td" $ show <$> right)
+  show (Row left right) = tag "tr" $ (tag "td" . concat $ show <$> left) ++ (tag "td" . concat $ show <$> right)
 
 bimap :: ([HTML] -> [HTML]) -> ([HTML] -> [HTML]) -> Row -> Row
 bimap f g (Row a b) = Row (f a) (g b)
