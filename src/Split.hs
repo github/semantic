@@ -87,7 +87,6 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
     rowFromMaybeRows a b = Row (join $ Maybe.maybeToList a) (join $ Maybe.maybeToList b)
     (leftElements, leftRange) = termToLines a before
     (rightElements, rightRange) = termToLines b after
-    rowWithReplacedLine (Line elements) = Row elements []
 
 newtype Line = Line { unLine :: [HTML] } deriving (Show, Eq)
 
