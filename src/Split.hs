@@ -24,9 +24,10 @@ data HTML =
   | Dt String
   deriving (Eq, Show)
 
-instance Show (Maybe ClassName) where
-  show (Just c) = " class='" ++ c ++ "'"
-  show _ = ""
+showClassName :: Maybe ClassName -> String
+showClassName (Just c) = " class='" ++ c ++ "'"
+showClassName _ = ""
+
 
 split :: Diff a Info -> String -> String -> IO ByteString
 split diff before after = return . pack . show $ diffToRows diff (0, 0) before after
