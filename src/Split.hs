@@ -31,6 +31,9 @@ showClassName _ = ""
 tag :: String -> String -> String
 tag name contents = "<" ++ name ++ ">" ++ contents ++ "</" ++ name ++ ">"
 
+table :: String -> String
+table contents = "<table class='diff'>" ++ contents ++ "</table>"
+
 li :: HTML -> String
 li (Text string) = string
 li html = tag "li" $ show html
@@ -51,7 +54,7 @@ split diff before after = return . pack
   . tag "html"
     . (tag "head" "<link rel='stylesheet' href='style.css'>" ++)
     . tag "body"
-      . tag "table"
+      . table
         . concat $ show <$> (fst $ diffToRows diff (0, 0) before after)
 
 data Row = Row [HTML] [HTML]
