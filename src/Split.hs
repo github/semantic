@@ -36,11 +36,15 @@ toLi :: HTML -> Markup
 toLi (Text s) = string s
 toLi e = li $ toMarkup e
 
+toDd :: HTML -> Markup
+toDd (Text s) = string s
+toDd e = dd $ toMarkup e
+
 instance ToMarkup HTML where
   toMarkup (Text s) = string s
   toMarkup (Span className s) = classifyMarkup className . span $ string s
   toMarkup (Ul className children) = classifyMarkup className . ul $ mconcat (toLi <$> children)
-  toMarkup (Dl className children) = classifyMarkup className . dl $ mconcat (dd . toMarkup <$> children)
+  toMarkup (Dl className children) = classifyMarkup className . dl $ mconcat (toDd <$> children)
   toMarkup (Dt key) = dt $ string key
 
 split :: Diff a Info -> String -> String -> IO ByteString
