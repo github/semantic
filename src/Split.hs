@@ -47,7 +47,7 @@ instance Show HTML where
   show (Dt key) = tag "dt" key
 
 split :: Diff a Info -> String -> String -> IO ByteString
-split diff before after = return . pack . show $ diffToRows diff (0, 0) before after
+split diff before after = return . pack . concat $ show <$> (fst $ diffToRows diff (0, 0) before after)
 
 data Row = Row [HTML] [HTML]
   deriving Eq
