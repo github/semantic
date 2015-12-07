@@ -7,7 +7,6 @@ import Term
 import Syntax
 import Control.Monad
 import Control.Comonad.Cofree
-import qualified Data.List as L
 import Range
 import Control.Monad.Free
 import Data.ByteString.Lazy.Internal
@@ -62,7 +61,7 @@ makeRow :: [HTML] -> [HTML] -> Row
 makeRow = Row Set.empty
 
 instance ToMarkup Row where
-  toMarkup (Row classNames left right) = tr ! A.class_ (stringValue . L.intercalate " " $ Set.toList classNames) $ (td . mconcat $ toMarkup <$> left) <> (td . mconcat $ toMarkup <$> right)
+  toMarkup (Row _ left right) = (tr $ (td . mconcat $ toMarkup <$> left) <> (td . mconcat $ toMarkup <$> right))
 
 bimap :: ([HTML] -> [HTML]) -> ([HTML] -> [HTML]) -> Row -> Row
 bimap f g (Row className a b) = Row className (f a) (g b)
