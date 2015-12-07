@@ -65,21 +65,20 @@ arguments = Argument
 main :: IO ()
 main = do
   arguments <- execParser opts
-  output <- do
-    let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
-    aContents <- readFile sourceAPath
-    bContents <- readFile sourceBPath
-    language <- (parserForType . takeExtension) sourceAPath
-    (aTerm, bTerm) <- case language of
-      Just lang -> do aTerm <- parseTreeSitterFile lang aContents
-                      bTerm <- parseTreeSitterFile lang bContents
-                      return (aTerm, bTerm)
-      Nothing -> error ("Unsupported language extension in path: " ++ sourceAPath)
-    let diff = interpret comparable aTerm bTerm in
-      case output arguments of
-        Unified -> unified diff aContents bContents
-        Split -> split diff aContents bContents
-  ByteString.putStr output where
+  let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
+  aContents <- readFile sourceAPath
+  bContents <- readFile sourceBPath
+  language <- (parserForType . takeExtension) sourceAPath
+  (aTerm, bTerm) <- case language of
+    Just lang -> do aTerm <- parseTreeSitterFile lang aContents
+                    bTerm <- parseTreeSitterFile lang bContents
+                    return (aTerm, bTerm)
+    Nothing -> error ("Unsupported language extension in path: " ++ sourceAPath)
+  let diff = interpret comparable aTerm bTerm in do
+    output <- case output arguments of
+      Unified -> unified diff aContents bContents
+      Split -> split diff aContents bContents
+    ByteString.putStr output where
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
