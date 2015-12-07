@@ -52,7 +52,7 @@ instance Show HTML where
 split :: Diff a Info -> String -> String -> IO ByteString
 split diff before after = return . pack
   . tag "html"
-    . (tag "head" "<link rel='stylesheet' href='style.css'>" ++)
+    . (tag "head" "<link rel='stylesheet' href='style.css'/>" ++)
     . tag "body"
       . table
         . concat $ show <$> (fst $ diffToRows diff (0, 0) before after)
