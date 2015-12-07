@@ -22,12 +22,18 @@ data HTML =
   | Ul (Maybe ClassName) [HTML]
   | Dl (Maybe ClassName) [HTML]
   | Dt String
-  deriving (Eq, Show)
+  deriving Eq
 
 showClassName :: Maybe ClassName -> String
 showClassName (Just c) = " class='" ++ c ++ "'"
 showClassName _ = ""
 
+instance Show HTML where
+  show (Text string) = string
+  show (Span className string) = "<span" ++ showClassName className ++ ">" ++ string ++ "</span>"
+  show (Ul className children) = "<ul" ++ showClassName className ++ ">" ++ concat (show <$> children) ++ "</ul>"
+  show (Dl className children) = "<dl" ++ showClassName className ++ ">" ++ concat (show <$> children) ++ "</dl>"
+  show (Dt key) = "<dt>" ++ key ++ "</dt>"
 
 split :: Diff a Info -> String -> String -> IO ByteString
 split diff before after = return . pack . show $ diffToRows diff (0, 0) before after
