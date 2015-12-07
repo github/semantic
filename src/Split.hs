@@ -1,6 +1,6 @@
 module Split where
 
-import Prelude hiding (span, head)
+import Prelude hiding (div, head, span)
 import Diff
 import Patch
 import Term
@@ -24,6 +24,7 @@ data HTML =
   | Span (Maybe ClassName) String
   | Ul (Maybe ClassName) [HTML]
   | Dl (Maybe ClassName) [HTML]
+  | Div (Maybe ClassName) [HTML]
   | Dt String
   deriving (Show, Eq)
 
@@ -44,6 +45,7 @@ instance ToMarkup HTML where
   toMarkup (Span className s) = classifyMarkup className . span $ string s
   toMarkup (Ul className children) = classifyMarkup className . ul $ mconcat (toLi <$> children)
   toMarkup (Dl className children) = classifyMarkup className . dl $ mconcat (toDd <$> children)
+  toMarkup (Div className children) = classifyMarkup className . div $ mconcat (toMarkup <$> children)
   toMarkup (Dt key) = dt $ string key
 
 split :: Diff a Info -> String -> String -> IO ByteString
