@@ -1,13 +1,12 @@
 module Split where
 
-import Prelude hiding (span, head)
+import Prelude hiding (div, head, span)
 import Diff
 import Patch
 import Term
 import Syntax
 import Control.Monad
 import Control.Comonad.Cofree
-import qualified Data.List as L
 import Range
 import Control.Monad.Free
 import Data.ByteString.Lazy.Internal
@@ -25,6 +24,7 @@ data HTML =
   | Span (Maybe ClassName) String
   | Ul (Maybe ClassName) [HTML]
   | Dl (Maybe ClassName) [HTML]
+  | Div (Maybe ClassName) [HTML]
   | Dt String
   deriving (Show, Eq)
 
@@ -32,11 +32,20 @@ classifyMarkup :: Maybe ClassName -> Markup -> Markup
 classifyMarkup (Just className) element = element ! A.class_ (stringValue className)
 classifyMarkup _ element = element
 
+toLi :: HTML -> Markup
+toLi (Text s) = string s
+toLi e = li $ toMarkup e
+
+toDd :: HTML -> Markup
+toDd (Text s) = string s
+toDd e = dd $ toMarkup e
+
 instance ToMarkup HTML where
   toMarkup (Text s) = string s
   toMarkup (Span className s) = classifyMarkup className . span $ string s
-  toMarkup (Ul className children) = classifyMarkup className . ul $ mconcat (li . toMarkup <$> children)
-  toMarkup (Dl className children) = classifyMarkup className . dl $ mconcat (dd . toMarkup <$> children)
+  toMarkup (Ul className children) = classifyMarkup className . ul $ mconcat (toLi <$> children)
+  toMarkup (Dl className children) = classifyMarkup className . dl $ mconcat (toDd <$> children)
+  toMarkup (Div className children) = classifyMarkup className . div $ mconcat (toMarkup <$> children)
   toMarkup (Dt key) = dt $ string key
 
 split :: Diff a Info -> String -> String -> IO ByteString
@@ -47,40 +56,35 @@ split diff before after = return . renderHtml
       . (table ! A.class_ (stringValue "diff"))
         . mconcat $ toMarkup <$> (fst $ diffToRows diff (0, 0) before after)
 
-data Row = Row (Set.Set ClassName) [HTML] [HTML]
+data Row = Row [HTML] [HTML]
   deriving (Show, Eq)
 
-makeRow :: [HTML] -> [HTML] -> Row
-makeRow = Row Set.empty
-
 instance ToMarkup Row where
-  toMarkup (Row classNames left right) = tr ! A.class_ (stringValue . L.intercalate " " $ Set.toList classNames) $ (td . mconcat $ toMarkup <$> left) <> (td . mconcat $ toMarkup <$> right)
+  toMarkup (Row left right) = (tr $ (td . mconcat $ toMarkup <$> left) <> (td . mconcat $ toMarkup <$> right))
 
 bimap :: ([HTML] -> [HTML]) -> ([HTML] -> [HTML]) -> Row -> Row
-bimap f g (Row className a b) = Row className (f a) (g b)
+bimap f g (Row a b) = Row (f a) (g b)
 
 instance Monoid Row where
-  mempty = makeRow [] []
-  mappend (Row c1 x1 y1) (Row c2 x2 y2) = Row (c1 <> c2) (x1 <> x2) (y1 <> y2)
-
-insertClasses = Set.singleton "insert"
-deleteClasses = Set.singleton "delete"
-replaceClasses = Set.singleton "replace"
+  mempty = Row [] []
+  mappend (Row x1 y1) (Row x2 y2) = Row (x1 <> x2) (y1 <> y2)
 
 diffToRows :: Diff a Info -> (Int, Int) -> String -> String -> ([Row], (Range, Range))
 diffToRows (Free annotated) _ before after = annotatedToRows annotated before after
 diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLine <$> afterLines, (range, Range previousIndex previousIndex))
   where
     (afterLines, range) = termToLines term after
-    rowWithInsertedLine (Line elements) = Row insertClasses [] elements
+    rowWithInsertedLine (Line elements) = Row [] [ Div (Just "insert") elements ]
 diffToRows (Pure (Delete term)) (_, previousIndex) before _ = (rowWithDeletedLine <$> lines, (range, Range previousIndex previousIndex))
   where
     (lines, range) = termToLines term before
-    rowWithDeletedLine (Line elements) = Row deleteClasses elements []
-diffToRows (Pure (Replace a b)) _ before after =  (zipWithMaybe rowFromMaybeRows (unLine <$> leftElements) (unLine <$> rightElements), (leftRange, rightRange))
+    rowWithDeletedLine (Line elements) = Row [ Div (Just "delete") elements ] []
+diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, rightRange))
   where
+    replacedRows = zipWithMaybe rowFromMaybeRows (replace <$> leftElements) (replace <$> rightElements)
+    replace = (:[]) . Div (Just "replace") . unLine
     rowFromMaybeRows :: Maybe [HTML] -> Maybe [HTML] -> Row
-    rowFromMaybeRows a b = Row replaceClasses (join $ Maybe.maybeToList a) (join $ Maybe.maybeToList b)
+    rowFromMaybeRows a b = Row (join $ Maybe.maybeToList a) (join $ Maybe.maybeToList b)
     (leftElements, leftRange) = termToLines a before
     (rightElements, rightRange) = termToLines b after
 
@@ -93,7 +97,7 @@ instance Monoid Line where
 termToLines :: Term a Info -> String -> ([Line], Range)
 termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
   where
-    rows (Leaf _) = Line . (:[]) <$> rightElements
+    rows (Leaf _) = Line . (:[]) <$> elements
     rows (Indexed i) = rewrapLineContentsInUl <$> childLines i
 
     rewrapLineContentsInUl (Line elements) = Line [ Ul (classify categories) elements ]
@@ -105,7 +109,7 @@ termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
         separatorLines = lineElements (Range previous $ start childRange) source
         allLines = lines `adjoinLines` separatorLines `adjoinLines` childLines
         (childLines, childRange) = termToLines child source
-    rightElements = Span (classify categories) <$> actualLines (substring range source)
+    elements = Span (classify categories) <$> actualLines (substring range source)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], (Range, Range))
@@ -141,7 +145,7 @@ ends :: (Range, Range) -> (Int, Int)
 ends (left, right) = (end left, end right)
 
 rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row
-rowFromMaybeRows a b = makeRow (Maybe.maybeToList a) (Maybe.maybeToList b)
+rowFromMaybeRows a b = Row (Maybe.maybeToList a) (Maybe.maybeToList b)
 
 -- | Adjoin a list of rows onto an existing list of rows.
 adjoinRows :: [Row] -> [Row] -> [Row]
@@ -151,11 +155,11 @@ adjoinRows accum (row : rows) = reverse (adjoin2 (reverse accum) row) ++ rows
 
 adjoin2 :: [Row] -> Row -> [Row]
 adjoin2 [] row = [row]
-adjoin2 (Row _ [] [] : init) row = adjoin2 init row
-adjoin2 (Row c1 [] rights : Row c2 lefts rights' : init) (Row c3 xs ys) =
-  Row (Set.union c1 c3) [] (rights <> ys) : Row (Set.union c2 c3) (lefts <> xs) rights' : init
-adjoin2 (Row c1 lefts [] : Row c2 lefts' rights : init) (Row c3 xs ys) =
-  Row (Set.union c1 c3) (lefts <> xs) [] : Row (Set.union c2 c3) lefts' (rights <> ys) : init
+adjoin2 (Row [] [] : init) row = adjoin2 init row
+adjoin2 (Row [] rights : Row lefts rights' : init) (Row xs ys) =
+  Row [] (rights <> ys) : Row (lefts <> xs) rights' : init
+adjoin2 (Row lefts [] : Row lefts' rights : init) (Row xs ys) =
+  Row (lefts <> xs) [] : Row lefts' (rights <> ys) : init
 adjoin2 (last:init) row = (last <> row) : init
 
 adjoinLines :: [Line] -> [Line] -> [Line]
