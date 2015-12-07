@@ -93,7 +93,7 @@ instance Monoid Line where
 termToLines :: Term a Info -> String -> ([Line], Range)
 termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
   where
-    rows (Leaf _) = Line . (:[]) <$> rightElements
+    rows (Leaf _) = Line . (:[]) <$> elements
     rows (Indexed i) = rewrapLineContentsInUl <$> childLines i
 
     rewrapLineContentsInUl (Line elements) = Line [ Ul (classify categories) elements ]
@@ -105,7 +105,7 @@ termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
         separatorLines = lineElements (Range previous $ start childRange) source
         allLines = lines `adjoinLines` separatorLines `adjoinLines` childLines
         (childLines, childRange) = termToLines child source
-    rightElements = Span (classify categories) <$> actualLines (substring range source)
+    elements = Span (classify categories) <$> actualLines (substring range source)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], (Range, Range))
