@@ -15,7 +15,7 @@
 	url = https://github.com/maxbrunsfeld/tree-sitter.git
 [submodule "prototype/External/tree-sitter-javascript"]
 	path = prototype/External/tree-sitter-javascript
-	url = https://github.com/joshvera/tree-sitter-javascript.git
+	url = https://github.com/maxbrunsfeld/tree-sitter-javascript.git
 [submodule "prototype/External/tree-sitter-c"]
 	path = prototype/External/tree-sitter-c
-	url = https://github.com/robrix/tree-sitter-c.git
+	url = https://github.com/maxbrunsfeld/tree-sitter-c.git
