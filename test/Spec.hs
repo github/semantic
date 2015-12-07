@@ -57,10 +57,10 @@ main = hspec $ do
         Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
       ])) "[ a,\nb ]" "[ a,\nb ]" `shouldBe`
       ([
-          Row [ Ul (Just "branch") [ Text "[ ", span "a", Text "," ] ]
-              [ Ul (Just "branch") [ Text "[ ", span "a", Text "," ] ],
-          Row [ Ul (Just "branch") [ Text "", span "b", Text " ]" ] ]
-              [ Ul (Just "branch") [ Text "", span "b", Text " ]" ] ]
+          Row [ Ul (Just "category-branch") [ Text "[ ", span "a", Text "," ] ]
+              [ Ul (Just "category-branch") [ Text "[ ", span "a", Text "," ] ],
+          Row [ Ul (Just "category-branch") [ Text "", span "b", Text " ]" ] ]
+              [ Ul (Just "category-branch") [ Text "", span "b", Text " ]" ] ]
        ], (Range 0 8, Range 0 8))
 
     it "outputs two rows for two-line non-empty formatted indexed nodes" $
@@ -69,12 +69,12 @@ main = hspec $ do
         Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
       ])) "[ a,\nb ]" "[\na,\nb ]" `shouldBe`
       ([
-          Row [ Ul (Just "branch") [ Text "[ ", span "a", Text "," ] ]
-              [ Ul (Just "branch") [ Text "[" ] ],
-          Row [ Ul (Just "branch") [] ]
-              [ Ul (Just "branch") [ Text "", span "a", Text "," ] ],
-          Row [ Ul (Just "branch") [ Text "", span "b", Text " ]" ] ]
-              [ Ul (Just "branch") [ Text "", span "b", Text " ]" ] ]
+          Row [ Ul (Just "category-branch") [ Text "[ ", span "a", Text "," ] ]
+              [ Ul (Just "category-branch") [ Text "[" ] ],
+          Row [ Ul (Just "category-branch") [] ]
+              [ Ul (Just "category-branch") [ Text "", span "a", Text "," ] ],
+          Row [ Ul (Just "category-branch") [ Text "", span "b", Text " ]" ] ]
+              [ Ul (Just "category-branch") [ Text "", span "b", Text " ]" ] ]
        ], (Range 0 8, Range 0 8))
 
     where
