@@ -12,6 +12,10 @@ TSLanguage *ts_language_c_use() {
 	return ts_language_c();
 }
 
+TSLanguage *ts_language_javascript_use() {
+	return ts_language_javascript();
+}
+
 const char *ts_node_p_name(const TSNode *node, const TSDocument *document) {
 	assert(node != NULL);
 	assert(node->data != NULL);
@@ -49,4 +53,16 @@ size_t ts_node_p_size_chars(const TSNode *node) {
 	assert(node != NULL);
 	assert(node->data != NULL);
 	return ts_node_size(*node).chars;
+}
+
+size_t ts_node_p_start_point(const TSNode *node) {
+	assert(node != NULL);
+	assert(node->data != NULL);
+	return ts_node_start_point(*node).row;
+}
+
+size_t ts_node_p_end_point(const TSNode *node) {
+	assert(node != NULL);
+	assert(node->data != NULL);
+	return ts_node_end_point(*node).row;
 }

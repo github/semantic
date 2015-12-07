@@ -22,13 +22,19 @@ library
                      , SES
                      , Categorizable
                      , Term
+                     , Range
+                     , Split
+                     , Unified
   build-depends:       base >= 4.8 && < 5
                      , containers
                      , free
                      , mtl
+                     , rainbow
+                     , bytestring
+                     , blaze-html
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable
-  ghc-options:        -Wall -Werror
+  ghc-options:        -Wall -fno-warn-name-shadowing
 
 executable semantic-diff-exe
   hs-source-dirs:      app
@@ -38,18 +44,21 @@ executable semantic-diff-exe
                      , containers
                      , free
                      , semantic-diff
-                     , rainbow
                      , bytestring
+                     , optparse-applicative
+                     , filepath
   default-language:    Haskell2010
-  other-modules:       Unified
   extra-libraries:     bridge
-  extra-lib-dirs:      prototype/External/tree-sitter/out/Release, prototype/External/tree-sitter-c, .
+  extra-lib-dirs:      .
 
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
   build-depends:       base
+                     , containers
+                     , free
+                     , hspec
                      , semantic-diff
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010

@@ -4,6 +4,7 @@ import Diff
 import Patch
 import Syntax
 import Term
+import Range
 import Control.Arrow
 import Control.Monad.Free
 import Control.Comonad.Cofree
@@ -17,10 +18,10 @@ unified diff before after = do
   return . mconcat . chunksToByteStrings renderer . fst $ iter g mapped where
     mapped = fmap (unifiedPatch &&& range) diff
     g (Annotated (_, info) syntax) = annotationAndSyntaxToChunks after info syntax
-    annotationAndSyntaxToChunks source (Info range _) (Leaf _) = (pure . chunk $ substring range source, Just range)
-    annotationAndSyntaxToChunks source (Info range _) (Indexed i) = (unifiedRange range i source, Just range)
-    annotationAndSyntaxToChunks source (Info range _) (Fixed f) = (unifiedRange range f source, Just range)
-    annotationAndSyntaxToChunks source (Info range _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) source, Just range)
+    annotationAndSyntaxToChunks source (Info range _ _) (Leaf _) = (pure . chunk $ substring range source, Just range)
+    annotationAndSyntaxToChunks source (Info range _ _) (Indexed i) = (unifiedRange range i source, Just range)
+    annotationAndSyntaxToChunks source (Info range _ _) (Fixed f) = (unifiedRange range f source, Just range)
+    annotationAndSyntaxToChunks source (Info range _ _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) source, Just range)
 
     unifiedPatch :: Patch (Term a Info) -> [Chunk String]
     unifiedPatch patch = (fore red . bold <$> beforeChunk) <> (fore green . bold <$> afterChunk) where
@@ -36,16 +37,11 @@ unified diff before after = do
       accumulateContext (out, previous) (child, Just range) = (mconcat [ out, pure . chunk $ substring Range { start = previous, end = start range } source, child ], end range)
       accumulateContext (out, previous) (child, _) = (out <> child, previous)
 
-substring :: Range -> String -> String
-substring range = take (end range - start range) . drop (start range)
-
 range :: Patch (Term a Info) -> Maybe Range
 range patch = range . extract <$> after patch where
   extract (annotation :< _) = annotation
-  range (Info range _) = range
+  range (Info range _ _) = range
 
 change :: String -> [Chunk String] -> [Chunk String]
 change bound content = [ chunk "{", chunk bound ] ++ content ++ [ chunk bound, chunk "}" ]
 
-instance Ord Range where
-  a <= b = start a <= start b

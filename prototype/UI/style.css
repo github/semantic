@@ -1,3 +1,6 @@
+table.diff td {
+	width: 50%;
+}
 #before, #after {
 	width: 50%;
 }
@@ -12,15 +15,15 @@ body {
 	padding: 0;
 	font-family: monospace;
 }
-.insert {
+tr.insert td:last-child {
 	background-color: #eaffea;
 	outline: 1px solid #c1e9c1;
 }
-.delete {
+tr.delete td:first-child {
 	background-color: #ffecec;
 	outline: 1px solid #f1c0c0;
 }
-.replace {
+tr.replace td {
 	background-color: #ffffec;
 	outline: 1px solid #e9e9c0;
 }
