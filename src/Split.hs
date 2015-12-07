@@ -79,8 +79,10 @@ diffToRows (Pure (Delete term)) (_, previousIndex) before _ = (rowWithDeletedLin
   where
     (lines, range) = termToLines term before
     rowWithDeletedLine (Line elements) = Row [ Div (Just "delete") elements ] []
-diffToRows (Pure (Replace a b)) _ before after =  (zipWithMaybe rowFromMaybeRows (unLine <$> leftElements) (unLine <$> rightElements), (leftRange, rightRange))
+diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, rightRange))
   where
+    replacedRows = zipWithMaybe rowFromMaybeRows (replace <$> leftElements) (replace <$> rightElements)
+    replace = (:[]) . Div (Just "replace") . unLine
     rowFromMaybeRows :: Maybe [HTML] -> Maybe [HTML] -> Row
     rowFromMaybeRows a b = Row (join $ Maybe.maybeToList a) (join $ Maybe.maybeToList b)
     (leftElements, leftRange) = termToLines a before
