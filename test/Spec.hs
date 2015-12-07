@@ -37,19 +37,19 @@ main = hspec $ do
       annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` ([ Row [ span "a" ] [ span "a" ] ], (Range 0 1, Range 0 1))
 
     it "outputs one row for single-line empty unchanged indexed nodes" $
-      annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` ([ Row [ Ul (Just "branch") [ Text "[]" ] ] [ Ul (Just "branch") [ Text "[]" ] ] ], (Range 0 2, Range 0 2))
+      annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` ([ Row [ Ul (Just "category-branch") [ Text "[]" ] ] [ Ul (Just "category-branch") [ Text "[]" ] ] ], (Range 0 2, Range 0 2))
 
     it "outputs one row for single-line non-empty unchanged indexed nodes" $
       annotatedToRows (unchanged "[ a, b ]" "branch" (Indexed [
         Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
         Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
-      ])) "[ a, b ]" "[ a, b ]" `shouldBe` ([ Row [ Ul (Just "branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ] [ Ul (Just "branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ] ], (Range 0 8, Range 0 8))
+      ])) "[ a, b ]" "[ a, b ]" `shouldBe` ([ Row [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ] [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ] ], (Range 0 8, Range 0 8))
 
     it "outputs one row for single-line non-empty formatted indexed nodes" $
       annotatedToRows (formatted "[ a, b ]" "[ a,  b ]" "branch" (Indexed [
         Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
         Free . offsetAnnotated 5 6 $ unchanged "b" "leaf" (Leaf "")
-      ])) "[ a, b ]" "[ a,  b ]" `shouldBe` ([ Row [ Ul (Just "branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ] [ Ul (Just "branch") [ Text "[ ", span "a", Text ",  ", span "b", Text " ]" ] ] ], (Range 0 8, Range 0 9))
+      ])) "[ a, b ]" "[ a,  b ]" `shouldBe` ([ Row [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ] [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",  ", span "b", Text " ]" ] ] ], (Range 0 8, Range 0 9))
 
     it "outputs two rows for two-line non-empty unchanged indexed nodes" $
       annotatedToRows (unchanged "[ a,\nb ]" "branch" (Indexed [
