@@ -1,5 +1,6 @@
 module Split where
 
+import Prelude hiding (span, head)
 import Diff
 import Patch
 import Term
@@ -8,11 +9,13 @@ import Control.Monad
 import Control.Comonad.Cofree
 import Range
 import Control.Monad.Free
-
+import Data.ByteString.Lazy.Internal
+import Text.Blaze.Html5
+import qualified Text.Blaze.Html5.Attributes as A
+import Text.Blaze.Html.Renderer.Utf8
 import qualified Data.Maybe as Maybe
+import Data.Monoid
 import qualified Data.Set as Set
-import Rainbow
-import Data.ByteString.Char8 (pack)
 
 type ClassName = String
 
@@ -22,46 +25,32 @@ data HTML =
   | Ul (Maybe ClassName) [HTML]
   | Dl (Maybe ClassName) [HTML]
   | Dt String
-  deriving Eq
+  deriving (Show, Eq)
 
-showClassName :: Maybe ClassName -> String
-showClassName (Just c) = " class='" ++ c ++ "'"
-showClassName _ = ""
+classifyMarkup :: Maybe ClassName -> Markup -> Markup
+classifyMarkup (Just className) element = element ! A.class_ (stringValue className)
+classifyMarkup _ element = element
 
-tag :: String -> String -> String
-tag name contents = "<" ++ name ++ ">" ++ contents ++ "</" ++ name ++ ">"
-
-table :: String -> String
-table contents = "<table class='diff'>" ++ contents ++ "</table>"
-
-li :: HTML -> String
-li (Text string) = string
-li html = tag "li" $ show html
-
-dd :: HTML -> String
-dd (Text string) = string
-dd html = tag "dd" $ show html
-
-instance Show HTML where
-  show (Text string) = string
-  show (Span className string) = "<span" ++ showClassName className ++ ">" ++ string ++ "</span>"
-  show (Ul className children) = "<ul" ++ showClassName className ++ ">" ++ concat (li <$> children) ++ "</ul>"
-  show (Dl className children) = "<dl" ++ showClassName className ++ ">" ++ concat (dd <$> children) ++ "</dl>"
-  show (Dt key) = tag "dt" key
+instance ToMarkup HTML where
+  toMarkup (Text s) = string s
+  toMarkup (Span className s) = classifyMarkup className . span $ string s
+  toMarkup (Ul className children) = classifyMarkup className . ul $ mconcat (li . toMarkup <$> children)
+  toMarkup (Dl className children) = classifyMarkup className . dl $ mconcat (dd . toMarkup <$> children)
+  toMarkup (Dt key) = dt $ string key
 
 split :: Diff a Info -> String -> String -> IO ByteString
-split diff before after = return . pack
-  . tag "html"
-    . (tag "head" "<link rel='stylesheet' href='style.css'/>" ++)
-    . tag "body"
-      . table
-        . concat $ show <$> (fst $ diffToRows diff (0, 0) before after)
+split diff before after = return . renderHtml
+  . docTypeHtml
+    . ((head $ link ! A.rel (stringValue "stylesheet") ! A.href (stringValue "style.css")) <>)
+    . body
+      . (table ! A.class_ (stringValue "diff"))
+        . mconcat $ toMarkup <$> (fst $ diffToRows diff (0, 0) before after)
 
 data Row = Row [HTML] [HTML]
-  deriving Eq
+  deriving (Show, Eq)
 
-instance Show Row where
-  show (Row left right) = (tag "tr" $ (tag "td" . concat $ show <$> left) ++ (tag "td" . concat $ show <$> right)) ++ "\n"
+instance ToMarkup Row where
+  toMarkup (Row left right) = (tr $ (td . mconcat $ toMarkup <$> left) <> (td . mconcat $ toMarkup <$> right))
 
 bimap :: ([HTML] -> [HTML]) -> ([HTML] -> [HTML]) -> Row -> Row
 bimap f g (Row a b) = Row (f a) (g b)

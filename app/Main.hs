@@ -10,7 +10,8 @@ import Term
 import Unified
 import Control.Comonad.Cofree
 import qualified Data.Map as Map
-import qualified Data.ByteString.Char8 as ByteString
+import qualified Data.ByteString.Char8 as B1
+import qualified Data.ByteString.Lazy as B2
 import Data.Set hiding (split)
 import Options.Applicative
 import System.FilePath
@@ -74,11 +75,15 @@ main = do
                     bTerm <- parseTreeSitterFile lang bContents
                     return (aTerm, bTerm)
     Nothing -> error ("Unsupported language extension in path: " ++ sourceAPath)
-  let diff = interpret comparable aTerm bTerm in do
-    output <- case output arguments of
-      Unified -> unified diff aContents bContents
-      Split -> split diff aContents bContents
-    ByteString.putStr output where
+  let diff = interpret comparable aTerm bTerm in
+    case output arguments of
+      Unified -> do
+        output <- unified diff aContents bContents
+        B1.putStr output
+      Split -> do
+        output <- split diff aContents bContents
+        B2.putStr output
+    where
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
