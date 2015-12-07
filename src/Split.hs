@@ -74,7 +74,7 @@ diffToRows (Free annotated) _ before after = annotatedToRows annotated before af
 diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLine <$> afterLines, (range, Range previousIndex previousIndex))
   where
     (afterLines, range) = termToLines term after
-    rowWithInsertedLine (Line elements) = Row [] elements
+    rowWithInsertedLine (Line elements) = Row [] [ Div (Just "insert") elements ]
 diffToRows (Pure (Delete term)) (_, previousIndex) before _ = (rowWithDeletedLine <$> lines, (range, Range previousIndex previousIndex))
   where
     (lines, range) = termToLines term before
