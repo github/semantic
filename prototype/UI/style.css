@@ -1,3 +1,6 @@
+table.diff td {
+	width: 50%;
+}
 #before, #after {
 	width: 50%;
 }
