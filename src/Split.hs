@@ -50,7 +50,10 @@ split :: Diff a Info -> String -> String -> IO ByteString
 split diff before after = return . pack . show $ diffToRows diff (0, 0) before after
 
 data Row = Row [HTML] [HTML]
-  deriving (Eq, Show)
+  deriving Eq
+
+instance Show Row where
+  show (Row left right) = tag "tr" (tag "td" $ show <$> left) (tag "td" $ show <$> right)
 
 bimap :: ([HTML] -> [HTML]) -> ([HTML] -> [HTML]) -> Row -> Row
 bimap f g (Row a b) = Row (f a) (g b)
