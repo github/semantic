@@ -28,6 +28,9 @@ showClassName :: Maybe ClassName -> String
 showClassName (Just c) = " class='" ++ c ++ "'"
 showClassName _ = ""
 
+tag :: String -> String -> String
+tag name contents = "<" ++ name ++ ">" ++ contents ++ "</" ++ name ++ ">"
+
 li :: HTML -> String
 li (Text string) = string
 li html = "<li>" ++ show html ++ "</li>"
