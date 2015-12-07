@@ -28,11 +28,17 @@ showClassName :: Maybe ClassName -> String
 showClassName (Just c) = " class='" ++ c ++ "'"
 showClassName _ = ""
 
+li :: HTML -> String
+li html = "<li>" ++ show html ++ "</li>"
+
+dd :: HTML -> String
+dd html = "<dd>" ++ show html ++ "</dd>"
+
 instance Show HTML where
   show (Text string) = string
   show (Span className string) = "<span" ++ showClassName className ++ ">" ++ string ++ "</span>"
-  show (Ul className children) = "<ul" ++ showClassName className ++ ">" ++ concat (show <$> children) ++ "</ul>"
-  show (Dl className children) = "<dl" ++ showClassName className ++ ">" ++ concat (show <$> children) ++ "</dl>"
+  show (Ul className children) = "<ul" ++ showClassName className ++ ">" ++ concat (li <$> children) ++ "</ul>"
+  show (Dl className children) = "<dl" ++ showClassName className ++ ">" ++ concat (dd <$> children) ++ "</dl>"
   show (Dt key) = "<dt>" ++ key ++ "</dt>"
 
 split :: Diff a Info -> String -> String -> IO ByteString
