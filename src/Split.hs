@@ -33,18 +33,18 @@ tag name contents = "<" ++ name ++ ">" ++ contents ++ "</" ++ name ++ ">"
 
 li :: HTML -> String
 li (Text string) = string
-li html = "<li>" ++ show html ++ "</li>"
+li html = tag "li" $ show html
 
 dd :: HTML -> String
 dd (Text string) = string
-dd html = "<dd>" ++ show html ++ "</dd>"
+dd html = tag "dd" $ show html
 
 instance Show HTML where
   show (Text string) = string
   show (Span className string) = "<span" ++ showClassName className ++ ">" ++ string ++ "</span>"
   show (Ul className children) = "<ul" ++ showClassName className ++ ">" ++ concat (li <$> children) ++ "</ul>"
   show (Dl className children) = "<dl" ++ showClassName className ++ ">" ++ concat (dd <$> children) ++ "</dl>"
-  show (Dt key) = "<dt>" ++ key ++ "</dt>"
+  show (Dt key) = tag "dt" key
 
 split :: Diff a Info -> String -> String -> IO ByteString
 split diff before after = return . pack . show $ diffToRows diff (0, 0) before after
