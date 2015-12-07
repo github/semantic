@@ -29,9 +29,11 @@ showClassName (Just c) = " class='" ++ c ++ "'"
 showClassName _ = ""
 
 li :: HTML -> String
+li (Text string) = string
 li html = "<li>" ++ show html ++ "</li>"
 
 dd :: HTML -> String
+dd (Text string) = string
 dd html = "<dd>" ++ show html ++ "</dd>"
 
 instance Show HTML where
