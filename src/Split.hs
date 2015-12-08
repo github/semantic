@@ -94,6 +94,8 @@ instance Monoid Line where
  mempty = Line []
  mappend (Line xs) (Line ys) = Line (xs <> ys)
 
+-- | Takes a term and a `source` and returns a list of HTML lines
+-- | and their range within `source`.
 termToLines :: Term a Info -> String -> ([Line], Range)
 termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
   where
