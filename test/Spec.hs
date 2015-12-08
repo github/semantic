@@ -77,6 +77,28 @@ main = hspec $ do
               (Line [ Ul (Just "category-branch") [ Text "", span "b", Text " ]" ] ])
        ], (Range 0 8, Range 0 8))
 
+    it "" $
+      let (sourceA, sourceB) = ("[\na\n,\nb]", "[a,b]") in
+        annotatedToRows (formatted sourceA sourceB "branch" (Indexed [
+          Free . offsetAnnotated 2 1 $ unchanged "a" "leaf" (Leaf ""),
+          Free . offsetAnnotated 7 3 $ unchanged "b" "leaf" (Leaf "")
+        ])) sourceA sourceB `shouldBe`
+        ([
+            Row (Line [ Ul (Just "category-branch") [ Text "[" ] ])
+                (Line [ Ul (Just "category-branch") [ Text "[", span "a", Text ",", span "b", Text "]" ] ]),
+            Row (Line [ Ul (Just "category-branch") [ Text "", span "a" ] ])
+                EmptyLine,
+            Row (Line [ Ul (Just "category-branch") [ Text "", Text "," ] ])
+                EmptyLine,
+            Row (Line [ Ul (Just "category-branch") [ Text "", span "b", Text " ]" ] ])
+                EmptyLine
+        ], (Range 0 8, Range 0 5))
+
+  describe "adjoin2" $ do
+    it "appends a row starting with a newline" $
+      adjoin2 [ Row (Line [ Ul Nothing [ Text "[",Span Nothing "a" ]]) EmptyLine ] (Row (Line [ Text "", Text "," ]) EmptyLine) `shouldBe`
+      [ Row (Line [ Text "", Text "," ]) EmptyLine, Row (Line [ Ul Nothing [ Text "[",Span Nothing "a" ]]) EmptyLine ]
+
     where
       info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
       unchanged source category = formatted source source category

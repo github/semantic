@@ -10,7 +10,7 @@ import Control.Comonad.Cofree
 import Range
 import Control.Monad.Free
 import Data.ByteString.Lazy.Internal
-import Text.Blaze.Html5
+import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
 import Data.Monoid
@@ -26,6 +26,15 @@ data HTML =
   | Div (Maybe ClassName) [HTML]
   | Dt String
   deriving (Show, Eq)
+
+maybeFirstNewLine :: HTML -> Maybe HTML
+maybeFirstNewLine text@(Text "") = Just text
+maybeFirstNewLine text@(Text _) = Nothing
+maybeFirstNewLine (Span _ _) = Nothing
+maybeFirstNewLine (Dt _) = Nothing
+maybeFirstNewLine (Ul _ elements) = getFirst $ mconcat $ map First $ map maybeFirstNewLine elements
+maybeFirstNewLine (Dl _ elements) = getFirst $ mconcat $ map First $ map maybeFirstNewLine elements
+maybeFirstNewLine (Div _ elements) = getFirst $ mconcat $ map First $ map maybeFirstNewLine elements
 
 classifyMarkup :: Maybe ClassName -> Markup -> Markup
 classifyMarkup (Just className) element = element ! A.class_ (stringValue className)
@@ -172,8 +181,12 @@ adjoin2 [] row = [row]
 adjoin2 (Row EmptyLine EmptyLine : init) row = adjoin2 init row
 adjoin2 (Row EmptyLine rights : Row lefts rights' : init) (Row xs ys) =
   Row EmptyLine (rights <> ys) : Row (lefts <> xs) rights' : init
-adjoin2 (Row lefts EmptyLine : Row lefts' rights : init) (Row xs ys) =
+adjoin2 (Row lefts EmptyLine : Row lefts' rights : init) (Row xs@(Line (node : _)) ys) | Just _ <- maybeFirstNewLine node =
   Row (lefts <> xs) EmptyLine : Row lefts' (rights <> ys) : init
+-- adjoin2 (Row lefts EmptyLine : Row lefts' rights : init) (Row xs ys) =
+--  Row (lefts <> xs) EmptyLine : Row lefts' (rights <> ys) : init
+adjoin2 rows row@(Row (Line (node : _)) _) | Just _ <- maybeFirstNewLine node = row : rows
+adjoin2 rows row@(Row _ (Line (node : _))) | Just _ <- maybeFirstNewLine node = row : rows
 adjoin2 (last:init) row = (last <> row) : init
 {-
 
