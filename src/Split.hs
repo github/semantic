@@ -63,6 +63,7 @@ instance ToMarkup Row where
   toMarkup (Row left right) = (tr $ toMarkup left <> toMarkup right)
 
 instance ToMarkup Line where
+  toMarkup EmptyLine = td (string "")
   toMarkup (Line html) = td . mconcat $ toMarkup <$> html
 
 data Line = Line { unLine :: [HTML] } | EmptyLine deriving (Show, Eq)
@@ -75,9 +76,10 @@ instance Monoid Line where
  mappend (Line xs) (Line ys) = Line (xs <> ys)
 
 bimap :: ([HTML] -> [HTML]) -> ([HTML] -> [HTML]) -> Row -> Row
+bimap _ _ (Row EmptyLine EmptyLine) = mempty
 bimap f g (Row (Line a) (Line b)) = Row (Line $ f a) (Line $ g b)
-bimap f g (Row EmptyLine (Line b)) = Row EmptyLine (Line $ g b)
-bimap f g (Row (Line a) EmptyLine) = Row (Line $ f a) EmptyLine
+bimap _ g (Row EmptyLine (Line b)) = Row EmptyLine (Line $ g b)
+bimap f _ (Row (Line a) EmptyLine) = Row (Line $ f a) EmptyLine
 
 instance Monoid Row where
   mempty = Row EmptyLine EmptyLine
@@ -89,10 +91,12 @@ diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLin
   where
     (afterLines, range) = termToLines term after
     rowWithInsertedLine (Line elements) = Row EmptyLine $ Line [ Div (Just "insert") elements ]
+    rowWithInsertedLine EmptyLine = mempty
 diffToRows (Pure (Delete term)) (_, previousIndex) before _ = (rowWithDeletedLine <$> lines, (range, Range previousIndex previousIndex))
   where
     (lines, range) = termToLines term before
     rowWithDeletedLine (Line elements) = Row (Line [ Div (Just "delete") elements ]) EmptyLine
+    rowWithDeletedLine EmptyLine = mempty
 diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, rightRange))
   where
     replacedRows = zipWithMaybe rowFromMaybeRows (replace <$> leftElements) (replace <$> rightElements)
@@ -111,6 +115,7 @@ termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
     rows (Indexed i) = rewrapLineContentsInUl <$> childLines i
 
     rewrapLineContentsInUl (Line elements) = Line [ Ul (classify categories) elements ]
+    rewrapLineContentsInUl EmptyLine = EmptyLine
     lineElements r s = Line . (:[]) <$> textElements r s
     childLines i = appendRemainder $ foldl sumLines ([], start range) i
     appendRemainder (lines, previous) = adjoinLines lines $ lineElements (Range previous (end range)) source
