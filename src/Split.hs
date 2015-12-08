@@ -13,7 +13,6 @@ import Data.ByteString.Lazy.Internal
 import Text.Blaze.Html5
 import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
-import qualified Data.Maybe as Maybe
 import Data.Monoid
 import qualified Data.Set as Set
 
@@ -102,7 +101,7 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
     replacedRows = zipWithMaybe rowFromMaybeRows (replace <$> leftElements) (replace <$> rightElements)
     replace = (:[]) . Div (Just "replace") . unLine
     rowFromMaybeRows :: Maybe [HTML] -> Maybe [HTML] -> Row
-    rowFromMaybeRows a b = Row (Line . join $ Maybe.maybeToList a) (Line . join $ Maybe.maybeToList b)
+    rowFromMaybeRows a b = Row (maybe EmptyLine Line a) (maybe EmptyLine Line b)
     (leftElements, leftRange) = termToLines a before
     (rightElements, rightRange) = termToLines b after
 
@@ -160,7 +159,7 @@ ends :: (Range, Range) -> (Int, Int)
 ends (left, right) = (end left, end right)
 
 rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row
-rowFromMaybeRows a b = Row (Line $ Maybe.maybeToList a) (Line $ Maybe.maybeToList b)
+rowFromMaybeRows a b = Row  (maybe EmptyLine (Line . (:[])) a) (maybe EmptyLine (Line . (:[])) b)
 
 -- | Adjoin a list of rows onto an existing list of rows.
 adjoinRows :: [Row] -> [Row] -> [Row]
