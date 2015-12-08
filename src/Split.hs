@@ -136,6 +136,7 @@ contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows
     leftElements = textElements (Range (fst previousIndices) (fst childIndices)) (fst sources)
     rightElements = textElements (Range (snd previousIndices) (snd childIndices)) (snd sources)
 
+textElements :: Range -> String -> [HTML]
 textElements range source = Text <$> actualLines (substring range source)
 
 starts :: (Range , Range) -> (Int, Int)
