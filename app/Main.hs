@@ -55,7 +55,7 @@ main = do
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
 parserForType :: String -> Maybe P.Parser
-parserForType mediaType = maybe Nothing (Just . parseTreeSitterFile) $ case mediaType of
+parserForType mediaType = parseTreeSitterFile <$> case mediaType of
     ".h" -> Just ts_language_c
     ".c" -> Just ts_language_c
     ".js" -> Just ts_language_javascript
