@@ -84,6 +84,10 @@ main = hspec $ do
       adjoin2 [ leftRowText "a" ] (leftRow  [ newline ]) `shouldBe`
               [ leftRow [ newline ], leftRowText "a" ]
 
+    it "promotes HTML through empty lines" $
+      adjoin2 [ rightRowText "b", leftRow [ newline ] ] (leftRowText "a") `shouldBe`
+              [ rightRowText "b", leftRow [ newline, Text "a" ] ]
+
     it "does not promote newlines through empty lines" $
       adjoin2 [ rightRowText "c", rowText "a" "b" ] (leftRow [ newline ]) `shouldBe`
         [ leftRow [ newline ], rightRowText "c", rowText "a" "b" ]
