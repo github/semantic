@@ -3,6 +3,7 @@ module Main where
 import Categorizable
 import Diff
 import Interpreter
+import qualified Parser as P
 import Syntax
 import Range
 import Split
@@ -93,7 +94,7 @@ parserForType mediaType = sequence $ case mediaType of
     ".js" -> Just ts_language_javascript
     _ -> Nothing
 
-parseTreeSitterFile :: Ptr TSLanguage -> String -> IO (Term String Info)
+parseTreeSitterFile :: Ptr TSLanguage -> P.Parser
 parseTreeSitterFile language contents = do
   document <- ts_document_make
   ts_document_set_language document language
@@ -104,7 +105,7 @@ parseTreeSitterFile language contents = do
     ts_document_free document
     return term)
 
-documentToTerm :: Ptr TSDocument -> String -> IO (Term String Info)
+documentToTerm :: Ptr TSDocument -> P.Parser
 documentToTerm document contents = alloca $ \root -> do
   ts_document_root_node_p document root
   snd <$> toTerm root where
