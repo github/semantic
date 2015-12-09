@@ -107,6 +107,10 @@ main = hspec $ do
       adjoin2 [ Row (Line [ Text "a" ]) EmptyLine ] (Row newLine EmptyLine) `shouldBe`
         [ Row newLine EmptyLine, Row (Line [ Text "a" ]) EmptyLine ]
 
+    it "does not promote newlines through empty lines" $
+      adjoin2 [ Row EmptyLine (Line [ Text "c" ]), Row (Line [ Text "a" ]) (Line [ Text "b" ]) ] (Row newLine EmptyLine) `shouldBe`
+        [ Row newLine EmptyLine, Row EmptyLine (Line [ Text "c" ]), Row (Line [ Text "a" ]) (Line [ Text "b" ]) ]
+
     where
       newLine = Line [ Text "" ]
       info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
