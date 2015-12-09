@@ -180,12 +180,6 @@ ends (left, right) = (end left, end right)
 rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row
 rowFromMaybeRows a b = Row  (maybe EmptyLine (Line . (:[])) a) (maybe EmptyLine (Line . (:[])) b)
 
--- | Adjoin a list of rows onto an existing list of rows.
-adjoinRows :: [Row] -> [Row] -> [Row]
-adjoinRows [] rows = rows
-adjoinRows rows [] = rows
-adjoinRows accum (row : rows) = reverse (adjoin2 (reverse accum) row) ++ rows
-
 adjoin2 :: [Row] -> Row -> [Row]
 adjoin2 [] row = [row]
 -- handle the case where we append a newline on both sides
