@@ -100,13 +100,13 @@ main = hspec $ do
       [ Row EmptyLine (Line [ Text "[", span "a" ]) ]
 
     it "appends onto newlines" $
-      adjoin2 [ Row (Line [ Text ""]) EmptyLine ] (Row (Line [ Text "," ]) EmptyLine) `shouldBe`
+      adjoin2 [ Row newLine EmptyLine ] (Row (Line [ Text "," ]) EmptyLine) `shouldBe`
       [ Row (Line [ Text "", Text "," ]) EmptyLine ]
 
     it "produces new rows for newlines" $
-      adjoin2 [ Row (Line [ Text "a" ]) EmptyLine ] (Row (Line [ Text "" ]) EmptyLine) `shouldBe`
-        [ Row (Line [ Text "" ]) EmptyLine, Row (Line [ Text "a" ]) EmptyLine ]
-    
+      adjoin2 [ Row (Line [ Text "a" ]) EmptyLine ] (Row newLine EmptyLine) `shouldBe`
+        [ Row newLine EmptyLine, Row (Line [ Text "a" ]) EmptyLine ]
+
     where
       newLine = Line [ Text "" ]
       info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
