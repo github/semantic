@@ -178,17 +178,57 @@ adjoinRows accum (row : rows) = reverse (adjoin2 (reverse accum) row) ++ rows
 
 adjoin2 :: [Row] -> Row -> [Row]
 adjoin2 [] row = [row]
+-- handle the case where we append a newline on both sides
+adjoin2 rows (Row left@(Line [ Text "" ]) right) = Row left EmptyLine : zipWith Row lefts rights
+  where
+    lefts = leftLines rows
+    rights = adjoin2Lines (rightLines rows) right
+adjoin2 rows (Row left right@(Line [ Text "" ])) = Row EmptyLine right : zipWith Row lefts rights
+  where
+    lefts = adjoin2Lines (leftLines rows) left
+    rights = rightLines rows
+
 adjoin2 (Row EmptyLine EmptyLine : init) row = adjoin2 init row
-adjoin2 (Row EmptyLine rights : Row lefts rights' : init) (Row xs ys) =
-  Row EmptyLine (rights <> ys) : Row (lefts <> xs) rights' : init
-adjoin2 (Row lefts EmptyLine : Row lefts' rights : init) (Row xs@(Line (node : _)) ys) | Just _ <- maybeFirstNewLine node =
-  Row (lefts <> xs) EmptyLine : Row lefts' (rights <> ys) : init
+
+adjoin2 rows (Row left right) = zipWith Row lefts rights
+  where
+    lefts = adjoin2Lines (leftLines rows) left
+    rights = adjoin2Lines (rightLines rows) right
+
+-- adjoin2 (Row EmptyLine rights : Row lefts rights' : init) (Row xs ys) =
+  -- adjoin2 (adjoin2 init row2) row1
+  -- where row1 = Row EmptyLine (rights <> ys)
+  -- row2 = Row
+  -- Row EmptyLine (rights <> ys) : Row (lefts <> xs) rights' : init
+-- adjoin2 (Row lefts EmptyLine : Row lefts' rights : init) (Row xs ys) =
+  -- Row (lefts <> xs) EmptyLine : Row lefts' (rights <> ys) : init
+  -- adjoin2 (adjoin2 init row2) row1
+  -- where row1 = Row EmptyLine (rights <> ys)
+  --       row2 = Row lefts' (rights <> ys)
+
 -- adjoin2 (Row lefts EmptyLine : Row lefts' rights : init) (Row xs ys) =
 --  Row (lefts <> xs) EmptyLine : Row lefts' (rights <> ys) : init
-adjoin2 rows row@(Row (Line (node : _)) _) | Just _ <- maybeFirstNewLine node = row : rows
-adjoin2 rows row@(Row _ (Line (node : _))) | Just _ <- maybeFirstNewLine node = row : rows
-adjoin2 (last:init) row = (last <> row) : init
+-- adjoin2 (last:init) row = (last <> row) : init
+
+leftLines :: [Row] -> [Line]
+leftLines rows = left <$> rows
+  where
+    left (Row left _) = left
+
+rightLines :: [Row] -> [Line]
+rightLines rows = right <$> rows
+  where
+    right (Row _ right) = right
+
+adjoin2Lines :: [Line] -> Line -> [Line]
+adjoin2Lines [] line = [line]
+adjoin2Lines (EmptyLine : xs) line = EmptyLine : (adjoin2Lines xs line)
+adjoin2Lines (last:init) line = (last <> line) : init
+
 {-
+
+
+
 
 foo.bar([
   quux
