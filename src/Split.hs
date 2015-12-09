@@ -68,7 +68,7 @@ data Row = Row Line Line
   deriving (Show, Eq)
 
 instance ToMarkup Row where
-  toMarkup (Row left right) = (tr $ toMarkup left <> toMarkup right)
+  toMarkup (Row left right) = (tr $ toMarkup left <> toMarkup right) <> string "\n"
 
 instance ToMarkup Line where
   toMarkup EmptyLine = td (string "")
