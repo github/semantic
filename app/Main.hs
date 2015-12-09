@@ -18,6 +18,8 @@ import Data.Set hiding (split)
 import Options.Applicative
 import System.FilePath
 
+import Foreign.Ptr
+
 data Output = Unified | Split
 
 data Argument = Argument { output :: Output, sourceA :: FilePath, sourceB :: FilePath }
@@ -35,11 +37,10 @@ main = do
   let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
   aContents <- readFile sourceAPath
   bContents <- readFile sourceBPath
-  language <- (parserForType . takeExtension) sourceAPath
-  (aTerm, bTerm) <- case language of
-    Just lang -> do aTerm <- parseTreeSitterFile lang aContents
-                    bTerm <- parseTreeSitterFile lang bContents
-                    return (aTerm, bTerm)
+  (aTerm, bTerm) <- case (parserForType . takeExtension) sourceAPath of
+    Just parse -> do aTerm <- parse aContents
+                     bTerm <- parse bContents
+                     return (aTerm, bTerm)
     Nothing -> error ("Unsupported language extension in path: " ++ sourceAPath)
   let diff = interpret comparable aTerm bTerm in
     case output arguments of
@@ -53,7 +54,8 @@ main = do
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
-parserForType mediaType = sequence $ case mediaType of
+parserForType :: String -> Maybe P.Parser
+parserForType mediaType = maybe Nothing (Just . parseTreeSitterFile) $ case mediaType of
     ".h" -> Just ts_language_c
     ".c" -> Just ts_language_c
     ".js" -> Just ts_language_javascript
