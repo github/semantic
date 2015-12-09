@@ -10,28 +10,6 @@ import Test.Hspec
 
 main :: IO ()
 main = hspec $ do
-  describe "adjoinRows" $ do
-    it "empty lines are the left unit" $
-      adjoinRows [ Row EmptyLine EmptyLine ] [ Row (Line [ Text "a" ]) (Line [ Text "b" ]) ] `shouldBe` [ Row (Line [ Text "a" ]) (Line [ Text "b" ]) ]
-
-    it "empty lines are the left unit for multiple lines" $
-      adjoinRows [ Row EmptyLine EmptyLine ] [ Row (Line [ Text "a" ]) (Line [ Text "b" ]), Row (Line [ Text "a" ]) (Line [ Text "b" ]) ] `shouldBe` [ Row (Line [ Text "a" ]) (Line [ Text "b" ]), Row (Line [ Text "a" ]) (Line [ Text "b" ]) ]
-
-    it "two single line elements should concatenate into a single line" $
-      adjoinRows [ Row (Line [ Text "a" ]) (Line [ Text "b" ]) ] [ Row (Line [ Text "a" ]) (Line [ Text "b" ]) ] `shouldBe` [ Row (Line [ Text "a", Text "a" ]) (Line [ Text "b", Text "b" ]) ]
-
-    it "single line elements on the left concatenate onto the first of multiple lines on the right" $
-      adjoinRows [ Row (Line [ Text "a1" ]) (Line [ Text "b1" ]) ] [ Row (Line [ Text "a2" ]) (Line [ Text "b2" ]), Row (Line [ Text "a3" ]) (Line [ Text "b3" ]) ] `shouldBe` [ Row (Line [ Text "a1", Text "a2" ]) (Line [ Text "b1", Text "b2" ]), Row (Line [ Text "a3" ]) (Line [ Text "b3" ]) ]
-
-    it "the last of multiple line elements on the left concatenate onto the first of multiple lines on the right" $
-      adjoinRows [ Row (Line [ Text "a1" ]) (Line [ Text "b1" ]), Row (Line [ Text "a2" ]) (Line [ Text "b2" ]) ]
-                 [ Row (Line [ Text "a3" ]) (Line [ Text "b3" ]), Row (Line [ Text "a4" ]) (Line [ Text "b4" ]) ]
-      `shouldBe`
-      [ Row (Line [ Text "a1" ]) (Line [ Text "b1" ]),
-        Row (Line [ Text "a2", Text "a3" ]) (Line [ Text "b2", Text "b3" ]),
-        Row (Line [ Text "a4" ]) (Line [ Text "b4" ]) ]
-
-
   describe "annotatedToRows" $ do
     it "outputs one row for single-line unchanged leaves" $
       annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` ([ Row (Line [ span "a" ]) (Line [ span "a" ]) ], (Range 0 1, Range 0 1))
