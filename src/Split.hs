@@ -27,15 +27,6 @@ data HTML =
   | Dt String
   deriving (Show, Eq)
 
-maybeFirstNewLine :: HTML -> Maybe HTML
-maybeFirstNewLine text@(Text "") = Just text
-maybeFirstNewLine text@(Text _) = Nothing
-maybeFirstNewLine (Span _ _) = Nothing
-maybeFirstNewLine (Dt _) = Nothing
-maybeFirstNewLine (Ul _ elements) = getFirst $ mconcat $ map First $ map maybeFirstNewLine elements
-maybeFirstNewLine (Dl _ elements) = getFirst $ mconcat $ map First $ map maybeFirstNewLine elements
-maybeFirstNewLine (Div _ elements) = getFirst $ mconcat $ map First $ map maybeFirstNewLine elements
-
 classifyMarkup :: Maybe ClassName -> Markup -> Markup
 classifyMarkup (Just className) element = element ! A.class_ (stringValue className)
 classifyMarkup _ element = element
