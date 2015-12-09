@@ -11,4 +11,7 @@ instance Categorizable annotation => Categorizable (Term a annotation) where
   categories (annotation :< _) = categories annotation
 
 comparable :: Categorizable a => a -> a -> Bool
-comparable a b = not . Data.Set.null $ intersection (categories a) (categories b)
+comparable a b = catsA == catsB || (not . Data.Set.null $ intersection catsA catsB)
+  where
+    catsA = categories a
+    catsB = categories b
