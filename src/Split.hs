@@ -229,26 +229,6 @@ adjoinLines [] lines = lines
 adjoinLines lines [] = lines
 adjoinLines accum (line : lines) = init accum ++ [ last accum <> line ] ++ lines
 
-{-
-foo.bar([
-  quux
-]).baz
-d()
-
-foo.bar([ quux ]).baz
-d()
-
-"foo.bar([" "foo.bar([ quux ]).baz"
-"  quux"    []
-"]).baz"    []
-"d()"       "d()"
-
-"#include b"   "#include b"
-"#include ..." []
-"#include a"   "#include a"
-
--}
-
 zipWithMaybe :: (Maybe a -> Maybe b -> c) -> [a] -> [b] -> [c]
 zipWithMaybe f la lb = take len $ zipWith f la' lb'
   where
