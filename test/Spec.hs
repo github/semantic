@@ -108,6 +108,7 @@ main = hspec $ do
         [ Row (Line [ Text "" ]) EmptyLine, Row (Line [ Text "a" ]) EmptyLine ]
     
     where
+      newLine = Line [ Text "" ]
       info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
       unchanged source category = formatted source source category
       formatted source1 source2 category = Annotated (info source1 category, info source2 category)
