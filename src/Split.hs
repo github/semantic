@@ -150,7 +150,7 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     sumRows (rows, previousIndices) child = (allRows, ends childRanges)
       where
         separatorRows = contextRows (starts childRanges) previousIndices sources
-        allRows = rows `adjoinRows` separatorRows `adjoinRows` childRows
+        allRows = reverse . foldl adjoin2 [] $ rows ++ separatorRows ++ childRows
         (childRows, childRanges) = diffToRows child previousIndices before after
 
 contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row]
@@ -160,6 +160,18 @@ contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows
     rightElements = textElements (Range (snd previousIndices) (snd childIndices)) (snd sources)
 
 textElements range source = Text <$> actualLines (substring range source)
+
+{-
+
+["", ","]
+"a", ""
+"," ""
+"b"
+
+"a"
+"", ","
+
+-}
 
 starts :: (Range , Range) -> (Int, Int)
 starts (left, right) = (start left, start right)
@@ -195,21 +207,6 @@ adjoin2 rows (Row left right) = zipWith Row lefts rights
     lefts = adjoin2Lines (leftLines rows) left
     rights = adjoin2Lines (rightLines rows) right
 
--- adjoin2 (Row EmptyLine rights : Row lefts rights' : init) (Row xs ys) =
-  -- adjoin2 (adjoin2 init row2) row1
-  -- where row1 = Row EmptyLine (rights <> ys)
-  -- row2 = Row
-  -- Row EmptyLine (rights <> ys) : Row (lefts <> xs) rights' : init
--- adjoin2 (Row lefts EmptyLine : Row lefts' rights : init) (Row xs ys) =
-  -- Row (lefts <> xs) EmptyLine : Row lefts' (rights <> ys) : init
-  -- adjoin2 (adjoin2 init row2) row1
-  -- where row1 = Row EmptyLine (rights <> ys)
-  --       row2 = Row lefts' (rights <> ys)
-
--- adjoin2 (Row lefts EmptyLine : Row lefts' rights : init) (Row xs ys) =
---  Row (lefts <> xs) EmptyLine : Row lefts' (rights <> ys) : init
--- adjoin2 (last:init) row = (last <> row) : init
-
 leftLines :: [Row] -> [Line]
 leftLines rows = left <$> rows
   where
@@ -225,11 +222,12 @@ adjoin2Lines [] line = [line]
 adjoin2Lines (EmptyLine : xs) line = EmptyLine : (adjoin2Lines xs line)
 adjoin2Lines (last:init) line = (last <> line) : init
 
+adjoinLines :: [Line] -> [Line] -> [Line]
+adjoinLines [] lines = lines
+adjoinLines lines [] = lines
+adjoinLines accum (line : lines) = init accum ++ [ last accum <> line ] ++ lines
+
 {-
-
-
-
-
 foo.bar([
   quux
 ]).baz
@@ -248,10 +246,6 @@ d()
 "#include a"   "#include a"
 
 -}
-adjoinLines :: [Line] -> [Line] -> [Line]
-adjoinLines [] lines = lines
-adjoinLines lines [] = lines
-adjoinLines accum (line : lines) = init accum ++ [ last accum <> line ] ++ lines
 
 zipWithMaybe :: (Maybe a -> Maybe b -> c) -> [a] -> [b] -> [c]
 zipWithMaybe f la lb = take len $ zipWith f la' lb'
