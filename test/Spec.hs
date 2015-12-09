@@ -81,7 +81,7 @@ main = hspec $ do
       let (sourceA, sourceB) = ("[\na\n,\nb]", "[a,b]") in
         annotatedToRows (formatted sourceA sourceB "branch" (Indexed [
           Free . offsetAnnotated 2 1 $ unchanged "a" "leaf" (Leaf ""),
-          Free . offsetAnnotated 7 3 $ unchanged "b" "leaf" (Leaf "")
+          Free . offsetAnnotated 6 3 $ unchanged "b" "leaf" (Leaf "")
         ])) sourceA sourceB `shouldBe`
         ([
             Row (Line [ Ul (Just "category-branch") [ Text "[" ] ])
