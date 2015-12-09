@@ -74,23 +74,27 @@ main = hspec $ do
 
   describe "adjoin2" $ do
     it "appends a right-hand line without newlines" $
-      adjoin2 [ Row EmptyLine (Line [ Text "[" ]) ] (Row EmptyLine (Line [ span "a" ])) `shouldBe`
-      [ Row EmptyLine (Line [ Text "[", span "a" ]) ]
+      adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe` [ rightRow [ Text "[", Text "a" ] ]
 
     it "appends onto newlines" $
-      adjoin2 [ Row newLine EmptyLine ] (Row (Line [ Text "," ]) EmptyLine) `shouldBe`
-      [ Row (Line [ Text "", Text "," ]) EmptyLine ]
+      adjoin2 [ leftRow [ newline ] ] (leftRowText ",") `shouldBe`
+              [ leftRow [ newline, Text "," ] ]
 
     it "produces new rows for newlines" $
-      adjoin2 [ Row (Line [ Text "a" ]) EmptyLine ] (Row newLine EmptyLine) `shouldBe`
-        [ Row newLine EmptyLine, Row (Line [ Text "a" ]) EmptyLine ]
+      adjoin2 [ leftRowText "a" ] (leftRow  [ newline ]) `shouldBe`
+              [ leftRow [ newline ], leftRowText "a" ]
 
     it "does not promote newlines through empty lines" $
-      adjoin2 [ Row EmptyLine (Line [ Text "c" ]), Row (Line [ Text "a" ]) (Line [ Text "b" ]) ] (Row newLine EmptyLine) `shouldBe`
-        [ Row newLine EmptyLine, Row EmptyLine (Line [ Text "c" ]), Row (Line [ Text "a" ]) (Line [ Text "b" ]) ]
+      adjoin2 [ rightRowText "c", rowText "a" "b" ] (leftRow [ newline ]) `shouldBe`
+        [ leftRow [ newline ], rightRowText "c", rowText "a" "b" ]
 
     where
-      newLine = Line [ Text "" ]
+      rightRowText text = rightRow [ Text text ]
+      rightRow xs = Row EmptyLine (Line xs)
+      leftRowText text = leftRow [ Text text ]
+      leftRow xs = Row (Line xs) EmptyLine
+      rowText a b = Row (Line [ Text a ]) (Line [ Text b ])
+      newline = Text ""
       info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
       unchanged source category = formatted source source category
       formatted source1 source2 category = Annotated (info source1 category, info source2 category)
