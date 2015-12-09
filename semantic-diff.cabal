@@ -18,6 +18,7 @@ library
                      , Operation
                      , Algorithm
                      , Interpreter
+                     , Parser
                      , Patch
                      , SES
                      , Categorizable
