@@ -65,7 +65,10 @@ split diff before after = return . renderHtml
         . mconcat $ toMarkup <$> (fst $ diffToRows diff (0, 0) before after)
 
 data Row = Row Line Line
-  deriving (Show, Eq)
+  deriving Eq
+
+instance Show Row where
+  show (Row left right) = "\n" ++ show left ++ " | " ++ show right
 
 instance ToMarkup Row where
   toMarkup (Row left right) = (tr $ toMarkup left <> toMarkup right) <> string "\n"
@@ -74,7 +77,11 @@ instance ToMarkup Line where
   toMarkup EmptyLine = td (string "")
   toMarkup (Line html) = td . mconcat $ toMarkup <$> html
 
-data Line = Line { unLine :: [HTML] } | EmptyLine deriving (Show, Eq)
+data Line = Line { unLine :: [HTML] } | EmptyLine deriving Eq
+
+instance Show Line where
+  show (Line elements) = "[" ++ (concat $ show <$> elements) ++ "]"
+  show EmptyLine = "EmptyLine"
 
 instance Monoid Line where
  mempty = EmptyLine
