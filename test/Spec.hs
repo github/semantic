@@ -90,7 +90,7 @@ main = hspec $ do
                 EmptyLine,
             Row (Line [ Ul (Just "category-branch") [ Text "", Text "," ] ])
                 EmptyLine,
-            Row (Line [ Ul (Just "category-branch") [ Text "", span "b", Text " ]" ] ])
+            Row (Line [ Ul (Just "category-branch") [ Text "", span "b", Text "]" ] ])
                 EmptyLine
         ], (Range 0 8, Range 0 5))
 
