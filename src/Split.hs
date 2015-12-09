@@ -189,6 +189,10 @@ adjoinRows accum (row : rows) = reverse (adjoin2 (reverse accum) row) ++ rows
 adjoin2 :: [Row] -> Row -> [Row]
 adjoin2 [] row = [row]
 -- handle the case where we append a newline on both sides
+adjoin2 rows (Row left@(Line (Text "" : _)) right@(Line (Text "" : _))) = Row left right : zipWith Row lefts rights
+  where
+    lefts = leftLines rows
+    rights = rightLines rows
 adjoin2 rows (Row left@(Line (Text "" : _)) right) = Row left EmptyLine : zipWith Row lefts rights
   where
     lefts = leftLines rows
