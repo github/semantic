@@ -5,7 +5,7 @@ import Diff
 import Patch
 import Term
 import Syntax
-import Control.Monad
+
 import Control.Comonad.Cofree
 import Range
 import Control.Monad.Free
@@ -150,7 +150,8 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     sumRows (rows, previousIndices) child = (allRows, ends childRanges)
       where
         separatorRows = contextRows (starts childRanges) previousIndices sources
-        allRows = reverse . foldl adjoin2 [] $ rows ++ separatorRows ++ childRows
+        unajoinedRows = rows ++ separatorRows ++ childRows
+        allRows = reverse $ foldl adjoin2 [] unajoinedRows
         (childRows, childRanges) = diffToRows child previousIndices before after
 
 contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row]
@@ -191,11 +192,11 @@ adjoinRows accum (row : rows) = reverse (adjoin2 (reverse accum) row) ++ rows
 adjoin2 :: [Row] -> Row -> [Row]
 adjoin2 [] row = [row]
 -- handle the case where we append a newline on both sides
-adjoin2 rows (Row left@(Line [ Text "" ]) right) = Row left EmptyLine : zipWith Row lefts rights
+adjoin2 rows (Row left@(Line (Text "" : _)) right) = Row left EmptyLine : zipWith Row lefts rights
   where
     lefts = leftLines rows
     rights = adjoin2Lines (rightLines rows) right
-adjoin2 rows (Row left right@(Line [ Text "" ])) = Row EmptyLine right : zipWith Row lefts rights
+adjoin2 rows (Row left right@(Line ( Text "" : _))) = Row EmptyLine right : zipWith Row lefts rights
   where
     lefts = adjoin2Lines (leftLines rows) left
     rights = rightLines rows
