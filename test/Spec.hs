@@ -98,9 +98,11 @@ main = hspec $ do
     it "appends a right-hand line without newlines" $
       adjoin2 [ Row EmptyLine (Line [ Text "[" ]) ] (Row EmptyLine (Line [ span "a" ])) `shouldBe`
       [ Row EmptyLine (Line [ Text "[", span "a" ]) ]
+
     it "appends onto newlines" $
       adjoin2 [ Row (Line [ Text ""]) EmptyLine ] (Row (Line [ Text "," ]) EmptyLine) `shouldBe`
       [ Row (Line [ Text "", Text "," ]) EmptyLine ]
+
     where
       info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
       unchanged source category = formatted source source category
