@@ -52,6 +52,9 @@ instance ToMarkup HTML where
   toMarkup (Div className children) = classifyMarkup className . div $ mconcat (toMarkup <$> children)
   toMarkup (Dt key) = dt $ string key
 
+trace' :: Show a => a -> a
+trace' a = traceShow a a
+
 split :: Diff a Info -> String -> String -> IO ByteString
 split diff before after = return . renderHtml
   . docTypeHtml
