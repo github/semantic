@@ -8,9 +8,10 @@ import Syntax
 
 import Control.Comonad.Cofree
 import Range
-import Control.Monad
+
 import Control.Monad.Free
 import Data.ByteString.Lazy.Internal
+import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
@@ -61,21 +62,44 @@ split diff before after = return . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel (stringValue "stylesheet") ! A.href (stringValue "style.css")) <>)
     . body
-      . (table ! A.class_ (stringValue "diff"))
-        . mconcat $ toMarkup <$> (fst $ diffToRows diff (0, 0) before after)
+      . (table ! A.class_ (stringValue "diff")) $ toMarkup
+        [ (colgroup colgroupHtml),
+          tbody . mconcat $ toMarkup <$> ((reverse . snd $ foldl numberRows (0, []) rows) :: [(Int, Row)]) ]
+   where
+     colgroupHtml :: Html
+     colgroupHtml = (toMarkup [ col ! A.width (stringValue "40"), col, col ! A.width (stringValue "40"), col ])
+     rows = fst $ diffToRows diff (0, 0) before after
+     numberRows (count, rows) row = (count + 1, (count + 1, row):rows)
 
+
+
+data RowWithLine = RowWithLine Int Row
 data Row = Row Line Line
   deriving Eq
 
 instance Show Row where
   show (Row left right) = "\n" ++ show left ++ " | " ++ show right
 
-instance ToMarkup Row where
-  toMarkup (Row left right) = (tr $ toMarkup left <> toMarkup right) <> string "\n"
+instance ToMarkup (Int, Row) where
+  toMarkup (num, (Row EmptyLine EmptyLine)) = tr $ numberTd "" <> td (string "") <> numberTd "" <> toMarkup (string "") <> string "\n"
+  toMarkup (num, (Row EmptyLine right)) = tr $ numberTd "" <> td (string "") <>
+                                               numberTd (show num) <> toMarkup right <> string "\n"
+  toMarkup (num, (Row left EmptyLine)) = tr $ numberTd (show num)  <> toMarkup left <>
+                                              numberTd "" <> td (string "") <> string "\n"
+  toMarkup (num, (Row left right)) = tr $ numberTd (show num) <> toMarkup left <>
+                                          numberTd (show num) <> toMarkup right <> string "\n"
+
+numberTd :: String -> Html
+numberTd s = td (string s) ! A.class_ (stringValue "blob-num")
+
+codeTd :: Html -> Html
+codeTd el = td el ! A.class_ (stringValue "blob-code")
+--instance ToMarkup Row where
+--  toMarkup (Row left right) = (tr $ toMarkup left <> toMarkup right) <> string "\n"
 
 instance ToMarkup Line where
-  toMarkup EmptyLine = td (string "")
-  toMarkup (Line html) = td . mconcat $ toMarkup <$> html
+  toMarkup EmptyLine = codeTd (string "")
+  toMarkup (Line html) = codeTd . mconcat $ toMarkup <$> html
 
 data Line =
   Line [HTML]
