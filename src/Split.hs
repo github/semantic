@@ -158,7 +158,7 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     ranges = (left, right)
     rows = appendRemainder $ foldl sumRows ([], starts ranges) i
     sources = (before, after)
-    appendRemainder (rows, previousIndices) = reverse $ foldl adjoin2 [] $ rows ++ (contextRows (ends ranges) previousIndices sources)
+    appendRemainder (rows, previousIndices) = reverse . foldl adjoin2 [] $ rows ++ (contextRows (ends ranges) previousIndices sources)
     sumRows (rows, previousIndices) child = (allRows, ends childRanges)
       where
         separatorRows = contextRows (starts childRanges) previousIndices sources
