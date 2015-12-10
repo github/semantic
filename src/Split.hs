@@ -169,7 +169,7 @@ contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows
 textElements :: Range -> String -> [HTML]
 textElements range source = textOrBreak <$> actualLines s
   where s = substring range source
-        textOrBreak "" = Break
+        textOrBreak "\n" = Break
         textOrBreak x = Text x
 
 starts :: (Range , Range) -> (Int, Int)
@@ -236,4 +236,6 @@ actualLines "" = [""]
 actualLines lines = case break (== '\n') lines of
   (l, lines') -> l : (case lines' of
                        [] -> []
-                       _:lines' -> actualLines lines')
+                       _:lines' -> (case actualLines lines' of
+                                      [] -> ["\n"]
+                                      s:rest -> ('\n' : s) : rest))
