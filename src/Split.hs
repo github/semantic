@@ -228,6 +228,13 @@ rightLines rows = right <$> rows
   where
     right (Row _ right) = right
 
+openElement :: HTML -> Maybe HTML
+openElement Break = Nothing
+openElement (Ul _ elements) = getLast . mconcat . map Last $ openElement <$> elements
+openElement (Dl _ elements) = getLast . mconcat . map Last $ openElement <$> elements
+openElement (Div _ elements) = getLast . mconcat . map Last $ openElement <$> elements
+openElement h = Just h
+
 openLine :: [Line] -> Maybe Line
 openLine [] = Nothing
 openLine (EmptyLine : rest) = openLine rest
