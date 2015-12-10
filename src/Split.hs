@@ -95,7 +95,7 @@ instance Monoid Row where
 
 diffToRows :: Diff a Info -> (Int, Int) -> String -> String -> ([Row], (Range, Range))
 diffToRows (Free annotated) _ before after = annotatedToRows annotated before after
-diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLine <$> afterLines, (range, Range previousIndex previousIndex))
+diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLine <$> afterLines, (Range previousIndex previousIndex, range))
   where
     (afterLines, range) = termToLines term after
     rowWithInsertedLine (Line elements) = Row EmptyLine $ Line [ Div (Just "insert") elements ]
