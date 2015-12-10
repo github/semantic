@@ -226,8 +226,8 @@ openLine (line : _) = case maybeLast $ unLine line of
 
 adjoin2Lines :: [Line] -> Line -> [Line]
 adjoin2Lines [] line = [line]
-adjoin2Lines (EmptyLine : xs) line = EmptyLine : (adjoin2Lines xs line)
-adjoin2Lines (last:init) line = (last <> line) : init
+adjoin2Lines (EmptyLine : xs) line | Just _ <- openLine xs = EmptyLine : adjoin2Lines xs line
+adjoin2Lines (prev:rest) line = (prev <> line) : rest
 
 adjoinLines :: [Line] -> [Line] -> [Line]
 adjoinLines [] lines = lines
