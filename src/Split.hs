@@ -8,6 +8,7 @@ import Syntax
 
 import Control.Comonad.Cofree
 import Range
+import Control.Monad
 import Control.Monad.Free
 import Data.ByteString.Lazy.Internal
 import Text.Blaze.Html5 hiding (map)
@@ -238,10 +239,7 @@ openElement h = Just h
 openLine :: [Line] -> Maybe Line
 openLine [] = Nothing
 openLine (EmptyLine : rest) = openLine rest
-openLine (line : _) = case maybeLast $ unLine line of
-  Just Break -> Nothing
-  Just _ -> Just line
-  Nothing -> Nothing
+openLine (line : _) = const line <$> (join . maybeLast $ openElement <$> unLine line)
 
 adjoin2Lines :: [Line] -> Line -> [Line]
 adjoin2Lines [] line = [line]
