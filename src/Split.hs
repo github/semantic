@@ -134,11 +134,12 @@ termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
     rewrapLineContentsInUl EmptyLine = EmptyLine
     lineElements r s = Line . (:[]) <$> textElements r s
     childLines i = appendRemainder $ foldl sumLines ([], start range) i
-    appendRemainder (lines, previous) = adjoinLines lines $ lineElements (Range previous (end range)) source
+    appendRemainder (lines, previous) = reverse . foldl adjoin2Lines [] $ lines ++ lineElements (Range previous (end range)) source
     sumLines (lines, previous) child = (allLines, end childRange)
       where
         separatorLines = lineElements (Range previous $ start childRange) source
-        allLines = lines `adjoinLines` separatorLines `adjoinLines` childLines
+        unadjoinedLines = lines ++ separatorLines ++ childLines
+        allLines = reverse $ foldl adjoin2Lines [] unadjoinedLines
         (childLines, childRange) = termToLines child source
     elements = (elementAndBreak $ Span (classify categories)) =<< actualLines (substring range source)
 
