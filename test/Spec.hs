@@ -77,7 +77,7 @@ main = hspec $ do
     it "should split multi-line deletions across multiple rows" $
       let (sourceA, sourceB) = ("/*\n*/\na", "a") in
         annotatedToRows (formatted sourceA sourceB "branch" (Indexed [
-          Pure . Delete $ (Info (Range 0 5) (Range 0 2) (Set.fromList ["comment"]) :< (Leaf "")),
+          Pure . Delete $ (Info (Range 0 5) (Range 0 2) (Set.fromList ["leaf"]) :< (Leaf "")),
           Free . offsetAnnotated 6 0 $ unchanged "a" "leaf" (Leaf "")
         ])) sourceA sourceB `shouldBe`
         ([
