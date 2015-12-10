@@ -188,18 +188,18 @@ maybeLast list = listToMaybe $ reverse list
 
 adjoin2 :: [Row] -> Row -> [Row]
 adjoin2 [] row = [row]
--- handle the case where we append a newline on both sides
-adjoin2 rows (Row left@(Line (Break : _)) right@(Line (Break : _))) = Row left right : rows
-adjoin2 rows (Row left@(Line (Break : _)) right) = Row left EmptyLine : zipWith Row lefts rights
-  where
-    lefts = leftLines rows
-    rights = adjoin2Lines (rightLines rows) right
-adjoin2 rows (Row left right@(Line (Break : _))) = Row EmptyLine right : zipWith Row lefts rights
-  where
-    lefts = adjoin2Lines (leftLines rows) left
-    rights = rightLines rows
 
-adjoin2 (Row EmptyLine EmptyLine : init) row = adjoin2 init row
+adjoin2 rows@(Row left right:_) row | Just Break <- maybeLast $ unLine left, Just Break <- maybeLast $ unLine right = row : rows
+
+adjoin2 rows@(Row left _:_) (Row left' right') | Just Break <- maybeLast $ unLine left = Row left' EmptyLine : zipWith Row lefts rights
+  where lefts = leftLines rows
+        rights = adjoin2Lines (rightLines rows) right'
+
+adjoin2 rows@(Row _ right:_) (Row left' right') | Just Break <- maybeLast $ unLine right = Row EmptyLine right' : zipWith Row lefts rights
+  where lefts = adjoin2Lines (leftLines rows) left'
+        rights = rightLines rows
+
+adjoin2 (Row EmptyLine EmptyLine : rows) row = adjoin2 rows row
 
 adjoin2 rows (Row left right) = zipWith Row lefts rights
   where
