@@ -37,11 +37,10 @@ main = do
   let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
   aContents <- readFile sourceAPath
   bContents <- readFile sourceBPath
-  (aTerm, bTerm) <- case (parserForType . takeExtension) sourceAPath of
-    Just parse -> do aTerm <- parse aContents
-                     bTerm <- parse bContents
-                     return (aTerm, bTerm)
-    Nothing -> error ("Unsupported language extension in path: " ++ sourceAPath)
+  (aTerm, bTerm) <- let parse = (parserForType . takeExtension) sourceAPath in do
+    aTerm <- parse aContents
+    bTerm <- parse bContents
+    return (aTerm, bTerm)
   let diff = interpret comparable aTerm bTerm in
     case output arguments of
       Unified -> do
@@ -54,8 +53,8 @@ main = do
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
-parserForType :: String -> Maybe P.Parser
-parserForType mediaType = parseTreeSitterFile <$> case mediaType of
+parserForType :: String -> P.Parser
+parserForType mediaType = maybe P.lineByLineParser parseTreeSitterFile $ case mediaType of
     ".h" -> Just ts_language_c
     ".c" -> Just ts_language_c
     ".js" -> Just ts_language_javascript
