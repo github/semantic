@@ -151,6 +151,7 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     rows (Leaf _) = zipWithMaybe rowFromMaybeRows leftElements rightElements
     rows (Indexed i) = rewrapRowContentsIn Ul <$> childRows i
     rows (Fixed f) = rewrapRowContentsIn Ul <$> childRows f
+    rows (Keyed k) = rewrapRowContentsIn Dl <$> childRows (snd <$> Map.toList k)
 
     leftElements = (elementAndBreak $ Span (classify leftCategories)) =<< actualLines (substring left before)
     rightElements = (elementAndBreak $ Span (classify rightCategories)) =<< actualLines (substring right after)
