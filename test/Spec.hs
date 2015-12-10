@@ -107,14 +107,14 @@ main = hspec $ do
       adjoin2 [ rightRowText "c", rowText "a" "b" ] (leftRow [ Break ]) `shouldBe`
         [ rightRowText "c", Row (Line [ Text "a", Break ]) (Line [ Text "b" ]) ]
 
-    describe "termToLines" $ do
-      it "splits multi-line terms into multiple lines" $
-        termToLines (Info (Range 0 5) (Range 0 2) (Set.fromList ["comment"]) :< (Leaf "")) "/*\n*/"
-        `shouldBe`
-        ([
-          Line [ span "/*", Break ],
-          Line [ span "*/" ]
-        ], Range 0 5)
+  describe "termToLines" $ do
+    it "splits multi-line terms into multiple lines" $
+      termToLines (Info (Range 0 5) (Range 0 2) (Set.fromList ["comment"]) :< (Leaf "")) "/*\n*/"
+      `shouldBe`
+      ([
+        Line [ span "/*", Break ],
+        Line [ span "*/" ]
+      ], Range 0 5)
 
     where
       rightRowText text = rightRow [ Text text ]
