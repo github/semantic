@@ -154,10 +154,10 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     leftElements = (elementAndBreak $ Span (classify leftCategories)) =<< actualLines (substring left before)
     rightElements = (elementAndBreak $ Span (classify rightCategories)) =<< actualLines (substring right after)
 
-    wrapRows = fmap rewrap . appendRemainder . foldl sumRows ([], starts ranges)
+    wrapRows = fmap (rewrapRowContentsIn Ul) . appendRemainder . foldl sumRows ([], starts ranges)
     wrap _ EmptyLine = EmptyLine
     wrap f (Line elements) = Line [ f elements ]
-    rewrap (Row left right) = Row (wrap (Ul $ classify leftCategories) left) (wrap (Ul $ classify rightCategories) right)
+    rewrapRowContentsIn f (Row left right) = Row (wrap (f $ classify leftCategories) left) (wrap (f $ classify rightCategories) right)
     ranges = (left, right)
     sources = (before, after)
     appendRemainder (rows, previousIndices) = reverse . foldl adjoin2 [] $ rows ++ (contextRows (ends ranges) previousIndices sources)
