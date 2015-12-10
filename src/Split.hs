@@ -143,6 +143,8 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
 
 annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (bimap ((:[]) . Ul (classify leftCategories)) ((:[]) . Ul (classify rightCategories)) <$> rows, ranges)
   where
+    rewrap EmptyRow = EmptyRow
+    rewrap (Row left right) = Row (Line [ Ul (classify leftCategories) $ unLine left ]) (Line [ Ul (classify rightCategories) $ unLine right ])
     ranges = (left, right)
     rows = appendRemainder $ foldl sumRows ([], starts ranges) i
     sources = (before, after)
