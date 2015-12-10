@@ -109,7 +109,7 @@ main = hspec $ do
 
   describe "termToLines" $ do
     it "splits multi-line terms into multiple lines" $
-      termToLines (Info (Range 0 5) (Range 0 2) (Set.fromList ["comment"]) :< (Leaf "")) "/*\n*/"
+      termToLines (Info (Range 0 5) (Range 0 2) (Set.singleton "leaf") :< (Leaf "")) "/*\n*/"
       `shouldBe`
       ([
         Line [ span "/*", Break ],
