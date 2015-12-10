@@ -189,22 +189,21 @@ maybeLast list = listToMaybe $ reverse list
 adjoin2 :: [Row] -> Row -> [Row]
 adjoin2 [] row = [row]
 
-adjoin2 rows@(Row left right:_) row | Just Break <- maybeLast $ unLine left, Just Break <- maybeLast $ unLine right = row : rows
-
-adjoin2 rows@(Row left _:_) (Row left' right') | Just Break <- maybeLast $ unLine left = Row left' EmptyLine : zipWith Row lefts rights
-  where lefts = leftLines rows
+adjoin2 rows (Row left' right') | Just _ <- openLine $ leftLines rows, Just _ <- openLine $ rightLines rows = zipWith Row lefts rights
+  where lefts = adjoin2Lines (leftLines rows) left'
         rights = adjoin2Lines (rightLines rows) right'
 
-adjoin2 rows@(Row _ right:_) (Row left' right') | Just Break <- maybeLast $ unLine right = Row EmptyLine right' : zipWith Row lefts rights
+adjoin2 rows (Row left' right') | Just _ <- openLine $ leftLines rows = Row EmptyLine right' : zipWith Row lefts rights
   where lefts = adjoin2Lines (leftLines rows) left'
         rights = rightLines rows
 
+adjoin2 rows (Row left' right') | Just _ <- openLine $ rightLines rows = Row left' EmptyLine : zipWith Row lefts rights
+  where lefts = leftLines rows
+        rights = adjoin2Lines (rightLines rows) right'
+
 adjoin2 (Row EmptyLine EmptyLine : rows) row = adjoin2 rows row
 
-adjoin2 rows (Row left right) = zipWith Row lefts rights
-  where
-    lefts = adjoin2Lines (leftLines rows) left
-    rights = adjoin2Lines (rightLines rows) right
+adjoin2 rows row = row : rows
 
 leftLines :: [Row] -> [Line]
 leftLines rows = left <$> rows
