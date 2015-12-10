@@ -191,6 +191,8 @@ maybeLast list = listToMaybe $ reverse list
 adjoin2 :: [Row] -> Row -> [Row]
 adjoin2 [] row = [row]
 
+adjoin2 (Row EmptyLine EmptyLine : rows) row = adjoin2 rows row
+
 adjoin2 rows (Row left' right') | Just _ <- openLine $ leftLines rows, Just _ <- openLine $ rightLines rows = zipWith Row lefts rights
   where lefts = adjoin2Lines (leftLines rows) left'
         rights = adjoin2Lines (rightLines rows) right'
@@ -202,8 +204,6 @@ adjoin2 rows (Row left' right') | Just _ <- openLine $ leftLines rows = Row Empt
 adjoin2 rows (Row left' right') | Just _ <- openLine $ rightLines rows = Row left' EmptyLine : zipWith Row lefts rights
   where lefts = leftLines rows
         rights = adjoin2Lines (rightLines rows) right'
-
-adjoin2 (Row EmptyLine EmptyLine : rows) row = adjoin2 rows row
 
 adjoin2 rows row = row : rows
 
