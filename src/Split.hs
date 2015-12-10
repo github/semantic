@@ -173,6 +173,7 @@ contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows
 
 elementAndBreak :: (String -> HTML) -> String -> [HTML]
 elementAndBreak _ "" = []
+elementAndBreak _ "\n" = [ Break ]
 elementAndBreak constructor x | '\n' <- last x = [ constructor $ init x, Break ]
 elementAndBreak constructor x = [ constructor x ]
 
