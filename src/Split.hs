@@ -173,11 +173,8 @@ elementAndBreak constructor x | '\n' <- last x = [ constructor $ init x, Break ]
 elementAndBreak constructor x = [ constructor x ]
 
 textElements :: Range -> String -> [HTML]
-textElements range source = textAndBreak =<< actualLines s
+textElements range source = (elementAndBreak Text) =<< actualLines s
   where s = substring range source
-        textAndBreak "" = []
-        textAndBreak x | '\n' <- last x = [ Text $ init x, Break ]
-        textAndBreak x = [ Text x ]
 
 starts :: (Range , Range) -> (Int, Int)
 starts (left, right) = (start left, start right)
