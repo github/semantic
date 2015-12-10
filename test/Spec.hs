@@ -35,10 +35,10 @@ main = hspec $ do
         Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
       ])) "[ a,\nb ]" "[ a,\nb ]" `shouldBe`
       ([
-          Row (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text "," ] ])
-              (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text "," ] ]),
-          Row (Line [ Ul (Just "category-branch") [ Break, span "b", Text " ]" ] ])
-              (Line [ Ul (Just "category-branch") [ Break, span "b", Text " ]" ] ])
+          Row (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break ] ])
+              (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break] ]),
+          Row (Line [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
+              (Line [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
        ], (Range 0 8, Range 0 8))
 
     it "outputs two rows for two-line non-empty formatted indexed nodes" $
@@ -47,12 +47,12 @@ main = hspec $ do
         Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
       ])) "[ a,\nb ]" "[\na,\nb ]" `shouldBe`
       ([
-          Row (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text "," ] ])
-              (Line [ Ul (Just "category-branch") [ Text "[" ] ]),
+          Row (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break ] ])
+              (Line [ Ul (Just "category-branch") [ Text "[", Break ] ]),
           Row EmptyLine
-              (Line [ Ul (Just "category-branch") [ Break, span "a", Text "," ] ]),
-          Row (Line [ Ul (Just "category-branch") [ Break, span "b", Text " ]" ] ])
-              (Line [ Ul (Just "category-branch") [ Break, span "b", Text " ]" ] ])
+              (Line [ Ul (Just "category-branch") [ span "a", Text ",", Break ] ]),
+          Row (Line [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
+              (Line [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
        ], (Range 0 8, Range 0 8))
 
     it "" $
@@ -62,35 +62,36 @@ main = hspec $ do
           Free . offsetAnnotated 6 3 $ unchanged "b" "leaf" (Leaf "")
         ])) sourceA sourceB `shouldBe`
         ([
-            Row (Line [ Ul (Just "category-branch") [ Text "[" ] ])
+            Row (Line [ Ul (Just "category-branch") [ Text "[", Break ] ])
                 (Line [ Ul (Just "category-branch") [ Text "[", span "a", Text ",", span "b", Text "]" ] ]),
-            Row (Line [ Ul (Just "category-branch") [ Break, span "a" ] ])
+            Row (Line [ Ul (Just "category-branch") [ span "a", Break ] ])
                 EmptyLine,
-            Row (Line [ Ul (Just "category-branch") [ Break, Text "," ] ])
+            Row (Line [ Ul (Just "category-branch") [ Text ",", Break ] ])
                 EmptyLine,
-            Row (Line [ Ul (Just "category-branch") [ Break, span "b", Text "]" ] ])
+            Row (Line [ Ul (Just "category-branch") [ span "b", Text "]" ] ])
                 EmptyLine
         ], (Range 0 8, Range 0 5))
 
   describe "adjoin2" $ do
     it "appends a right-hand line without newlines" $
-      adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe` [ rightRow [ Text "[", Text "a" ] ]
+      adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe`
+              [ rightRow [ Text "[", Text "a" ] ]
 
-    it "appends onto newlines" $
+    it "does not append onto lines ending in breaks" $
       adjoin2 [ leftRow [ Break ] ] (leftRowText ",") `shouldBe`
-              [ leftRow [ Break, Text "," ] ]
+              [ leftRowText ",", leftRow [ Break ]  ]
 
     it "produces new rows for newlines" $
       adjoin2 [ leftRowText "a" ] (leftRow  [ Break ]) `shouldBe`
-              [ leftRow [ Break ], leftRowText "a" ]
+              [ leftRow [ Text "a", Break ] ]
 
-    it "promotes HTML through empty lines" $
+    it "does not promote HTML through empty lines onto complete lines" $
       adjoin2 [ rightRowText "b", leftRow [ Break ] ] (leftRowText "a") `shouldBe`
-              [ rightRowText "b", leftRow [ Break, Text "a" ] ]
+              [ leftRowText "a", rightRowText "b", leftRow [ Break ] ]
 
-    it "does not promote newlines through empty lines" $
+    it "promotes breaks through empty lines onto incomplete lines" $
       adjoin2 [ rightRowText "c", rowText "a" "b" ] (leftRow [ Break ]) `shouldBe`
-        [ leftRow [ Break ], rightRowText "c", rowText "a" "b" ]
+        [ rightRowText "c", Row (Line [ Text "a", Break ]) (Line [ Text "b" ]) ]
 
     where
       rightRowText text = rightRow [ Text text ]
