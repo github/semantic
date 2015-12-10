@@ -83,12 +83,6 @@ instance Monoid Line where
  mappend (Line xs) EmptyLine = Line xs
  mappend (Line xs) (Line ys) = Line (xs <> ys)
 
-bimap :: ([HTML] -> [HTML]) -> ([HTML] -> [HTML]) -> Row -> Row
-bimap _ _ (Row EmptyLine EmptyLine) = mempty
-bimap f g (Row (Line a) (Line b)) = Row (Line $ f a) (Line $ g b)
-bimap _ g (Row EmptyLine (Line b)) = Row EmptyLine (Line $ g b)
-bimap f _ (Row (Line a) EmptyLine) = Row (Line $ f a) EmptyLine
-
 instance Monoid Row where
   mempty = Row EmptyLine EmptyLine
   mappend (Row x1 y1) (Row x2 y2) = Row (x1 <> x2) (y1 <> y2)
