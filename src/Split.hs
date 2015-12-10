@@ -15,6 +15,8 @@ import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
 import Data.Monoid
 import qualified Data.Set as Set
+import Debug.Trace
+import Data.List (intersperse)
 
 type ClassName = String
 
@@ -71,7 +73,7 @@ instance ToMarkup Line where
 data Line = Line { unLine :: [HTML] } | EmptyLine deriving Eq
 
 instance Show Line where
-  show (Line elements) = "[" ++ (concat $ show <$> elements) ++ "]"
+  show (Line elements) = "[" ++ (concat . intersperse ", " $ show <$> elements) ++ "]"
   show EmptyLine = "EmptyLine"
 
 instance Monoid Line where
