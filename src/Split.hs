@@ -21,7 +21,8 @@ import Data.List (intersperse)
 type ClassName = String
 
 data HTML =
-  Text String
+  Break
+  | Text String
   | Span (Maybe ClassName) String
   | Ul (Maybe ClassName) [HTML]
   | Dl (Maybe ClassName) [HTML]
@@ -42,6 +43,7 @@ toDd (Text s) = string s
 toDd e = dd $ toMarkup e
 
 instance ToMarkup HTML where
+  toMarkup Break = string ""
   toMarkup (Text s) = string s
   toMarkup (Span className s) = classifyMarkup className . span $ string s
   toMarkup (Ul className children) = classifyMarkup className . ul $ mconcat (toLi <$> children)
@@ -165,8 +167,10 @@ contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows
     rightElements = textElements (Range (snd previousIndices) (snd childIndices)) (snd sources)
 
 textElements :: Range -> String -> [HTML]
-textElements range source = Text <$> actualLines s
+textElements range source = textOrBreak <$> actualLines s
   where s = substring range source
+        textOrBreak "" = Break
+        textOrBreak x = Text x
 
 starts :: (Range , Range) -> (Int, Int)
 starts (left, right) = (start left, start right)
