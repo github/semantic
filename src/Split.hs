@@ -70,7 +70,10 @@ instance ToMarkup Line where
   toMarkup EmptyLine = td (string "")
   toMarkup (Line html) = td . mconcat $ toMarkup <$> html
 
-data Line = Line { unLine :: [HTML] } | EmptyLine deriving Eq
+data Line =
+  Line { unLine :: [HTML] }
+  | EmptyLine
+  deriving Eq
 
 instance Show Line where
   show (Line elements) = "[" ++ (concat . intersperse ", " $ show <$> elements) ++ "]"
