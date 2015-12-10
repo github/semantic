@@ -127,7 +127,7 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
 termToLines :: Term a Info -> String -> ([Line], Range)
 termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
   where
-    rows (Leaf _) = Line . (:[]) <$> elements
+    rows (Leaf _) = reverse $ foldl adjoin2Lines [] $ Line . (:[]) <$> elements
     rows (Indexed i) = rewrapLineContentsInUl <$> childLines i
 
     rewrapLineContentsInUl (Line elements) = Line [ Ul (classify categories) elements ]
