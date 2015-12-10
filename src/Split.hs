@@ -162,8 +162,7 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     sumRows (rows, previousIndices) child = (allRows, ends childRanges)
       where
         separatorRows = contextRows (starts childRanges) previousIndices sources
-        unadjoinedRows = rows ++ separatorRows ++ childRows
-        allRows = reverse $ foldl adjoin2 [] unadjoinedRows
+        allRows = rows ++ separatorRows ++ childRows
         (childRows, childRanges) = diffToRows child previousIndices before after
 
 contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row]
