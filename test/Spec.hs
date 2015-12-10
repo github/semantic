@@ -1,9 +1,11 @@
 module Main where
 
 import Diff
+import Patch
 import Range
 import Split
 import Syntax
+import Control.Comonad.Cofree
 import Control.Monad.Free
 import qualified Data.Set as Set
 import Test.Hspec
@@ -71,6 +73,18 @@ main = hspec $ do
             Row (Line [ Ul (Just "category-branch") [ span "b", Text "]" ] ])
                 EmptyLine
         ], (Range 0 8, Range 0 5))
+
+    it "should split multi-line deletions across multiple rows" $
+      let (sourceA, sourceB) = ("/*\n*/\na", "a") in
+        annotatedToRows (formatted sourceA sourceB "branch" (Indexed [
+          Pure . Delete $ (Info (Range 0 5) (Range 0 2) (Set.fromList ["comment"]) :< (Leaf "")),
+          Free . offsetAnnotated 6 0 $ unchanged "a" "leaf" (Leaf "")
+        ])) sourceA sourceB `shouldBe`
+        ([
+          Row (Line [ Ul (Just "category-branch") [ Div (Just "delete") [ span "/*", Break ] ] ]) EmptyLine,
+          Row (Line [ Ul (Just "category-branch") [ Div (Just "delete") [ span "*/" ], Break ] ]) EmptyLine,
+          Row (Line [ Ul (Just "category-branch") [ span "a" ] ]) (Line [ Ul (Just "category-branch") [ span "a" ] ])
+        ], (Range 0 7, Range 0 1))
 
   describe "adjoin2" $ do
     it "appends appends HTML onto incomplete lines" $
