@@ -144,7 +144,9 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
 
 annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (rewrap <$> rows, ranges)
   where
-    rewrap (Row left right) = Row (Line [ Ul (classify leftCategories) $ unLine left ]) (Line [ Ul (classify rightCategories) $ unLine right ])
+    wrap _ EmptyLine = EmptyLine
+    wrap f (Line elements) = Line [ f elements ]
+    rewrap (Row left right) = Row (wrap (Ul $ classify leftCategories) left) (wrap (Ul $ classify rightCategories) right)
     ranges = (left, right)
     rows = appendRemainder $ foldl sumRows ([], starts ranges) i
     sources = (before, after)
