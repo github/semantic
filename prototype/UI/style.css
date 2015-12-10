@@ -1,3 +1,6 @@
+table {
+	width: 100%;
+}
 table.diff td {
 	width: 50%;
 	height: 15px;
