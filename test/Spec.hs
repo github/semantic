@@ -124,6 +124,11 @@ main = hspec $ do
         Line [ Div (Just "delete") [ span "/*", Break ] ]
       ] `shouldBe` (Just $ Line [ Div (Just "delete") [ span "*/" ] ])
 
+    it "should return Nothing if the earliest non-empty line is closed" $
+      openLine [
+        Line [ Div (Just "delete") [ span " * Debugging", Break ] ]
+      ] `shouldBe` Nothing
+
     where
       rightRowText text = rightRow [ Text text ]
       rightRow xs = Row EmptyLine (Line xs)
