@@ -245,7 +245,8 @@ openLine (line : _) = const line <$> (join . maybeLast $ openElement <$> unLine 
 adjoin2Lines :: [Line] -> Line -> [Line]
 adjoin2Lines [] line = [line]
 adjoin2Lines (EmptyLine : xs) line | Just _ <- openLine xs = EmptyLine : adjoin2Lines xs line
-adjoin2Lines (prev:rest) line = (prev <> line) : rest
+adjoin2Lines (prev:rest) line | Just _ <- openLine [ prev ] = (prev <> line) : rest
+adjoin2Lines lines line = line : lines
 
 adjoinLines :: [Line] -> [Line] -> [Line]
 adjoinLines [] lines = lines
