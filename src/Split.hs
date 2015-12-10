@@ -130,6 +130,7 @@ termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
     rows (Leaf _) = reverse $ foldl adjoin2Lines [] $ Line . (:[]) <$> elements
     rows (Indexed i) = rewrapLineContentsIn Ul <$> childLines i
     rows (Fixed f) = rewrapLineContentsIn Ul <$> childLines f
+    rows (Keyed k) = rewrapLineContentsIn Dl <$> childLines k
 
     rewrapLineContentsIn f (Line elements) = Line [ f (classify categories) elements ]
     rewrapLineContentsIn _ EmptyLine = EmptyLine
