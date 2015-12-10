@@ -1,9 +1,11 @@
 module Main where
 
 import Diff
+import Patch
 import Range
 import Split
 import Syntax
+import Control.Comonad.Cofree
 import Control.Monad.Free
 import qualified Data.Set as Set
 import Test.Hspec
@@ -35,10 +37,10 @@ main = hspec $ do
         Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
       ])) "[ a,\nb ]" "[ a,\nb ]" `shouldBe`
       ([
-          Row (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text "," ] ])
-              (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text "," ] ]),
-          Row (Line [ Ul (Just "category-branch") [ Break, span "b", Text " ]" ] ])
-              (Line [ Ul (Just "category-branch") [ Break, span "b", Text " ]" ] ])
+          Row (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break ] ])
+              (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break] ]),
+          Row (Line [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
+              (Line [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
        ], (Range 0 8, Range 0 8))
 
     it "outputs two rows for two-line non-empty formatted indexed nodes" $
@@ -47,12 +49,12 @@ main = hspec $ do
         Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
       ])) "[ a,\nb ]" "[\na,\nb ]" `shouldBe`
       ([
-          Row (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text "," ] ])
-              (Line [ Ul (Just "category-branch") [ Text "[" ] ]),
+          Row (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break ] ])
+              (Line [ Ul (Just "category-branch") [ Text "[", Break ] ]),
           Row EmptyLine
-              (Line [ Ul (Just "category-branch") [ Break, span "a", Text "," ] ]),
-          Row (Line [ Ul (Just "category-branch") [ Break, span "b", Text " ]" ] ])
-              (Line [ Ul (Just "category-branch") [ Break, span "b", Text " ]" ] ])
+              (Line [ Ul (Just "category-branch") [ span "a", Text ",", Break ] ]),
+          Row (Line [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
+              (Line [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
        ], (Range 0 8, Range 0 8))
 
     it "" $
@@ -62,35 +64,70 @@ main = hspec $ do
           Free . offsetAnnotated 6 3 $ unchanged "b" "leaf" (Leaf "")
         ])) sourceA sourceB `shouldBe`
         ([
-            Row (Line [ Ul (Just "category-branch") [ Text "[" ] ])
+            Row (Line [ Ul (Just "category-branch") [ Text "[", Break ] ])
                 (Line [ Ul (Just "category-branch") [ Text "[", span "a", Text ",", span "b", Text "]" ] ]),
-            Row (Line [ Ul (Just "category-branch") [ Break, span "a" ] ])
+            Row (Line [ Ul (Just "category-branch") [ span "a", Break ] ])
                 EmptyLine,
-            Row (Line [ Ul (Just "category-branch") [ Break, Text "," ] ])
+            Row (Line [ Ul (Just "category-branch") [ Text ",", Break ] ])
                 EmptyLine,
-            Row (Line [ Ul (Just "category-branch") [ Break, span "b", Text "]" ] ])
+            Row (Line [ Ul (Just "category-branch") [ span "b", Text "]" ] ])
                 EmptyLine
         ], (Range 0 8, Range 0 5))
 
+    it "should split multi-line deletions across multiple rows" $
+      let (sourceA, sourceB) = ("/*\n*/\na", "a") in
+        annotatedToRows (formatted sourceA sourceB "branch" (Indexed [
+          Pure . Delete $ (Info (Range 0 5) (Range 0 2) (Set.fromList ["leaf"]) :< (Leaf "")),
+          Free . offsetAnnotated 6 0 $ unchanged "a" "leaf" (Leaf "")
+        ])) sourceA sourceB `shouldBe`
+        ([
+          Row (Line [ Ul (Just "category-branch") [ Div (Just "delete") [ span "/*", Break ] ] ]) EmptyLine,
+          Row (Line [ Ul (Just "category-branch") [ Div (Just "delete") [ span "*/" ], Break ] ]) EmptyLine,
+          Row (Line [ Ul (Just "category-branch") [ span "a" ] ]) (Line [ Ul (Just "category-branch") [ span "a" ] ])
+        ], (Range 0 7, Range 0 1))
+
   describe "adjoin2" $ do
-    it "appends a right-hand line without newlines" $
-      adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe` [ rightRow [ Text "[", Text "a" ] ]
+    it "appends appends HTML onto incomplete lines" $
+      adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe`
+              [ rightRow [ Text "[", Text "a" ] ]
 
-    it "appends onto newlines" $
+    it "does not append HTML onto complete lines" $
       adjoin2 [ leftRow [ Break ] ] (leftRowText ",") `shouldBe`
-              [ leftRow [ Break, Text "," ] ]
+              [ leftRowText ",", leftRow [ Break ]  ]
 
-    it "produces new rows for newlines" $
+    it "appends breaks onto incomplete lines" $
       adjoin2 [ leftRowText "a" ] (leftRow  [ Break ]) `shouldBe`
-              [ leftRow [ Break ], leftRowText "a" ]
+              [ leftRow [ Text "a", Break ] ]
 
-    it "promotes HTML through empty lines" $
+    it "does not promote HTML through empty lines onto complete lines" $
       adjoin2 [ rightRowText "b", leftRow [ Break ] ] (leftRowText "a") `shouldBe`
-              [ rightRowText "b", leftRow [ Break, Text "a" ] ]
+              [ leftRowText "a", rightRowText "b", leftRow [ Break ] ]
 
-    it "does not promote newlines through empty lines" $
+    it "promotes breaks through empty lines onto incomplete lines" $
       adjoin2 [ rightRowText "c", rowText "a" "b" ] (leftRow [ Break ]) `shouldBe`
-        [ leftRow [ Break ], rightRowText "c", rowText "a" "b" ]
+        [ rightRowText "c", Row (Line [ Text "a", Break ]) (Line [ Text "b" ]) ]
+
+  describe "termToLines" $ do
+    it "splits multi-line terms into multiple lines" $
+      termToLines (Info (Range 0 5) (Range 0 2) (Set.singleton "leaf") :< (Leaf "")) "/*\n*/"
+      `shouldBe`
+      ([
+        Line [ span "/*", Break ],
+        Line [ span "*/" ]
+      ], Range 0 5)
+
+  describe "openLine" $ do
+    it "should produce the earliest non-empty line in a list, if open" $
+      openLine [
+        Line [ Div (Just "delete") [ span "*/" ] ],
+        Line [ Div (Just "delete") [ span " * Debugging", Break ] ],
+        Line [ Div (Just "delete") [ span "/*", Break ] ]
+      ] `shouldBe` (Just $ Line [ Div (Just "delete") [ span "*/" ] ])
+
+    it "should return Nothing if the earliest non-empty line is closed" $
+      openLine [
+        Line [ Div (Just "delete") [ span " * Debugging", Break ] ]
+      ] `shouldBe` Nothing
 
     where
       rightRowText text = rightRow [ Text text ]
