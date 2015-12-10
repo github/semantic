@@ -199,12 +199,18 @@ adjoin2 rows (Row left' right') | Just _ <- openLine $ leftLines rows, Just _ <-
   where lefts = adjoin2Lines (leftLines rows) left'
         rights = adjoin2Lines (rightLines rows) right'
 
-adjoin2 rows (Row left' right') | Just _ <- openLine $ leftLines rows = Row EmptyLine right' : zipWith Row lefts rights
-  where lefts = adjoin2Lines (leftLines rows) left'
+adjoin2 rows (Row left' right') | Just _ <- openLine $ leftLines rows = case right' of
+  EmptyLine -> rest
+  _ -> Row EmptyLine right' : rest
+  where rest = zipWith Row lefts rights
+        lefts = adjoin2Lines (leftLines rows) left'
         rights = rightLines rows
 
-adjoin2 rows (Row left' right') | Just _ <- openLine $ rightLines rows = Row left' EmptyLine : zipWith Row lefts rights
-  where lefts = leftLines rows
+adjoin2 rows (Row left' right') | Just _ <- openLine $ rightLines rows = case left' of
+  EmptyLine -> rest
+  _ -> Row left' EmptyLine : rest
+  where rest = zipWith Row lefts rights
+        lefts = leftLines rows
         rights = adjoin2Lines (rightLines rows) right'
 
 adjoin2 rows row = row : rows
