@@ -8,7 +8,6 @@ import Syntax
 
 import Control.Comonad.Cofree
 import Range
-import Control.Monad
 import Control.Monad.Free
 import Data.ByteString.Lazy.Internal
 import Text.Blaze.Html5 hiding (map)
