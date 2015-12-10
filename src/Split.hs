@@ -216,6 +216,14 @@ rightLines rows = right <$> rows
   where
     right (Row _ right) = right
 
+openLine :: [Line] -> Maybe Line
+openLine [] = Nothing
+openLine (EmptyLine : rest) = openLine rest
+openLine (line : _) = case maybeLast $ unLine line of
+  Just Break -> Nothing
+  Just _ -> Just line
+  Nothing -> Nothing
+
 adjoin2Lines :: [Line] -> Line -> [Line]
 adjoin2Lines [] line = [line]
 adjoin2Lines (EmptyLine : xs) line = EmptyLine : (adjoin2Lines xs line)
