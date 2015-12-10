@@ -117,7 +117,7 @@ main = hspec $ do
       ], Range 0 5)
 
   describe "openLine" $ do
-    it "should produce the earliest open line in a list" $
+    it "should produce the earliest non-empty line in a list, if open" $
       openLine [
         Line [ Div (Just "delete") [ span "*/" ] ],
         Line [ Div (Just "delete") [ span " * Debugging", Break ] ],
