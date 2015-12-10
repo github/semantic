@@ -44,7 +44,7 @@ toDd (Text s) = string s
 toDd e = dd $ toMarkup e
 
 instance ToMarkup HTML where
-  toMarkup Break = string ""
+  toMarkup Break = br
   toMarkup (Text s) = string s
   toMarkup (Span className s) = classifyMarkup className . span $ string s
   toMarkup (Ul className children) = classifyMarkup className . ul $ mconcat (toLi <$> children)
