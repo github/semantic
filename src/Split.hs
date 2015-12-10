@@ -127,11 +127,11 @@ termToLines :: Term a Info -> String -> ([Line], Range)
 termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
   where
     rows (Leaf _) = reverse $ foldl adjoin2Lines [] $ Line . (:[]) <$> elements
-    rows (Indexed i) = rewrapLineContentsInUl <$> childLines i
-    rows (Fixed f) = rewrapLineContentsInUl <$> childLines f
+    rows (Indexed i) = rewrapLineContentsIn Ul <$> childLines i
+    rows (Fixed f) = rewrapLineContentsIn Ul <$> childLines f
 
-    rewrapLineContentsInUl (Line elements) = Line [ Ul (classify categories) elements ]
-    rewrapLineContentsInUl EmptyLine = EmptyLine
+    rewrapLineContentsIn f (Line elements) = Line [ f (classify categories) elements ]
+    rewrapLineContentsIn _ EmptyLine = EmptyLine
     lineElements r s = Line . (:[]) <$> textElements r s
     childLines i = appendRemainder $ foldl sumLines ([], start range) i
     appendRemainder (lines, previous) = reverse . foldl adjoin2Lines [] $ lines ++ lineElements (Range previous (end range)) source
