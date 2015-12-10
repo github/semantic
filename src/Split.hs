@@ -168,10 +168,11 @@ contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows
     rightElements = textElements (Range (snd previousIndices) (snd childIndices)) (snd sources)
 
 textElements :: Range -> String -> [HTML]
-textElements range source = textOrBreak <$> actualLines s
+textElements range source = textAndBreak =<< actualLines s
   where s = substring range source
-        textOrBreak "\n" = Break
-        textOrBreak x = Text x
+        textAndBreak "" = []
+        textAndBreak x | '\n' <- last x = [ Text $ init x, Break ]
+        textAndBreak x = [ Text x ]
 
 starts :: (Range , Range) -> (Int, Int)
 starts (left, right) = (start left, start right)
