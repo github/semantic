@@ -234,8 +234,6 @@ classify = foldr (const . Just . ("category-" ++)) Nothing
 actualLines :: String -> [String]
 actualLines "" = [""]
 actualLines lines = case break (== '\n') lines of
-  (l, lines') -> l : (case lines' of
-                       [] -> []
-                       _:lines' -> (case actualLines lines' of
-                                      [] -> ["\n"]
-                                      s:rest -> ('\n' : s) : rest))
+  (l, lines') -> (case lines' of
+                       [] -> [ l ]
+                       _:lines' -> (l ++ "\n") : actualLines lines')
