@@ -149,16 +149,16 @@ annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String ->
 annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) syntax) before after = (rows syntax, (left, right))
   where
     rows (Leaf _) = zipWithMaybe rowFromMaybeRows leftElements rightElements
+    rows (Indexed i) = wrapRows i
+
     leftElements = (elementAndBreak $ Span (classify leftCategories)) =<< actualLines (substring left before)
     rightElements = (elementAndBreak $ Span (classify rightCategories)) =<< actualLines (substring right after)
 
-annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (rewrap <$> rows, ranges)
-  where
+    wrapRows = fmap rewrap . appendRemainder . foldl sumRows ([], starts ranges)
     wrap _ EmptyLine = EmptyLine
     wrap f (Line elements) = Line [ f elements ]
     rewrap (Row left right) = Row (wrap (Ul $ classify leftCategories) left) (wrap (Ul $ classify rightCategories) right)
     ranges = (left, right)
-    rows = appendRemainder $ foldl sumRows ([], starts ranges) i
     sources = (before, after)
     appendRemainder (rows, previousIndices) = reverse . foldl adjoin2 [] $ rows ++ (contextRows (ends ranges) previousIndices sources)
     sumRows (rows, previousIndices) child = (allRows, ends childRanges)
