@@ -150,6 +150,7 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
   where
     rows (Leaf _) = zipWithMaybe rowFromMaybeRows leftElements rightElements
     rows (Indexed i) = wrapRows i
+    rows (Fixed f) = wrapRows f
 
     leftElements = (elementAndBreak $ Span (classify leftCategories)) =<< actualLines (substring left before)
     rightElements = (elementAndBreak $ Span (classify rightCategories)) =<< actualLines (substring right after)
