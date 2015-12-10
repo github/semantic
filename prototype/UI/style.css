@@ -1,10 +1,23 @@
 table {
-	width: 100%;
+  width: 100%;
+  table-layout: fixed;
 }
 table.diff td {
 	width: 50%;
 	height: 15px;
 }
+
+table.diff td.blob-num {
+    width: 1%;
+    min-width: 50px;
+}
+
+table.diff td.blob-code {
+    position: relative;
+    width: 99%;
+    min-width: 100px;
+}
+
 #before, #after {
 	width: 50%;
 }
