@@ -73,15 +73,15 @@ main = hspec $ do
         ], (Range 0 8, Range 0 5))
 
   describe "adjoin2" $ do
-    it "appends a right-hand line without newlines" $
+    it "appends appends HTML onto incomplete lines" $
       adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe`
               [ rightRow [ Text "[", Text "a" ] ]
 
-    it "does not append onto lines ending in breaks" $
+    it "does not append HTML onto complete lines" $
       adjoin2 [ leftRow [ Break ] ] (leftRowText ",") `shouldBe`
               [ leftRowText ",", leftRow [ Break ]  ]
 
-    it "produces new rows for newlines" $
+    it "appends breaks onto incomplete lines" $
       adjoin2 [ leftRowText "a" ] (leftRow  [ Break ]) `shouldBe`
               [ leftRow [ Text "a", Break ] ]
 
