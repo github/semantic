@@ -13,6 +13,7 @@ import Data.ByteString.Lazy.Internal
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
+import Data.Maybe
 import Data.Monoid
 import qualified Data.Set as Set
 import Debug.Trace
@@ -180,6 +181,9 @@ ends (left, right) = (end left, end right)
 
 rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row
 rowFromMaybeRows a b = Row  (maybe EmptyLine (Line . (:[])) a) (maybe EmptyLine (Line . (:[])) b)
+
+maybeLast :: [a] -> Maybe a
+maybeLast list = listToMaybe $ reverse list
 
 adjoin2 :: [Row] -> Row -> [Row]
 adjoin2 [] row = [row]
