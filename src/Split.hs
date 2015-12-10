@@ -141,7 +141,7 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
     leftElements = Span (classify leftCategories) <$> actualLines (substring left before)
     rightElements = Span (classify rightCategories) <$> actualLines (substring right after)
 
-annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (bimap ((:[]) . Ul (classify leftCategories)) ((:[]) . Ul (classify rightCategories)) <$> rows, ranges)
+annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (rewrap <$> rows, ranges)
   where
     rewrap EmptyRow = EmptyRow
     rewrap (Row left right) = Row (Line [ Ul (classify leftCategories) $ unLine left ]) (Line [ Ul (classify rightCategories) $ unLine right ])
