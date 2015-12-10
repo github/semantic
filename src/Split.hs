@@ -145,7 +145,7 @@ termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], (Range, Range))
-annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) syntax) before after = (rows syntax, (left, right))
+annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) syntax) before after = (rows syntax, ranges)
   where
     rows (Leaf _) = zipWithMaybe rowFromMaybeRows leftElements rightElements
     rows (Indexed i) = wrapRows i
