@@ -239,7 +239,7 @@ openElement h = Just h
 openLine :: [Line] -> Maybe Line
 openLine [] = Nothing
 openLine (EmptyLine : rest) = openLine rest
-openLine (line : _) = const line <$> (join . maybeLast $ openElement <$> unLine line)
+openLine (line : _) = const line <$> (openElement =<< (maybeLast $ unLine line))
 
 adjoin2Lines :: [Line] -> Line -> [Line]
 adjoin2Lines [] line = [line]
