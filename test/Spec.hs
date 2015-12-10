@@ -116,6 +116,14 @@ main = hspec $ do
         Line [ span "*/" ]
       ], Range 0 5)
 
+  describe "openLine" $ do
+    it "should produce the earliest open line in a list" $
+      openLine [
+        Line [ Div (Just "delete") [ span "*/" ] ],
+        Line [ Div (Just "delete") [ span " * Debugging", Break ] ],
+        Line [ Div (Just "delete") [ span "/*", Break ] ]
+      ] `shouldBe` (Just $ Line [ Div (Just "delete") [ span "*/" ] ])
+
     where
       rightRowText text = rightRow [ Text text ]
       rightRow xs = Row EmptyLine (Line xs)
