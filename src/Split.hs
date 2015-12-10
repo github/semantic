@@ -142,8 +142,8 @@ termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], (Range, Range))
 annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Leaf _)) before after = (zipWithMaybe rowFromMaybeRows leftElements rightElements, (left, right))
   where
-    leftElements = Span (classify leftCategories) <$> actualLines (substring left before)
-    rightElements = Span (classify rightCategories) <$> actualLines (substring right after)
+    leftElements = (elementAndBreak $ Span (classify leftCategories)) =<< actualLines (substring left before)
+    rightElements = (elementAndBreak $ Span (classify rightCategories)) =<< actualLines (substring right after)
 
 annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (rewrap <$> rows, ranges)
   where
