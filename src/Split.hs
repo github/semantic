@@ -167,6 +167,11 @@ contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows
     leftElements = textElements (Range (fst previousIndices) (fst childIndices)) (fst sources)
     rightElements = textElements (Range (snd previousIndices) (snd childIndices)) (snd sources)
 
+elementAndBreak :: (String -> HTML) -> String -> [HTML]
+elementAndBreak _ "" = []
+elementAndBreak constructor x | '\n' <- last x = [ constructor $ init x, Break ]
+elementAndBreak constructor x = [ constructor x ]
+
 textElements :: Range -> String -> [HTML]
 textElements range source = textAndBreak =<< actualLines s
   where s = substring range source
