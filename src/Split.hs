@@ -231,9 +231,9 @@ rightLines rows = right <$> rows
 
 openElement :: HTML -> Maybe HTML
 openElement Break = Nothing
-openElement (Ul _ elements) = getLast . mconcat . map Last $ openElement <$> elements
-openElement (Dl _ elements) = getLast . mconcat . map Last $ openElement <$> elements
-openElement (Div _ elements) = getLast . mconcat . map Last $ openElement <$> elements
+openElement (Ul _ elements) = openElement =<< maybeLast elements
+openElement (Dl _ elements) = openElement =<< maybeLast elements
+openElement (Div _ elements) = openElement =<< maybeLast elements
 openElement h = Just h
 
 openLine :: [Line] -> Maybe Line
