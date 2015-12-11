@@ -59,7 +59,7 @@ main :: IO ()
 main = hspec $ do
   describe "Term" $ do
     prop "equality is reflexive" $
-      \ a -> a == (a :: ArbitraryTerm String ())
+      \ a -> unTerm a == unTerm (a :: ArbitraryTerm String ())
 
   describe "annotatedToRows" $ do
     it "outputs one row for single-line unchanged leaves" $
