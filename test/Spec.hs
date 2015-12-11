@@ -15,7 +15,7 @@ import Data.Tuple
 import GHC.Generics
 import Test.Hspec
 import Test.Hspec.QuickCheck
-import Test.QuickCheck
+import Test.QuickCheck hiding (Fixed)
 
 newtype ArbitraryTerm a annotation = ArbitraryTerm (annotation, (Syntax a (ArbitraryTerm a annotation)))
   deriving (Show, Eq, Generic)
