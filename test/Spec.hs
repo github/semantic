@@ -14,7 +14,7 @@ import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
-newtype ArbitraryTerm a annotation = ArbitraryTerm (Term a annotation)
+newtype ArbitraryTerm a annotation = ArbitraryTerm (annotation, (Syntax a (ArbitraryTerm a annotation)))
   deriving (Show, Eq)
 
 newtype ArbitrarySyntax a f = ArbitrarySyntax { unSyntax :: Syntax a f }
@@ -28,7 +28,7 @@ instance (Arbitrary a, Arbitrary f) => Arbitrary (ArbitrarySyntax a f) where
     ArbitrarySyntax . Keyed . Map.fromList <$> arbitrary ]
 
 instance (Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
-  arbitrary = oneof [ (\ annotation leaf -> ArbitraryTerm $ annotation :< Leaf leaf) <$> arbitrary <*> arbitrary ]
+  arbitrary = (\ annotation syntax -> ArbitraryTerm $ (annotation, unSyntax syntax)) <$> arbitrary <*> arbitrary
 
 instance Arbitrary HTML where
   arbitrary = oneof [
