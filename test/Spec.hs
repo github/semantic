@@ -7,6 +7,7 @@ import Split
 import Syntax
 import Term
 import Control.Comonad.Cofree
+import Control.Monad
 import Control.Monad.Free hiding (unfold)
 import qualified Data.List as List
 import qualified Data.Map as Map
