@@ -24,6 +24,13 @@ unTerm :: ArbitraryTerm a annotation -> Term a annotation
 unTerm arbitraryTerm = unfold unpack arbitraryTerm
   where unpack (ArbitraryTerm (annotation, syntax)) = (annotation, syntax)
 
+instance (Eq a, Eq f, Arbitrary a, Arbitrary f) => Arbitrary (Syntax a f) where
+  shrink syntax = filter (/= syntax) $ shrinkSyntax syntax
+    where shrinkSyntax (Leaf a) = Leaf <$> shrink a
+          shrinkSyntax (Indexed i) = Indexed <$> shrink i
+          shrinkSyntax (Fixed f) = Fixed <$> shrink f
+          shrinkSyntax (Keyed k) = Keyed . Map.fromList <$> shrink (Map.toList k)
+
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = arbitraryBounded 4
   shrink term@(ArbitraryTerm (annotation, syntax)) = filter (/= term) $ ArbitraryTerm <$> ((,) <$> shrink annotation <*> shrinkSyntax syntax)
