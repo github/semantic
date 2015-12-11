@@ -5,11 +5,14 @@ import Patch
 import Range
 import Split
 import Syntax
+import Term
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import qualified Data.Set as Set
 import Test.Hspec
 import Test.QuickCheck
+
+newtype ArbitraryTerm = ArbitraryTerm (Term String Info)
 
 main :: IO ()
 main = hspec $ do
