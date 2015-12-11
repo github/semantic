@@ -6,6 +6,7 @@ module OrderedMap (
   , (!)
   , OrderedMap.lookup
   , size
+  , empty
   ) where
 
 data OrderedMap key value = OrderedMap { toList :: [(key, value)] }
@@ -29,3 +30,6 @@ lookup key = Prelude.lookup key . toList
 
 size :: OrderedMap key value -> Int
 size = length . toList
+
+empty :: OrderedMap key value
+empty = OrderedMap []
