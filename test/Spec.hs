@@ -42,6 +42,9 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
       Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
       Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink))
 
+newtype ArbitraryDiff a annotation = ArbitraryDiff (ArbitraryTerm a annotation, ArbitraryTerm a annotation)
+  deriving (Show, Eq)
+
 instance (Eq a, Eq annotation, Categorizable annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (Diff a annotation) where
   arbitrary = interpret comparable <$> (unTerm <$> arbitrary) <*> (unTerm <$> arbitrary)
 
