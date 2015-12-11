@@ -1,4 +1,9 @@
-module OrderedMap (OrderedMap, fromList, toList, keys) where
+module OrderedMap (
+    OrderedMap
+  , fromList
+  , toList
+  , keys
+  ) where
 
 data OrderedMap key value = OrderedMap { toList :: [(key, value)] }
   deriving (Show, Eq, Functor, Foldable, Traversable)
