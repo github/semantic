@@ -25,13 +25,6 @@ unTerm arbitraryTerm = unfold unpack arbitraryTerm
 newtype ArbitrarySyntax a f = ArbitrarySyntax { unSyntax :: Syntax a f }
   deriving (Show, Eq)
 
-instance (Arbitrary a, Arbitrary f) => Arbitrary (ArbitrarySyntax a f) where
-  arbitrary = oneof [
-    ArbitrarySyntax . Leaf <$> arbitrary,
-    ArbitrarySyntax . Indexed <$> arbitrary,
-    ArbitrarySyntax . Syntax.Fixed <$> arbitrary,
-    ArbitrarySyntax . Keyed . Map.fromList <$> arbitrary ]
-
 instance (Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = arbitraryBounded 4
 
