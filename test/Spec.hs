@@ -12,12 +12,13 @@ import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import Data.Tuple
+import GHC.Generics
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
 newtype ArbitraryTerm a annotation = ArbitraryTerm (annotation, (Syntax a (ArbitraryTerm a annotation)))
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generic)
 
 unTerm :: ArbitraryTerm a annotation -> Term a annotation
 unTerm arbitraryTerm = unfold unpack arbitraryTerm
