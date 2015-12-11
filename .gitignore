@@ -8,3 +8,4 @@ xcuserdata
 libbridge.dylib
 *.prof
 *.prof.html
+*.hp
