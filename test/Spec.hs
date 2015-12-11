@@ -19,6 +19,12 @@ newtype ArbitraryTerm = ArbitraryTerm (Term String ())
 instance Arbitrary ArbitraryTerm where
   arbitrary = oneof [ ArbitraryTerm . (() :<) . Leaf <$> arbitrary ]
 
+instance Arbitrary HTML where
+  arbitrary = oneof [
+    Text <$> arbitrary,
+    Span <$> arbitrary <*> arbitrary,
+    const Break <$> (arbitrary :: Gen ()) ]
+
 main :: IO ()
 main = hspec $ do
   describe "Term" $ do
