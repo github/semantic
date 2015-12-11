@@ -68,7 +68,6 @@ executable semantic-diff-profile
                      , bytestring
                      , optparse-applicative
                      , filepath
-                     , profiteur
   default-language:    Haskell2010
   extra-libraries:     bridge
   extra-lib-dirs:      .
