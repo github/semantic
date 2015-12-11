@@ -40,6 +40,8 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
       Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
       Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink))
 
+data CategorySet = A | B | C | D deriving (Eq, Show)
+
 instance Arbitrary HTML where
   arbitrary = oneof [
     Text <$> arbitrary,
