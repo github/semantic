@@ -2,6 +2,7 @@ module Main where
 
 import Categorizable
 import Diff
+import Interpreter
 import Patch
 import Range
 import Split
@@ -40,6 +41,9 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
       Indexed i -> Indexed <$> (List.subsequences i >>= recursivelyShrink)
       Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
       Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink))
+
+instance (Eq a, Eq annotation, Categorizable annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (Diff a annotation) where
+  arbitrary = interpret comparable <$> (unTerm <$> arbitrary) <*> (unTerm <$> arbitrary)
 
 data CategorySet = A | B | C | D deriving (Eq, Show)
 
