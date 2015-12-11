@@ -12,8 +12,6 @@ table.diff td.blob-num {
 }
 
 table.diff td.blob-code {
-  position: relative;
-  width: 99%;
   min-width: 100px;
 }
 
