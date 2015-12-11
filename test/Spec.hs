@@ -29,7 +29,7 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
     where shrinkSyntax (Leaf a) = Leaf <$> shrink a
           shrinkSyntax (Indexed i) = (getSyntax <$> i) ++ (Indexed <$> (shrink =<< List.subsequences i))
           shrinkSyntax (Syntax.Fixed f) = (getSyntax <$> f) ++ (Syntax.Fixed <$> (shrink =<< List.subsequences f))
-          shrinkSyntax (Keyed k) = (getSyntax . snd <$> (Map.toList k)) ++ (Keyed . Map.fromList <$> shrink (Map.toList k))
+          shrinkSyntax (Keyed k) = (getSyntax . snd <$> (Map.toList k)) ++ (Keyed . Map.fromList <$> (shrink =<< List.subsequences (Map.toList k)))
           getSyntax (ArbitraryTerm (_, syntax)) = syntax
 
 arbitraryBounded :: (Arbitrary a, Arbitrary annotation) => Int -> Gen (ArbitraryTerm a annotation)
