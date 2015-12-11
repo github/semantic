@@ -51,9 +51,6 @@ unDiff (ArbitraryDiff (a, b)) = interpret comparable (unTerm a) (unTerm b)
 instance (Eq a, Eq annotation, Categorizable annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryDiff a annotation) where
   arbitrary = ArbitraryDiff <$> ((,) <$> arbitrary <*> arbitrary)
 
-instance (Eq a, Eq annotation, Categorizable annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (Diff a annotation) where
-  arbitrary = interpret comparable <$> (unTerm <$> arbitrary) <*> (unTerm <$> arbitrary)
-
 data CategorySet = A | B | C | D deriving (Eq, Show)
 
 instance Categorizable CategorySet where
