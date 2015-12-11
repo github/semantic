@@ -33,7 +33,7 @@ instance (Arbitrary a, Arbitrary f) => Arbitrary (ArbitrarySyntax a f) where
     ArbitrarySyntax . Keyed . Map.fromList <$> arbitrary ]
 
 instance (Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
-  arbitrary = (\ annotation syntax -> ArbitraryTerm $ (annotation, unSyntax syntax)) <$> arbitrary <*> arbitrary
+  arbitrary = arbitraryBounded 4
 
 arbitraryBounded :: (Arbitrary a, Arbitrary annotation) => Int -> Gen (ArbitraryTerm a annotation)
 arbitraryBounded k = ArbitraryTerm <$> ((,) <$> arbitrary <*> oneof [
