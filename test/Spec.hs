@@ -49,6 +49,9 @@ instance Categorizable CategorySet where
   categories C = Set.fromList [ "c" ]
   categories D = Set.fromList [ "d" ]
 
+instance Arbitrary CategorySet where
+  arbitrary = elements [ A, B, C, D ]
+
 instance Arbitrary HTML where
   arbitrary = oneof [
     Text <$> arbitrary,
