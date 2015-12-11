@@ -8,6 +8,7 @@ module OrderedMap (
   , size
   , empty
   , union
+  , unions
   ) where
 
 data OrderedMap key value = OrderedMap { toList :: [(key, value)] }
@@ -38,3 +39,6 @@ empty = OrderedMap []
 union :: Eq key => OrderedMap key value -> OrderedMap key value -> OrderedMap key value
 union (OrderedMap a) (OrderedMap b) = OrderedMap $ a ++ filter ((`elem` extant) . fst) b
   where extant = fst <$> a
+
+unions :: Eq key => [OrderedMap key value] -> OrderedMap key value
+unions = foldl union empty
