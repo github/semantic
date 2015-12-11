@@ -6,3 +6,5 @@ xcuserdata
 *.xccheckout
 .stack-work
 libbridge.dylib
+*.prof
+*.prof.html
