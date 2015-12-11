@@ -8,14 +8,13 @@ table.diff td {
 }
 
 table.diff td.blob-num {
-    width: 1%;
-    min-width: 50px;
+  width: 40px;
 }
 
 table.diff td.blob-code {
-    position: relative;
-    width: 99%;
-    min-width: 100px;
+  position: relative;
+  width: 99%;
+  min-width: 100px;
 }
 
 #before, #after {
