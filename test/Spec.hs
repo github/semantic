@@ -30,6 +30,10 @@ instance Arbitrary Line where
     Line <$> arbitrary,
     const EmptyLine <$> (arbitrary :: Gen ()) ]
 
+instance Arbitrary Row where
+  arbitrary = oneof [
+    Row <$> arbitrary <*> arbitrary ]
+
 main :: IO ()
 main = hspec $ do
   describe "Term" $ do
