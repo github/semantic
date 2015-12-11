@@ -37,8 +37,9 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
           boundedSyntax 0 = liftM Leaf arbitrary
           boundedSyntax n = frequency
             [ (1, liftM Leaf arbitrary),
-              (4, liftM Indexed . listOf . boundedTerm $ n - 1),
-              (4, liftM Fixed . listOf . boundedTerm $ n - 1) ]
+              (4, liftM Indexed $ listOf arbitrary),
+              (4, liftM Fixed $ listOf arbitrary),
+              (4, liftM (Keyed . Map.fromList) $ listOf arbitrary) ]
   shrink term@(ArbitraryTerm (annotation, syntax)) = (++) (subterms term) $ filter (/= term) $
     ArbitraryTerm <$> ((,) <$> shrink annotation <*> case syntax of
       Leaf a -> Leaf <$> shrink a
