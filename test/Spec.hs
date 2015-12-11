@@ -88,7 +88,7 @@ main = hspec $ do
 
   describe "Diff" $ do
     prop "equality is reflexive" $
-      \ a -> a == (a :: Diff String CategorySet)
+      \ a -> unDiff a == unDiff (a :: ArbitraryDiff String CategorySet)
 
   describe "annotatedToRows" $ do
     it "outputs one row for single-line unchanged leaves" $
