@@ -13,6 +13,7 @@ import Test.Hspec
 import Test.QuickCheck
 
 newtype ArbitraryTerm = ArbitraryTerm (Term String Info)
+  deriving (Show, Eq)
 
 instance Arbitrary ArbitraryTerm where
   arbitrary = elements [ ArbitraryTerm $ (Info (Range 0 0) (Range 0 0) (Set.singleton "leaf")) :< Leaf "" ]
