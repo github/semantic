@@ -78,7 +78,7 @@ instance Show Row where
   show (Row left right) = "\n" ++ show left ++ " | " ++ show right
 
 instance ToMarkup (Int, Row) where
-  toMarkup (num, (Row EmptyLine EmptyLine)) = tr $ numberTd "" <> td (string "") <> numberTd "" <> toMarkup (string "") <> string "\n"
+  toMarkup (_, (Row EmptyLine EmptyLine)) = tr $ numberTd "" <> td (string "") <> numberTd "" <> toMarkup (string "") <> string "\n"
   toMarkup (num, (Row EmptyLine right)) = tr $ numberTd "" <> td (string "") <>
                                                numberTd (show num) <> toMarkup right <> string "\n"
   toMarkup (num, (Row left EmptyLine)) = tr $ numberTd (show num)  <> toMarkup left <>
