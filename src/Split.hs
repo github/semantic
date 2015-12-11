@@ -64,11 +64,13 @@ split diff before after = return . renderHtml
     . body
       . (table ! A.class_ (stringValue "diff")) $ toMarkup
         [ (colgroup colgroupHtml),
-          tbody . mconcat $ toMarkup <$> ((reverse $ foldl numberRows [] rows) :: [(Int, Row)]) ]
+          tbody . mconcat $ toMarkup <$> (reverse $ foldl numberRows [] rows) ]
    where
      colgroupHtml :: Html
      colgroupHtml = (toMarkup [ col ! A.width (stringValue "40"), col, col ! A.width (stringValue "40"), col ])
      rows = fst $ diffToRows diff (0, 0) before after
+
+     numberRows :: [(Int, Row)] -> Row -> [(Int, Row)]
      numberRows [] row = [(1, row)]
      numberRows rows@((count, _):_) row = (count + 1, row):rows
 
