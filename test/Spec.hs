@@ -14,6 +14,9 @@ import Test.QuickCheck
 
 newtype ArbitraryTerm = ArbitraryTerm (Term String Info)
 
+instance Arbitrary ArbitraryTerm where
+  arbitrary = elements [ ArbitraryTerm $ (Info (Range 0 0) (Range 0 0) (Set.singleton "leaf")) :< Leaf "" ]
+
 main :: IO ()
 main = hspec $ do
   describe "annotatedToRows" $ do
