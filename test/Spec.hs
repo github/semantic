@@ -29,7 +29,7 @@ instance (Eq a, Eq f, Arbitrary a, Arbitrary f) => Arbitrary (Syntax a f) where
     where shrinkSyntax (Leaf a) = Leaf <$> shrink a
           shrinkSyntax (Indexed i) = Indexed <$> (shrink =<< List.subsequences i)
           shrinkSyntax (Fixed f) = Fixed <$> (shrink =<< List.subsequences f)
-          shrinkSyntax (Keyed k) = Keyed . Map.fromList <$> shrink (Map.toList k)
+          shrinkSyntax (Keyed k) = Keyed . Map.fromList <$> (shrink =<< List.subsequences (Map.toList k))
 
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = arbitraryBounded 4
