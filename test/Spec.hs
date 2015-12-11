@@ -7,7 +7,7 @@ import Split
 import Syntax
 import Term
 import Control.Comonad.Cofree
-import Control.Monad.Free
+import Control.Monad.Free hiding (unfold)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import Test.Hspec
@@ -16,6 +16,10 @@ import Test.QuickCheck
 
 newtype ArbitraryTerm a annotation = ArbitraryTerm (annotation, (Syntax a (ArbitraryTerm a annotation)))
   deriving (Show, Eq)
+
+unTerm :: ArbitraryTerm a annotation -> Term a annotation
+unTerm arbitraryTerm = unfold unpack arbitraryTerm
+  where unpack (ArbitraryTerm (annotation, syntax)) = (annotation, syntax)
 
 newtype ArbitrarySyntax a f = ArbitrarySyntax { unSyntax :: Syntax a f }
   deriving (Show, Eq)
