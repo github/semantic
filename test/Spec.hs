@@ -23,9 +23,9 @@ unTerm :: ArbitraryTerm a annotation -> Term a annotation
 unTerm arbitraryTerm = unfold unpack arbitraryTerm
   where unpack (ArbitraryTerm (annotation, syntax)) = (annotation, syntax)
 
-instance (Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
+instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = arbitraryBounded 4
-  shrink (ArbitraryTerm (annotation, syntax)) = ArbitraryTerm <$> ((,) <$> shrink annotation <*> shrinkSyntax syntax)
+  shrink term@(ArbitraryTerm (annotation, syntax)) = filter (/= term) $ ArbitraryTerm <$> ((,) <$> shrink annotation <*> shrinkSyntax syntax)
     where shrinkSyntax (Leaf a) = Leaf <$> shrink a
           shrinkSyntax (Indexed i) = (getSyntax <$> i) ++ (Indexed <$> List.subsequences i) ++ (Indexed <$> shrink i)
           shrinkSyntax (Syntax.Fixed f) = (getSyntax <$> f) ++ (Syntax.Fixed <$> List.subsequences f) ++ (Syntax.Fixed <$> shrink f)
