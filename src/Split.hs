@@ -74,9 +74,6 @@ split diff before after = return . renderHtml
      numberRows [] row = [(1, row)]
      numberRows rows@((count, _):_) row = (count + 1, row):rows
 
-
-
-data RowWithLine = RowWithLine Int Row
 data Row = Row Line Line
   deriving Eq
 
