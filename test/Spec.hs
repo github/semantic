@@ -35,7 +35,7 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
   arbitrary = sized boundedTerm
     where boundedTerm n = ArbitraryTerm <$> ((,) <$> arbitrary <*> boundedSyntax n)
           boundedSyntax 0 = liftM Leaf arbitrary
-          boundedSyntax n = frequency
+          boundedSyntax _ = frequency
             [ (1, liftM Leaf arbitrary),
               (4, liftM Indexed $ listOf arbitrary),
               (4, liftM Fixed $ listOf arbitrary),
