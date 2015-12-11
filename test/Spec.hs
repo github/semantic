@@ -10,6 +10,7 @@ import Control.Comonad.Cofree
 import Control.Monad.Free
 import qualified Data.Set as Set
 import Test.Hspec
+import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
 newtype ArbitraryTerm = ArbitraryTerm (Term String Info)
@@ -21,7 +22,7 @@ instance Arbitrary ArbitraryTerm where
 main :: IO ()
 main = hspec $ do
   describe "Term" $ do
-    it "equality is reflexive" $ property $
+    prop "equality is reflexive" $
       \ a b -> a == (b :: ArbitraryTerm)
 
   describe "annotatedToRows" $ do
