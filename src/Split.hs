@@ -67,9 +67,16 @@ split diff before after = return . renderHtml
    where
      rows = fst $ diffToRows diff (0, 0) before after
 
-     numberRows :: [(Int, Row)] -> Row -> [(Int, Row)]
-     numberRows [] row = [(1, row)]
-     numberRows rows@((count, _):_) row = (count + 1, row):rows
+     numberRows :: [(Int, Line, Int, Line)] -> Row -> [(Int, Line, Int, Line)]
+     numberRows [] (Row EmptyLine EmptyLine) = []
+     numberRows [] (Row left@(Line _) EmptyLine) = [(1, left, 0, EmptyLine)]
+     numberRows [] (Row EmptyLine right@(Line _)) = [(0, EmptyLine, 1, right)]
+     numberRows [] (Row left right) = [(1, left, 1, right)]
+     numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine EmptyLine) = (leftCount, EmptyLine, rightCount, EmptyLine):rows
+     numberRows rows@((leftCount, _, rightCount, _):_) (Row left@(Line _) EmptyLine) = (leftCount + 1, left, rightCount, EmptyLine):rows
+     numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine right@(Line _)) = (leftCount, EmptyLine, rightCount + 1, right):rows
+     numberRows rows@((leftCount, _, rightCount, _):_) (Row left right) = (leftCount + 1, left, rightCount + 1, right):rows
+
 
 data Row = Row Line Line
   deriving Eq
@@ -77,14 +84,14 @@ data Row = Row Line Line
 instance Show Row where
   show (Row left right) = "\n" ++ show left ++ " | " ++ show right
 
-instance ToMarkup (Int, Row) where
-  toMarkup (_, (Row EmptyLine EmptyLine)) = tr $ numberTd "" <> td (string "") <> numberTd "" <> toMarkup (string "") <> string "\n"
-  toMarkup (num, (Row EmptyLine right)) = tr $ numberTd "" <> td (string "") <>
+instance ToMarkup (Int, Line, Int, Line) where
+  toMarkup (_, EmptyLine, _, EmptyLine) = tr $ numberTd "" <> td (string "") <> numberTd "" <> toMarkup (string "") <> string "\n"
+  toMarkup (_, EmptyLine, num, right) = tr $ numberTd "" <> td (string "") <>
                                                numberTd (show num) <> toMarkup right <> string "\n"
-  toMarkup (num, (Row left EmptyLine)) = tr $ numberTd (show num)  <> toMarkup left <>
+  toMarkup (num, left, _, EmptyLine) = tr $ numberTd (show num)  <> toMarkup left <>
                                               numberTd "" <> td (string "") <> string "\n"
-  toMarkup (num, (Row left right)) = tr $ numberTd (show num) <> toMarkup left <>
-                                          numberTd (show num) <> toMarkup right <> string "\n"
+  toMarkup (leftNum, left, rightNum, right) = tr $ numberTd (show leftNum) <> toMarkup left <>
+                                          numberTd (show rightNum) <> toMarkup right <> string "\n"
 
 numberTd :: String -> Html
 numberTd s = td (string s) ! A.class_ (stringValue "blob-num")
