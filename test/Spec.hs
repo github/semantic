@@ -8,6 +8,7 @@ import Syntax
 import Term
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
+import qualified Data.List as List
 import qualified Data.Map as Map
 import qualified Data.Set as Set
 import Data.Tuple
@@ -26,7 +27,7 @@ instance (Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annot
   arbitrary = arbitraryBounded 4
   shrink (ArbitraryTerm (annotation, syntax)) = ArbitraryTerm <$> ((,) <$> shrink annotation <*> shrinkSyntax syntax)
     where shrinkSyntax (Leaf a) = Leaf <$> shrink a
-          shrinkSyntax (Indexed i) = (getSyntax <$> i) ++ (Indexed <$> shrink i)
+          shrinkSyntax (Indexed i) = (getSyntax <$> i) ++ (Indexed <$> List.subsequences i) ++ (Indexed <$> shrink i)
           shrinkSyntax (Syntax.Fixed f) = (getSyntax <$> f) ++ (Syntax.Fixed <$> shrink f)
           shrinkSyntax (Keyed k) = (getSyntax . snd <$> (Map.toList k)) ++ (Keyed . Map.fromList <$> shrink (Map.toList k))
           getSyntax (ArbitraryTerm (_, syntax)) = syntax
