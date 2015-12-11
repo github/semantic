@@ -14,7 +14,7 @@ import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
-newtype ArbitraryTerm = ArbitraryTerm (Term String ())
+newtype ArbitraryTerm a = ArbitraryTerm (Term a ())
   deriving (Show, Eq)
 
 newtype ArbitrarySyntax a f = ArbitrarySyntax (Syntax a f)
@@ -27,7 +27,7 @@ instance (Arbitrary a, Arbitrary f) => Arbitrary (ArbitrarySyntax a f) where
     ArbitrarySyntax . Syntax.Fixed <$> arbitrary,
     ArbitrarySyntax . Keyed . Map.fromList <$> arbitrary ]
 
-instance Arbitrary ArbitraryTerm where
+instance Arbitrary a => Arbitrary (ArbitraryTerm a) where
   arbitrary = oneof [ ArbitraryTerm . (() :<) . Leaf <$> arbitrary ]
 
 instance Arbitrary HTML where
@@ -49,7 +49,7 @@ main :: IO ()
 main = hspec $ do
   describe "Term" $ do
     prop "equality is reflexive" $
-      \ a -> a == (a :: ArbitraryTerm)
+      \ a -> a == (a :: ArbitraryTerm String)
 
   describe "annotatedToRows" $ do
     it "outputs one row for single-line unchanged leaves" $
