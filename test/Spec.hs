@@ -31,7 +31,7 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
     where boundedTerm m n = ArbitraryTerm <$> ((,) <$> arbitrary <*> boundedSyntax m n)
           boundedSyntax _ n | n <= 0 = liftM Leaf arbitrary
           boundedSyntax m n = frequency
-            [ (6, liftM Leaf arbitrary),
+            [ (12, liftM Leaf arbitrary),
               (1, liftM Indexed $ take n <$> listOf (boundedTerm (div m 2) (div n 3))),
               (1, liftM Fixed $ take n <$> listOf (boundedTerm (div m 2) (div n 3))),
               (1, liftM (Keyed . Map.fromList) $ take n <$> listOf (arbitrary >>= (\x -> ((,) x) <$> boundedTerm (div m 2) (div n 3)))) ]
