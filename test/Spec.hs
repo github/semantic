@@ -22,9 +22,6 @@ unTerm :: ArbitraryTerm a annotation -> Term a annotation
 unTerm arbitraryTerm = unfold unpack arbitraryTerm
   where unpack (ArbitraryTerm (annotation, syntax)) = (annotation, syntax)
 
-newtype ArbitrarySyntax a f = ArbitrarySyntax { unSyntax :: Syntax a f }
-  deriving (Show, Eq)
-
 instance (Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = arbitraryBounded 4
 
