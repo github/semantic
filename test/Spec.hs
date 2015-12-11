@@ -33,12 +33,11 @@ instance (Eq a, Eq f, Arbitrary a, Arbitrary f) => Arbitrary (Syntax a f) where
 
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = arbitraryBounded 4
-  shrink term@(ArbitraryTerm (annotation, syntax)) = filter (/= term) $ ArbitraryTerm <$> ((,) <$> shrink annotation <*> shrinkSyntax syntax)
+  shrink term@(ArbitraryTerm (annotation, syntax)) = (++) (subterms term) $ filter (/= term) $ ArbitraryTerm <$> ((,) <$> shrink annotation <*> shrinkSyntax syntax)
     where shrinkSyntax (Leaf a) = Leaf <$> shrink a
-          shrinkSyntax (Indexed i) = (getSyntax <$> i) ++ (Indexed <$> (shrink =<< List.subsequences i))
-          shrinkSyntax (Syntax.Fixed f) = (getSyntax <$> f) ++ (Syntax.Fixed <$> (shrink =<< List.subsequences f))
-          shrinkSyntax (Keyed k) = (getSyntax . snd <$> (Map.toList k)) ++ (Keyed . Map.fromList <$> (shrink =<< List.subsequences (Map.toList k)))
-          getSyntax (ArbitraryTerm (_, syntax)) = syntax
+          shrinkSyntax (Indexed i) = Indexed <$> (List.subsequences i >>= recursivelyShrink)
+          shrinkSyntax (Fixed f) = Fixed <$> (List.subsequences f >>= recursivelyShrink)
+          shrinkSyntax (Keyed k) = Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink)
 
 arbitraryBounded :: (Arbitrary a, Arbitrary annotation) => Int -> Gen (ArbitraryTerm a annotation)
 arbitraryBounded k = ArbitraryTerm <$> ((,) <$> arbitrary <*> oneof [
