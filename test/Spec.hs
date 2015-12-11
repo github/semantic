@@ -121,6 +121,9 @@ main = hspec $ do
     prop "is identity on top of empty rows" $
       \ a -> adjoin2 [ mempty ] a == [ a ]
 
+    prop "is identity on top of no rows" $
+      \ a -> adjoin2 [] a == [ a ]
+
     it "appends appends HTML onto incomplete lines" $
       adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe`
               [ rightRow [ Text "[", Text "a" ] ]
