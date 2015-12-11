@@ -37,7 +37,7 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
           boundedSyntax 0 = liftM Leaf arbitrary
           boundedSyntax n = frequency
             [ (1, liftM Leaf arbitrary),
-              (4, liftM Indexed $ listOf $ boundedTerm $ n - 1) ]
+              (4, liftM Indexed . listOf . boundedTerm $ n - 1) ]
   shrink term@(ArbitraryTerm (annotation, syntax)) = (++) (subterms term) $ filter (/= term) $ ArbitraryTerm <$> ((,) <$> shrink annotation <*> shrinkSyntax syntax)
     where shrinkSyntax (Leaf a) = Leaf <$> shrink a
           shrinkSyntax (Indexed i) = Indexed <$> (List.subsequences i >>= recursivelyShrink)
