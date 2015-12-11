@@ -9,6 +9,7 @@ import Control.Comonad.Cofree
 import Control.Monad.Free
 import qualified Data.Set as Set
 import Test.Hspec
+import Test.QuickCheck
 
 main :: IO ()
 main = hspec $ do
