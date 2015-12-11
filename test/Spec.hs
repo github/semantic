@@ -17,7 +17,7 @@ import Test.QuickCheck
 newtype ArbitraryTerm a annotation = ArbitraryTerm (Term a annotation)
   deriving (Show, Eq)
 
-newtype ArbitrarySyntax a f = ArbitrarySyntax (Syntax a f)
+newtype ArbitrarySyntax a f = ArbitrarySyntax { unSyntax :: Syntax a f }
   deriving (Show, Eq)
 
 instance (Arbitrary a, Arbitrary f) => Arbitrary (ArbitrarySyntax a f) where
