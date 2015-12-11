@@ -16,6 +16,9 @@ import Test.QuickCheck
 newtype ArbitraryTerm = ArbitraryTerm (Term String ())
   deriving (Show, Eq)
 
+newtype ArbitrarySyntax a f = ArbitrarySyntax (Syntax a f)
+  deriving (Show, Eq)
+
 instance Arbitrary ArbitraryTerm where
   arbitrary = oneof [ ArbitraryTerm . (() :<) . Leaf <$> arbitrary ]
 
