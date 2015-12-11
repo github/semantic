@@ -25,6 +25,11 @@ instance Arbitrary HTML where
     Span <$> arbitrary <*> arbitrary,
     const Break <$> (arbitrary :: Gen ()) ]
 
+instance Arbitrary Line where
+  arbitrary = oneof [
+    Line <$> arbitrary,
+    const EmptyLine <$> (arbitrary :: Gen ()) ]
+
 main :: IO ()
 main = hspec $ do
   describe "Term" $ do
