@@ -4,6 +4,7 @@ module OrderedMap (
   , toList
   , keys
   , (!)
+  , OrderedMap.lookup
   ) where
 
 data OrderedMap key value = OrderedMap { toList :: [(key, value)] }
@@ -18,6 +19,9 @@ keys (OrderedMap pairs) = fst <$> pairs
 infixl 9 !
 
 (!) :: Eq key => OrderedMap key value -> key -> value
-OrderedMap pairs ! key = case lookup key pairs of
+map ! key = case OrderedMap.lookup key map of
   Just value -> value
   Nothing -> error "no value found for key"
+
+lookup :: Eq key => key -> OrderedMap key value -> Maybe value
+lookup key = Prelude.lookup key . toList
