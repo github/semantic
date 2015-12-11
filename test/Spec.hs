@@ -24,6 +24,12 @@ unTerm arbitraryTerm = unfold unpack arbitraryTerm
 
 instance (Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = arbitraryBounded 4
+  shrink (ArbitraryTerm (annotation, syntax)) = ArbitraryTerm <$> ((,) <$> shrink annotation <*> shrinkSyntax syntax)
+    where shrinkSyntax (Leaf a) = Leaf <$> shrink a
+          shrinkSyntax (Indexed i) = (getSyntax <$> i) ++ (Indexed <$> shrink i)
+          shrinkSyntax (Syntax.Fixed f) = (getSyntax <$> f) ++ (Syntax.Fixed <$> shrink f)
+          shrinkSyntax (Keyed k) = (getSyntax . snd <$> (Map.toList k)) ++ (Keyed . Map.fromList <$> shrink (Map.toList k))
+          getSyntax (ArbitraryTerm (_, syntax)) = syntax
 
 arbitraryBounded :: (Arbitrary a, Arbitrary annotation) => Int -> Gen (ArbitraryTerm a annotation)
 arbitraryBounded k = ArbitraryTerm <$> ((,) <$> arbitrary <*> oneof [
