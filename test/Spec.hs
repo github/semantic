@@ -48,6 +48,9 @@ newtype ArbitraryDiff a annotation = ArbitraryDiff (ArbitraryTerm a annotation, 
 unDiff :: (Eq a, Eq annotation, Categorizable annotation) => ArbitraryDiff a annotation -> Diff a annotation
 unDiff (ArbitraryDiff (a, b)) = interpret comparable (unTerm a) (unTerm b)
 
+instance (Eq a, Eq annotation, Categorizable annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryDiff a annotation) where
+  arbitrary = ArbitraryDiff <$> ((,) <$> arbitrary <*> arbitrary)
+
 instance (Eq a, Eq annotation, Categorizable annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (Diff a annotation) where
   arbitrary = interpret comparable <$> (unTerm <$> arbitrary) <*> (unTerm <$> arbitrary)
 
