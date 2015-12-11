@@ -101,8 +101,7 @@ main = hspec $ do
 
   describe "adjoin2" $ do
     prop "is idempotent for additions of empty rows" $
-      \ () -> let empty = Row EmptyLine EmptyLine in
-        adjoin2 (adjoin2 [ empty ] empty) empty == (adjoin2 [ empty ] empty)
+      \ () -> adjoin2 (adjoin2 [ mempty ] mempty) mempty == (adjoin2 [ mempty ] mempty)
 
     it "appends appends HTML onto incomplete lines" $
       adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe`
