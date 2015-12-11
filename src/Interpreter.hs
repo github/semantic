@@ -1,5 +1,6 @@
 module Interpreter (interpret, Comparable) where
 
+import Prelude hiding (lookup)
 import Algorithm
 import Diff
 import Operation
@@ -42,7 +43,7 @@ run comparable (Free (Recursive (annotation1 :< a) (annotation2 :< b) f)) = run 
   recur (Keyed a') (Keyed b') | keys a' == keys b' = annotate . Keyed . fromList . fmap repack $ keys b'
     where
       repack key = (key, interpretInBoth key a' b')
-      interpretInBoth key x y = maybeInterpret (Data.Map.lookup key x) (Data.Map.lookup key y)
+      interpretInBoth key x y = maybeInterpret (lookup key x) (lookup key y)
       maybeInterpret (Just x) (Just y) = interpret comparable x y
       maybeInterpret _ _ = error "maybeInterpret assumes that its operands are `Just`s."
   recur _ _ = Pure $ Replace (annotation1 :< a) (annotation2 :< b)
