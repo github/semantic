@@ -10,6 +10,7 @@ import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
 import qualified Data.Map as Map
 import qualified Data.Set as Set
+import Data.Tuple
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
@@ -39,8 +40,12 @@ arbitraryBounded k = ArbitraryTerm <$> ((,) <$> arbitrary <*> oneof [
   Leaf <$> arbitrary,
   Indexed <$> vectorOfAtMost k (arbitraryBounded $ k - 1),
   Syntax.Fixed <$> vectorOfAtMost k (arbitraryBounded $ k - 1),
-  Keyed . Map.fromList <$> arbitrary ])
+  Keyed . Map.fromList <$> (pairWithKey =<< vectorOfAtMost k (arbitraryBounded $ k - 1))])
   where vectorOfAtMost k gen = choose (0, k) >>= \n -> vectorOf n gen
+        pairWithKey :: [ArbitraryTerm a annotation] -> Gen [(String, ArbitraryTerm a annotation)]
+        pairWithKey x = sequence (generatorOfThings <$> x)
+        generatorOfThings :: ArbitraryTerm a annotation -> Gen (String, ArbitraryTerm a annotation)
+        generatorOfThings x = (swap . (,) x) <$> arbitrary
 
 instance Arbitrary HTML where
   arbitrary = oneof [
