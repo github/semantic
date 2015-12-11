@@ -20,6 +20,10 @@ instance Arbitrary ArbitraryTerm where
 
 main :: IO ()
 main = hspec $ do
+  describe "Term" $ do
+    it "equality is reflexive" $ property $
+      \ a b -> a == (b :: ArbitraryTerm)
+
   describe "annotatedToRows" $ do
     it "outputs one row for single-line unchanged leaves" $
       annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` ([ Row (Line [ span "a" ]) (Line [ span "a" ]) ], (Range 0 1, Range 0 1))
