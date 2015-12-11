@@ -77,6 +77,10 @@ main = hspec $ do
     prop "equality is reflexive" $
       \ a -> unTerm a == unTerm (a :: ArbitraryTerm String ())
 
+  describe "Diff" $ do
+    prop "equality is reflexive" $
+      \ a -> a == (a :: Diff String CategorySet)
+
   describe "annotatedToRows" $ do
     it "outputs one row for single-line unchanged leaves" $
       annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` ([ Row (Line [ span "a" ]) (Line [ span "a" ]) ], (Range 0 1, Range 0 1))
