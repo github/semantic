@@ -6,6 +6,4 @@ xcuserdata
 *.xccheckout
 .stack-work
 libbridge.dylib
-*.prof
-*.prof.html
-*.hp
+semantic-diff-profile.*
