@@ -8,6 +8,7 @@ import Syntax
 import Term
 import Control.Comonad.Cofree
 import Control.Monad.Free
+import qualified Data.Map as Map
 import qualified Data.Set as Set
 import Test.Hspec
 import Test.Hspec.QuickCheck
@@ -18,6 +19,13 @@ newtype ArbitraryTerm = ArbitraryTerm (Term String ())
 
 newtype ArbitrarySyntax a f = ArbitrarySyntax (Syntax a f)
   deriving (Show, Eq)
+
+instance (Arbitrary a, Arbitrary f) => Arbitrary (ArbitrarySyntax a f) where
+  arbitrary = oneof [
+    ArbitrarySyntax . Leaf <$> arbitrary,
+    ArbitrarySyntax . Indexed <$> arbitrary,
+    ArbitrarySyntax . Syntax.Fixed <$> arbitrary,
+    ArbitrarySyntax . Keyed . Map.fromList <$> arbitrary ]
 
 instance Arbitrary ArbitraryTerm where
   arbitrary = oneof [ ArbitraryTerm . (() :<) . Leaf <$> arbitrary ]
