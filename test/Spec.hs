@@ -32,7 +32,12 @@ instance (Eq a, Eq f, Arbitrary a, Arbitrary f) => Arbitrary (Syntax a f) where
           shrinkSyntax (Keyed k) = Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= shrink)
 
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
-  arbitrary = arbitraryBounded 4
+  arbitrary = sized boundedTerm
+    where boundedTerm n = ArbitraryTerm <$> ((,) <$> arbitrary <*> boundedSyntax n)
+          boundedSyntax 0 = liftM Leaf arbitrary
+          boundedSyntax n = frequency
+            [ (1, liftM Leaf arbitrary),
+              (4, liftM Indexed $ listOf $ boundedTerm $ n - 1) ]
   shrink term@(ArbitraryTerm (annotation, syntax)) = (++) (subterms term) $ filter (/= term) $ ArbitraryTerm <$> ((,) <$> shrink annotation <*> shrinkSyntax syntax)
     where shrinkSyntax (Leaf a) = Leaf <$> shrink a
           shrinkSyntax (Indexed i) = Indexed <$> (List.subsequences i >>= recursivelyShrink)
