@@ -1,5 +1,6 @@
 module Main where
 
+import Categorizable
 import Diff
 import Patch
 import Range
@@ -41,6 +42,12 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
       Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink))
 
 data CategorySet = A | B | C | D deriving (Eq, Show)
+
+instance Categorizable CategorySet where
+  categories A = Set.fromList [ "a" ]
+  categories B = Set.fromList [ "b" ]
+  categories C = Set.fromList [ "c" ]
+  categories D = Set.fromList [ "d" ]
 
 instance Arbitrary HTML where
   arbitrary = oneof [
