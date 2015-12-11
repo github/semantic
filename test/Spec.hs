@@ -35,13 +35,12 @@ instance (Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annot
   arbitrary = (\ annotation syntax -> ArbitraryTerm $ (annotation, unSyntax syntax)) <$> arbitrary <*> arbitrary
 
 arbitraryBounded :: (Arbitrary a, Arbitrary annotation) => Int -> Gen (ArbitraryTerm a annotation)
-arbitraryBounded k = make <$> arbitrary <*> oneof [
+arbitraryBounded k = ArbitraryTerm <$> ((,) <$> arbitrary <*> oneof [
   Leaf <$> arbitrary,
   Indexed <$> vectorOfAtMost k (arbitraryBounded $ k - 1),
   Syntax.Fixed <$> vectorOfAtMost k (arbitraryBounded $ k - 1),
-  Keyed . Map.fromList <$> arbitrary ]
-  where make annotation syntax = ArbitraryTerm $ (annotation, syntax)
-        vectorOfAtMost k gen = choose (0, k) >>= \n -> vectorOf n gen
+  Keyed . Map.fromList <$> arbitrary ])
+  where vectorOfAtMost k gen = choose (0, k) >>= \n -> vectorOf n gen
 
 instance Arbitrary HTML where
   arbitrary = oneof [
