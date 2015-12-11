@@ -8,7 +8,6 @@ import Syntax
 
 import Control.Comonad.Cofree
 import Range
-
 import Control.Monad.Free
 import Data.ByteString.Lazy.Internal
 import Text.Blaze.Html
@@ -157,6 +156,7 @@ termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
   where
     rows (Leaf _) = reverse $ foldl adjoin2Lines [] $ Line . (:[]) <$> elements
     rows (Indexed i) = rewrapLineContentsInUl <$> childLines i
+    rows (Fixed f) = rewrapLineContentsInUl <$> childLines f
 
     rewrapLineContentsInUl (Line elements) = Line [ Ul (classify categories) elements ]
     rewrapLineContentsInUl EmptyLine = EmptyLine
@@ -173,18 +173,20 @@ termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], (Range, Range))
-annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Leaf _)) before after = (zipWithMaybe rowFromMaybeRows leftElements rightElements, (left, right))
+annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) syntax) before after = (rows syntax, ranges)
   where
+    rows (Leaf _) = zipWithMaybe rowFromMaybeRows leftElements rightElements
+    rows (Indexed i) = wrapRows i
+    rows (Fixed f) = wrapRows f
+
     leftElements = (elementAndBreak $ Span (classify leftCategories)) =<< actualLines (substring left before)
     rightElements = (elementAndBreak $ Span (classify rightCategories)) =<< actualLines (substring right after)
 
-annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) (Indexed i)) before after = (rewrap <$> rows, ranges)
-  where
+    wrapRows = fmap rewrap . appendRemainder . foldl sumRows ([], starts ranges)
     wrap _ EmptyLine = EmptyLine
     wrap f (Line elements) = Line [ f elements ]
     rewrap (Row left right) = Row (wrap (Ul $ classify leftCategories) left) (wrap (Ul $ classify rightCategories) right)
     ranges = (left, right)
-    rows = appendRemainder $ foldl sumRows ([], starts ranges) i
     sources = (before, after)
     appendRemainder (rows, previousIndices) = reverse . foldl adjoin2 [] $ rows ++ (contextRows (ends ranges) previousIndices sources)
     sumRows (rows, previousIndices) child = (allRows, ends childRanges)
