@@ -27,8 +27,8 @@ unTerm arbitraryTerm = unfold unpack arbitraryTerm
 instance (Eq a, Eq f, Arbitrary a, Arbitrary f) => Arbitrary (Syntax a f) where
   shrink syntax = filter (/= syntax) $ shrinkSyntax syntax
     where shrinkSyntax (Leaf a) = Leaf <$> shrink a
-          shrinkSyntax (Indexed i) = Indexed <$> shrink i
-          shrinkSyntax (Fixed f) = Fixed <$> shrink f
+          shrinkSyntax (Indexed i) = Indexed <$> (shrink =<< List.subsequences i)
+          shrinkSyntax (Fixed f) = Fixed <$> (shrink =<< List.subsequences f)
           shrinkSyntax (Keyed k) = Keyed . Map.fromList <$> shrink (Map.toList k)
 
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
