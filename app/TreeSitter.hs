@@ -6,7 +6,7 @@ import Range
 import Syntax
 import Term
 import Control.Comonad.Cofree
-import qualified Data.Map as Map
+import qualified OrderedMap as Map
 import Data.Set
 import Foreign
 import Foreign.C

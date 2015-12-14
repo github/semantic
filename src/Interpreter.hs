@@ -10,7 +10,7 @@ import Syntax
 import Term
 import Control.Monad.Free
 import Control.Comonad.Cofree hiding (unwrap)
-import Data.Map
+import OrderedMap
 import Data.Maybe
 
 hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
