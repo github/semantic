@@ -20,7 +20,7 @@ spec = do
       Map.union a b `shouldNotBe` Map.union b a
 
   describe "unions" $ do
-    it "is the union of multiple maps" $
+    it "is equivalent to `union` for two maps" $
       Map.unions [ a, b ] `shouldBe` Map.union a b
 
   describe "intersectionWith" $ do
