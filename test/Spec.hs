@@ -142,6 +142,9 @@ main = hspec $ do
     it "should produce a list of ranges for whitespace-separated words" $
       rangesOfWordsFrom 0 "wordOne wordTwo" `shouldBe` [ Range 0 7, Range 8 15 ]
 
+    it "should skip multiple whitespace characters" $
+      rangesOfWordsFrom 0 "a  b" `shouldBe` [ Range 0 1, Range 3 4 ]
+
     where
       rightRowText text = rightRow [ Text text ]
       rightRow xs = Row EmptyLine (Line xs)
