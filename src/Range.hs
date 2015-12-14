@@ -18,8 +18,8 @@ offsetRange i (Range start end) = Range (i + start) (i + end)
 rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom _ "" = []
 rangesAndWordsFrom startIndex string =
-  case parse isWord string <|> parse (not . isWordOrSeparator) string of
-    Just parsed -> takeAndContinue parsed
+  case takeAndContinue <$> (parse isWord string <|> parse (not . isWordOrSeparator) string) of
+    Just a -> a
     Nothing ->
       case parse Char.isSpace string of
         Just parsed -> skipAndContinue parsed
