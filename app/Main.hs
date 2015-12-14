@@ -61,6 +61,17 @@ parserForType mediaType = maybe P.lineByLineParser parseTreeSitterFile $ case me
     ".js" -> Just ts_language_javascript
     _ -> Nothing
 
+replaceLeavesWithWordBranches :: Term String Info -> String -> Term String Info
+replaceLeavesWithWordBranches term source = replaceIn term
+  where
+    replaceIn (info@(Info range lineRange categories) :< syntax) = info :< case syntax of
+      Leaf _ | ranges <- rangesOfWordsFrom (start range) (substring range source), length (ranges) > 1 -> Indexed $ makeLeaf lineRange categories <$> ranges
+      Indexed i -> Indexed $ replaceIn <$> i
+      Fixed f -> Fixed $ replaceIn <$> f
+      Keyed k -> Keyed $ replaceIn <$> k
+      _ -> syntax
+    makeLeaf lineRange categories range = Info range lineRange categories :< Leaf (substring range source)
+
 rangesOfWordsFrom :: Int -> String -> [Range]
 rangesOfWordsFrom startIndex string = case break Char.isSpace string of
   ([], []) -> []
