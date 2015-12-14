@@ -21,7 +21,7 @@ rangesAndWordsFrom startIndex string =
   case takeAndContinue <$> (word <|> punctuation) of
     Just a -> a
     Nothing ->
-      case parse Char.isSpace string of
+      case space of
         Just parsed -> skipAndContinue parsed
         Nothing -> []
   where
