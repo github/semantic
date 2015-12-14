@@ -30,6 +30,9 @@ spec = do
     it "should return those elements in both a and b, combined with a function" $
       Map.intersectionWith (-) a b `shouldBe` (Map.fromList [ ("b", 4), ("c", 6) ])
 
+    it "is asymmetrical" $ do
+      Map.intersectionWith (-) a b `shouldNotBe` Map.intersectionWith (-) b a
+
   describe "keys" $ do
     it "should return all the keys in a map" $
       Map.keys a `shouldBe` [ "a", "b", "c" ]
