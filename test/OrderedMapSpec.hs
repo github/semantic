@@ -1,6 +1,7 @@
 module OrderedMapSpec where
 
 import Data.Map as Map
+import Test.Hspec
 
 orderedMapSpec :: IO ()
 orderedMapSpec = hspec $ do
