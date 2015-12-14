@@ -41,7 +41,7 @@ main = do
   (aTerm, bTerm) <- let parse = (parserForType . takeExtension) sourceAPath in do
     aTerm <- parse aContents
     bTerm <- parse bContents
-    return (aTerm, bTerm)
+    return (replaceLeavesWithWordBranches aTerm aContents, replaceLeavesWithWordBranches bTerm bContents)
   let diff = interpret comparable aTerm bTerm in
     case output arguments of
       Unified -> do
