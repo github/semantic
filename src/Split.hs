@@ -14,7 +14,7 @@ import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
-import qualified Data.Map as Map
+import qualified OrderedMap as Map
 import Data.Maybe
 import Data.Monoid
 import qualified Data.Set as Set
