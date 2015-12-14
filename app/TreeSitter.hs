@@ -30,10 +30,10 @@ data TSNode = TsNode { _data :: Ptr (), offset :: TSLength }
   deriving (Show, Eq)
 
 instance Storable TSNode where
-  alignment n = 24
-  sizeOf n = 24
-  peek p = error "Haskell code should never read TSNode values directly."
-  poke p n = error "Haskell code should never write TSNode values directly."
+  alignment _ = 24
+  sizeOf _ = 24
+  peek _ = error "Haskell code should never read TSNode values directly."
+  poke _ _ = error "Haskell code should never write TSNode values directly."
 
 foreign import ccall "app/bridge.h ts_document_root_node_p" ts_document_root_node_p :: Ptr TSDocument -> Ptr TSNode -> IO ()
 foreign import ccall "app/bridge.h ts_node_p_name" ts_node_p_name :: Ptr TSNode -> Ptr TSDocument -> IO CString
@@ -71,8 +71,7 @@ documentToTerm document contents = alloca $ \root -> do
       name <- peekCString name
       children <- withNamedChildren node toTerm
       range <- range node
-      lineRange <- getLineRange node
-      annotation <- return . Info range lineRange $ singleton name
+      annotation <- return . Info range $ singleton name
       return (name, annotation :< case children of
         [] -> Leaf $ substring range contents
         _ | member name keyedProductions -> Keyed $ Map.fromList children
@@ -86,7 +85,7 @@ withNamedChildren node transformNode = do
     then return []
     else mapM (alloca . getChild) [0..pred count] where
       getChild n out = do
-        ts_node_p_named_child node n out
+        _ <- ts_node_p_named_child node n out
         transformNode out
 
 range :: Ptr TSNode -> IO Range
