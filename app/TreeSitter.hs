@@ -41,8 +41,6 @@ foreign import ccall "app/bridge.h ts_node_p_named_child_count" ts_node_p_named_
 foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child :: Ptr TSNode -> CSize -> Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_pos_chars" ts_node_p_pos_chars :: Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars :: Ptr TSNode -> IO CSize
-foreign import ccall "app/bridge.h ts_node_p_start_point" ts_node_p_start_point :: Ptr TSNode -> IO CSize
-foreign import ccall "app/bridge.h ts_node_p_end_point" ts_node_p_end_point :: Ptr TSNode -> IO CSize
 
 keyedProductions :: Set String
 keyedProductions = fromList [ "object" ]
