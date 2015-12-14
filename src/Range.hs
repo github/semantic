@@ -18,7 +18,7 @@ rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom startIndex string = case break (not . isWord) string of
   ([], []) -> []
   ([], rest) | (whitespace, rest) <- break isWord rest -> rangesAndWordsFrom (startIndex + length whitespace) rest
-  (word, rest) -> (Range startIndex $ startIndex + length word, word) : rangesAndWordsAfterWhitespace (startIndex + length word) rest
+  (word, rest) -> (Range startIndex $ startIndex + length word, word) : case break isWord rest of (whitespace, rest) -> rangesAndWordsFrom (startIndex + length word + length whitespace) rest
   where
     rangesAndWordsAfterWhitespace startIndex string | (whitespace, rest) <- break isWord string = rangesAndWordsFrom (startIndex + length whitespace) rest
     -- | Is this a word character?
