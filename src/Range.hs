@@ -20,6 +20,7 @@ rangesAndWordsFrom startIndex string = case break (not . isWord) string of
   ([], rest) | (whitespace, rest) <- break isWord rest -> rangesAndWordsFrom (startIndex + length whitespace) rest
   (word, rest) -> (Range startIndex $ startIndex + length word, word) : case break isWord rest of (whitespace, rest) -> rangesAndWordsFrom (startIndex + length word + length whitespace) rest
   where
+    takeAndContinue (parsed, rest) = (Range startIndex $ startIndex + length parsed, parsed) : rangesAndWordsFrom (startIndex + length parsed) rest
     parse predicate string = case span predicate string of
       ([], _) -> Nothing
       (parsed, rest) -> Just (parsed, rest)
