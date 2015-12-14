@@ -34,5 +34,8 @@ spec = do
     it "should return all the keys in a map" $
       Map.keys a `shouldBe` [ "a", "b", "c" ]
 
+    it "is ordered" $
+      Map.keys (Map.union b a) `shouldBe` [ "b", "c", "d", "a" ]
+
   where a = Map.fromList [ ("a", 1), ("b", 2), ("c", 3) ]
         b = Map.fromList [ ("b", -2), ("c", -3), ("d", -4) ]
