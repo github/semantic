@@ -136,6 +136,9 @@ main = hspec $ do
     it "should produce no ranges for whitespace" $
       rangesOfWordsFrom 0 "  \t\n  " `shouldBe` []
 
+    it "should produce a list containing the range of the string for a single-word string" $
+      rangesOfWordsFrom 0 "word" `shouldBe` [ Range 0 4 ]
+
     where
       rightRowText text = rightRow [ Text text ]
       rightRow xs = Row EmptyLine (Line xs)
