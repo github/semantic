@@ -64,11 +64,11 @@ parserForType mediaType = maybe P.lineByLineParser parseTreeSitterFile $ case me
 replaceLeavesWithWordBranches :: String -> Term String Info -> Term String Info
 replaceLeavesWithWordBranches source term@(Info range _ _ :< _) = replaceIn source range term
   where
-    replaceIn source parentRange (info@(Info range lineRange categories) :< syntax) = info :< case syntax of
+    replaceIn source parentRange (info@(Info range lineRange categories) :< syntax) | range <- offsetRange (start parentRange) range = info :< case syntax of
       Leaf _ | ranges <- rangesOfWordsFrom (start range) (substring range source), length (ranges) > 1 -> Indexed $ makeLeaf lineRange categories <$> ranges
-      Indexed i -> Indexed $ replaceIn source parentRange <$> i
-      Fixed f -> Fixed $ replaceIn source parentRange <$> f
-      Keyed k -> Keyed $ replaceIn source parentRange <$> k
+      Indexed i -> Indexed $ replaceIn (substring range source) range <$> i
+      Fixed f -> Fixed $ replaceIn (substring range source) range <$> f
+      Keyed k -> Keyed $ replaceIn (substring range source) range <$> k
       _ -> syntax
     makeLeaf lineRange categories range = Info range lineRange categories :< Leaf (substring range source)
 
