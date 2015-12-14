@@ -129,6 +129,10 @@ main = hspec $ do
         Line [ Div (Just "delete") [ span " * Debugging", Break ] ]
       ] `shouldBe` Nothing
 
+  describe "rangesOfWordsFrom" $ do
+    it "should produce no ranges for whitespace" $
+      rangesOfWordsFrom 0 "  \t\n  " `shouldBe` []
+
     where
       rightRowText text = rightRow [ Text text ]
       rightRow xs = Row EmptyLine (Line xs)
