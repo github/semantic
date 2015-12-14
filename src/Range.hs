@@ -26,6 +26,7 @@ rangesAndWordsFrom startIndex string =
         Nothing -> []
   where
     takeAndContinue (parsed, rest) = (Range startIndex $ startIndex + length parsed, parsed) : rangesAndWordsFrom (startIndex + length parsed) rest
+    skipAndContinue (parsed, rest) = rangesAndWordsFrom (startIndex + length parsed) rest
     parse predicate string = case span predicate string of
       ([], _) -> Nothing
       (parsed, rest) -> Just (parsed, rest)
