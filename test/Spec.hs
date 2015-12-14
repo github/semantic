@@ -145,6 +145,9 @@ main = hspec $ do
     it "should skip multiple whitespace characters" $
       rangesOfWordsFrom 0 "a  b" `shouldBe` [ Range 0 1, Range 3 4 ]
 
+    it "should skip whitespace at the start" $
+      rangesOfWordsFrom 0 "  a b" `shouldBe` [ Range 2 3, Range 4 5 ]
+
     where
       rightRowText text = rightRow [ Text text ]
       rightRow xs = Row EmptyLine (Line xs)
