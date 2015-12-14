@@ -65,4 +65,4 @@ replaceLeavesWithWordBranches source term = replaceIn source 0 term
       Fixed f -> Fixed $ replaceIn substring (start range) <$> f
       Keyed k -> Keyed $ replaceIn substring (start range) <$> k
       _ -> syntax
-    makeLeaf source startIndex lineRange categories range = Info range lineRange categories :< Leaf (substring (offsetRange (negate startIndex) range) source)
+    makeLeaf source startIndex lineRange categories (range, substring) = Info range lineRange categories :< Leaf substring
