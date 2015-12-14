@@ -1,17 +1,89 @@
 module Main where
 
+import Categorizable
 import Diff
+import Interpreter
 import Patch
 import Range
 import Split
 import Syntax
+import Term
 import Control.Comonad.Cofree
-import Control.Monad.Free
+import Control.Monad
+import Control.Monad.Free hiding (unfold)
+import qualified Data.List as List
+import qualified Data.Map as Map
 import qualified Data.Set as Set
+import GHC.Generics
 import Test.Hspec
+import Test.Hspec.QuickCheck
+import Test.QuickCheck hiding (Fixed)
+
+newtype ArbitraryTerm a annotation = ArbitraryTerm (annotation, (Syntax a (ArbitraryTerm a annotation)))
+  deriving (Show, Eq, Generic)
+
+unTerm :: ArbitraryTerm a annotation -> Term a annotation
+unTerm arbitraryTerm = unfold unpack arbitraryTerm
+  where unpack (ArbitraryTerm (annotation, syntax)) = (annotation, syntax)
+
+instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
+  arbitrary = sized (\ x -> boundedTerm x x) -- first indicates the cube of the max length of lists, second indicates the cube of the max depth of the tree
+    where boundedTerm maxLength maxDepth = ArbitraryTerm <$> ((,) <$> arbitrary <*> boundedSyntax maxLength maxDepth)
+          boundedSyntax _ maxDepth | maxDepth <= 0 = liftM Leaf arbitrary
+          boundedSyntax maxLength maxDepth = frequency
+            [ (12, liftM Leaf arbitrary),
+              (1, liftM Indexed $ take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
+              (1, liftM Fixed $ take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
+              (1, liftM (Keyed . Map.fromList) $ take maxLength <$> listOf (arbitrary >>= (\x -> ((,) x) <$> smallerTerm maxLength maxDepth))) ]
+          smallerTerm maxLength maxDepth = boundedTerm (div maxLength 3) (div maxDepth 3)
+  shrink term@(ArbitraryTerm (annotation, syntax)) = (++) (subterms term) $ filter (/= term) $
+    ArbitraryTerm <$> ((,) <$> shrink annotation <*> case syntax of
+      Leaf a -> Leaf <$> shrink a
+      Indexed i -> Indexed <$> (List.subsequences i >>= recursivelyShrink)
+      Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
+      Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink))
+
+data CategorySet = A | B | C | D deriving (Eq, Show)
+
+instance Categorizable CategorySet where
+  categories A = Set.fromList [ "a" ]
+  categories B = Set.fromList [ "b" ]
+  categories C = Set.fromList [ "c" ]
+  categories D = Set.fromList [ "d" ]
+
+instance Arbitrary CategorySet where
+  arbitrary = elements [ A, B, C, D ]
+
+instance Arbitrary HTML where
+  arbitrary = oneof [
+    Text <$> arbitrary,
+    Span <$> arbitrary <*> arbitrary,
+    const Break <$> (arbitrary :: Gen ()) ]
+
+instance Arbitrary Line where
+  arbitrary = oneof [
+    Line <$> arbitrary,
+    const EmptyLine <$> (arbitrary :: Gen ()) ]
+
+instance Arbitrary Row where
+  arbitrary = oneof [
+    Row <$> arbitrary <*> arbitrary ]
 
 main :: IO ()
 main = hspec $ do
+  describe "Term" $ do
+    prop "equality is reflexive" $
+      \ a -> unTerm a == unTerm (a :: ArbitraryTerm String ())
+
+  describe "Diff" $ do
+    prop "equality is reflexive" $
+      \ a b -> let diff = interpret comparable (unTerm a) (unTerm (b :: ArbitraryTerm String CategorySet)) in
+        diff == diff
+
+    prop "equal terms produce identity diffs" $
+      \ a -> let term = unTerm (a :: ArbitraryTerm String CategorySet) in
+        diffCost (interpret comparable term term) == 0
+
   describe "annotatedToRows" $ do
     it "outputs one row for single-line unchanged leaves" $
       annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` ([ Row (Line [ span "a" ]) (Line [ span "a" ]) ], (Range 0 1, Range 0 1))
@@ -87,6 +159,15 @@ main = hspec $ do
         ], (Range 0 7, Range 0 1))
 
   describe "adjoin2" $ do
+    prop "is idempotent for additions of empty rows" $
+      \ a -> adjoin2 (adjoin2 [ a ] mempty) mempty == (adjoin2 [ a ] mempty)
+
+    prop "is identity on top of empty rows" $
+      \ a -> adjoin2 [ mempty ] a == [ a ]
+
+    prop "is identity on top of no rows" $
+      \ a -> adjoin2 [] a == [ a ]
+
     it "appends appends HTML onto incomplete lines" $
       adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe`
               [ rightRow [ Text "[", Text "a" ] ]
