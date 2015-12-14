@@ -77,6 +77,7 @@ documentToTerm document contents = alloca $ \root -> do
         _ | otherwise -> Indexed $ fmap snd children)
         where assignKey ("pair", node) = ("pair", node)
               assignKey (_, node@(Info range _ :< _)) = (substring range contents, node)
+              getSubstring (Info range _ :< _) = substring range contents
 
 withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO (String, a)) -> IO [(String, a)]
 withNamedChildren node transformNode = do
