@@ -1,5 +1,6 @@
 module Range where
 
+import Control.Applicative ((<|>))
 import qualified Data.Char as Char
 
 data Range = Range { start :: Int, end :: Int }
@@ -17,15 +18,12 @@ offsetRange i (Range start end) = Range (i + start) (i + end)
 rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom _ "" = []
 rangesAndWordsFrom startIndex string =
-  case parse isWord string of
+  case (parse isWord string <|> parse (not . isWordOrSeparator) string) of
     Just parsed -> takeAndContinue parsed
     Nothing ->
-      case parse (not . isWordOrSeparator) string of
-        Just parsed -> takeAndContinue parsed
-        Nothing ->
-          case parse Char.isSeparator string of
-            Just (space, rest) -> rangesAndWordsFrom (startIndex + length space) rest
-            Nothing -> []
+      case parse Char.isSeparator string of
+        Just (space, rest) -> rangesAndWordsFrom (startIndex + length space) rest
+        Nothing -> []
   where
     takeAndContinue (parsed, rest) = (Range startIndex $ startIndex + length parsed, parsed) : rangesAndWordsFrom (startIndex + length parsed) rest
     parse predicate string = case span predicate string of
