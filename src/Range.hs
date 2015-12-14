@@ -23,9 +23,6 @@ rangesAndWordsFrom startIndex string = case break (not . isWord) string of
     parse predicate string = case span predicate string of
       ([], _) -> Nothing
       (parsed, rest) -> Just (parsed, rest)
-    word string = parse isWord
-    punctuation = parse $ \ c -> not (isWord c || Char.isSpace c)
-    space string = parse Char.isSeparator
     isWordOrSeparator c = Char.isSeparator c || isWord c
     -- | Is this a word character?
     -- | Word characters are defined as in [Ruby’s `\p{Word}` syntax](http://ruby-doc.org/core-2.1.1/Regexp.html#class-Regexp-label-Character+Properties), i.e.:
