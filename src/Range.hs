@@ -17,7 +17,7 @@ offsetRange i (Range start end) = Range (i + start) (i + end)
 rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom startIndex string = case break (not . isWord) string of
   ([], []) -> []
-  ([], rest) -> rangesAndWordsAfterWhitespace startIndex rest
+  ([], rest) | (whitespace, rest) <- break isWord rest -> rangesAndWordsFrom (startIndex + length whitespace) rest
   (word, rest) -> (Range startIndex $ startIndex + length word, word) : rangesAndWordsAfterWhitespace (startIndex + length word) rest
   where
     rangesAndWordsAfterWhitespace startIndex string | (whitespace, rest) <- break isWord string = rangesAndWordsFrom (startIndex + length whitespace) rest
