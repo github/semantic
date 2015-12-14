@@ -18,12 +18,9 @@ offsetRange i (Range start end) = Range (i + start) (i + end)
 rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom _ "" = []
 rangesAndWordsFrom startIndex string =
-  case takeAndContinue <$> (word <|> punctuation) of
+  case takeAndContinue <$> (word <|> punctuation) <|> skipAndContinue <$> space of
     Just a -> a
-    Nothing ->
-      case space of
-        Just parsed -> skipAndContinue parsed
-        Nothing -> []
+    Nothing -> []
   where
     word = parse isWord string
     punctuation = parse (not . isWordOrSpace) string
