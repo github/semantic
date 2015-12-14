@@ -93,9 +93,3 @@ range node = do
   let start = fromIntegral pos
       end = start + fromIntegral size
   return Range { start = start, end = end }
-
-getLineRange :: Ptr TSNode -> IO Range
-getLineRange node = do
-  startLine <- ts_node_p_start_point node
-  endLine <- ts_node_p_end_point node
-  return Range { start = fromIntegral startLine, end = fromIntegral endLine }
