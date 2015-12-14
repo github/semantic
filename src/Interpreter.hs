@@ -43,9 +43,7 @@ run comparable (Free (Recursive (annotation1 :< a) (annotation2 :< b) f)) = run 
   recur (Keyed a') (Keyed b') | keys a' == keys b' = annotate . Keyed . fromList . fmap repack $ keys b'
     where
       repack key = (key, interpretInBoth key a' b')
-      interpretInBoth key x y = maybeInterpret (lookup key x) (lookup key y)
-      maybeInterpret (Just x) (Just y) = interpret comparable x y
-      maybeInterpret _ _ = error "maybeInterpret assumes that its operands are `Just`s."
+      interpretInBoth key x y = interpret comparable (x ! key) (y ! key)
   recur _ _ = Pure $ Replace (annotation1 :< a) (annotation2 :< b)
 
   annotate = Free . Annotated (annotation1, annotation2)
