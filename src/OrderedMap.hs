@@ -9,6 +9,7 @@ module OrderedMap (
   , empty
   , union
   , unions
+  , intersectionWith
   ) where
 
 data OrderedMap key value = OrderedMap { toList :: [(key, value)] }
@@ -42,3 +43,6 @@ union (OrderedMap a) (OrderedMap b) = OrderedMap $ a ++ filter (not . (`elem` ex
 
 unions :: Eq key => [OrderedMap key value] -> OrderedMap key value
 unions = foldl union empty
+
+intersectionWith :: Eq key => (a -> b -> c) -> OrderedMap key a -> OrderedMap key b -> OrderedMap key c
+intersectionWith combine (OrderedMap a) (OrderedMap b) = OrderedMap $ a >>= (\ (key, value) -> maybe [] (pure . ((,) key) . combine value) $ Prelude.lookup key b)
