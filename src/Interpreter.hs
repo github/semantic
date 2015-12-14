@@ -41,8 +41,9 @@ run _ (Pure diff) = Just diff
 run comparable (Free (Recursive (annotation1 :< a) (annotation2 :< b) f)) = run comparable . f $ recur a b where
   recur (Indexed a') (Indexed b') | length a' == length b' = annotate . Indexed $ zipWith (interpret comparable) a' b'
   recur (Fixed a') (Fixed b') | length a' == length b' = annotate . Fixed $ zipWith (interpret comparable) a' b'
-  recur (Keyed a') (Keyed b') | Map.keys a' == Map.keys b' = annotate . Keyed . Map.fromList . fmap repack $ Map.keys b'
+  recur (Keyed a') (Keyed b') | Map.keys a' == bKeys = annotate . Keyed . Map.fromList . fmap repack $ bKeys
     where
+      bKeys = Map.keys b'
       repack key = (key, interpretInBoth key a' b')
       interpretInBoth key x y = interpret comparable (x ! key) (y ! key)
   recur _ _ = Pure $ Replace (annotation1 :< a) (annotation2 :< b)
