@@ -28,14 +28,14 @@ unTerm arbitraryTerm = unfold unpack arbitraryTerm
 
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = sized (\ x -> boundedTerm x x) -- first indicates the cube of the max length of lists, second indicates the cube of the max depth of the tree
-    where boundedTerm m n = ArbitraryTerm <$> ((,) <$> arbitrary <*> boundedSyntax m n)
+    where boundedTerm maxLength n = ArbitraryTerm <$> ((,) <$> arbitrary <*> boundedSyntax maxLength n)
           boundedSyntax _ n | n <= 0 = liftM Leaf arbitrary
-          boundedSyntax m n = frequency
+          boundedSyntax maxLength n = frequency
             [ (12, liftM Leaf arbitrary),
-              (1, liftM Indexed $ take m <$> listOf (smallerTerm m n)),
-              (1, liftM Fixed $ take m <$> listOf (smallerTerm m n)),
-              (1, liftM (Keyed . Map.fromList) $ take n <$> listOf (arbitrary >>= (\x -> ((,) x) <$> smallerTerm m n))) ]
-          smallerTerm m n = boundedTerm (div m 3) (div n 3)
+              (1, liftM Indexed $ take maxLength <$> listOf (smallerTerm maxLength n)),
+              (1, liftM Fixed $ take maxLength <$> listOf (smallerTerm maxLength n)),
+              (1, liftM (Keyed . Map.fromList) $ take n <$> listOf (arbitrary >>= (\x -> ((,) x) <$> smallerTerm maxLength n))) ]
+          smallerTerm maxLength n = boundedTerm (div maxLength 3) (div n 3)
   shrink term@(ArbitraryTerm (annotation, syntax)) = (++) (subterms term) $ filter (/= term) $
     ArbitraryTerm <$> ((,) <$> shrink annotation <*> case syntax of
       Leaf a -> Leaf <$> shrink a
