@@ -26,6 +26,7 @@ rangesAndWordsFrom startIndex string = case break (not . isWord) string of
     word string = parse isWord
     punctuation = parse $ \ c -> not (isWord c || Char.isSpace c)
     space string = parse Char.isSeparator
+    isWordOrSeparator c = Char.isSeparator c || isWord c
     -- | Is this a word character?
     -- | Word characters are defined as in [Ruby’s `\p{Word}` syntax](http://ruby-doc.org/core-2.1.1/Regexp.html#class-Regexp-label-Character+Properties), i.e.:
     -- | > A member of one of the following Unicode general category _Letter_, _Mark_, _Number_, _Connector_Punctuation_
