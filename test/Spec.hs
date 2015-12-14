@@ -210,30 +210,30 @@ main = hspec $ do
         Line [ Div (Just "delete") [ span " * Debugging", Break ] ]
       ] `shouldBe` Nothing
 
-  describe "rangesOfWordsFrom" $ do
+  describe "rangesAndWordsFrom" $ do
     it "should produce no ranges for the empty string" $
-      rangesOfWordsFrom 0 [] `shouldBe` []
+      rangesAndWordsFrom 0 [] `shouldBe` []
 
     it "should produce no ranges for whitespace" $
-      rangesOfWordsFrom 0 "  \t\n  " `shouldBe` []
+      rangesAndWordsFrom 0 "  \t\n  " `shouldBe` []
 
     it "should produce a list containing the range of the string for a single-word string" $
-      rangesOfWordsFrom 0 "word" `shouldBe` [ Range 0 4 ]
+      rangesAndWordsFrom 0 "word" `shouldBe` [ Range 0 4 ]
 
     it "should produce a list of ranges for whitespace-separated words" $
-      rangesOfWordsFrom 0 "wordOne wordTwo" `shouldBe` [ Range 0 7, Range 8 15 ]
+      rangesAndWordsFrom 0 "wordOne wordTwo" `shouldBe` [ Range 0 7, Range 8 15 ]
 
     it "should skip multiple whitespace characters" $
-      rangesOfWordsFrom 0 "a  b" `shouldBe` [ Range 0 1, Range 3 4 ]
+      rangesAndWordsFrom 0 "a  b" `shouldBe` [ Range 0 1, Range 3 4 ]
 
     it "should skip whitespace at the start" $
-      rangesOfWordsFrom 0 "  a b" `shouldBe` [ Range 2 3, Range 4 5 ]
+      rangesAndWordsFrom 0 "  a b" `shouldBe` [ Range 2 3, Range 4 5 ]
 
     it "should skip whitespace at the end" $
-      rangesOfWordsFrom 0 "a b  " `shouldBe` [ Range 0 1, Range 2 3 ]
+      rangesAndWordsFrom 0 "a b  " `shouldBe` [ Range 0 1, Range 2 3 ]
 
     it "should produce ranges offset by its start index" $
-      rangesOfWordsFrom 100 "a b" `shouldBe` [ Range 100 101, Range 102 103 ]
+      rangesAndWordsFrom 100 "a b" `shouldBe` [ Range 100 101, Range 102 103 ]
 
     where
       rightRowText text = rightRow [ Text text ]
