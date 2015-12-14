@@ -16,6 +16,10 @@ spec = do
     it "should return those elements in either a or b" $
       Map.union a b `shouldBe` (Map.fromList $ ("a", 1) : Map.toList b)
 
+  describe "unions" $ do
+    it "is the union of multiple maps" $
+      Map.unions [ a, b ] `shouldBe` Map.union a b
+
   describe "intersectionWith" $ do
     it "should return those elements in both a and b, combined with a function" $
       Map.intersectionWith (+) a b `shouldBe` (Map.fromList [ ("b", 4), ("c", 6) ])
