@@ -1,5 +1,7 @@
 module Main where
 
+import qualified OrderedMapSpec
+
 import Categorizable
 import Diff
 import Interpreter
@@ -234,6 +236,8 @@ main = hspec $ do
 
     it "should produce ranges offset by its start index" $
       rangesAndWordsFrom 100 "a b" `shouldBe` [ (Range 100 101, "a"), (Range 102 103, "b") ]
+
+  describe "OrderedMap" OrderedMapSpec.spec
 
     where
       rightRowText text = rightRow [ Text text ]
