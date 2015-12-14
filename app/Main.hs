@@ -41,7 +41,7 @@ main = do
   (aTerm, bTerm) <- let parse = (parserForType . takeExtension) sourceAPath in do
     aTerm <- parse aContents
     bTerm <- parse bContents
-    return (replaceLeavesWithWordBranches aTerm aContents, replaceLeavesWithWordBranches bTerm bContents)
+    return (replaceLeavesWithWordBranches aContents aTerm, replaceLeavesWithWordBranches bContents bTerm)
   let diff = interpret comparable aTerm bTerm in
     case output arguments of
       Unified -> do
@@ -61,8 +61,8 @@ parserForType mediaType = maybe P.lineByLineParser parseTreeSitterFile $ case me
     ".js" -> Just ts_language_javascript
     _ -> Nothing
 
-replaceLeavesWithWordBranches :: Term String Info -> String -> Term String Info
-replaceLeavesWithWordBranches term source = replaceIn term
+replaceLeavesWithWordBranches :: String -> Term String Info -> Term String Info
+replaceLeavesWithWordBranches source term = replaceIn term
   where
     replaceIn (info@(Info range lineRange categories) :< syntax) = info :< case syntax of
       Leaf _ | ranges <- rangesOfWordsFrom (start range) (substring range source), length (ranges) > 1 -> Indexed $ makeLeaf lineRange categories <$> ranges
