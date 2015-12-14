@@ -9,6 +9,9 @@ spec = do
     it "should return those elements of a not in b" $
       Map.difference a b `shouldBe` (Map.fromList [ ("a", 1) ])
 
+    it "is asymmetrical" $ do
+      Map.difference a b `shouldNotBe` Map.difference b a
+
   describe "union" $ do
     it "should return those elements in either a or b" $
       Map.union a b `shouldBe` (Map.fromList $ ("a", 1) : Map.toList b)
