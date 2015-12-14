@@ -18,7 +18,7 @@ offsetRange i (Range start end) = Range (i + start) (i + end)
 rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom _ "" = []
 rangesAndWordsFrom startIndex string =
-  case takeAndContinue <$> (parse isWord string <|> parse (not . isWordOrSeparator) string) of
+  case takeAndContinue <$> (parse isWord string <|> parse (not . isWordOrSpace) string) of
     Just a -> a
     Nothing ->
       case parse Char.isSpace string of
@@ -30,7 +30,7 @@ rangesAndWordsFrom startIndex string =
     parse predicate string = case span predicate string of
       ([], _) -> Nothing
       (parsed, rest) -> Just (parsed, rest)
-    isWordOrSeparator c = Char.isSpace c || isWord c
+    isWordOrSpace c = Char.isSpace c || isWord c
     -- | Is this a word character?
     -- | Word characters are defined as in [Ruby’s `\p{Word}` syntax](http://ruby-doc.org/core-2.1.1/Regexp.html#class-Regexp-label-Character+Properties), i.e.:
     -- | > A member of one of the following Unicode general category _Letter_, _Mark_, _Number_, _Connector_Punctuation_
