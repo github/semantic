@@ -130,6 +130,9 @@ main = hspec $ do
       ] `shouldBe` Nothing
 
   describe "rangesOfWordsFrom" $ do
+    it "should produce no ranges for the empty string" $
+      rangesOfWordsFrom 0 [] `shouldBe` []
+    
     it "should produce no ranges for whitespace" $
       rangesOfWordsFrom 0 "  \t\n  " `shouldBe` []
 
