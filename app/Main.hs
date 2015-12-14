@@ -70,7 +70,7 @@ replaceLeavesWithWordBranches source term = replaceIn source 0 term
       Fixed f -> Fixed $ replaceIn (substring range source) (start range) <$> f
       Keyed k -> Keyed $ replaceIn (substring range source) (start range) <$> k
       _ -> syntax
-    makeLeaf source startIndex lineRange categories range = Info range lineRange categories :< Leaf (substring range source)
+    makeLeaf source startIndex lineRange categories range = Info range lineRange categories :< Leaf (substring (offsetRange (negate startIndex) range) source)
 
 rangesOfWordsFrom :: Int -> String -> [Range]
 rangesOfWordsFrom startIndex string = case break Char.isSpace string of
