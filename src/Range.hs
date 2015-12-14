@@ -18,7 +18,6 @@ rangesOfWordsFrom :: Int -> String -> [Range]
 rangesOfWordsFrom startIndex string = case break (not . isWord) string of
   ([], []) -> []
   ([], rest) -> rangesOfWordsAfterWhitespace startIndex rest
-  (word, []) -> [ Range startIndex $ startIndex + length word ]
   (word, rest) -> (Range startIndex $ startIndex + length word) : rangesOfWordsAfterWhitespace (startIndex + length word) rest
   where
     rangesOfWordsAfterWhitespace startIndex string | (whitespace, rest) <- break isWord string = rangesOfWordsFrom (startIndex + length whitespace) rest
