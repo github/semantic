@@ -21,7 +21,7 @@ rangesAndWordsFrom startIndex string =
   case parse isWord string <|> parse (not . isWordOrSeparator) string of
     Just parsed -> takeAndContinue parsed
     Nothing ->
-      case parse Char.isSeparator string of
+      case parse Char.isSpace string of
         Just (space, rest) -> rangesAndWordsFrom (startIndex + length space) rest
         Nothing -> []
   where
