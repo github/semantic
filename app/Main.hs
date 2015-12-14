@@ -11,7 +11,6 @@ import Term
 import TreeSitter
 import Unified
 import Control.Comonad.Cofree
-import qualified Data.Char as Char
 import qualified Data.Map as Map
 import qualified Data.ByteString.Char8 as B1
 import qualified Data.ByteString.Lazy as B2
@@ -71,12 +70,3 @@ replaceLeavesWithWordBranches source term = replaceIn source 0 term
       Keyed k -> Keyed $ replaceIn (substring range source) (start range) <$> k
       _ -> syntax
     makeLeaf source startIndex lineRange categories range = Info range lineRange categories :< Leaf (substring (offsetRange (negate startIndex) range) source)
-
-rangesOfWordsFrom :: Int -> String -> [Range]
-rangesOfWordsFrom startIndex string = case break Char.isSpace string of
-  ([], []) -> []
-  ([], rest) -> rangesOfWordsAfterWhitespace startIndex rest
-  (word, []) -> [ Range startIndex $ length word ]
-  (word, rest) -> (Range startIndex $ length word) : rangesOfWordsAfterWhitespace (startIndex + length word) rest
-  where
-    rangesOfWordsAfterWhitespace startIndex string | (whitespace, rest) <- break (not . Char.isSpace) string = rangesOfWordsFrom (startIndex + length whitespace) rest
