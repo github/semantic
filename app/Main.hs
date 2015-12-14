@@ -11,14 +11,10 @@ import Term
 import TreeSitter
 import Unified
 import Control.Comonad.Cofree
-import qualified Data.Map as Map
 import qualified Data.ByteString.Char8 as B1
 import qualified Data.ByteString.Lazy as B2
-import Data.Set hiding (split)
 import Options.Applicative
 import System.FilePath
-
-import Foreign.Ptr
 
 data Output = Unified | Split
 
