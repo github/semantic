@@ -38,7 +38,7 @@ empty :: OrderedMap key value
 empty = OrderedMap []
 
 union :: Eq key => OrderedMap key value -> OrderedMap key value -> OrderedMap key value
-union (OrderedMap a) (OrderedMap b) = OrderedMap $ a ++ filter (not . (`elem` extant) . fst) b
+union (OrderedMap a) (OrderedMap b) = OrderedMap $ a ++ filter ((`elem` extant) . fst) b
   where extant = fst <$> a
 
 unions :: Eq key => [OrderedMap key value] -> OrderedMap key value
