@@ -11,14 +11,10 @@ import Term
 import TreeSitter
 import Unified
 import Control.Comonad.Cofree
-import qualified Data.Map as Map
 import qualified Data.ByteString.Char8 as B1
 import qualified Data.ByteString.Lazy as B2
-import Data.Set hiding (split)
 import Options.Applicative
 import System.FilePath
-
-import Foreign.Ptr
 
 data Output = Unified | Split
 
@@ -40,7 +36,7 @@ main = do
   (aTerm, bTerm) <- let parse = (parserForType . takeExtension) sourceAPath in do
     aTerm <- parse aContents
     bTerm <- parse bContents
-    return (aTerm, bTerm)
+    return (replaceLeavesWithWordBranches aContents aTerm, replaceLeavesWithWordBranches bContents bTerm)
   let diff = interpret comparable aTerm bTerm in
     case output arguments of
       Unified -> do
@@ -59,3 +55,14 @@ parserForType mediaType = maybe P.lineByLineParser parseTreeSitterFile $ case me
     ".c" -> Just ts_language_c
     ".js" -> Just ts_language_javascript
     _ -> Nothing
+
+replaceLeavesWithWordBranches :: String -> Term String Info -> Term String Info
+replaceLeavesWithWordBranches source term = replaceIn source 0 term
+  where
+    replaceIn source startIndex (info@(Info range categories) :< syntax) | substring <- substring (offsetRange (negate startIndex) range) source = info :< case syntax of
+      Leaf _ | ranges <- rangesAndWordsFrom (start range) substring, length ranges > 1 -> Indexed $ makeLeaf substring startIndex categories <$> ranges
+      Indexed i -> Indexed $ replaceIn substring (start range) <$> i
+      Fixed f -> Fixed $ replaceIn substring (start range) <$> f
+      Keyed k -> Keyed $ replaceIn substring (start range) <$> k
+      _ -> syntax
+    makeLeaf source startIndex categories (range, substring) = Info range categories :< Leaf substring

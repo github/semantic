@@ -13,7 +13,7 @@ data Annotated a annotation f = Annotated annotation (Syntax a f)
 
 
 type Category = String
-data Info = Info { characterRange :: Range, lineRange ::  Range, categories :: (Set Category) }
+data Info = Info { characterRange :: Range, categories :: (Set Category) }
   deriving (Eq, Show)
 
 instance Categorizable Info where
