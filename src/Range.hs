@@ -22,8 +22,9 @@ rangesAndWordsFrom startIndex string = maybe [] id $ takeAndContinue <$> (word <
     word = parse isWord string
     punctuation = parse (not . isWordOrSpace) string
     space = parse Char.isSpace string
-    takeAndContinue (parsed, rest) = (Range startIndex $ startIndex + length parsed, parsed) : rangesAndWordsFrom (startIndex + length parsed) rest
-    skipAndContinue (parsed, rest) = rangesAndWordsFrom (startIndex + length parsed) rest
+    takeAndContinue (parsed, rest) = (Range startIndex $ endFor parsed, parsed) : rangesAndWordsFrom (endFor parsed) rest
+    skipAndContinue (parsed, rest) = rangesAndWordsFrom (endFor parsed) rest
+    endFor parsed = startIndex + length parsed
     parse predicate string = case span predicate string of
       ([], _) -> Nothing
       (parsed, rest) -> Just (parsed, rest)
