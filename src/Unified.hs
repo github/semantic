@@ -9,7 +9,7 @@ import Control.Arrow
 import Control.Monad.Free
 import Control.Comonad.Cofree
 import Data.List hiding (foldl)
-import qualified Data.Map as Map
+import qualified OrderedMap as Map
 import Rainbow
 
 unified :: Diff a Info -> String -> String -> IO ByteString
@@ -44,4 +44,3 @@ range patch = range . extract <$> after patch where
 
 change :: String -> [Chunk String] -> [Chunk String]
 change bound content = [ chunk "{", chunk bound ] ++ content ++ [ chunk bound, chunk "}" ]
-

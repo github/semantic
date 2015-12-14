@@ -1,6 +1,6 @@
 module Syntax where
 
-import Data.Map
+import OrderedMap
 
 -- | A node in an abstract syntax tree.
 data Syntax
@@ -14,5 +14,5 @@ data Syntax
   -- | An ordered branch of child nodes, expected to be of fixed length in the grammar, e.g. a binary operator & its operands.
   | Fixed [f]
   -- | A branch of child nodes indexed by some String identity. This is useful for identifying e.g. methods & properties in a class scope by their names. Note that comments can generally occur in these scopes as well; one strategy for dealing with this is to identify comments by their text in the source.
-  | Keyed (Map String f)
+  | Keyed (OrderedMap String f)
   deriving (Functor, Show, Eq, Foldable, Traversable)

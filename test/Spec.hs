@@ -12,7 +12,7 @@ import Control.Comonad.Cofree
 import Control.Monad
 import Control.Monad.Free hiding (unfold)
 import qualified Data.List as List
-import qualified Data.Map as Map
+import qualified OrderedMap as Map
 import qualified Data.Set as Set
 import GHC.Generics
 import Test.Hspec
