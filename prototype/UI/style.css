@@ -9,6 +9,7 @@ table.diff td {
 
 table.diff td.blob-num {
   width: 40px;
+  text-align: right;
 }
 
 table.diff td.blob-code {
