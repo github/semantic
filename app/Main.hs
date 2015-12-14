@@ -60,7 +60,7 @@ replaceLeavesWithWordBranches :: String -> Term String Info -> Term String Info
 replaceLeavesWithWordBranches source term = replaceIn source 0 term
   where
     replaceIn source startIndex (info@(Info range lineRange categories) :< syntax) | substring <- substring (offsetRange (negate startIndex) range) source = info :< case syntax of
-      Leaf _ | ranges <- rangesOfWordsFrom (start range) substring, length ranges > 1 -> Indexed $ makeLeaf substring startIndex lineRange categories <$> ranges
+      Leaf _ | ranges <- rangesAndWordsFrom (start range) substring, length ranges > 1 -> Indexed $ makeLeaf substring startIndex lineRange categories <$> ranges
       Indexed i -> Indexed $ replaceIn substring (start range) <$> i
       Fixed f -> Fixed $ replaceIn substring (start range) <$> f
       Keyed k -> Keyed $ replaceIn substring (start range) <$> k
