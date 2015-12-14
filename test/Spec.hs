@@ -148,6 +148,9 @@ main = hspec $ do
     it "should skip whitespace at the start" $
       rangesOfWordsFrom 0 "  a b" `shouldBe` [ Range 2 3, Range 4 5 ]
 
+    it "should skip whitespace at the end" $
+      rangesOfWordsFrom 0 "a b  " `shouldBe` [ Range 0 1, Range 2 3 ]
+
     where
       rightRowText text = rightRow [ Text text ]
       rightRow xs = Row EmptyLine (Line xs)
