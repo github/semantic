@@ -22,6 +22,9 @@ rangesOfWordsFrom startIndex string = case break Char.isSpace string of
   (word, rest) -> (Range startIndex $ startIndex + length word) : rangesOfWordsAfterWhitespace (startIndex + length word) rest
   where
     rangesOfWordsAfterWhitespace startIndex string | (whitespace, rest) <- break (not . Char.isSpace) string = rangesOfWordsFrom (startIndex + length whitespace) rest
+    -- | Is this a word character?
+    -- | Word characters are defined as in [Ruby’s `\p{Word}` syntax](http://ruby-doc.org/core-2.1.1/Regexp.html#class-Regexp-label-Character+Properties), i.e.:
+    -- | > A member of one of the following Unicode general category _Letter_, _Mark_, _Number_, _Connector_Punctuation_
     isWord c = Char.isLetter c || Char.isNumber c || Char.isMark c || Char.generalCategory c == Char.ConnectorPunctuation
 
 
