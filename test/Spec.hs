@@ -43,15 +43,6 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
       Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
       Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink))
 
-newtype ArbitraryDiff a annotation = ArbitraryDiff (ArbitraryTerm a annotation, ArbitraryTerm a annotation)
-  deriving (Show, Eq)
-
-unDiff :: (Eq a, Eq annotation, Categorizable annotation) => ArbitraryDiff a annotation -> Diff a annotation
-unDiff (ArbitraryDiff (a, b)) = interpret comparable (unTerm a) (unTerm b)
-
-instance (Eq a, Eq annotation, Categorizable annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryDiff a annotation) where
-  arbitrary = ArbitraryDiff <$> ((,) <$> arbitrary <*> arbitrary)
-
 data CategorySet = A | B | C | D deriving (Eq, Show)
 
 instance Categorizable CategorySet where
