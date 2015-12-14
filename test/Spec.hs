@@ -151,6 +151,9 @@ main = hspec $ do
     it "should skip whitespace at the end" $
       rangesOfWordsFrom 0 "a b  " `shouldBe` [ Range 0 1, Range 2 3 ]
 
+    it "should produce ranges offset by its start index" $
+      rangesOfWordsFrom 100 "a b" `shouldBe` [ Range 100 101, Range 102 103 ]
+
     where
       rightRowText text = rightRow [ Text text ]
       rightRow xs = Row EmptyLine (Line xs)
