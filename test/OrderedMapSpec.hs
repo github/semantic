@@ -23,6 +23,9 @@ spec = do
     it "is equivalent to `union` for two maps" $
       Map.unions [ a, b ] `shouldBe` Map.union a b
 
+    it "does not duplicate elements" $
+      Map.unions [ a, b, a, b, a, b ] `shouldBe` Map.union a b
+
   describe "intersectionWith" $ do
     it "should return those elements in both a and b, combined with a function" $
       Map.intersectionWith (-) a b `shouldBe` (Map.fromList [ ("b", 4), ("c", 6) ])
