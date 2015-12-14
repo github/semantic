@@ -16,6 +16,9 @@ spec = do
     it "should return those elements in either a or b" $
       Map.union a b `shouldBe` (Map.fromList $ Map.toList a ++ [ ("d", -4) ])
 
+    it "is asymmetrical" $ do
+      Map.union a b `shouldNotBe` Map.union b a
+
   describe "unions" $ do
     it "is the union of multiple maps" $
       Map.unions [ a, b ] `shouldBe` Map.union a b
