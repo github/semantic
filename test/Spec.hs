@@ -149,7 +149,7 @@ main = hspec $ do
     it "should split multi-line deletions across multiple rows" $
       let (sourceA, sourceB) = ("/*\n*/\na", "a") in
         annotatedToRows (formatted sourceA sourceB "branch" (Indexed [
-          Pure . Delete $ (Info (Range 0 5) (Range 0 2) (Set.fromList ["leaf"]) :< (Leaf "")),
+          Pure . Delete $ (Info (Range 0 5) (Set.fromList ["leaf"]) :< (Leaf "")),
           Free . offsetAnnotated 6 0 $ unchanged "a" "leaf" (Leaf "")
         ])) sourceA sourceB `shouldBe`
         ([
@@ -190,7 +190,7 @@ main = hspec $ do
 
   describe "termToLines" $ do
     it "splits multi-line terms into multiple lines" $
-      termToLines (Info (Range 0 5) (Range 0 2) (Set.singleton "leaf") :< (Leaf "")) "/*\n*/"
+      termToLines (Info (Range 0 5) (Set.singleton "leaf") :< (Leaf "")) "/*\n*/"
       `shouldBe`
       ([
         Line [ span "/*", Break ],
@@ -210,15 +210,40 @@ main = hspec $ do
         Line [ Div (Just "delete") [ span " * Debugging", Break ] ]
       ] `shouldBe` Nothing
 
+  describe "rangesAndWordsFrom" $ do
+    it "should produce no ranges for the empty string" $
+      rangesAndWordsFrom 0 [] `shouldBe` []
+
+    it "should produce no ranges for whitespace" $
+      rangesAndWordsFrom 0 "  \t\n  " `shouldBe` []
+
+    it "should produce a list containing the range of the string for a single-word string" $
+      rangesAndWordsFrom 0 "word" `shouldBe` [ (Range 0 4, "word") ]
+
+    it "should produce a list of ranges for whitespace-separated words" $
+      rangesAndWordsFrom 0 "wordOne wordTwo" `shouldBe` [ (Range 0 7, "wordOne"), (Range 8 15, "wordTwo") ]
+
+    it "should skip multiple whitespace characters" $
+      rangesAndWordsFrom 0 "a  b" `shouldBe` [ (Range 0 1, "a"), (Range 3 4, "b") ]
+
+    it "should skip whitespace at the start" $
+      rangesAndWordsFrom 0 "  a b" `shouldBe` [ (Range 2 3, "a"), (Range 4 5, "b") ]
+
+    it "should skip whitespace at the end" $
+      rangesAndWordsFrom 0 "a b  " `shouldBe` [ (Range 0 1, "a"), (Range 2 3, "b") ]
+
+    it "should produce ranges offset by its start index" $
+      rangesAndWordsFrom 100 "a b" `shouldBe` [ (Range 100 101, "a"), (Range 102 103, "b") ]
+
     where
       rightRowText text = rightRow [ Text text ]
       rightRow xs = Row EmptyLine (Line xs)
       leftRowText text = leftRow [ Text text ]
       leftRow xs = Row (Line xs) EmptyLine
       rowText a b = Row (Line [ Text a ]) (Line [ Text b ])
-      info source category = Info (totalRange source) (Range 0 0) (Set.fromList [ category ])
+      info source category = Info (totalRange source)  (Set.fromList [ category ])
       unchanged source category = formatted source source category
       formatted source1 source2 category = Annotated (info source1 category, info source2 category)
-      offsetInfo by (Info (Range start end) lineRange categories) = Info (Range (start + by) (end + by)) lineRange categories
+      offsetInfo by (Info (Range start end) categories) = Info (Range (start + by) (end + by)) categories
       offsetAnnotated by1 by2 (Annotated (left, right) syntax) = Annotated (offsetInfo by1 left, offsetInfo by2 right) syntax
       span = Span (Just "category-leaf")
