@@ -22,6 +22,8 @@ rangesOfWordsFrom startIndex string = case break Char.isSpace string of
   (word, rest) -> (Range startIndex $ startIndex + length word) : rangesOfWordsAfterWhitespace (startIndex + length word) rest
   where
     rangesOfWordsAfterWhitespace startIndex string | (whitespace, rest) <- break (not . Char.isSpace) string = rangesOfWordsFrom (startIndex + length whitespace) rest
+    isWord c = Char.isLetter c || Char.isNumber c || Char.isMark c || Char.generalCategory c == Char.ConnectorPunctuation
+
 
 instance Ord Range where
   a <= b = start a <= start b
