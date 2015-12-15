@@ -61,7 +61,8 @@ split diff before after = return . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel (stringValue "stylesheet") ! A.href (stringValue "style.css")) <>)
     . body
-      . (table ! A.class_ (stringValue "diff"))
+      . (table ! A.class_ (stringValue "diff")) $
+        ((<>) (colgroup (col ! A.width (stringValue "44")) <> col <> (col ! A.width (stringValue "44")) <> col))
         . mconcat $ toMarkup <$> (reverse $ foldl numberRows [] rows)
    where
      rows = fst $ diffToRows diff (0, 0) before after
