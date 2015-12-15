@@ -17,6 +17,10 @@ table.diff td.blob-code {
   min-width: 100px;
 }
 
+.blob-code+.blob-num {
+    border-left-width: 1px;
+}
+
 #before, #after {
 	width: 50%;
 }
