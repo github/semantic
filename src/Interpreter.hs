@@ -58,6 +58,7 @@ run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
   patched = Map.intersectionWith (interpret comparable) a b
   toKeyValue key | Set.member key deleted = (key, Pure $ Delete (a ! key))
   toKeyValue key | Set.member key inserted = (key, Pure $ Delete (b ! key))
+  toKeyValue key = (key, interpret comparable (a ! key) (b ! key))
   aKeys = Set.fromList $ Map.keys a
   bKeys = Set.fromList $ Map.keys b
   deleted = Set.difference aKeys bKeys
