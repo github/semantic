@@ -32,6 +32,7 @@ td {
   padding-right: 10px;
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
   font-size: 12px;
+  color: #333;
 }
 
 .empty-cell {
