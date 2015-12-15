@@ -30,6 +30,8 @@ td {
 .blob-code {
   padding-left: 10px;
   padding-right: 10px;
+  font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 12px;
 }
 
 .empty-cell {
