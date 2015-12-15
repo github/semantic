@@ -9,10 +9,12 @@ table.diff td {
 }
 
 table.diff td.blob-num {
-  width: 40px;
+  width: 20px;
   text-align: right;
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
   font-size: 12px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 table.diff td.blob-code {
