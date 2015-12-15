@@ -153,7 +153,7 @@ main = hspec $ do
     it "should split multi-line deletions across multiple rows" $
       let (sourceA, sourceB) = ("/*\n*/\na", "a") in
         annotatedToRows (formatted sourceA sourceB "branch" (Indexed [
-          Pure . Delete $ (Info (Range 0 5) (Set.fromList ["leaf"]) :< (Leaf "")),
+          Pure . Delete $ Info (Range 0 5) (Set.fromList ["leaf"]) :< Leaf "",
           Free . offsetAnnotated 6 0 $ unchanged "a" "leaf" (Leaf "")
         ])) sourceA sourceB `shouldBe`
         ([
@@ -172,7 +172,7 @@ main = hspec $ do
 
   describe "adjoin2" $ do
     prop "is idempotent for additions of empty rows" $
-      \ a -> adjoin2 (adjoin2 [ a ] mempty) mempty == (adjoin2 [ a ] mempty)
+      \ a -> adjoin2 (adjoin2 [ a ] mempty) mempty == adjoin2 [ a ] mempty
 
     prop "is identity on top of empty rows" $
       \ a -> adjoin2 [ mempty ] a == [ a ]
