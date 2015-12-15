@@ -27,14 +27,15 @@ library
                      , Split
                      , Unified
   build-depends:       base >= 4.8 && < 5
+                     , blaze-html
+                     , bytestring
                      , containers
                      , free
                      , mtl
                      , rainbow
-                     , bytestring
-                     , blaze-html
+                     , text >= 1.2.1.3
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable
+  default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable, OverloadedStrings
   ghc-options:        -Wall -fno-warn-name-shadowing
 
 executable semantic-diff-exe
