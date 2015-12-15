@@ -6,3 +6,4 @@ xcuserdata
 *.xccheckout
 .stack-work
 libbridge.dylib
+semantic-diff-profile.*

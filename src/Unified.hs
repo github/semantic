@@ -9,7 +9,7 @@ import Control.Arrow
 import Control.Monad.Free
 import Control.Comonad.Cofree
 import Data.List hiding (foldl)
-import qualified Data.Map as Map
+import qualified OrderedMap as Map
 import Rainbow
 
 unified :: Diff a Info -> String -> String -> IO ByteString
@@ -18,10 +18,10 @@ unified diff before after = do
   return . mconcat . chunksToByteStrings renderer . fst $ iter g mapped where
     mapped = fmap (unifiedPatch &&& range) diff
     g (Annotated (_, info) syntax) = annotationAndSyntaxToChunks after info syntax
-    annotationAndSyntaxToChunks source (Info range _ _) (Leaf _) = (pure . chunk $ substring range source, Just range)
-    annotationAndSyntaxToChunks source (Info range _ _) (Indexed i) = (unifiedRange range i source, Just range)
-    annotationAndSyntaxToChunks source (Info range _ _) (Fixed f) = (unifiedRange range f source, Just range)
-    annotationAndSyntaxToChunks source (Info range _ _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) source, Just range)
+    annotationAndSyntaxToChunks source (Info range _) (Leaf _) = (pure . chunk $ substring range source, Just range)
+    annotationAndSyntaxToChunks source (Info range _) (Indexed i) = (unifiedRange range i source, Just range)
+    annotationAndSyntaxToChunks source (Info range _) (Fixed f) = (unifiedRange range f source, Just range)
+    annotationAndSyntaxToChunks source (Info range _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) source, Just range)
 
     unifiedPatch :: Patch (Term a Info) -> [Chunk String]
     unifiedPatch patch = (fore red . bold <$> beforeChunk) <> (fore green . bold <$> afterChunk) where
@@ -40,8 +40,7 @@ unified diff before after = do
 range :: Patch (Term a Info) -> Maybe Range
 range patch = range . extract <$> after patch where
   extract (annotation :< _) = annotation
-  range (Info range _ _) = range
+  range (Info range _) = range
 
 change :: String -> [Chunk String] -> [Chunk String]
 change bound content = [ chunk "{", chunk bound ] ++ content ++ [ chunk bound, chunk "}" ]
-
