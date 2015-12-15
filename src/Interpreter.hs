@@ -13,6 +13,7 @@ import Control.Comonad.Cofree hiding (unwrap)
 import qualified OrderedMap as Map
 import OrderedMap ((!))
 import Data.Maybe
+import qualified Data.Set as Set
 
 hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
 hylo down up a = down annotation $ hylo down up <$> syntax where
@@ -55,6 +56,10 @@ run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
   deleted = (Pure . Delete) <$> Map.difference a b
   inserted = (Pure . Insert) <$> Map.difference b a
   patched = Map.intersectionWith (interpret comparable) a b
+  toKeyValue key | Set.member key deleted = (key, Pure $ Delete (a ! key))
+  aKeys = Set.fromList $ Map.keys a
+  bKeys = Set.fromList $ Map.keys b
+  deleted = Set.difference aKeys bKeys
 
 run comparable (Free (ByIndex a b f)) = run comparable . f $ ses (constructAndRun comparable) diffCost a b
 
