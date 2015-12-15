@@ -66,7 +66,7 @@ split diff before after = return . TL.toStrict . HText.renderHtml
       . (table ! A.class_ "diff")
         . mconcat $ toMarkup <$> (reverse $ foldl numberRows [] rows)
    where
-     rows = fst $ diffToRows diff (0, 0) before after
+     rows = normalizedDiffToRows diff before after
 
      numberRows :: [(Int, Line, Int, Line)] -> Row -> [(Int, Line, Int, Line)]
      numberRows [] (Row EmptyLine EmptyLine) = []
@@ -77,6 +77,9 @@ split diff before after = return . TL.toStrict . HText.renderHtml
      numberRows rows@((leftCount, _, rightCount, _):_) (Row left@(Line _) EmptyLine) = (leftCount + 1, left, rightCount, EmptyLine):rows
      numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine right@(Line _)) = (leftCount, EmptyLine, rightCount + 1, right):rows
      numberRows rows@((leftCount, _, rightCount, _):_) (Row left right) = (leftCount + 1, left, rightCount + 1, right):rows
+
+normalizedDiffToRows :: Diff a Info -> T.Text -> T.Text -> [Row]
+normalizedDiffToRows diff before after = fst $ diffToRows diff (0, 0) before after
 
 
 data Row = Row Line Line
