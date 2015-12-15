@@ -5,6 +5,7 @@ table {
   border-spacing: 0;
   box-sizing: border-box;
 }
+
 table.diff td {
     vertical-align: top;
     padding: 0;
