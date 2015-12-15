@@ -86,6 +86,12 @@ main = hspec $ do
           Row (Line [ Ul (Just "category-branch") [ span "a" ] ]) (Line [ Ul (Just "category-branch") [ span "a" ] ])
         ], (Range 0 7, Range 0 1))
 
+    describe "unicode" $
+      it "considers equivalent precomposed and decomposed characters equal" $
+        let (sourceA, sourceB) = ("Å", "Å") in
+            annotatedToRows (formatted sourceA sourceB "leaf" (Leaf $ Free . offsetAnnotated 0 0 $ unchanged "Å" "leaf" (Leaf ""))) sourceA sourceB `shouldBe`
+            ([ Row (Line [ span "Å" ]) (Line [ span "Å"]) ], (Range 0 1, Range 0 1))
+
   describe "adjoin2" $ do
     it "appends appends HTML onto incomplete lines" $
       adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe`
