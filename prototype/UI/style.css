@@ -17,6 +17,11 @@ table.diff td.blob-code {
   min-width: 100px;
 }
 
+.empty-cell {
+    background-color: #fafafa;
+    border-right-color: #eee;
+}
+
 .blob-code+.blob-num {
     border-left-width: 1px;
 }
