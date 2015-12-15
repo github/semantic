@@ -5,11 +5,9 @@ import Diff
 import Patch
 import Term
 import Syntax
-
 import Control.Comonad.Cofree
 import Range
 import Control.Monad.Free
-import Data.ByteString.Lazy.Internal
 import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
@@ -20,6 +18,7 @@ import qualified Data.Set as Set
 import Debug.Trace
 import Data.List (intersperse)
 import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
 import TextShow (showt)
 
 type ClassName = T.Text
@@ -59,7 +58,7 @@ trace' :: Show a => a -> a
 trace' a = traceShow a a
 
 split :: Diff a Info -> T.Text -> T.Text -> IO T.Text
-split diff before after = HText.renderHtml
+split diff before after = return . TL.toStrict . HText.renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body
@@ -206,7 +205,7 @@ contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows
 elementAndBreak :: (T.Text -> HTML) -> T.Text -> [HTML]
 elementAndBreak _ "" = []
 elementAndBreak _ "\n" = [ Break ]
-elementAndBreak constructor x | '\n' <- last x = [ constructor $ init x, Break ]
+elementAndBreak constructor x | '\n' <- T.last x = [ constructor $ T.init x, Break ]
 elementAndBreak constructor x = [ constructor x ]
 
 textElements :: Range -> T.Text -> [HTML]
@@ -293,7 +292,7 @@ zipWithMaybe f la lb = take len $ zipWith f la' lb'
     lb' = (Just <$> lb) ++ (repeat Nothing)
 
 classify :: Set.Set Category -> Maybe ClassName
-classify = foldr (const . Just . ("category-" ++)) Nothing
+classify = foldr (const . Just . (T.append "category-")) Nothing
 
 actualLines :: T.Text -> [T.Text]
 actualLines "" = [""]
