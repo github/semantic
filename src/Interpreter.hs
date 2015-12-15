@@ -1,5 +1,6 @@
 module Interpreter (interpret, Comparable) where
 
+import Prelude hiding (lookup)
 import Algorithm
 import Diff
 import Operation
@@ -9,7 +10,8 @@ import Syntax
 import Term
 import Control.Monad.Free
 import Control.Comonad.Cofree hiding (unwrap)
-import Data.Map
+import qualified OrderedMap as Map
+import OrderedMap ((!))
 import Data.Maybe
 
 hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
@@ -39,21 +41,20 @@ run _ (Pure diff) = Just diff
 run comparable (Free (Recursive (annotation1 :< a) (annotation2 :< b) f)) = run comparable . f $ recur a b where
   recur (Indexed a') (Indexed b') | length a' == length b' = annotate . Indexed $ zipWith (interpret comparable) a' b'
   recur (Fixed a') (Fixed b') | length a' == length b' = annotate . Fixed $ zipWith (interpret comparable) a' b'
-  recur (Keyed a') (Keyed b') | keys a' == keys b' = annotate . Keyed . fromList . fmap repack $ keys b'
+  recur (Keyed a') (Keyed b') | Map.keys a' == bKeys = annotate . Keyed . Map.fromList . fmap repack $ bKeys
     where
+      bKeys = Map.keys b'
       repack key = (key, interpretInBoth key a' b')
-      interpretInBoth key x y = maybeInterpret (Data.Map.lookup key x) (Data.Map.lookup key y)
-      maybeInterpret (Just x) (Just y) = interpret comparable x y
-      maybeInterpret _ _ = error "maybeInterpret assumes that its operands are `Just`s."
+      interpretInBoth key x y = interpret comparable (x ! key) (y ! key)
   recur _ _ = Pure $ Replace (annotation1 :< a) (annotation2 :< b)
 
   annotate = Free . Annotated (annotation1, annotation2)
 
 run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
-  byKey = unions [ deleted, inserted, patched ]
-  deleted = (Pure . Delete) <$> difference a b
-  inserted = (Pure . Insert) <$> difference b a
-  patched = intersectionWith (interpret comparable) a b
+  byKey = Map.unions [ deleted, inserted, patched ]
+  deleted = (Pure . Delete) <$> Map.difference a b
+  inserted = (Pure . Insert) <$> Map.difference b a
+  patched = Map.intersectionWith (interpret comparable) a b
 
 run comparable (Free (ByIndex a b f)) = run comparable . f $ ses (constructAndRun comparable) diffCost a b
 

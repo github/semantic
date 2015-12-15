@@ -152,7 +152,7 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
 -- | Takes a term and a `source` and returns a list of HTML lines
 -- | and their range within `source`.
 termToLines :: Term a Info -> String -> ([Line], Range)
-termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
+termToLines (Info range categories :< syntax) source = (rows syntax, range)
   where
     rows (Leaf _) = reverse $ foldl adjoin2Lines [] $ Line . (:[]) <$> elements
     rows (Indexed i) = rewrapLineContentsInUl <$> childLines i
@@ -173,7 +173,7 @@ termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], (Range, Range))
-annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) syntax) before after = (rows syntax, ranges)
+annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories) syntax) before after = (rows syntax, ranges)
   where
     rows (Leaf _) = zipWithMaybe rowFromMaybeRows leftElements rightElements
     rows (Indexed i) = wrapRows i
