@@ -93,6 +93,7 @@ instance ToMarkup (Int, Line, Int, Line) where
                                           numberTd (show rightNum) <> toMarkup right <> string "\n"
 
 numberTd :: String -> Html
+numberTd "" = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
 numberTd s = td (string s) ! A.class_ (stringValue "blob-num")
 
 codeTd :: Html -> Html
