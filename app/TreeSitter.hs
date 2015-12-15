@@ -47,6 +47,13 @@ keyedProductions = fromList [ "object" ]
 fixedProductions :: Set String
 fixedProductions = fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
+languageForType :: String -> Maybe (Ptr TSLanguage)
+languageForType mediaType = case mediaType of
+    ".h" -> Just ts_language_c
+    ".c" -> Just ts_language_c
+    ".js" -> Just ts_language_javascript
+    _ -> Nothing
+
 parseTreeSitterFile :: Ptr TSLanguage -> String -> IO (Term String Info)
 parseTreeSitterFile language contents = do
   document <- ts_document_make
