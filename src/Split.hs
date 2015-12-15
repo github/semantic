@@ -97,8 +97,6 @@ numberTd s = td (string s) ! A.class_ (stringValue "blob-num")
 
 codeTd :: Html -> Html
 codeTd el = td el ! A.class_ (stringValue "blob-code")
---instance ToMarkup Row where
---  toMarkup (Row left right) = (tr $ toMarkup left <> toMarkup right) <> string "\n"
 
 instance ToMarkup Line where
   toMarkup EmptyLine = codeTd (string "")
