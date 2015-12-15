@@ -20,6 +20,7 @@ import qualified Data.Set as Set
 import Debug.Trace
 import Data.List (intersperse)
 import qualified Data.Text as T
+import TextShow (showt)
 
 type ClassName = T.Text
 
@@ -87,14 +88,14 @@ instance Show Row where
 instance ToMarkup (Int, Line, Int, Line) where
   toMarkup (_, EmptyLine, _, EmptyLine) = tr $ numberTd "" <> td (text "") <> numberTd "" <> toMarkup (text "") <> text "\n"
   toMarkup (_, EmptyLine, num, right) = tr $ numberTd "" <> td (string "") <>
-                                               numberTd (show num) <> toMarkup right <> string "\n"
-  toMarkup (num, left, _, EmptyLine) = tr $ numberTd (show num)  <> toMarkup left <>
+                                               numberTd (showt num) <> toMarkup right <> string "\n"
+  toMarkup (num, left, _, EmptyLine) = tr $ numberTd (showt num)  <> toMarkup left <>
                                               numberTd "" <> td (string "") <> string "\n"
-  toMarkup (leftNum, left, rightNum, right) = tr $ numberTd (show leftNum) <> toMarkup left <>
-                                          numberTd (show rightNum) <> toMarkup right <> string "\n"
+  toMarkup (leftNum, left, rightNum, right) = tr $ numberTd (showt leftNum) <> toMarkup left <>
+                                          numberTd (showt rightNum) <> toMarkup right <> string "\n"
 
 numberTd :: T.Text -> Html
-numberTd s = td (string s) ! A.class_ (stringValue "blob-num")
+numberTd s = td (text s) ! A.class_ (stringValue "blob-num")
 
 codeTd :: Html -> Html
 codeTd el = td el ! A.class_ (stringValue "blob-code")
