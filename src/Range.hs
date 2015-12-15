@@ -10,8 +10,8 @@ data Range = Range { start :: Int, end :: Int }
 substring :: Range -> T.Text -> T.Text
 substring range = T.take (end range - start range) . T.drop (start range)
 
-totalRange :: [a] -> Range
-totalRange list = Range 0 $ length list
+totalRange :: T.Text -> Range
+totalRange t = Range 0 $ T.length t
 
 offsetRange :: Int -> Range -> Range
 offsetRange i (Range start end) = Range (i + start) (i + end)

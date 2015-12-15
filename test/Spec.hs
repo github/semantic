@@ -224,7 +224,7 @@ main = hspec $ do
 
   describe "rangesAndWordsFrom" $ do
     it "should produce no ranges for the empty string" $
-      rangesAndWordsFrom 0 [] `shouldBe` []
+      rangesAndWordsFrom 0 "" `shouldBe` []
 
     it "should produce no ranges for whitespace" $
       rangesAndWordsFrom 0 "  \t\n  " `shouldBe` []
