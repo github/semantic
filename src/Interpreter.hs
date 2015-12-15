@@ -12,6 +12,8 @@ import Control.Monad.Free
 import Control.Comonad.Cofree hiding (unwrap)
 import qualified OrderedMap as Map
 import OrderedMap ((!))
+import qualified Data.List as List
+import Data.List ((\\))
 import Data.Maybe
 
 hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
@@ -51,10 +53,14 @@ run comparable (Free (Recursive (annotation1 :< a) (annotation2 :< b) f)) = run 
   annotate = Free . Annotated (annotation1, annotation2)
 
 run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
-  byKey = Map.unions [ deleted, inserted, patched ]
-  deleted = (Pure . Delete) <$> Map.difference a b
-  inserted = (Pure . Insert) <$> Map.difference b a
-  patched = Map.intersectionWith (interpret comparable) a b
+  byKey = Map.fromList $ toKeyValue <$> List.union aKeys bKeys
+  toKeyValue key | List.elem key deleted = (key, Pure . Delete $ a ! key)
+  toKeyValue key | List.elem key inserted = (key, Pure . Insert $ b ! key)
+  toKeyValue key = (key, interpret comparable (a ! key) (b ! key))
+  aKeys = Map.keys a
+  bKeys = Map.keys b
+  deleted = aKeys \\ bKeys
+  inserted = bKeys \\ aKeys
 
 run comparable (Free (ByIndex a b f)) = run comparable . f $ ses (constructAndRun comparable) diffCost a b
 

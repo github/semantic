@@ -12,6 +12,7 @@ import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Text as HText
+import qualified OrderedMap as Map
 import Data.Maybe
 import Data.Monoid
 import qualified Data.Set as Set
@@ -156,11 +157,12 @@ termToLines :: Term a Info -> T.Text -> ([Line], Range)
 termToLines (Info range categories :< syntax) source = (rows syntax, range)
   where
     rows (Leaf _) = reverse $ foldl adjoin2Lines [] $ Line . (:[]) <$> elements
-    rows (Indexed i) = rewrapLineContentsInUl <$> childLines i
-    rows (Fixed f) = rewrapLineContentsInUl <$> childLines f
+    rows (Indexed i) = rewrapLineContentsIn Ul <$> childLines i
+    rows (Fixed f) = rewrapLineContentsIn Ul <$> childLines f
+    rows (Keyed k) = rewrapLineContentsIn Dl <$> childLines k
 
-    rewrapLineContentsInUl (Line elements) = Line [ Ul (classify categories) elements ]
-    rewrapLineContentsInUl EmptyLine = EmptyLine
+    rewrapLineContentsIn f (Line elements) = Line [ f (classify categories) elements ]
+    rewrapLineContentsIn _ EmptyLine = EmptyLine
     lineElements r s = Line . (:[]) <$> textElements r s
     childLines i = appendRemainder $ foldl sumLines ([], start range) i
     appendRemainder (lines, previous) = reverse . foldl adjoin2Lines [] $ lines ++ lineElements (Range previous (end range)) source
@@ -177,18 +179,19 @@ annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> T.Text -> T.Text ->
 annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories) syntax) before after = (rows syntax, ranges)
   where
     rows (Leaf _) = zipWithMaybe rowFromMaybeRows leftElements rightElements
-    rows (Indexed i) = wrapRows i
-    rows (Fixed f) = wrapRows f
+    rows (Indexed i) = rewrapRowContentsIn Ul <$> childRows i
+    rows (Fixed f) = rewrapRowContentsIn Ul <$> childRows f
+    rows (Keyed k) = rewrapRowContentsIn Dl <$> childRows (snd <$> Map.toList k)
 
     leftElements = (elementAndBreak $ Span (classify leftCategories)) =<< actualLines (substring left before)
     rightElements = (elementAndBreak $ Span (classify rightCategories)) =<< actualLines (substring right after)
 
-    wrapRows = fmap rewrap . appendRemainder . foldl sumRows ([], starts ranges)
     wrap _ EmptyLine = EmptyLine
     wrap f (Line elements) = Line [ f elements ]
-    rewrap (Row left right) = Row (wrap (Ul $ classify leftCategories) left) (wrap (Ul $ classify rightCategories) right)
+    rewrapRowContentsIn f (Row left right) = Row (wrap (f $ classify leftCategories) left) (wrap (f $ classify rightCategories) right)
     ranges = (left, right)
     sources = (before, after)
+    childRows = appendRemainder . foldl sumRows ([], starts ranges)
     appendRemainder (rows, previousIndices) = reverse . foldl adjoin2 [] $ rows ++ (contextRows (ends ranges) previousIndices sources)
     sumRows (rows, previousIndices) child = (allRows, ends childRanges)
       where

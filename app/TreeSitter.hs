@@ -73,9 +73,12 @@ documentToTerm document contents = alloca $ \root -> do
       annotation <- return . Info range . singleton $ name
       return (name, annotation :< case children of
         [] -> Leaf $ substring range contents
-        _ | member name keyedProductions -> Keyed $ Map.fromList children
+        _ | member name keyedProductions -> Keyed . Map.fromList $ assignKey <$> children
         _ | member name fixedProductions -> Fixed $ fmap snd children
         _ | otherwise -> Indexed $ fmap snd children)
+        where assignKey ("pair", node@(_ :< Fixed (key : _))) = (getSubstring key, node)
+              assignKey (_, node) = (getSubstring node, node)
+              getSubstring (Info range _ :< _) = substring range contents
 
 withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO (T.Text, a)) -> IO [(T.Text, a)]
 withNamedChildren node transformNode = do
