@@ -6,7 +6,7 @@ table {
   box-sizing: border-box;
 }
 
-table.diff td {
+td {
     vertical-align: top;
     padding: 0;
 }
