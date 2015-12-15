@@ -4,6 +4,7 @@ import Diff
 import Range
 import Syntax
 import Term
+import TreeSitter
 import Control.Comonad.Cofree
 import qualified Data.Set as Set
 

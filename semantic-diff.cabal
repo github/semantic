@@ -19,7 +19,6 @@ library
                      , Algorithm
                      , Interpreter
                      , OrderedMap
-                     , Parser
                      , Patch
                      , SES
                      , Categorizable
@@ -43,6 +42,7 @@ executable semantic-diff-exe
   main-is:             Main.hs
   other-modules:       TreeSitter
                      , Haskell
+                     , Parser
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , containers
@@ -60,6 +60,7 @@ executable semantic-diff-profile
   hs-source-dirs:      app
   main-is:             Main.hs
   other-modules:       TreeSitter
+                     , Parser
   ghc-options:         -O2
                        -threaded
                        -fprof-auto
