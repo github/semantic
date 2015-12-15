@@ -88,9 +88,11 @@ main = hspec $ do
 
     describe "unicode" $
       it "considers equivalent precomposed and decomposed characters equal" $
-        let (sourceA, sourceB) = ("Å", "Å") in
-            annotatedToRows (formatted sourceA sourceB "leaf" (Leaf $ Free . offsetAnnotated 0 0 $ unchanged "Å" "leaf" (Leaf ""))) sourceA sourceB `shouldBe`
-            ([ Row (Line [ span "Å" ]) (Line [ span "Å"]) ], (Range 0 1, Range 0 1))
+        let (sourceA, sourceB) = ("ẗ", "ẗ")
+            syntax = (Leaf . Free . offsetAnnotated 0 0 $ unchanged "ẗ" "leaf" (Leaf ""))
+        in
+            annotatedToRows (formatted sourceA sourceB "leaf" syntax) sourceA sourceB `shouldBe`
+            ([ Row (Line [ span "ẗ" ]) (Line [ span "ẗ"]) ], (Range 0 1, Range 0 1))
 
   describe "adjoin2" $ do
     it "appends appends HTML onto incomplete lines" $
