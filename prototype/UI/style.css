@@ -66,13 +66,6 @@ body {
 	color: initial;
 }
 
-	ul.line-numbers {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		float: left;
-	}
-
 .diff dt {
 	display: none;
 }
