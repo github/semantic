@@ -28,7 +28,6 @@ table.diff td.blob-num {
 }
 
 table.diff td.blob-code {
-  min-width: 100px;
 }
 
 .empty-cell {
