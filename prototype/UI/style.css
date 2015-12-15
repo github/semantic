@@ -11,7 +11,7 @@ table.diff td {
     padding: 0;
 }
 
-table.diff td.blob-num {
+.blob-num {
   width: 1%;
   min-width: 50px;
   white-space: nowrap;
@@ -27,7 +27,7 @@ table.diff td.blob-num {
   -webkit-user-select: none;
 }
 
-table.diff td.blob-code {
+.blob-code {
   padding-left: 10px;
   padding-right: 10px;
 }
