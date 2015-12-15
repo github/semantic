@@ -13,6 +13,7 @@ table.diff td.blob-num {
   text-align: right;
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
   font-size: 12px;
+  line-height: 18px;
   border: solid #eee;
   border-width: 0 1px 0 0;
   padding-left: 10px;
