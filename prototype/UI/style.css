@@ -1,6 +1,9 @@
 table {
   width: 100%;
   table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+  box-sizing: border-box;
 }
 table.diff td {
 	height: 15px;
