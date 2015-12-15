@@ -3,7 +3,6 @@ table {
   table-layout: fixed;
 }
 table.diff td {
-	width: 50%;
 	height: 15px;
     vertical-align: top;
     padding: 0;
