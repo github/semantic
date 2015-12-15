@@ -15,6 +15,7 @@ table.diff td.blob-num {
   font-size: 12px;
   padding-left: 10px;
   padding-right: 10px;
+  -webkit-user-select: none;
 }
 
 table.diff td.blob-code {
