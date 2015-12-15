@@ -11,6 +11,7 @@ table.diff td {
 table.diff td.blob-num {
   width: 1%;
   min-width: 50px;
+  white-space: nowrap;
   text-align: right;
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
   font-size: 12px;
