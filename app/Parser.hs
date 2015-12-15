@@ -10,11 +10,10 @@ import Control.Comonad.Cofree
 type Parser = String -> IO (Term String Info)
 
 parserForType :: String -> Parser
-parserForType mediaType = maybe lineByLineParser parseTreeSitterFile $ case mediaType of
-    ".h" -> Just ts_language_c
-    ".c" -> Just ts_language_c
-    ".js" -> Just ts_language_javascript
-    _ -> Nothing
+parserForType ".h" = parseTreeSitterFile ts_language_c
+parserForType ".c" = parseTreeSitterFile ts_language_c
+parserForType ".js" = parseTreeSitterFile ts_language_javascript
+parserForType _ = lineByLineParser
 
 lineByLineParser :: Parser
 lineByLineParser input = return . root . Indexed $ case foldl annotateLeaves ([], 0) lines of
