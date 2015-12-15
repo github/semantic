@@ -21,7 +21,6 @@ import Data.List (intersperse)
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import TextShow (showt)
-import qualified Data.Text.ICU.Normalize as TextN
 
 type ClassName = T.Text
 
@@ -80,9 +79,7 @@ split diff before after = return . TL.toStrict . HText.renderHtml
      numberRows rows@((leftCount, _, rightCount, _):_) (Row left right) = (leftCount + 1, left, rightCount + 1, right):rows
 
 normalizedDiffToRows :: Diff a Info -> T.Text -> T.Text -> [Row]
-normalizedDiffToRows diff before after = fst $ diffToRows diff (0, 0) (normalizeSource before) (normalizeSource after)
-  where
-    normalizeSource = TextN.normalize TextN.NFD
+normalizedDiffToRows diff before after = fst $ diffToRows diff (0, 0) before after
 
 
 data Row = Row Line Line

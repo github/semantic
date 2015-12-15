@@ -16,6 +16,7 @@ import Options.Applicative
 import System.FilePath
 import qualified Data.Text as T
 import qualified Data.Text.IO as TextIO
+import qualified Data.Text.ICU.Normalize as TextN
 
 data Output = Unified | Split
 
@@ -32,8 +33,8 @@ main :: IO ()
 main = do
   arguments <- execParser opts
   let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
-  aContents <- TextIO.readFile sourceAPath
-  bContents <- TextIO.readFile sourceBPath
+  aContents <- TextN.normalize TextN.NFD <$> TextIO.readFile sourceAPath
+  bContents <- TextN.normalize TextN.NFD <$> TextIO.readFile sourceBPath
   (aTerm, bTerm) <- let parse = (parserForType . takeExtension) sourceAPath in do
     aTerm <- parse aContents
     bTerm <- parse bContents
