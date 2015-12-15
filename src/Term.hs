@@ -1,6 +1,6 @@
 module Term where
 
-import Data.Map hiding (size)
+import OrderedMap hiding (size)
 import Data.Maybe
 import Control.Comonad.Cofree
 import Syntax

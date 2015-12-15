@@ -12,9 +12,8 @@ import qualified Data.Text as T
 data Annotated a annotation f = Annotated annotation (Syntax a f)
   deriving (Functor, Eq, Show, Foldable)
 
-
 type Category = T.Text
-data Info = Info { characterRange :: Range, lineRange ::  Range, categories :: (Set Category) }
+data Info = Info { characterRange :: Range, categories :: (Set Category) }
   deriving (Eq, Show)
 
 instance Categorizable Info where

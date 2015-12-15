@@ -6,11 +6,12 @@ import Range
 import Syntax
 import Term
 import Control.Comonad.Cofree
-import qualified Data.Map as Map
+import qualified OrderedMap as Map
 import Data.Set
 import Foreign
 import Foreign.C
 import Foreign.C.Types
+import qualified Data.Text as T
 
 data TSLanguage = TsLanguage deriving (Show, Eq)
 foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_c" ts_language_c :: Ptr TSLanguage
@@ -30,10 +31,10 @@ data TSNode = TsNode { _data :: Ptr (), offset :: TSLength }
   deriving (Show, Eq)
 
 instance Storable TSNode where
-  alignment n = 24
-  sizeOf n = 24
-  peek p = error "Haskell code should never read TSNode values directly."
-  poke p n = error "Haskell code should never write TSNode values directly."
+  alignment _ = 24
+  sizeOf _ = 24
+  peek _ = error "Haskell code should never read TSNode values directly."
+  poke _ _ = error "Haskell code should never write TSNode values directly."
 
 foreign import ccall "app/bridge.h ts_document_root_node_p" ts_document_root_node_p :: Ptr TSDocument -> Ptr TSNode -> IO ()
 foreign import ccall "app/bridge.h ts_node_p_name" ts_node_p_name :: Ptr TSNode -> Ptr TSDocument -> IO CString
@@ -41,20 +42,18 @@ foreign import ccall "app/bridge.h ts_node_p_named_child_count" ts_node_p_named_
 foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child :: Ptr TSNode -> CSize -> Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_pos_chars" ts_node_p_pos_chars :: Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars :: Ptr TSNode -> IO CSize
-foreign import ccall "app/bridge.h ts_node_p_start_point" ts_node_p_start_point :: Ptr TSNode -> IO CSize
-foreign import ccall "app/bridge.h ts_node_p_end_point" ts_node_p_end_point :: Ptr TSNode -> IO CSize
 
-keyedProductions :: Set String
+keyedProductions :: Set T.Text
 keyedProductions = fromList [ "object" ]
 
-fixedProductions :: Set String
+fixedProductions :: Set T.Text
 fixedProductions = fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
 parseTreeSitterFile :: Ptr TSLanguage -> Parser
 parseTreeSitterFile language contents = do
   document <- ts_document_make
   ts_document_set_language document language
-  withCString contents (\source -> do
+  withCString (T.unpack contents) (\source -> do
     ts_document_set_input_string document source
     ts_document_parse document
     term <- documentToTerm document contents
@@ -65,28 +64,27 @@ documentToTerm :: Ptr TSDocument -> Parser
 documentToTerm document contents = alloca $ \root -> do
   ts_document_root_node_p document root
   snd <$> toTerm root where
-    toTerm :: Ptr TSNode -> IO (String, Term String Info)
+    toTerm :: Ptr TSNode -> IO (T.Text, Term T.Text Info)
     toTerm node = do
       name <- ts_node_p_name node document
-      name <- peekCString name
+      name <- T.pack <$> peekCString name
       children <- withNamedChildren node toTerm
       range <- range node
-      lineRange <- getLineRange node
-      annotation <- return . Info range lineRange $ singleton name
+      annotation <- return . Info range . singleton $ name
       return (name, annotation :< case children of
         [] -> Leaf $ substring range contents
         _ | member name keyedProductions -> Keyed $ Map.fromList children
         _ | member name fixedProductions -> Fixed $ fmap snd children
         _ | otherwise -> Indexed $ fmap snd children)
 
-withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO (String, a)) -> IO [(String, a)]
+withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO (T.Text, a)) -> IO [(T.Text, a)]
 withNamedChildren node transformNode = do
   count <- ts_node_p_named_child_count node
   if count == 0
     then return []
     else mapM (alloca . getChild) [0..pred count] where
       getChild n out = do
-        ts_node_p_named_child node n out
+        _ <- ts_node_p_named_child node n out
         transformNode out
 
 range :: Ptr TSNode -> IO Range
@@ -96,9 +94,3 @@ range node = do
   let start = fromIntegral pos
       end = start + fromIntegral size
   return Range { start = start, end = end }
-
-getLineRange :: Ptr TSNode -> IO Range
-getLineRange node = do
-  startLine <- ts_node_p_start_point node
-  endLine <- ts_node_p_end_point node
-  return Range { start = fromIntegral startLine, end = fromIntegral endLine }
