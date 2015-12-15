@@ -36,6 +36,7 @@ library
                      , rainbow
                      , text >= 1.2.1.3
                      , text-show
+                     , text-icu
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable, OverloadedStrings
   ghc-options:        -Wall -fno-warn-name-shadowing
@@ -53,7 +54,6 @@ executable semantic-diff-exe
                      , optparse-applicative
                      , filepath
                      , text >= 1.2.1.3
-                     , text-icu
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings
   extra-libraries:     bridge
@@ -75,7 +75,6 @@ executable semantic-diff-profile
                      , optparse-applicative
                      , filepath
                      , text >= 1.2.1.3
-                     , text-icu
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings
   extra-libraries:     bridge
