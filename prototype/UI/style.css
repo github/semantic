@@ -6,6 +6,7 @@ table.diff td {
 	width: 50%;
 	height: 15px;
     vertical-align: top;
+    padding: 0;
 }
 
 table.diff td.blob-num {
