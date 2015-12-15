@@ -60,6 +60,7 @@ executable semantic-diff-profile
   hs-source-dirs:      app
   main-is:             Main.hs
   other-modules:       TreeSitter
+                     , Haskell
                      , Parser
   ghc-options:         -O2
                        -threaded
