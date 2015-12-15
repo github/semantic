@@ -32,8 +32,8 @@ main :: IO ()
 main = do
   arguments <- execParser opts
   let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
-  aContents <- T.pack <$> readFile sourceAPath
-  bContents <- T.pack <$> readFile sourceBPath
+  aContents <- TextIO.readFile sourceAPath
+  bContents <- TextIO.readFile sourceBPath
   (aTerm, bTerm) <- let parse = (parserForType . takeExtension) sourceAPath in do
     aTerm <- parse aContents
     bTerm <- parse bContents
