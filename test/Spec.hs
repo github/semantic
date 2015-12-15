@@ -20,6 +20,8 @@ import GHC.Generics
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck hiding (Fixed)
+import Data.Text.Arbitrary ()
+import qualified Data.Text as T
 
 newtype ArbitraryTerm a annotation = ArbitraryTerm (annotation, (Syntax a (ArbitraryTerm a annotation)))
   deriving (Show, Eq, Generic)
