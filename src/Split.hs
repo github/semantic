@@ -13,55 +13,56 @@ import Data.ByteString.Lazy.Internal
 import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
-import Text.Blaze.Html.Renderer.Utf8
+import Text.Blaze.Html.Renderer.Text as HText
 import Data.Maybe
 import Data.Monoid
 import qualified Data.Set as Set
 import Debug.Trace
 import Data.List (intersperse)
+import qualified Data.Text as T
 
-type ClassName = String
+type ClassName = T.Text
 
 data HTML =
   Break
-  | Text String
-  | Span (Maybe ClassName) String
+  | Text T.Text
+  | Span (Maybe ClassName) T.Text
   | Ul (Maybe ClassName) [HTML]
   | Dl (Maybe ClassName) [HTML]
   | Div (Maybe ClassName) [HTML]
-  | Dt String
+  | Dt T.Text
   deriving (Show, Eq)
 
 classifyMarkup :: Maybe ClassName -> Markup -> Markup
-classifyMarkup (Just className) element = element ! A.class_ (stringValue className)
+classifyMarkup (Just className) element = element ! A.class_ (textValue className)
 classifyMarkup _ element = element
 
 toLi :: HTML -> Markup
-toLi (Text s) = string s
+toLi (Text s) = text s
 toLi e = li $ toMarkup e
 
 toDd :: HTML -> Markup
-toDd (Text s) = string s
+toDd (Text s) = text s
 toDd e = dd $ toMarkup e
 
 instance ToMarkup HTML where
   toMarkup Break = br
-  toMarkup (Text s) = string s
-  toMarkup (Span className s) = classifyMarkup className . span $ string s
+  toMarkup (Text s) = text s
+  toMarkup (Span className s) = classifyMarkup className . span $ text s
   toMarkup (Ul className children) = classifyMarkup className . ul $ mconcat (toLi <$> children)
   toMarkup (Dl className children) = classifyMarkup className . dl $ mconcat (toDd <$> children)
   toMarkup (Div className children) = classifyMarkup className . div $ mconcat (toMarkup <$> children)
-  toMarkup (Dt key) = dt $ string key
+  toMarkup (Dt key) = dt $ text key
 
 trace' :: Show a => a -> a
 trace' a = traceShow a a
 
-split :: Diff a Info -> String -> String -> IO ByteString
-split diff before after = return . renderHtml
+split :: Diff a Info -> T.Text -> T.Text -> IO T.Text
+split diff before after = HText.renderHtml
   . docTypeHtml
-    . ((head $ link ! A.rel (stringValue "stylesheet") ! A.href (stringValue "style.css")) <>)
+    . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body
-      . (table ! A.class_ (stringValue "diff"))
+      . (table ! A.class_ "diff")
         . mconcat $ toMarkup <$> (reverse $ foldl numberRows [] rows)
    where
      rows = fst $ diffToRows diff (0, 0) before after
@@ -84,7 +85,7 @@ instance Show Row where
   show (Row left right) = "\n" ++ show left ++ " | " ++ show right
 
 instance ToMarkup (Int, Line, Int, Line) where
-  toMarkup (_, EmptyLine, _, EmptyLine) = tr $ numberTd "" <> td (string "") <> numberTd "" <> toMarkup (string "") <> string "\n"
+  toMarkup (_, EmptyLine, _, EmptyLine) = tr $ numberTd "" <> td (text "") <> numberTd "" <> toMarkup (text "") <> text "\n"
   toMarkup (_, EmptyLine, num, right) = tr $ numberTd "" <> td (string "") <>
                                                numberTd (show num) <> toMarkup right <> string "\n"
   toMarkup (num, left, _, EmptyLine) = tr $ numberTd (show num)  <> toMarkup left <>
@@ -92,7 +93,7 @@ instance ToMarkup (Int, Line, Int, Line) where
   toMarkup (leftNum, left, rightNum, right) = tr $ numberTd (show leftNum) <> toMarkup left <>
                                           numberTd (show rightNum) <> toMarkup right <> string "\n"
 
-numberTd :: String -> Html
+numberTd :: T.Text -> Html
 numberTd s = td (string s) ! A.class_ (stringValue "blob-num")
 
 codeTd :: Html -> Html
@@ -128,7 +129,7 @@ instance Monoid Row where
   mempty = Row EmptyLine EmptyLine
   mappend (Row x1 y1) (Row x2 y2) = Row (x1 <> x2) (y1 <> y2)
 
-diffToRows :: Diff a Info -> (Int, Int) -> String -> String -> ([Row], (Range, Range))
+diffToRows :: Diff a Info -> (Int, Int) -> T.Text -> T.Text -> ([Row], (Range, Range))
 diffToRows (Free annotated) _ before after = annotatedToRows annotated before after
 diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLine <$> afterLines, (Range previousIndex previousIndex, range))
   where
@@ -151,7 +152,7 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
 
 -- | Takes a term and a `source` and returns a list of HTML lines
 -- | and their range within `source`.
-termToLines :: Term a Info -> String -> ([Line], Range)
+termToLines :: Term a Info -> T.Text -> ([Line], Range)
 termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
   where
     rows (Leaf _) = reverse $ foldl adjoin2Lines [] $ Line . (:[]) <$> elements
@@ -172,7 +173,7 @@ termToLines (Info range _ categories :< syntax) source = (rows syntax, range)
     elements = (elementAndBreak $ Span (classify categories)) =<< actualLines (substring range source)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
-annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], (Range, Range))
+annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> T.Text -> T.Text -> ([Row], (Range, Range))
 annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCategories) syntax) before after = (rows syntax, ranges)
   where
     rows (Leaf _) = zipWithMaybe rowFromMaybeRows leftElements rightElements
@@ -195,19 +196,19 @@ annotatedToRows (Annotated (Info left _ leftCategories, Info right _ rightCatego
         allRows = rows ++ separatorRows ++ childRows
         (childRows, childRanges) = diffToRows child previousIndices before after
 
-contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row]
+contextRows :: (Int, Int) -> (Int, Int) -> (T.Text, T.Text) -> [Row]
 contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows leftElements rightElements
   where
     leftElements = textElements (Range (fst previousIndices) (fst childIndices)) (fst sources)
     rightElements = textElements (Range (snd previousIndices) (snd childIndices)) (snd sources)
 
-elementAndBreak :: (String -> HTML) -> String -> [HTML]
+elementAndBreak :: (T.Text -> HTML) -> T.Text -> [HTML]
 elementAndBreak _ "" = []
 elementAndBreak _ "\n" = [ Break ]
 elementAndBreak constructor x | '\n' <- last x = [ constructor $ init x, Break ]
 elementAndBreak constructor x = [ constructor x ]
 
-textElements :: Range -> String -> [HTML]
+textElements :: Range -> T.Text -> [HTML]
 textElements range source = (elementAndBreak Text) =<< actualLines s
   where s = substring range source
 
@@ -293,9 +294,9 @@ zipWithMaybe f la lb = take len $ zipWith f la' lb'
 classify :: Set.Set Category -> Maybe ClassName
 classify = foldr (const . Just . ("category-" ++)) Nothing
 
-actualLines :: String -> [String]
+actualLines :: T.Text -> [T.Text]
 actualLines "" = [""]
-actualLines lines = case break (== '\n') lines of
-  (l, lines') -> (case lines' of
-                       [] -> [ l ]
-                       _:lines' -> (l ++ "\n") : actualLines lines')
+actualLines lines = case T.break (== '\n') lines of
+  (l, lines') -> case lines' of
+                       "" -> [ l ]
+                       lines' -> (T.snoc l '\n') : (actualLines . T.tail) lines'

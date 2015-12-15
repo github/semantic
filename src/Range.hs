@@ -1,10 +1,12 @@
 module Range where
 
+import qualified Data.Text as T
+
 data Range = Range { start :: Int, end :: Int }
   deriving (Eq, Show)
 
-substring :: Range -> String -> String
-substring range = take (end range - start range) . drop (start range)
+substring :: Range -> T.Text -> T.Text
+substring range = T.take (end range - start range) . T.drop (start range)
 
 totalRange :: [a] -> Range
 totalRange list = Range 0 $ length list
