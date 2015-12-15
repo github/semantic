@@ -1,6 +1,7 @@
 module Parser where
 
 import Diff
+import Haskell
 import Range
 import Syntax
 import Term
@@ -10,6 +11,7 @@ import Control.Comonad.Cofree
 type Parser = String -> IO (Term String Info)
 
 parserForType :: String -> Parser
+parserForType ".hs" = runHaskellParser
 parserForType mediaType = maybe lineByLineParser parseTreeSitterFile $ languageForType mediaType
 
 lineByLineParser :: Parser
