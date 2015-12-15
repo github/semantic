@@ -57,9 +57,11 @@ run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
   inserted = (Pure . Insert) <$> Map.difference b a
   patched = Map.intersectionWith (interpret comparable) a b
   toKeyValue key | Set.member key deleted = (key, Pure $ Delete (a ! key))
+  toKeyValue key | Set.member key inserted = (key, Pure $ Delete (b ! key))
   aKeys = Set.fromList $ Map.keys a
   bKeys = Set.fromList $ Map.keys b
   deleted = Set.difference aKeys bKeys
+  inserted = Set.difference bKeys aKeys
 
 run comparable (Free (ByIndex a b f)) = run comparable . f $ ses (constructAndRun comparable) diffCost a b
 
