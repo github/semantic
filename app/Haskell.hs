@@ -8,11 +8,12 @@ import Control.Comonad.Cofree
 import Text.Parsec
 import Text.Parsec.String
 
-data Token = Token { getRange :: Range, getString :: String }
+data TokenInfo = TokenInfo { getRange :: Range, getString :: String }
+data Token = Token TokenInfo
 
 tokenize :: String -> [Token]
 tokenize "" = []
-tokenize string = uncurry Token <$> rangesAndWordsFrom 0 string
+tokenize string = Token . uncurry TokenInfo <$> rangesAndWordsFrom 0 string
 
 haskellParser :: Parser (Term String Info)
 haskellParser = toTerm <$> many anyChar
