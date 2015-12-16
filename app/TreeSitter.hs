@@ -40,16 +40,13 @@ foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child 
 foreign import ccall "app/bridge.h ts_node_p_pos_chars" ts_node_p_pos_chars :: Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars :: Ptr TSNode -> IO CSize
 
-fixedProductions :: Set.Set String
-fixedProductions = Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
-
 data Language = Language { getTsLanguage :: Ptr TSLanguage, getConstructor :: Constructor }
 
 languageForType :: String -> Maybe Language
 languageForType mediaType = case mediaType of
     ".h" -> Just . Language ts_language_c $ constructorForProductions mempty mempty
     ".c" -> Just . Language ts_language_c $ constructorForProductions mempty mempty
-    ".js" -> Just . Language ts_language_javascript $ constructorForProductions (Set.fromList [ "object" ]) fixedProductions
+    ".js" -> Just . Language ts_language_javascript $ constructorForProductions (Set.fromList [ "object" ]) (Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ])
     _ -> Nothing
 
 parseTreeSitterFile :: Language -> Parser
