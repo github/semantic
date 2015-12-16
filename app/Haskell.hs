@@ -10,10 +10,6 @@ import Text.Parsec.String
 
 data Token = Token { getRange :: Range, getString :: String }
 
-tokenize :: String -> [Token]
-tokenize "" = []
-tokenize string = uncurry Token <$> rangesAndWordsFrom 0 string
-
 module' :: Parser (Term String Info)
 module' = toTerm <$> string "module"
   where toTerm a = Info (Range 0 0) mempty :< Leaf a
