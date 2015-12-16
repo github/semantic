@@ -50,6 +50,9 @@ keyedProductions = Set.fromList [ "object" ]
 fixedProductions :: Set.Set String
 fixedProductions = Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
+-- | Given two sets of production names & a source string, produce a Constructor.
+constructorForProductions :: Set.Set String -> Set.Set String -> String -> Constructor
+constructorForProductions _ _ source info@(Info range _) [] = info :< Leaf (substring range source)
 languageForType :: String -> Maybe (Ptr TSLanguage)
 languageForType mediaType = case mediaType of
     ".h" -> Just ts_language_c
