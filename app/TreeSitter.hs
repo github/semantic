@@ -41,6 +41,9 @@ foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child 
 foreign import ccall "app/bridge.h ts_node_p_pos_chars" ts_node_p_pos_chars :: Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars :: Ptr TSNode -> IO CSize
 
+-- | Given a production name and a list of child terms, produce a term.
+type Constructor = String -> [Term String Info] -> Term String Info
+
 keyedProductions :: Set String
 keyedProductions = fromList [ "object" ]
 
