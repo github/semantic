@@ -15,6 +15,10 @@ tokenize :: String -> [Token]
 tokenize "" = []
 tokenize string = Token . uncurry TokenInfo <$> rangesAndWordsFrom 0 string
 
+module' :: Parser (Term String Info)
+module' = toTerm <$> string "module"
+  where toTerm a = Info (Range 0 0) mempty :< Leaf a
+
 haskellParser :: Parser (Term String Info)
 haskellParser = toTerm <$> many anyChar
   where toTerm a = Info (Range 0 0) mempty :< Leaf a
