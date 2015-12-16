@@ -160,6 +160,15 @@ main = hspec $ do
           Row (Line [ Ul (Just "category-branch") [ span "a" ] ]) (Line [ Ul (Just "category-branch") [ span "a" ] ])
         ], (Range 0 7, Range 0 1))
 
+    describe "unicode" $
+      it "equivalent precomposed and decomposed characters are not equal" $
+        let (sourceA, sourceB) = ("ẗ", "ẗ")
+            syntax = (Leaf . Free . offsetAnnotated 0 0 $ unchanged "ẗ" "leaf" (Leaf ""))
+        in
+            annotatedToRows (formatted sourceA sourceB "leaf" syntax) sourceA sourceB `shouldBe`
+            ([ Row (Line [ span "ẗ" ]) (Line [ span "ẗ"]) ], (Range 0 2, Range 0 1))
+
+
   describe "adjoin2" $ do
     prop "is idempotent for additions of empty rows" $
       \ a -> adjoin2 (adjoin2 [ a ] mempty) mempty == (adjoin2 [ a ] mempty)
