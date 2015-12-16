@@ -1,4 +1,4 @@
-module Parser where
+module Parsers where
 
 import Diff
 import Range
