@@ -47,9 +47,9 @@ data Language = Language { getTsLanguage :: Ptr TSLanguage, getConstructor :: Co
 
 languageForType :: String -> Maybe Language
 languageForType mediaType = case mediaType of
-    ".h" -> Just $ Language ts_language_c (constructorForProductions mempty mempty)
-    ".c" -> Just $ Language ts_language_c (constructorForProductions mempty mempty)
-    ".js" -> Just $ Language ts_language_javascript (constructorForProductions (Set.fromList [ "object" ]) fixedProductions)
+    ".h" -> Just . Language ts_language_c $ constructorForProductions mempty mempty
+    ".c" -> Just . Language ts_language_c $ constructorForProductions mempty mempty
+    ".js" -> Just . Language ts_language_javascript $ constructorForProductions (Set.fromList [ "object" ]) fixedProductions
     _ -> Nothing
 
 parseTreeSitterFile :: Language -> Parser
