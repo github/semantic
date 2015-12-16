@@ -47,7 +47,8 @@ main = do
       Split -> do
         rendered <- split diff aContents bContents
         case output arguments of
-          Just path -> IO.withFile path IO.WriteMode (\ h -> B2.hPut h rendered)
+          Just path -> IO.withFile path IO.WriteMode write
+            where write h = B2.hPut h rendered
           Nothing -> B2.putStr rendered
     where
     opts = info (helper <*> arguments)
