@@ -52,6 +52,7 @@ executable semantic-diff-exe
                      , optparse-applicative
                      , filepath
                      , parsec
+                     , directory
   default-language:    Haskell2010
   extra-libraries:     bridge
   extra-lib-dirs:      .
@@ -74,6 +75,7 @@ executable semantic-diff-profile
                      , optparse-applicative
                      , filepath
                      , parsec
+                     , directory
   default-language:    Haskell2010
   extra-libraries:     bridge
   extra-lib-dirs:      .
