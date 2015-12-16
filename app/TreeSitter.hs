@@ -77,12 +77,12 @@ parseTreeSitterFile (Language constructor language) contents = do
   withCString contents (\source -> do
     ts_document_set_input_string document source
     ts_document_parse document
-    term <- documentToTerm document contents
+    term <- documentToTerm constructor document contents
     ts_document_free document
     return term)
 
-documentToTerm :: Ptr TSDocument -> String -> IO (Term String Info)
-documentToTerm document contents = alloca $ \root -> do
+documentToTerm :: Constructor -> Ptr TSDocument -> String -> IO (Term String Info)
+documentToTerm constructor document contents = alloca $ \root -> do
   ts_document_root_node_p document root
   snd <$> toTerm root where
     toTerm :: Ptr TSNode -> IO (String, Term String Info)
