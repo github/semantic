@@ -18,7 +18,7 @@ import System.FilePath
 
 data Renderer = Unified | Split
 
-data Argument = Argument { output :: Renderer, sourceA :: FilePath, sourceB :: FilePath }
+data Argument = Argument { renderer :: Renderer, sourceA :: FilePath, sourceB :: FilePath }
 
 arguments :: Parser Argument
 arguments = Argument
@@ -38,7 +38,7 @@ main = do
     bTerm <- parse bContents
     return (replaceLeavesWithWordBranches aContents aTerm, replaceLeavesWithWordBranches bContents bTerm)
   let diff = interpret comparable aTerm bTerm in
-    case output arguments of
+    case renderer arguments of
       Unified -> do
         output <- unified diff aContents bContents
         B1.putStr output
