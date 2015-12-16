@@ -1,7 +1,6 @@
 module TreeSitter where
 
 import Diff
-import Parser
 import Range
 import Syntax
 import Term
@@ -48,7 +47,14 @@ keyedProductions = fromList [ "object" ]
 fixedProductions :: Set String
 fixedProductions = fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
-parseTreeSitterFile :: Ptr TSLanguage -> Parser
+languageForType :: String -> Maybe (Ptr TSLanguage)
+languageForType mediaType = case mediaType of
+    ".h" -> Just ts_language_c
+    ".c" -> Just ts_language_c
+    ".js" -> Just ts_language_javascript
+    _ -> Nothing
+
+parseTreeSitterFile :: Ptr TSLanguage -> String -> IO (Term String Info)
 parseTreeSitterFile language contents = do
   document <- ts_document_make
   ts_document_set_language document language
@@ -59,7 +65,7 @@ parseTreeSitterFile language contents = do
     ts_document_free document
     return term)
 
-documentToTerm :: Ptr TSDocument -> Parser
+documentToTerm :: Ptr TSDocument -> String -> IO (Term String Info)
 documentToTerm document contents = alloca $ \root -> do
   ts_document_root_node_p document root
   snd <$> toTerm root where
