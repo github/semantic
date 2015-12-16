@@ -54,6 +54,7 @@ fixedProductions = Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwi
 constructorForProductions :: Set.Set String -> Set.Set String -> Constructor
 constructorForProductions keyed fixed source info@(Info range categories) = (info :<) . construct
   where construct [] = Leaf (substring range source)
+        construct children | not . Set.null $ Set.intersection fixed categories = Fixed $ fmap snd children
         construct children = Indexed $ fmap snd children
 
 languageForType :: String -> Maybe (Ptr TSLanguage)
