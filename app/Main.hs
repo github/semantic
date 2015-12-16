@@ -26,7 +26,8 @@ arguments :: Parser Argument
 arguments = Argument
   <$> (flag Split Unified (long "unified" <> help "output a unified diff")
   <|> flag' Split (long "split" <> help "output a split diff"))
-  <*> (Just <$> (strOption (long "output" <> short 'o' <> help "output directory for split diffs, defaulting to stdout if unspecified")) <|> flag' Nothing (internal <> hidden))
+  <*> (Just <$> (strOption (long "output" <> short 'o' <> help "output directory for split diffs, defaulting to stdout if unspecified"))
+  <|> flag' Nothing (internal <> hidden))
   <*> strArgument (metavar "FILE a")
   <*> strArgument (metavar "FILE b")
 
