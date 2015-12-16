@@ -6,14 +6,13 @@ import Syntax
 import Term
 import Control.Comonad.Cofree
 import qualified Data.Set as Set
-import Text.Parsec
-import Text.Parsec.String
+import Text.Trifecta
 
 leaf :: String -> Parser String -> Parser (Term String Info)
 leaf production parser = do
-  from <- getPosition
+  from <- position
   parsed <- parser
-  to <- getPosition
+  to <- position
   return $ Info (Range 0 0) (Set.singleton production) :< Leaf parsed
 
 module' :: Parser (Term String Info)
@@ -25,5 +24,6 @@ haskellParser = toTerm <$> many anyChar
   where toTerm a = Info (Range 0 0) mempty :< Leaf a
 
 runHaskellParser :: String -> IO (Term String Info)
-runHaskellParser input = return . either errorToTerm id $ parse haskellParser "" input
-  where errorToTerm _ = Info (Range 0 0) mempty :< Leaf "onoes"
+runHaskellParser input = return $ case parseString haskellParser mempty input of
+  Success a -> a
+  Failure _ -> Info (Range 0 0) mempty :< Leaf "onoes"
