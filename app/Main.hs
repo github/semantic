@@ -15,6 +15,7 @@ import qualified Data.ByteString.Char8 as B1
 import qualified Data.ByteString.Lazy as B2
 import Options.Applicative
 import System.FilePath
+import qualified System.IO as IO
 
 data Renderer = Unified | Split
 
