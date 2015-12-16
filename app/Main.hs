@@ -46,7 +46,7 @@ main = do
         B1.putStr rendered
       Split -> do
         rendered <- split diff aContents bContents
-        B2.putStr rendered
+        maybe (B2.hPut IO.stdout rendered) (writeToFile (\ h -> B2.hPut h rendered)) $ output arguments
     where
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
