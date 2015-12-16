@@ -46,7 +46,9 @@ languageForType :: String -> Maybe Language
 languageForType mediaType = case mediaType of
     ".h" -> Just . Language ts_language_c $ constructorForProductions mempty mempty
     ".c" -> Just . Language ts_language_c $ constructorForProductions mempty mempty
-    ".js" -> Just . Language ts_language_javascript $ constructorForProductions (Set.fromList [ "object" ]) (Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ])
+    ".js" -> Just . Language ts_language_javascript $ constructorForProductions
+      (Set.fromList [ "object" ])
+      (Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ])
     _ -> Nothing
 
 parseTreeSitterFile :: Language -> Parser
