@@ -24,8 +24,8 @@ arguments :: Parser Argument
 arguments = Argument
   <$> (flag Split Unified (long "unified" <> help "output a unified diff")
   <|> flag' Split (long "split" <> help "output a split diff"))
-  <*> argument str (metavar "FILE a")
-  <*> argument str (metavar "FILE b")
+  <*> strArgument (metavar "FILE a")
+  <*> strArgument (metavar "FILE b")
 
 main :: IO ()
 main = do
