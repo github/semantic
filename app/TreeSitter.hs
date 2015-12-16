@@ -41,8 +41,8 @@ foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child 
 foreign import ccall "app/bridge.h ts_node_p_pos_chars" ts_node_p_pos_chars :: Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars :: Ptr TSNode -> IO CSize
 
--- | Given a term’s annotation and children, construct the term.
-type Constructor = Info -> [Term String Info] -> Term String Info
+-- | Given a source string and a term’s annotation & children, construct the term.
+type Constructor = String -> Info -> [Term String Info] -> Term String Info
 
 keyedProductions :: Set.Set String
 keyedProductions = Set.fromList [ "object" ]
@@ -50,8 +50,8 @@ keyedProductions = Set.fromList [ "object" ]
 fixedProductions :: Set.Set String
 fixedProductions = Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
--- | Given two sets of production names & a source string, produce a Constructor.
-constructorForProductions :: Set.Set String -> Set.Set String -> String -> Constructor
+-- | Given two sets of production names, produce a Constructor.
+constructorForProductions :: Set.Set String -> Set.Set String -> Constructor
 constructorForProductions _ _ source info@(Info range _) [] = info :< Leaf (substring range source)
 languageForType :: String -> Maybe (Ptr TSLanguage)
 languageForType mediaType = case mediaType of
