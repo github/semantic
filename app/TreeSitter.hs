@@ -61,6 +61,8 @@ constructorForProductions keyed fixed source info@(Info range categories) = (inf
         assignKey (_, node) = (getSubstring node, node)
         getSubstring (Info range _ :< _) = substring range source
 
+data Language = Language { getConstructor :: Constructor, getTsLanguage :: Ptr TSLanguage }
+
 languageForType :: String -> Maybe (Ptr TSLanguage)
 languageForType mediaType = case mediaType of
     ".h" -> Just ts_language_c
