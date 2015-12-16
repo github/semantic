@@ -50,6 +50,7 @@ main = do
     where
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
+    writeToFile act path = IO.withFile path IO.WriteMode act
 
 parserForType :: String -> P.Parser
 parserForType mediaType = maybe P.lineByLineParser parseTreeSitterFile $ case mediaType of
