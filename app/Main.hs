@@ -18,12 +18,13 @@ import System.FilePath
 
 data Renderer = Unified | Split
 
-data Argument = Argument { renderer :: Renderer, sourceA :: FilePath, sourceB :: FilePath }
+data Argument = Argument { renderer :: Renderer, output :: Maybe FilePath, sourceA :: FilePath, sourceB :: FilePath }
 
 arguments :: Parser Argument
 arguments = Argument
   <$> (flag Split Unified (long "unified" <> help "output a unified diff")
   <|> flag' Split (long "split" <> help "output a split diff"))
+  <*> option auto (long "output" <> short 'o' <> value Nothing)
   <*> strArgument (metavar "FILE a")
   <*> strArgument (metavar "FILE b")
 
