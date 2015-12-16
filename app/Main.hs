@@ -41,11 +41,11 @@ main = do
   let diff = interpret comparable aTerm bTerm in
     case renderer arguments of
       Unified -> do
-        output <- unified diff aContents bContents
-        B1.putStr output
+        rendered <- unified diff aContents bContents
+        B1.putStr rendered
       Split -> do
-        output <- split diff aContents bContents
-        B2.putStr output
+        rendered <- split diff aContents bContents
+        B2.putStr rendered
     where
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
