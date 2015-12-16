@@ -106,6 +106,9 @@ instance ToMarkup Line where
   toMarkup EmptyLine = codeTd Nothing
   toMarkup (Line html) = codeTd . Just . mconcat $ toMarkup <$> html
 
+data LineChange = None | Inserted | Deleted | Replaced
+  deriving (Eq, Show)
+
 data Line =
   Line [HTML]
   | EmptyLine
