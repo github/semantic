@@ -1,5 +1,6 @@
 module Main where
 
+import qualified InterpreterSpec
 import qualified OrderedMapSpec
 
 import Categorizable
@@ -247,6 +248,7 @@ main = hspec $ do
       rangesAndWordsFrom 100 "a b" `shouldBe` [ (Range 100 101, "a"), (Range 102 103, "b") ]
 
   describe "OrderedMap" OrderedMapSpec.spec
+  describe "InterpreterSpec" InterpreterSpec.spec
 
     where
       rightRowText text = rightRow [ Text text ]
