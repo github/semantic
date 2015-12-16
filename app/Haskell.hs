@@ -5,8 +5,16 @@ import Range
 import Syntax
 import Term
 import Control.Comonad.Cofree
+import qualified Data.Set as Set
 import Text.Parsec
 import Text.Parsec.String
+
+leaf :: String -> Parser String -> Parser (Term String Info)
+leaf production parser = do
+  from <- getPosition
+  parsed <- parser
+  to <- getPosition
+  return $ Info (Range 0 0) (Set.singleton production) :< Leaf parsed
 
 module' :: Parser (Term String Info)
 module' = toTerm <$> string "module"
