@@ -14,6 +14,7 @@ import Control.Comonad.Cofree
 import qualified Data.ByteString.Char8 as B1
 import qualified Data.ByteString.Lazy as B2
 import Options.Applicative
+import System.Directory
 import System.FilePath
 import qualified System.IO as IO
 
@@ -47,7 +48,9 @@ main = do
       Split -> do
         rendered <- split diff aContents bContents
         case output arguments of
-          Just path -> IO.withFile path IO.WriteMode (write rendered)
+          Just path -> do
+            isDir <- doesDirectoryExist path
+            IO.withFile (if isDir then path </> (takeFileName $ replaceExtension ".html" sourceBPath) else path) IO.WriteMode (write rendered)
           Nothing -> B2.putStr rendered
     where
     opts = info (helper <*> arguments)
