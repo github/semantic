@@ -52,7 +52,9 @@ fixedProductions = Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwi
 
 -- | Given two sets of production names, produce a Constructor.
 constructorForProductions :: Set.Set String -> Set.Set String -> Constructor
-constructorForProductions _ _ source info@(Info range _) [] = info :< Leaf (substring range source)
+constructorForProductions keyed fixed source info@(Info range categories) = (info :<) . construct
+  where construct [] = Leaf (substring range source)
+
 languageForType :: String -> Maybe (Ptr TSLanguage)
 languageForType mediaType = case mediaType of
     ".h" -> Just ts_language_c
