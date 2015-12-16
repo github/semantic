@@ -91,8 +91,7 @@ documentToTerm constructor document contents = alloca $ \root -> do
       name <- peekCString name
       children <- withNamedChildren node toTerm
       range <- range node
-      annotation <- return . Info range $ Set.singleton name
-      return (name, annotation :< case children of
+      return (name, Info range (Set.singleton name) :< case children of
         [] -> Leaf $ substring range contents
         _ | Set.member name keyedProductions -> Keyed . Map.fromList $ assignKey <$> children
         _ | Set.member name fixedProductions -> Fixed $ fmap snd children
