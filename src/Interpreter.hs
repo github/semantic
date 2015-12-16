@@ -16,6 +16,13 @@ import qualified Data.List as List
 import Data.List ((\\))
 import Data.Maybe
 
+
+-- | Returns whether two terms are comparable
+type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
+
+interpret :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
+interpret comparable a b = fromMaybe (Pure $ Replace a b) $ constructAndRun comparable a b
+
 hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
 hylo down up a = down annotation $ hylo down up <$> syntax where
   (annotation, syntax) = up a
@@ -63,8 +70,3 @@ run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
   inserted = bKeys \\ aKeys
 
 run comparable (Free (ByIndex a b f)) = run comparable . f $ ses (constructAndRun comparable) diffCost a b
-
-type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
-
-interpret :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
-interpret comparable a b = fromMaybe (Pure $ Replace a b) $ constructAndRun comparable a b
