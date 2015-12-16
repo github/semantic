@@ -47,12 +47,12 @@ main = do
       Split -> do
         rendered <- split diff aContents bContents
         case output arguments of
-          Just path -> IO.withFile path IO.WriteMode write
-            where write h = B2.hPut h rendered
+          Just path -> IO.withFile path IO.WriteMode (write rendered)
           Nothing -> B2.putStr rendered
     where
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
+    write rendered h = B2.hPut h rendered
 
 parserForType :: String -> P.Parser
 parserForType mediaType = maybe P.lineByLineParser parseTreeSitterFile $ case mediaType of
