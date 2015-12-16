@@ -162,11 +162,11 @@ main = hspec $ do
 
     describe "unicode" $
       it "equivalent precomposed and decomposed characters are not equal" $
-        let (sourceA, sourceB) = ("ẗ", "ẗ")
-            syntax = (Leaf . Free . offsetAnnotated 0 0 $ unchanged "ẗ" "leaf" (Leaf ""))
+        let (sourceA, sourceB) = ("t\776", "\7831")
+            syntax = Leaf . Pure $ Replace (info sourceA "leaf" :< (Leaf "")) (info sourceB "leaf" :< (Leaf ""))
         in
             annotatedToRows (formatted sourceA sourceB "leaf" syntax) sourceA sourceB `shouldBe`
-            ([ Row (Line [ span "ẗ" ]) (Line [ span "ẗ"]) ], (Range 0 2, Range 0 1))
+            ([ Row (Line [ span "t\776" ]) (Line [ span "\7831"]) ], (Range 0 2, Range 0 1))
 
 
   describe "adjoin2" $ do
