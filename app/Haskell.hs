@@ -20,4 +20,4 @@ haskellParser = toTerm <$> many anyChar
 
 runHaskellParser :: String -> IO (Term String Info)
 runHaskellParser input = return . either errorToTerm id $ parse haskellParser "" input
-  where errorToTerm _ = Info (Range 0 0) mempty :< Leaf "_"
+  where errorToTerm _ = Info (Range 0 0) mempty :< Leaf "onoes"
