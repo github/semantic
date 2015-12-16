@@ -16,9 +16,9 @@ import qualified Data.ByteString.Lazy as B2
 import Options.Applicative
 import System.FilePath
 
-data Output = Unified | Split
+data Renderer = Unified | Split
 
-data Argument = Argument { output :: Output, sourceA :: FilePath, sourceB :: FilePath }
+data Argument = Argument { output :: Renderer, sourceA :: FilePath, sourceB :: FilePath }
 
 arguments :: Parser Argument
 arguments = Argument
