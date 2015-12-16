@@ -8,6 +8,8 @@ import Control.Comonad.Cofree
 import Text.Parsec
 import Text.Parsec.String
 
+data Token = Token { getRange :: Range, getString :: String }
+
 haskellParser :: Parser (Term String Info)
 haskellParser = toTerm <$> many anyChar
   where toTerm a = Info (Range 0 0) mempty :< Leaf a
