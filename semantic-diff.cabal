@@ -26,6 +26,7 @@ library
                      , Range
                      , Split
                      , Unified
+                     , Parser
   build-depends:       base >= 4.8 && < 5
                      , containers
                      , free

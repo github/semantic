@@ -2,6 +2,7 @@ module TreeSitter where
 
 import Diff
 import Range
+import Parser
 import Syntax
 import Term
 import Control.Comonad.Cofree
@@ -70,7 +71,7 @@ languageForType mediaType = case mediaType of
     ".js" -> Just $ Language (constructorForProductions keyedProductions fixedProductions) ts_language_javascript
     _ -> Nothing
 
-parseTreeSitterFile :: Language -> String -> IO (Term String Info)
+parseTreeSitterFile :: Language -> Parser
 parseTreeSitterFile (Language constructor language) contents = do
   document <- ts_document_make
   ts_document_set_language document language
@@ -81,7 +82,7 @@ parseTreeSitterFile (Language constructor language) contents = do
     ts_document_free document
     return term)
 
-documentToTerm :: Constructor -> Ptr TSDocument -> String -> IO (Term String Info)
+documentToTerm :: Constructor -> Ptr TSDocument -> Parser
 documentToTerm constructor document contents = alloca $ \root -> do
   ts_document_root_node_p document root
   snd <$> toTerm root where
