@@ -63,15 +63,15 @@ constructorForProductions keyed fixed source info@(Info range categories) = (inf
 
 data Language = Language { getConstructor :: Constructor, getTsLanguage :: Ptr TSLanguage }
 
-languageForType :: String -> Maybe (Ptr TSLanguage)
+languageForType :: String -> Maybe Language
 languageForType mediaType = case mediaType of
-    ".h" -> Just ts_language_c
-    ".c" -> Just ts_language_c
-    ".js" -> Just ts_language_javascript
+    ".h" -> Just $ Language (constructorForProductions mempty mempty) ts_language_c
+    ".c" -> Just $ Language (constructorForProductions mempty mempty) ts_language_c
+    ".js" -> Just $ Language (constructorForProductions keyedProductions fixedProductions) ts_language_javascript
     _ -> Nothing
 
-parseTreeSitterFile :: Ptr TSLanguage -> String -> IO (Term String Info)
-parseTreeSitterFile language contents = do
+parseTreeSitterFile :: Language -> String -> IO (Term String Info)
+parseTreeSitterFile (Language constructor language) contents = do
   document <- ts_document_make
   ts_document_set_language document language
   withCString contents (\source -> do
