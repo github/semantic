@@ -55,7 +55,11 @@ constructorForProductions :: Set.Set String -> Set.Set String -> Constructor
 constructorForProductions keyed fixed source info@(Info range categories) = (info :<) . construct
   where construct [] = Leaf (substring range source)
         construct children | not . Set.null $ Set.intersection fixed categories = Fixed $ fmap snd children
+        construct children | not . Set.null $ Set.intersection keyed categories = Keyed . Map.fromList $ assignKey <$> children
         construct children = Indexed $ fmap snd children
+        assignKey ("pair", node@(_ :< Fixed (key : _))) = (getSubstring key, node)
+        assignKey (_, node) = (getSubstring node, node)
+        getSubstring (Info range _ :< _) = substring range source
 
 languageForType :: String -> Maybe (Ptr TSLanguage)
 languageForType mediaType = case mediaType of
