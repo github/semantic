@@ -50,7 +50,7 @@ main = do
         case output arguments of
           Just path -> do
             isDir <- doesDirectoryExist path
-            IO.withFile (if isDir then path </> (takeFileName $ replaceExtension ".html" sourceBPath) else path) IO.WriteMode (write rendered)
+            IO.withFile (if isDir then path </> (takeFileName sourceBPath -<.> ".html") else path) IO.WriteMode (write rendered)
           Nothing -> B2.putStr rendered
     where
     opts = info (helper <*> arguments)
