@@ -6,7 +6,7 @@ import Syntax
 import Term
 import Control.Comonad.Cofree
 import qualified OrderedMap as Map
-import Data.Set
+import qualified Data.Set as Set
 import Foreign
 import Foreign.C
 import Foreign.C.Types
@@ -44,11 +44,11 @@ foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars ::
 -- | Given a term’s annotation and children, construct the term.
 type Constructor = Info -> [Term String Info] -> Term String Info
 
-keyedProductions :: Set String
-keyedProductions = fromList [ "object" ]
+keyedProductions :: Set.Set String
+keyedProductions = Set.fromList [ "object" ]
 
-fixedProductions :: Set String
-fixedProductions = fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
+fixedProductions :: Set.Set String
+fixedProductions = Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
 
 languageForType :: String -> Maybe (Ptr TSLanguage)
 languageForType mediaType = case mediaType of
@@ -78,11 +78,11 @@ documentToTerm document contents = alloca $ \root -> do
       name <- peekCString name
       children <- withNamedChildren node toTerm
       range <- range node
-      annotation <- return . Info range $ singleton name
+      annotation <- return . Info range $ Set.singleton name
       return (name, annotation :< case children of
         [] -> Leaf $ substring range contents
-        _ | member name keyedProductions -> Keyed . Map.fromList $ assignKey <$> children
-        _ | member name fixedProductions -> Fixed $ fmap snd children
+        _ | Set.member name keyedProductions -> Keyed . Map.fromList $ assignKey <$> children
+        _ | Set.member name fixedProductions -> Fixed $ fmap snd children
         _ | otherwise -> Indexed $ fmap snd children)
         where assignKey ("pair", node@(_ :< Fixed (key : _))) = (getSubstring key, node)
               assignKey (_, node) = (getSubstring node, node)
