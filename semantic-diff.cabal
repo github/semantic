@@ -50,7 +50,6 @@ executable semantic-diff-exe
                      , bytestring
                      , optparse-applicative
                      , filepath
-                     , trifecta
                      , directory
   default-language:    Haskell2010
   extra-libraries:     bridge
@@ -72,7 +71,6 @@ executable semantic-diff-profile
                      , bytestring
                      , optparse-applicative
                      , filepath
-                     , trifecta
                      , directory
   default-language:    Haskell2010
   extra-libraries:     bridge
