@@ -1,13 +1,12 @@
-module Parser where
+module Parsers where
 
 import Diff
 import Range
+import Parser
 import Syntax
 import Term
 import TreeSitter
 import Control.Comonad.Cofree
-
-type Parser = String -> IO (Term String Info)
 
 parserForType :: String -> Parser
 parserForType mediaType = maybe lineByLineParser parseTreeSitterFile $ languageForType mediaType

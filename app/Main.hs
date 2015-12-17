@@ -3,7 +3,7 @@ module Main where
 import Categorizable
 import Diff
 import Interpreter
-import qualified Parser as P
+import qualified Parsers as P
 import Syntax
 import Range
 import Split

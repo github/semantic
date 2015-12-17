@@ -2,11 +2,10 @@ module TreeSitter where
 
 import Diff
 import Range
+import Parser
 import Syntax
 import Term
-import Control.Comonad.Cofree
-import qualified OrderedMap as Map
-import Data.Set
+import qualified Data.Set as Set
 import Foreign
 import Foreign.C
 import Foreign.C.Types
@@ -41,32 +40,31 @@ foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child 
 foreign import ccall "app/bridge.h ts_node_p_pos_chars" ts_node_p_pos_chars :: Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars :: Ptr TSNode -> IO CSize
 
-keyedProductions :: Set String
-keyedProductions = fromList [ "object" ]
+data Language = Language { getTsLanguage :: Ptr TSLanguage, getConstructor :: Constructor }
 
-fixedProductions :: Set String
-fixedProductions = fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
-
-languageForType :: String -> Maybe (Ptr TSLanguage)
+languageForType :: String -> Maybe Language
 languageForType mediaType = case mediaType of
-    ".h" -> Just ts_language_c
-    ".c" -> Just ts_language_c
-    ".js" -> Just ts_language_javascript
+    ".h" -> c
+    ".c" -> c
+    ".js" -> Just . Language ts_language_javascript $ constructorForProductions
+      (Set.fromList [ "object" ])
+      (Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ])
     _ -> Nothing
+  where c = Just . Language ts_language_c $ constructorForProductions mempty (Set.fromList [ "assignment_expression", "logical_expression", "pointer_expression", "field_expression", "relational_expression", "designator", "call_expression", "math_expression" ])
 
-parseTreeSitterFile :: Ptr TSLanguage -> String -> IO (Term String Info)
-parseTreeSitterFile language contents = do
+parseTreeSitterFile :: Language -> Parser
+parseTreeSitterFile (Language language constructor) contents = do
   document <- ts_document_make
   ts_document_set_language document language
   withCString contents (\source -> do
     ts_document_set_input_string document source
     ts_document_parse document
-    term <- documentToTerm document contents
+    term <- documentToTerm constructor document contents
     ts_document_free document
     return term)
 
-documentToTerm :: Ptr TSDocument -> String -> IO (Term String Info)
-documentToTerm document contents = alloca $ \root -> do
+documentToTerm :: Constructor -> Ptr TSDocument -> Parser
+documentToTerm constructor document contents = alloca $ \root -> do
   ts_document_root_node_p document root
   snd <$> toTerm root where
     toTerm :: Ptr TSNode -> IO (String, Term String Info)
@@ -75,15 +73,7 @@ documentToTerm document contents = alloca $ \root -> do
       name <- peekCString name
       children <- withNamedChildren node toTerm
       range <- range node
-      annotation <- return . Info range $ singleton name
-      return (name, annotation :< case children of
-        [] -> Leaf $ substring range contents
-        _ | member name keyedProductions -> Keyed . Map.fromList $ assignKey <$> children
-        _ | member name fixedProductions -> Fixed $ fmap snd children
-        _ | otherwise -> Indexed $ fmap snd children)
-        where assignKey ("pair", node@(_ :< Fixed (key : _))) = (getSubstring key, node)
-              assignKey (_, node) = (getSubstring node, node)
-              getSubstring (Info range _ :< _) = substring range contents
+      return (name, constructor contents (Info range $ Set.singleton name) children)
 
 withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO (String, a)) -> IO [(String, a)]
 withNamedChildren node transformNode = do
