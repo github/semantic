@@ -82,7 +82,6 @@ test-suite semantic-diff-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       OrderedMapSpec
-                     , InterpreterSpec
   build-depends:       base
                      , containers
                      , free
