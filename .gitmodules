@@ -19,3 +19,6 @@
 [submodule "prototype/External/tree-sitter-c"]
 	path = prototype/External/tree-sitter-c
 	url = https://github.com/maxbrunsfeld/tree-sitter-c.git
+[submodule "vendor/tree-sitter-parsers"]
+	path = vendor/tree-sitter-parsers
+	url = https://github.com/github/tree-sitter-parsers
