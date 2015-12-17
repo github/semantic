@@ -68,6 +68,9 @@ split diff before after = return . renderHtml
   where
     rows = fst $ diffToRows diff (0, 0) before after
     numbered = foldl numberRows [] rows
+    maxNumber = case numbered of
+      [] -> 0
+      ((x, _, y, _) : _) -> max x y
 
     numberRows :: [(Int, Line, Int, Line)] -> Row -> [(Int, Line, Int, Line)]
     numberRows [] (Row EmptyLine EmptyLine) = []
