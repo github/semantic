@@ -72,6 +72,9 @@ split diff before after = return . renderHtml
       [] -> 0
       ((x, _, y, _) : _) -> max x y
 
+    digits n = let base = 10 in
+      ceiling $ log(fromIntegral n) / log(fromIntegral base)
+
     numberRows :: [(Int, Line, Int, Line)] -> Row -> [(Int, Line, Int, Line)]
     numberRows [] (Row EmptyLine EmptyLine) = []
     numberRows [] (Row left@(Line _ _) EmptyLine) = [(1, left, 0, EmptyLine)]
