@@ -4,8 +4,7 @@ import Test.Hspec
 import Range
 
 spec :: Spec
-spec = do
-  describe "rangesAndWordsFrom" $ do
+spec = describe "rangesAndWordsFrom" $ do
     it "should produce no ranges for the empty string" $
       rangesAndWordsFrom 0 [] `shouldBe` []
 

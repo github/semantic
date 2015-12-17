@@ -5,7 +5,6 @@ import Split
 import qualified Data.Set as Set
 import Diff
 import Range
-import Term
 import Test.Hspec.QuickCheck
 import Test.QuickCheck hiding (Fixed)
 import Control.Comonad.Cofree

@@ -20,7 +20,7 @@ newtype ArbitraryTerm a annotation = ArbitraryTerm (annotation, (Syntax a (Arbit
   deriving (Show, Eq, Generic)
 
 unTerm :: ArbitraryTerm a annotation -> Term a annotation
-unTerm arbitraryTerm = unfold unpack arbitraryTerm
+unTerm = unfold unpack
   where unpack (ArbitraryTerm (annotation, syntax)) = (annotation, syntax)
 
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
