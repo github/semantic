@@ -27,6 +27,22 @@ td {
   -webkit-user-select: none;
 }
 
+.blob-num-replacement {
+  background-color: #ffdddd;
+  border-color: #f1c0c0
+}
+.blob-code+.blob-num-replacement {
+  background-color: #dbffdb;
+  border-color: #c1e9c1
+}
+
+.blob-code-replacement {
+  background-color: #ffecec;
+}
+.blob-code-replacement:last-child {
+  background-color: #eaffea;
+}
+
 .blob-code {
   padding-left: 10px;
   padding-right: 10px;
@@ -54,26 +70,17 @@ td {
   float: right;
 }
 body {
-}
-.insert {
-	background-color: #eaffea;
-	outline: 1px solid #c1e9c1;
   margin: 0;
   padding: 0;
   font-family: monospace;
 }
-.delete {
-	background-color: #ffecec;
-	outline: 1px solid #f1c0c0;
+.blob-code-replacement:last-child .insert,
+.blob-code-replacement:last-child .replace {
+  background-color: #a6f3a6;
 }
-.replace {
-	background-color: #ffffec;
-	outline: 1px solid #e9e9c0;
-}
-
-.invisible {
-	background-color: #fff;
-	visibility: hidden;
+.blob-code-replacement .delete,
+.blob-code-replacement .replace {
+    background-color: #f8cbcb;
 }
 
 .diff div, .diff ul, .diff li, .diff dl, .diff dd, .diff span {
