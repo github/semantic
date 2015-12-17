@@ -65,18 +65,18 @@ split diff before after = return . renderHtml
       . (table ! A.class_ (stringValue "diff")) $
         ((<>) (colgroup $ (col ! A.width (stringValue "44")) <> col <> (col ! A.width (stringValue "44")) <> col))
         . mconcat $ toMarkup <$> (reverse $ foldl numberRows [] rows)
-   where
-     rows = fst $ diffToRows diff (0, 0) before after
+  where
+    rows = fst $ diffToRows diff (0, 0) before after
 
-     numberRows :: [(Int, Line, Int, Line)] -> Row -> [(Int, Line, Int, Line)]
-     numberRows [] (Row EmptyLine EmptyLine) = []
-     numberRows [] (Row left@(Line _ _) EmptyLine) = [(1, left, 0, EmptyLine)]
-     numberRows [] (Row EmptyLine right@(Line _ _)) = [(0, EmptyLine, 1, right)]
-     numberRows [] (Row left right) = [(1, left, 1, right)]
-     numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine EmptyLine) = (leftCount, EmptyLine, rightCount, EmptyLine):rows
-     numberRows rows@((leftCount, _, rightCount, _):_) (Row left@(Line _ _) EmptyLine) = (leftCount + 1, left, rightCount, EmptyLine):rows
-     numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine right@(Line _ _)) = (leftCount, EmptyLine, rightCount + 1, right):rows
-     numberRows rows@((leftCount, _, rightCount, _):_) (Row left right) = (leftCount + 1, left, rightCount + 1, right):rows
+    numberRows :: [(Int, Line, Int, Line)] -> Row -> [(Int, Line, Int, Line)]
+    numberRows [] (Row EmptyLine EmptyLine) = []
+    numberRows [] (Row left@(Line _ _) EmptyLine) = [(1, left, 0, EmptyLine)]
+    numberRows [] (Row EmptyLine right@(Line _ _)) = [(0, EmptyLine, 1, right)]
+    numberRows [] (Row left right) = [(1, left, 1, right)]
+    numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine EmptyLine) = (leftCount, EmptyLine, rightCount, EmptyLine):rows
+    numberRows rows@((leftCount, _, rightCount, _):_) (Row left@(Line _ _) EmptyLine) = (leftCount + 1, left, rightCount, EmptyLine):rows
+    numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine right@(Line _ _)) = (leftCount, EmptyLine, rightCount + 1, right):rows
+    numberRows rows@((leftCount, _, rightCount, _):_) (Row left right) = (leftCount + 1, left, rightCount + 1, right):rows
 
 
 data Row = Row Line Line
