@@ -53,8 +53,6 @@ executable semantic-diff-exe
                      , filepath
                      , directory
   default-language:    Haskell2010
-  extra-libraries:     bridge
-  extra-lib-dirs:      .
 
 executable semantic-diff-profile
   hs-source-dirs:      app
@@ -73,8 +71,6 @@ executable semantic-diff-profile
                      , filepath
                      , directory
   default-language:    Haskell2010
-  extra-libraries:     bridge
-  extra-lib-dirs:      .
 
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
