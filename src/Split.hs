@@ -94,6 +94,10 @@ instance ToMarkup (Int, Line, Int, Line) where
   toMarkup (leftNum, left, rightNum, right) = tr $ numberTd (show leftNum) <> toMarkup left <>
                                           numberTd (show rightNum) <> toMarkup right <> string "\n"
 
+instance ToMarkup (Int, Line) where
+  toMarkup (_, EmptyLine) = numberTd "" <> toMarkup EmptyLine <> string "\n"
+  toMarkup (num, line@(Line _ _)) = numberTd (show num) <> toMarkup line <> string "\n"
+
 numberTd :: String -> Html
 numberTd "" = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
 numberTd s = td (string s) ! A.class_ (stringValue "blob-num")
