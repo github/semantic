@@ -3,7 +3,6 @@ module TreeSitter where
 import Diff
 import Range
 import Parser
-import Syntax
 import Term
 import qualified Data.Set as Set
 import Foreign
@@ -37,8 +36,8 @@ foreign import ccall "app/bridge.h ts_document_root_node_p" ts_document_root_nod
 foreign import ccall "app/bridge.h ts_node_p_name" ts_node_p_name :: Ptr TSNode -> Ptr TSDocument -> IO CString
 foreign import ccall "app/bridge.h ts_node_p_named_child_count" ts_node_p_named_child_count :: Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child :: Ptr TSNode -> CSize -> Ptr TSNode -> IO CSize
-foreign import ccall "app/bridge.h ts_node_p_pos_chars" ts_node_p_pos_chars :: Ptr TSNode -> IO CSize
-foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars :: Ptr TSNode -> IO CSize
+foreign import ccall "app/bridge.h ts_node_p_start_char" ts_node_p_start_char :: Ptr TSNode -> CSize
+foreign import ccall "app/bridge.h ts_node_p_end_char" ts_node_p_end_char :: Ptr TSNode -> CSize
 
 data Language = Language { getTsLanguage :: Ptr TSLanguage, getConstructor :: Constructor }
 
@@ -72,8 +71,7 @@ documentToTerm constructor document contents = alloca $ \root -> do
       name <- ts_node_p_name node document
       name <- peekCString name
       children <- withNamedChildren node toTerm
-      range <- range node
-      return (name, constructor contents (Info range $ Set.singleton name) children)
+      return (name, constructor contents (Info (range node) $ Set.singleton name) children)
 
 withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO (String, a)) -> IO [(String, a)]
 withNamedChildren node transformNode = do
@@ -85,10 +83,5 @@ withNamedChildren node transformNode = do
         _ <- ts_node_p_named_child node n out
         transformNode out
 
-range :: Ptr TSNode -> IO Range
-range node = do
-  pos <- ts_node_p_pos_chars node
-  size <- ts_node_p_size_chars node
-  let start = fromIntegral pos
-      end = start + fromIntegral size
-  return Range { start = start, end = end }
+range :: Ptr TSNode -> Range
+range node = Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
