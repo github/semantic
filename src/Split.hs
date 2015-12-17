@@ -90,7 +90,7 @@ instance ToMarkup (Int, Line, Int, Line) where
 
 instance ToMarkup (Int, Line) where
   toMarkup (_, EmptyLine) = numberTd "" <> toMarkup EmptyLine <> string "\n"
-  toMarkup (num, line@(Line True _)) = numberTd (show num) ! A.class_ (stringValue "blob-num-replacement") <> toMarkup line <> string "\n"
+  toMarkup (num, line@(Line True _)) = td (string $ show num) ! A.class_ (stringValue "blob-num blob-num-replacement") <> toMarkup line <> string "\n"
   toMarkup (num, line@(Line _ _)) = numberTd (show num) <> toMarkup line <> string "\n"
 
 numberTd :: String -> Html
