@@ -1,24 +1,3 @@
-[submodule "prototype/External/Assertions"]
-	path = prototype/External/Assertions
-	url = https://github.com/robrix/Assertions.git
-[submodule "prototype/External/Stream"]
-	path = prototype/External/Stream
-	url = https://github.com/antitypical/Stream.git
-[submodule "prototype/External/Madness"]
-	path = prototype/External/Madness
-	url = https://github.com/robrix/Madness
-[submodule "prototype/External/SwiftCheck"]
-	path = prototype/External/SwiftCheck
-	url = https://github.com/typelift/SwiftCheck.git
-[submodule "prototype/External/tree-sitter"]
-	path = prototype/External/tree-sitter
-	url = https://github.com/maxbrunsfeld/tree-sitter.git
-[submodule "prototype/External/tree-sitter-javascript"]
-	path = prototype/External/tree-sitter-javascript
-	url = https://github.com/maxbrunsfeld/tree-sitter-javascript.git
-[submodule "prototype/External/tree-sitter-c"]
-	path = prototype/External/tree-sitter-c
-	url = https://github.com/maxbrunsfeld/tree-sitter-c.git
 [submodule "vendor/tree-sitter-parsers"]
 	path = vendor/tree-sitter-parsers
 	url = https://github.com/github/tree-sitter-parsers
