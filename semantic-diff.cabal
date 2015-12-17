@@ -7,7 +7,7 @@ author:              Rob Rix, Josh Vera
 maintainer:          rob.rix@github.com
 copyright:           2015 GitHub
 category:            Web
-build-type:          Simple
+build-type:          Custom
 -- extra-source-files:
 cabal-version:       >=1.10
 
@@ -39,6 +39,7 @@ library
   default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable
   ghc-options:        -Wall -fno-warn-name-shadowing
   include-dirs:        prototype/External/tree-sitter/include
+  extra-libraries:     runtime
   c-sources:           src/bridge.c
                      , prototype/External/tree-sitter-c/src/parser.c
                      , prototype/External/tree-sitter-javascript/src/parser.c
