@@ -47,8 +47,15 @@ td {
   padding-left: 10px;
   padding-right: 10px;
   font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+  font-size: 13px;
+  line-height: 18px;
+  color: rgb(51, 51, 51);
+  tab-size: 8;
+}
+
+.blob-code>* {
   font-size: 12px;
-  color: #333;
+  line-height: 16px;
 }
 
 .empty-cell {
