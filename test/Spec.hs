@@ -65,7 +65,7 @@ instance Arbitrary HTML where
 
 instance Arbitrary Line where
   arbitrary = oneof [
-    Line <$> arbitrary,
+    Line <$> arbitrary <*> arbitrary,
     const EmptyLine <$> (arbitrary :: Gen ()) ]
 
 instance Arbitrary Row where
@@ -89,22 +89,22 @@ main = hspec $ do
 
   describe "annotatedToRows" $ do
     it "outputs one row for single-line unchanged leaves" $
-      annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` ([ Row (Line [ span "a" ]) (Line [ span "a" ]) ], (Range 0 1, Range 0 1))
+      annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` ([ Row (Line False [ span "a" ]) (Line False [ span "a" ]) ], (Range 0 1, Range 0 1))
 
     it "outputs one row for single-line empty unchanged indexed nodes" $
-      annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` ([ Row (Line [ Ul (Just "category-branch") [ Text "[]" ] ]) (Line [ Ul (Just "category-branch") [ Text "[]" ] ]) ], (Range 0 2, Range 0 2))
+      annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` ([ Row (Line False [ Ul (Just "category-branch") [ Text "[]" ] ]) (Line False [ Ul (Just "category-branch") [ Text "[]" ] ]) ], (Range 0 2, Range 0 2))
 
     it "outputs one row for single-line non-empty unchanged indexed nodes" $
       annotatedToRows (unchanged "[ a, b ]" "branch" (Indexed [
         Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
         Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
-      ])) "[ a, b ]" "[ a, b ]" `shouldBe` ([ Row (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) ], (Range 0 8, Range 0 8))
+      ])) "[ a, b ]" "[ a, b ]" `shouldBe` ([ Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) ], (Range 0 8, Range 0 8))
 
     it "outputs one row for single-line non-empty formatted indexed nodes" $
       annotatedToRows (formatted "[ a, b ]" "[ a,  b ]" "branch" (Indexed [
         Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
         Free . offsetAnnotated 5 6 $ unchanged "b" "leaf" (Leaf "")
-      ])) "[ a, b ]" "[ a,  b ]" `shouldBe` ([ Row (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",  ", span "b", Text " ]" ] ]) ], (Range 0 8, Range 0 9))
+      ])) "[ a, b ]" "[ a,  b ]" `shouldBe` ([ Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",  ", span "b", Text " ]" ] ]) ], (Range 0 8, Range 0 9))
 
     it "outputs two rows for two-line non-empty unchanged indexed nodes" $
       annotatedToRows (unchanged "[ a,\nb ]" "branch" (Indexed [
@@ -112,10 +112,10 @@ main = hspec $ do
         Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
       ])) "[ a,\nb ]" "[ a,\nb ]" `shouldBe`
       ([
-          Row (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break ] ])
-              (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break] ]),
-          Row (Line [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
-              (Line [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
+          Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break ] ])
+              (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break] ]),
+          Row (Line False [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
+              (Line False [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
        ], (Range 0 8, Range 0 8))
 
     it "outputs two rows for two-line non-empty formatted indexed nodes" $
@@ -124,12 +124,12 @@ main = hspec $ do
         Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
       ])) "[ a,\nb ]" "[\na,\nb ]" `shouldBe`
       ([
-          Row (Line [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break ] ])
-              (Line [ Ul (Just "category-branch") [ Text "[", Break ] ]),
+          Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break ] ])
+              (Line False [ Ul (Just "category-branch") [ Text "[", Break ] ]),
           Row EmptyLine
-              (Line [ Ul (Just "category-branch") [ span "a", Text ",", Break ] ]),
-          Row (Line [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
-              (Line [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
+              (Line False [ Ul (Just "category-branch") [ span "a", Text ",", Break ] ]),
+          Row (Line False [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
+              (Line False [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
        ], (Range 0 8, Range 0 8))
 
     it "" $
@@ -139,13 +139,13 @@ main = hspec $ do
           Free . offsetAnnotated 6 3 $ unchanged "b" "leaf" (Leaf "")
         ])) sourceA sourceB `shouldBe`
         ([
-            Row (Line [ Ul (Just "category-branch") [ Text "[", Break ] ])
-                (Line [ Ul (Just "category-branch") [ Text "[", span "a", Text ",", span "b", Text "]" ] ]),
-            Row (Line [ Ul (Just "category-branch") [ span "a", Break ] ])
+            Row (Line False [ Ul (Just "category-branch") [ Text "[", Break ] ])
+                (Line False [ Ul (Just "category-branch") [ Text "[", span "a", Text ",", span "b", Text "]" ] ]),
+            Row (Line False [ Ul (Just "category-branch") [ span "a", Break ] ])
                 EmptyLine,
-            Row (Line [ Ul (Just "category-branch") [ Text ",", Break ] ])
+            Row (Line False [ Ul (Just "category-branch") [ Text ",", Break ] ])
                 EmptyLine,
-            Row (Line [ Ul (Just "category-branch") [ span "b", Text "]" ] ])
+            Row (Line False [ Ul (Just "category-branch") [ span "b", Text "]" ] ])
                 EmptyLine
         ], (Range 0 8, Range 0 5))
 
@@ -156,9 +156,9 @@ main = hspec $ do
           Free . offsetAnnotated 6 0 $ unchanged "a" "leaf" (Leaf "")
         ])) sourceA sourceB `shouldBe`
         ([
-          Row (Line [ Ul (Just "category-branch") [ Div (Just "delete") [ span "/*", Break ] ] ]) EmptyLine,
-          Row (Line [ Ul (Just "category-branch") [ Div (Just "delete") [ span "*/" ], Break ] ]) EmptyLine,
-          Row (Line [ Ul (Just "category-branch") [ span "a" ] ]) (Line [ Ul (Just "category-branch") [ span "a" ] ])
+          Row (Line True [ Ul (Just "category-branch") [ Div (Just "delete") [ span "/*", Break ] ] ]) EmptyLine,
+          Row (Line True [ Ul (Just "category-branch") [ Div (Just "delete") [ span "*/" ], Break ] ]) EmptyLine,
+          Row (Line False [ Ul (Just "category-branch") [ span "a" ] ]) (Line False [ Ul (Just "category-branch") [ span "a" ] ])
         ], (Range 0 7, Range 0 1))
 
     describe "unicode" $
@@ -167,7 +167,7 @@ main = hspec $ do
             syntax = Leaf . Pure $ Replace (info sourceA "leaf" :< (Leaf "")) (info sourceB "leaf" :< (Leaf ""))
         in
             annotatedToRows (formatted sourceA sourceB "leaf" syntax) sourceA sourceB `shouldBe`
-            ([ Row (Line [ span "t\776" ]) (Line [ span "\7831"]) ], (Range 0 2, Range 0 1))
+            ([ Row (Line False [ span "t\776" ]) (Line False [ span "\7831"]) ], (Range 0 2, Range 0 1))
 
 
   describe "adjoin2" $ do
@@ -198,28 +198,28 @@ main = hspec $ do
 
     it "promotes breaks through empty lines onto incomplete lines" $
       adjoin2 [ rightRowText "c", rowText "a" "b" ] (leftRow [ Break ]) `shouldBe`
-        [ rightRowText "c", Row (Line [ Text "a", Break ]) (Line [ Text "b" ]) ]
+        [ rightRowText "c", Row (Line False [ Text "a", Break ]) (Line False [ Text "b" ]) ]
 
   describe "termToLines" $ do
     it "splits multi-line terms into multiple lines" $
       termToLines (Info (Range 0 5) (Set.singleton "leaf") :< (Leaf "")) "/*\n*/"
       `shouldBe`
       ([
-        Line [ span "/*", Break ],
-        Line [ span "*/" ]
+        Line True [ span "/*", Break ],
+        Line True [ span "*/" ]
       ], Range 0 5)
 
   describe "openLine" $ do
     it "should produce the earliest non-empty line in a list, if open" $
       openLine [
-        Line [ Div (Just "delete") [ span "*/" ] ],
-        Line [ Div (Just "delete") [ span " * Debugging", Break ] ],
-        Line [ Div (Just "delete") [ span "/*", Break ] ]
-      ] `shouldBe` (Just $ Line [ Div (Just "delete") [ span "*/" ] ])
+        Line True [ Div (Just "delete") [ span "*/" ] ],
+        Line True [ Div (Just "delete") [ span " * Debugging", Break ] ],
+        Line True [ Div (Just "delete") [ span "/*", Break ] ]
+      ] `shouldBe` (Just $ Line True [ Div (Just "delete") [ span "*/" ] ])
 
     it "should return Nothing if the earliest non-empty line is closed" $
       openLine [
-        Line [ Div (Just "delete") [ span " * Debugging", Break ] ]
+        Line True [ Div (Just "delete") [ span " * Debugging", Break ] ]
       ] `shouldBe` Nothing
 
   describe "rangesAndWordsFrom" $ do
@@ -252,10 +252,10 @@ main = hspec $ do
 
     where
       rightRowText text = rightRow [ Text text ]
-      rightRow xs = Row EmptyLine (Line xs)
+      rightRow xs = Row EmptyLine (Line False xs)
       leftRowText text = leftRow [ Text text ]
-      leftRow xs = Row (Line xs) EmptyLine
-      rowText a b = Row (Line [ Text a ]) (Line [ Text b ])
+      leftRow xs = Row (Line False xs) EmptyLine
+      rowText a b = Row (Line False [ Text a ]) (Line False [ Text b ])
       info source category = Info (totalRange source)  (Set.fromList [ category ])
       unchanged source category = formatted source source category
       formatted source1 source2 category = Annotated (info source1 category, info source2 category)
