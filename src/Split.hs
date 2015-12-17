@@ -62,20 +62,30 @@ split diff before after = return . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel (stringValue "stylesheet") ! A.href (stringValue "style.css")) <>)
     . body
-      . (table ! A.class_ (stringValue "diff"))
-        . mconcat $ toMarkup <$> (reverse $ foldl numberRows [] rows)
-   where
-     rows = fst $ diffToRows diff (0, 0) before after
+      . (table ! A.class_ (stringValue "diff")) $
+        ((<>) (colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col))
+        . mconcat $ toMarkup <$> reverse numbered
+  where
+    rows = fst $ diffToRows diff (0, 0) before after
+    numbered = foldl numberRows [] rows
+    maxNumber = case numbered of
+      [] -> 0
+      ((x, _, y, _) : _) -> max x y
 
-     numberRows :: [(Int, Line, Int, Line)] -> Row -> [(Int, Line, Int, Line)]
-     numberRows [] (Row EmptyLine EmptyLine) = []
-     numberRows [] (Row left@(Line _) EmptyLine) = [(1, left, 0, EmptyLine)]
-     numberRows [] (Row EmptyLine right@(Line _)) = [(0, EmptyLine, 1, right)]
-     numberRows [] (Row left right) = [(1, left, 1, right)]
-     numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine EmptyLine) = (leftCount, EmptyLine, rightCount, EmptyLine):rows
-     numberRows rows@((leftCount, _, rightCount, _):_) (Row left@(Line _) EmptyLine) = (leftCount + 1, left, rightCount, EmptyLine):rows
-     numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine right@(Line _)) = (leftCount, EmptyLine, rightCount + 1, right):rows
-     numberRows rows@((leftCount, _, rightCount, _):_) (Row left right) = (leftCount + 1, left, rightCount + 1, right):rows
+    digits n = let base = 10 in
+      ceiling $ log(fromIntegral n) / log(fromIntegral base)
+
+    columnWidth = max (20 + digits maxNumber * 8) 40
+
+    numberRows :: [(Int, Line, Int, Line)] -> Row -> [(Int, Line, Int, Line)]
+    numberRows [] (Row EmptyLine EmptyLine) = []
+    numberRows [] (Row left@(Line _ _) EmptyLine) = [(1, left, 0, EmptyLine)]
+    numberRows [] (Row EmptyLine right@(Line _ _)) = [(0, EmptyLine, 1, right)]
+    numberRows [] (Row left right) = [(1, left, 1, right)]
+    numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine EmptyLine) = (leftCount, EmptyLine, rightCount, EmptyLine):rows
+    numberRows rows@((leftCount, _, rightCount, _):_) (Row left@(Line _ _) EmptyLine) = (leftCount + 1, left, rightCount, EmptyLine):rows
+    numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine right@(Line _ _)) = (leftCount, EmptyLine, rightCount + 1, right):rows
+    numberRows rows@((leftCount, _, rightCount, _):_) (Row left right) = (leftCount + 1, left, rightCount + 1, right):rows
 
 
 data Row = Row Line Line
@@ -85,45 +95,49 @@ instance Show Row where
   show (Row left right) = "\n" ++ show left ++ " | " ++ show right
 
 instance ToMarkup (Int, Line, Int, Line) where
-  toMarkup (_, EmptyLine, _, EmptyLine) = tr $ numberTd "" <> td (string "") <> numberTd "" <> toMarkup (string "") <> string "\n"
-  toMarkup (_, EmptyLine, num, right) = tr $ numberTd "" <> td (string "") <>
-                                               numberTd (show num) <> toMarkup right <> string "\n"
-  toMarkup (num, left, _, EmptyLine) = tr $ numberTd (show num)  <> toMarkup left <>
-                                              numberTd "" <> td (string "") <> string "\n"
-  toMarkup (leftNum, left, rightNum, right) = tr $ numberTd (show leftNum) <> toMarkup left <>
-                                          numberTd (show rightNum) <> toMarkup right <> string "\n"
+  toMarkup (m, left, n, right) = tr $ toMarkup (m, left) <> toMarkup (n, right) <> string "\n"
+
+instance ToMarkup (Int, Line) where
+  toMarkup (_, EmptyLine) = numberTd "" <> toMarkup EmptyLine <> string "\n"
+  toMarkup (num, line@(Line True _)) = td (string $ show num) ! A.class_ (stringValue "blob-num blob-num-replacement") <> toMarkup line <> string "\n"
+  toMarkup (num, line@(Line _ _)) = numberTd (show num) <> toMarkup line <> string "\n"
 
 numberTd :: String -> Html
+numberTd "" = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
 numberTd s = td (string s) ! A.class_ (stringValue "blob-num")
 
-codeTd :: Html -> Html
-codeTd el = td el ! A.class_ (stringValue "blob-code")
---instance ToMarkup Row where
---  toMarkup (Row left right) = (tr $ toMarkup left <> toMarkup right) <> string "\n"
+codeTd :: Bool -> Maybe Html -> Html
+codeTd _ Nothing = td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
+codeTd True (Just el) = td el ! A.class_ (stringValue "blob-code blob-code-replacement")
+codeTd _ (Just el) = td el ! A.class_ (stringValue "blob-code")
 
 instance ToMarkup Line where
-  toMarkup EmptyLine = codeTd (string "")
-  toMarkup (Line html) = codeTd . mconcat $ toMarkup <$> html
+  toMarkup EmptyLine = codeTd False Nothing
+  toMarkup (Line changed html) = codeTd changed . Just . mconcat $ toMarkup <$> html
 
 data Line =
-  Line [HTML]
+  Line Bool [HTML]
   | EmptyLine
   deriving Eq
 
 unLine :: Line -> [HTML]
 unLine EmptyLine = []
-unLine (Line htmls) = htmls
+unLine (Line _ htmls) = htmls
+
+isChanged :: Line -> Bool
+isChanged EmptyLine = False
+isChanged (Line isChanged _) = isChanged
 
 instance Show Line where
-  show (Line elements) = "[" ++ (concat . intersperse ", " $ show <$> elements) ++ "]"
+  show (Line change elements) = show change ++ " [" ++ (concat . intersperse ", " $ show <$> elements) ++ "]"
   show EmptyLine = "EmptyLine"
 
 instance Monoid Line where
  mempty = EmptyLine
  mappend EmptyLine EmptyLine = EmptyLine
- mappend EmptyLine (Line ys) = Line ys
- mappend (Line xs) EmptyLine = Line xs
- mappend (Line xs) (Line ys) = Line (xs <> ys)
+ mappend EmptyLine (Line c ys) = Line c ys
+ mappend (Line c xs) EmptyLine = Line c xs
+ mappend (Line c1 xs) (Line c2 ys) = Line (c1 || c2) (xs <> ys)
 
 instance Monoid Row where
   mempty = Row EmptyLine EmptyLine
@@ -134,19 +148,19 @@ diffToRows (Free annotated) _ before after = annotatedToRows annotated before af
 diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLine <$> afterLines, (Range previousIndex previousIndex, range))
   where
     (afterLines, range) = termToLines term after
-    rowWithInsertedLine (Line elements) = Row EmptyLine $ Line [ Div (Just "insert") elements ]
+    rowWithInsertedLine (Line _ elements) = Row EmptyLine $ Line True [ Div (Just "insert") elements ]
     rowWithInsertedLine EmptyLine = mempty
 diffToRows (Pure (Delete term)) (_, previousIndex) before _ = (rowWithDeletedLine <$> lines, (range, Range previousIndex previousIndex))
   where
     (lines, range) = termToLines term before
-    rowWithDeletedLine (Line elements) = Row (Line [ Div (Just "delete") elements ]) EmptyLine
+    rowWithDeletedLine (Line _ elements) = Row (Line True [ Div (Just "delete") elements ]) EmptyLine
     rowWithDeletedLine EmptyLine = mempty
 diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, rightRange))
   where
     replacedRows = zipWithMaybe rowFromMaybeRows (replace <$> leftElements) (replace <$> rightElements)
     replace = (:[]) . Div (Just "replace") . unLine
     rowFromMaybeRows :: Maybe [HTML] -> Maybe [HTML] -> Row
-    rowFromMaybeRows a b = Row (maybe EmptyLine Line a) (maybe EmptyLine Line b)
+    rowFromMaybeRows a b = Row (maybe EmptyLine (Line True) a) (maybe EmptyLine (Line True) b)
     (leftElements, leftRange) = termToLines a before
     (rightElements, rightRange) = termToLines b after
 
@@ -155,14 +169,14 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
 termToLines :: Term a Info -> String -> ([Line], Range)
 termToLines (Info range categories :< syntax) source = (rows syntax, range)
   where
-    rows (Leaf _) = reverse $ foldl adjoin2Lines [] $ Line . (:[]) <$> elements
+    rows (Leaf _) = reverse $ foldl adjoin2Lines [] $ Line True . (:[]) <$> elements
     rows (Indexed i) = rewrapLineContentsIn Ul <$> childLines i
     rows (Fixed f) = rewrapLineContentsIn Ul <$> childLines f
     rows (Keyed k) = rewrapLineContentsIn Dl <$> childLines k
 
-    rewrapLineContentsIn f (Line elements) = Line [ f (classify categories) elements ]
+    rewrapLineContentsIn f (Line _ elements) = Line True [ f (classify categories) elements ]
     rewrapLineContentsIn _ EmptyLine = EmptyLine
-    lineElements r s = Line . (:[]) <$> textElements r s
+    lineElements r s = Line True . (:[]) <$> textElements r s
     childLines i = appendRemainder $ foldl sumLines ([], start range) i
     appendRemainder (lines, previous) = reverse . foldl adjoin2Lines [] $ lines ++ lineElements (Range previous (end range)) source
     sumLines (lines, previous) child = (allLines, end childRange)
@@ -186,7 +200,7 @@ annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories
     rightElements = (elementAndBreak $ Span (classify rightCategories)) =<< actualLines (substring right after)
 
     wrap _ EmptyLine = EmptyLine
-    wrap f (Line elements) = Line [ f elements ]
+    wrap f (Line c elements) = Line c [ f elements ]
     rewrapRowContentsIn f (Row left right) = Row (wrap (f $ classify leftCategories) left) (wrap (f $ classify rightCategories) right)
     ranges = (left, right)
     sources = (before, after)
@@ -221,7 +235,7 @@ ends :: (Range, Range) -> (Int, Int)
 ends (left, right) = (end left, end right)
 
 rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row
-rowFromMaybeRows a b = Row  (maybe EmptyLine (Line . (:[])) a) (maybe EmptyLine (Line . (:[])) b)
+rowFromMaybeRows a b = Row (maybe EmptyLine (Line False . (:[])) a) (maybe EmptyLine (Line False . (:[])) b)
 
 maybeLast :: [a] -> Maybe a
 maybeLast list = listToMaybe $ reverse list
