@@ -35,6 +35,7 @@ library
                      , rainbow
                      , bytestring
                      , blaze-html
+                     , tree-sitter-parsers
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable
   ghc-options:        -Wall -fno-warn-name-shadowing
