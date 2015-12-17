@@ -75,7 +75,7 @@ split diff before after = return . renderHtml
     digits n = let base = 10 in
       ceiling $ log(fromIntegral n) / log(fromIntegral base)
 
-    columnWidth n = max (20 + digits n * 8) 40
+    columnWidth = max (20 + digits maxNumber * 8) 40
 
     numberRows :: [(Int, Line, Int, Line)] -> Row -> [(Int, Line, Int, Line)]
     numberRows [] (Row EmptyLine EmptyLine) = []
