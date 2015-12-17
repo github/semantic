@@ -27,6 +27,7 @@ library
                      , Split
                      , Unified
                      , Parser
+                     , TreeSitter
   build-depends:       base >= 4.8 && < 5
                      , containers
                      , free
@@ -34,6 +35,7 @@ library
                      , rainbow
                      , bytestring
                      , blaze-html
+                     , tree-sitter-parsers
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable
   ghc-options:        -Wall -fno-warn-name-shadowing
@@ -41,8 +43,7 @@ library
 executable semantic-diff-exe
   hs-source-dirs:      app
   main-is:             Main.hs
-  other-modules:       TreeSitter
-                     , Parsers
+  other-modules:       Parsers
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , containers
@@ -53,14 +54,11 @@ executable semantic-diff-exe
                      , filepath
                      , directory
   default-language:    Haskell2010
-  extra-libraries:     bridge
-  extra-lib-dirs:      .
 
 executable semantic-diff-profile
   hs-source-dirs:      app
   main-is:             Main.hs
-  other-modules:       TreeSitter
-                     , Parsers
+  other-modules:       Parsers
   ghc-options:         -O2
                        -threaded
                        -fprof-auto
@@ -74,8 +72,6 @@ executable semantic-diff-profile
                      , filepath
                      , directory
   default-language:    Haskell2010
-  extra-libraries:     bridge
-  extra-lib-dirs:      .
 
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0

@@ -72,8 +72,9 @@ split diff before after = return . renderHtml
       [] -> 0
       ((x, _, y, _) : _) -> max x y
 
-    digits n = let base = 10 in
-      ceiling $ log(fromIntegral n) / log(fromIntegral base)
+    digits :: Int -> Int
+    digits n = let base = 10 :: Int in
+      ceiling (log(fromIntegral n) / log(fromIntegral base) :: Double)
 
     columnWidth = max (20 + digits maxNumber * 8) 40
 
