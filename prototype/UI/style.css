@@ -7,8 +7,8 @@ table {
 }
 
 td {
-    vertical-align: top;
-    padding: 0;
+  vertical-align: top;
+  padding: 0;
 }
 
 .blob-num {
@@ -80,7 +80,7 @@ body {
 }
 .blob-code-replacement .delete,
 .blob-code-replacement .replace {
-    background-color: #f8cbcb;
+  background-color: #f8cbcb;
 }
 
 .diff div, .diff ul, .diff li, .diff dl, .diff dd, .diff span {
