@@ -100,6 +100,7 @@ numberTd s = td (string s) ! A.class_ (stringValue "blob-num")
 
 codeTd :: Bool -> Maybe Html -> Html
 codeTd _ Nothing = td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
+codeTd True (Just el) = td el ! A.class_ (stringValue "blob-code blob-code-replacement")
 codeTd _ (Just el) = td el ! A.class_ (stringValue "blob-code")
 
 instance ToMarkup Line where
