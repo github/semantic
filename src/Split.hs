@@ -225,7 +225,7 @@ ends :: (Range, Range) -> (Int, Int)
 ends (left, right) = (end left, end right)
 
 rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row
-rowFromMaybeRows a b = Row  (maybe EmptyLine (Line . (:[])) a) (maybe EmptyLine (Line . (:[])) b)
+rowFromMaybeRows a b = Row (maybe EmptyLine (Line . (:[])) a) (maybe EmptyLine (Line . (:[])) b)
 
 maybeLast :: [a] -> Maybe a
 maybeLast list = listToMaybe $ reverse list
