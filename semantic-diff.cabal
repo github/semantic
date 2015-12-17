@@ -38,6 +38,7 @@ library
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable
   ghc-options:        -Wall -fno-warn-name-shadowing
+  include-dirs:        prototype/External/tree-sitter/include
 
 executable semantic-diff-exe
   hs-source-dirs:      app
