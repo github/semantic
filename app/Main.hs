@@ -24,6 +24,7 @@ data Argument = Argument { renderer :: Renderer, output :: Maybe FilePath, sourc
 arguments :: Parser Argument
 arguments = Argument
   <$> (flag Split Unified (long "unified" <> help "output a unified diff")
+  <|> flag Split Patch (long "patch" <> help "output a patch(1)-compatible diff")
   <|> flag' Split (long "split" <> help "output a split diff"))
   <*> (optional $ strOption (long "output" <> short 'o' <> help "output directory for split diffs, defaulting to stdout if unspecified"))
   <*> strArgument (metavar "FILE a")
