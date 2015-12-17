@@ -1,3 +1,0 @@
-[submodule "vendor/tree-sitter-parsers"]
-	path = vendor/tree-sitter-parsers
-	url = https://github.com/github/tree-sitter-parsers
