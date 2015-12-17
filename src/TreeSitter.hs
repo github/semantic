@@ -3,7 +3,6 @@ module TreeSitter where
 import Diff
 import Range
 import Parser
-import Syntax
 import Term
 import qualified Data.Set as Set
 import Foreign
