@@ -64,9 +64,10 @@ split diff before after = return . renderHtml
     . body
       . (table ! A.class_ (stringValue "diff")) $
         ((<>) (colgroup $ (col ! A.width (stringValue "44")) <> col <> (col ! A.width (stringValue "44")) <> col))
-        . mconcat $ toMarkup <$> (reverse $ foldl numberRows [] rows)
+        . mconcat $ toMarkup <$> reverse numbered
   where
     rows = fst $ diffToRows diff (0, 0) before after
+    numbered = foldl numberRows [] rows
 
     numberRows :: [(Int, Line, Int, Line)] -> Row -> [(Int, Line, Int, Line)]
     numberRows [] (Row EmptyLine EmptyLine) = []
