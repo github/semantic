@@ -17,7 +17,7 @@ import System.Directory
 import System.FilePath
 import qualified System.IO as IO
 
-data Renderer = Unified | Split
+data Renderer = Unified | Split | Patch
 
 data Argument = Argument { renderer :: Renderer, output :: Maybe FilePath, sourceA :: FilePath, sourceB :: FilePath }
 
