@@ -127,10 +127,6 @@ spec = do
         \ (a@(Row (Line ac1 as1) (Line bc1 bs1)), b@(Row (Line ac2 as2) (Line bc2 bs2))) ->
           adjoin2 [ a ] b `shouldBe` [ Row (Line (ac1 || ac2) $ as1 ++ as2) (Line (bc1 || bc2) $ bs1 ++ bs2) ]
 
-    it "appends elements onto incomplete lines" $
-      adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe`
-              [ rightRow [ Text "[", Text "a" ] ]
-
     it "does not append elements onto complete lines" $
       adjoin2 [ leftRow [ Break ] ] (leftRowText ",") `shouldBe`
               [ leftRowText ",", leftRow [ Break ]  ]
