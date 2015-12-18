@@ -292,11 +292,6 @@ adjoin2Lines (EmptyLine : xs) line | Just _ <- openLine xs = EmptyLine : adjoin2
 adjoin2Lines (prev:rest) line | Just _ <- openLine [ prev ] = (prev <> line) : rest
 adjoin2Lines lines line = line : lines
 
-adjoinLines :: [Line] -> [Line] -> [Line]
-adjoinLines [] lines = lines
-adjoinLines lines [] = lines
-adjoinLines accum (line : lines) = init accum ++ [ last accum <> line ] ++ lines
-
 zipWithMaybe :: (Maybe a -> Maybe b -> c) -> [a] -> [b] -> [c]
 zipWithMaybe f la lb = take len $ zipWith f la' lb'
   where
