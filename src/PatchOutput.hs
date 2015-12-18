@@ -20,5 +20,5 @@ header (Hunk offsetA offsetB lines) = "@@ -" ++ show offsetA ++ "," ++ show coun
 
 data Line = Insert String | Delete String | Context String
 
-hunks :: Diff a Info -> String -> String -> [String]
+hunks :: Diff a Info -> String -> String -> [Hunk]
 hunks diff sourceA sourceB = []
