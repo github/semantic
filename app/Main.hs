@@ -36,7 +36,7 @@ main = do
   let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
   aContents <- TextIO.readFile sourceAPath
   bContents <- TextIO.readFile sourceBPath
-  (aTerm, bTerm) <- let parse = (P.parserForType . takeExtension) sourceAPath in do
+  (aTerm, bTerm) <- let parse = (P.parserForType . T.pack . takeExtension) sourceAPath in do
     aTerm <- parse aContents
     bTerm <- parse bContents
     return (replaceLeavesWithWordBranches aContents aTerm, replaceLeavesWithWordBranches bContents bTerm)
