@@ -58,7 +58,7 @@ main = do
     write rendered h = TextIO.hPutStr h rendered
 
 replaceLeavesWithWordBranches :: T.Text -> Term T.Text Info -> Term T.Text Info
-replaceLeavesWithWordBranches source term = replaceIn source 0 term
+replaceLeavesWithWordBranches source = replaceIn source 0
   where
     replaceIn source startIndex (info@(Info range categories) :< syntax) | substring <- substring (offsetRange (negate startIndex) range) source = info :< case syntax of
       Leaf _ | ranges <- rangesAndWordsFrom (start range) substring, length ranges > 1 -> Indexed $ makeLeaf categories <$> ranges
