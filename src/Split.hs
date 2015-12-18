@@ -91,11 +91,11 @@ data Row a = Row (Line a) (Line a)
 instance Show (Row a) where
   show (Row left right) = "\n" ++ show left ++ " | " ++ show right
 
-instance ToMarkup (Int, Line a, Int, Line a) where
+instance ToMarkup a => ToMarkup (Int, Line a, Int, Line a) where
   toMarkup (m, left, n, right) = tr $ toMarkup (m, left) <> toMarkup (n, right) <> string "\n"
 
-instance ToMarkup (Int, Line a) where
-  toMarkup (_, EmptyLine) = numberTd "" <> toMarkup EmptyLine <> string "\n"
+instance ToMarkup a => ToMarkup (Int, Line a) where
+  toMarkup (_, line@EmptyLine) = numberTd "" <> toMarkup line <> string "\n"
   toMarkup (num, line@(Line True _)) = td (string $ show num) ! A.class_ (stringValue "blob-num blob-num-replacement") <> toMarkup line <> string "\n"
   toMarkup (num, line@(Line _ _)) = numberTd (show num) <> toMarkup line <> string "\n"
 
@@ -108,7 +108,7 @@ codeTd _ Nothing = td mempty ! A.class_ (stringValue "blob-code blob-code-empty 
 codeTd True (Just el) = td el ! A.class_ (stringValue "blob-code blob-code-replacement")
 codeTd _ (Just el) = td el ! A.class_ (stringValue "blob-code")
 
-instance ToMarkup (Line a) where
+instance ToMarkup a => ToMarkup (Line a) where
   toMarkup EmptyLine = codeTd False Nothing
   toMarkup (Line changed html) = codeTd changed . Just . mconcat $ toMarkup <$> html
 
