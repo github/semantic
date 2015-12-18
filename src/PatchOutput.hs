@@ -1,6 +1,7 @@
 module PatchOutput (patch) where
 
 import Diff
+import Control.Monad.Free
 
 patch :: Diff a Info -> String -> String -> String
 patch diff sourceA sourceB = mconcat $ show <$> hunks diff sourceA sourceB
@@ -21,4 +22,6 @@ header (Hunk offsetA offsetB lines) = "@@ -" ++ show offsetA ++ "," ++ show coun
 data Line = Insert String | Delete String | Context String
 
 hunks :: Diff a Info -> String -> String -> [Hunk]
-hunks diff sourceA sourceB = []
+hunks diff sourceA sourceB = case diff of
+  Pure patch -> []
+  Free (Annotated (a, b) syntax) -> []
