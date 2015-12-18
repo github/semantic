@@ -18,7 +18,6 @@ import qualified OrderedMap as Map
 import Data.Maybe
 import Data.Monoid
 import qualified Data.Set as Set
-import Debug.Trace
 import Data.List (intersperse)
 
 type ClassName = String
@@ -53,9 +52,6 @@ instance ToMarkup HTML where
   toMarkup (Dl className children) = classifyMarkup className . dl $ mconcat (toDd <$> children)
   toMarkup (Div className children) = classifyMarkup className . div $ mconcat (toMarkup <$> children)
   toMarkup (Dt key) = dt $ string key
-
-trace' :: Show a => a -> a
-trace' a = traceShow a a
 
 split :: Diff a Info -> String -> String -> IO ByteString
 split diff before after = return . renderHtml
