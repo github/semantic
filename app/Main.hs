@@ -6,7 +6,7 @@ import Interpreter
 import qualified Parsers as P
 import Syntax
 import Range
-import PatchOutput
+import qualified PatchOutput
 import Split
 import Term
 import Unified
@@ -54,7 +54,7 @@ main = do
             IO.withFile (if isDir then path </> (takeFileName sourceBPath -<.> ".html") else path) IO.WriteMode (write rendered)
           Nothing -> B2.putStr rendered
       Patch -> do
-        putStr $ patch diff aContents bContents
+        putStr $ PatchOutput.patch diff aContents bContents
     where
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
