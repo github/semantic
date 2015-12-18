@@ -7,6 +7,9 @@ patch diff sourceA sourceB = mconcat $ hunks diff sourceA sourceB
 
 data Hunk = Hunk Int Int [Line]
 
+instance Show Hunk where
+  show hunk = header hunk
+
 header :: Hunk -> String
 header (Hunk offsetA offsetB lines) = "@@ -" ++ show offsetA ++ "," ++ show countDeleted ++ " +" ++ show offsetB ++ "," ++ show countInserted ++ " @@\n"
   where (countDeleted, countInserted) = foldl countLine (0 :: Int, 0 :: Int) lines
