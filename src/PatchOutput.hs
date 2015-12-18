@@ -20,6 +20,7 @@ header (Hunk offsetA offsetB lines) = "@@ -" ++ show offsetA ++ "," ++ show coun
           Context _ -> (countDeleted + 1, countInserted + 1)
 
 data Line = Insert String | Delete String | Context String
+  deriving (Show, Eq)
 
 hunks :: Diff a Info -> String -> String -> [Hunk]
 hunks diff sourceA sourceB = case diff of
