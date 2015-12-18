@@ -12,7 +12,7 @@ import Control.Monad.Free hiding (unfold)
 import Patch
 import Syntax
 
-instance Arbitrary Row where
+instance Arbitrary (Row a) where
   arbitrary = oneof [
     Row <$> arbitrary <*> arbitrary ]
 

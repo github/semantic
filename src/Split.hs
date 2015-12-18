@@ -74,7 +74,7 @@ split diff before after = return . renderHtml
 
     columnWidth = max (20 + digits maxNumber * 8) 40
 
-    numberRows :: [(Int, Line, Int, Line)] -> Row -> [(Int, Line, Int, Line)]
+    numberRows :: [(Int, Line, Int, Line)] -> Row HTML -> [(Int, Line, Int, Line)]
     numberRows [] (Row EmptyLine EmptyLine) = []
     numberRows [] (Row left@(Line _ _) EmptyLine) = [(1, left, 0, EmptyLine)]
     numberRows [] (Row EmptyLine right@(Line _ _)) = [(0, EmptyLine, 1, right)]
@@ -85,10 +85,10 @@ split diff before after = return . renderHtml
     numberRows rows@((leftCount, _, rightCount, _):_) (Row left right) = (leftCount + 1, left, rightCount + 1, right):rows
 
 
-data Row = Row Line Line
+data Row a = Row Line Line
   deriving Eq
 
-instance Show Row where
+instance Show (Row a) where
   show (Row left right) = "\n" ++ show left ++ " | " ++ show right
 
 instance ToMarkup (Int, Line, Int, Line) where
@@ -136,11 +136,11 @@ instance Monoid Line where
  mappend (Line c xs) EmptyLine = Line c xs
  mappend (Line c1 xs) (Line c2 ys) = Line (c1 || c2) (xs <> ys)
 
-instance Monoid Row where
+instance Monoid (Row a) where
   mempty = Row EmptyLine EmptyLine
   mappend (Row x1 y1) (Row x2 y2) = Row (x1 <> x2) (y1 <> y2)
 
-diffToRows :: Diff a Info -> (Int, Int) -> String -> String -> ([Row], (Range, Range))
+diffToRows :: Diff a Info -> (Int, Int) -> String -> String -> ([Row HTML], (Range, Range))
 diffToRows (Free annotated) _ before after = annotatedToRows annotated before after
 diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLine <$> afterLines, (Range previousIndex previousIndex, range))
   where
@@ -156,7 +156,7 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
   where
     replacedRows = zipWithMaybe rowFromMaybeRows (replace <$> leftElements) (replace <$> rightElements)
     replace = (:[]) . Div (Just "replace") . unLine
-    rowFromMaybeRows :: Maybe [HTML] -> Maybe [HTML] -> Row
+    rowFromMaybeRows :: Maybe [HTML] -> Maybe [HTML] -> Row HTML
     rowFromMaybeRows a b = Row (maybe EmptyLine (Line True) a) (maybe EmptyLine (Line True) b)
     (leftElements, leftRange) = termToLines a before
     (rightElements, rightRange) = termToLines b after
@@ -185,7 +185,7 @@ termToLines (Info range categories :< syntax) source = (rows syntax, range)
     elements = (elementAndBreak $ Span (classify categories)) =<< actualLines (substring range source)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
-annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row], (Range, Range))
+annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row HTML], (Range, Range))
 annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories) syntax) before after = (rows syntax, ranges)
   where
     rows (Leaf _) = zipWithMaybe rowFromMaybeRows leftElements rightElements
@@ -209,7 +209,7 @@ annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories
         allRows = rows ++ separatorRows ++ childRows
         (childRows, childRanges) = diffToRows child previousIndices before after
 
-contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row]
+contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row HTML]
 contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows leftElements rightElements
   where
     leftElements = textElements (Range (fst previousIndices) (fst childIndices)) (fst sources)
@@ -231,13 +231,13 @@ starts (left, right) = (start left, start right)
 ends :: (Range, Range) -> (Int, Int)
 ends (left, right) = (end left, end right)
 
-rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row
+rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> (Row HTML)
 rowFromMaybeRows a b = Row (maybe EmptyLine (Line False . (:[])) a) (maybe EmptyLine (Line False . (:[])) b)
 
 maybeLast :: [a] -> Maybe a
 maybeLast list = listToMaybe $ reverse list
 
-adjoin2 :: [Row] -> Row -> [Row]
+adjoin2 :: [Row a] -> Row a -> [Row a]
 adjoin2 [] row = [row]
 
 adjoin2 rows (Row left' right') | Just _ <- openLine $ leftLines rows, Just _ <- openLine $ rightLines rows = zipWith Row lefts rights
@@ -260,12 +260,12 @@ adjoin2 rows (Row left' right') | Just _ <- openLine $ rightLines rows = case le
 
 adjoin2 rows row = row : rows
 
-leftLines :: [Row] -> [Line]
+leftLines :: [Row a] -> [Line]
 leftLines rows = left <$> rows
   where
     left (Row left _) = left
 
-rightLines :: [Row] -> [Line]
+rightLines :: [Row a] -> [Line]
 rightLines rows = right <$> rows
   where
     right (Row _ right) = right
