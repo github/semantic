@@ -122,11 +122,11 @@ spec = do
     prop "is identity on top of no rows" $
       \ a -> adjoin2 [] a == [ a ]
 
-    it "appends appends HTML onto incomplete lines" $
+    it "appends elements onto incomplete lines" $
       adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe`
               [ rightRow [ Text "[", Text "a" ] ]
 
-    it "does not append HTML onto complete lines" $
+    it "does not append elements onto complete lines" $
       adjoin2 [ leftRow [ Break ] ] (leftRowText ",") `shouldBe`
               [ leftRowText ",", leftRow [ Break ]  ]
 
@@ -134,7 +134,7 @@ spec = do
       adjoin2 [ leftRowText "a" ] (leftRow  [ Break ]) `shouldBe`
               [ leftRow [ Text "a", Break ] ]
 
-    it "does not promote HTML through empty lines onto complete lines" $
+    it "does not promote elements through empty lines onto complete lines" $
       adjoin2 [ rightRowText "b", leftRow [ Break ] ] (leftRowText "a") `shouldBe`
               [ leftRowText "a", rightRowText "b", leftRow [ Break ] ]
 
