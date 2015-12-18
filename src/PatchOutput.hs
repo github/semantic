@@ -1,4 +1,7 @@
-module PatchOutput (patch) where
+module PatchOutput (
+  patch,
+  hunks
+) where
 
 import Diff
 import Control.Monad.Free
