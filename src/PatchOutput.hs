@@ -9,7 +9,7 @@ data Hunk = Hunk Int Int [Line]
 
 header :: Hunk -> String
 header (Hunk offsetA offsetB lines) = "@@ -" ++ show offsetA ++ "," ++ show countDeleted ++ " +" ++ show offsetB ++ "," ++ show countInserted ++ " @@\n"
-  where (countDeleted, countInserted) = foldl countLine (0, 0) lines
+  where (countDeleted, countInserted) = foldl countLine (0 :: Int, 0 :: Int) lines
         countLine (countDeleted, countInserted) line = case line of
           Insert _ -> (countDeleted, countInserted + 1)
           Delete _ -> (countDeleted + 1, countInserted)
