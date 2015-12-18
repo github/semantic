@@ -113,12 +113,6 @@ spec = do
 
 
   describe "adjoin2" $ do
-    prop "is idempotent for additions of empty rows" $
-      \ a -> adjoin2 (adjoin2 [ a ] mempty) mempty == (adjoin2 [ a ] mempty)
-
-    prop "is identity on top of empty rows" $
-      \ a -> adjoin2 [ mempty ] a == [ a ]
-
     prop "is identity on top of no rows" $
       \ a -> adjoin2 [] a == [ a ]
 
