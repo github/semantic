@@ -119,7 +119,7 @@ data Line a =
 
 unLine :: Line a -> [HTML]
 unLine EmptyLine = []
-unLine (Line _ htmls) = htmls
+unLine (Line _ elements) = elements
 
 isChanged :: Line a -> Bool
 isChanged EmptyLine = False
