@@ -129,6 +129,10 @@ spec = do
       forAll ((arbitrary `suchThat` isClosed) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isClosed)) $
         \ (a, b) -> adjoin2 [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
 
+    prop "promotes elements through empty lines onto open lines" $
+      forAll ((arbitrary `suchThat` isOpen) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isOpen)) $
+        \ (a, b) -> adjoin2 [ Row EmptyLine EmptyLine, a ] b `shouldBe` Row EmptyLine EmptyLine : adjoin2 [ a ] b
+
     it "promotes breaks through empty lines onto incomplete lines" $
       adjoin2 [ rightRowText "c", rowText "a" "b" ] (leftRow [ Break ]) `shouldBe`
         [ rightRowText "c", Row (Line False [ Text "a", Break ]) (Line False [ Text "b" ]) ]
