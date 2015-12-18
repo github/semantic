@@ -42,7 +42,7 @@ foreign import ccall "app/bridge.h ts_node_p_end_char" ts_node_p_end_char :: Ptr
 
 data Language = Language { getTsLanguage :: Ptr TSLanguage, getConstructor :: Constructor }
 
-languageForType :: String -> Maybe Language
+languageForType :: T.Text -> Maybe Language
 languageForType mediaType = case mediaType of
     ".h" -> c
     ".c" -> c
