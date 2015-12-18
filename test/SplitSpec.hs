@@ -127,6 +127,10 @@ spec = do
         \ (a@(Row (Line ac1 as1) (Line bc1 bs1)), b@(Row (Line ac2 as2) (Line bc2 bs2))) ->
           adjoin2 [ a ] b `shouldBe` [ Row (Line (ac1 || ac2) $ as1 ++ as2) (Line (bc1 || bc2) $ bs1 ++ bs2) ]
 
+    prop "does not append onto closed rows" $
+      forAll ((arbitrary `suchThat` isClosed) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isClosed)) $
+        \ (a, b) -> adjoin2 [ a ] b `shouldBe` [ b, a ]
+
     it "does not append elements onto complete lines" $
       adjoin2 [ leftRow [ Break ] ] (leftRowText ",") `shouldBe`
               [ leftRowText ",", leftRow [ Break ]  ]
