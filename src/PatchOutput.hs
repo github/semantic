@@ -1,4 +1,4 @@
-module PatchOutput where
+module PatchOutput (patch) where
 
 import Diff
 
