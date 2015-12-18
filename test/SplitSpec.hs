@@ -131,6 +131,10 @@ spec = do
       forAll ((arbitrary `suchThat` isClosed) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isClosed)) $
         \ (a, b) -> adjoin2 [ a ] b `shouldBe` [ b, a ]
 
+    prop "does not promote elements through empty lines onto closed lines" $
+      forAll ((arbitrary `suchThat` isClosed) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isClosed)) $
+        \ (a, b) -> adjoin2 [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
+
     it "does not promote elements through empty lines onto complete lines" $
       adjoin2 [ rightRowText "b", leftRow [ Break ] ] (leftRowText "a") `shouldBe`
               [ leftRowText "a", rightRowText "b", leftRow [ Break ] ]
