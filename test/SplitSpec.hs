@@ -16,7 +16,6 @@ instance Arbitrary Row where
   arbitrary = oneof [
     Row <$> arbitrary <*> arbitrary ]
 
-
 instance Arbitrary HTML where
   arbitrary = oneof [
     Text <$> arbitrary,
