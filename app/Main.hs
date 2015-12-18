@@ -55,7 +55,7 @@ main = do
     where
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
-    write rendered h = B2.hPut h rendered
+    write rendered h = TextIO.hPutStr h rendered
 
 replaceLeavesWithWordBranches :: T.Text -> Term T.Text Info -> Term T.Text Info
 replaceLeavesWithWordBranches source term = replaceIn source 0 term
