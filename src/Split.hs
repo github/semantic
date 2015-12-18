@@ -88,7 +88,7 @@ split diff before after = return . renderHtml
 data Row a = Row (Line a) (Line a)
   deriving Eq
 
-instance Show (Row a) where
+instance Show a => Show (Row a) where
   show (Row left right) = "\n" ++ show left ++ " | " ++ show right
 
 instance ToMarkup a => ToMarkup (Int, Line a, Int, Line a) where
@@ -125,7 +125,7 @@ isChanged :: Line a -> Bool
 isChanged EmptyLine = False
 isChanged (Line isChanged _) = isChanged
 
-instance Show (Line a) where
+instance Show a => Show (Line a) where
   show (Line change elements) = show change ++ " [" ++ (concat . intersperse ", " $ show <$> elements) ++ "]"
   show EmptyLine = "EmptyLine"
 
