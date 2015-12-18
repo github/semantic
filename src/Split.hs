@@ -74,7 +74,7 @@ split diff before after = return . renderHtml
 
     columnWidth = max (20 + digits maxNumber * 8) 40
 
-    numberRows :: [(Int, Line, Int, Line)] -> Row HTML -> [(Int, Line, Int, Line)]
+    numberRows :: [(Int, Line HTML, Int, Line HTML)] -> Row HTML -> [(Int, Line HTML, Int, Line HTML)]
     numberRows [] (Row EmptyLine EmptyLine) = []
     numberRows [] (Row left@(Line _ _) EmptyLine) = [(1, left, 0, EmptyLine)]
     numberRows [] (Row EmptyLine right@(Line _ _)) = [(0, EmptyLine, 1, right)]
@@ -85,16 +85,16 @@ split diff before after = return . renderHtml
     numberRows rows@((leftCount, _, rightCount, _):_) (Row left right) = (leftCount + 1, left, rightCount + 1, right):rows
 
 
-data Row a = Row Line Line
+data Row a = Row (Line a) (Line a)
   deriving Eq
 
 instance Show (Row a) where
   show (Row left right) = "\n" ++ show left ++ " | " ++ show right
 
-instance ToMarkup (Int, Line, Int, Line) where
+instance ToMarkup (Int, Line a, Int, Line a) where
   toMarkup (m, left, n, right) = tr $ toMarkup (m, left) <> toMarkup (n, right) <> string "\n"
 
-instance ToMarkup (Int, Line) where
+instance ToMarkup (Int, Line a) where
   toMarkup (_, EmptyLine) = numberTd "" <> toMarkup EmptyLine <> string "\n"
   toMarkup (num, line@(Line True _)) = td (string $ show num) ! A.class_ (stringValue "blob-num blob-num-replacement") <> toMarkup line <> string "\n"
   toMarkup (num, line@(Line _ _)) = numberTd (show num) <> toMarkup line <> string "\n"
@@ -108,28 +108,28 @@ codeTd _ Nothing = td mempty ! A.class_ (stringValue "blob-code blob-code-empty 
 codeTd True (Just el) = td el ! A.class_ (stringValue "blob-code blob-code-replacement")
 codeTd _ (Just el) = td el ! A.class_ (stringValue "blob-code")
 
-instance ToMarkup Line where
+instance ToMarkup (Line a) where
   toMarkup EmptyLine = codeTd False Nothing
   toMarkup (Line changed html) = codeTd changed . Just . mconcat $ toMarkup <$> html
 
-data Line =
+data Line a =
   Line Bool [HTML]
   | EmptyLine
   deriving Eq
 
-unLine :: Line -> [HTML]
+unLine :: Line a -> [HTML]
 unLine EmptyLine = []
 unLine (Line _ htmls) = htmls
 
-isChanged :: Line -> Bool
+isChanged :: Line a -> Bool
 isChanged EmptyLine = False
 isChanged (Line isChanged _) = isChanged
 
-instance Show Line where
+instance Show (Line a) where
   show (Line change elements) = show change ++ " [" ++ (concat . intersperse ", " $ show <$> elements) ++ "]"
   show EmptyLine = "EmptyLine"
 
-instance Monoid Line where
+instance Monoid (Line a) where
  mempty = EmptyLine
  mappend EmptyLine EmptyLine = EmptyLine
  mappend EmptyLine (Line c ys) = Line c ys
@@ -163,7 +163,7 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
 
 -- | Takes a term and a `source` and returns a list of HTML lines
 -- | and their range within `source`.
-termToLines :: Term a Info -> String -> ([Line], Range)
+termToLines :: Term a Info -> String -> ([Line HTML], Range)
 termToLines (Info range categories :< syntax) source = (rows syntax, range)
   where
     rows (Leaf _) = reverse $ foldl adjoin2Lines [] $ Line True . (:[]) <$> elements
@@ -260,12 +260,12 @@ adjoin2 rows (Row left' right') | Just _ <- openLine $ rightLines rows = case le
 
 adjoin2 rows row = row : rows
 
-leftLines :: [Row a] -> [Line]
+leftLines :: [Row a] -> [Line a]
 leftLines rows = left <$> rows
   where
     left (Row left _) = left
 
-rightLines :: [Row a] -> [Line]
+rightLines :: [Row a] -> [Line a]
 rightLines rows = right <$> rows
   where
     right (Row _ right) = right
@@ -277,12 +277,12 @@ openElement (Dl _ elements) = openElement =<< maybeLast elements
 openElement (Div _ elements) = openElement =<< maybeLast elements
 openElement h = Just h
 
-openLine :: [Line] -> Maybe Line
+openLine :: [Line a] -> Maybe (Line a)
 openLine [] = Nothing
 openLine (EmptyLine : rest) = openLine rest
 openLine (line : _) = const line <$> (openElement =<< (maybeLast $ unLine line))
 
-adjoin2Lines :: [Line] -> Line -> [Line]
+adjoin2Lines :: [Line a] -> Line a -> [Line a]
 adjoin2Lines [] line = [line]
 adjoin2Lines (EmptyLine : xs) line | Just _ <- openLine xs = EmptyLine : adjoin2Lines xs line
 adjoin2Lines (prev:rest) line | Just _ <- openLine [ prev ] = (prev <> line) : rest

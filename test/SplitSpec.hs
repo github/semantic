@@ -22,7 +22,7 @@ instance Arbitrary HTML where
     Span <$> arbitrary <*> arbitrary,
     const Break <$> (arbitrary :: Gen ()) ]
 
-instance Arbitrary Line where
+instance Arbitrary (Line a) where
   arbitrary = oneof [
     Line <$> arbitrary <*> arbitrary,
     const EmptyLine <$> (arbitrary :: Gen ()) ]
