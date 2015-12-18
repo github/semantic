@@ -131,10 +131,6 @@ spec = do
       forAll ((arbitrary `suchThat` isClosed) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isClosed)) $
         \ (a, b) -> adjoin2 [ a ] b `shouldBe` [ b, a ]
 
-    it "does not append elements onto complete lines" $
-      adjoin2 [ leftRow [ Break ] ] (leftRowText ",") `shouldBe`
-              [ leftRowText ",", leftRow [ Break ]  ]
-
     it "appends breaks onto incomplete lines" $
       adjoin2 [ leftRowText "a" ] (leftRow  [ Break ]) `shouldBe`
               [ leftRow [ Text "a", Break ] ]
