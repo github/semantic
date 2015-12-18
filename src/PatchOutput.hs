@@ -7,6 +7,7 @@ patch :: Diff a Info -> String -> String -> String
 patch diff sourceA sourceB = mconcat $ show <$> hunks diff sourceA sourceB
 
 data Hunk = Hunk Int Int [Line]
+  deriving Eq
 
 instance Show Hunk where
   show hunk = header hunk
