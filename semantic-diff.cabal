@@ -19,7 +19,6 @@ library
                      , Algorithm
                      , Interpreter
                      , OrderedMap
-                     , Parser
                      , Patch
                      , SES
                      , Categorizable
@@ -27,6 +26,8 @@ library
                      , Range
                      , Split
                      , Unified
+                     , Parser
+                     , TreeSitter
   build-depends:       base >= 4.8 && < 5
                      , blaze-html
                      , bytestring
@@ -36,6 +37,8 @@ library
                      , rainbow
                      , text >= 1.2.1.3
                      , text-show
+                     , blaze-html
+                     , tree-sitter-parsers
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable, OverloadedStrings
   ghc-options:        -Wall -fno-warn-name-shadowing
@@ -43,7 +46,7 @@ library
 executable semantic-diff-exe
   hs-source-dirs:      app
   main-is:             Main.hs
-  other-modules:       TreeSitter
+  other-modules:       Parsers
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , containers
@@ -53,16 +56,15 @@ executable semantic-diff-exe
                      , optparse-applicative
                      , filepath
                      , text >= 1.2.1.3
+                     , directory
                      , text-icu
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings
-  extra-libraries:     bridge
-  extra-lib-dirs:      .
 
 executable semantic-diff-profile
   hs-source-dirs:      app
   main-is:             Main.hs
-  other-modules:       TreeSitter
+  other-modules:       Parsers
   ghc-options:         -O2
                        -threaded
                        -fprof-auto
@@ -76,16 +78,14 @@ executable semantic-diff-profile
                      , filepath
                      , text >= 1.2.1.3
                      , text-icu
-  default-language:    Haskell2010
+                     , directory
   default-extensions:  OverloadedStrings
-  extra-libraries:     bridge
-  extra-lib-dirs:      .
+  default-language:    Haskell2010
 
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       OrderedMapSpec
   build-depends:       base
                      , containers
                      , free

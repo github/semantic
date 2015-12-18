@@ -5,19 +5,22 @@ import Range
 import Syntax
 import Term
 import Control.Comonad.Cofree
+import qualified OrderedMap as Map
 import qualified Data.Set as Set
 import qualified Data.Text as T
 
 type Parser = T.Text -> IO (Term T.Text Info)
 
-lineByLineParser :: Parser
-lineByLineParser input = return . root . Indexed $ case foldl annotateLeaves ([], 0) lines of
-  (leaves, _) -> leaves
-  where
-    lines :: [T.Text]
-    lines = T.lines input
-    root syntax = Info (Range 0 $ T.length input) Set.empty :< syntax
-    leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) Set.empty :< Leaf line
-    annotateLeaves (accum, charIndex) line =
-      (accum ++ [ leaf charIndex line ]
-      , charIndex + T.length line + 1)
+-- | Given a source string and a term’s annotation & production/child pairs, construct the term.
+type Constructor = String -> Info -> [(String, Term String Info)] -> Term String Info
+
+-- | Given two sets of production names, produce a Constructor.
+constructorForProductions :: Set.Set String -> Set.Set String -> Constructor
+constructorForProductions keyed fixed source info@(Info range categories) = (info :<) . construct
+  where construct [] = Leaf (substring range source)
+        construct children | not . Set.null $ Set.intersection fixed categories = Fixed $ fmap snd children
+        construct children | not . Set.null $ Set.intersection keyed categories = Keyed . Map.fromList $ assignKey <$> children
+        construct children = Indexed $ fmap snd children
+        assignKey ("pair", node@(_ :< Fixed (key : _))) = (getSubstring key, node)
+        assignKey (_, node) = (getSubstring node, node)
+        getSubstring (Info range _ :< _) = substring range source

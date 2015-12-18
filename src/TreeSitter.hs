@@ -1,13 +1,10 @@
 module TreeSitter where
 
 import Diff
-import Parser
 import Range
-import Syntax
+import Parser
 import Term
-import Control.Comonad.Cofree
-import qualified OrderedMap as Map
-import Data.Set
+import qualified Data.Set as Set
 import Foreign
 import Foreign.C
 import Foreign.C.Types
@@ -40,28 +37,34 @@ foreign import ccall "app/bridge.h ts_document_root_node_p" ts_document_root_nod
 foreign import ccall "app/bridge.h ts_node_p_name" ts_node_p_name :: Ptr TSNode -> Ptr TSDocument -> IO CString
 foreign import ccall "app/bridge.h ts_node_p_named_child_count" ts_node_p_named_child_count :: Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child :: Ptr TSNode -> CSize -> Ptr TSNode -> IO CSize
-foreign import ccall "app/bridge.h ts_node_p_pos_chars" ts_node_p_pos_chars :: Ptr TSNode -> IO CSize
-foreign import ccall "app/bridge.h ts_node_p_size_chars" ts_node_p_size_chars :: Ptr TSNode -> IO CSize
+foreign import ccall "app/bridge.h ts_node_p_start_char" ts_node_p_start_char :: Ptr TSNode -> CSize
+foreign import ccall "app/bridge.h ts_node_p_end_char" ts_node_p_end_char :: Ptr TSNode -> CSize
 
-keyedProductions :: Set T.Text
-keyedProductions = fromList [ "object" ]
+data Language = Language { getTsLanguage :: Ptr TSLanguage, getConstructor :: Constructor }
 
-fixedProductions :: Set T.Text
-fixedProductions = fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ]
+languageForType :: String -> Maybe Language
+languageForType mediaType = case mediaType of
+    ".h" -> c
+    ".c" -> c
+    ".js" -> Just . Language ts_language_javascript $ constructorForProductions
+      (Set.fromList [ "object" ])
+      (Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ])
+    _ -> Nothing
+  where c = Just . Language ts_language_c $ constructorForProductions mempty (Set.fromList [ "assignment_expression", "logical_expression", "pointer_expression", "field_expression", "relational_expression", "designator", "call_expression", "math_expression" ])
 
-parseTreeSitterFile :: Ptr TSLanguage -> Parser
-parseTreeSitterFile language contents = do
+parseTreeSitterFile :: Language -> Parser
+parseTreeSitterFile (Language language constructor) contents = do
   document <- ts_document_make
   ts_document_set_language document language
   withCString (T.unpack contents) (\source -> do
     ts_document_set_input_string document source
     ts_document_parse document
-    term <- documentToTerm document contents
+    term <- documentToTerm constructor document contents
     ts_document_free document
     return term)
 
-documentToTerm :: Ptr TSDocument -> Parser
-documentToTerm document contents = alloca $ \root -> do
+documentToTerm :: Constructor -> Ptr TSDocument -> Parser
+documentToTerm constructor document contents = alloca $ \root -> do
   ts_document_root_node_p document root
   snd <$> toTerm root where
     toTerm :: Ptr TSNode -> IO (T.Text, Term T.Text Info)
@@ -69,16 +72,7 @@ documentToTerm document contents = alloca $ \root -> do
       name <- ts_node_p_name node document
       name <- T.pack <$> peekCString name
       children <- withNamedChildren node toTerm
-      range <- range node
-      annotation <- return . Info range . singleton $ name
-      return (name, annotation :< case children of
-        [] -> Leaf $ substring range contents
-        _ | member name keyedProductions -> Keyed . Map.fromList $ assignKey <$> children
-        _ | member name fixedProductions -> Fixed $ fmap snd children
-        _ | otherwise -> Indexed $ fmap snd children)
-        where assignKey ("pair", node@(_ :< Fixed (key : _))) = (getSubstring key, node)
-              assignKey (_, node) = (getSubstring node, node)
-              getSubstring (Info range _ :< _) = substring range contents
+      return (name, constructor contents (Info (range node) $ Set.singleton name) children)
 
 withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO (T.Text, a)) -> IO [(T.Text, a)]
 withNamedChildren node transformNode = do
@@ -90,10 +84,5 @@ withNamedChildren node transformNode = do
         _ <- ts_node_p_named_child node n out
         transformNode out
 
-range :: Ptr TSNode -> IO Range
-range node = do
-  pos <- ts_node_p_pos_chars node
-  size <- ts_node_p_size_chars node
-  let start = fromIntegral pos
-      end = start + fromIntegral size
-  return Range { start = start, end = end }
+range :: Ptr TSNode -> Range
+range node = Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
