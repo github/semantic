@@ -3,7 +3,7 @@ module PatchOutput (patch) where
 import Diff
 
 patch :: Diff a Info -> String -> String -> String
-patch diff sourceA sourceB = mconcat $ hunks diff sourceA sourceB
+patch diff sourceA sourceB = mconcat $ show <$> hunks diff sourceA sourceB
 
 data Hunk = Hunk Int Int [Line]
 
