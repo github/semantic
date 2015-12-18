@@ -122,6 +122,9 @@ spec = do
     prop "is identity on top of no rows" $
       \ a -> adjoin2 [] a == [ a ]
 
+    prop "appends onto open lines" $
+      const True <$> ((arbitrary :: Gen Row) `suchThat` isOpen)
+
     it "appends elements onto incomplete lines" $
       adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe`
               [ rightRow [ Text "[", Text "a" ] ]
