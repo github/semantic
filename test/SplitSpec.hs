@@ -178,4 +178,5 @@ spec = do
       offsetAnnotated by1 by2 (Annotated (left, right) syntax) = Annotated (offsetInfo by1 left, offsetInfo by2 right) syntax
       span = Span (Just "category-leaf")
       isOpen (Row a b) = (maybe False (const True) $ openLine [ a ]) && (maybe False (const True) $ openLine [ b ])
-      isClosed (Row a b) = (maybe True (const False) $ openLine [ a ]) && (maybe True (const False) $ openLine [ b ])
+      isClosed (Row a@(Line _ _) b@(Line _ _)) = (maybe True (const False) $ openLine [ a ]) && (maybe True (const False) $ openLine [ b ])
+      isClosed (Row _ _) = False
