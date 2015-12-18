@@ -1,15 +1,17 @@
 module SplitSpec where
 
 import Test.Hspec
-import Split
-import qualified Data.Set as Set
-import Diff
-import Range
 import Test.Hspec.QuickCheck
 import Test.QuickCheck hiding (Fixed)
+import Data.Text.Arbitrary ()
+
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
+import qualified Data.Set as Set
+import Diff
 import Patch
+import Range
+import Split
 import Syntax
 
 instance Arbitrary Row where

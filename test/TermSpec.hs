@@ -3,16 +3,17 @@ module TermSpec where
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck hiding (Fixed)
+import Data.Text.Arbitrary ()
 
 import Categorizable
-import qualified OrderedMap as Map
-import qualified Data.List as List
-import qualified Data.Set as Set
-import Interpreter
-import Diff
 import Control.Comonad.Cofree
 import Control.Monad
 import GHC.Generics
+import qualified Data.List as List
+import qualified Data.Set as Set
+import qualified OrderedMap as Map
+import Diff
+import Interpreter
 import Syntax
 import Term
 
