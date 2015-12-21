@@ -152,7 +152,7 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
 termToLines :: Term a Info -> String -> ([Line HTML], Range)
 termToLines (Info range categories :< syntax) source = (rows syntax, range)
   where
-    rows (Leaf _) = reverse $ foldl (adjoinLinesBy openElement) [] $ Line True . (:[]) <$> elements
+    rows (Leaf _) = reverse . foldl (adjoinLinesBy openElement) [] $ Line True . (:[]) <$> elements
     rows (Indexed i) = rewrapLineContentsIn (Ul $ classify categories) <$> childLines i
     rows (Fixed f) = rewrapLineContentsIn (Ul $ classify categories) <$> childLines f
     rows (Keyed k) = rewrapLineContentsIn (Dl $ classify categories) <$> childLines k
@@ -165,8 +165,7 @@ termToLines (Info range categories :< syntax) source = (rows syntax, range)
     sumLines (lines, previous) child = (allLines, end childRange)
       where
         separatorLines = contextLines (Range previous $ start childRange) source
-        unadjoinedLines = lines ++ separatorLines ++ childLines
-        allLines = reverse $ foldl (adjoinLinesBy openElement) [] unadjoinedLines
+        allLines = reverse . foldl (adjoinLinesBy openElement) [] $ lines ++ separatorLines ++ childLines
         (childLines, childRange) = termToLines child source
     elements = elementAndBreak (Span $ classify categories) =<< actualLines (substring range source)
 
