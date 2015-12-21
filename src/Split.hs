@@ -139,12 +139,12 @@ diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLin
   where
     (afterLines, range) = termToLines term after
     rowWithInsertedLine (Line _ elements) = Row EmptyLine $ Line True [ Div (Just "insert") elements ]
-    rowWithInsertedLine EmptyLine = mempty
+    rowWithInsertedLine line = Row line line
 diffToRows (Pure (Delete term)) (_, previousIndex) before _ = (rowWithDeletedLine <$> lines, (range, Range previousIndex previousIndex))
   where
     (lines, range) = termToLines term before
     rowWithDeletedLine (Line _ elements) = Row (Line True [ Div (Just "delete") elements ]) EmptyLine
-    rowWithDeletedLine EmptyLine = mempty
+    rowWithDeletedLine line = Row line line
 diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, rightRange))
   where
     replacedRows = zipWithMaybe rowFromMaybeRows (replace <$> leftElements) (replace <$> rightElements)
