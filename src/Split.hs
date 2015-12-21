@@ -248,9 +248,6 @@ adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ unRight <$> ro
 
 adjoinRowsBy _ rows row = row : rows
 
-rightLines :: [Row a] -> [Line a]
-rightLines rows = unRight <$> rows
-
 openElement :: HTML -> Maybe HTML
 openElement Break = Nothing
 openElement (Ul _ elements) = openElement =<< maybeLast elements
