@@ -112,11 +112,11 @@ instance ToMarkup a => ToMarkup (Line a) where
   toMarkup (Line changed html) = codeTd changed . Just . mconcat $ toMarkup <$> html
 
 data Line a =
-  Line Bool [HTML]
+  Line Bool [a]
   | EmptyLine
   deriving Eq
 
-unLine :: Line a -> [HTML]
+unLine :: Line a -> [a]
 unLine EmptyLine = []
 unLine (Line _ elements) = elements
 
