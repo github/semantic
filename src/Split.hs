@@ -5,7 +5,6 @@ import Diff
 import Patch
 import Term
 import Syntax
-
 import Control.Comonad.Cofree
 import Range
 import Control.Monad.Free
