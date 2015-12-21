@@ -34,6 +34,9 @@ rangesAndWordsFrom startIndex string = maybe [] id $ takeAndContinue <$> (word <
     -- | > A member of one of the following Unicode general category _Letter_, _Mark_, _Number_, _Connector_Punctuation_
     isWord c = Char.isLetter c || Char.isNumber c || Char.isMark c || Char.generalCategory c == Char.ConnectorPunctuation
 
+maybeLastIndex :: Range -> Maybe Int
+maybeLastIndex (Range start end) | start == end = Nothing
+maybeLastIndex (Range _ end) = Just $ end - 1
 
 instance Ord Range where
   a <= b = start a <= start b
