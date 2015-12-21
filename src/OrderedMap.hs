@@ -13,6 +13,8 @@ module OrderedMap (
   , difference
   ) where
 
+import qualified Data.Maybe as Maybe
+
 data OrderedMap key value = OrderedMap { toList :: [(key, value)] }
   deriving (Show, Eq, Functor, Foldable, Traversable)
 
@@ -29,9 +31,7 @@ keys (OrderedMap pairs) = fst <$> pairs
 infixl 9 !
 
 (!) :: Eq key => OrderedMap key value -> key -> value
-map ! key = case OrderedMap.lookup key map of
-  Just value -> value
-  Nothing -> error "no value found for key"
+map ! key = Maybe.fromMaybe (error "no value found for key") $ OrderedMap.lookup key map
 
 lookup :: Eq key => key -> OrderedMap key value -> Maybe value
 lookup key = Prelude.lookup key . toList
