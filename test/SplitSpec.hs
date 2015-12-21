@@ -142,16 +142,16 @@ spec = do
         Line True [ span "*/" ]
       ], Range 0 5)
 
-  describe "openLine" $ do
+  describe "openLineBy" $ do
     it "should produce the earliest non-empty line in a list, if open" $
-      openLine [
+      openLineBy openElement [
         Line True [ Div (Just "delete") [ span "*/" ] ],
         Line True [ Div (Just "delete") [ span " * Debugging", Break ] ],
         Line True [ Div (Just "delete") [ span "/*", Break ] ]
       ] `shouldBe` (Just $ Line True [ Div (Just "delete") [ span "*/" ] ])
 
     it "should return Nothing if the earliest non-empty line is closed" $
-      openLine [
+      openLineBy openElement [
         Line True [ Div (Just "delete") [ span " * Debugging", Break ] ]
       ] `shouldBe` Nothing
 
@@ -167,6 +167,6 @@ spec = do
       offsetInfo by (Info (Range start end) categories) = Info (Range (start + by) (end + by)) categories
       offsetAnnotated by1 by2 (Annotated (left, right) syntax) = Annotated (offsetInfo by1 left, offsetInfo by2 right) syntax
       span = Span (Just "category-leaf")
-      isOpen (Row a b) = (maybe False (const True) $ openLine [ a ]) && (maybe False (const True) $ openLine [ b ])
-      isClosed (Row a@(Line _ _) b@(Line _ _)) = (maybe True (const False) $ openLine [ a ]) && (maybe True (const False) $ openLine [ b ])
+      isOpen (Row a b) = (maybe False (const True) $ openLineBy openElement [ a ]) && (maybe False (const True) $ openLineBy openElement [ b ])
+      isClosed (Row a@(Line _ _) b@(Line _ _)) = (maybe True (const False) $ openLineBy openElement [ a ]) && (maybe True (const False) $ openLineBy openElement [ b ])
       isClosed (Row _ _) = False
