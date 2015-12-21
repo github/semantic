@@ -14,7 +14,6 @@ import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
 import qualified OrderedMap as Map
-import Data.Maybe
 import Data.Monoid
 import qualified Data.Set as Set
 import Data.List (intercalate)
@@ -225,8 +224,8 @@ textElements range source = elementAndBreak Text =<< actualLines s
 rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row HTML
 rowFromMaybeRows a b = Row (maybe EmptyLine (Line False . (:[])) a) (maybe EmptyLine (Line False . (:[])) b)
 
-maybeLast :: [a] -> Maybe a
-maybeLast list = listToMaybe $ reverse list
+maybeLast :: Foldable f => f a -> Maybe a
+maybeLast = foldl (flip $ const . Just) Nothing
 
 adjoin2By :: (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
 adjoin2By _ [] row = [row]
