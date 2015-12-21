@@ -160,7 +160,7 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
 termToLines :: Term a Info -> String -> ([Line HTML], Range)
 termToLines (Info range categories :< syntax) source = (rows syntax, range)
   where
-    rows (Leaf _) = reverse $ foldl (adjoin2LinesBy openElement) [] $ Line True . (:[]) <$> elements
+    rows (Leaf _) = reverse $ foldl (adjoinLinesBy openElement) [] $ Line True . (:[]) <$> elements
     rows (Indexed i) = rewrapLineContentsIn (Ul $ classify categories) <$> childLines i
     rows (Fixed f) = rewrapLineContentsIn (Ul $ classify categories) <$> childLines f
     rows (Keyed k) = rewrapLineContentsIn (Dl $ classify categories) <$> childLines k
@@ -169,12 +169,12 @@ termToLines (Info range categories :< syntax) source = (rows syntax, range)
     rewrapLineContentsIn _ EmptyLine = EmptyLine
     contextLines r s = Line True . (:[]) <$> textElements r s
     childLines i = let (lines, previous) = foldl sumLines ([], start range) i in
-      reverse . foldl (adjoin2LinesBy openElement) [] $ lines ++ contextLines (Range previous (end range)) source
+      reverse . foldl (adjoinLinesBy openElement) [] $ lines ++ contextLines (Range previous (end range)) source
     sumLines (lines, previous) child = (allLines, end childRange)
       where
         separatorLines = contextLines (Range previous $ start childRange) source
         unadjoinedLines = lines ++ separatorLines ++ childLines
-        allLines = reverse $ foldl (adjoin2LinesBy openElement) [] unadjoinedLines
+        allLines = reverse $ foldl (adjoinLinesBy openElement) [] unadjoinedLines
         (childLines, childRange) = termToLines child source
     elements = elementAndBreak (Span $ classify categories) =<< actualLines (substring range source)
 
@@ -231,14 +231,14 @@ adjoin2By :: (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
 adjoin2By _ [] row = [row]
 
 adjoin2By f rows (Row left' right') | Just _ <- openLineBy f $ leftLines rows, Just _ <- openLineBy f $ rightLines rows = zipWith Row lefts rights
-  where lefts = adjoin2LinesBy f (leftLines rows) left'
-        rights = adjoin2LinesBy f (rightLines rows) right'
+  where lefts = adjoinLinesBy f (leftLines rows) left'
+        rights = adjoinLinesBy f (rightLines rows) right'
 
 adjoin2By f rows (Row left' right') | Just _ <- openLineBy f $ leftLines rows = case right' of
   EmptyLine -> rest
   _ -> Row EmptyLine right' : rest
   where rest = zipWith Row lefts rights
-        lefts = adjoin2LinesBy f (leftLines rows) left'
+        lefts = adjoinLinesBy f (leftLines rows) left'
         rights = rightLines rows
 
 adjoin2By f rows (Row left' right') | Just _ <- openLineBy f $ rightLines rows = case left' of
@@ -246,7 +246,7 @@ adjoin2By f rows (Row left' right') | Just _ <- openLineBy f $ rightLines rows =
   _ -> Row left' EmptyLine : rest
   where rest = zipWith Row lefts rights
         lefts = leftLines rows
-        rights = adjoin2LinesBy f (rightLines rows) right'
+        rights = adjoinLinesBy f (rightLines rows) right'
 
 adjoin2By _ rows row = row : rows
 
@@ -277,11 +277,11 @@ openLineBy _ [] = Nothing
 openLineBy f (EmptyLine : rest) = openLineBy f rest
 openLineBy f (line : _) = const line <$> (f =<< maybeLast (unLine line))
 
-adjoin2LinesBy :: (a -> Maybe a) -> [Line a] -> Line a -> [Line a]
-adjoin2LinesBy _ [] line = [line]
-adjoin2LinesBy f (EmptyLine : xs) line | Just _ <- openLineBy f xs = EmptyLine : adjoin2LinesBy f xs line
-adjoin2LinesBy f (prev:rest) line | Just _ <- openLineBy f [ prev ] = (prev <> line) : rest
-adjoin2LinesBy _ lines line = line : lines
+adjoinLinesBy :: (a -> Maybe a) -> [Line a] -> Line a -> [Line a]
+adjoinLinesBy _ [] line = [line]
+adjoinLinesBy f (EmptyLine : xs) line | Just _ <- openLineBy f xs = EmptyLine : adjoinLinesBy f xs line
+adjoinLinesBy f (prev:rest) line | Just _ <- openLineBy f [ prev ] = (prev <> line) : rest
+adjoinLinesBy _ lines line = line : lines
 
 zipWithMaybe :: (Maybe a -> Maybe b -> c) -> [a] -> [b] -> [c]
 zipWithMaybe f la lb = take len $ zipWith f la' lb'
