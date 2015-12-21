@@ -154,6 +154,8 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
   Leaf a -> adjoin $ Line True . (:[]) . (:< Leaf a) . (`Info` categories) <$> actualLineRanges range source
   where adjoin = reverse . foldl (adjoinLinesBy $ openTerm source) []
         contextLines constructor range source = Line True . (:[]) . (:< constructor []) . (`Info` categories) <$> actualLineRanges range source
+        childLines constructor (lines, previous) child = let (childLines, childRange) = splitTermByLines child source in
+          (adjoin $ lines ++ contextLines constructor (Range previous $ start childRange) source ++ childLines, end childRange)
 
 -- | Takes a term and a `source` and returns a list of lines and their range within `source`.
 termToLines :: Term a Info -> String -> ([Line HTML], Range)
