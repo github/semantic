@@ -198,6 +198,8 @@ annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories
     sources = (before, after)
     childRows = appendRemainder . foldl sumRows ([], starts ranges)
     appendRemainder (rows, previousIndices) = reverse . foldl (adjoin2By openElement) [] $ rows ++ contextRows (ends ranges) previousIndices sources
+    starts (left, right) = (start left, start right)
+    ends (left, right) = (end left, end right)
     sumRows (rows, previousIndices) child = (allRows, ends childRanges)
       where
         separatorRows = contextRows (starts childRanges) previousIndices sources
@@ -219,12 +221,6 @@ elementAndBreak constructor x = [ constructor x ]
 textElements :: Range -> String -> [HTML]
 textElements range source = elementAndBreak Text =<< actualLines s
   where s = substring range source
-
-starts :: (Range , Range) -> (Int, Int)
-starts (left, right) = (start left, start right)
-
-ends :: (Range, Range) -> (Int, Int)
-ends (left, right) = (end left, end right)
 
 rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row HTML
 rowFromMaybeRows a b = Row (maybe EmptyLine (Line False . (:[])) a) (maybe EmptyLine (Line False . (:[])) b)
