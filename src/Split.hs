@@ -221,7 +221,7 @@ textElements :: Range -> String -> [HTML]
 textElements range source = elementAndBreak Text =<< actualLines s
   where s = substring range source
 
-rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row HTML
+rowFromMaybeRows :: Maybe a -> Maybe a -> Row a
 rowFromMaybeRows a b = Row (maybe EmptyLine (Line False . (:[])) a) (maybe EmptyLine (Line False . (:[])) b)
 
 maybeLast :: Foldable f => f a -> Maybe a
