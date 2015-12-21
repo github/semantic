@@ -248,9 +248,6 @@ adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ unRight <$> ro
 
 adjoinRowsBy _ rows row = row : rows
 
-leftLines :: [Row a] -> [Line a]
-leftLines rows = unLeft <$> rows
-
 rightLines :: [Row a] -> [Line a]
 rightLines rows = unRight <$> rows
 
