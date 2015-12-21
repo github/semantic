@@ -282,6 +282,11 @@ openLine [] = Nothing
 openLine (EmptyLine : rest) = openLine rest
 openLine (line : _) = const line <$> (openElement =<< (maybeLast $ unLine line))
 
+openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
+openLineBy _ [] = Nothing
+openLineBy f (EmptyLine : rest) = openLineBy f rest
+openLineBy f (line : _) = const line <$> (f =<< (maybeLast $ unLine line))
+
 adjoin2Lines :: [Line a] -> Line a -> [Line a]
 adjoin2Lines [] line = [line]
 adjoin2Lines (EmptyLine : xs) line | Just _ <- openLine xs = EmptyLine : adjoin2Lines xs line
