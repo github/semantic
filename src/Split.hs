@@ -72,7 +72,7 @@ split diff before after = return . renderHtml
 
     columnWidth = max (20 + digits maxNumber * 8) 40
 
-    numberRows :: [(Int, Line HTML, Int, Line HTML)] -> Row HTML -> [(Int, Line HTML, Int, Line HTML)]
+    numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
     numberRows [] (Row EmptyLine EmptyLine) = []
     numberRows [] (Row left@(Line _ _) EmptyLine) = [(1, left, 0, EmptyLine)]
     numberRows [] (Row EmptyLine right@(Line _ _)) = [(0, EmptyLine, 1, right)]
