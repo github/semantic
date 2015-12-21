@@ -16,6 +16,10 @@ module OrderedMap (
 data OrderedMap key value = OrderedMap { toList :: [(key, value)] }
   deriving (Show, Eq, Functor, Foldable, Traversable)
 
+instance Eq key => Monoid (OrderedMap key value) where
+  mempty = fromList []
+  mappend = union
+
 fromList :: [(key, value)] -> OrderedMap key value
 fromList list = OrderedMap list
 
