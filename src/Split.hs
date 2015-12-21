@@ -152,6 +152,8 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
 splitTermByLines :: Term a Info -> String -> ([Line (Term a Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
   Leaf a -> adjoin $ Line True . (:[]) . (:< Leaf a) . (`Info` categories) <$> actualLineRanges range source
+  Indexed children -> let (lines, previous) = foldl (childLines Indexed) ([], start range) children in
+    adjoin $ lines ++ contextLines Indexed (Range previous $ end range) source
   where adjoin = reverse . foldl (adjoinLinesBy $ openTerm source) []
         contextLines constructor range source = Line True . (:[]) . (:< constructor []) . (`Info` categories) <$> actualLineRanges range source
         childLines constructor (lines, previous) child = let (childLines, childRange) = splitTermByLines child source in
