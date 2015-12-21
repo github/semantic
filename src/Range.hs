@@ -3,6 +3,7 @@ module Range where
 import Control.Applicative ((<|>))
 import qualified Data.Char as Char
 
+-- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: Int, end :: Int }
   deriving (Eq, Show)
 
