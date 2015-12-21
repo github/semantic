@@ -236,9 +236,6 @@ rowFromMaybeRows a b = Row (maybe EmptyLine (Line False . (:[])) a) (maybe Empty
 maybeLast :: [a] -> Maybe a
 maybeLast list = listToMaybe $ reverse list
 
-adjoin2 :: [Row HTML] -> Row HTML -> [Row HTML]
-adjoin2 = adjoin2By openElement
-
 adjoin2By :: (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
 adjoin2By _ [] row = [row]
 
