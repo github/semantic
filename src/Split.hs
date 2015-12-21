@@ -277,7 +277,7 @@ openElement (Div _ elements) = openElement =<< maybeLast elements
 openElement h = Just h
 
 openLine :: [Line HTML] -> Maybe (Line HTML)
-openLine lines = openLineBy openElement lines
+openLine = openLineBy openElement
 
 openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
 openLineBy _ [] = Nothing
