@@ -153,8 +153,7 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
     (leftElements, leftRange) = termToLines a before
     (rightElements, rightRange) = termToLines b after
 
--- | Takes a term and a `source` and returns a list of HTML lines
--- | and their range within `source`.
+-- | Takes a term and a `source` and returns a list of lines and their range within `source`.
 termToLines :: Term a Info -> String -> ([Line HTML], Range)
 termToLines (Info range categories :< syntax) source = (rows syntax, range)
   where
