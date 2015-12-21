@@ -120,10 +120,6 @@ unLine :: Line a -> [a]
 unLine EmptyLine = []
 unLine (Line _ elements) = elements
 
-isChanged :: Line a -> Bool
-isChanged EmptyLine = False
-isChanged (Line isChanged _) = isChanged
-
 instance Show a => Show (Line a) where
   show (Line change elements) = show change ++ " [" ++ (concat . intersperse ", " $ show <$> elements) ++ "]"
   show EmptyLine = "EmptyLine"
