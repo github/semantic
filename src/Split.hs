@@ -171,8 +171,7 @@ termToLines (Info range categories :< syntax) source = (rows syntax, range)
       adjoin $ lines ++ contextLines (Range previous (end range)) source
     sumLines (lines, previous) child = (allLines, end childRange)
       where
-        separatorLines = contextLines (Range previous $ start childRange) source
-        allLines = adjoin $ lines ++ separatorLines ++ childLines
+        allLines = adjoin $ lines ++ contextLines (Range previous $ start childRange) source ++ childLines
         (childLines, childRange) = termToLines child source
     elements = elementAndBreak (Span $ classify categories) =<< actualLines (substring range source)
 
