@@ -168,8 +168,8 @@ termToLines (Info range categories :< syntax) source = (rows syntax, range)
     rewrapLineContentsIn f (Line _ elements) = Line True [ f elements ]
     rewrapLineContentsIn _ EmptyLine = EmptyLine
     contextLines r s = Line True . (:[]) <$> textElements r s
-    childLines i = appendRemainder $ foldl sumLines ([], start range) i
-    appendRemainder (lines, previous) = reverse . foldl (adjoin2LinesBy openElement) [] $ lines ++ contextLines (Range previous (end range)) source
+    childLines i = let (lines, previous) = foldl sumLines ([], start range) i in
+      reverse . foldl (adjoin2LinesBy openElement) [] $ lines ++ contextLines (Range previous (end range)) source
     sumLines (lines, previous) child = (allLines, end childRange)
       where
         separatorLines = contextLines (Range previous $ start childRange) source
