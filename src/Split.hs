@@ -228,22 +228,22 @@ maybeLast = foldl (flip $ const . Just) Nothing
 adjoinRowsBy :: (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
 adjoinRowsBy _ [] row = [row]
 
-adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ leftLines rows, Just _ <- openLineBy f $ rightLines rows = zipWith Row lefts rights
-  where lefts = adjoinLinesBy f (leftLines rows) left'
+adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ unLeft <$> rows, Just _ <- openLineBy f $ rightLines rows = zipWith Row lefts rights
+  where lefts = adjoinLinesBy f (unLeft <$> rows) left'
         rights = adjoinLinesBy f (rightLines rows) right'
 
-adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ leftLines rows = case right' of
+adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ unLeft <$> rows = case right' of
   EmptyLine -> rest
   _ -> Row EmptyLine right' : rest
   where rest = zipWith Row lefts rights
-        lefts = adjoinLinesBy f (leftLines rows) left'
+        lefts = adjoinLinesBy f (unLeft <$> rows) left'
         rights = rightLines rows
 
 adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ rightLines rows = case left' of
   EmptyLine -> rest
   _ -> Row left' EmptyLine : rest
   where rest = zipWith Row lefts rights
-        lefts = leftLines rows
+        lefts = unLeft <$> rows
         rights = adjoinLinesBy f (rightLines rows) right'
 
 adjoinRowsBy _ rows row = row : rows
