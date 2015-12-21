@@ -23,7 +23,7 @@ instance Eq key => Monoid (OrderedMap key value) where
   mappend = union
 
 fromList :: [(key, value)] -> OrderedMap key value
-fromList list = OrderedMap list
+fromList = OrderedMap
 
 keys :: OrderedMap key value -> [key]
 keys (OrderedMap pairs) = fst <$> pairs
