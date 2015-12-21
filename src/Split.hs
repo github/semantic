@@ -289,7 +289,7 @@ zipWithMaybe f la lb = take len $ zipWith f la' lb'
     lb' = (Just <$> lb) ++ repeat Nothing
 
 classify :: Set.Set Category -> Maybe ClassName
-classify = foldr (const . Just . ("category-" ++)) Nothing
+classify categories = ("category-" ++) <$> maybeLast categories
 
 actualLines :: String -> [String]
 actualLines "" = [""]
