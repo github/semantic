@@ -252,9 +252,7 @@ leftLines :: [Row a] -> [Line a]
 leftLines rows = unLeft <$> rows
 
 rightLines :: [Row a] -> [Line a]
-rightLines rows = right <$> rows
-  where
-    right (Row _ right) = right
+rightLines rows = unRight <$> rows
 
 openElement :: HTML -> Maybe HTML
 openElement Break = Nothing
