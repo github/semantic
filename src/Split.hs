@@ -291,6 +291,12 @@ adjoin2Lines (EmptyLine : xs) line | Just _ <- openLine xs = EmptyLine : adjoin2
 adjoin2Lines (prev:rest) line | Just _ <- openLine [ prev ] = (prev <> line) : rest
 adjoin2Lines lines line = line : lines
 
+adjoin2LinesBy :: (a -> Maybe a) -> [Line a] -> Line a -> [Line a]
+adjoin2LinesBy _ [] line = [line]
+adjoin2LinesBy f (EmptyLine : xs) line | Just _ <- openLineBy f xs = EmptyLine : adjoin2LinesBy f xs line
+adjoin2LinesBy f (prev:rest) line | Just _ <- openLineBy f [ prev ] = (prev <> line) : rest
+adjoin2LinesBy _ lines line = line : lines
+
 zipWithMaybe :: (Maybe a -> Maybe b -> c) -> [a] -> [b] -> [c]
 zipWithMaybe f la lb = take len $ zipWith f la' lb'
   where
