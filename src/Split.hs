@@ -267,6 +267,11 @@ openElement (Dl _ elements) = openElement =<< maybeLast elements
 openElement (Div _ elements) = openElement =<< maybeLast elements
 openElement h = Just h
 
+openTerm :: String -> Term a Info -> Maybe (Term a Info)
+openTerm source term@(Info range _ :< _) = case (source !!) <$> maybeLastIndex range of
+  Just '\n' -> Just term
+  _ -> Nothing
+
 openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
 openLineBy _ [] = Nothing
 openLineBy f (EmptyLine : rest) = openLineBy f rest
