@@ -249,9 +249,7 @@ adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ rightLines row
 adjoinRowsBy _ rows row = row : rows
 
 leftLines :: [Row a] -> [Line a]
-leftLines rows = left <$> rows
-  where
-    left (Row left _) = left
+leftLines rows = unLeft <$> rows
 
 rightLines :: [Row a] -> [Line a]
 rightLines rows = right <$> rows
