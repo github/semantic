@@ -125,7 +125,6 @@ instance Show a => Show (Line a) where
 
 instance Monoid (Line a) where
  mempty = EmptyLine
- mappend EmptyLine EmptyLine = EmptyLine
  mappend EmptyLine line = line
  mappend line EmptyLine = line
  mappend (Line c1 xs) (Line c2 ys) = Line (c1 || c2) (xs <> ys)
