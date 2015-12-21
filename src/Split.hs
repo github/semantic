@@ -121,7 +121,7 @@ unLine EmptyLine = []
 unLine (Line _ elements) = elements
 
 instance Show a => Show (Line a) where
-  show (Line change elements) = show change ++ " [" ++ (intercalate ", " $ show <$> elements) ++ "]"
+  show (Line change elements) = show change ++ " [" ++ intercalate ", " (show <$> elements) ++ "]"
   show EmptyLine = "EmptyLine"
 
 instance Monoid (Line a) where
@@ -177,7 +177,7 @@ termToLines (Info range categories :< syntax) source = (rows syntax, range)
         unadjoinedLines = lines ++ separatorLines ++ childLines
         allLines = reverse $ foldl (adjoin2LinesBy openElement) [] unadjoinedLines
         (childLines, childRange) = termToLines child source
-    elements = (elementAndBreak $ Span (classify categories)) =<< actualLines (substring range source)
+    elements = elementAndBreak (Span $ classify categories) =<< actualLines (substring range source)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row HTML], (Range, Range))
@@ -188,8 +188,8 @@ annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories
     rows (Fixed f) = rewrapRowContentsIn Ul <$> childRows f
     rows (Keyed k) = rewrapRowContentsIn Dl <$> childRows (snd <$> Map.toList k)
 
-    leftElements = (elementAndBreak $ Span (classify leftCategories)) =<< actualLines (substring left before)
-    rightElements = (elementAndBreak $ Span (classify rightCategories)) =<< actualLines (substring right after)
+    leftElements = elementAndBreak (Span $ classify leftCategories) =<< actualLines (substring left before)
+    rightElements = elementAndBreak (Span $ classify rightCategories) =<< actualLines (substring right after)
 
     wrap _ EmptyLine = EmptyLine
     wrap f (Line c elements) = Line c [ f elements ]
@@ -197,7 +197,7 @@ annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories
     ranges = (left, right)
     sources = (before, after)
     childRows = appendRemainder . foldl sumRows ([], starts ranges)
-    appendRemainder (rows, previousIndices) = reverse . foldl (adjoin2By openElement) [] $ rows ++ (contextRows (ends ranges) previousIndices sources)
+    appendRemainder (rows, previousIndices) = reverse . foldl (adjoin2By openElement) [] $ rows ++ contextRows (ends ranges) previousIndices sources
     sumRows (rows, previousIndices) child = (allRows, ends childRanges)
       where
         separatorRows = contextRows (starts childRanges) previousIndices sources
@@ -217,7 +217,7 @@ elementAndBreak constructor x | '\n' <- last x = [ constructor $ init x, Break ]
 elementAndBreak constructor x = [ constructor x ]
 
 textElements :: Range -> String -> [HTML]
-textElements range source = (elementAndBreak Text) =<< actualLines s
+textElements range source = elementAndBreak Text =<< actualLines s
   where s = substring range source
 
 starts :: (Range , Range) -> (Int, Int)
@@ -226,7 +226,7 @@ starts (left, right) = (start left, start right)
 ends :: (Range, Range) -> (Int, Int)
 ends (left, right) = (end left, end right)
 
-rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> (Row HTML)
+rowFromMaybeRows :: Maybe HTML -> Maybe HTML -> Row HTML
 rowFromMaybeRows a b = Row (maybe EmptyLine (Line False . (:[])) a) (maybe EmptyLine (Line False . (:[])) b)
 
 maybeLast :: [a] -> Maybe a
@@ -275,7 +275,7 @@ openElement h = Just h
 openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
 openLineBy _ [] = Nothing
 openLineBy f (EmptyLine : rest) = openLineBy f rest
-openLineBy f (line : _) = const line <$> (f =<< (maybeLast $ unLine line))
+openLineBy f (line : _) = const line <$> (f =<< maybeLast (unLine line))
 
 adjoin2LinesBy :: (a -> Maybe a) -> [Line a] -> Line a -> [Line a]
 adjoin2LinesBy _ [] line = [line]
@@ -287,8 +287,8 @@ zipWithMaybe :: (Maybe a -> Maybe b -> c) -> [a] -> [b] -> [c]
 zipWithMaybe f la lb = take len $ zipWith f la' lb'
   where
     len = max (length la) (length lb)
-    la' = (Just <$> la) ++ (repeat Nothing)
-    lb' = (Just <$> lb) ++ (repeat Nothing)
+    la' = (Just <$> la) ++ repeat Nothing
+    lb' = (Just <$> lb) ++ repeat Nothing
 
 classify :: Set.Set Category -> Maybe ClassName
 classify = foldr (const . Just . ("category-" ++)) Nothing
@@ -296,6 +296,6 @@ classify = foldr (const . Just . ("category-" ++)) Nothing
 actualLines :: String -> [String]
 actualLines "" = [""]
 actualLines lines = case break (== '\n') lines of
-  (l, lines') -> (case lines' of
-                       [] -> [ l ]
-                       _:lines' -> (l ++ "\n") : actualLines lines')
+  (l, lines') -> case lines' of
+                      [] -> [ l ]
+                      _:lines' -> (l ++ "\n") : actualLines lines'
