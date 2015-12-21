@@ -149,6 +149,13 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
     (rightElements, rightRange) = termToLines b after
 
 -- | Takes a term and a `source` and returns a list of lines and their range within `source`.
+splitTermByLines :: Term a Info -> String -> ([Line (Term a Info)], Range)
+splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
+  Leaf a -> reverse . foldl (adjoinLinesBy $ openTerm source) [] $
+    Line True . (:[]) . (:< Leaf a) . (`Info` categories) <$> scanl toRange (Range (start range) (start range)) (actualLines $ substring range source)
+  where toRange previous string = Range (end previous) $ end previous + length string
+
+-- | Takes a term and a `source` and returns a list of lines and their range within `source`.
 termToLines :: Term a Info -> String -> ([Line HTML], Range)
 termToLines (Info range categories :< syntax) source = (rows syntax, range)
   where
