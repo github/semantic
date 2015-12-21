@@ -9,6 +9,7 @@ import Test.Hspec.QuickCheck
 import Test.QuickCheck hiding (Fixed)
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
+import qualified Data.Maybe as Maybe
 import Patch
 import Syntax
 
@@ -167,6 +168,6 @@ spec = do
       offsetInfo by (Info (Range start end) categories) = Info (Range (start + by) (end + by)) categories
       offsetAnnotated by1 by2 (Annotated (left, right) syntax) = Annotated (offsetInfo by1 left, offsetInfo by2 right) syntax
       span = Span (Just "category-leaf")
-      isOpen (Row a b) = (maybe False (const True) $ openLineBy openElement [ a ]) && (maybe False (const True) $ openLineBy openElement [ b ])
-      isClosed (Row a@(Line _ _) b@(Line _ _)) = (maybe True (const False) $ openLineBy openElement [ a ]) && (maybe True (const False) $ openLineBy openElement [ b ])
+      isOpen (Row a b) = (Maybe.isJust $ openLineBy openElement [ a ]) && (Maybe.isJust $ openLineBy openElement [ b ])
+      isClosed (Row a@(Line _ _) b@(Line _ _)) = (Maybe.isNothing $ openLineBy openElement [ a ]) && (Maybe.isNothing $ openLineBy openElement [ b ])
       isClosed (Row _ _) = False
