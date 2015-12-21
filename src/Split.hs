@@ -83,7 +83,7 @@ split diff before after = return . renderHtml
     numberRows rows@((leftCount, _, rightCount, _):_) (Row left right) = (leftCount + 1, left, rightCount + 1, right):rows
 
 
-data Row a = Row (Line a) (Line a)
+data Row a = Row { unLeft :: Line a, unRight :: Line a }
   deriving Eq
 
 instance Show a => Show (Row a) where
