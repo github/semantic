@@ -158,20 +158,21 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
 termToLines :: Term a Info -> String -> ([Line HTML], Range)
 termToLines (Info range categories :< syntax) source = (rows syntax, range)
   where
-    rows (Leaf _) = reverse . foldl (adjoinLinesBy openElement) [] $ Line True . (:[]) <$> elements
+    rows (Leaf _) = adjoin $ Line True . (:[]) <$> elements
     rows (Indexed i) = rewrapLineContentsIn (Ul $ classify categories) <$> childLines i
     rows (Fixed f) = rewrapLineContentsIn (Ul $ classify categories) <$> childLines f
     rows (Keyed k) = rewrapLineContentsIn (Dl $ classify categories) <$> childLines k
 
+    adjoin = reverse . foldl (adjoinLinesBy openElement) []
     rewrapLineContentsIn f (Line _ elements) = Line True [ f elements ]
     rewrapLineContentsIn _ EmptyLine = EmptyLine
     contextLines r s = Line True . (:[]) <$> textElements r s
     childLines i = let (lines, previous) = foldl sumLines ([], start range) i in
-      reverse . foldl (adjoinLinesBy openElement) [] $ lines ++ contextLines (Range previous (end range)) source
+      adjoin $ lines ++ contextLines (Range previous (end range)) source
     sumLines (lines, previous) child = (allLines, end childRange)
       where
         separatorLines = contextLines (Range previous $ start childRange) source
-        allLines = reverse . foldl (adjoinLinesBy openElement) [] $ lines ++ separatorLines ++ childLines
+        allLines = adjoin $ lines ++ separatorLines ++ childLines
         (childLines, childRange) = termToLines child source
     elements = elementAndBreak (Span $ classify categories) =<< actualLines (substring range source)
 
