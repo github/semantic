@@ -50,7 +50,7 @@ unions :: Eq key => [OrderedMap key value] -> OrderedMap key value
 unions = foldl union empty
 
 intersectionWith :: Eq key => (a -> b -> c) -> OrderedMap key a -> OrderedMap key b -> OrderedMap key c
-intersectionWith combine (OrderedMap a) (OrderedMap b) = OrderedMap $ a >>= (\ (key, value) -> maybe [] (pure . ((,) key) . combine value) $ Prelude.lookup key b)
+intersectionWith combine (OrderedMap a) (OrderedMap b) = OrderedMap $ a >>= (\ (key, value) -> maybe [] (pure . (,) key . combine value) $ Prelude.lookup key b)
 
 difference :: Eq key => OrderedMap key a -> OrderedMap key b -> OrderedMap key a
 difference (OrderedMap a) (OrderedMap b) = OrderedMap $ filter (not . (`elem` extant) . fst) a
