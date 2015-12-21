@@ -17,7 +17,7 @@ import qualified OrderedMap as Map
 import Data.Maybe
 import Data.Monoid
 import qualified Data.Set as Set
-import Data.List (intersperse)
+import Data.List (intercalate)
 
 type ClassName = String
 
@@ -121,7 +121,7 @@ unLine EmptyLine = []
 unLine (Line _ elements) = elements
 
 instance Show a => Show (Line a) where
-  show (Line change elements) = show change ++ " [" ++ (concat . intersperse ", " $ show <$> elements) ++ "]"
+  show (Line change elements) = show change ++ " [" ++ (intercalate ", " $ show <$> elements) ++ "]"
   show EmptyLine = "EmptyLine"
 
 instance Monoid (Line a) where
