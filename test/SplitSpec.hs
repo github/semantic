@@ -112,26 +112,26 @@ spec = do
             ([ Row (Line False [ span "t\776" ]) (Line False [ span "\7831"]) ], (Range 0 2, Range 0 1))
 
 
-  describe "adjoin2By" $ do
+  describe "adjoinBy" $ do
     prop "is identity on top of no rows" $
-      \ a -> adjoin2By openElement [] a == [ a ]
+      \ a -> adjoinBy openElement [] a == [ a ]
 
     prop "appends onto open rows" $
       forAll ((arbitrary `suchThat` isOpen) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isOpen)) $
         \ (a@(Row (Line ac1 as1) (Line bc1 bs1)), b@(Row (Line ac2 as2) (Line bc2 bs2))) ->
-          adjoin2By openElement [ a ] b `shouldBe` [ Row (Line (ac1 || ac2) $ as1 ++ as2) (Line (bc1 || bc2) $ bs1 ++ bs2) ]
+          adjoinBy openElement [ a ] b `shouldBe` [ Row (Line (ac1 || ac2) $ as1 ++ as2) (Line (bc1 || bc2) $ bs1 ++ bs2) ]
 
     prop "does not append onto closed rows" $
       forAll ((arbitrary `suchThat` isClosed) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isClosed)) $
-        \ (a, b) -> adjoin2By openElement [ a ] b `shouldBe` [ b, a ]
+        \ (a, b) -> adjoinBy openElement [ a ] b `shouldBe` [ b, a ]
 
     prop "does not promote elements through empty lines onto closed lines" $
       forAll ((arbitrary `suchThat` isClosed) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isClosed)) $
-        \ (a, b) -> adjoin2By openElement [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
+        \ (a, b) -> adjoinBy openElement [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
 
     prop "promotes elements through empty lines onto open lines" $
       forAll ((arbitrary `suchThat` isOpen) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isOpen)) $
-        \ (a, b) -> adjoin2By openElement [ Row EmptyLine EmptyLine, a ] b `shouldBe` Row EmptyLine EmptyLine : adjoin2By openElement [ a ] b
+        \ (a, b) -> adjoinBy openElement [ Row EmptyLine EmptyLine, a ] b `shouldBe` Row EmptyLine EmptyLine : adjoinBy openElement [ a ] b
 
   describe "termToLines" $ do
     it "splits multi-line terms into multiple lines" $
