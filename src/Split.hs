@@ -169,10 +169,8 @@ termToLines (Info range categories :< syntax) source = (rows syntax, range)
     contextLines r s = Line True . (:[]) <$> textElements r s
     childLines i = let (lines, previous) = foldl sumLines ([], start range) i in
       adjoin $ lines ++ contextLines (Range previous (end range)) source
-    sumLines (lines, previous) child = (allLines, end childRange)
-      where
-        allLines = adjoin $ lines ++ contextLines (Range previous $ start childRange) source ++ childLines
-        (childLines, childRange) = termToLines child source
+    sumLines (lines, previous) child = let (childLines, childRange) = termToLines child source in
+      (adjoin $ lines ++ contextLines (Range previous $ start childRange) source ++ childLines, end childRange)
     elements = elementAndBreak (Span $ classify categories) =<< actualLines (substring range source)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
