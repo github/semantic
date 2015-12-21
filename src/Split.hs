@@ -196,7 +196,7 @@ annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories
     ranges = (left, right)
     sources = (before, after)
     childRows = appendRemainder . foldl sumRows ([], starts ranges)
-    appendRemainder (rows, previousIndices) = reverse . foldl (adjoinBy openElement) [] $ rows ++ contextRows (ends ranges) previousIndices sources
+    appendRemainder (rows, previousIndices) = reverse . foldl (adjoinRowsBy openElement) [] $ rows ++ contextRows (ends ranges) previousIndices sources
     starts (left, right) = (start left, start right)
     ends (left, right) = (end left, end right)
     sumRows (rows, previousIndices) child = (allRows, ends childRanges)
@@ -227,28 +227,28 @@ rowFromMaybeRows a b = Row (maybe EmptyLine (Line False . (:[])) a) (maybe Empty
 maybeLast :: Foldable f => f a -> Maybe a
 maybeLast = foldl (flip $ const . Just) Nothing
 
-adjoinBy :: (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
-adjoinBy _ [] row = [row]
+adjoinRowsBy :: (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
+adjoinRowsBy _ [] row = [row]
 
-adjoinBy f rows (Row left' right') | Just _ <- openLineBy f $ leftLines rows, Just _ <- openLineBy f $ rightLines rows = zipWith Row lefts rights
+adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ leftLines rows, Just _ <- openLineBy f $ rightLines rows = zipWith Row lefts rights
   where lefts = adjoinLinesBy f (leftLines rows) left'
         rights = adjoinLinesBy f (rightLines rows) right'
 
-adjoinBy f rows (Row left' right') | Just _ <- openLineBy f $ leftLines rows = case right' of
+adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ leftLines rows = case right' of
   EmptyLine -> rest
   _ -> Row EmptyLine right' : rest
   where rest = zipWith Row lefts rights
         lefts = adjoinLinesBy f (leftLines rows) left'
         rights = rightLines rows
 
-adjoinBy f rows (Row left' right') | Just _ <- openLineBy f $ rightLines rows = case left' of
+adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ rightLines rows = case left' of
   EmptyLine -> rest
   _ -> Row left' EmptyLine : rest
   where rest = zipWith Row lefts rights
         lefts = leftLines rows
         rights = adjoinLinesBy f (rightLines rows) right'
 
-adjoinBy _ rows row = row : rows
+adjoinRowsBy _ rows row = row : rows
 
 leftLines :: [Row a] -> [Line a]
 leftLines rows = left <$> rows
