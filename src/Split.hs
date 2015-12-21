@@ -153,6 +153,7 @@ splitTermByLines :: Term a Info -> String -> ([Line (Term a Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
   Leaf a -> adjoin $ Line True . (:[]) . (:< Leaf a) . (`Info` categories) <$> actualLineRanges range source
   where adjoin = reverse . foldl (adjoinLinesBy $ openTerm source) []
+        contextLines constructor range source = Line True . (:[]) . (:< constructor []) . (`Info` categories) <$> actualLineRanges range source
 
 -- | Takes a term and a `source` and returns a list of lines and their range within `source`.
 termToLines :: Term a Info -> String -> ([Line HTML], Range)
