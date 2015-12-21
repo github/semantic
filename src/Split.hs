@@ -129,10 +129,6 @@ instance Monoid (Line a) where
  mappend line EmptyLine = line
  mappend (Line c1 xs) (Line c2 ys) = Line (c1 || c2) (xs <> ys)
 
-instance Monoid (Row a) where
-  mempty = Row EmptyLine EmptyLine
-  mappend (Row x1 y1) (Row x2 y2) = Row (x1 <> x2) (y1 <> y2)
-
 diffToRows :: Diff a Info -> (Int, Int) -> String -> String -> ([Row HTML], (Range, Range))
 diffToRows (Free annotated) _ before after = annotatedToRows annotated before after
 diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLine <$> afterLines, (Range previousIndex previousIndex, range))
