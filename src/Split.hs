@@ -285,11 +285,8 @@ openLineBy _ [] = Nothing
 openLineBy f (EmptyLine : rest) = openLineBy f rest
 openLineBy f (line : _) = const line <$> (f =<< (maybeLast $ unLine line))
 
-adjoin2Lines :: [Line a] -> Line a -> [Line a]
-adjoin2Lines [] line = [line]
-adjoin2Lines (EmptyLine : xs) line | Just _ <- openLine xs = EmptyLine : adjoin2Lines xs line
-adjoin2Lines (prev:rest) line | Just _ <- openLine [ prev ] = (prev <> line) : rest
-adjoin2Lines lines line = line : lines
+adjoin2Lines :: [Line HTML] -> Line HTML -> [Line HTML]
+adjoin2Lines = adjoin2LinesBy openElement
 
 adjoin2LinesBy :: (a -> Maybe a) -> [Line a] -> Line a -> [Line a]
 adjoin2LinesBy _ [] line = [line]
