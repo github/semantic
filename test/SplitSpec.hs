@@ -12,7 +12,7 @@ import Control.Monad.Free hiding (unfold)
 import Patch
 import Syntax
 
-instance Arbitrary (Row a) where
+instance Arbitrary a => Arbitrary (Row a) where
   arbitrary = oneof [
     Row <$> arbitrary <*> arbitrary ]
 
@@ -22,7 +22,7 @@ instance Arbitrary HTML where
     Span <$> arbitrary <*> arbitrary,
     const Break <$> (arbitrary :: Gen ()) ]
 
-instance Arbitrary (Line a) where
+instance Arbitrary a => Arbitrary (Line a) where
   arbitrary = oneof [
     Line <$> arbitrary <*> arbitrary,
     const EmptyLine <$> (arbitrary :: Gen ()) ]
