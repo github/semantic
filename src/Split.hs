@@ -149,9 +149,7 @@ diffToRows (Pure (Delete term)) (_, previousIndex) before _ = (rowWithDeletedLin
 diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, rightRange))
   where
     replacedRows = zipWithMaybe rowFromMaybeRows (replace <$> leftElements) (replace <$> rightElements)
-    replace = (:[]) . Div (Just "replace") . unLine
-    rowFromMaybeRows :: Maybe [a] -> Maybe [a] -> Row a
-    rowFromMaybeRows a b = Row (maybe EmptyLine (Line True) a) (maybe EmptyLine (Line True) b)
+    replace = Div (Just "replace") . unLine
     (leftElements, leftRange) = termToLines a before
     (rightElements, rightRange) = termToLines b after
 
