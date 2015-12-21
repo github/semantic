@@ -153,6 +153,7 @@ splitTermByLines :: Term a Info -> String -> ([Line (Term a Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
   Leaf a -> adjoin $ Line True . (:[]) . (:< Leaf a) . (`Info` categories) <$> actualLineRanges range source
   Indexed children -> adjoinTermLines Indexed children
+  Fixed children -> adjoinTermLines Fixed children
   where adjoin = reverse . foldl (adjoinLinesBy $ openTerm source) []
         adjoinTermLines constructor children = let (lines, previous) = foldl (childLines constructor) ([], start range) children in
           adjoin $ lines ++ contextLines constructor (Range previous $ end range) source
