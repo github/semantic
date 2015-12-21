@@ -236,28 +236,31 @@ rowFromMaybeRows a b = Row (maybe EmptyLine (Line False . (:[])) a) (maybe Empty
 maybeLast :: [a] -> Maybe a
 maybeLast list = listToMaybe $ reverse list
 
-adjoin2 :: [Row a] -> Row a -> [Row a]
-adjoin2 [] row = [row]
+adjoin2 :: [Row HTML] -> Row HTML -> [Row HTML]
+adjoin2 = adjoin2By openElement
 
-adjoin2 rows (Row left' right') | Just _ <- openLine $ leftLines rows, Just _ <- openLine $ rightLines rows = zipWith Row lefts rights
-  where lefts = adjoin2Lines (leftLines rows) left'
-        rights = adjoin2Lines (rightLines rows) right'
+adjoin2By :: (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
+adjoin2By _ [] row = [row]
 
-adjoin2 rows (Row left' right') | Just _ <- openLine $ leftLines rows = case right' of
+adjoin2By f rows (Row left' right') | Just _ <- openLineBy f $ leftLines rows, Just _ <- openLineBy f $ rightLines rows = zipWith Row lefts rights
+  where lefts = adjoin2LinesBy f (leftLines rows) left'
+        rights = adjoin2LinesBy f (rightLines rows) right'
+
+adjoin2By f rows (Row left' right') | Just _ <- openLineBy f $ leftLines rows = case right' of
   EmptyLine -> rest
   _ -> Row EmptyLine right' : rest
   where rest = zipWith Row lefts rights
-        lefts = adjoin2Lines (leftLines rows) left'
+        lefts = adjoin2LinesBy f (leftLines rows) left'
         rights = rightLines rows
 
-adjoin2 rows (Row left' right') | Just _ <- openLine $ rightLines rows = case left' of
+adjoin2By f rows (Row left' right') | Just _ <- openLineBy f $ rightLines rows = case left' of
   EmptyLine -> rest
   _ -> Row left' EmptyLine : rest
   where rest = zipWith Row lefts rights
         lefts = leftLines rows
-        rights = adjoin2Lines (rightLines rows) right'
+        rights = adjoin2LinesBy f (rightLines rows) right'
 
-adjoin2 rows row = row : rows
+adjoin2By _ rows row = row : rows
 
 leftLines :: [Row a] -> [Line a]
 leftLines rows = left <$> rows
