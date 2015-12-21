@@ -165,7 +165,7 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
 termToLines :: Term a Info -> String -> ([Line HTML], Range)
 termToLines (Info range categories :< syntax) source = (rows syntax, range)
   where
-    rows (Leaf _) = reverse $ foldl adjoin2Lines [] $ Line True . (:[]) <$> elements
+    rows (Leaf _) = reverse $ foldl (adjoin2LinesBy openElement) [] $ Line True . (:[]) <$> elements
     rows (Indexed i) = rewrapLineContentsIn Ul <$> childLines i
     rows (Fixed f) = rewrapLineContentsIn Ul <$> childLines f
     rows (Keyed k) = rewrapLineContentsIn Dl <$> childLines k
@@ -174,12 +174,12 @@ termToLines (Info range categories :< syntax) source = (rows syntax, range)
     rewrapLineContentsIn _ EmptyLine = EmptyLine
     lineElements r s = Line True . (:[]) <$> textElements r s
     childLines i = appendRemainder $ foldl sumLines ([], start range) i
-    appendRemainder (lines, previous) = reverse . foldl adjoin2Lines [] $ lines ++ lineElements (Range previous (end range)) source
+    appendRemainder (lines, previous) = reverse . foldl (adjoin2LinesBy openElement) [] $ lines ++ lineElements (Range previous (end range)) source
     sumLines (lines, previous) child = (allLines, end childRange)
       where
         separatorLines = lineElements (Range previous $ start childRange) source
         unadjoinedLines = lines ++ separatorLines ++ childLines
-        allLines = reverse $ foldl adjoin2Lines [] unadjoinedLines
+        allLines = reverse $ foldl (adjoin2LinesBy openElement) [] unadjoinedLines
         (childLines, childRange) = termToLines child source
     elements = (elementAndBreak $ Span (classify categories)) =<< actualLines (substring range source)
 
