@@ -277,10 +277,8 @@ openElement (Dl _ elements) = openElement =<< maybeLast elements
 openElement (Div _ elements) = openElement =<< maybeLast elements
 openElement h = Just h
 
-openLine :: [Line a] -> Maybe (Line a)
-openLine [] = Nothing
-openLine (EmptyLine : rest) = openLine rest
-openLine (line : _) = const line <$> (openElement =<< (maybeLast $ unLine line))
+openLine :: [Line HTML] -> Maybe (Line HTML)
+openLine lines = openLineBy openElement lines
 
 openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
 openLineBy _ [] = Nothing
