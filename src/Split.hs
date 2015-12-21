@@ -130,7 +130,7 @@ instance Monoid (Line a) where
  mappend (Line c1 xs) (Line c2 ys) = Line (c1 || c2) (xs <> ys)
 
 diffToRows :: Diff a Info -> (Int, Int) -> String -> String -> ([Row HTML], (Range, Range))
-diffToRows (Free annotated) _ before after = annotatedToRows annotated before after
+diffToRows (Free annotated@(Annotated (Info left _, Info right _) _)) _ before after = (annotatedToRows annotated before after, (left, right))
 diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLine <$> afterLines, (Range previousIndex previousIndex, range))
   where
     (afterLines, range) = termToLines term after
@@ -182,8 +182,8 @@ termToLines (Info range categories :< syntax) source = (rows syntax, range)
     elements = elementAndBreak (Span $ classify categories) =<< actualLines (substring range source)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
-annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> ([Row HTML], (Range, Range))
-annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories) syntax) before after = (rows syntax, ranges)
+annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> [Row HTML]
+annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories) syntax) before after = rows syntax
   where
     rows (Leaf _) = zipWithMaybe rowFromMaybeRows leftElements rightElements
     rows (Indexed i) = rewrapRowContentsIn Ul <$> childRows i
