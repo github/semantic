@@ -3,6 +3,7 @@ module Split where
 import Prelude hiding (div, head, span)
 import Diff
 import Line
+import Row
 import Patch
 import Term
 import Syntax
@@ -53,13 +54,6 @@ split diff before after = return . renderHtml
     numberRows rows@((leftCount, _, rightCount, _):_) (Row left@(Line _) EmptyLine) = (leftCount + 1, left, rightCount, EmptyLine):rows
     numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine right@(Line _)) = (leftCount, EmptyLine, rightCount + 1, right):rows
     numberRows rows@((leftCount, _, rightCount, _):_) (Row left right) = (leftCount + 1, left, rightCount + 1, right):rows
-
-
-data Row a = Row { unLeft :: Line a, unRight :: Line a }
-  deriving (Eq, Functor)
-
-instance Show a => Show (Row a) where
-  show (Row left right) = "\n" ++ show left ++ " | " ++ show right
 
 -- | A diff with only one side’s annotations.
 type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf annotation)
