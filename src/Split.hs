@@ -330,9 +330,9 @@ openDiff :: String -> SplitDiff a Info -> Maybe (SplitDiff a Info)
 openDiff source diff@(Free (Annotated (Info range _) _)) = const diff <$> openRange source range
 openDiff source diff@(Pure term) = const diff <$> openTerm source term
 
-openDiff2 :: (forall b. (b, b) -> b) -> (String, String) -> Diff a Info -> Maybe (Diff a Info)
-openDiff2 which sources diff@(Free (Annotated (Info range1 _, Info range2 _) _)) = const diff <$> openRange (which sources) (which (range1, range2))
-openDiff2 which sources diff@(Pure patch) = const diff . openTerm (which sources) <$> which (before patch, after patch)
+openDiff2 :: String -> (forall b. (b, b) -> b) -> Diff a Info -> Maybe (Diff a Info)
+openDiff2 source which diff@(Free (Annotated (Info range1 _, Info range2 _) _)) = const diff <$> openRange source (which (range1, range2))
+openDiff2 source which diff@(Pure patch) = const diff . openTerm source <$> which (before patch, after patch)
 
 openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
 openLineBy _ [] = Nothing
