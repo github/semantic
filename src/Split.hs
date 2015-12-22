@@ -150,9 +150,9 @@ instance ToMarkup (Renderable (Term a Info)) where
   toMarkup (Renderable (source, term)) = fst $ cata (\ info@(Info range _) syntax -> (toMarkup $ Renderable (source, (info, syntax)), range)) term
 
 instance ToMarkup (Renderable (SplitDiff a Info)) where
-  toMarkup (Renderable (source, Pure term)) = toMarkup (Renderable (source, term))
-  toMarkup (Renderable (source, Free (Annotated (Info range categories) syntax))) = classifyMarkup (maybeLast categories) $ case syntax of
-    _ -> br
+  toMarkup (Renderable (source, diff)) = fst $ iter (\ (Annotated info@(Info range _) syntax) -> (toMarkup $ Renderable (source, (info, syntax)), range)) $ toMarkupAndRange <$> diff
+    where toMarkupAndRange :: Term a Info -> (Markup, Range)
+          toMarkupAndRange term@(Info range _ :< _) = (toMarkup $ Renderable (source, term), range)
 
 splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (SplitDiff a Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
