@@ -39,9 +39,6 @@ spec = do
                    Row (Line [ Free $ Annotated (Info range mempty) $ Leaf a ]) (Line [ Free $ Annotated (Info range mempty) $ Leaf a ]) ]
 
   describe "annotatedToRows" $ do
-    it "outputs one row for single-line unchanged leaves" $
-      annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` [ Row (Line [ span "a" ]) (Line [ span "a" ]) ]
-
     it "outputs one row for single-line empty unchanged indexed nodes" $
       annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` [ Row (Line [ Ul (Just "category-branch") [ Text "[]" ] ]) (Line [ Ul (Just "category-branch") [ Text "[]" ] ]) ]
 
