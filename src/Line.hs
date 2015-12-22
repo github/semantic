@@ -38,9 +38,6 @@ instance Monoid (Line a) where
   mappend line EmptyLine = line
   mappend (Line xs) (Line ys) = Line (xs <> ys)
 
-instance ToMarkup a => ToMarkup (Int, Line a, Int, Line a) where
-  toMarkup (m, left, n, right) = tr $ toMarkup (m, left) <> toMarkup (n, right) <> string "\n"
-
 instance ToMarkup a => ToMarkup (Int, Line a) where
   toMarkup (_, line@EmptyLine) = numberTd "" <> toMarkup line <> string "\n"
   -- toMarkup (num, line@(Line _)) = td (string $ show num) ! A.class_ (stringValue "blob-num blob-num-replacement") <> toMarkup line <> string "\n"
