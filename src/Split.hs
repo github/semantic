@@ -52,7 +52,7 @@ instance ToMarkup HTML where
   toMarkup (Dt key) = dt $ string key
 
 split :: Diff a Info -> String -> String -> IO ByteString
-split diff before after = return . renderHtml
+split diff left right = return . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel (stringValue "stylesheet") ! A.href (stringValue "style.css")) <>)
     . body
@@ -60,8 +60,8 @@ split diff before after = return . renderHtml
         ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
         . mconcat $ toMarkup <$> reverse numbered
   where
-    rows = toRenderable <$> fst (splitDiffByLines diff (0, 0) (before, after))
-    toRenderable (Row a b) = Row (Renderable . (,) before <$> a) (Renderable . (,) after <$> b)
+    rows = toRenderable <$> fst (splitDiffByLines diff (0, 0) (left, right))
+    toRenderable (Row a b) = Row (Renderable . (,) left . split fst <$> a) (Renderable . (,) right . split snd <$> b)
     numbered = foldl numberRows [] rows
     maxNumber = case numbered of
       [] -> 0
