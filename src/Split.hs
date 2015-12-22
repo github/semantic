@@ -217,6 +217,9 @@ annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories
     sumRows (rows, previousIndices) child = let (childRows, childRanges) = diffToRows child previousIndices before after in
       (rows ++ contextRows (starts childRanges) previousIndices sources ++ childRows, ends childRanges)
 
+contextLines :: Syntax a (Term a Info) -> Range -> Set.Set Category -> String -> [Line (Term a Info)]
+contextLines constructor range categories source = Line True . (:[]) . (:< constructor) . (`Info` categories) <$> actualLineRanges range source
+
 contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row HTML]
 contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows leftElements rightElements
   where
