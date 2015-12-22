@@ -43,10 +43,6 @@ instance ToMarkup a => ToMarkup (Bool, Int, Line a) where
   toMarkup (True, num, line@(Line _)) = td (string $ show num) ! A.class_ (stringValue "blob-num blob-num-replacement") <> toMarkup line <> string "\n"
   toMarkup (_, num, line@(Line _)) = td (string $ show num) ! A.class_ (stringValue "blob-num") <> toMarkup line <> string "\n"
 
-numberTd :: String -> Html
-numberTd "" = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
-numberTd s = td (string s) ! A.class_ (stringValue "blob-num")
-
 codeTd :: Bool -> Maybe Html -> Html
 codeTd _ Nothing = td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
 codeTd True (Just el) = td el ! A.class_ (stringValue "blob-code blob-code-replacement")
