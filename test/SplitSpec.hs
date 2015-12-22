@@ -92,7 +92,7 @@ spec = do
                 EmptyLine
         ]
 
-    it "should split multi-line deletions across multiple rows" $
+    it "splits multi-line deletions across multiple rows" $
       let (sourceA, sourceB) = ("/*\n*/\na", "a") in
         annotatedToRows (formatted sourceA sourceB "branch" (Indexed [
           Pure . Delete $ (Info (Range 0 5) (Set.fromList ["leaf"]) :< Leaf ""),
@@ -153,25 +153,25 @@ spec = do
       ], Range 0 5)
 
   describe "openLineBy" $ do
-    it "should produce the earliest non-empty line in a list, if open" $
+    it "produces the earliest non-empty line in a list, if open" $
       openLineBy openElement [
         Line True [ Div (Just "delete") [ span "*/" ] ],
         Line True [ Div (Just "delete") [ span " * Debugging", Break ] ],
         Line True [ Div (Just "delete") [ span "/*", Break ] ]
       ] `shouldBe` (Just $ Line True [ Div (Just "delete") [ span "*/" ] ])
 
-    it "should produce the earliest non-empty line in a list, if open" $
+    it "produces the earliest non-empty line in a list, if open" $
       openLineBy (openTerm "\n ") [
         Line True [ Info (Range 1 2) mempty :< Leaf "" ],
         Line True [ Info (Range 0 1) mempty :< Leaf "" ]
       ] `shouldBe` (Just $ Line True [ Info (Range 1 2) mempty :< Leaf "" ])
 
-    it "should return Nothing if the earliest non-empty line is closed" $
+    it "returns Nothing if the earliest non-empty line is closed" $
       openLineBy openElement [
         Line True [ Div (Just "delete") [ span " * Debugging", Break ] ]
       ] `shouldBe` Nothing
 
-    it "should return Nothing if the earliest non-empty line is closed" $
+    it "returns Nothing if the earliest non-empty line is closed" $
       openLineBy (openTerm "\n") [
         Line True [ Info (Range 0 1) mempty :< Leaf "" ]
       ] `shouldBe` Nothing
