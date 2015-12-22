@@ -150,6 +150,8 @@ instance ToMarkup (Renderable (Term a Info)) where
 
 instance ToMarkup (Renderable (SplitDiff a Info)) where
   toMarkup (Renderable (source, Pure term)) = toMarkup (Renderable (source, term))
+  toMarkup (Renderable (source, Free (Annotated (Info range categories) syntax))) = classifyMarkup (maybeLast categories) $ case syntax of
+    _ -> br
 
 splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (SplitDiff a Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
