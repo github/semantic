@@ -94,8 +94,6 @@ spec = do
       openTerm " \n" (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
 
     where
-      offsetInfo by (Info (Range start end) categories) = Info (Range (start + by) (end + by)) categories
-      offsetAnnotated by1 by2 (Annotated (left, right) syntax) = Annotated (offsetInfo by1 left, offsetInfo by2 right) syntax
       isOpenBy f (Row a b) = Maybe.isJust (openLineBy f [ a ]) && Maybe.isJust (openLineBy f [ b ])
       isClosedBy f (Row a@(Line _) b@(Line _)) = Maybe.isNothing (openLineBy f [ a ]) && Maybe.isNothing (openLineBy f [ b ])
       isClosedBy _ (Row _ _) = False
