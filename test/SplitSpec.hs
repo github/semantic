@@ -12,6 +12,7 @@ import Control.Monad.Free hiding (unfold)
 import qualified Data.Maybe as Maybe
 import Patch
 import Syntax
+import ArbitraryTerm
 
 instance Arbitrary a => Arbitrary (Row a) where
   arbitrary = oneof [
@@ -31,6 +32,12 @@ instance Arbitrary a => Arbitrary (Line a) where
 spec :: Spec
 spec = do
   describe "splitAnnotatedByLines" $ do
+    prop "outputs one row for single-line unchanged leaves" $
+      \ a -> let source = filter (/= '\n') a
+                 range = totalRange source in
+                 splitAnnotatedByLines (source, source) (range, range) (mempty, mempty) (Leaf a) `shouldBe` [
+                   Row (Line [ Free $ Annotated (Info range mempty) $ Leaf a ]) (Line [ Free $ Annotated (Info range mempty) $ Leaf a ]) ]
+
     it "outputs one row for single-line unchanged leaves" $
       let sources = ("a", "a")
           ranges = (Range 0 1, Range 0 1)
