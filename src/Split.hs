@@ -183,8 +183,9 @@ termToLines (Info range categories :< syntax) source = (rows syntax, range)
 
 splitAnnotatedByLines :: (String, String) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (Term a Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
-  Leaf a -> zipWithDefaults Row EmptyLine EmptyLine (contextLines (Leaf a) (fst ranges) (fst categories) (fst sources)) (contextLines (Leaf a) (snd ranges) (snd categories) (snd sources))
+  Leaf a -> contextRows (Leaf a) ranges categories sources
   where contextLines constructor range categories source = Line False . (:[]) . (:< constructor) . (`Info` categories) <$> actualLineRanges range source
+        contextRows constructor ranges categoriess sources = zipWithDefaults Row EmptyLine EmptyLine (contextLines (Leaf a) (fst ranges) (fst categories) (fst sources)) (contextLines (Leaf a) (snd ranges) (snd categories) (snd sources))
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> [Row HTML]
