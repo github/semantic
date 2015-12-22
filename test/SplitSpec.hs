@@ -176,6 +176,10 @@ spec = do
         Line True [ Info (Range 0 1) mempty :< Leaf "" ]
       ] `shouldBe` Nothing
 
+  describe "openTerm" $ do
+    it "should return Nothing for terms whose substring ends with a newline" $
+      openTerm " \n" (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
+
     where
       rightRowText text = rightRow [ Text text ]
       rightRow xs = Row EmptyLine (Line False xs)
