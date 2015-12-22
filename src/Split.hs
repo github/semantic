@@ -134,19 +134,18 @@ type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf ann
 
 newtype Renderable a = Renderable (String, a)
 
-instance ToMarkup (Renderable (Term a Info)) where
-  toMarkup (Renderable (source, Info range categories :< syntax)) = classifyMarkup (maybeLast categories) $ case syntax of
+instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
+  toMarkup (Renderable (source, (Info range categories, syntax))) = classifyMarkup (maybeLast categories) $ case syntax of
     Leaf _ -> span . string $ substring range source
     Indexed children -> ul . mconcat $ contentElements children
     Fixed children -> ul . mconcat $ contentElements children
     Keyed children -> dl . mconcat $ contentElements children
-    where markupForSeparatorAndChild :: ([Markup], Int) -> Term a Info -> ([Markup], Int)
-          markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string (substring (Range previous $ start $ getRange child) source), toMarkup (Renderable (source, child)) ], end $ getRange child)
+    where markupForSeparatorAndChild :: ToMarkup f => ([Markup], Int) -> (f, Range) -> ([Markup], Int)
+          markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string (substring (Range previous $ start $ snd child) source), toMarkup $ fst child ], end $ snd child)
 
           contentElements children = let (elements, previous) = foldl markupForSeparatorAndChild ([], start range) children in
             elements ++ [ string $ substring (Range previous $ end range) source ]
 
-          getRange (Info range _ :< _) = range
 
 instance ToMarkup (Renderable (SplitDiff a Info)) where
   toMarkup (Renderable (source, Pure term)) = toMarkup (Renderable (source, term))
