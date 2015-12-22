@@ -148,6 +148,9 @@ instance ToMarkup (Renderable (Term a Info)) where
 
           getRange (Info range _ :< _) = range
 
+instance ToMarkup (Renderable (SplitDiff a Info)) where
+  toMarkup (Renderable (source, Pure term)) = toMarkup (Renderable (source, term))
+
 splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (SplitDiff a Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
