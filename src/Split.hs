@@ -139,6 +139,7 @@ instance ToMarkup (Renderable (Term a Info)) where
     Leaf _ -> span . string $ substring range source
     Indexed children -> ul . mconcat $ contentElements children
     Fixed children -> ul . mconcat $ contentElements children
+    Keyed children -> dl . mconcat $ contentElements children
     where markupForSeparatorAndChild :: ([Markup], Int) -> Term a Info -> ([Markup], Int)
           markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string (substring (Range previous $ start $ getRange child) source), toMarkup (Renderable (source, child)) ], end $ getRange child)
 
