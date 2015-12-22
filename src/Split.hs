@@ -151,7 +151,7 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term a Info -> String -> ([Line (Term a Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
-  Leaf a -> adjoin $ contextLines (Leaf a) range source
+  Leaf a -> contextLines (Leaf a) range source
   Indexed children -> adjoinTermLines Indexed children
   Fixed children -> adjoinTermLines Fixed children
   Keyed children -> adjoinTermLines Keyed children
