@@ -42,8 +42,7 @@ instance ToMarkup a => ToMarkup (Bool, Int, Line a) where
   toMarkup (hasChanges, num, line) = case line of
     EmptyLine -> td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell") <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell") <> string "\n"
     _ -> cell "num" (string $ show num) <> cell "code" (toMarkup line) <> string "\n"
-    where cell kind = td ! A.class_ (toClass kind)
-          toClass kind = stringValue $ "blob-" ++ kind ++ if hasChanges then " blob-" ++ kind ++ "-replacement" else ""
+    where cell kind = td ! A.class_ (stringValue $ "blob-" ++ kind ++ if hasChanges then " blob-" ++ kind ++ "-replacement" else "")
 
 codeTd :: Bool -> Maybe Html -> Html
 codeTd _ Nothing = td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
