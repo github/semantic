@@ -47,7 +47,7 @@ spec = do
             Row (Line [ Free $ Annotated (Info (totalRange source) mempty) $ Indexed [] ]) (Line [ Free $ Annotated (Info (totalRange source) mempty) $ Indexed [] ]) ]
 
     prop "preserves line counts in equal sources" $
-      \ source -> let range = totalRange source in
+      \ source ->
         length (splitAnnotatedByLines (source, source) (totalRange source, totalRange source) (mempty, mempty) (Indexed . fst $ foldl combineIntoLeaves ([], 0) source)) `shouldBe` length (filter (== '\n') source) + 1
 
   describe "annotatedToRows" $ do
