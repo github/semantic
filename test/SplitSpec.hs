@@ -59,7 +59,7 @@ spec = do
       \ a -> adjoinRowsBy openString openString [] a == [ a ]
 
     prop "appends onto open rows" $
-      forAll ((arbitrary `suchThat` isOpen) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpen)) $
+      forAll ((arbitrary `suchThat` isOpenBy openElement) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openElement)) $
         \ (a@(Row (Line a1) (Line b1)), b@(Row (Line a2) (Line b2))) ->
           adjoinRowsBy openElement openElement [ a ] b `shouldBe` [ Row (Line $ a1 ++ a2) (Line $ b1 ++ b2) ]
 
@@ -72,7 +72,7 @@ spec = do
         \ (a, b) -> adjoinRowsBy openElement openElement [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
 
     prop "promotes elements through empty lines onto open lines" $
-      forAll ((arbitrary `suchThat` isOpen) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpen)) $
+      forAll ((arbitrary `suchThat` isOpenBy openElement) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openElement)) $
         \ (a, b) -> adjoinRowsBy openElement openElement [ Row EmptyLine EmptyLine, a ] b `shouldBe` Row EmptyLine EmptyLine : adjoinRowsBy openElement openElement [ a ] b
 
   describe "splitTermByLines" $ do
@@ -111,7 +111,7 @@ spec = do
       offsetInfo by (Info (Range start end) categories) = Info (Range (start + by) (end + by)) categories
       offsetAnnotated by1 by2 (Annotated (left, right) syntax) = Annotated (offsetInfo by1 left, offsetInfo by2 right) syntax
       span = Span (Just "category-leaf")
-      isOpen (Row a b) = Maybe.isJust (openLineBy openElement [ a ]) && Maybe.isJust (openLineBy openElement [ b ])
+      isOpenBy f (Row a b) = Maybe.isJust (openLineBy f [ a ]) && Maybe.isJust (openLineBy f [ b ])
       isClosedBy f (Row a@(Line _) b@(Line _)) = Maybe.isNothing (openLineBy f [ a ]) && Maybe.isNothing (openLineBy f [ b ])
       isClosedBy _ (Row _ _) = False
 
