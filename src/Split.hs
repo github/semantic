@@ -227,9 +227,6 @@ adjoinLinesBy _ lines line = line : lines
 zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
 zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++ repeat da) (b ++ repeat db)
 
-classify :: Set.Set Category -> Maybe ClassName
-classify categories = ("category-" ++) <$> maybeLast categories
-
 actualLines :: String -> [String]
 actualLines "" = [""]
 actualLines lines = case break (== '\n') lines of
