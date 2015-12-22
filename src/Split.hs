@@ -84,7 +84,7 @@ split diff before after = return . renderHtml
 
 
 data Row a = Row { unLeft :: Line a, unRight :: Line a }
-  deriving Eq
+  deriving (Eq, Functor)
 
 instance Show a => Show (Row a) where
   show (Row left right) = "\n" ++ show left ++ " | " ++ show right
