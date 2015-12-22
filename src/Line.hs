@@ -44,6 +44,9 @@ instance ToMarkup a => ToMarkup (Bool, Int, Line a) where
     _ -> cell "num" (string $ show num) <> cell "code" (toMarkup line) <> string "\n"
     where cell kind = td ! A.class_ (toClass kind)
           toClass kind = stringValue $ "blob-" ++ kind ++ if hasChanges then " blob-" ++ kind ++ "-replacement" else ""
+  toMarkup (_, _, line@EmptyLine) = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell") <> toMarkup line <> string "\n"
+  toMarkup (True, num, line@(Line _)) = td (string $ show num) ! A.class_ (stringValue "blob-num blob-num-replacement") <> toMarkup line <> string "\n"
+  toMarkup (_, num, line@(Line _)) = td (string $ show num) ! A.class_ (stringValue "blob-num") <> toMarkup line <> string "\n"
 
 codeTd :: Bool -> Maybe Html -> Html
 codeTd _ Nothing = td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
