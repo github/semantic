@@ -300,6 +300,12 @@ openTerm source term@(Info range _ :< _) = case (source !!) <$> maybeLastIndex r
   Just '\n' -> Nothing
   _ -> Just term
 
+openDiff :: String -> SplitDiff a Info -> Maybe (SplitDiff a Info)
+openDiff source diff@(Free (Annotated (Info range _) _)) = case (source !!) <$> maybeLastIndex range of
+  Just '\n' -> Nothing
+  _ -> Just diff
+openDiff source diff@(Pure term) = const diff <$> openTerm source term
+
 openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
 openLineBy _ [] = Nothing
 openLineBy f (EmptyLine : rest) = openLineBy f rest
