@@ -209,10 +209,6 @@ elementAndBreak _ "\n" = [ Break ]
 elementAndBreak constructor x | '\n' <- last x = [ constructor $ init x, Break ]
 elementAndBreak constructor x = [ constructor x ]
 
-textElements :: Range -> String -> [HTML]
-textElements range source = elementAndBreak Text =<< actualLines s
-  where s = substring range source
-
 rowFromMaybeRows :: Maybe a -> Maybe a -> Row a
 rowFromMaybeRows a b = Row (maybe EmptyLine (Line . (:[])) a) (maybe EmptyLine (Line . (:[])) b)
 
