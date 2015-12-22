@@ -81,12 +81,12 @@ body {
   padding: 0;
   font-family: monospace;
 }
-.blob-code-replacement:last-child .insert,
-.blob-code-replacement:last-child .replace {
+.blob-code:last-child .insert,
+.blob-code:last-child .replace {
   background-color: #a6f3a6;
 }
-.blob-code-replacement .delete,
-.blob-code-replacement .replace {
+.blob-code .delete,
+.blob-code .replace {
   background-color: #f8cbcb;
 }
 
