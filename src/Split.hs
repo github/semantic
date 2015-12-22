@@ -136,7 +136,7 @@ type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf ann
 newtype Renderable a = Renderable (String, a)
 
 instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
-  toMarkup (Renderable (source, (Info range categories, syntax))) = classifyMarkup (maybeLast categories) $ case syntax of
+  toMarkup (Renderable (source, (Info range categories, syntax))) = classifyMarkup (classify categories) $ case syntax of
     Leaf _ -> span . string $ substring range source
     Indexed children -> ul . mconcat $ contentElements children
     Fixed children -> ul . mconcat $ contentElements children
