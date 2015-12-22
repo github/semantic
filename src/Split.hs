@@ -193,6 +193,9 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         adjoin = reverse . foldl (adjoinRowsBy (openTerm $ fst sources) (openTerm $ snd sources)) []
 
+        childRows constructor (rows, previous) child = let (childRows, childRanges) = splitDiffByLines child previous sources in
+          (adjoin $ rows ++ contextRows constructor (makeRanges previous (starts childRanges)) categories sources ++ childRows, ends childRanges)
+
         starts (left, right) = (start left, start right)
         ends (left, right) = (end left, end right)
         makeRanges (leftStart, rightStart) (leftEnd, rightEnd) = (Range leftStart leftEnd, Range rightStart rightEnd)
