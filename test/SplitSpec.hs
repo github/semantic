@@ -64,11 +64,11 @@ spec = do
           adjoinRowsBy openElement openElement [ a ] b `shouldBe` [ Row (Line $ a1 ++ a2) (Line $ b1 ++ b2) ]
 
     prop "does not append onto closed rows" $
-      forAll ((arbitrary `suchThat` isClosed) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosed)) $
+      forAll ((arbitrary `suchThat` isClosedBy openElement) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openElement)) $
         \ (a, b) -> adjoinRowsBy openElement openElement [ a ] b `shouldBe` [ b, a ]
 
     prop "does not promote elements through empty lines onto closed lines" $
-      forAll ((arbitrary `suchThat` isClosed) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosed)) $
+      forAll ((arbitrary `suchThat` isClosedBy openElement) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openElement)) $
         \ (a, b) -> adjoinRowsBy openElement openElement [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
 
     prop "promotes elements through empty lines onto open lines" $
@@ -112,8 +112,8 @@ spec = do
       offsetAnnotated by1 by2 (Annotated (left, right) syntax) = Annotated (offsetInfo by1 left, offsetInfo by2 right) syntax
       span = Span (Just "category-leaf")
       isOpen (Row a b) = Maybe.isJust (openLineBy openElement [ a ]) && Maybe.isJust (openLineBy openElement [ b ])
-      isClosed (Row a@(Line _) b@(Line _)) = Maybe.isNothing (openLineBy openElement [ a ]) && Maybe.isNothing (openLineBy openElement [ b ])
-      isClosed (Row _ _) = False
+      isClosedBy f (Row a@(Line _) b@(Line _)) = Maybe.isNothing (openLineBy f [ a ]) && Maybe.isNothing (openLineBy f [ b ])
+      isClosedBy _ (Row _ _) = False
 
       isOnSingleLine (a, _, _) = filter (/= '\n') a == a
 
