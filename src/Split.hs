@@ -205,7 +205,7 @@ annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories
     ranges = (left, right)
     sources = (before, after)
     childRows = appendRemainder . foldl sumRows ([], starts ranges)
-    appendRemainder (rows, previousIndices) = reverse . foldl (adjoinRowsBy openElement) [] $ rows ++ contextRows (ends ranges) previousIndices sources
+    appendRemainder (rows, previousIndices) = reverse . foldl (adjoinRowsBy openElement openElement) [] $ rows ++ contextRows (ends ranges) previousIndices sources
     starts (left, right) = (start left, start right)
     ends (left, right) = (end left, end right)
     sumRows (rows, previousIndices) child = let (childRows, childRanges) = diffToRows child previousIndices before after in
@@ -233,28 +233,28 @@ rowFromMaybeRows a b = Row (maybe EmptyLine (Line False . (:[])) a) (maybe Empty
 maybeLast :: Foldable f => f a -> Maybe a
 maybeLast = foldl (flip $ const . Just) Nothing
 
-adjoinRowsBy :: (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
-adjoinRowsBy _ [] row = [row]
+adjoinRowsBy :: (a -> Maybe a) -> (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
+adjoinRowsBy _ _ [] row = [row]
 
-adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ unLeft <$> rows, Just _ <- openLineBy f $ unRight <$> rows = zipWith Row lefts rights
+adjoinRowsBy f g rows (Row left' right') | Just _ <- openLineBy f $ unLeft <$> rows, Just _ <- openLineBy g $ unRight <$> rows = zipWith Row lefts rights
   where lefts = adjoinLinesBy f (unLeft <$> rows) left'
-        rights = adjoinLinesBy f (unRight <$> rows) right'
+        rights = adjoinLinesBy g (unRight <$> rows) right'
 
-adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ unLeft <$> rows = case right' of
+adjoinRowsBy f _ rows (Row left' right') | Just _ <- openLineBy f $ unLeft <$> rows = case right' of
   EmptyLine -> rest
   _ -> Row EmptyLine right' : rest
   where rest = zipWith Row lefts rights
         lefts = adjoinLinesBy f (unLeft <$> rows) left'
         rights = unRight <$> rows
 
-adjoinRowsBy f rows (Row left' right') | Just _ <- openLineBy f $ unRight <$> rows = case left' of
+adjoinRowsBy _ g rows (Row left' right') | Just _ <- openLineBy g $ unRight <$> rows = case left' of
   EmptyLine -> rest
   _ -> Row left' EmptyLine : rest
   where rest = zipWith Row lefts rights
         lefts = unLeft <$> rows
-        rights = adjoinLinesBy f (unRight <$> rows) right'
+        rights = adjoinLinesBy g (unRight <$> rows) right'
 
-adjoinRowsBy _ rows row = row : rows
+adjoinRowsBy _ _ rows row = row : rows
 
 openElement :: HTML -> Maybe HTML
 openElement Break = Nothing
