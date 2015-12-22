@@ -132,7 +132,7 @@ instance Monoid (Line a) where
 -- | A diff with only one side’s annotations.
 type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf annotation)
 
-newtype RenderableSplitDiff leaf annotation = RenderableSplitDiff (String, SplitDiff leaf annotation)
+newtype Renderable a = Renderable (String, a)
 
 splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (SplitDiff a Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
