@@ -181,25 +181,6 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
         childLines constructor (lines, previous) child = let (childLines, childRange) = splitTermByLines child source in
           (adjoin $ lines ++ contextLines (:< constructor) (Range previous $ start childRange) categories source ++ childLines, end childRange)
 
--- | Takes a term and a source and returns a list of lines and their range within source.
-termToLines :: Term a Info -> String -> ([Line HTML], Range)
-termToLines (Info range categories :< syntax) source = (rows syntax, range)
-  where
-    rows (Leaf _) = adjoin $ Line . (:[]) <$> elements
-    rows (Indexed i) = rewrapLineContentsIn (Ul $ classify categories) <$> childLines i
-    rows (Fixed f) = rewrapLineContentsIn (Ul $ classify categories) <$> childLines f
-    rows (Keyed k) = rewrapLineContentsIn (Dl $ classify categories) <$> childLines k
-
-    adjoin = reverse . foldl (adjoinLinesBy openElement) []
-    rewrapLineContentsIn f (Line elements) = Line [ f elements ]
-    rewrapLineContentsIn _ EmptyLine = EmptyLine
-    contextLines r s = Line . (:[]) <$> textElements r s
-    childLines i = let (lines, previous) = foldl sumLines ([], start range) i in
-      adjoin $ lines ++ contextLines (Range previous (end range)) source
-    sumLines (lines, previous) child = let (childLines, childRange) = termToLines child source in
-      (adjoin $ lines ++ contextLines (Range previous $ start childRange) source ++ childLines, end childRange)
-    elements = elementAndBreak (Span $ classify categories) =<< actualLines (substring range source)
-
 splitAnnotatedByLines :: (String, String) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> contextRows (Leaf a) ranges categories sources
