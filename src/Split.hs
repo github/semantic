@@ -129,6 +129,11 @@ instance Monoid (Line a) where
   mappend line EmptyLine = line
   mappend (Line c1 xs) (Line c2 ys) = Line (c1 || c2) (xs <> ys)
 
+splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (Term a Info)], (Range, Range))
+splitDiffByLines (Free (Annotated annotation syntax)) _ sources = (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
+  where categories (Info _ left, Info _ right) = (left, right)
+        ranges (Info left _, Info right _) = (left, right)
+
 diffToRows :: Diff a Info -> (Int, Int) -> String -> String -> ([Row HTML], (Range, Range))
 diffToRows (Free annotated@(Annotated (Info left _, Info right _) _)) _ before after = (annotatedToRows annotated before after, (left, right))
 diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLine <$> afterLines, (Range previousIndex previousIndex, range))
