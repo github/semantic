@@ -37,7 +37,7 @@ library
                      , blaze-html
                      , tree-sitter-parsers
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable, RankNTypes
+  default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable
   ghc-options:        -Wall -fno-warn-name-shadowing
 
 executable semantic-diff-exe
