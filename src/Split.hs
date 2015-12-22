@@ -134,7 +134,7 @@ splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
     (Row EmptyLine <$> lines, (Range prevLeft prevLeft, range))
-  Pure (Delete term) -> let (lines, range) = splitTermByLines term (snd sources) in
+  Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst sources) in
     (flip Row EmptyLine <$> lines, (range, Range prevRight prevRight))
   where categories (Info _ left, Info _ right) = (left, right)
         ranges (Info left _, Info right _) = (left, right)
