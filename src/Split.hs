@@ -19,16 +19,6 @@ import Data.List (intercalate)
 
 type ClassName = String
 
-data HTML =
-  Break
-  | Text String
-  | Span (Maybe ClassName) String
-  | Ul (Maybe ClassName) [HTML]
-  | Dl (Maybe ClassName) [HTML]
-  | Div (Maybe ClassName) [HTML]
-  | Dt String
-  deriving (Show, Eq)
-
 classifyMarkup :: Maybe ClassName -> Markup -> Markup
 classifyMarkup (Just className) element = element ! A.class_ (stringValue className)
 classifyMarkup _ element = element
