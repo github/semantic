@@ -177,6 +177,9 @@ spec = do
       ] `shouldBe` Nothing
 
   describe "openTerm" $ do
+    it "returns Just the term if its substring does not end with a newline" $
+      let term = Info (Range 0 2) mempty :< Leaf "" in openTerm "  " term `shouldBe` Just term
+
     it "returns Nothing for terms whose substring ends with a newline" $
       openTerm " \n" (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
 
