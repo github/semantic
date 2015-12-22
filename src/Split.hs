@@ -209,9 +209,6 @@ elementAndBreak _ "\n" = [ Break ]
 elementAndBreak constructor x | '\n' <- last x = [ constructor $ init x, Break ]
 elementAndBreak constructor x = [ constructor x ]
 
-rowFromMaybeRows :: Maybe a -> Maybe a -> Row a
-rowFromMaybeRows a b = Row (maybe EmptyLine (Line . (:[])) a) (maybe EmptyLine (Line . (:[])) b)
-
 maybeLast :: Foldable f => f a -> Maybe a
 maybeLast = foldl (flip $ const . Just) Nothing
 
