@@ -59,9 +59,9 @@ spec = do
       \ a -> adjoinRowsBy openString openString [] a == [ a ]
 
     prop "appends onto open rows" $
-      forAll ((arbitrary `suchThat` isOpenBy openString) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openString)) $
+      forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
         \ (a@(Row (Line a1) (Line b1)), b@(Row (Line a2) (Line b2))) ->
-          adjoinRowsBy openString openString [ a ] b `shouldBe` [ Row (Line $ a1 ++ a2) (Line $ b1 ++ b2) ]
+          adjoinRowsBy openMaybe openMaybe [ a ] b `shouldBe` [ Row (Line $ a1 ++ a2) (Line $ b1 ++ b2) ]
 
     prop "does not append onto closed rows" $
       forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
