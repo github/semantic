@@ -267,8 +267,8 @@ openElement h = Just h
 
 openTerm :: String -> Term a Info -> Maybe (Term a Info)
 openTerm source term@(Info range _ :< _) = case (source !!) <$> maybeLastIndex range of
-  Just '\n' -> Just term
-  _ -> Nothing
+  Just '\n' -> Nothing
+  _ -> Just term
 
 openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
 openLineBy _ [] = Nothing
