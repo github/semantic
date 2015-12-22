@@ -164,12 +164,6 @@ openDiff :: String -> SplitDiff a Info -> Maybe (SplitDiff a Info)
 openDiff source diff@(Free (Annotated (Info range _) _)) = const diff <$> openRange source range
 openDiff source diff@(Pure term) = const diff <$> openTerm source term
 
-adjoinLinesBy :: (a -> Maybe a) -> [Line a] -> Line a -> [Line a]
-adjoinLinesBy _ [] line = [line]
-adjoinLinesBy f (EmptyLine : xs) line | Just _ <- openLineBy f xs = EmptyLine : adjoinLinesBy f xs line
-adjoinLinesBy f (prev:rest) line | Just _ <- openLineBy f [ prev ] = (prev <> line) : rest
-adjoinLinesBy _ lines line = line : lines
-
 zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
 zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++ repeat da) (b ++ repeat db)
 

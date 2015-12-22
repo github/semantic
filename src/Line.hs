@@ -22,6 +22,12 @@ openLineBy _ [] = Nothing
 openLineBy f (EmptyLine : rest) = openLineBy f rest
 openLineBy f (line : _) = const line <$> (f =<< maybeLast (unLine line))
 
+adjoinLinesBy :: (a -> Maybe a) -> [Line a] -> Line a -> [Line a]
+adjoinLinesBy _ [] line = [line]
+adjoinLinesBy f (EmptyLine : xs) line | Just _ <- openLineBy f xs = EmptyLine : adjoinLinesBy f xs line
+adjoinLinesBy f (prev:rest) line | Just _ <- openLineBy f [ prev ] = (prev <> line) : rest
+adjoinLinesBy _ lines line = line : lines
+
 instance Show a => Show (Line a) where
   show (Line elements) = "[" ++ intercalate ", " (show <$> elements) ++ "]"
   show EmptyLine = "EmptyLine"
