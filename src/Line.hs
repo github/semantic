@@ -40,7 +40,9 @@ instance Monoid (Line a) where
 
 instance ToMarkup a => ToMarkup (Bool, Int, Line a) where
   toMarkup (_, _, line@EmptyLine) = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell") <> toMarkup line <> string "\n"
-  toMarkup (hasChanges, num, line) = td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num") <> toMarkup line <> string "\n"
+  toMarkup (hasChanges, num, Line contents)
+    = td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
+    <> td (mconcat $ toMarkup <$> contents) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code") <> string "\n"
 
 codeTd :: Bool -> Maybe Html -> Html
 codeTd _ Nothing = td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
