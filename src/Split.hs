@@ -102,14 +102,14 @@ numberTd :: String -> Html
 numberTd "" = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
 numberTd s = td (string s) ! A.class_ (stringValue "blob-num")
 
-codeTd :: Maybe Html -> Html
-codeTd Nothing = td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
--- codeTd True (Just el) = td el ! A.class_ (stringValue "blob-code blob-code-replacement")
-codeTd (Just el) = td el ! A.class_ (stringValue "blob-code")
+codeTd :: Bool -> Maybe Html -> Html
+codeTd _ Nothing = td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
+codeTd True (Just el) = td el ! A.class_ (stringValue "blob-code blob-code-replacement")
+codeTd False (Just el) = td el ! A.class_ (stringValue "blob-code")
 
 instance ToMarkup a => ToMarkup (Line a) where
-  toMarkup EmptyLine = codeTd Nothing
-  toMarkup (Line contents) = codeTd . Just . mconcat $ toMarkup <$> contents
+  toMarkup EmptyLine = codeTd False Nothing
+  toMarkup (Line contents) = codeTd False . Just . mconcat $ toMarkup <$> contents
 
 data Line a =
   Line [a]
