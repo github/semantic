@@ -18,6 +18,7 @@ library
                      , Operation
                      , Algorithm
                      , Interpreter
+                     , Line
                      , OrderedMap
                      , Patch
                      , SES
