@@ -50,6 +50,10 @@ spec = do
       \ source ->
         length (splitAnnotatedByLines (source, source) (totalRange source, totalRange source) (mempty, mempty) (Indexed . fst $ foldl combineIntoLeaves ([], 0) source)) `shouldBe` length (filter (== '\n') source) + 1
 
+    prop "produces the maximum line count in inequal sources" $
+      \ sourceA sourceB ->
+        length (splitAnnotatedByLines (sourceA, sourceB) (totalRange sourceA, totalRange sourceB) (mempty, mempty) (Indexed [])) `shouldBe` max (length (filter (== '\n') sourceA) + 1) (length (filter (== '\n') sourceB) + 1)
+
   describe "annotatedToRows" $ do
     it "outputs one row for single-line empty unchanged indexed nodes" $
       annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` [ Row (Line [ Ul (Just "category-branch") [ Text "[]" ] ]) (Line [ Ul (Just "category-branch") [ Text "[]" ] ]) ]
