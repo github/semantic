@@ -18,12 +18,6 @@ instance Arbitrary a => Arbitrary (Row a) where
   arbitrary = oneof [
     Row <$> arbitrary <*> arbitrary ]
 
-instance Arbitrary HTML where
-  arbitrary = oneof [
-    Text <$> arbitrary,
-    Span <$> arbitrary <*> arbitrary,
-    const Break <$> (arbitrary :: Gen ()) ]
-
 instance Arbitrary a => Arbitrary (Line a) where
   arbitrary = oneof [
     Line <$> arbitrary,
