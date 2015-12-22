@@ -135,8 +135,8 @@ type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf ann
 newtype Renderable a = Renderable (String, a)
 
 instance ToMarkup (Renderable (Term a Info)) where
-  toMarkup (Renderable (source, Info range categories :< syntax)) = case syntax of
-    Leaf _ -> classifyMarkup (maybeLast categories) . span . string $ substring range source
+  toMarkup (Renderable (source, Info range categories :< syntax)) = classifyMarkup (maybeLast categories) $ case syntax of
+    Leaf _ -> span . string $ substring range source
 
 splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (SplitDiff a Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
