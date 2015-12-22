@@ -109,7 +109,7 @@ codeTd (Just el) = td el ! A.class_ (stringValue "blob-code")
 
 instance ToMarkup a => ToMarkup (Line a) where
   toMarkup EmptyLine = codeTd Nothing
-  toMarkup (Line html) = codeTd . Just . mconcat $ toMarkup <$> html
+  toMarkup (Line contents) = codeTd . Just . mconcat $ toMarkup <$> contents
 
 data Line a =
   Line [a]
