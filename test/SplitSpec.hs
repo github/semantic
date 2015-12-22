@@ -94,9 +94,6 @@ spec = do
       openTerm " \n" (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
 
     where
-      info source category = Info (totalRange source)  (Set.fromList [ category ])
-      unchanged source = formatted source source
-      formatted source1 source2 category = Annotated (info source1 category, info source2 category)
       offsetInfo by (Info (Range start end) categories) = Info (Range (start + by) (end + by)) categories
       offsetAnnotated by1 by2 (Annotated (left, right) syntax) = Annotated (offsetInfo by1 left, offsetInfo by2 right) syntax
       isOpenBy f (Row a b) = Maybe.isJust (openLineBy f [ a ]) && Maybe.isJust (openLineBy f [ b ])
