@@ -61,27 +61,6 @@ data Row a = Row { unLeft :: Line a, unRight :: Line a }
 instance Show a => Show (Row a) where
   show (Row left right) = "\n" ++ show left ++ " | " ++ show right
 
-instance ToMarkup a => ToMarkup (Int, Line a, Int, Line a) where
-  toMarkup (m, left, n, right) = tr $ toMarkup (m, left) <> toMarkup (n, right) <> string "\n"
-
-instance ToMarkup a => ToMarkup (Int, Line a) where
-  toMarkup (_, line@EmptyLine) = numberTd "" <> toMarkup line <> string "\n"
-  -- toMarkup (num, line@(Line _)) = td (string $ show num) ! A.class_ (stringValue "blob-num blob-num-replacement") <> toMarkup line <> string "\n"
-  toMarkup (num, line@(Line _)) = numberTd (show num) <> toMarkup line <> string "\n"
-
-numberTd :: String -> Html
-numberTd "" = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
-numberTd s = td (string s) ! A.class_ (stringValue "blob-num")
-
-codeTd :: Bool -> Maybe Html -> Html
-codeTd _ Nothing = td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
-codeTd True (Just el) = td el ! A.class_ (stringValue "blob-code blob-code-replacement")
-codeTd False (Just el) = td el ! A.class_ (stringValue "blob-code")
-
-instance ToMarkup a => ToMarkup (Line a) where
-  toMarkup EmptyLine = codeTd False Nothing
-  toMarkup (Line contents) = codeTd False . Just . mconcat $ toMarkup <$> contents
-
 -- | A diff with only one side’s annotations.
 type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf annotation)
 
