@@ -68,8 +68,8 @@ spec = do
         \ (a, b) -> adjoinRowsBy openMaybe openMaybe [ a ] b `shouldBe` [ b, a ]
 
     prop "does not promote elements through empty lines onto closed lines" $
-      forAll ((arbitrary `suchThat` isClosedBy openElement) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openElement)) $
-        \ (a, b) -> adjoinRowsBy openElement openElement [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
+      forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
+        \ (a, b) -> adjoinRowsBy openMaybe openMaybe [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
 
     prop "promotes elements through empty lines onto open lines" $
       forAll ((arbitrary `suchThat` isOpenBy openElement) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openElement)) $
