@@ -129,29 +129,6 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 contextLines :: (Info -> a) -> Range -> Set.Set Category -> String -> [Line a]
 contextLines constructor range categories source = Line . (:[]) . constructor . (`Info` categories) <$> actualLineRanges range source
 
-adjoinRowsBy :: (a -> Maybe a) -> (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
-adjoinRowsBy _ _ [] row = [row]
-
-adjoinRowsBy f g rows (Row left' right') | Just _ <- openLineBy f $ unLeft <$> rows, Just _ <- openLineBy g $ unRight <$> rows = zipWith Row lefts rights
-  where lefts = adjoinLinesBy f (unLeft <$> rows) left'
-        rights = adjoinLinesBy g (unRight <$> rows) right'
-
-adjoinRowsBy f _ rows (Row left' right') | Just _ <- openLineBy f $ unLeft <$> rows = case right' of
-  EmptyLine -> rest
-  _ -> Row EmptyLine right' : rest
-  where rest = zipWith Row lefts rights
-        lefts = adjoinLinesBy f (unLeft <$> rows) left'
-        rights = unRight <$> rows
-
-adjoinRowsBy _ g rows (Row left' right') | Just _ <- openLineBy g $ unRight <$> rows = case left' of
-  EmptyLine -> rest
-  _ -> Row left' EmptyLine : rest
-  where rest = zipWith Row lefts rights
-        lefts = unLeft <$> rows
-        rights = adjoinLinesBy g (unRight <$> rows) right'
-
-adjoinRowsBy _ _ rows row = row : rows
-
 openRange :: String -> Range -> Maybe Range
 openRange source range = case (source !!) <$> maybeLastIndex range of
   Just '\n' -> Nothing
