@@ -132,16 +132,16 @@ instance Monoid (Line a) where
 -- | A diff with only one side’s annotations.
 type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf annotation)
 
-splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (Term a Info)], (Range, Range))
+splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (SplitDiff a Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
-    (Row EmptyLine <$> lines, (Range prevLeft prevLeft, range))
+    (Row EmptyLine . fmap Pure <$> lines, (Range prevLeft prevLeft, range))
   Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst sources) in
-    (flip Row EmptyLine <$> lines, (range, Range prevRight prevRight))
+    (flip Row EmptyLine . fmap Pure <$> lines, (range, Range prevRight prevRight))
   Pure (Replace leftTerm rightTerm) -> let (leftLines, leftRange) = splitTermByLines leftTerm (fst sources)
                                            (rightLines, rightRange) = splitTermByLines rightTerm (snd sources) in
-                                           (zipWithDefaults Row EmptyLine EmptyLine leftLines rightLines, (leftRange, rightRange))
+                                           (zipWithDefaults Row EmptyLine EmptyLine (fmap Pure <$> leftLines) (fmap Pure <$> rightLines), (leftRange, rightRange))
   where categories (Info _ left, Info _ right) = (left, right)
         ranges (Info left _, Info right _) = (left, right)
 
@@ -197,15 +197,16 @@ termToLines (Info range categories :< syntax) source = (rows syntax, range)
       (adjoin $ lines ++ contextLines (Range previous $ start childRange) source ++ childLines, end childRange)
     elements = elementAndBreak (Span $ classify categories) =<< actualLines (substring range source)
 
-splitAnnotatedByLines :: (String, String) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (Term a Info)]
+splitAnnotatedByLines :: (String, String) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> contextRows (Leaf a) ranges categories sources
   Indexed children -> adjoinChildRows Indexed children
   Fixed children -> adjoinChildRows Fixed children
   Keyed children -> adjoinChildRows Keyed children
   where contextRows constructor ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine (contextLines constructor (fst ranges) (fst categories) (fst sources)) (contextLines constructor (snd ranges) (snd categories) (snd sources))
+        contextLines constructor range categories source = Line True . (:[]) . Free . (`Annotated` constructor) . (`Info` categories) <$> actualLineRanges range source
 
-        adjoin = reverse . foldl (adjoinRowsBy (openTerm $ fst sources) (openTerm $ snd sources)) []
+        adjoin = reverse . foldl (adjoinRowsBy (openDiff $ fst sources) (openDiff $ snd sources)) []
         adjoinChildRows constructor children = let (rows, previous) = foldl (childRows $ constructor mempty) ([], starts ranges) children in
           adjoin $ rows ++ contextRows (constructor mempty) (makeRanges previous (ends ranges)) categories sources
 
