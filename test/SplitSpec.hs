@@ -29,15 +29,15 @@ instance Arbitrary a => Arbitrary (Line a) where
     Line <$> arbitrary,
     const EmptyLine <$> (arbitrary :: Gen ()) ]
 
-arbitraryLeaf :: Int -> Gen (String, Info, Syntax String f)
-arbitraryLeaf start = toTuple <$> arbitrary
-  where toTuple string = (string, Info (Range start $ start + length string) mempty, Leaf string)
+arbitraryLeaf :: Gen (String, Info, Syntax String f)
+arbitraryLeaf = toTuple <$> arbitrary
+  where toTuple string = (string, Info (Range 0 $ length string) mempty, Leaf string)
 
 spec :: Spec
 spec = do
   describe "splitAnnotatedByLines" $ do
     prop "outputs one row for single-line unchanged leaves" $
-      forAll (arbitraryLeaf 0 `suchThat` \ (a, _, _) -> filter (/= '\n') a == a) $
+      forAll (arbitraryLeaf `suchThat` \ (a, _, _) -> filter (/= '\n') a == a) $
         \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (source, source) (range, range) (categories, categories) syntax `shouldBe` [
           Row (Line [ Free $ Annotated info $ Leaf source ]) (Line [ Free $ Annotated info $ Leaf source ]) ]
 
