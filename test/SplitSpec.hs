@@ -72,8 +72,8 @@ spec = do
         \ (a, b) -> adjoinRowsBy openMaybe openMaybe [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
 
     prop "promotes elements through empty lines onto open lines" $
-      forAll ((arbitrary `suchThat` isOpenBy openElement) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openElement)) $
-        \ (a, b) -> adjoinRowsBy openElement openElement [ Row EmptyLine EmptyLine, a ] b `shouldBe` Row EmptyLine EmptyLine : adjoinRowsBy openElement openElement [ a ] b
+      forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
+        \ (a, b) -> adjoinRowsBy openMaybe openMaybe [ Row EmptyLine EmptyLine, a ] b `shouldBe` Row EmptyLine EmptyLine : adjoinRowsBy openMaybe openMaybe [ a ] b
 
   describe "splitTermByLines" $ do
     prop "preserves line count" $
