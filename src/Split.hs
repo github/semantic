@@ -189,6 +189,10 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         adjoin = reverse . foldl (adjoinRowsBy (openTerm $ fst sources) (openTerm $ snd sources)) []
 
+        starts (left, right) = (start left, start right)
+        ends (left, right) = (end left, end right)
+        makeRanges (leftStart, rightStart) (leftEnd, rightEnd) = (Range leftStart leftEnd, Range rightStart rightEnd)
+
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> [Row HTML]
 annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories) syntax) before after = rows syntax
