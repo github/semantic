@@ -41,6 +41,11 @@ spec = do
         \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (source, source) (range, range) (categories, categories) syntax `shouldBe` [
           Row (Line [ Free $ Annotated info $ Leaf source ]) (Line [ Free $ Annotated info $ Leaf source ]) ]
 
+    prop "outputs one row for single-line empty unchanged indexed nodes" $
+      forAll (arbitrary `suchThat` \ s -> filter (/= '\n') s == s) $
+          \ source -> splitAnnotatedByLines (source, source) (totalRange source, totalRange source) (mempty, mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
+            Row (Line [ Free $ Annotated (Info (totalRange source) mempty) $ Indexed [] ]) (Line [ Free $ Annotated (Info (totalRange source) mempty) $ Indexed [] ]) ]
+
   describe "annotatedToRows" $ do
     it "outputs one row for single-line empty unchanged indexed nodes" $
       annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` [ Row (Line [ Ul (Just "category-branch") [ Text "[]" ] ]) (Line [ Ul (Just "category-branch") [ Text "[]" ] ]) ]
