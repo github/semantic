@@ -56,7 +56,7 @@ spec = do
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $
-      \ a -> adjoinRowsBy openElement openElement [] a == [ a ]
+      \ a -> adjoinRowsBy openString openString [] a == [ a ]
 
     prop "appends onto open rows" $
       forAll ((arbitrary `suchThat` isOpen) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpen)) $
