@@ -244,7 +244,6 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         starts (left, right) = (start left, start right)
         ends (left, right) = (end left, end right)
         makeRanges (leftStart, rightStart) (leftEnd, rightEnd) = (Range leftStart leftEnd, Range rightStart rightEnd)
-        duplicate x = (x, x)
 
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> [Row HTML]
