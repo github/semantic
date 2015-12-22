@@ -124,10 +124,10 @@ instance Show a => Show (Line a) where
   show EmptyLine = "EmptyLine"
 
 instance Monoid (Line a) where
- mempty = EmptyLine
- mappend EmptyLine line = line
- mappend line EmptyLine = line
- mappend (Line c1 xs) (Line c2 ys) = Line (c1 || c2) (xs <> ys)
+  mempty = EmptyLine
+  mappend EmptyLine line = line
+  mappend line EmptyLine = line
+  mappend (Line c1 xs) (Line c2 ys) = Line (c1 || c2) (xs <> ys)
 
 diffToRows :: Diff a Info -> (Int, Int) -> String -> String -> ([Row HTML], (Range, Range))
 diffToRows (Free annotated@(Annotated (Info left _, Info right _) _)) _ before after = (annotatedToRows annotated before after, (left, right))
