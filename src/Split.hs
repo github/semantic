@@ -208,11 +208,8 @@ annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories
     appendRemainder (rows, previousIndices) = reverse . foldl (adjoinRowsBy openElement) [] $ rows ++ contextRows (ends ranges) previousIndices sources
     starts (left, right) = (start left, start right)
     ends (left, right) = (end left, end right)
-    sumRows (rows, previousIndices) child = (allRows, ends childRanges)
-      where
-        separatorRows = contextRows (starts childRanges) previousIndices sources
-        allRows = rows ++ separatorRows ++ childRows
-        (childRows, childRanges) = diffToRows child previousIndices before after
+    sumRows (rows, previousIndices) child = let (childRows, childRanges) = diffToRows child previousIndices before after in
+      (rows ++ contextRows (starts childRanges) previousIndices sources ++ childRows, ends childRanges)
 
 contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row HTML]
 contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows leftElements rightElements
