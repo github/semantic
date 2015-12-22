@@ -37,10 +37,9 @@ spec :: Spec
 spec = do
   describe "splitAnnotatedByLines" $ do
     prop "outputs one row for single-line unchanged leaves" $
-      \ a -> let source = filter (/= '\n') a
-                 range = totalRange source in
-                 splitAnnotatedByLines (source, source) (range, range) (mempty, mempty) (Leaf a) `shouldBe` [
-                   Row (Line [ Free $ Annotated (Info range mempty) $ Leaf a ]) (Line [ Free $ Annotated (Info range mempty) $ Leaf a ]) ]
+      forAll (arbitraryLeaf 0 `suchThat` \ (a, _, _) -> filter (/= '\n') a == a) $
+        \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (source, source) (range, range) (categories, categories) syntax `shouldBe` [
+          Row (Line [ Free $ Annotated info $ Leaf source ]) (Line [ Free $ Annotated info $ Leaf source ]) ]
 
   describe "annotatedToRows" $ do
     it "outputs one row for single-line empty unchanged indexed nodes" $
