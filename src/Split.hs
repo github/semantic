@@ -190,6 +190,7 @@ splitAnnotatedByLines :: (String, String) -> (Range, Range) -> (Set.Set Category
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> contextRows (Leaf a) ranges categories sources
   Indexed children -> adjoinChildRows Indexed children
+  Fixed children -> adjoinChildRows Fixed children
   where contextRows constructor ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine (contextLines constructor (fst ranges) (fst categories) (fst sources)) (contextLines constructor (snd ranges) (snd categories) (snd sources))
 
         adjoin = reverse . foldl (adjoinRowsBy (openTerm $ fst sources) (openTerm $ snd sources)) []
