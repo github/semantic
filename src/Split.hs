@@ -137,10 +137,13 @@ newtype Renderable a = Renderable (String, a)
 instance ToMarkup (Renderable (Term a Info)) where
   toMarkup (Renderable (source, Info range categories :< syntax)) = classifyMarkup (maybeLast categories) $ case syntax of
     Leaf _ -> span . string $ substring range source
-    Indexed children -> ul . mconcat $ let (elements, previous) = foldl markupForSeparatorAndChild ([], start range) children in
-      elements ++ [ string $ substring (Range previous $ end range) source ]
+    Indexed children -> ul . mconcat $ contentElements children
     where markupForSeparatorAndChild :: ([Markup], Int) -> Term a Info -> ([Markup], Int)
           markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string (substring (Range previous $ start $ getRange child) source), toMarkup (Renderable (source, child)) ], end $ getRange child)
+
+          contentElements children = let (elements, previous) = foldl markupForSeparatorAndChild ([], start range) children in
+            elements ++ [ string $ substring (Range previous $ end range) source ]
+
           getRange (Info range _ :< _) = range
 
 splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (SplitDiff a Info)], (Range, Range))
