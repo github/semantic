@@ -161,16 +161,16 @@ instance ToMarkup (Renderable (SplitDiff a Info)) where
     where toMarkupAndRange :: Term a Info -> (Markup, Range)
           toMarkupAndRange term@(Info range _ :< _) = ((div ! A.class_ (stringValue "patch")) . toMarkup $ Renderable (source, term), range)
 
-splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (SplitDiff a Info)], (Range, Range))
+splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (Diff a Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
-    (Row EmptyLine . fmap Pure <$> lines, (Range prevLeft prevLeft, range))
+    (Row EmptyLine . fmap (Pure . Insert) <$> lines, (Range prevLeft prevLeft, range))
   Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst sources) in
-    (flip Row EmptyLine . fmap Pure <$> lines, (range, Range prevRight prevRight))
+    (flip Row EmptyLine . fmap (Pure . Delete) <$> lines, (range, Range prevRight prevRight))
   Pure (Replace leftTerm rightTerm) -> let (leftLines, leftRange) = splitTermByLines leftTerm (fst sources)
                                            (rightLines, rightRange) = splitTermByLines rightTerm (snd sources) in
-                                           (zipWithDefaults Row EmptyLine EmptyLine (fmap Pure <$> leftLines) (fmap Pure <$> rightLines), (leftRange, rightRange))
+                                           (zipWithDefaults Row EmptyLine EmptyLine (fmap (Pure . Delete) <$> leftLines) (fmap (Pure . Insert) <$> rightLines), (leftRange, rightRange))
   where categories (Info _ left, Info _ right) = (left, right)
         ranges (Info left _, Info right _) = (left, right)
 
@@ -226,15 +226,15 @@ termToLines (Info range categories :< syntax) source = (rows syntax, range)
       (adjoin $ lines ++ contextLines (Range previous $ start childRange) source ++ childLines, end childRange)
     elements = elementAndBreak (Span $ classify categories) =<< actualLines (substring range source)
 
-splitAnnotatedByLines :: (String, String) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
+splitAnnotatedByLines :: (String, String) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (Diff a Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> contextRows (Leaf a) ranges categories sources
   Indexed children -> adjoinChildRows Indexed children
   Fixed children -> adjoinChildRows Fixed children
   Keyed children -> adjoinChildRows Keyed children
-  where contextRows constructor ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine (contextLines (Free . (`Annotated` constructor)) (fst ranges) (fst categories) (fst sources)) (contextLines (Free . (`Annotated` constructor)) (snd ranges) (snd categories) (snd sources))
+  where contextRows constructor ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine (contextLines (Free . (`Annotated` constructor) . duplicate) (fst ranges) (fst categories) (fst sources)) (contextLines (Free . (`Annotated` constructor) . duplicate) (snd ranges) (snd categories) (snd sources))
 
-        adjoin = reverse . foldl (adjoinRowsBy (openDiff $ fst sources) (openDiff $ snd sources)) []
+        adjoin = reverse . foldl (adjoinRowsBy (openDiff2 fst sources) (openDiff2 snd sources)) []
         adjoinChildRows constructor children = let (rows, previous) = foldl (childRows $ constructor mempty) ([], starts ranges) children in
           adjoin $ rows ++ contextRows (constructor mempty) (makeRanges previous (ends ranges)) categories sources
 
