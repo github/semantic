@@ -145,11 +145,11 @@ spec = do
 
   describe "splitTermByLines" $ do
     it "splits multi-line terms into multiple lines" $
-      let categories = Set.singleton "leaf" in splitTermByLines (Info (Range 0 5) categories :< Leaf "") "/*\n*/"
+      splitTermByLines (Info (Range 0 5) mempty :< Leaf "") "/*\n*/"
       `shouldBe`
       ([
-        Line True [ Info (Range 0 3) categories :< Leaf "" ],
-        Line True [ Info (Range 3 5) categories :< Leaf "" ]
+        Line True [ Info (Range 0 3) mempty :< Leaf "" ],
+        Line True [ Info (Range 3 5) mempty :< Leaf "" ]
       ], Range 0 5)
 
   describe "openLineBy" $ do
