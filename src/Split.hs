@@ -187,6 +187,8 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   where contextLines constructor range categories source = Line False . (:[]) . (:< constructor) . (`Info` categories) <$> actualLineRanges range source
         contextRows constructor ranges categoriess sources = zipWithDefaults Row EmptyLine EmptyLine (contextLines (Leaf a) (fst ranges) (fst categories) (fst sources)) (contextLines (Leaf a) (snd ranges) (snd categories) (snd sources))
 
+        adjoin = reverse . foldl (adjoinRowsBy (openTerm $ fst sources) (openTerm $ snd sources)) []
+
 -- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
 annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> [Row HTML]
 annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories) syntax) before after = rows syntax
