@@ -158,7 +158,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
   where adjoin = reverse . foldl (adjoinLinesBy $ openTerm source) []
         adjoinChildLines constructor children = let (lines, previous) = foldl (childLines $ constructor mempty) ([], start range) children in
           adjoin $ lines ++ contextLines (constructor mempty) (Range previous $ end range) categories source
-        contextLines constructor range categories source = Line True . (:[]) . (:< constructor) . (`Info` categories) <$> actualLineRanges range source
+
         childLines constructor (lines, previous) child = let (childLines, childRange) = splitTermByLines child source in
           (adjoin $ lines ++ contextLines constructor (Range previous $ start childRange) categories source ++ childLines, end childRange)
 
