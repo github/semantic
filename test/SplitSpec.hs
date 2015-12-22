@@ -38,12 +38,6 @@ spec = do
                  splitAnnotatedByLines (source, source) (range, range) (mempty, mempty) (Leaf a) `shouldBe` [
                    Row (Line [ Free $ Annotated (Info range mempty) $ Leaf a ]) (Line [ Free $ Annotated (Info range mempty) $ Leaf a ]) ]
 
-    it "outputs one row for single-line unchanged leaves" $
-      let sources = ("a", "a")
-          ranges = (Range 0 1, Range 0 1)
-          categories = (mempty, mempty) in
-          splitAnnotatedByLines sources ranges categories (Leaf "b") `shouldBe` [ Row (Line [ Free $ Annotated (Info (fst ranges) (fst categories)) $ Leaf "b" ]) (Line [ Free $ Annotated (Info (snd ranges) (snd categories)) $ Leaf "b" ]) ]
-
   describe "annotatedToRows" $ do
     it "outputs one row for single-line unchanged leaves" $
       annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` [ Row (Line [ span "a" ]) (Line [ span "a" ]) ]
