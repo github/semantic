@@ -203,12 +203,6 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 contextLines :: (Info -> a) -> Range -> Set.Set Category -> String -> [Line a]
 contextLines constructor range categories source = Line . (:[]) . constructor . (`Info` categories) <$> actualLineRanges range source
 
-elementAndBreak :: (String -> HTML) -> String -> [HTML]
-elementAndBreak _ "" = []
-elementAndBreak _ "\n" = [ Break ]
-elementAndBreak constructor x | '\n' <- last x = [ constructor $ init x, Break ]
-elementAndBreak constructor x = [ constructor x ]
-
 maybeLast :: Foldable f => f a -> Maybe a
 maybeLast = foldl (flip $ const . Just) Nothing
 
