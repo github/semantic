@@ -52,7 +52,7 @@ spec = do
 
     prop "produces the maximum line count in inequal sources" $
       \ sourceA sourceB ->
-        length (splitAnnotatedByLines (sourceA, sourceB) (totalRange sourceA, totalRange sourceB) (mempty, mempty) (Indexed [])) `shouldBe` max (length (filter (== '\n') sourceA) + 1) (length (filter (== '\n') sourceB) + 1)
+        length (splitAnnotatedByLines (sourceA, sourceB) (totalRange sourceA, totalRange sourceB) (mempty, mempty) (Indexed $ zipWith (leafWithRangesInSources sourceA sourceB) (actualLineRanges (totalRange sourceA) sourceA) (actualLineRanges (totalRange sourceB) sourceB))) `shouldBe` max (length (filter (== '\n') sourceA) + 1) (length (filter (== '\n') sourceB) + 1)
 
   describe "annotatedToRows" $ do
     it "outputs one row for single-line empty unchanged indexed nodes" $
