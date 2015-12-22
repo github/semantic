@@ -192,6 +192,8 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   where contextRows constructor ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine (contextLines constructor (fst ranges) (fst categories) (fst sources)) (contextLines constructor (snd ranges) (snd categories) (snd sources))
 
         adjoin = reverse . foldl (adjoinRowsBy (openTerm $ fst sources) (openTerm $ snd sources)) []
+        adjoinChildRows constructor children = let (rows, previous) = foldl (childRows $ constructor mempty) ([], starts ranges) children in
+          adjoin $ rows ++ contextRows (constructor mempty) (makeRanges previous (ends ranges)) categories sources
 
         childRows constructor (rows, previous) child = let (childRows, childRanges) = splitDiffByLines child previous sources in
           (adjoin $ rows ++ contextRows constructor (makeRanges previous (starts childRanges)) categories sources ++ childRows, ends childRanges)
