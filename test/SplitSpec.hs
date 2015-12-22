@@ -37,7 +37,7 @@ spec :: Spec
 spec = do
   describe "splitAnnotatedByLines" $ do
     prop "outputs one row for single-line unchanged leaves" $
-      forAll (arbitraryLeaf `suchThat` \ (a, _, _) -> filter (/= '\n') a == a) $
+      forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
         \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (source, source) (range, range) (categories, categories) syntax `shouldBe` [
           Row (Line [ Free $ Annotated info $ Leaf source ]) (Line [ Free $ Annotated info $ Leaf source ]) ]
 
