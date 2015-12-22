@@ -167,16 +167,16 @@ diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, righ
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term a Info -> String -> ([Line (Term a Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
-  Leaf a -> contextLines (Leaf a) range categories source
+  Leaf a -> contextLines (:< Leaf a) range categories source
   Indexed children -> adjoinChildLines Indexed children
   Fixed children -> adjoinChildLines Fixed children
   Keyed children -> adjoinChildLines Keyed children
   where adjoin = reverse . foldl (adjoinLinesBy $ openTerm source) []
         adjoinChildLines constructor children = let (lines, previous) = foldl (childLines $ constructor mempty) ([], start range) children in
-          adjoin $ lines ++ contextLines (constructor mempty) (Range previous $ end range) categories source
+          adjoin $ lines ++ contextLines (:< constructor mempty) (Range previous $ end range) categories source
 
         childLines constructor (lines, previous) child = let (childLines, childRange) = splitTermByLines child source in
-          (adjoin $ lines ++ contextLines constructor (Range previous $ start childRange) categories source ++ childLines, end childRange)
+          (adjoin $ lines ++ contextLines (:< constructor) (Range previous $ start childRange) categories source ++ childLines, end childRange)
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
 termToLines :: Term a Info -> String -> ([Line HTML], Range)
@@ -241,8 +241,8 @@ annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories
     sumRows (rows, previousIndices) child = let (childRows, childRanges) = diffToRows child previousIndices before after in
       (rows ++ contextRows (starts childRanges) previousIndices sources ++ childRows, ends childRanges)
 
-contextLines :: Syntax a (Term a Info) -> Range -> Set.Set Category -> String -> [Line (Term a Info)]
-contextLines constructor range categories source = Line True . (:[]) . (:< constructor) . (`Info` categories) <$> actualLineRanges range source
+contextLines :: (Info -> a) -> Range -> Set.Set Category -> String -> [Line a]
+contextLines constructor range categories source = Line True . (:[]) . constructor . (`Info` categories) <$> actualLineRanges range source
 
 contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row HTML]
 contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows leftElements rightElements
