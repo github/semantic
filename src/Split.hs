@@ -71,12 +71,6 @@ split diff left right = return . renderHtml
     digits n = let base = 10 :: Int in
       ceiling (logBase (fromIntegral base) (fromIntegral n) :: Double)
 
-    split :: (forall b. (b, b) -> b) -> Free (Annotated leaf (annotation, annotation)) (Patch (Term leaf annotation)) -> SplitDiff leaf annotation
-    split which (Pure patch) = Pure $ case which (before patch, after patch) of
-      Just term -> term
-      _ -> error "`split` expects to be called with a total selector for patches"
-    split which (Free (Annotated infos syntax)) = Free . Annotated (which infos) $ split which <$> syntax
-
     columnWidth = max (20 + digits maxNumber * 8) 40
 
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
