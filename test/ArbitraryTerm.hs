@@ -11,7 +11,7 @@ import qualified Data.Set as Set
 import GHC.Generics
 import Test.QuickCheck hiding (Fixed)
 
-newtype ArbitraryTerm a annotation = ArbitraryTerm (annotation, (Syntax a (ArbitraryTerm a annotation)))
+newtype ArbitraryTerm a annotation = ArbitraryTerm (annotation, Syntax a (ArbitraryTerm a annotation))
   deriving (Show, Eq, Generic)
 
 unTerm :: ArbitraryTerm a annotation -> Term a annotation
@@ -26,7 +26,7 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
             [ (12, liftM Leaf arbitrary),
               (1, liftM Indexed $ take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
               (1, liftM Fixed $ take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
-              (1, liftM (Keyed . Map.fromList) $ take maxLength <$> listOf (arbitrary >>= (\x -> ((,) x) <$> smallerTerm maxLength maxDepth))) ]
+              (1, liftM (Keyed . Map.fromList) $ take maxLength <$> listOf (arbitrary >>= (\x -> (,) x <$> smallerTerm maxLength maxDepth))) ]
           smallerTerm maxLength maxDepth = boundedTerm (div maxLength 3) (div maxDepth 3)
   shrink term@(ArbitraryTerm (annotation, syntax)) = (++) (subterms term) $ filter (/= term) $
     ArbitraryTerm <$> ((,) <$> shrink annotation <*> case syntax of
