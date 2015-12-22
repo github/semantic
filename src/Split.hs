@@ -19,9 +19,8 @@ import Data.List (intercalate)
 
 type ClassName = String
 
-classifyMarkup :: Maybe ClassName -> Markup -> Markup
-classifyMarkup (Just className) element = element ! A.class_ (stringValue className)
-classifyMarkup _ element = element
+classifyMarkup :: Foldable f => f String -> Markup -> Markup
+classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeLast categories
 
 split :: Diff a Info -> String -> String -> IO ByteString
 split diff before after = return . renderHtml
@@ -108,7 +107,7 @@ type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf ann
 newtype Renderable a = Renderable (String, a)
 
 instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
-  toMarkup (Renderable (source, (Info range categories, syntax))) = classifyMarkup (classify categories) $ case syntax of
+  toMarkup (Renderable (source, (Info range categories, syntax))) = classifyMarkup categories $ case syntax of
     Leaf _ -> span . string $ substring range source
     Indexed children -> ul . mconcat $ contentElements children
     Fixed children -> ul . mconcat $ contentElements children
