@@ -295,15 +295,16 @@ openElement (Dl _ elements) = openElement =<< maybeLast elements
 openElement (Div _ elements) = openElement =<< maybeLast elements
 openElement h = Just h
 
-openTerm :: String -> Term a Info -> Maybe (Term a Info)
-openTerm source term@(Info range _ :< _) = case (source !!) <$> maybeLastIndex range of
+openRange :: String -> Range -> Maybe Range
+openRange source range = case (source !!) <$> maybeLastIndex range of
   Just '\n' -> Nothing
-  _ -> Just term
+  _ -> Just range
+
+openTerm :: String -> Term a Info -> Maybe (Term a Info)
+openTerm source term@(Info range _ :< _) = const term <$> openRange source range
 
 openDiff :: String -> SplitDiff a Info -> Maybe (SplitDiff a Info)
-openDiff source diff@(Free (Annotated (Info range _) _)) = case (source !!) <$> maybeLastIndex range of
-  Just '\n' -> Nothing
-  _ -> Just diff
+openDiff source diff@(Free (Annotated (Info range _) _)) = const diff <$> openRange source range
 openDiff source diff@(Pure term) = const diff <$> openTerm source term
 
 openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
