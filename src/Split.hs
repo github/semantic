@@ -13,7 +13,6 @@ import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
-import qualified OrderedMap as Map
 import Data.Monoid
 import qualified Data.Set as Set
 import Data.List (intercalate)
@@ -168,25 +167,6 @@ splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   where categories (Info _ left, Info _ right) = (left, right)
         ranges (Info left _, Info right _) = (left, right)
 
-diffToRows :: Diff a Info -> (Int, Int) -> String -> String -> ([Row HTML], (Range, Range))
-diffToRows (Free annotated@(Annotated (Info left _, Info right _) _)) _ before after = (annotatedToRows annotated before after, (left, right))
-diffToRows (Pure (Insert term)) (previousIndex, _) _ after = (rowWithInsertedLine <$> afterLines, (Range previousIndex previousIndex, range))
-  where
-    (afterLines, range) = termToLines term after
-    rowWithInsertedLine (Line elements) = Row EmptyLine $ Line [ Div (Just "insert") elements ]
-    rowWithInsertedLine line = Row line line
-diffToRows (Pure (Delete term)) (_, previousIndex) before _ = (rowWithDeletedLine <$> lines, (range, Range previousIndex previousIndex))
-  where
-    (lines, range) = termToLines term before
-    rowWithDeletedLine (Line elements) = Row (Line [ Div (Just "delete") elements ]) EmptyLine
-    rowWithDeletedLine line = Row line line
-diffToRows (Pure (Replace a b)) _ before after = (replacedRows, (leftRange, rightRange))
-  where
-    replacedRows = zipWithMaybe rowFromMaybeRows (replace <$> leftElements) (replace <$> rightElements)
-    replace = Div (Just "replace") . unLine
-    (leftElements, leftRange) = termToLines a before
-    (rightElements, rightRange) = termToLines b after
-
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term a Info -> String -> ([Line (Term a Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
@@ -238,30 +218,6 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         starts (left, right) = (start left, start right)
         ends (left, right) = (end left, end right)
         makeRanges (leftStart, rightStart) (leftEnd, rightEnd) = (Range leftStart leftEnd, Range rightStart rightEnd)
-
--- | Given an Annotated and before/after strings, returns a list of `Row`s representing the newline-separated diff.
-annotatedToRows :: Annotated a (Info, Info) (Diff a Info) -> String -> String -> [Row HTML]
-annotatedToRows (Annotated (Info left leftCategories, Info right rightCategories) syntax) before after = rows syntax
-  where
-    rows (Leaf _) = zipWithMaybe rowFromMaybeRows leftElements rightElements
-    rows (Indexed i) = rewrapRowContentsIn Ul <$> childRows i
-    rows (Fixed f) = rewrapRowContentsIn Ul <$> childRows f
-    rows (Keyed k) = rewrapRowContentsIn Dl <$> childRows (snd <$> Map.toList k)
-
-    leftElements = elementAndBreak (Span $ classify leftCategories) =<< actualLines (substring left before)
-    rightElements = elementAndBreak (Span $ classify rightCategories) =<< actualLines (substring right after)
-
-    wrap _ EmptyLine = EmptyLine
-    wrap f (Line elements) = Line [ f elements ]
-    rewrapRowContentsIn f (Row left right) = Row (wrap (f $ classify leftCategories) left) (wrap (f $ classify rightCategories) right)
-    ranges = (left, right)
-    sources = (before, after)
-    childRows = appendRemainder . foldl sumRows ([], starts ranges)
-    appendRemainder (rows, previousIndices) = reverse . foldl (adjoinRowsBy openElement openElement) [] $ rows ++ contextRows (ends ranges) previousIndices sources
-    starts (left, right) = (start left, start right)
-    ends (left, right) = (end left, end right)
-    sumRows (rows, previousIndices) child = let (childRows, childRanges) = diffToRows child previousIndices before after in
-      (rows ++ contextRows (starts childRanges) previousIndices sources ++ childRows, ends childRanges)
 
 contextLines :: (Info -> a) -> Range -> Set.Set Category -> String -> [Line a]
 contextLines constructor range categories source = Line . (:[]) . constructor . (`Info` categories) <$> actualLineRanges range source
