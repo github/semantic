@@ -82,22 +82,10 @@ spec = do
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
-      openLineBy openElement [
-        Line [ Div (Just "delete") [ span "*/" ] ],
-        Line [ Div (Just "delete") [ span " * Debugging", Break ] ],
-        Line [ Div (Just "delete") [ span "/*", Break ] ]
-      ] `shouldBe` (Just $ Line [ Div (Just "delete") [ span "*/" ] ])
-
-    it "produces the earliest non-empty line in a list, if open" $
       openLineBy (openTerm "\n ") [
         Line [ Info (Range 1 2) mempty :< Leaf "" ],
         Line [ Info (Range 0 1) mempty :< Leaf "" ]
       ] `shouldBe` (Just $ Line [ Info (Range 1 2) mempty :< Leaf "" ])
-
-    it "returns Nothing if the earliest non-empty line is closed" $
-      openLineBy openElement [
-        Line [ Div (Just "delete") [ span " * Debugging", Break ] ]
-      ] `shouldBe` Nothing
 
     it "returns Nothing if the earliest non-empty line is closed" $
       openLineBy (openTerm "\n") [
