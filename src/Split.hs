@@ -265,9 +265,6 @@ adjoinLinesBy f (EmptyLine : xs) line | Just _ <- openLineBy f xs = EmptyLine : 
 adjoinLinesBy f (prev:rest) line | Just _ <- openLineBy f [ prev ] = (prev <> line) : rest
 adjoinLinesBy _ lines line = line : lines
 
-zipWithMaybe :: (Maybe a -> Maybe b -> c) -> [a] -> [b] -> [c]
-zipWithMaybe f a b = zipWithDefaults f Nothing Nothing (Just <$> a) (Just <$> b)
-
 zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
 zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++ repeat da) (b ++ repeat db)
 
