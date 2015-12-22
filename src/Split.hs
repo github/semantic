@@ -113,7 +113,7 @@ instance ToMarkup a => ToMarkup (Line a) where
 data Line a =
   Line Bool [a]
   | EmptyLine
-  deriving Eq
+  deriving (Eq, Functor)
 
 unLine :: Line a -> [a]
 unLine EmptyLine = []
