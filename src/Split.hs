@@ -45,6 +45,9 @@ split diff before after = return . renderHtml
 
     columnWidth = max (20 + digits maxNumber * 8) 40
 
+    numberedLinesToMarkup :: (Int, Line (SplitDiff a Info), Int, Line (SplitDiff a Info)) -> Markup
+    numberedLinesToMarkup (m, left, n, right) = tr $ toMarkup (foldl (||) False $ hasChanges <$> unLine left, m, renderable before left) <> toMarkup (foldl (||) False $ hasChanges <$> unLine right, n, renderable after right) <> string "\n"
+
     renderable source = fmap (Renderable . (,) source)
 
     hasChanges diff = foldl (||) False $ const True <$> diff
