@@ -136,6 +136,9 @@ splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
     (Row EmptyLine <$> lines, (Range prevLeft prevLeft, range))
   Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst sources) in
     (flip Row EmptyLine <$> lines, (range, Range prevRight prevRight))
+  Pure (Replace leftTerm rightTerm) -> let (leftLines, leftRange) = splitTermByLines leftTerm (fst sources)
+                                           (rightLines, rightRange) = splitTermByLines rightTerm (snd sources) in
+                                           (zipWithDefaults Row EmptyLine EmptyLine leftLines rightLines, (leftRange, rightRange))
   where categories (Info _ left, Info _ right) = (left, right)
         ranges (Info left _, Info right _) = (left, right)
 
