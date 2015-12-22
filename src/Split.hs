@@ -184,7 +184,7 @@ termToLines (Info range categories :< syntax) source = (rows syntax, range)
 splitAnnotatedByLines :: (String, String) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (Term a Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> contextRows (Leaf a) ranges categories sources
-  where contextRows constructor ranges categoriess sources = zipWithDefaults Row EmptyLine EmptyLine (contextLines (Leaf a) (fst ranges) (fst categories) (fst sources)) (contextLines (Leaf a) (snd ranges) (snd categories) (snd sources))
+  where contextRows constructor ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine (contextLines constructor (fst ranges) (fst categories) (fst sources)) (contextLines constructor (snd ranges) (snd categories) (snd sources))
 
         adjoin = reverse . foldl (adjoinRowsBy (openTerm $ fst sources) (openTerm $ snd sources)) []
 
