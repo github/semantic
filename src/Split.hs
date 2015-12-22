@@ -129,9 +129,6 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 contextLines :: (Info -> a) -> Range -> Set.Set Category -> String -> [Line a]
 contextLines constructor range categories source = Line . (:[]) . constructor . (`Info` categories) <$> actualLineRanges range source
 
-maybeLast :: Foldable f => f a -> Maybe a
-maybeLast = foldl (flip $ const . Just) Nothing
-
 adjoinRowsBy :: (a -> Maybe a) -> (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
 adjoinRowsBy _ _ [] row = [row]
 
@@ -166,11 +163,6 @@ openTerm source term@(Info range _ :< _) = const term <$> openRange source range
 openDiff :: String -> SplitDiff a Info -> Maybe (SplitDiff a Info)
 openDiff source diff@(Free (Annotated (Info range _) _)) = const diff <$> openRange source range
 openDiff source diff@(Pure term) = const diff <$> openTerm source term
-
-openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
-openLineBy _ [] = Nothing
-openLineBy f (EmptyLine : rest) = openLineBy f rest
-openLineBy f (line : _) = const line <$> (f =<< maybeLast (unLine line))
 
 adjoinLinesBy :: (a -> Maybe a) -> [Line a] -> Line a -> [Line a]
 adjoinLinesBy _ [] line = [line]

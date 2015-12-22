@@ -14,6 +14,14 @@ unLine :: Line a -> [a]
 unLine EmptyLine = []
 unLine (Line elements) = elements
 
+maybeLast :: Foldable f => f a -> Maybe a
+maybeLast = foldl (flip $ const . Just) Nothing
+
+openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
+openLineBy _ [] = Nothing
+openLineBy f (EmptyLine : rest) = openLineBy f rest
+openLineBy f (line : _) = const line <$> (f =<< maybeLast (unLine line))
+
 instance Show a => Show (Line a) where
   show (Line elements) = "[" ++ intercalate ", " (show <$> elements) ++ "]"
   show EmptyLine = "EmptyLine"
