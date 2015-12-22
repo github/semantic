@@ -212,13 +212,6 @@ adjoinRowsBy _ g rows (Row left' right') | Just _ <- openLineBy g $ unRight <$> 
 
 adjoinRowsBy _ _ rows row = row : rows
 
-openElement :: HTML -> Maybe HTML
-openElement Break = Nothing
-openElement (Ul _ elements) = openElement =<< maybeLast elements
-openElement (Dl _ elements) = openElement =<< maybeLast elements
-openElement (Div _ elements) = openElement =<< maybeLast elements
-openElement h = Just h
-
 openRange :: String -> Range -> Maybe Range
 openRange source range = case (source !!) <$> maybeLastIndex range of
   Just '\n' -> Nothing
