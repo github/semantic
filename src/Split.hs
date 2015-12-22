@@ -146,6 +146,8 @@ instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
           contentElements children = let (elements, previous) = foldl markupForSeparatorAndChild ([], start range) children in
             elements ++ [ string $ substring (Range previous $ end range) source ]
 
+instance ToMarkup (Renderable (Term a Info)) where
+  toMarkup (Renderable (source, term)) = fst $ cata (\ info@(Info range _) syntax -> (toMarkup $ Renderable (source, (info, syntax)), range)) term
 
 instance ToMarkup (Renderable (SplitDiff a Info)) where
   toMarkup (Renderable (source, Pure term)) = toMarkup (Renderable (source, term))
