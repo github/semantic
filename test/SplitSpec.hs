@@ -94,11 +94,6 @@ spec = do
       openTerm " \n" (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
 
     where
-      rightRowText text = rightRow [ Text text ]
-      rightRow xs = Row EmptyLine (Line xs)
-      leftRowText text = leftRow [ Text text ]
-      leftRow xs = Row (Line xs) EmptyLine
-      rowText a b = Row (Line [ Text a ]) (Line [ Text b ])
       info source category = Info (totalRange source)  (Set.fromList [ category ])
       unchanged source = formatted source source
       formatted source1 source2 category = Annotated (info source1 category, info source2 category)
