@@ -283,6 +283,9 @@ zipWithMaybe f la lb = take len $ zipWith f la' lb'
     la' = (Just <$> la) ++ repeat Nothing
     lb' = (Just <$> lb) ++ repeat Nothing
 
+zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
+zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++ repeat da) (b ++ repeat db)
+
 classify :: Set.Set Category -> Maybe ClassName
 classify categories = ("category-" ++) <$> maybeLast categories
 
