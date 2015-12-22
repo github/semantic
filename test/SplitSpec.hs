@@ -143,6 +143,15 @@ spec = do
         Line True [ span "*/" ]
       ], Range 0 5)
 
+  describe "splitTermByLines" $ do
+    it "splits multi-line terms into multiple lines" $
+      let categories = Set.singleton "leaf" in splitTermByLines (Info (Range 0 5) categories :< Leaf "") "/*\n*/"
+      `shouldBe`
+      ([
+        Line True [ Info (Range 0 3) categories :< Leaf "" ],
+        Line True [ Info (Range 3 5) categories :< Leaf "" ]
+      ], Range 0 5)
+
   describe "openLineBy" $ do
     it "should produce the earliest non-empty line in a list, if open" $
       openLineBy openElement [
