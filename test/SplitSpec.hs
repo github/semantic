@@ -29,9 +29,9 @@ instance Arbitrary a => Arbitrary (Line a) where
     Line <$> arbitrary,
     const EmptyLine <$> (arbitrary :: Gen ()) ]
 
-arbitraryLeaf :: Int -> (Info -> Syntax String f -> f) -> Gen (String, f)
-arbitraryLeaf start f = pairWithLeaf <$> arbitrary
-  where pairWithLeaf string = (string, f (Info (Range start $ start + length string) mempty) (Leaf string))
+arbitraryLeaf :: Int -> Gen (String, Info, Syntax String f)
+arbitraryLeaf start = pairWithLeaf <$> arbitrary
+  where pairWithLeaf string = (string, Info (Range start $ start + length string) mempty, Leaf string)
 
 spec :: Spec
 spec = do
