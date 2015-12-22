@@ -206,3 +206,5 @@ spec = do
       isOpen (Row a b) = Maybe.isJust (openLineBy openElement [ a ]) && Maybe.isJust (openLineBy openElement [ b ])
       isClosed (Row a@(Line _) b@(Line _)) = Maybe.isNothing (openLineBy openElement [ a ]) && Maybe.isNothing (openLineBy openElement [ b ])
       isClosed (Row _ _) = False
+
+      isOnSingleLine (a, _, _) = filter (/= '\n') a == a
