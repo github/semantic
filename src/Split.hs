@@ -47,6 +47,8 @@ split diff before after = return . renderHtml
 
     renderable source = fmap (Renderable . (,) source)
 
+    hasChanges diff = foldl (||) False $ const True <$> diff
+
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
     numberRows [] (Row EmptyLine EmptyLine) = []
     numberRows [] (Row left@(Line _) EmptyLine) = [(1, left, 0, EmptyLine)]
