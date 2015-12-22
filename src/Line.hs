@@ -39,11 +39,6 @@ instance Monoid (Line a) where
   mappend (Line xs) (Line ys) = Line (xs <> ys)
 
 instance ToMarkup a => ToMarkup (Bool, Int, Line a) where
-  toMarkup (hasChanges, num, line) = case line of
-    EmptyLine -> td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell") <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell") <> string "\n"
-    _ -> cell "num" (string $ show num) <> cell "code" (toMarkup line) <> string "\n"
-    where cell kind = td ! A.class_ (toClass kind)
-          toClass kind = stringValue $ "blob-" ++ kind ++ if hasChanges then " blob-" ++ kind ++ "-replacement" else ""
   toMarkup (_, _, line@EmptyLine) = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell") <> toMarkup line <> string "\n"
   toMarkup (True, num, line@(Line _)) = td (string $ show num) ! A.class_ (stringValue "blob-num blob-num-replacement") <> toMarkup line <> string "\n"
   toMarkup (_, num, line@(Line _)) = td (string $ show num) ! A.class_ (stringValue "blob-num") <> toMarkup line <> string "\n"
