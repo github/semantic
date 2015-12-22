@@ -61,6 +61,7 @@ split diff before after = return . renderHtml
         . mconcat $ toMarkup <$> reverse numbered
   where
     rows = fst $ diffToRows diff (0, 0) before after
+    rows' = fst $ splitDiffByLines diff (0, 0) (before, after)
     numbered = foldl numberRows [] rows
     maxNumber = case numbered of
       [] -> 0
