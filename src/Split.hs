@@ -130,7 +130,7 @@ instance Monoid (Line a) where
   mappend (Line c1 xs) (Line c2 ys) = Line (c1 || c2) (xs <> ys)
 
 -- | A diff with only one side’s annotations.
-type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Maybe (Term leaf annotation))
+type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf annotation)
 
 splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (Term a Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
