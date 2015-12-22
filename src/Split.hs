@@ -30,9 +30,9 @@ split diff before after = return . renderHtml
     . body
       . (table ! A.class_ (stringValue "diff")) $
         ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
-        . mconcat $ toMarkup <$> reverse numbered
+        . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
-    rows = toRenderable <$> fst (splitDiffByLines diff (0, 0) (before, after))
+    rows = fst (splitDiffByLines diff (0, 0) (before, after))
     toRenderable (Row a b) = Row (renderable before a) (renderable after b)
     numbered = foldl numberRows [] rows
     maxNumber = case numbered of
