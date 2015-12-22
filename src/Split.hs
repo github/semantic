@@ -203,12 +203,6 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 contextLines :: (Info -> a) -> Range -> Set.Set Category -> String -> [Line a]
 contextLines constructor range categories source = Line . (:[]) . constructor . (`Info` categories) <$> actualLineRanges range source
 
-contextRows :: (Int, Int) -> (Int, Int) -> (String, String) -> [Row HTML]
-contextRows childIndices previousIndices sources = zipWithMaybe rowFromMaybeRows leftElements rightElements
-  where
-    leftElements = textElements (Range (fst previousIndices) (fst childIndices)) (fst sources)
-    rightElements = textElements (Range (snd previousIndices) (snd childIndices)) (snd sources)
-
 elementAndBreak :: (String -> HTML) -> String -> [HTML]
 elementAndBreak _ "" = []
 elementAndBreak _ "\n" = [ Break ]
