@@ -75,15 +75,6 @@ spec = do
       forAll ((arbitrary `suchThat` isOpen) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpen)) $
         \ (a, b) -> adjoinRowsBy openElement openElement [ Row EmptyLine EmptyLine, a ] b `shouldBe` Row EmptyLine EmptyLine : adjoinRowsBy openElement openElement [ a ] b
 
-  describe "termToLines" $ do
-    it "splits multi-line terms into multiple lines" $
-      termToLines (Info (Range 0 5) (Set.singleton "leaf") :< Leaf "") "/*\n*/"
-      `shouldBe`
-      ([
-        Line [ span "/*", Break ],
-        Line [ span "*/" ]
-      ], Range 0 5)
-
   describe "splitTermByLines" $ do
     it "splits multi-line terms into multiple lines" $
       splitTermByLines (Info (Range 0 5) mempty :< Leaf "") "/*\n*/"
