@@ -32,48 +32,48 @@ spec :: Spec
 spec = do
   describe "annotatedToRows" $ do
     it "outputs one row for single-line unchanged leaves" $
-      annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` ([ Row (Line False [ span "a" ]) (Line False [ span "a" ]) ], (Range 0 1, Range 0 1))
+      annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` [ Row (Line False [ span "a" ]) (Line False [ span "a" ]) ]
 
     it "outputs one row for single-line empty unchanged indexed nodes" $
-      annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` ([ Row (Line False [ Ul (Just "category-branch") [ Text "[]" ] ]) (Line False [ Ul (Just "category-branch") [ Text "[]" ] ]) ], (Range 0 2, Range 0 2))
+      annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` [ Row (Line False [ Ul (Just "category-branch") [ Text "[]" ] ]) (Line False [ Ul (Just "category-branch") [ Text "[]" ] ]) ]
 
     it "outputs one row for single-line non-empty unchanged indexed nodes" $
       annotatedToRows (unchanged "[ a, b ]" "branch" (Indexed [
         Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
         Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
-      ])) "[ a, b ]" "[ a, b ]" `shouldBe` ([ Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) ], (Range 0 8, Range 0 8))
+      ])) "[ a, b ]" "[ a, b ]" `shouldBe` [ Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) ]
 
     it "outputs one row for single-line non-empty formatted indexed nodes" $
       annotatedToRows (formatted "[ a, b ]" "[ a,  b ]" "branch" (Indexed [
         Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
         Free . offsetAnnotated 5 6 $ unchanged "b" "leaf" (Leaf "")
-      ])) "[ a, b ]" "[ a,  b ]" `shouldBe` ([ Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",  ", span "b", Text " ]" ] ]) ], (Range 0 8, Range 0 9))
+      ])) "[ a, b ]" "[ a,  b ]" `shouldBe` [ Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",  ", span "b", Text " ]" ] ]) ]
 
     it "outputs two rows for two-line non-empty unchanged indexed nodes" $
       annotatedToRows (unchanged "[ a,\nb ]" "branch" (Indexed [
         Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
         Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
       ])) "[ a,\nb ]" "[ a,\nb ]" `shouldBe`
-      ([
+      [
           Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break ] ])
               (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break] ]),
           Row (Line False [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
               (Line False [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
-       ], (Range 0 8, Range 0 8))
+      ]
 
     it "outputs two rows for two-line non-empty formatted indexed nodes" $
       annotatedToRows (formatted "[ a,\nb ]" "[\na,\nb ]" "branch" (Indexed [
         Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
         Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
       ])) "[ a,\nb ]" "[\na,\nb ]" `shouldBe`
-      ([
+      [
           Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break ] ])
               (Line False [ Ul (Just "category-branch") [ Text "[", Break ] ]),
           Row EmptyLine
               (Line False [ Ul (Just "category-branch") [ span "a", Text ",", Break ] ]),
           Row (Line False [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
               (Line False [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
-       ], (Range 0 8, Range 0 8))
+      ]
 
     it "" $
       let (sourceA, sourceB) = ("[\na\n,\nb]", "[a,b]") in
@@ -81,7 +81,7 @@ spec = do
           Free . offsetAnnotated 2 1 $ unchanged "a" "leaf" (Leaf ""),
           Free . offsetAnnotated 6 3 $ unchanged "b" "leaf" (Leaf "")
         ])) sourceA sourceB `shouldBe`
-        ([
+        [
             Row (Line False [ Ul (Just "category-branch") [ Text "[", Break ] ])
                 (Line False [ Ul (Just "category-branch") [ Text "[", span "a", Text ",", span "b", Text "]" ] ]),
             Row (Line False [ Ul (Just "category-branch") [ span "a", Break ] ])
@@ -90,7 +90,7 @@ spec = do
                 EmptyLine,
             Row (Line False [ Ul (Just "category-branch") [ span "b", Text "]" ] ])
                 EmptyLine
-        ], (Range 0 8, Range 0 5))
+        ]
 
     it "should split multi-line deletions across multiple rows" $
       let (sourceA, sourceB) = ("/*\n*/\na", "a") in
@@ -98,11 +98,11 @@ spec = do
           Pure . Delete $ (Info (Range 0 5) (Set.fromList ["leaf"]) :< Leaf ""),
           Free . offsetAnnotated 6 0 $ unchanged "a" "leaf" (Leaf "")
         ])) sourceA sourceB `shouldBe`
-        ([
+        [
           Row (Line True [ Ul (Just "category-branch") [ Div (Just "delete") [ span "/*", Break ] ] ]) EmptyLine,
           Row (Line True [ Ul (Just "category-branch") [ Div (Just "delete") [ span "*/" ], Break ] ]) EmptyLine,
           Row (Line False [ Ul (Just "category-branch") [ span "a" ] ]) (Line False [ Ul (Just "category-branch") [ span "a" ] ])
-        ], (Range 0 7, Range 0 1))
+        ]
 
     describe "unicode" $
       it "equivalent precomposed and decomposed characters are not equal" $
@@ -110,7 +110,7 @@ spec = do
             syntax = Leaf . Pure $ Replace (info sourceA "leaf" :< Leaf "") (info sourceB "leaf" :< Leaf "")
         in
             annotatedToRows (formatted sourceA sourceB "leaf" syntax) sourceA sourceB `shouldBe`
-            ([ Row (Line False [ span "t\776" ]) (Line False [ span "\7831"]) ], (Range 0 2, Range 0 1))
+            [ Row (Line False [ span "t\776" ]) (Line False [ span "\7831"]) ]
 
 
   describe "adjoinRowsBy" $ do
