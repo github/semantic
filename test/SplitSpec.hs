@@ -29,6 +29,10 @@ instance Arbitrary a => Arbitrary (Line a) where
     Line <$> arbitrary,
     const EmptyLine <$> (arbitrary :: Gen ()) ]
 
+arbitraryLeaf :: Int -> (Info -> Syntax String f -> f) -> Gen (String, f)
+arbitraryLeaf start f = pairWithLeaf <$> arbitrary
+  where pairWithLeaf string = (string, f (Info (Range start $ start + length string) mempty) (Leaf string))
+
 spec :: Spec
 spec = do
   describe "splitAnnotatedByLines" $ do
