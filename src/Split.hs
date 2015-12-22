@@ -2,6 +2,7 @@ module Split where
 
 import Prelude hiding (div, head, span)
 import Diff
+import Line
 import Patch
 import Term
 import Syntax
@@ -15,7 +16,6 @@ import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
 import Data.Monoid
 import qualified Data.Set as Set
-import Data.List (intercalate)
 
 type ClassName = String
 
@@ -81,25 +81,6 @@ codeTd False (Just el) = td el ! A.class_ (stringValue "blob-code")
 instance ToMarkup a => ToMarkup (Line a) where
   toMarkup EmptyLine = codeTd False Nothing
   toMarkup (Line contents) = codeTd False . Just . mconcat $ toMarkup <$> contents
-
-data Line a =
-  Line [a]
-  | EmptyLine
-  deriving (Eq, Functor)
-
-unLine :: Line a -> [a]
-unLine EmptyLine = []
-unLine (Line elements) = elements
-
-instance Show a => Show (Line a) where
-  show (Line elements) = "[" ++ intercalate ", " (show <$> elements) ++ "]"
-  show EmptyLine = "EmptyLine"
-
-instance Monoid (Line a) where
-  mempty = EmptyLine
-  mappend EmptyLine line = line
-  mappend line EmptyLine = line
-  mappend (Line xs) (Line ys) = Line (xs <> ys)
 
 -- | A diff with only one side’s annotations.
 type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf annotation)
