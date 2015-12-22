@@ -30,6 +30,13 @@ instance Arbitrary a => Arbitrary (Line a) where
 
 spec :: Spec
 spec = do
+  describe "splitAnnotatedByLines" $ do
+    it "outputs one row for single-line unchanged leaves" $
+      let sources = ("a", "a")
+          ranges = (Range 0 1, Range 0 1)
+          categories = (mempty, mempty) in
+          splitAnnotatedByLines sources ranges categories (Leaf "b") `shouldBe` [ Row (Line False [ Free $ Annotated (Info (fst ranges) (fst categories)) $ Leaf "b" ]) (Line False [ Free $ Annotated (Info (snd ranges) (snd categories)) $ Leaf "b" ]) ]
+
   describe "annotatedToRows" $ do
     it "outputs one row for single-line unchanged leaves" $
       annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` [ Row (Line False [ span "a" ]) (Line False [ span "a" ]) ]
