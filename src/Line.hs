@@ -48,7 +48,3 @@ codeTd :: Bool -> Maybe Html -> Html
 codeTd _ Nothing = td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
 codeTd True (Just el) = td el ! A.class_ (stringValue "blob-code blob-code-replacement")
 codeTd False (Just el) = td el ! A.class_ (stringValue "blob-code")
-
-instance ToMarkup a => ToMarkup (Line a) where
-  toMarkup EmptyLine = codeTd False Nothing
-  toMarkup (Line contents) = codeTd False . Just . mconcat $ toMarkup <$> contents
