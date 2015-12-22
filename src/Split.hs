@@ -130,7 +130,8 @@ instance Monoid (Line a) where
   mappend (Line c1 xs) (Line c2 ys) = Line (c1 || c2) (xs <> ys)
 
 splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (Term a Info)], (Range, Range))
-splitDiffByLines (Free (Annotated annotation syntax)) _ sources = (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
+splitDiffByLines diff _ sources = case diff of
+  Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
   where categories (Info _ left, Info _ right) = (left, right)
         ranges (Info left _, Info right _) = (left, right)
 
