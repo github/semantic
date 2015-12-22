@@ -76,13 +76,9 @@ spec = do
         \ (a, b) -> adjoinRowsBy openElement openElement [ Row EmptyLine EmptyLine, a ] b `shouldBe` Row EmptyLine EmptyLine : adjoinRowsBy openElement openElement [ a ] b
 
   describe "splitTermByLines" $ do
-    it "splits multi-line terms into multiple lines" $
-      splitTermByLines (Info (Range 0 5) mempty :< Leaf "") "/*\n*/"
-      `shouldBe`
-      ([
-        Line [ Info (Range 0 3) mempty :< Leaf "" ],
-        Line [ Info (Range 3 5) mempty :< Leaf "" ]
-      ], Range 0 5)
+    prop "preserves line count" $
+      \ source -> let range = totalRange source in
+        splitTermByLines (Info range mempty :< Leaf source) source `shouldBe` (Line . (:[]) . (:< Leaf source) . (`Info` mempty) <$> actualLineRanges range source, range)
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
