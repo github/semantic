@@ -8,7 +8,7 @@ import qualified Text.Blaze.Html5.Attributes as A
 data Line a =
   Line [a]
   | EmptyLine
-  deriving (Eq, Functor)
+  deriving (Eq, Functor, Foldable)
 
 unLine :: Line a -> [a]
 unLine EmptyLine = []
