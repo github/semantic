@@ -45,6 +45,10 @@ instance ToMarkup a => ToMarkup (Int, Line a) where
   toMarkup (_, line@EmptyLine) = numberTd "" <> toMarkup line <> string "\n"
   -- toMarkup (num, line@(Line _)) = td (string $ show num) ! A.class_ (stringValue "blob-num blob-num-replacement") <> toMarkup line <> string "\n"
   toMarkup (num, line@(Line _)) = numberTd (show num) <> toMarkup line <> string "\n"
+instance ToMarkup a => ToMarkup (Bool, Int, Line a) where
+  toMarkup (_, _, line@EmptyLine) = numberTd "" <> toMarkup line <> string "\n"
+  toMarkup (True, num, line@(Line _)) = td (string $ show num) ! A.class_ (stringValue "blob-num blob-num-replacement") <> toMarkup line <> string "\n"
+  toMarkup (_, num, line@(Line _)) = numberTd (show num) <> toMarkup line <> string "\n"
 
 numberTd :: String -> Html
 numberTd "" = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
