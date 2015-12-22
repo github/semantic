@@ -299,5 +299,5 @@ actualLines lines = case break (== '\n') lines of
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> String -> [Range]
-actualLineRanges range = scanl toRange (Range (start range) (start range)) . actualLines . substring range
+actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . substring range
   where toRange previous string = Range (end previous) $ end previous + length string
