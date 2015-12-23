@@ -7,6 +7,7 @@ import qualified Data.Set as Set
 import Foreign
 import Foreign.C
 import Foreign.C.Types
+import qualified GHC.Generics as Generics
 
 data TSLanguage = TsLanguage deriving (Show, Eq)
 foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_c" ts_language_c :: Ptr TSLanguage
@@ -20,7 +21,7 @@ foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_free" ts_document_free :: Ptr TSDocument -> IO ()
 
 data TSNode = TsNode { _data :: Ptr (), offset0 :: CSize, offset1 :: CSize, offset2 :: CSize }
-  deriving (Show, Eq)
+  deriving (Show, Eq, Generics.Generic)
 
 instance Storable TSNode where
   alignment _ = 32
