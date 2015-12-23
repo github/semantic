@@ -3,7 +3,6 @@ module TreeSitter where
 import Diff
 import Range
 import Parser
-import Term
 import qualified Data.Set as Set
 import Foreign
 import Foreign.C
@@ -65,13 +64,19 @@ parseTreeSitterFile (Language language constructor) contents = do
 documentToTerm :: Constructor -> Ptr TSDocument -> Parser
 documentToTerm constructor document contents = alloca $ \root -> do
   ts_document_root_node_p document root
-  snd <$> toTerm root where
-    toTerm :: Ptr TSNode -> IO (String, Term String Info)
-    toTerm node = do
-      name <- ts_node_p_name node document
-      name <- peekCString name
-      children <- withNamedChildren node toTerm
-      return (name, constructor contents (Info (range node) $ Set.singleton name) children)
+  (_, term) <- toTerm root
+  return term
+  where toTerm node = do
+          name <- ts_node_p_name node document
+          name <- peekCString name
+          count <- ts_node_p_named_child_count node
+          children <- if count == 0
+            then return []
+            else mapM (alloca . getChild node toTerm) [0..pred count]
+          return (name, constructor contents (Info (range node) (Set.singleton name)) children)
+        getChild node transform n out = do
+          _ <- ts_node_p_named_child node n out
+          transform out
 
 withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO (String, a)) -> IO [(String, a)]
 withNamedChildren node transformNode = do
