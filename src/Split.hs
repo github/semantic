@@ -11,6 +11,7 @@ import Control.Comonad.Cofree
 import Range
 import Control.Monad.Free
 import Data.ByteString.Lazy.Internal
+import Data.Foldable
 import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
@@ -33,7 +34,7 @@ split diff before after = return . renderHtml
         . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
     rows = fst (splitDiffByLines diff (0, 0) (before, after))
-    numbered = foldl numberRows [] rows
+    numbered = foldl' numberRows [] rows
     maxNumber = case numbered of
       [] -> 0
       ((x, _, y, _) : _) -> max x y
@@ -75,7 +76,7 @@ instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
     where markupForSeparatorAndChild :: ToMarkup f => ([Markup], Int) -> (f, Range) -> ([Markup], Int)
           markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string (substring (Range previous $ start $ snd child) source), toMarkup $ fst child ], end $ snd child)
 
-          contentElements children = let (elements, previous) = foldl markupForSeparatorAndChild ([], start range) children in
+          contentElements children = let (elements, previous) = foldl' markupForSeparatorAndChild ([], start range) children in
             elements ++ [ string $ substring (Range previous $ end range) source ]
 
 instance ToMarkup (Renderable (Term a Info)) where
@@ -106,8 +107,8 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
   Indexed children -> adjoinChildLines Indexed children
   Fixed children -> adjoinChildLines Fixed children
   Keyed children -> adjoinChildLines Keyed children
-  where adjoin = reverse . foldl (adjoinLinesBy $ openTerm source) []
-        adjoinChildLines constructor children = let (lines, previous) = foldl (childLines $ constructor mempty) ([], start range) children in
+  where adjoin = reverse . foldl' (adjoinLinesBy $ openTerm source) []
+        adjoinChildLines constructor children = let (lines, previous) = foldl' (childLines $ constructor mempty) ([], start range) children in
           adjoin $ lines ++ contextLines (:< constructor mempty) (Range previous $ end range) categories source
 
         childLines constructor (lines, previous) child = let (childLines, childRange) = splitTermByLines child source in
@@ -121,8 +122,8 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Keyed children -> adjoinChildRows Keyed children
   where contextRows constructor ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine (contextLines (Free . (`Annotated` constructor)) (fst ranges) (fst categories) (fst sources)) (contextLines (Free . (`Annotated` constructor)) (snd ranges) (snd categories) (snd sources))
 
-        adjoin = reverse . foldl (adjoinRowsBy (openDiff $ fst sources) (openDiff $ snd sources)) []
-        adjoinChildRows constructor children = let (rows, previous) = foldl (childRows $ constructor mempty) ([], starts ranges) children in
+        adjoin = reverse . foldl' (adjoinRowsBy (openDiff $ fst sources) (openDiff $ snd sources)) []
+        adjoinChildRows constructor children = let (rows, previous) = foldl' (childRows $ constructor mempty) ([], starts ranges) children in
           adjoin $ rows ++ contextRows (constructor mempty) (makeRanges previous (ends ranges)) categories sources
 
         childRows constructor (rows, previous) child = let (childRows, childRanges) = splitDiffByLines child previous sources in
