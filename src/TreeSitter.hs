@@ -78,15 +78,5 @@ documentToTerm constructor document contents = alloca $ \root -> do
           _ <- ts_node_p_named_child node n out
           transform out
 
-withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO (String, a)) -> IO [(String, a)]
-withNamedChildren node transformNode = do
-  count <- ts_node_p_named_child_count node
-  if count == 0
-    then return []
-    else mapM (alloca . getChild) [0..pred count] where
-      getChild n out = do
-        _ <- ts_node_p_named_child node n out
-        transformNode out
-
 range :: Ptr TSNode -> Range
 range node = Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
