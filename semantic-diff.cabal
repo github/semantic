@@ -38,7 +38,7 @@ library
                      , tree-sitter-parsers
                      , c-storable-deriving
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable
+  default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable, DeriveGeneric
   ghc-options:        -Wall -fno-warn-name-shadowing
 
 executable semantic-diff-exe
