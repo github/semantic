@@ -54,7 +54,7 @@ parseTreeSitterFile :: Language -> Parser
 parseTreeSitterFile (Language language constructor) contents = do
   document <- ts_document_make
   ts_document_set_language document language
-  withCString contents (\source -> do
+  withCString contents (\ source -> do
     ts_document_set_input_string document source
     ts_document_parse document
     term <- documentToTerm constructor document contents
@@ -62,7 +62,7 @@ parseTreeSitterFile (Language language constructor) contents = do
     return term)
 
 documentToTerm :: Constructor -> Ptr TSDocument -> Parser
-documentToTerm constructor document contents = alloca $ \root -> do
+documentToTerm constructor document contents = alloca $ \ root -> do
   ts_document_root_node_p document root
   (_, term) <- toTerm root
   return term
