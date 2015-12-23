@@ -3,6 +3,7 @@ module Range where
 import Control.Applicative ((<|>))
 import qualified Data.Char as Char
 
+-- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: Int, end :: Int }
   deriving (Eq, Show)
 
@@ -34,6 +35,10 @@ rangesAndWordsFrom startIndex string = maybe [] id $ takeAndContinue <$> (word <
     -- | > A member of one of the following Unicode general category _Letter_, _Mark_, _Number_, _Connector_Punctuation_
     isWord c = Char.isLetter c || Char.isNumber c || Char.isMark c || Char.generalCategory c == Char.ConnectorPunctuation
 
+-- | Return Just the last index from a non-empty range, or if the range is empty, Nothing.
+maybeLastIndex :: Range -> Maybe Int
+maybeLastIndex (Range start end) | start == end = Nothing
+maybeLastIndex (Range _ end) = Just $ end - 1
 
 instance Ord Range where
   a <= b = start a <= start b
