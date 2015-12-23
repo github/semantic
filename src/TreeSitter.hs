@@ -26,10 +26,10 @@ data TSNode = TsNode { _data :: Ptr (), offset0 :: CSize, offset1 :: CSize, offs
 
 instance CStorable TSNode
 instance Storable TSNode where
-  alignment _ = 32
-  sizeOf _ = 32
-  peek _ = error "Haskell code should never read TSNode values directly."
-  poke _ _ = error "Haskell code should never write TSNode values directly."
+  alignment = cAlignment
+  sizeOf = cSizeOf
+  peek = cPeek
+  poke = cPoke
 
 foreign import ccall "app/bridge.h ts_document_root_node_p" ts_document_root_node_p :: Ptr TSDocument -> Ptr TSNode -> IO ()
 foreign import ccall "app/bridge.h ts_node_p_name" ts_node_p_name :: Ptr TSNode -> Ptr TSDocument -> IO CString
