@@ -2,6 +2,7 @@ module Range where
 
 import Control.Applicative ((<|>))
 import qualified Data.Char as Char
+import Data.Maybe (fromMaybe)
 
 data Range = Range { start :: !Int, end :: !Int }
   deriving (Eq, Show)
@@ -17,7 +18,7 @@ offsetRange i (Range start end) = Range (i + start) (i + end)
 
 rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom _ "" = []
-rangesAndWordsFrom startIndex string = maybe [] id $ takeAndContinue <$> (word <|> punctuation) <|> skipAndContinue <$> space
+rangesAndWordsFrom startIndex string = fromMaybe [] $ takeAndContinue <$> (word <|> punctuation) <|> skipAndContinue <$> space
   where
     word = parse isWord string
     punctuation = parse (not . isWordOrSpace) string
