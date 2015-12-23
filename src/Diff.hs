@@ -8,7 +8,7 @@ import Term
 import Range
 import Categorizable
 
-data Annotated a annotation f = Annotated annotation (Syntax a f)
+data Annotated a annotation f = Annotated !annotation !(Syntax a f)
   deriving (Functor, Eq, Show, Foldable)
 
 type Category = String
