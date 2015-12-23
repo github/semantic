@@ -27,8 +27,8 @@ data TSNode = TsNode { _data :: Ptr (), offset :: TSLength }
   deriving (Show, Eq)
 
 instance Storable TSNode where
-  alignment _ = 24
-  sizeOf _ = 24
+  alignment _ = 32
+  sizeOf _ = 32
   peek _ = error "Haskell code should never read TSNode values directly."
   poke _ _ = error "Haskell code should never write TSNode values directly."
 
