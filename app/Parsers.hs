@@ -4,7 +4,6 @@ import Diff
 import Range
 import Parser
 import Syntax
-import Term
 import TreeSitter
 import Control.Comonad.Cofree
 
