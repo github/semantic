@@ -77,6 +77,4 @@ documentToTerm constructor document contents = alloca $ \root -> do
         getChild node transform n out = do
           _ <- ts_node_p_named_child node n out
           transform out
-
-range :: Ptr TSNode -> Range
-range node = Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
+        range node = Range { start = fromIntegral $! ts_node_p_start_char node, end = fromIntegral $! ts_node_p_end_char node }
