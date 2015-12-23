@@ -7,6 +7,7 @@ import qualified Data.Set as Set
 import Foreign
 import Foreign.C
 import Foreign.C.Types
+import Foreign.CStorable
 import qualified GHC.Generics as Generics
 
 data TSLanguage = TsLanguage deriving (Show, Eq)
@@ -23,6 +24,7 @@ foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime
 data TSNode = TsNode { _data :: Ptr (), offset0 :: CSize, offset1 :: CSize, offset2 :: CSize }
   deriving (Show, Eq, Generics.Generic)
 
+instance CStorable TSNode
 instance Storable TSNode where
   alignment _ = 32
   sizeOf _ = 32
