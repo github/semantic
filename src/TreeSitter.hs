@@ -70,9 +70,9 @@ documentToTerm constructor document contents = alloca $ \ root -> do
           name <- ts_node_p_name node document
           name <- peekCString name
           count <- ts_node_p_named_child_count node
-          children <- mapM (alloca . getChild node toTerm) $ take (fromIntegral count) [0..]
+          children <- mapM (alloca . getChild node) $ take (fromIntegral count) [0..]
           return (name, constructor contents (Info (range node) (Set.singleton name)) children)
-        getChild node transform n out = do
+        getChild node n out = do
           _ <- ts_node_p_named_child node n out
-          transform out
+          toTerm out
         range node = Range { start = fromIntegral $! ts_node_p_start_char node, end = fromIntegral $! ts_node_p_end_char node }
