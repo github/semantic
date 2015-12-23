@@ -16,7 +16,7 @@ data Info = Info { characterRange :: Range, categories :: Set Category }
   deriving (Eq, Show)
 
 instance Categorizable Info where
-  categories info = Diff.categories info
+  categories = Diff.categories
 
 type Diff a annotation = Free (Annotated a (annotation, annotation)) (Patch (Term a annotation))
 
