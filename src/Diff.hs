@@ -11,7 +11,6 @@ import Categorizable
 data Annotated a annotation f = Annotated annotation (Syntax a f)
   deriving (Functor, Eq, Show, Foldable)
 
-
 type Category = String
 data Info = Info { characterRange :: Range, categories :: (Set Category) }
   deriving (Eq, Show)
