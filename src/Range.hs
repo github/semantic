@@ -3,7 +3,7 @@ module Range where
 import Control.Applicative ((<|>))
 import qualified Data.Char as Char
 
-data Range = Range { start :: Int, end :: Int }
+data Range = Range { start :: !Int, end :: !Int }
   deriving (Eq, Show)
 
 substring :: Range -> String -> String
