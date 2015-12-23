@@ -2,7 +2,7 @@ module Row where
 
 import Line
 
-data Row a = Row { unLeft :: Line a, unRight :: Line a }
+data Row a = Row { unLeft :: !(Line a), unRight :: !(Line a) }
   deriving (Eq, Functor)
 
 adjoinRowsBy :: (a -> Maybe a) -> (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
