@@ -23,7 +23,7 @@ foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime
 data TSLength = TsLength { bytes :: CSize, chars :: CSize }
   deriving (Show, Eq)
 
-data TSNode = TsNode { _data :: Ptr (), offset :: TSLength }
+data TSNode = TsNode { _data :: Ptr (), offset0 :: CSize, offset1 :: CSize, offset2 :: CSize }
   deriving (Show, Eq)
 
 instance Storable TSNode where
