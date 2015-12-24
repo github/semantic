@@ -33,7 +33,7 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
       nomination <- fmap best $ case diffTerms a b of
         Just diff -> do
           diagonal <- recur (succ i, succ j) as bs
-          return $ [ delete down, insert right, consWithCost cost diff diagonal ]
+          return [ delete down, insert right, consWithCost cost diff diagonal ]
         Nothing -> return [ delete down, insert right ]
       cachedDiffs' <- get
       put $ Map.insert (i, j) nomination cachedDiffs'
