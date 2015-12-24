@@ -23,7 +23,7 @@ import qualified Source ((++))
 type ClassName = String
 
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
-classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeLast categories
+classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeFirst categories
 
 split :: Diff a Info -> String -> String -> IO ByteString
 split diff before after = return . renderHtml
