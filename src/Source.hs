@@ -20,3 +20,6 @@ toString = unSource
 
 at :: Source a -> Int -> a
 at = (!!) . unSource
+
+null :: Source a -> Bool
+null (Source vector) = Vector.null vector
