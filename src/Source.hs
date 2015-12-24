@@ -13,7 +13,7 @@ toList :: Source a -> [a]
 toList = Vector.toList . getVector
 
 slice :: Range -> Source a -> Source a
-slice range (Source vector) = Source $ Vector.slice (start range) (end range - start range) vector
+slice range = Source . Vector.slice (start range) (end range - start range) . getVector
 
 toString :: Source Char -> String
 toString = toList
