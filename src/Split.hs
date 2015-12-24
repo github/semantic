@@ -22,7 +22,7 @@ import Source hiding ((++))
 type ClassName = String
 
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
-classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeLast categories
+classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeFirst categories
 
 split :: Diff a Info -> Source Char -> Source Char -> IO ByteString
 split diff before after = return . renderHtml
@@ -134,7 +134,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         makeRanges (leftStart, rightStart) (leftEnd, rightEnd) = (Range leftStart leftEnd, Range rightStart rightEnd)
 
 contextLines :: (Info -> a) -> Range -> Set.Set Category -> Source Char -> [Line a]
-contextLines constructor range categories source = Line . (:[]) . constructor . (`Info` categories) <$> actualLineRanges range source
+contextLines constructor range categories source = makeLine . (:[]) . constructor . (`Info` categories) <$> actualLineRanges range source
 
 openRange :: Source Char -> Range -> Maybe Range
 openRange source range = case (source `at`) <$> maybeLastIndex range of
