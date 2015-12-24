@@ -14,10 +14,10 @@ import Control.Monad.Free
 patch :: Diff a Info -> Source Char -> Source Char -> String
 patch diff sourceA sourceB = mconcat $ showHunk sourceA sourceB <$> hunks diff sourceA sourceB
 
-data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, getRows :: [Row (SplitDiff a Info)] }
+data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, getRows :: [Row a] }
   deriving (Eq, Show)
 
-showHunk :: Source Char -> Source Char -> Hunk a -> String
+showHunk :: Source Char -> Source Char -> Hunk (SplitDiff a Info) -> String
 showHunk sourceA sourceB hunk = header hunk ++ concat (showRow <$> getRows hunk)
   where showRow (Row lineA lineB) = showLine '-' sourceA lineA ++ showLine '+' sourceB lineB
         showLine _ _ EmptyLine = ""
@@ -28,16 +28,16 @@ showHunk sourceA sourceB hunk = header hunk ++ concat (showRow <$> getRows hunk)
 header :: Hunk a -> String
 header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show 0 ++ " +" ++ show (offsetB hunk) ++ "," ++ show 0 ++ " @@\n"
 
-hunks :: Diff a Info -> Source Char -> Source Char -> [Hunk a]
+hunks :: Diff a Info -> Source Char -> Source Char -> [Hunk (SplitDiff a Info)]
 hunks diff sourceA sourceB = hunksInRows rows
   where (rows, _) = splitDiffByLines diff (0, 0) (sourceA, sourceB)
 
-hunksInRows :: [Row (SplitDiff a Info)] -> [Hunk a]
+hunksInRows :: [Row (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]
 hunksInRows rows = case nextHunk rows of
   Nothing -> []
   Just (hunk, rest) -> hunk : hunksInRows rest
 
-nextHunk :: [Row (SplitDiff a Info)] -> Maybe (Hunk a, [Row (SplitDiff a Info)])
+nextHunk :: [Row (SplitDiff a Info)] -> Maybe (Hunk (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextHunk rows = case hunkRows of
   [] -> Nothing
   hunkRows' -> Just (Hunk 0 0 hunkRows', afterChanges)
