@@ -71,15 +71,15 @@ newtype Renderable a = Renderable (Source Char, a)
 
 instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
   toMarkup (Renderable (source, (Info range categories, syntax))) = classifyMarkup categories $ case syntax of
-    Leaf _ -> span . string . toString $ subsource range source
+    Leaf _ -> span . string . toString $ slice range source
     Indexed children -> ul . mconcat $ contentElements children
     Fixed children -> ul . mconcat $ contentElements children
     Keyed children -> dl . mconcat $ contentElements children
     where markupForSeparatorAndChild :: ToMarkup f => ([Markup], Int) -> (f, Range) -> ([Markup], Int)
-          markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string  (toString $ subsource (Range previous $ start $ snd child) source), toMarkup $ fst child ], end $ snd child)
+          markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string  (toString $ slice (Range previous $ start $ snd child) source), toMarkup $ fst child ], end $ snd child)
 
           contentElements children = let (elements, previous) = foldl markupForSeparatorAndChild ([], start range) children in
-            elements ++ [ string . toString $ subsource (Range previous $ end range) source ]
+            elements ++ [ string . toString $ slice (Range previous $ end range) source ]
 
 instance ToMarkup (Renderable (Term a Info)) where
   toMarkup (Renderable (source, term)) = fst $ cata (\ info@(Info range _) syntax -> (toMarkup $ Renderable (source, (info, syntax)), range)) term
@@ -162,5 +162,5 @@ actualLines source = case Source.break (== '\n') source of
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source Char -> [Range]
-actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . subsource range
+actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous string = Range (end previous) $ end previous + length string

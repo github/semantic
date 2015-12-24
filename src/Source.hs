@@ -12,8 +12,8 @@ makeSource = Source . Vector.fromList
 unSource :: Source a -> [a]
 unSource (Source vector) = Vector.toList vector
 
-subsource :: Range -> Source a -> Source a
-subsource range (Source vector) = Source $ Vector.slice (start range) (end range - start range) vector
+slice :: Range -> Source a -> Source a
+slice range (Source vector) = Source $ Vector.slice (start range) (end range - start range) vector
 
 toString :: Source Char -> String
 toString = unSource
