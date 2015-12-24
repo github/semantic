@@ -24,6 +24,9 @@ type Source = String
 subsource :: Range -> Source -> Source
 subsource = substring
 
+toString :: Source -> String
+toString source = source
+
 at :: Source -> Int -> Char
 at = (!!)
 
