@@ -19,9 +19,6 @@ instance Show Hunk where
 header :: Hunk -> String
 header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show (length $ deletions hunk) ++ " +" ++ show (offsetB hunk) ++ "," ++ show (length $ insertions hunk) ++ " @@\n"
 
-data Line = Insert String | Delete String | Context String
-  deriving (Show, Eq)
-
 hunks :: Diff a Info -> Source Char -> Source Char -> [Hunk]
 hunks diff sourceA sourceB = case diff of
   Pure patch -> []
