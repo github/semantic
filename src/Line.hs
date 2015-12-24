@@ -34,6 +34,9 @@ adjoinLinesBy f (EmptyLine : xs) line | Just _ <- openLineBy f xs = EmptyLine : 
 adjoinLinesBy f (prev:rest) line | Just _ <- openLineBy f [ prev ] = (prev <> line) : rest
 adjoinLinesBy _ lines line = line : lines
 
+intersperse :: Foldable t => a -> t a -> [a]
+intersperse separator elements = drop 1 $ foldr (\ each rest -> separator : each : rest) [] elements
+
 instance Show a => Show (Line a) where
   show (Line elements) = "[" ++ intercalate ", " (show <$> elements) ++ "]"
   show EmptyLine = "EmptyLine"
