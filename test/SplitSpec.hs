@@ -28,7 +28,7 @@ instance Arbitrary a => Arbitrary (Line a) where
 instance Arbitrary a => Arbitrary (Source a) where
   arbitrary = makeSource <$> arbitrary
 
-arbitraryLeaf :: Gen (String, Info, Syntax String f)
+arbitraryLeaf :: Gen (Source Char, Info, Syntax (Source Char) f)
 arbitraryLeaf = toTuple <$> arbitrary
   where toTuple string = (string, Info (Range 0 $ length string) mempty, Leaf string)
 
