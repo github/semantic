@@ -46,3 +46,7 @@ maybeLastIndex (Range _ end) = Just $ end - 1
 
 instance Ord Range where
   a <= b = start a <= start b
+
+instance Monoid Range where
+  mempty = Range 0 0
+  mappend (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
