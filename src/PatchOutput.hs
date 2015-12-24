@@ -22,3 +22,12 @@ header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show 0 ++ " +" ++ show (of
 
 hunks :: Diff a Info -> Source Char -> Source Char -> [Hunk a]
 hunks diff sourceA sourceB = []
+
+nextHunk :: [Row (SplitDiff a Info)] -> Maybe (Hunk a, [Row (SplitDiff a Info)])
+nextHunk rows = Nothing
+  where (leadingContext, afterLeadingContext) = Prelude.break rowHasChanges rows
+        (changes, afterChanges) = span rowHasChanges afterLeadingContext
+
+        rowHasChanges (Row left right) = lineHasChanges left || lineHasChanges right
+        lineHasChanges = or . fmap diffHasChanges
+        diffHasChanges = or . fmap (const True)
