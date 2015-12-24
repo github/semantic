@@ -17,7 +17,7 @@ import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
 import Data.Monoid
 import qualified Data.Set as Set
-import Source
+import Source hiding ((++))
 
 type ClassName = String
 

@@ -32,3 +32,6 @@ uncons (Source vector) = if Vector.null vector then Nothing else Just (Vector.he
 
 break :: (a -> Bool) -> Source a -> (Source a, Source a)
 break predicate (Source vector) = let (start, remainder) = Vector.break predicate vector in (Source start, Source remainder)
+
+(++) :: Source a -> Source a -> Source a
+(++) (Source a) = Source . (a Vector.++) . getVector
