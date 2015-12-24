@@ -12,7 +12,7 @@ import Control.Comonad.Cofree
 import Control.Monad.Free
 
 patch :: Diff a Info -> Source Char -> Source Char -> String
-patch diff sourceA sourceB = mconcat $ show <$> hunks diff sourceA sourceB
+patch diff sourceA sourceB = mconcat $ showHunk sourceA sourceB <$> hunks diff sourceA sourceB
 
 data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, getRows :: [Row (SplitDiff a Info)] }
   deriving Eq
