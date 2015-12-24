@@ -154,11 +154,11 @@ zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
 zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++ repeat da) (b ++ repeat db)
 
 actualLines :: Source Char -> [Source Char]
-actualLines source@(Source (_, "")) = [ source ]
-actualLines (Source (i, lines)) = case break (== '\n') lines of
+actualLines source | length source == 0 = [ source ]
+actualLines source | lines <- toString source = case break (== '\n') lines of
   (l, lines') -> case lines' of
-                      [] -> [ Source (i, l) ]
-                      _:lines' -> Source (i, l ++ "\n") : actualLines (Source (i + length l + 1, lines'))
+                      [] -> [ makeSource l ]
+                      _:lines' -> makeSource (l ++ "\n") : actualLines (makeSource lines')
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source Char -> [Range]

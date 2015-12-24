@@ -1,18 +1,19 @@
 module Source where
 
 import Range
+import qualified Data.Vector as Vector
 
-newtype Source a = Source (Int, [a])
+newtype Source a = Source (Vector.Vector a)
   deriving (Eq, Show, Functor, Foldable)
 
 makeSource :: [a] -> Source a
-makeSource list = Source (0, list)
+makeSource = Source . Vector.fromList
 
 unSource :: Source a -> [a]
-unSource (Source (_, list)) = list
+unSource (Source vector) = Vector.toList vector
 
 subsource :: Range -> Source a -> Source a
-subsource range (Source (i, list)) = Source (start range, sublist (offsetRange (negate i) range) list)
+subsource range (Source vector) = Source (Vector.slice (start range) (end range) vector)
 
 toString :: Source Char -> String
 toString = unSource
