@@ -45,9 +45,14 @@ nextHunk rows = case hunkRows of
         (leadingRows, afterLeadingContext) = Prelude.break rowHasChanges rows
         (changes, afterChanges) = span rowHasChanges afterLeadingContext
 
-        rowHasChanges (Row left right) = lineHasChanges left || lineHasChanges right
-        lineHasChanges = or . fmap diffHasChanges
-        diffHasChanges = or . fmap (const True)
+rowHasChanges :: Row (SplitDiff a Info) -> Bool
+rowHasChanges (Row left right) = lineHasChanges left || lineHasChanges right
+
+lineHasChanges :: Line (SplitDiff a Info) -> Bool
+lineHasChanges = or . fmap diffHasChanges
+
+diffHasChanges :: SplitDiff a Info -> Bool
+diffHasChanges = or . fmap (const True)
 
 takeLast :: Int -> [a] -> [a]
 takeLast n = fst . foldr accum ([], 0)
