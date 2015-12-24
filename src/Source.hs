@@ -23,3 +23,6 @@ at = (!!) . unSource
 
 null :: Source a -> Bool
 null (Source vector) = Vector.null vector
+
+uncons :: Source a -> Maybe (a, Source a)
+uncons (Source vector) = if Vector.null vector then Nothing else Just (Vector.head vector, Source $ Vector.tail vector)
