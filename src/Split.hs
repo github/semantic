@@ -81,15 +81,15 @@ newtype Renderable a = Renderable (Source, a)
 
 instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
   toMarkup (Renderable (source, (Info range categories, syntax))) = classifyMarkup categories $ case syntax of
-    Leaf _ -> span . string $ subsource range source
+    Leaf _ -> span . string . toString $ subsource range source
     Indexed children -> ul . mconcat $ contentElements children
     Fixed children -> ul . mconcat $ contentElements children
     Keyed children -> dl . mconcat $ contentElements children
     where markupForSeparatorAndChild :: ToMarkup f => ([Markup], Int) -> (f, Range) -> ([Markup], Int)
-          markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string (subsource (Range previous $ start $ snd child) source), toMarkup $ fst child ], end $ snd child)
+          markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string  (toString $ subsource (Range previous $ start $ snd child) source), toMarkup $ fst child ], end $ snd child)
 
           contentElements children = let (elements, previous) = foldl markupForSeparatorAndChild ([], start range) children in
-            elements ++ [ string $ subsource (Range previous $ end range) source ]
+            elements ++ [ string . toString $ subsource (Range previous $ end range) source ]
 
 instance ToMarkup (Renderable (Term a Info)) where
   toMarkup (Renderable (source, term)) = fst $ cata (\ info@(Info range _) syntax -> (toMarkup $ Renderable (source, (info, syntax)), range)) term
