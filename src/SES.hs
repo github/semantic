@@ -41,8 +41,9 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
   where
     delete = consWithCost cost (Pure . Delete $ a)
     insert = consWithCost cost (Pure . Insert $ b)
-    sumCost script = sum $ snd <$> script
-    best options = minimumBy (comparing sumCost) options
+    costOf [] = 0
+    costOf ((_, c) : _) = c
+    best options = minimumBy (comparing costOf) options
     recur = diffAt diffTerms cost
 
 consWithCost :: Cost a annotation -> Diff a annotation -> [(Diff a annotation, Integer)] -> [(Diff a annotation, Integer)]
