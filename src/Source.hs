@@ -13,7 +13,7 @@ unSource :: Source a -> [a]
 unSource (Source vector) = Vector.toList vector
 
 subsource :: Range -> Source a -> Source a
-subsource range (Source vector) = Source (Vector.slice (start range) (end range) vector)
+subsource range (Source vector) = Source (Vector.slice (start range) (end range - start range) vector)
 
 toString :: Source Char -> String
 toString = unSource
