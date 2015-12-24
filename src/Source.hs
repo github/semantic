@@ -6,8 +6,8 @@ import qualified Data.Vector as Vector
 newtype Source a = Source { getVector :: Vector.Vector a  }
   deriving (Eq, Show, Functor, Foldable)
 
-makeSource :: [a] -> Source a
-makeSource = Source . Vector.fromList
+fromList :: [a] -> Source a
+fromList = Source . Vector.fromList
 
 toList :: Source a -> [a]
 toList = Vector.toList . getVector

@@ -52,7 +52,7 @@ split diff before after = return . renderHtml
 
     hasChanges diff = or $ const True <$> diff
 
-    sources = (makeSource before, makeSource after)
+    sources = (fromList before, fromList after)
 
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
     numberRows [] (Row EmptyLine EmptyLine) = []
@@ -158,7 +158,7 @@ actualLines source | length source == 0 = [ source ]
 actualLines source = case Source.break (== '\n') source of
   (l, lines') -> case uncons lines' of
     Nothing -> [ l ]
-    Just (_, lines') -> (makeSource $ toString l ++ "\n") : actualLines lines'
+    Just (_, lines') -> (fromList $ toString l ++ "\n") : actualLines lines'
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source Char -> [Range]

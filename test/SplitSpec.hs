@@ -27,7 +27,7 @@ instance Arbitrary a => Arbitrary (Line a) where
     const EmptyLine <$> (arbitrary :: Gen ()) ]
 
 instance Arbitrary a => Arbitrary (Source a) where
-  arbitrary = makeSource <$> arbitrary
+  arbitrary = fromList <$> arbitrary
 
 arbitraryLeaf :: Gen (Source Char, Info, Syntax (Source Char) f)
 arbitraryLeaf = toTuple <$> arbitrary
@@ -82,22 +82,22 @@ spec = do
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
-      openLineBy (openTerm $ makeSource "\n ") [
+      openLineBy (openTerm $ fromList "\n ") [
         Line [ Info (Range 1 2) mempty :< Leaf "" ],
         Line [ Info (Range 0 1) mempty :< Leaf "" ]
       ] `shouldBe` (Just $ Line [ Info (Range 1 2) mempty :< Leaf "" ])
 
     it "returns Nothing if the earliest non-empty line is closed" $
-      openLineBy (openTerm $ makeSource "\n") [
+      openLineBy (openTerm $ fromList "\n") [
         Line [ Info (Range 0 1) mempty :< Leaf "" ]
       ] `shouldBe` Nothing
 
   describe "openTerm" $ do
     it "returns Just the term if its substring does not end with a newline" $
-      let term = Info (Range 0 2) mempty :< Leaf "" in openTerm (makeSource "  ") term `shouldBe` Just term
+      let term = Info (Range 0 2) mempty :< Leaf "" in openTerm (fromList "  ") term `shouldBe` Just term
 
     it "returns Nothing for terms whose substring ends with a newline" $
-      openTerm (makeSource " \n") (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
+      openTerm (fromList " \n") (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
 
     where
       isOpenBy f (Row a b) = Maybe.isJust (openLineBy f [ a ]) && Maybe.isJust (openLineBy f [ b ])
