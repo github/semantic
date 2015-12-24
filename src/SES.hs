@@ -47,4 +47,4 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
     recur = diffAt diffTerms cost
 
 consWithCost :: Cost a annotation -> Diff a annotation -> [(Diff a annotation, Integer)] -> [(Diff a annotation, Integer)]
-consWithCost cost diff rest = (diff, cost diff + (maybe 0 snd $ fst <$> uncons rest)) : rest
+consWithCost cost diff rest = (diff, cost diff + maybe 0 snd (fst <$> uncons rest)) : rest
