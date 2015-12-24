@@ -22,7 +22,7 @@ at :: Source a -> Int -> a
 at = (!!) . toList
 
 null :: Source a -> Bool
-null (Source vector) = Vector.null vector
+null = Vector.null . getVector
 
 cons :: a -> Source a -> Source a
 cons a = Source . Vector.cons a . getVector
