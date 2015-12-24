@@ -37,6 +37,9 @@ adjoinLinesBy _ lines line = line : lines
 intersperse :: Foldable t => a -> t a -> [a]
 intersperse separator elements = drop 1 $ foldr (\ each rest -> separator : each : rest) [] elements
 
+intercalate :: (Foldable t, Foldable u) => t a -> u (t a) -> [a]
+intercalate separator elements = concatMap Foldable.toList $ intersperse separator elements
+
 instance Show a => Show (Line a) where
   show (Line elements) = "[" ++ intercalate ", " (show <$> elements) ++ "]"
   show EmptyLine = "EmptyLine"
