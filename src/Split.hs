@@ -10,7 +10,6 @@ import Syntax
 import Control.Comonad.Cofree
 import Range
 import Control.Monad.Free
-import qualified Data.Array.IArray as Array
 import Data.ByteString.Lazy.Internal
 import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
@@ -20,7 +19,7 @@ import Data.Monoid
 import qualified Data.Set as Set
 
 type ClassName = String
-type Source = Array.Array Int Char
+type Source = String
 
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeLast categories
@@ -54,7 +53,7 @@ split diff before after = return . renderHtml
     hasChanges diff = or $ const True <$> diff
 
     sources :: (Source, Source)
-    sources = (Array.listArray (0, length before) before, Array.listArray (0, length after) after)
+    sources = (before, after)
 
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
     numberRows [] (Row EmptyLine EmptyLine) = []
