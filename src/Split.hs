@@ -24,6 +24,9 @@ type Source = String
 subsource :: Range -> Source -> Source
 subsource = substring
 
+at :: Source -> Int -> Char
+at = (!!)
+
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeLast categories
 
