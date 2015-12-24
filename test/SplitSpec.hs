@@ -78,22 +78,22 @@ spec = do
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
-      openLineBy (openTerm "\n ") [
+      openLineBy (openTerm $ makeSource "\n ") [
         Line [ Info (Range 1 2) mempty :< Leaf "" ],
         Line [ Info (Range 0 1) mempty :< Leaf "" ]
       ] `shouldBe` (Just $ Line [ Info (Range 1 2) mempty :< Leaf "" ])
 
     it "returns Nothing if the earliest non-empty line is closed" $
-      openLineBy (openTerm "\n") [
+      openLineBy (openTerm $ makeSource "\n") [
         Line [ Info (Range 0 1) mempty :< Leaf "" ]
       ] `shouldBe` Nothing
 
   describe "openTerm" $ do
     it "returns Just the term if its substring does not end with a newline" $
-      let term = Info (Range 0 2) mempty :< Leaf "" in openTerm "  " term `shouldBe` Just term
+      let term = Info (Range 0 2) mempty :< Leaf "" in openTerm (makeSource "  ") term `shouldBe` Just term
 
     it "returns Nothing for terms whose substring ends with a newline" $
-      openTerm " \n" (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
+      openTerm (makeSource " \n") (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
 
     where
       isOpenBy f (Row a b) = Maybe.isJust (openLineBy f [ a ]) && Maybe.isJust (openLineBy f [ b ])
