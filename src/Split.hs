@@ -18,7 +18,6 @@ import Text.Blaze.Html.Renderer.Utf8
 import Data.Monoid
 import qualified Data.Set as Set
 import Source hiding ((++))
-import qualified Source as Source ((++))
 
 type ClassName = String
 
@@ -153,15 +152,3 @@ openDiff source diff@(Pure term) = const diff <$> openTerm source term
 
 zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
 zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++ repeat da) (b ++ repeat db)
-
-actualLines :: Source Char -> [Source Char]
-actualLines source | length source == 0 = [ source ]
-actualLines source = case Source.break (== '\n') source of
-  (l, lines') -> case uncons lines' of
-    Nothing -> [ l ]
-    Just (_, lines') -> (l Source.++ fromList "\n") : actualLines lines'
-
--- | Compute the line ranges within a given range of a string.
-actualLineRanges :: Range -> Source Char -> [Range]
-actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
-  where toRange previous string = Range (end previous) $ end previous + length string
