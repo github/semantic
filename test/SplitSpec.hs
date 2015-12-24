@@ -103,7 +103,7 @@ spec = do
       isClosedBy f (Row a@(Line _) b@(Line _)) = Maybe.isNothing (openLineBy f [ a ]) && Maybe.isNothing (openLineBy f [ b ])
       isClosedBy _ (Row _ _) = False
 
-      isOnSingleLine (a, _, _) = filter (/= '\n') a == a
+      isOnSingleLine (Source (_, a), _, _) = filter (/= '\n') a == a
 
       combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info (Range start $ start + 1) mempty, Info (Range start $ start + 1) mempty) (Leaf [ char ]) ], start + 1)
 
