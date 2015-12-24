@@ -41,7 +41,7 @@ spec = do
           Row (Line [ Free $ Annotated info $ Leaf source ]) (Line [ Free $ Annotated info $ Leaf source ]) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
-      forAll (arbitrary `suchThat` \ s -> filter (/= '\n') s == s) $
+      forAll (arbitrary `suchThat` (\ (Source (_, a)) -> filter (/= '\n') a == a)) $
           \ source -> splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
             Row (Line [ Free $ Annotated (Info (totalRange source) mempty) $ Indexed [] ]) (Line [ Free $ Annotated (Info (totalRange source) mempty) $ Indexed [] ]) ]
 
