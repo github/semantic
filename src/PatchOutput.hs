@@ -14,19 +14,14 @@ import Control.Monad.Free
 patch :: Diff a Info -> Source Char -> Source Char -> String
 patch diff sourceA sourceB = mconcat $ showHunk sourceA sourceB <$> hunks diff sourceA sourceB
 
-data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, getRows :: [Row a] }
+data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a] }
   deriving (Eq, Show)
 
 data Change a = Change { context :: [Row a], contents :: [Row a] }
   deriving (Eq, Show)
 
 showHunk :: Source Char -> Source Char -> Hunk (SplitDiff a Info) -> String
-showHunk sourceA sourceB hunk = header hunk ++ concat (showRow <$> getRows hunk)
-  where showRow (Row lineA lineB) = showLine '-' sourceA lineA ++ showLine '+' sourceB lineB
-        showLine _ _ EmptyLine = ""
-        showLine prefix source line = prefix : (toString . (`slice` source) . mconcat $ getRange <$> unLine line)
-        getRange (Free (Annotated (Info range _) _)) = range
-        getRange (Pure (Info range _ :< _)) = range
+showHunk sourceA sourceB hunk = header hunk ++ concat (showChange sourceA sourceB <$> changes hunk)
 
 showChange :: Source Char -> Source Char -> Change (SplitDiff a Info) -> String
 showChange sourceA sourceB change = concat (showLine ' ' sourceB . unRight <$> context change) ++ concat (showRow <$> contents change)
@@ -49,13 +44,9 @@ hunksInRows rows = case nextHunk rows of
   Just (hunk, rest) -> hunk : hunksInRows rest
 
 nextHunk :: [Row (SplitDiff a Info)] -> Maybe (Hunk (SplitDiff a Info), [Row (SplitDiff a Info)])
-nextHunk rows = case hunkRows of
-  [] -> Nothing
-  hunkRows' -> Just (Hunk 0 0 hunkRows', afterChanges)
-  where hunkRows = takeLast 3 leadingRows ++ changes
-
-        (leadingRows, afterLeadingContext) = Prelude.break rowHasChanges rows
-        (changes, afterChanges) = span rowHasChanges afterLeadingContext
+nextHunk rows = case nextChange rows of
+  Nothing -> Nothing
+  Just (change, rest) -> Just (Hunk 0 0 [ change ], rest)
 
 nextChange :: [Row (SplitDiff a Info)] -> Maybe (Change (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextChange rows = case changes of
