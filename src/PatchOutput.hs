@@ -14,7 +14,7 @@ data Hunk = Hunk Int Int [Line]
   deriving Eq
 
 instance Show Hunk where
-  show hunk = header hunk
+  show = header
 
 header :: Hunk -> String
 header (Hunk offsetA offsetB lines) = "@@ -" ++ show offsetA ++ "," ++ show countDeleted ++ " +" ++ show offsetB ++ "," ++ show countInserted ++ " @@\n"
