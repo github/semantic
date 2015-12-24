@@ -19,16 +19,17 @@ import Data.Monoid
 import qualified Data.Set as Set
 
 type ClassName = String
-type Source a = [a]
+newtype Source a = Source { unSource :: [a] }
+  deriving (Eq, Show, Functor, Foldable)
 
 subsource :: Range -> Source a -> Source a
-subsource = substring
+subsource range = Source . sublist range . unSource
 
 toString :: Source Char -> String
-toString source = source
+toString = unSource
 
 at :: Source a -> Int -> a
-at = (!!)
+at = (!!) . unSource
 
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeLast categories
@@ -61,7 +62,7 @@ split diff before after = return . renderHtml
 
     hasChanges diff = or $ const True <$> diff
 
-    sources = (before, after)
+    sources = (Source before, Source after)
 
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
     numberRows [] (Row EmptyLine EmptyLine) = []
@@ -163,11 +164,11 @@ zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
 zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++ repeat da) (b ++ repeat db)
 
 actualLines :: Source Char -> [Source Char]
-actualLines "" = [""]
-actualLines lines = case break (== '\n') lines of
+actualLines (Source "") = [Source ""]
+actualLines (Source lines) = case break (== '\n') lines of
   (l, lines') -> case lines' of
-                      [] -> [ l ]
-                      _:lines' -> (l ++ "\n") : actualLines lines'
+                      [] -> [ Source l ]
+                      _:lines' -> (Source $ l ++ "\n") : actualLines (Source lines')
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source Char -> [Range]
