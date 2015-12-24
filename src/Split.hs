@@ -24,7 +24,7 @@ type ClassName = String
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeLast categories
 
-split :: Diff a Info -> String -> String -> IO ByteString
+split :: Diff a Info -> Source Char -> Source Char -> IO ByteString
 split diff before after = return . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel (stringValue "stylesheet") ! A.href (stringValue "style.css")) <>)
@@ -33,7 +33,7 @@ split diff before after = return . renderHtml
         ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
         . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
-    rows = fst (splitDiffByLines diff (0, 0) sources)
+    rows = fst (splitDiffByLines diff (0, 0) (before, after))
     numbered = foldl numberRows [] rows
     maxNumber = case numbered of
       [] -> 0
@@ -46,13 +46,11 @@ split diff before after = return . renderHtml
     columnWidth = max (20 + digits maxNumber * 8) 40
 
     numberedLinesToMarkup :: (Int, Line (SplitDiff a Info), Int, Line (SplitDiff a Info)) -> Markup
-    numberedLinesToMarkup (m, left, n, right) = tr $ toMarkup (or $ hasChanges <$> left, m, renderable (fst sources) left) <> toMarkup (or $ hasChanges <$> right, n, renderable (snd sources) right) <> string "\n"
+    numberedLinesToMarkup (m, left, n, right) = tr $ toMarkup (or $ hasChanges <$> left, m, renderable before left) <> toMarkup (or $ hasChanges <$> right, n, renderable after right) <> string "\n"
 
     renderable source = fmap (Renderable . (,) source)
 
     hasChanges diff = or $ const True <$> diff
-
-    sources = (fromList before, fromList after)
 
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
     numberRows [] (Row EmptyLine EmptyLine) = []
