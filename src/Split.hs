@@ -10,6 +10,7 @@ import Syntax
 import Control.Comonad.Cofree
 import Range
 import Control.Monad.Free
+import qualified Data.Array.IArray as Array
 import Data.ByteString.Lazy.Internal
 import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
@@ -50,6 +51,9 @@ split diff before after = return . renderHtml
     renderable source = fmap (Renderable . (,) source)
 
     hasChanges diff = or $ const True <$> diff
+
+    sources :: (Array.Array Int Char, Array.Array Int Char)
+    sources = (Array.listArray (0, length before) before, Array.listArray (0, length after) after)
 
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
     numberRows [] (Row EmptyLine EmptyLine) = []
