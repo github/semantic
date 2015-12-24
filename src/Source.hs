@@ -3,7 +3,7 @@ module Source where
 import Range
 import qualified Data.Vector as Vector
 
-newtype Source a = Source (Vector.Vector a)
+newtype Source a = Source { getVector :: Vector.Vector a  }
   deriving (Eq, Show, Functor, Foldable)
 
 makeSource :: [a] -> Source a
