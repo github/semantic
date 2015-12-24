@@ -23,7 +23,7 @@ instance Arbitrary a => Arbitrary (Row a) where
 
 instance Arbitrary a => Arbitrary (Line a) where
   arbitrary = oneof [
-    Line <$> arbitrary,
+    makeLine <$> arbitrary,
     const EmptyLine <$> (arbitrary :: Gen ()) ]
 
 instance Arbitrary a => Arbitrary (Source a) where
@@ -39,12 +39,12 @@ spec = do
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
         \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (source, source) (range, range) (categories, categories) syntax `shouldBe` [
-          Row (Line [ Free $ Annotated info $ Leaf source ]) (Line [ Free $ Annotated info $ Leaf source ]) ]
+          Row (makeLine [ Free $ Annotated info $ Leaf source ]) (makeLine [ Free $ Annotated info $ Leaf source ]) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
           \ source -> splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
-            Row (Line [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) (Line [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) ]
+            Row (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) ]
 
     prop "preserves line counts in equal sources" $
       \ source ->
@@ -60,8 +60,8 @@ spec = do
 
     prop "appends onto open rows" $
       forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
-        \ (a@(Row (Line a1) (Line b1)), b@(Row (Line a2) (Line b2))) ->
-          adjoinRowsBy openMaybe openMaybe [ a ] b `shouldBe` [ Row (Line $ a1 ++ a2) (Line $ b1 ++ b2) ]
+        \ (a@(Row a1 b1), b@(Row a2 b2)) ->
+          adjoinRowsBy openMaybe openMaybe [ a ] b `shouldBe` [ Row (makeLine $ unLine a1 ++ unLine a2) (makeLine $ unLine b1 ++ unLine b2) ]
 
     prop "does not append onto closed rows" $
       forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
@@ -78,18 +78,18 @@ spec = do
   describe "splitTermByLines" $ do
     prop "preserves line count" $
       \ source -> let range = getTotalRange source in
-        splitTermByLines (Info range mempty :< Leaf source) source `shouldBe` (Line . (:[]) . (:< Leaf source) . (`Info` mempty) <$> actualLineRanges range source, range)
+        splitTermByLines (Info range mempty :< Leaf source) source `shouldBe` (makeLine . (:[]) . (:< Leaf source) . (`Info` mempty) <$> actualLineRanges range source, range)
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
       openLineBy (openTerm $ fromList "\n ") [
-        Line [ Info (Range 1 2) mempty :< Leaf "" ],
-        Line [ Info (Range 0 1) mempty :< Leaf "" ]
-      ] `shouldBe` (Just $ Line [ Info (Range 1 2) mempty :< Leaf "" ])
+        makeLine [ Info (Range 1 2) mempty :< Leaf "" ],
+        makeLine [ Info (Range 0 1) mempty :< Leaf "" ]
+      ] `shouldBe` (Just $ makeLine [ Info (Range 1 2) mempty :< Leaf "" ])
 
     it "returns Nothing if the earliest non-empty line is closed" $
       openLineBy (openTerm $ fromList "\n") [
-        Line [ Info (Range 0 1) mempty :< Leaf "" ]
+        makeLine [ Info (Range 0 1) mempty :< Leaf "" ]
       ] `shouldBe` Nothing
 
   describe "openTerm" $ do
