@@ -11,6 +11,9 @@ data Range = Range { start :: !Int, end :: !Int }
 substring :: Range -> String -> String
 substring range = take (end range - start range) . drop (start range)
 
+sublist :: Range -> [a] -> [a]
+sublist range = take (end range - start range) . drop (start range)
+
 totalRange :: [a] -> Range
 totalRange list = Range 0 $ length list
 
