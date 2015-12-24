@@ -14,7 +14,7 @@ type Compare a annotation = Term a annotation -> Term a annotation -> Maybe (Dif
 type Cost a annotation = Diff a annotation -> Integer
 
 ses :: Compare a annotation -> Cost a annotation -> [Term a annotation] -> [Term a annotation] -> [Diff a annotation]
-ses diffTerms cost as bs = fmap fst $ evalState diffState Map.empty where
+ses diffTerms cost as bs = fst <$> evalState diffState Map.empty where
   diffState = diffAt diffTerms cost (0, 0) as bs
 
 diffAt :: Compare a annotation -> Cost a annotation -> (Integer, Integer) -> [Term a annotation] -> [Term a annotation] -> State (Map.Map (Integer, Integer) [(Diff a annotation, Integer)]) [(Diff a annotation, Integer)]
