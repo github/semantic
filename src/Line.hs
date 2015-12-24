@@ -10,6 +10,9 @@ data Line a =
   | EmptyLine
   deriving (Eq, Functor, Foldable)
 
+makeLine :: [a] -> Line a
+makeLine = Line
+
 unLine :: Line a -> [a]
 unLine EmptyLine = []
 unLine (Line elements) = elements
