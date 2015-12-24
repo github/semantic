@@ -24,5 +24,8 @@ at = (!!) . unSource
 null :: Source a -> Bool
 null (Source vector) = Vector.null vector
 
+cons :: a -> Source a -> Source a
+cons a = Source . Vector.cons a . getVector
+
 uncons :: Source a -> Maybe (a, Source a)
 uncons (Source vector) = if Vector.null vector then Nothing else Just (Vector.head vector, Source $ Vector.tail vector)
