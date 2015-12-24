@@ -68,7 +68,7 @@ split diff before after = return . renderHtml
 
     hasChanges diff = or $ const True <$> diff
 
-    sources = (Source (0, before), Source (0, after))
+    sources = (makeSource before, makeSource after)
 
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
     numberRows [] (Row EmptyLine EmptyLine) = []
