@@ -17,25 +17,9 @@ import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
 import Data.Monoid
 import qualified Data.Set as Set
+import Source
 
 type ClassName = String
-newtype Source a = Source (Int, [a])
-  deriving (Eq, Show, Functor, Foldable)
-
-makeSource :: [a] -> Source a
-makeSource list = Source (0, list)
-
-unSource :: Source a -> [a]
-unSource (Source (_, list)) = list
-
-subsource :: Range -> Source a -> Source a
-subsource range (Source (i, list)) = Source (start range, sublist (offsetRange (negate i) range) list)
-
-toString :: Source Char -> String
-toString = unSource
-
-at :: Source a -> Int -> a
-at = (!!) . unSource
 
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeLast categories
