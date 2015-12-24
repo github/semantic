@@ -10,6 +10,7 @@ import Test.QuickCheck hiding (Fixed)
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
 import qualified Data.Maybe as Maybe
+import Source hiding ((++))
 import Line
 import Row
 import Patch
@@ -22,10 +23,13 @@ instance Arbitrary a => Arbitrary (Row a) where
 
 instance Arbitrary a => Arbitrary (Line a) where
   arbitrary = oneof [
-    Line <$> arbitrary,
+    makeLine <$> arbitrary,
     const EmptyLine <$> (arbitrary :: Gen ()) ]
 
-arbitraryLeaf :: Gen (String, Info, Syntax String f)
+instance Arbitrary a => Arbitrary (Source a) where
+  arbitrary = fromList <$> arbitrary
+
+arbitraryLeaf :: Gen (Source Char, Info, Syntax (Source Char) f)
 arbitraryLeaf = toTuple <$> arbitrary
   where toTuple string = (string, Info (Range 0 $ length string) mempty, Leaf string)
 
@@ -35,20 +39,20 @@ spec = do
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
         \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (source, source) (range, range) (categories, categories) syntax `shouldBe` [
-          Row (Line [ Free $ Annotated info $ Leaf source ]) (Line [ Free $ Annotated info $ Leaf source ]) ]
+          Row (makeLine [ Free $ Annotated info $ Leaf source ]) (makeLine [ Free $ Annotated info $ Leaf source ]) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
-      forAll (arbitrary `suchThat` \ s -> filter (/= '\n') s == s) $
-          \ source -> splitAnnotatedByLines (source, source) (totalRange source, totalRange source) (mempty, mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
-            Row (Line [ Free $ Annotated (Info (totalRange source) mempty) $ Indexed [] ]) (Line [ Free $ Annotated (Info (totalRange source) mempty) $ Indexed [] ]) ]
+      forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
+          \ source -> splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
+            Row (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) ]
 
     prop "preserves line counts in equal sources" $
       \ source ->
-        length (splitAnnotatedByLines (source, source) (totalRange source, totalRange source) (mempty, mempty) (Indexed . fst $ foldl combineIntoLeaves ([], 0) source)) `shouldBe` length (filter (== '\n') source) + 1
+        length (splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed . fst $ foldl combineIntoLeaves ([], 0) source)) `shouldBe` length (filter (== '\n') $ toList source) + 1
 
     prop "produces the maximum line count in inequal sources" $
       \ sourceA sourceB ->
-        length (splitAnnotatedByLines (sourceA, sourceB) (totalRange sourceA, totalRange sourceB) (mempty, mempty) (Indexed $ zipWith (leafWithRangesInSources sourceA sourceB) (actualLineRanges (totalRange sourceA) sourceA) (actualLineRanges (totalRange sourceB) sourceB))) `shouldBe` max (length (filter (== '\n') sourceA) + 1) (length (filter (== '\n') sourceB) + 1)
+        length (splitAnnotatedByLines (sourceA, sourceB) (getTotalRange sourceA, getTotalRange sourceB) (mempty, mempty) (Indexed $ zipWith (leafWithRangesInSources sourceA sourceB) (actualLineRanges (getTotalRange sourceA) sourceA) (actualLineRanges (getTotalRange sourceB) sourceB))) `shouldBe` max (length (filter (== '\n') $ toList sourceA) + 1) (length (filter (== '\n') $ toList sourceB) + 1)
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $
@@ -56,8 +60,8 @@ spec = do
 
     prop "appends onto open rows" $
       forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
-        \ (a@(Row (Line a1) (Line b1)), b@(Row (Line a2) (Line b2))) ->
-          adjoinRowsBy openMaybe openMaybe [ a ] b `shouldBe` [ Row (Line $ a1 ++ a2) (Line $ b1 ++ b2) ]
+        \ (a@(Row a1 b1), b@(Row a2 b2)) ->
+          adjoinRowsBy openMaybe openMaybe [ a ] b `shouldBe` [ Row (makeLine $ unLine a1 ++ unLine a2) (makeLine $ unLine b1 ++ unLine b2) ]
 
     prop "does not append onto closed rows" $
       forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
@@ -73,38 +77,40 @@ spec = do
 
   describe "splitTermByLines" $ do
     prop "preserves line count" $
-      \ source -> let range = totalRange source in
-        splitTermByLines (Info range mempty :< Leaf source) source `shouldBe` (Line . (:[]) . (:< Leaf source) . (`Info` mempty) <$> actualLineRanges range source, range)
+      \ source -> let range = getTotalRange source in
+        splitTermByLines (Info range mempty :< Leaf source) source `shouldBe` (makeLine . (:[]) . (:< Leaf source) . (`Info` mempty) <$> actualLineRanges range source, range)
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
-      openLineBy (openTerm "\n ") [
-        Line [ Info (Range 1 2) mempty :< Leaf "" ],
-        Line [ Info (Range 0 1) mempty :< Leaf "" ]
-      ] `shouldBe` (Just $ Line [ Info (Range 1 2) mempty :< Leaf "" ])
+      openLineBy (openTerm $ fromList "\n ") [
+        makeLine [ Info (Range 1 2) mempty :< Leaf "" ],
+        makeLine [ Info (Range 0 1) mempty :< Leaf "" ]
+      ] `shouldBe` (Just $ makeLine [ Info (Range 1 2) mempty :< Leaf "" ])
 
     it "returns Nothing if the earliest non-empty line is closed" $
-      openLineBy (openTerm "\n") [
-        Line [ Info (Range 0 1) mempty :< Leaf "" ]
+      openLineBy (openTerm $ fromList "\n") [
+        makeLine [ Info (Range 0 1) mempty :< Leaf "" ]
       ] `shouldBe` Nothing
 
   describe "openTerm" $ do
     it "returns Just the term if its substring does not end with a newline" $
-      let term = Info (Range 0 2) mempty :< Leaf "" in openTerm "  " term `shouldBe` Just term
+      let term = Info (Range 0 2) mempty :< Leaf "" in openTerm (fromList "  ") term `shouldBe` Just term
 
     it "returns Nothing for terms whose substring ends with a newline" $
-      openTerm " \n" (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
+      openTerm (fromList " \n") (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
 
     where
       isOpenBy f (Row a b) = Maybe.isJust (openLineBy f [ a ]) && Maybe.isJust (openLineBy f [ b ])
       isClosedBy f (Row a@(Line _) b@(Line _)) = Maybe.isNothing (openLineBy f [ a ]) && Maybe.isNothing (openLineBy f [ b ])
       isClosedBy _ (Row _ _) = False
 
-      isOnSingleLine (a, _, _) = filter (/= '\n') a == a
+      isOnSingleLine (a, _, _) = filter (/= '\n') (toList a) == toList a
+
+      getTotalRange (Source vector) = Range 0 $ length vector
 
       combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info (Range start $ start + 1) mempty, Info (Range start $ start + 1) mempty) (Leaf [ char ]) ], start + 1)
 
-      leafWithRangesInSources sourceA sourceB rangeA rangeB = Free $ Annotated (Info rangeA mempty, Info rangeB mempty) (Leaf $ substring rangeA sourceA ++ substring rangeB sourceB)
+      leafWithRangesInSources sourceA sourceB rangeA rangeB = Free $ Annotated (Info rangeA mempty, Info rangeB mempty) (Leaf $ toList sourceA ++ toList sourceB)
 
       openMaybe :: Maybe Bool -> Maybe (Maybe Bool)
       openMaybe (Just a) = Just (Just a)

@@ -3,6 +3,7 @@ module TreeSitter where
 import Diff
 import Range
 import Parser
+import Source
 import qualified Data.Set as Set
 import Foreign
 import Foreign.C
@@ -54,7 +55,7 @@ parseTreeSitterFile :: Language -> Parser
 parseTreeSitterFile (Language language constructor) contents = do
   document <- ts_document_make
   ts_document_set_language document language
-  withCString contents (\ source -> do
+  withCString (toList contents) (\ source -> do
     ts_document_set_input_string document source
     ts_document_parse document
     term <- documentToTerm constructor document contents
