@@ -47,11 +47,11 @@ spec = do
 
     prop "preserves line counts in equal sources" $
       \ source ->
-        length (splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed . fst $ foldl combineIntoLeaves ([], 0) source)) `shouldBe` length (filter (== '\n') source) + 1
+        length (splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed . fst $ foldl combineIntoLeaves ([], 0) source)) `shouldBe` length (filter (== '\n') $ unSource source) + 1
 
     prop "produces the maximum line count in inequal sources" $
       \ sourceA sourceB ->
-        length (splitAnnotatedByLines (sourceA, sourceB) (getTotalRange sourceA, getTotalRange sourceB) (mempty, mempty) (Indexed $ zipWith (leafWithRangesInSources sourceA sourceB) (actualLineRanges (getTotalRange sourceA) sourceA) (actualLineRanges (getTotalRange sourceB) sourceB))) `shouldBe` max (length (filter (== '\n') sourceA) + 1) (length (filter (== '\n') sourceB) + 1)
+        length (splitAnnotatedByLines (sourceA, sourceB) (getTotalRange sourceA, getTotalRange sourceB) (mempty, mempty) (Indexed $ zipWith (leafWithRangesInSources sourceA sourceB) (actualLineRanges (getTotalRange sourceA) sourceA) (actualLineRanges (getTotalRange sourceB) sourceB))) `shouldBe` max (length (filter (== '\n') $ unSource sourceA) + 1) (length (filter (== '\n') $ unSource sourceB) + 1)
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $
