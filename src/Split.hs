@@ -19,11 +19,14 @@ import Data.Monoid
 import qualified Data.Set as Set
 
 type ClassName = String
-newtype Source a = Source { unSource :: [a] }
+newtype Source a = Source (Int, [a])
   deriving (Eq, Show, Functor, Foldable)
 
+unSource :: Source a -> [a]
+unSource (Source (_, list)) = list
+
 subsource :: Range -> Source a -> Source a
-subsource range = Source . sublist range . unSource
+subsource range (Source (i, list)) = Source (start range, sublist (offsetRange (negate i) range) list)
 
 toString :: Source Char -> String
 toString = unSource
@@ -62,7 +65,7 @@ split diff before after = return . renderHtml
 
     hasChanges diff = or $ const True <$> diff
 
-    sources = (Source before, Source after)
+    sources = (Source (0, before), Source (0, after))
 
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
     numberRows [] (Row EmptyLine EmptyLine) = []
@@ -164,11 +167,11 @@ zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
 zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++ repeat da) (b ++ repeat db)
 
 actualLines :: Source Char -> [Source Char]
-actualLines (Source "") = [Source ""]
-actualLines (Source lines) = case break (== '\n') lines of
+actualLines source@(Source (_, "")) = [ source ]
+actualLines (Source (i, lines)) = case break (== '\n') lines of
   (l, lines') -> case lines' of
-                      [] -> [ Source l ]
-                      _:lines' -> (Source $ l ++ "\n") : actualLines (Source lines')
+                      [] -> [ Source (i, l) ]
+                      _:lines' -> Source (i, l ++ "\n") : actualLines (Source (i + length l + 1, lines'))
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source Char -> [Range]
