@@ -30,8 +30,12 @@ hunksInRows rows = case nextHunk rows of
   Just (hunk, rest) -> hunk : hunksInRows rest
 
 nextHunk :: [Row (SplitDiff a Info)] -> Maybe (Hunk a, [Row (SplitDiff a Info)])
-nextHunk rows = Nothing
-  where (leadingContext, afterLeadingContext) = Prelude.break rowHasChanges rows
+nextHunk rows = case hunkRows of
+  [] -> Nothing
+  hunkRows' -> Just (Hunk 0 0 hunkRows', afterChanges)
+  where hunkRows = takeLast 3 leadingRows ++ changes
+
+        (leadingRows, afterLeadingContext) = Prelude.break rowHasChanges rows
         (changes, afterChanges) = span rowHasChanges afterLeadingContext
 
         rowHasChanges (Row left right) = lineHasChanges left || lineHasChanges right
