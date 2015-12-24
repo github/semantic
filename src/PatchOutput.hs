@@ -10,19 +10,14 @@ import Control.Monad.Free
 patch :: Diff a Info -> Source Char -> Source Char -> String
 patch diff sourceA sourceB = mconcat $ show <$> hunks diff sourceA sourceB
 
-data Hunk = Hunk Int Int [Line]
+data Hunk = Hunk { offsetA :: Int, offsetB :: Int, leadingContext :: [String], deletions :: [String], insertions :: [String] , trailingContext :: [String] }
   deriving Eq
 
 instance Show Hunk where
   show = header
 
 header :: Hunk -> String
-header (Hunk offsetA offsetB lines) = "@@ -" ++ show offsetA ++ "," ++ show countDeleted ++ " +" ++ show offsetB ++ "," ++ show countInserted ++ " @@\n"
-  where (countDeleted, countInserted) = foldl countLine (0 :: Int, 0 :: Int) lines
-        countLine (countDeleted, countInserted) line = case line of
-          Insert _ -> (countDeleted, countInserted + 1)
-          Delete _ -> (countDeleted + 1, countInserted)
-          Context _ -> (countDeleted + 1, countInserted + 1)
+header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show (length $ deletions hunk) ++ " +" ++ show (offsetB hunk) ++ "," ++ show (length $ insertions hunk) ++ " @@\n"
 
 data Line = Insert String | Delete String | Context String
   deriving (Show, Eq)
