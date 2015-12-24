@@ -1,21 +1,22 @@
 module Line where
 
+import qualified Data.Foldable as Foldable
 import Data.Monoid
-import Data.List (intercalate)
+import qualified Data.Vector as Vector
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 
 data Line a =
-  Line [a]
+  Line (Vector.Vector a)
   | EmptyLine
   deriving (Eq, Functor, Foldable)
 
 makeLine :: [a] -> Line a
-makeLine = Line
+makeLine = Line . Vector.fromList
 
 unLine :: Line a -> [a]
 unLine EmptyLine = []
-unLine (Line elements) = elements
+unLine (Line elements) = Vector.toList elements
 
 maybeFirst :: Foldable f => f a -> Maybe a
 maybeFirst = foldr (const . Just) Nothing
@@ -54,4 +55,4 @@ instance ToMarkup a => ToMarkup (Bool, Int, Line a) where
   toMarkup (_, _, EmptyLine) = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell") <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell") <> string "\n"
   toMarkup (hasChanges, num, Line contents)
     = td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
-    <> td (mconcat $ toMarkup <$> contents) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code") <> string "\n"
+    <> td (mconcat . Vector.toList $ toMarkup <$> contents) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code") <> string "\n"
