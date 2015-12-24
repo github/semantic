@@ -10,7 +10,7 @@ import Test.QuickCheck hiding (Fixed)
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
 import qualified Data.Maybe as Maybe
-import Source
+import Source hiding ((++))
 import Line
 import Row
 import Patch
