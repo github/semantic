@@ -21,13 +21,13 @@ unLine (Line elements) = Vector.toList elements
 maybeFirst :: Foldable f => f a -> Maybe a
 maybeFirst = foldr (const . Just) Nothing
 
-maybeLast :: Foldable f => f a -> Maybe a
-maybeLast = foldl (flip $ const . Just) Nothing
+maybeLast :: Vector.Vector a -> Maybe a
+maybeLast vector = if Vector.null vector then Nothing else Just $ Vector.last vector
 
 openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
 openLineBy _ [] = Nothing
 openLineBy f (EmptyLine : rest) = openLineBy f rest
-openLineBy f (line : _) = const line <$> (f =<< maybeLast (unLine line))
+openLineBy f (line@(Line vector) : _) = const line <$> (f =<< maybeLast vector)
 
 adjoinLinesBy :: (a -> Maybe a) -> [Line a] -> Line a -> [Line a]
 adjoinLinesBy _ [] line = [line]
