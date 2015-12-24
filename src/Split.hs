@@ -18,6 +18,7 @@ import Text.Blaze.Html.Renderer.Utf8
 import Data.Monoid
 import qualified Data.Set as Set
 import Source hiding ((++))
+import qualified Source as Source ((++))
 
 type ClassName = String
 
@@ -158,7 +159,7 @@ actualLines source | length source == 0 = [ source ]
 actualLines source = case Source.break (== '\n') source of
   (l, lines') -> case uncons lines' of
     Nothing -> [ l ]
-    Just (_, lines') -> (fromList $ toString l ++ "\n") : actualLines lines'
+    Just (_, lines') -> (l Source.++ fromList "\n") : actualLines lines'
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source Char -> [Range]
