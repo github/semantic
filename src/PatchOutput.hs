@@ -4,9 +4,12 @@ module PatchOutput (
 ) where
 
 import Diff
+import Line
 import Row
 import Source hiding ((++))
 import Split
+import Control.Comonad.Cofree
+import Control.Monad.Free
 
 patch :: Diff a Info -> Source Char -> Source Char -> String
 patch diff sourceA sourceB = mconcat $ show <$> hunks diff sourceA sourceB
@@ -16,6 +19,13 @@ data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, getRows :: [Row (SplitDiff 
 
 instance Show (Hunk a) where
   show = header
+
+showHunk sourceA sourceB hunk = header hunk ++ concat (showRow <$> getRows hunk)
+  where showRow (Row lineA lineB) = showLine sourceA lineA ++ showLine sourceB lineB
+        showLine _ EmptyLine = ""
+        showLine source line = toString . (`slice` source) . mconcat $ getRange <$> unLine line
+        getRange (Free (Annotated (Info range _) _)) = range
+        getRange (Pure (Info range _ :< _)) = range
 
 header :: Hunk a -> String
 header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show 0 ++ " +" ++ show (offsetB hunk) ++ "," ++ show 0 ++ " @@\n"
