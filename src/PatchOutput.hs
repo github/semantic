@@ -19,9 +19,9 @@ data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, getRows :: [Row (SplitDiff 
 
 showHunk :: Source Char -> Source Char -> Hunk a -> String
 showHunk sourceA sourceB hunk = header hunk ++ concat (showRow <$> getRows hunk)
-  where showRow (Row lineA lineB) = showLine sourceA lineA ++ showLine sourceB lineB
-        showLine _ EmptyLine = ""
-        showLine source line = toString . (`slice` source) . mconcat $ getRange <$> unLine line
+  where showRow (Row lineA lineB) = showLine '-' sourceA lineA ++ showLine '+' sourceB lineB
+        showLine _ _ EmptyLine = ""
+        showLine prefix source line = prefix : (toString . (`slice` source) . mconcat $ getRange <$> unLine line)
         getRange (Free (Annotated (Info range _) _)) = range
         getRange (Pure (Info range _ :< _)) = range
 
