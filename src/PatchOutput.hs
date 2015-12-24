@@ -21,7 +21,8 @@ header :: Hunk a -> String
 header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show 0 ++ " +" ++ show (offsetB hunk) ++ "," ++ show 0 ++ " @@\n"
 
 hunks :: Diff a Info -> Source Char -> Source Char -> [Hunk a]
-hunks diff sourceA sourceB = []
+hunks diff sourceA sourceB = hunksInRows rows
+  where (rows, _) = splitDiffByLines diff (0, 0) (sourceA, sourceB)
 
 hunksInRows :: [Row (SplitDiff a Info)] -> [Hunk a]
 hunksInRows rows = case nextHunk rows of
