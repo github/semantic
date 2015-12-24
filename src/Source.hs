@@ -9,17 +9,17 @@ newtype Source a = Source { getVector :: Vector.Vector a  }
 makeSource :: [a] -> Source a
 makeSource = Source . Vector.fromList
 
-unSource :: Source a -> [a]
-unSource (Source vector) = Vector.toList vector
+toList :: Source a -> [a]
+toList = Vector.toList . getVector
 
 slice :: Range -> Source a -> Source a
 slice range (Source vector) = Source $ Vector.slice (start range) (end range - start range) vector
 
 toString :: Source Char -> String
-toString = unSource
+toString = toList
 
 at :: Source a -> Int -> a
-at = (!!) . unSource
+at = (!!) . toList
 
 null :: Source a -> Bool
 null (Source vector) = Vector.null vector
