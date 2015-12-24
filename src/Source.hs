@@ -19,7 +19,7 @@ toString :: Source Char -> String
 toString = toList
 
 at :: Source a -> Int -> a
-at = (!!) . toList
+at = (Vector.!) . getVector
 
 null :: Source a -> Bool
 null = Vector.null . getVector
