@@ -14,6 +14,9 @@ unLine :: Line a -> [a]
 unLine EmptyLine = []
 unLine (Line elements) = elements
 
+maybeFirst :: Foldable f => f a -> Maybe a
+maybeFirst = foldr (const . Just) Nothing
+
 maybeLast :: Foldable f => f a -> Maybe a
 maybeLast = foldl (flip $ const . Just) Nothing
 
