@@ -37,7 +37,7 @@ break predicate (Source vector) = let (start, remainder) = Vector.break predicat
 (++) (Source a) = Source . (a Vector.++) . getVector
 
 actualLines :: Source Char -> [Source Char]
-actualLines source | length source == 0 = [ source ]
+actualLines source | Source.null source = [ source ]
 actualLines source = case Source.break (== '\n') source of
   (l, lines') -> case uncons lines' of
     Nothing -> [ l ]
