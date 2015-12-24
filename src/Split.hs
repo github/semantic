@@ -74,19 +74,19 @@ split diff before after = return . renderHtml
 -- | A diff with only one side’s annotations.
 type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf annotation)
 
-newtype Renderable a = Renderable (String, a)
+newtype Renderable a = Renderable (Source, a)
 
 instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
   toMarkup (Renderable (source, (Info range categories, syntax))) = classifyMarkup categories $ case syntax of
-    Leaf _ -> span . string $ substring range source
+    Leaf _ -> span . string $ subsource range source
     Indexed children -> ul . mconcat $ contentElements children
     Fixed children -> ul . mconcat $ contentElements children
     Keyed children -> dl . mconcat $ contentElements children
     where markupForSeparatorAndChild :: ToMarkup f => ([Markup], Int) -> (f, Range) -> ([Markup], Int)
-          markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string (substring (Range previous $ start $ snd child) source), toMarkup $ fst child ], end $ snd child)
+          markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string (subsource (Range previous $ start $ snd child) source), toMarkup $ fst child ], end $ snd child)
 
           contentElements children = let (elements, previous) = foldl markupForSeparatorAndChild ([], start range) children in
-            elements ++ [ string $ substring (Range previous $ end range) source ]
+            elements ++ [ string $ subsource (Range previous $ end range) source ]
 
 instance ToMarkup (Renderable (Term a Info)) where
   toMarkup (Renderable (source, term)) = fst $ cata (\ info@(Info range _) syntax -> (toMarkup $ Renderable (source, (info, syntax)), range)) term
@@ -96,7 +96,7 @@ instance ToMarkup (Renderable (SplitDiff a Info)) where
     where toMarkupAndRange :: Term a Info -> (Markup, Range)
           toMarkupAndRange term@(Info range _ :< _) = ((div ! A.class_ (stringValue "patch")) . toMarkup $ Renderable (source, term), range)
 
-splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (SplitDiff a Info)], (Range, Range))
+splitDiffByLines :: Diff a Info -> (Int, Int) -> (Source, Source) -> ([Row (SplitDiff a Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
@@ -110,7 +110,7 @@ splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
         ranges (Info left _, Info right _) = (left, right)
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
-splitTermByLines :: Term a Info -> String -> ([Line (Term a Info)], Range)
+splitTermByLines :: Term a Info -> Source -> ([Line (Term a Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
   Leaf a -> contextLines (:< Leaf a) range categories source
   Indexed children -> adjoinChildLines Indexed children
@@ -123,7 +123,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
         childLines constructor (lines, previous) child = let (childLines, childRange) = splitTermByLines child source in
           (adjoin $ lines ++ contextLines (:< constructor) (Range previous $ start childRange) categories source ++ childLines, end childRange)
 
-splitAnnotatedByLines :: (String, String) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
+splitAnnotatedByLines :: (Source, Source) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> contextRows (Leaf a) ranges categories sources
   Indexed children -> adjoinChildRows Indexed children
@@ -142,25 +142,25 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         ends (left, right) = (end left, end right)
         makeRanges (leftStart, rightStart) (leftEnd, rightEnd) = (Range leftStart leftEnd, Range rightStart rightEnd)
 
-contextLines :: (Info -> a) -> Range -> Set.Set Category -> String -> [Line a]
+contextLines :: (Info -> a) -> Range -> Set.Set Category -> Source -> [Line a]
 contextLines constructor range categories source = Line . (:[]) . constructor . (`Info` categories) <$> actualLineRanges range source
 
-openRange :: String -> Range -> Maybe Range
-openRange source range = case (source !!) <$> maybeLastIndex range of
+openRange :: Source -> Range -> Maybe Range
+openRange source range = case (source `at`) <$> maybeLastIndex range of
   Just '\n' -> Nothing
   _ -> Just range
 
-openTerm :: String -> Term a Info -> Maybe (Term a Info)
+openTerm :: Source -> Term a Info -> Maybe (Term a Info)
 openTerm source term@(Info range _ :< _) = const term <$> openRange source range
 
-openDiff :: String -> SplitDiff a Info -> Maybe (SplitDiff a Info)
+openDiff :: Source -> SplitDiff a Info -> Maybe (SplitDiff a Info)
 openDiff source diff@(Free (Annotated (Info range _) _)) = const diff <$> openRange source range
 openDiff source diff@(Pure term) = const diff <$> openTerm source term
 
 zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
 zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++ repeat da) (b ++ repeat db)
 
-actualLines :: String -> [String]
+actualLines :: Source -> [Source]
 actualLines "" = [""]
 actualLines lines = case break (== '\n') lines of
   (l, lines') -> case lines' of
@@ -168,6 +168,6 @@ actualLines lines = case break (== '\n') lines of
                       _:lines' -> (l ++ "\n") : actualLines lines'
 
 -- | Compute the line ranges within a given range of a string.
-actualLineRanges :: Range -> String -> [Range]
-actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . substring range
+actualLineRanges :: Range -> Source -> [Range]
+actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . subsource range
   where toRange previous string = Range (end previous) $ end previous + length string
