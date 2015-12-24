@@ -22,6 +22,9 @@ type ClassName = String
 newtype Source a = Source (Int, [a])
   deriving (Eq, Show, Functor, Foldable)
 
+makeSource :: [a] -> Source a
+makeSource list = Source (0, list)
+
 unSource :: Source a -> [a]
 unSource (Source (_, list)) = list
 
