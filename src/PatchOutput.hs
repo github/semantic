@@ -49,6 +49,13 @@ nextHunk rows = case hunkRows of
         (leadingRows, afterLeadingContext) = Prelude.break rowHasChanges rows
         (changes, afterChanges) = span rowHasChanges afterLeadingContext
 
+nextChange :: [Row (SplitDiff a Info)] -> Maybe (Change (SplitDiff a Info), [Row (SplitDiff a Info)])
+nextChange rows = case changes of
+  [] -> Nothing
+  _ -> Just (Change (takeLast 3 leadingRows) changes, afterChanges)
+  where (leadingRows, afterLeadingContext) = Prelude.break rowHasChanges rows
+        (changes, afterChanges) = span rowHasChanges afterLeadingContext
+
 rowHasChanges :: Row (SplitDiff a Info) -> Bool
 rowHasChanges (Row left right) = lineHasChanges left || lineHasChanges right
 
