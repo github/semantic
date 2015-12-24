@@ -20,6 +20,7 @@ import Data.Monoid
 import qualified Data.Set as Set
 
 type ClassName = String
+type Source = Array.Array Int Char
 
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeLast categories
@@ -52,7 +53,7 @@ split diff before after = return . renderHtml
 
     hasChanges diff = or $ const True <$> diff
 
-    sources :: (Array.Array Int Char, Array.Array Int Char)
+    sources :: (Source, Source)
     sources = (Array.listArray (0, length before) before, Array.listArray (0, length after) after)
 
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
