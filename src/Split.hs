@@ -39,7 +39,7 @@ split diff before after = return . renderHtml
         ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
         . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
-    rows = fst (splitDiffByLines diff (0, 0) (before, after))
+    rows = fst (splitDiffByLines diff (0, 0) sources)
     numbered = foldl numberRows [] rows
     maxNumber = case numbered of
       [] -> 0
@@ -52,7 +52,7 @@ split diff before after = return . renderHtml
     columnWidth = max (20 + digits maxNumber * 8) 40
 
     numberedLinesToMarkup :: (Int, Line (SplitDiff a Info), Int, Line (SplitDiff a Info)) -> Markup
-    numberedLinesToMarkup (m, left, n, right) = tr $ toMarkup (or $ hasChanges <$> left, m, renderable before left) <> toMarkup (or $ hasChanges <$> right, n, renderable after right) <> string "\n"
+    numberedLinesToMarkup (m, left, n, right) = tr $ toMarkup (or $ hasChanges <$> left, m, renderable (fst sources) left) <> toMarkup (or $ hasChanges <$> right, n, renderable (snd sources) right) <> string "\n"
 
     renderable source = fmap (Renderable . (,) source)
 
