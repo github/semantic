@@ -28,9 +28,6 @@ makeSource list = Source (0, list)
 unSource :: Source a -> [a]
 unSource (Source (_, list)) = list
 
-getTotalRange :: Source a -> Range
-getTotalRange (Source (i, list)) = Range 0 $ i + length list
-
 subsource :: Range -> Source a -> Source a
 subsource range (Source (i, list)) = Source (start range, sublist (offsetRange (negate i) range) list)
 
