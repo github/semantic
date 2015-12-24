@@ -42,7 +42,7 @@ spec = do
           Row (Line [ Free $ Annotated info $ Leaf source ]) (Line [ Free $ Annotated info $ Leaf source ]) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
-      forAll (arbitrary `suchThat` (\ (Source (_, a)) -> filter (/= '\n') a == a)) $
+      forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
           \ source -> splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
             Row (Line [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) (Line [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) ]
 
@@ -104,9 +104,9 @@ spec = do
       isClosedBy f (Row a@(Line _) b@(Line _)) = Maybe.isNothing (openLineBy f [ a ]) && Maybe.isNothing (openLineBy f [ b ])
       isClosedBy _ (Row _ _) = False
 
-      isOnSingleLine (Source (_, a), _, _) = filter (/= '\n') a == a
+      isOnSingleLine (a, _, _) = filter (/= '\n') (toList a) == toList a
 
-      getTotalRange (Source (i, list)) = Range 0 $ i + length list
+      getTotalRange (Source vector) = Range 0 $ length vector
 
       combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info (Range start $ start + 1) mempty, Info (Range start $ start + 1) mempty) (Leaf [ char ]) ], start + 1)
 
