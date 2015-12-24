@@ -17,6 +17,9 @@ patch diff sourceA sourceB = mconcat $ showHunk sourceA sourceB <$> hunks diff s
 data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, getRows :: [Row a] }
   deriving (Eq, Show)
 
+data Change a = Change { context :: [Row a], contents :: [Row a] }
+  deriving (Eq, Show)
+
 showHunk :: Source Char -> Source Char -> Hunk (SplitDiff a Info) -> String
 showHunk sourceA sourceB hunk = header hunk ++ concat (showRow <$> getRows hunk)
   where showRow (Row lineA lineB) = showLine '-' sourceA lineA ++ showLine '+' sourceB lineB
