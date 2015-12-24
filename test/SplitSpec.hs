@@ -42,16 +42,16 @@ spec = do
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` \ s -> filter (/= '\n') s == s) $
-          \ source -> splitAnnotatedByLines (source, source) (totalRange source, totalRange source) (mempty, mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
+          \ source -> splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
             Row (Line [ Free $ Annotated (Info (totalRange source) mempty) $ Indexed [] ]) (Line [ Free $ Annotated (Info (totalRange source) mempty) $ Indexed [] ]) ]
 
     prop "preserves line counts in equal sources" $
       \ source ->
-        length (splitAnnotatedByLines (source, source) (totalRange source, totalRange source) (mempty, mempty) (Indexed . fst $ foldl combineIntoLeaves ([], 0) source)) `shouldBe` length (filter (== '\n') source) + 1
+        length (splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed . fst $ foldl combineIntoLeaves ([], 0) source)) `shouldBe` length (filter (== '\n') source) + 1
 
     prop "produces the maximum line count in inequal sources" $
       \ sourceA sourceB ->
-        length (splitAnnotatedByLines (sourceA, sourceB) (totalRange sourceA, totalRange sourceB) (mempty, mempty) (Indexed $ zipWith (leafWithRangesInSources sourceA sourceB) (actualLineRanges (totalRange sourceA) sourceA) (actualLineRanges (totalRange sourceB) sourceB))) `shouldBe` max (length (filter (== '\n') sourceA) + 1) (length (filter (== '\n') sourceB) + 1)
+        length (splitAnnotatedByLines (sourceA, sourceB) (getTotalRange sourceA, getTotalRange sourceB) (mempty, mempty) (Indexed $ zipWith (leafWithRangesInSources sourceA sourceB) (actualLineRanges (totalRange sourceA) sourceA) (actualLineRanges (totalRange sourceB) sourceB))) `shouldBe` max (length (filter (== '\n') sourceA) + 1) (length (filter (== '\n') sourceB) + 1)
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $
@@ -76,7 +76,7 @@ spec = do
 
   describe "splitTermByLines" $ do
     prop "preserves line count" $
-      \ source -> let range = totalRange source in
+      \ source -> let range = getTotalRange source in
         splitTermByLines (Info range mempty :< Leaf source) source `shouldBe` (Line . (:[]) . (:< Leaf source) . (`Info` mempty) <$> actualLineRanges range source, range)
 
   describe "openLineBy" $ do
