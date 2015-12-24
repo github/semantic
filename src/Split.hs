@@ -18,7 +18,7 @@ import Text.Blaze.Html.Renderer.Utf8
 import Data.Monoid
 import qualified Data.Set as Set
 import Source hiding ((++))
-import qualified Source as Source ((++))
+import qualified Source ((++))
 
 type ClassName = String
 
