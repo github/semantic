@@ -155,11 +155,10 @@ zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++
 
 actualLines :: Source Char -> [Source Char]
 actualLines source | length source == 0 = [ source ]
-actualLines source = makeSource <$> actualLines (toString source)
-  where actualLines lines = case break (== '\n') lines of
-          (l, lines') -> case lines' of
-            [] -> [ l ]
-            _:lines' -> (l ++ "\n") : actualLines lines'
+actualLines source = case Source.break (== '\n') source of
+  (l, lines') -> case uncons lines' of
+    Nothing -> [ l ]
+    Just (_, lines') -> (makeSource $ toString l ++ "\n") : actualLines lines'
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source Char -> [Range]
