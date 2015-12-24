@@ -4,22 +4,21 @@ module PatchOutput (
 ) where
 
 import Diff
+import Row
 import Source hiding ((++))
-import Control.Monad.Free
+import Split
 
 patch :: Diff a Info -> Source Char -> Source Char -> String
 patch diff sourceA sourceB = mconcat $ show <$> hunks diff sourceA sourceB
 
-data Hunk = Hunk { offsetA :: Int, offsetB :: Int, leadingContext :: [String], deletions :: [String], insertions :: [String] , trailingContext :: [String] }
+data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, getRows :: [Row (SplitDiff a Info)] }
   deriving Eq
 
-instance Show Hunk where
+instance Show (Hunk a) where
   show = header
 
-header :: Hunk -> String
-header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show (length $ deletions hunk) ++ " +" ++ show (offsetB hunk) ++ "," ++ show (length $ insertions hunk) ++ " @@\n"
+header :: Hunk a -> String
+header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show 0 ++ " +" ++ show (offsetB hunk) ++ "," ++ show 0 ++ " @@\n"
 
-hunks :: Diff a Info -> Source Char -> Source Char -> [Hunk]
-hunks diff sourceA sourceB = case diff of
-  Pure patch -> []
-  Free (Annotated (a, b) syntax) -> []
+hunks :: Diff a Info -> Source Char -> Source Char -> [Hunk a]
+hunks diff sourceA sourceB = []
