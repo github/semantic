@@ -3,6 +3,7 @@ module SES where
 import Patch
 import Diff
 import Term
+import Control.Monad.Free
 import Control.Monad.State
 import Data.Foldable (minimumBy)
 import Data.List (uncons)
@@ -19,9 +20,9 @@ ses diffTerms cost as bs = fst <$> evalState diffState Map.empty where
 diffAt :: Compare a annotation -> Cost a annotation -> (Integer, Integer) -> [Term a annotation] -> [Term a annotation] -> State (Map.Map (Integer, Integer) [(Diff a annotation, Integer)]) [(Diff a annotation, Integer)]
 diffAt _ _ _ [] [] = return []
 diffAt _ cost _ [] bs = return $ foldr toInsertions [] bs where
-  toInsertions each = consWithCost cost (pure . Insert $ each)
+  toInsertions each = consWithCost cost (Pure . Insert $ each)
 diffAt _ cost _ as [] = return $ foldr toDeletions [] as where
-  toDeletions each = consWithCost cost (pure . Delete $ each)
+  toDeletions each = consWithCost cost (Pure . Delete $ each)
 diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
   cachedDiffs <- get
   case Map.lookup (i, j) cachedDiffs of
@@ -38,8 +39,8 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
       put $ Map.insert (i, j) nomination cachedDiffs'
       return nomination
   where
-    delete = consWithCost cost (pure . Delete $ a)
-    insert = consWithCost cost (pure . Insert $ b)
+    delete = consWithCost cost (Pure . Delete $ a)
+    insert = consWithCost cost (Pure . Insert $ b)
     costOf [] = 0
     costOf ((_, c) : _) = c
     best = minimumBy (comparing costOf)

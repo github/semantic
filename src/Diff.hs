@@ -2,7 +2,7 @@ module Diff where
 
 import Syntax
 import Data.Set
-import Control.Monad.Free.Church
+import Control.Monad.Free
 import Patch
 import Term
 import Range
@@ -18,7 +18,7 @@ data Info = Info { characterRange :: !Range, categories :: !(Set Category) }
 instance Categorizable Info where
   categories = Diff.categories
 
-type Diff a annotation = F (Annotated a (annotation, annotation)) (Patch (Term a annotation))
+type Diff a annotation = Free (Annotated a (annotation, annotation)) (Patch (Term a annotation))
 
 diffSum :: (Patch (Term a annotation) -> Integer) -> Diff a annotation -> Integer
 diffSum patchCost diff = sum $ fmap patchCost diff
