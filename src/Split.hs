@@ -10,6 +10,7 @@ import Syntax
 import Control.Comonad.Cofree
 import Range
 import Control.Monad.Free
+import Control.Monad.Free.Church
 import Data.ByteString.Lazy.Internal
 import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
@@ -88,8 +89,8 @@ instance ToMarkup (Renderable (SplitDiff a Info)) where
           toMarkupAndRange term@(Info range _ :< _) = ((div ! A.class_ (stringValue "patch")) . toMarkup $ Renderable (source, term), range)
 
 splitDiffByLines :: Diff a Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff a Info)], (Range, Range))
-splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
-  Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
+splitDiffByLines diff (prevLeft, prevRight) sources = case fromF diff of
+  Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) (toF <$> syntax), ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
     (Row EmptyLine . fmap Pure <$> lines, (Range prevLeft prevLeft, range))
   Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst sources) in

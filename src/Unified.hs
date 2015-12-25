@@ -7,7 +7,7 @@ import Term
 import Range
 import Source hiding ((++))
 import Control.Arrow
-import Control.Monad.Free
+import Control.Monad.Free.Church
 import Control.Comonad.Cofree
 import Data.List hiding (foldl)
 import qualified OrderedMap as Map
@@ -23,6 +23,9 @@ unified diff before after = do
     annotationAndSyntaxToChunks source (Info range _) (Indexed i) = (unifiedRange range i source, Just range)
     annotationAndSyntaxToChunks source (Info range _) (Fixed f) = (unifiedRange range f source, Just range)
     annotationAndSyntaxToChunks source (Info range _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) source, Just range)
+
+    iter :: Functor f => (f a -> a) -> F f a -> a
+    iter phi xs = runF xs id phi
 
     unifiedPatch :: Patch (Term a Info) -> [Chunk String]
     unifiedPatch patch = (fore red . bold <$> beforeChunk) <> (fore green . bold <$> afterChunk) where
