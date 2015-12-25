@@ -8,7 +8,7 @@ import Range
 import Test.Hspec.QuickCheck
 import Test.QuickCheck hiding (Fixed)
 import Control.Comonad.Cofree
-import Control.Monad.Free hiding (unfold)
+import Control.Monad.Free.Church hiding (unfold)
 import qualified Data.Maybe as Maybe
 import Source hiding ((++))
 import Line
@@ -39,12 +39,12 @@ spec = do
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
         \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (source, source) (range, range) (categories, categories) syntax `shouldBe` [
-          Row (makeLine [ Free $ Annotated info $ Leaf source ]) (makeLine [ Free $ Annotated info $ Leaf source ]) ]
+          Row (makeLine [ wrap $ Annotated info $ Leaf source ]) (makeLine [ wrap $ Annotated info $ Leaf source ]) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
           \ source -> splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
-            Row (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) ]
+            Row (makeLine [ wrap $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) (makeLine [ wrap $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) ]
 
     prop "preserves line counts in equal sources" $
       \ source ->
@@ -108,9 +108,9 @@ spec = do
 
       getTotalRange (Source vector) = Range 0 $ length vector
 
-      combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info (Range start $ start + 1) mempty, Info (Range start $ start + 1) mempty) (Leaf [ char ]) ], start + 1)
+      combineIntoLeaves (leaves, start) char = (leaves ++ [ wrap $ Annotated (Info (Range start $ start + 1) mempty, Info (Range start $ start + 1) mempty) (Leaf [ char ]) ], start + 1)
 
-      leafWithRangesInSources sourceA sourceB rangeA rangeB = Free $ Annotated (Info rangeA mempty, Info rangeB mempty) (Leaf $ toList sourceA ++ toList sourceB)
+      leafWithRangesInSources sourceA sourceB rangeA rangeB = wrap $ Annotated (Info rangeA mempty, Info rangeB mempty) (Leaf $ toList sourceA ++ toList sourceB)
 
       openMaybe :: Maybe Bool -> Maybe (Maybe Bool)
       openMaybe (Just a) = Just (Just a)
