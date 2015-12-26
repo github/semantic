@@ -16,7 +16,6 @@ instance Arbitrary Row where
   arbitrary = oneof [
     Row <$> arbitrary <*> arbitrary ]
 
-
 instance Arbitrary HTML where
   arbitrary = oneof [
     Text <$> arbitrary,
@@ -114,34 +113,25 @@ spec = do
 
 
   describe "adjoin2" $ do
-    prop "is idempotent for additions of empty rows" $
-      \ a -> adjoin2 (adjoin2 [ a ] mempty) mempty == (adjoin2 [ a ] mempty)
-
-    prop "is identity on top of empty rows" $
-      \ a -> adjoin2 [ mempty ] a == [ a ]
-
     prop "is identity on top of no rows" $
       \ a -> adjoin2 [] a == [ a ]
 
-    it "appends appends HTML onto incomplete lines" $
-      adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe`
-              [ rightRow [ Text "[", Text "a" ] ]
+    prop "appends onto open rows" $
+      forAll ((arbitrary `suchThat` isOpen) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isOpen)) $
+        \ (a@(Row (Line ac1 as1) (Line bc1 bs1)), b@(Row (Line ac2 as2) (Line bc2 bs2))) ->
+          adjoin2 [ a ] b `shouldBe` [ Row (Line (ac1 || ac2) $ as1 ++ as2) (Line (bc1 || bc2) $ bs1 ++ bs2) ]
 
-    it "does not append HTML onto complete lines" $
-      adjoin2 [ leftRow [ Break ] ] (leftRowText ",") `shouldBe`
-              [ leftRowText ",", leftRow [ Break ]  ]
+    prop "does not append onto closed rows" $
+      forAll ((arbitrary `suchThat` isClosed) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isClosed)) $
+        \ (a, b) -> adjoin2 [ a ] b `shouldBe` [ b, a ]
 
-    it "appends breaks onto incomplete lines" $
-      adjoin2 [ leftRowText "a" ] (leftRow  [ Break ]) `shouldBe`
-              [ leftRow [ Text "a", Break ] ]
+    prop "does not promote elements through empty lines onto closed lines" $
+      forAll ((arbitrary `suchThat` isClosed) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isClosed)) $
+        \ (a, b) -> adjoin2 [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
 
-    it "does not promote HTML through empty lines onto complete lines" $
-      adjoin2 [ rightRowText "b", leftRow [ Break ] ] (leftRowText "a") `shouldBe`
-              [ leftRowText "a", rightRowText "b", leftRow [ Break ] ]
-
-    it "promotes breaks through empty lines onto incomplete lines" $
-      adjoin2 [ rightRowText "c", rowText "a" "b" ] (leftRow [ Break ]) `shouldBe`
-        [ rightRowText "c", Row (Line False [ Text "a", Break ]) (Line False [ Text "b" ]) ]
+    prop "promotes elements through empty lines onto open lines" $
+      forAll ((arbitrary `suchThat` isOpen) >>= \ a -> ((,) a) <$> (arbitrary `suchThat` isOpen)) $
+        \ (a, b) -> adjoin2 [ Row EmptyLine EmptyLine, a ] b `shouldBe` Row EmptyLine EmptyLine : adjoin2 [ a ] b
 
   describe "termToLines" $ do
     it "splits multi-line terms into multiple lines" $
@@ -177,3 +167,6 @@ spec = do
       offsetInfo by (Info (Range start end) categories) = Info (Range (start + by) (end + by)) categories
       offsetAnnotated by1 by2 (Annotated (left, right) syntax) = Annotated (offsetInfo by1 left, offsetInfo by2 right) syntax
       span = Span (Just "category-leaf")
+      isOpen (Row a b) = (maybe False (const True) $ openLine [ a ]) && (maybe False (const True) $ openLine [ b ])
+      isClosed (Row a@(Line _ _) b@(Line _ _)) = (maybe True (const False) $ openLine [ a ]) && (maybe True (const False) $ openLine [ b ])
+      isClosed (Row _ _) = False

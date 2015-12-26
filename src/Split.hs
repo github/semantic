@@ -244,10 +244,6 @@ maybeLast list = listToMaybe $ reverse list
 adjoin2 :: [Row] -> Row -> [Row]
 adjoin2 [] row = [row]
 
-adjoin2 rows (Row EmptyLine EmptyLine) = rows
-
-adjoin2 (Row EmptyLine EmptyLine : rows) row = adjoin2 rows row
-
 adjoin2 rows (Row left' right') | Just _ <- openLine $ leftLines rows, Just _ <- openLine $ rightLines rows = zipWith Row lefts rights
   where lefts = adjoin2Lines (leftLines rows) left'
         rights = adjoin2Lines (rightLines rows) right'
@@ -295,11 +291,6 @@ adjoin2Lines [] line = [line]
 adjoin2Lines (EmptyLine : xs) line | Just _ <- openLine xs = EmptyLine : adjoin2Lines xs line
 adjoin2Lines (prev:rest) line | Just _ <- openLine [ prev ] = (prev <> line) : rest
 adjoin2Lines lines line = line : lines
-
-adjoinLines :: [Line] -> [Line] -> [Line]
-adjoinLines [] lines = lines
-adjoinLines lines [] = lines
-adjoinLines accum (line : lines) = init accum ++ [ last accum <> line ] ++ lines
 
 zipWithMaybe :: (Maybe a -> Maybe b -> c) -> [a] -> [b] -> [c]
 zipWithMaybe f la lb = take len $ zipWith f la' lb'
