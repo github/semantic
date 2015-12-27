@@ -3,11 +3,12 @@ module TreeSitter where
 import Diff
 import Range
 import Parser
-import Term
 import qualified Data.Set as Set
 import Foreign
 import Foreign.C
 import Foreign.C.Types
+import Foreign.CStorable
+import qualified GHC.Generics as Generics
 
 data TSLanguage = TsLanguage deriving (Show, Eq)
 foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_c" ts_language_c :: Ptr TSLanguage
@@ -20,17 +21,15 @@ foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_parse" ts_document_parse :: Ptr TSDocument -> IO ()
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_free" ts_document_free :: Ptr TSDocument -> IO ()
 
-data TSLength = TsLength { bytes :: CSize, chars :: CSize }
-  deriving (Show, Eq)
+data TSNode = TsNode { _data :: Ptr (), offset0 :: CSize, offset1 :: CSize, offset2 :: CSize }
+  deriving (Show, Eq, Generics.Generic)
 
-data TSNode = TsNode { _data :: Ptr (), offset :: TSLength }
-  deriving (Show, Eq)
-
+instance CStorable TSNode
 instance Storable TSNode where
-  alignment _ = 32
-  sizeOf _ = 32
-  peek _ = error "Haskell code should never read TSNode values directly."
-  poke _ _ = error "Haskell code should never write TSNode values directly."
+  alignment = cAlignment
+  sizeOf = cSizeOf
+  peek = cPeek
+  poke = cPoke
 
 foreign import ccall "app/bridge.h ts_document_root_node_p" ts_document_root_node_p :: Ptr TSDocument -> Ptr TSNode -> IO ()
 foreign import ccall "app/bridge.h ts_node_p_name" ts_node_p_name :: Ptr TSNode -> Ptr TSDocument -> IO CString
@@ -55,7 +54,7 @@ parseTreeSitterFile :: Language -> Parser
 parseTreeSitterFile (Language language constructor) contents = do
   document <- ts_document_make
   ts_document_set_language document language
-  withCString contents (\source -> do
+  withCString contents (\ source -> do
     ts_document_set_input_string document source
     ts_document_parse document
     term <- documentToTerm constructor document contents
@@ -63,25 +62,18 @@ parseTreeSitterFile (Language language constructor) contents = do
     return term)
 
 documentToTerm :: Constructor -> Ptr TSDocument -> Parser
-documentToTerm constructor document contents = alloca $ \root -> do
+documentToTerm constructor document contents = alloca $ \ root -> do
   ts_document_root_node_p document root
-  snd <$> toTerm root where
-    toTerm :: Ptr TSNode -> IO (String, Term String Info)
-    toTerm node = do
-      name <- ts_node_p_name node document
-      name <- peekCString name
-      children <- withNamedChildren node toTerm
-      return (name, constructor contents (Info (range node) $ Set.singleton name) children)
-
-withNamedChildren :: Ptr TSNode -> (Ptr TSNode -> IO (String, a)) -> IO [(String, a)]
-withNamedChildren node transformNode = do
-  count <- ts_node_p_named_child_count node
-  if count == 0
-    then return []
-    else mapM (alloca . getChild) [0..pred count] where
-      getChild n out = do
-        _ <- ts_node_p_named_child node n out
-        transformNode out
-
-range :: Ptr TSNode -> Range
-range node = Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
+  (_, term) <- toTerm root
+  return term
+  where toTerm node = do
+          name <- ts_node_p_name node document
+          name <- peekCString name
+          count <- ts_node_p_named_child_count node
+          children <- mapM (alloca . getChild node) $ take (fromIntegral count) [0..]
+          -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
+          range <- return $! Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
+          return (name, constructor contents (Info range (Set.singleton name)) children)
+        getChild node n out = do
+          _ <- ts_node_p_named_child node n out
+          toTerm out
