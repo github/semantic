@@ -4,7 +4,7 @@ import Control.Applicative ((<|>))
 import qualified Data.Char as Char
 import Data.Maybe (fromMaybe)
 
-  -- | A half-open interval of integers, defined by start & end indices.
+-- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: !Int, end :: !Int }
   deriving (Eq, Show)
 
