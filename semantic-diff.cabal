@@ -30,6 +30,7 @@ library
                      , Unified
                      , Parser
                      , TreeSitter
+                     , Source
   build-depends:       base >= 4.8 && < 5
                      , containers
                      , free
@@ -39,6 +40,7 @@ library
                      , blaze-html
                      , tree-sitter-parsers
                      , c-storable-deriving
+                     , vector
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable, DeriveGeneric
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -threaded -fprof-auto "-with-rtsopts=-N -p -s -h -i0.1"

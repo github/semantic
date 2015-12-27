@@ -17,11 +17,13 @@ import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
 import Data.Monoid
 import qualified Data.Set as Set
+import Source hiding ((++))
+import qualified Source ((++))
 
 type ClassName = String
 
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
-classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeLast categories
+classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeFirst categories
 
 split :: Diff a Info -> String -> String -> IO ByteString
 split diff before after = return . renderHtml
@@ -32,7 +34,7 @@ split diff before after = return . renderHtml
         ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
         . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
-    rows = fst (splitDiffByLines diff (0, 0) (before, after))
+    rows = fst (splitDiffByLines diff (0, 0) sources)
     numbered = foldl numberRows [] rows
     maxNumber = case numbered of
       [] -> 0
@@ -45,11 +47,13 @@ split diff before after = return . renderHtml
     columnWidth = max (20 + digits maxNumber * 8) 40
 
     numberedLinesToMarkup :: (Int, Line (SplitDiff a Info), Int, Line (SplitDiff a Info)) -> Markup
-    numberedLinesToMarkup (m, left, n, right) = tr $ toMarkup (or $ hasChanges <$> left, m, renderable before left) <> toMarkup (or $ hasChanges <$> right, n, renderable after right) <> string "\n"
+    numberedLinesToMarkup (m, left, n, right) = tr $ toMarkup (or $ hasChanges <$> left, m, renderable (fst sources) left) <> toMarkup (or $ hasChanges <$> right, n, renderable (snd sources) right) <> string "\n"
 
     renderable source = fmap (Renderable . (,) source)
 
     hasChanges diff = or $ const True <$> diff
+
+    sources = (fromList before, fromList after)
 
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
     numberRows [] (Row EmptyLine EmptyLine) = []
@@ -64,19 +68,19 @@ split diff before after = return . renderHtml
 -- | A diff with only one side’s annotations.
 type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf annotation)
 
-newtype Renderable a = Renderable (String, a)
+newtype Renderable a = Renderable (Source Char, a)
 
 instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
   toMarkup (Renderable (source, (Info range categories, syntax))) = classifyMarkup categories $ case syntax of
-    Leaf _ -> span . string $ substring range source
+    Leaf _ -> span . string . toString $ slice range source
     Indexed children -> ul . mconcat $ contentElements children
     Fixed children -> ul . mconcat $ contentElements children
     Keyed children -> dl . mconcat $ contentElements children
     where markupForSeparatorAndChild :: ToMarkup f => ([Markup], Int) -> (f, Range) -> ([Markup], Int)
-          markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string (substring (Range previous $ start $ snd child) source), toMarkup $ fst child ], end $ snd child)
+          markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string  (toString $ slice (Range previous $ start $ snd child) source), toMarkup $ fst child ], end $ snd child)
 
           contentElements children = let (elements, previous) = foldl markupForSeparatorAndChild ([], start range) children in
-            elements ++ [ string $ substring (Range previous $ end range) source ]
+            elements ++ [ string . toString $ slice (Range previous $ end range) source ]
 
 instance ToMarkup (Renderable (Term a Info)) where
   toMarkup (Renderable (source, term)) = fst $ cata (\ info@(Info range _) syntax -> (toMarkup $ Renderable (source, (info, syntax)), range)) term
@@ -86,7 +90,7 @@ instance ToMarkup (Renderable (SplitDiff a Info)) where
     where toMarkupAndRange :: Term a Info -> (Markup, Range)
           toMarkupAndRange term@(Info range _ :< _) = ((div ! A.class_ (stringValue "patch")) . toMarkup $ Renderable (source, term), range)
 
-splitDiffByLines :: Diff a Info -> (Int, Int) -> (String, String) -> ([Row (SplitDiff a Info)], (Range, Range))
+splitDiffByLines :: Diff a Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff a Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
@@ -100,7 +104,7 @@ splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
         ranges (Info left _, Info right _) = (left, right)
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
-splitTermByLines :: Term a Info -> String -> ([Line (Term a Info)], Range)
+splitTermByLines :: Term a Info -> Source Char -> ([Line (Term a Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
   Leaf a -> contextLines (:< Leaf a) range categories source
   Indexed children -> adjoinChildLines Indexed children
@@ -113,7 +117,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
         childLines constructor (lines, previous) child = let (childLines, childRange) = splitTermByLines child source in
           (adjoin $ lines ++ contextLines (:< constructor) (Range previous $ start childRange) categories source ++ childLines, end childRange)
 
-splitAnnotatedByLines :: (String, String) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
+splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> contextRows (Leaf a) ranges categories sources
   Indexed children -> adjoinChildRows Indexed children
@@ -132,32 +136,32 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         ends (left, right) = (end left, end right)
         makeRanges (leftStart, rightStart) (leftEnd, rightEnd) = (Range leftStart leftEnd, Range rightStart rightEnd)
 
-contextLines :: (Info -> a) -> Range -> Set.Set Category -> String -> [Line a]
-contextLines constructor range categories source = Line . (:[]) . constructor . (`Info` categories) <$> actualLineRanges range source
+contextLines :: (Info -> a) -> Range -> Set.Set Category -> Source Char -> [Line a]
+contextLines constructor range categories source = makeLine . (:[]) . constructor . (`Info` categories) <$> actualLineRanges range source
 
-openRange :: String -> Range -> Maybe Range
-openRange source range = case (source !!) <$> maybeLastIndex range of
+openRange :: Source Char -> Range -> Maybe Range
+openRange source range = case (source `at`) <$> maybeLastIndex range of
   Just '\n' -> Nothing
   _ -> Just range
 
-openTerm :: String -> Term a Info -> Maybe (Term a Info)
+openTerm :: Source Char -> Term a Info -> Maybe (Term a Info)
 openTerm source term@(Info range _ :< _) = const term <$> openRange source range
 
-openDiff :: String -> SplitDiff a Info -> Maybe (SplitDiff a Info)
+openDiff :: Source Char -> SplitDiff a Info -> Maybe (SplitDiff a Info)
 openDiff source diff@(Free (Annotated (Info range _) _)) = const diff <$> openRange source range
 openDiff source diff@(Pure term) = const diff <$> openTerm source term
 
 zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
 zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++ repeat da) (b ++ repeat db)
 
-actualLines :: String -> [String]
-actualLines "" = [""]
-actualLines lines = case break (== '\n') lines of
-  (l, lines') -> case lines' of
-                      [] -> [ l ]
-                      _:lines' -> (l ++ "\n") : actualLines lines'
+actualLines :: Source Char -> [Source Char]
+actualLines source | length source == 0 = [ source ]
+actualLines source = case Source.break (== '\n') source of
+  (l, lines') -> case uncons lines' of
+    Nothing -> [ l ]
+    Just (_, lines') -> (l Source.++ fromList "\n") : actualLines lines'
 
 -- | Compute the line ranges within a given range of a string.
-actualLineRanges :: Range -> String -> [Range]
-actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . substring range
+actualLineRanges :: Range -> Source Char -> [Range]
+actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous string = Range (end previous) $ end previous + length string
