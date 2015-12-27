@@ -4,15 +4,15 @@ import Diff
 import Range
 import Parser
 import Syntax
-import Term
 import TreeSitter
 import Control.Comonad.Cofree
+import Data.Foldable
 
 parserForType :: String -> Parser
 parserForType mediaType = maybe lineByLineParser parseTreeSitterFile $ languageForType mediaType
 
 lineByLineParser :: Parser
-lineByLineParser input = return . root . Indexed $ case foldl annotateLeaves ([], 0) lines of
+lineByLineParser input = return . root . Indexed $ case foldl' annotateLeaves ([], 0) lines of
   (leaves, _) -> leaves
   where
     lines = Prelude.lines input
