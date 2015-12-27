@@ -18,6 +18,8 @@ library
                      , Operation
                      , Algorithm
                      , Interpreter
+                     , Line
+                     , Row
                      , OrderedMap
                      , Patch
                      , SES
@@ -78,6 +80,7 @@ test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
+  other-modules:       ArbitraryTerm
   build-depends:       base
                      , containers
                      , free
