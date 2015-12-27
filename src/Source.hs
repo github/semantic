@@ -35,3 +35,15 @@ break predicate (Source vector) = let (start, remainder) = Vector.break predicat
 
 (++) :: Source a -> Source a -> Source a
 (++) (Source a) = Source . (a Vector.++) . getVector
+
+actualLines :: Source Char -> [Source Char]
+actualLines source | Source.null source = [ source ]
+actualLines source = case Source.break (== '\n') source of
+  (l, lines') -> case uncons lines' of
+    Nothing -> [ l ]
+    Just (_, lines') -> (l Source.++ fromList "\n") : actualLines lines'
+
+-- | Compute the line ranges within a given range of a string.
+actualLineRanges :: Range -> Source Char -> [Range]
+actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
+  where toRange previous string = Range (end previous) $ end previous + length string

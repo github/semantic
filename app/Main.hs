@@ -9,6 +9,7 @@ import Range
 import Split
 import Term
 import Unified
+import Source
 import Control.Comonad.Cofree
 import qualified Data.ByteString.Char8 as B1
 import qualified Data.ByteString.Lazy as B2
@@ -33,8 +34,8 @@ main :: IO ()
 main = do
   arguments <- execParser opts
   let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
-  aContents <- readFile sourceAPath
-  bContents <- readFile sourceBPath
+  aContents <- fromList <$> readFile sourceAPath
+  bContents <- fromList <$> readFile sourceBPath
   (aTerm, bTerm) <- let parse = (P.parserForType . takeExtension) sourceAPath in do
     aTerm <- parse aContents
     bTerm <- parse bContents
@@ -56,11 +57,11 @@ main = do
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
     write rendered h = B2.hPut h rendered
 
-replaceLeavesWithWordBranches :: String -> Term String Info -> Term String Info
+replaceLeavesWithWordBranches :: Source Char -> Term String Info -> Term String Info
 replaceLeavesWithWordBranches source term = replaceIn source 0 term
   where
-    replaceIn source startIndex (info@(Info range categories) :< syntax) | substring <- substring (offsetRange (negate startIndex) range) source = info :< case syntax of
-      Leaf _ | ranges <- rangesAndWordsFrom (start range) substring, length ranges > 1 -> Indexed $ makeLeaf categories <$> ranges
+    replaceIn source startIndex (info@(Info range categories) :< syntax) | substring <- slice (offsetRange (negate startIndex) range) source = info :< case syntax of
+      Leaf _ | ranges <- rangesAndWordsFrom (start range) (toList substring), length ranges > 1 -> Indexed $ makeLeaf categories <$> ranges
       Indexed i -> Indexed $ replaceIn substring (start range) <$> i
       Fixed f -> Fixed $ replaceIn substring (start range) <$> f
       Keyed k -> Keyed $ replaceIn substring (start range) <$> k
