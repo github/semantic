@@ -118,7 +118,7 @@ splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Se
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> fmap (Free . (`Annotated` Leaf a)) <$> contextRows ranges categories sources
   Indexed children -> wrapRowContents (wrap Indexed (fst categories)) (wrap Indexed (snd categories)) <$> adjoinChildRows Indexed children
-  Fixed children -> adjoinChildRows Fixed children
+  Fixed children -> wrapRowContents (wrap Fixed (fst categories)) (wrap Fixed (snd categories)) <$> adjoinChildRows Fixed children
   Keyed children -> adjoinChildRows Keyed children
   where contextRows ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine
           (contextLines (fst ranges) (fst categories) (fst sources))
