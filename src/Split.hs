@@ -128,7 +128,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         adjoinChildRows constructor children = let (rows, previous) = foldl (childRows constructor) ([], starts ranges) children in
           adjoin $ rows ++ (fmap (Free . (`Annotated` constructor mempty)) <$> contextRows (makeRanges previous (ends ranges)) categories sources)
 
-        wrap constructor categories children = Free . Annotated (Info (maybe mempty id $ foldl (<>) Nothing $ Just . getRange <$> children) categories) $ constructor children
+        wrap constructor categories children = Free . Annotated (Info (maybe mempty id $ foldl (<>) Nothing $ Just . getRange <$> children) categories) . constructor $ filter (not . isContextBranch constructor categories) children
 
         getRange (Pure (Info range _ :< _)) = range
         getRange (Free (Annotated (Info range _) _)) = range
