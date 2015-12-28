@@ -116,20 +116,20 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
 
 splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
-  Leaf a -> contextRows (Leaf a) ranges categories sources
+  Leaf a -> fmap (Free . (`Annotated` Leaf a)) <$> contextRows ranges categories sources
   Indexed children -> adjoinChildRows Indexed children
   Fixed children -> adjoinChildRows Fixed children
   Keyed children -> adjoinChildRows Keyed children
-  where contextRows constructor ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine
-          (fmap (Free . (`Annotated` constructor)) <$> contextLines (fst ranges) (fst categories) (fst sources))
-          (fmap (Free . (`Annotated` constructor)) <$> contextLines (snd ranges) (snd categories) (snd sources))
+  where contextRows ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine
+          (contextLines (fst ranges) (fst categories) (fst sources))
+          (contextLines (snd ranges) (snd categories) (snd sources))
 
         adjoin = reverse . foldl (adjoinRowsBy (openDiff $ fst sources) (openDiff $ snd sources)) []
         adjoinChildRows constructor children = let (rows, previous) = foldl (childRows constructor) ([], starts ranges) children in
-          adjoin $ rows ++ contextRows (constructor mempty) (makeRanges previous (ends ranges)) categories sources
+          adjoin $ rows ++ (fmap (Free . (`Annotated` constructor mempty)) <$> contextRows (makeRanges previous (ends ranges)) categories sources)
 
         childRows constructor (rows, previous) child = let (childRows, childRanges) = splitDiffByLines child previous sources in
-          (adjoin $ rows ++ contextRows (constructor mempty) (makeRanges previous (starts childRanges)) categories sources ++ childRows, ends childRanges)
+          (adjoin $ rows ++ (fmap (Free . (`Annotated` constructor mempty)) <$> contextRows (makeRanges previous (starts childRanges)) categories sources) ++ childRows, ends childRanges)
 
         starts (left, right) = (start left, start right)
         ends (left, right) = (end left, end right)
