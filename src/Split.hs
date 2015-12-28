@@ -133,7 +133,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         getRange (Pure (Info range _ :< _)) = range
         getRange (Free (Annotated (Info range _) _)) = range
 
-        isContextBranch constructor cc (Free (Annotated info syntax)) | constructor mempty == syntax, Diff.categories info == cc = True
+        isContextBranch constructor cc (Free (Annotated (Info _ categories) syntax)) | constructor mempty == syntax, categories == cc = True
         isContextBranch _ _ _ = False
 
         childRows constructor (rows, previous) child = let (childRows, childRanges) = splitDiffByLines child previous sources in
