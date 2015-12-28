@@ -125,11 +125,11 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
           (fmap (Free . (`Annotated` constructor)) <$> contextLines (snd ranges) (snd categories) (snd sources))
 
         adjoin = reverse . foldl (adjoinRowsBy (openDiff $ fst sources) (openDiff $ snd sources)) []
-        adjoinChildRows constructor children = let (rows, previous) = foldl (childRows $ constructor mempty) ([], starts ranges) children in
+        adjoinChildRows constructor children = let (rows, previous) = foldl (childRows constructor) ([], starts ranges) children in
           adjoin $ rows ++ contextRows (constructor mempty) (makeRanges previous (ends ranges)) categories sources
 
         childRows constructor (rows, previous) child = let (childRows, childRanges) = splitDiffByLines child previous sources in
-          (adjoin $ rows ++ contextRows constructor (makeRanges previous (starts childRanges)) categories sources ++ childRows, ends childRanges)
+          (adjoin $ rows ++ contextRows (constructor mempty) (makeRanges previous (starts childRanges)) categories sources ++ childRows, ends childRanges)
 
         starts (left, right) = (start left, start right)
         ends (left, right) = (end left, end right)
