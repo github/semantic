@@ -11,7 +11,7 @@ import Split
 import Control.Comonad.Cofree
 import Control.Monad.Free
 
-patch :: Diff a Info -> Source Char -> Source Char -> String
+patch :: Eq a => Diff a Info -> Source Char -> Source Char -> String
 patch diff sourceA sourceB = mconcat $ showHunk sourceA sourceB <$> hunks diff sourceA sourceB
 
 data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a] }
@@ -20,12 +20,14 @@ data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a] }
 data Change a = Change { context :: [Row a], contents :: [Row a] }
   deriving (Eq, Show)
 
-showHunk :: Source Char -> Source Char -> Hunk (SplitDiff a Info) -> String
+showHunk :: Eq a => Source Char -> Source Char -> Hunk (SplitDiff a Info) -> String
 showHunk sourceA sourceB hunk = header hunk ++ concat (showChange sourceA sourceB <$> changes hunk)
 
-showChange :: Source Char -> Source Char -> Change (SplitDiff a Info) -> String
+showChange :: Eq a => Source Char -> Source Char -> Change (SplitDiff a Info) -> String
 showChange sourceA sourceB change = concat (showLine ' ' sourceB . unRight <$> context change) ++ concat (showRow <$> contents change)
-  where showRow (Row lineA lineB) = showLine '-' sourceA lineA ++ showLine '+' sourceB lineB
+  where showRow (Row lineA lineB) = if lineA == lineB
+          then showLine ' ' sourceB lineB
+          else showLine '-' sourceA lineA ++ showLine '+' sourceB lineB
         showLine _ _ EmptyLine = ""
         showLine prefix source line = prefix : (toString . (`slice` source) . mconcat $ getRange <$> unLine line)
         getRange (Free (Annotated (Info range _) _)) = range
