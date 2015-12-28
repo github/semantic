@@ -108,7 +108,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
   Fixed children -> wrapLineContents (wrap Fixed) <$> adjoinChildLines Fixed children
   Keyed children -> adjoinChildLines Keyed children
   where adjoin = reverse . foldl (adjoinLinesBy $ openTerm source) []
-        adjoinChildLines constructor children = let (lines, previous) = foldl (childLines $ constructor mempty) ([], start range) children in
+        adjoinChildLines constructor children = let (lines, previous) = foldl (childLines constructor) ([], start range) children in
           adjoin $ lines ++ (fmap (:< constructor mempty) <$> contextLines (Range previous $ end range) categories source)
 
         wrap constructor children = (Info (maybe mempty id $ foldl (<>) Nothing $ Just . getRange <$> children) categories :<) . constructor $ filter (not . isContextBranch constructor) children
@@ -119,7 +119,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
         isContextBranch _ _ = False
 
         childLines constructor (lines, previous) child = let (childLines, childRange) = splitTermByLines child source in
-          (adjoin $ lines ++ (fmap (:< constructor) <$> contextLines (Range previous $ start childRange) categories source) ++ childLines, end childRange)
+          (adjoin $ lines ++ (fmap (:< constructor mempty) <$> contextLines (Range previous $ start childRange) categories source) ++ childLines, end childRange)
 
 splitAnnotatedByLines :: Eq a => (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
