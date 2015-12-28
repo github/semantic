@@ -28,6 +28,8 @@ maybeFirst = foldr (const . Just) Nothing
 maybeLast :: Vector.Vector a -> Maybe a
 maybeLast vector = if Vector.null vector then Nothing else Just $ Vector.last vector
 
+type MaybeOpen a = a -> Maybe a
+
 openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
 openLineBy _ [] = Nothing
 openLineBy f (EmptyLine : rest) = openLineBy f rest
