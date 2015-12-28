@@ -5,6 +5,9 @@ import Line
 data Row a = Row { unLeft :: Line a, unRight :: Line a }
   deriving (Eq, Functor)
 
+wrapRowContents :: ([a] -> b) -> Row a -> Row b
+wrapRowContents transform (Row left right) = Row (wrapLineContents transform left) (wrapLineContents transform right)
+
 adjoinRowsBy :: (a -> Maybe a) -> (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
 adjoinRowsBy _ _ [] row = [row]
 
