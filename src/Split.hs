@@ -153,15 +153,17 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 contextLines :: Range -> Set.Set Category -> Source Char -> [Line Info]
 contextLines range categories source = makeLine . (:[]) . (`Info` categories) <$> actualLineRanges range source
 
-openRange :: Source Char -> Range -> Maybe Range
+type MaybeOpen a = a -> Maybe a
+
+openRange :: Source Char -> MaybeOpen Range
 openRange source range = case (source `at`) <$> maybeLastIndex range of
   Just '\n' -> Nothing
   _ -> Just range
 
-openTerm :: Source Char -> Term a Info -> Maybe (Term a Info)
+openTerm :: Source Char -> MaybeOpen (Term a Info)
 openTerm source term@(Info range _ :< _) = const term <$> openRange source range
 
-openDiff :: Source Char -> SplitDiff a Info -> Maybe (SplitDiff a Info)
+openDiff :: Source Char -> MaybeOpen (SplitDiff a Info)
 openDiff source diff@(Free (Annotated (Info range _) _)) = const diff <$> openRange source range
 openDiff source diff@(Pure term) = const diff <$> openTerm source term
 
