@@ -105,7 +105,7 @@ splitTermByLines :: Eq a => Term a Info -> Source Char -> ([Line (Term a Info)],
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
   Leaf a -> fmap (:< Leaf a) <$> contextLines range categories source
   Indexed children -> wrapLineContents (wrap Indexed) <$> adjoinChildLines Indexed children
-  Fixed children -> adjoinChildLines Fixed children
+  Fixed children -> wrapLineContents (wrap Fixed) <$> adjoinChildLines Fixed children
   Keyed children -> adjoinChildLines Keyed children
   where adjoin = reverse . foldl (adjoinLinesBy $ openTerm source) []
         adjoinChildLines constructor children = let (lines, previous) = foldl (childLines $ constructor mempty) ([], start range) children in
