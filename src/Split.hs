@@ -24,7 +24,7 @@ type ClassName = String
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeFirst categories
 
-split :: Diff a Info -> Source Char -> Source Char -> IO ByteString
+split :: Eq a => Diff a Info -> Source Char -> Source Char -> IO ByteString
 split diff before after = return . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel (stringValue "stylesheet") ! A.href (stringValue "style.css")) <>)
@@ -87,7 +87,7 @@ instance ToMarkup (Renderable (SplitDiff a Info)) where
     where toMarkupAndRange :: Term a Info -> (Markup, Range)
           toMarkupAndRange term@(Info range _ :< _) = ((div ! A.class_ (stringValue "patch")) . toMarkup $ Renderable (source, term), range)
 
-splitDiffByLines :: Diff a Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff a Info)], (Range, Range))
+splitDiffByLines :: Eq a => Diff a Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff a Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
@@ -114,7 +114,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
         childLines constructor (lines, previous) child = let (childLines, childRange) = splitTermByLines child source in
           (adjoin $ lines ++ (fmap (:< constructor) <$> contextLines (Range previous $ start childRange) categories source) ++ childLines, end childRange)
 
-splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
+splitAnnotatedByLines :: Eq a => (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> fmap (Free . (`Annotated` Leaf a)) <$> contextRows ranges categories sources
   Indexed children -> wrapRowContents (wrap Indexed (fst categories)) (wrap Indexed (snd categories)) <$> adjoinChildRows Indexed children
