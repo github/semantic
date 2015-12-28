@@ -44,6 +44,9 @@ maybeLastIndex :: Range -> Maybe Int
 maybeLastIndex (Range start end) | start == end = Nothing
 maybeLastIndex (Range _ end) = Just $ end - 1
 
+isEmpty :: Range -> Bool
+isEmpty (Range start end) = start == end
+
 instance Ord Range where
   a <= b = start a <= start b
 
