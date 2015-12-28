@@ -103,16 +103,16 @@ splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term a Info -> Source Char -> ([Line (Term a Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
-  Leaf a -> contextLines (:< Leaf a) range categories source
+  Leaf a -> fmap (:< Leaf a) <$> contextLines range categories source
   Indexed children -> adjoinChildLines Indexed children
   Fixed children -> adjoinChildLines Fixed children
   Keyed children -> adjoinChildLines Keyed children
   where adjoin = reverse . foldl (adjoinLinesBy $ openTerm source) []
         adjoinChildLines constructor children = let (lines, previous) = foldl (childLines $ constructor mempty) ([], start range) children in
-          adjoin $ lines ++ contextLines (:< constructor mempty) (Range previous $ end range) categories source
+          adjoin $ lines ++ (fmap (:< constructor mempty) <$> contextLines (Range previous $ end range) categories source)
 
         childLines constructor (lines, previous) child = let (childLines, childRange) = splitTermByLines child source in
-          (adjoin $ lines ++ contextLines (:< constructor) (Range previous $ start childRange) categories source ++ childLines, end childRange)
+          (adjoin $ lines ++ (fmap (:< constructor) <$> contextLines (Range previous $ start childRange) categories source) ++ childLines, end childRange)
 
 splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
@@ -121,8 +121,8 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Fixed children -> adjoinChildRows Fixed children
   Keyed children -> adjoinChildRows Keyed children
   where contextRows constructor ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine
-          (contextLines (Free . (`Annotated` constructor)) (fst ranges) (fst categories) (fst sources))
-          (contextLines (Free . (`Annotated` constructor)) (snd ranges) (snd categories) (snd sources))
+          (fmap (Free . (`Annotated` constructor)) <$> contextLines (fst ranges) (fst categories) (fst sources))
+          (fmap (Free . (`Annotated` constructor)) <$> contextLines (snd ranges) (snd categories) (snd sources))
 
         adjoin = reverse . foldl (adjoinRowsBy (openDiff $ fst sources) (openDiff $ snd sources)) []
         adjoinChildRows constructor children = let (rows, previous) = foldl (childRows $ constructor mempty) ([], starts ranges) children in
@@ -135,8 +135,8 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         ends (left, right) = (end left, end right)
         makeRanges (leftStart, rightStart) (leftEnd, rightEnd) = (Range leftStart leftEnd, Range rightStart rightEnd)
 
-contextLines :: (Info -> a) -> Range -> Set.Set Category -> Source Char -> [Line a]
-contextLines constructor range categories source = makeLine . (:[]) . constructor . (`Info` categories) <$> actualLineRanges range source
+contextLines :: Range -> Set.Set Category -> Source Char -> [Line Info]
+contextLines range categories source = makeLine . (:[]) . (`Info` categories) <$> actualLineRanges range source
 
 openRange :: Source Char -> Range -> Maybe Range
 openRange source range = case (source `at`) <$> maybeLastIndex range of
