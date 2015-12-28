@@ -101,7 +101,7 @@ splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
         ranges (Info left _, Info right _) = (left, right)
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
-splitTermByLines :: Term a Info -> Source Char -> ([Line (Term a Info)], Range)
+splitTermByLines :: Eq a => Term a Info -> Source Char -> ([Line (Term a Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
   Leaf a -> fmap (:< Leaf a) <$> contextLines range categories source
   Indexed children -> adjoinChildLines Indexed children
