@@ -111,6 +111,8 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
         adjoinChildLines constructor children = let (lines, previous) = foldl (childLines $ constructor mempty) ([], start range) children in
           adjoin $ lines ++ (fmap (:< constructor mempty) <$> contextLines (Range previous $ end range) categories source)
 
+        getRange (Info range _ :< _) = range
+
         isContextBranch constructor (Info _ cc :< syntax) | constructor mempty == syntax, categories == cc = True
         isContextBranch _ _ = False
 
