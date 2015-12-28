@@ -65,10 +65,6 @@ split diff before after = return . renderHtml
 -- | A diff with only one side’s annotations.
 type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf annotation)
 
-getRange :: SplitDiff leaf Info -> Range
-getRange (Pure (Info range _ :< _)) = range
-getRange (Free (Annotated (Info range _) _)) = range
-
 newtype Renderable a = Renderable (Source Char, a)
 
 instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
@@ -136,6 +132,9 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
           adjoin $ rows ++ (fmap (Free . (`Annotated` constructor mempty)) <$> contextRows (makeRanges previous (ends ranges)) categories sources)
 
         wrap constructor categories children = Free . Annotated (Info (maybe mempty id $ foldl (<>) Nothing $ Just . getRange <$> children) categories) . constructor $ filter (not . isContextBranch constructor categories) children
+
+        getRange (Pure (Info range _ :< _)) = range
+        getRange (Free (Annotated (Info range _) _)) = range
 
         isContextBranch constructor cc (Free (Annotated (Info _ categories) syntax)) | constructor mempty == syntax, categories == cc = True
         isContextBranch _ _ _ = False
