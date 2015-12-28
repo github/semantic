@@ -104,7 +104,7 @@ splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
 splitTermByLines :: Eq a => Term a Info -> Source Char -> ([Line (Term a Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
   Leaf a -> fmap (:< Leaf a) <$> contextLines range categories source
-  Indexed children -> adjoinChildLines Indexed children
+  Indexed children -> wrapLineContents (wrap Indexed) <$> adjoinChildLines Indexed children
   Fixed children -> adjoinChildLines Fixed children
   Keyed children -> adjoinChildLines Keyed children
   where adjoin = reverse . foldl (adjoinLinesBy $ openTerm source) []
