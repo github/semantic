@@ -117,7 +117,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
 splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> fmap (Free . (`Annotated` Leaf a)) <$> contextRows ranges categories sources
-  Indexed children -> adjoinChildRows Indexed children
+  Indexed children -> wrapRowContents (wrap Indexed (fst categories)) (wrap Indexed (snd categories)) <$> adjoinChildRows Indexed children
   Fixed children -> adjoinChildRows Fixed children
   Keyed children -> adjoinChildRows Keyed children
   where contextRows ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine
