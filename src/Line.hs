@@ -30,12 +30,12 @@ maybeLast vector = if Vector.null vector then Nothing else Just $ Vector.last ve
 
 type MaybeOpen a = a -> Maybe a
 
-openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
+openLineBy :: MaybeOpen a -> [Line a] -> Maybe (Line a)
 openLineBy _ [] = Nothing
 openLineBy f (EmptyLine : rest) = openLineBy f rest
 openLineBy f (line@(Line vector) : _) = const line <$> (f =<< maybeLast vector)
 
-adjoinLinesBy :: (a -> Maybe a) -> [Line a] -> Line a -> [Line a]
+adjoinLinesBy :: MaybeOpen a -> [Line a] -> Line a -> [Line a]
 adjoinLinesBy _ [] line = [line]
 adjoinLinesBy f (EmptyLine : xs) line | Just _ <- openLineBy f xs = EmptyLine : adjoinLinesBy f xs line
 adjoinLinesBy f (prev:rest) line | Just _ <- openLineBy f [ prev ] = (prev <> line) : rest
