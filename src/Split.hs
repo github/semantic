@@ -15,6 +15,7 @@ import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
+import Data.Maybe
 import Data.Monoid
 import qualified Data.Set as Set
 import Source hiding ((++))
@@ -135,7 +136,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         adjoinChildRows constructor children = let (rows, previous) = foldl (childRows constructor) ([], starts ranges) children in
           adjoin $ rows ++ (fmap (Free . (`Annotated` constructor mempty)) <$> contextRows (makeRanges previous (ends ranges)) categories sources)
 
-        wrap constructor categories children = Free . Annotated (Info (maybe mempty id $ foldl (<>) Nothing $ Just . getRange <$> children) categories) . constructor $ filter (not . isContextBranch constructor categories) children
+        wrap constructor categories children = Free . Annotated (Info (fromMaybe mempty $ foldl (<>) Nothing $ Just . getRange <$> children) categories) . constructor $ filter (not . isContextBranch constructor categories) children
 
         getRange (Pure (Info range _ :< _)) = range
         getRange (Free (Annotated (Info range _) _)) = range
