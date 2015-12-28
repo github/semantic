@@ -18,6 +18,10 @@ unLine :: Line a -> [a]
 unLine EmptyLine = []
 unLine (Line elements) = Vector.toList elements
 
+wrapLineContents :: ([a] -> b) -> Line a -> Line b
+wrapLineContents _ EmptyLine = EmptyLine
+wrapLineContents transform line = makeLine [ transform (unLine line) ]
+
 maybeFirst :: Foldable f => f a -> Maybe a
 maybeFirst = foldr (const . Just) Nothing
 
