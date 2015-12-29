@@ -4,7 +4,7 @@ import Range
 import qualified Data.Vector as Vector
 
 newtype Source a = Source { getVector :: Vector.Vector a  }
-  deriving (Eq, Show, Functor, Foldable)
+  deriving (Eq, Show, Functor, Foldable, Traversable)
 
 fromList :: [a] -> Source a
 fromList = Source . Vector.fromList
