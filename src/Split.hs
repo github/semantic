@@ -105,7 +105,6 @@ splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
         ranges (Info left _, Info right _) = (left, right)
 
 type HasTerm a = Lens' a (Term String Info)
-type HasDiff a = Lens' a (SplitDiff String Info)
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term String Info -> Source Char -> ([Line (Term String Info)], Range)
