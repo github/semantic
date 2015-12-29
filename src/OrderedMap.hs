@@ -11,6 +11,7 @@ module OrderedMap (
   , unions
   , intersectionWith
   , difference
+  , OrderedMap.filter
   ) where
 
 import qualified Data.Maybe as Maybe
@@ -43,7 +44,7 @@ empty :: OrderedMap key value
 empty = OrderedMap []
 
 union :: Eq key => OrderedMap key value -> OrderedMap key value -> OrderedMap key value
-union (OrderedMap a) (OrderedMap b) = OrderedMap $ a ++ filter (not . (`elem` extant) . fst) b
+union (OrderedMap a) (OrderedMap b) = OrderedMap $ a ++ Prelude.filter (not . (`elem` extant) . fst) b
   where extant = fst <$> a
 
 unions :: Eq key => [OrderedMap key value] -> OrderedMap key value
@@ -53,5 +54,8 @@ intersectionWith :: Eq key => (a -> b -> c) -> OrderedMap key a -> OrderedMap ke
 intersectionWith combine (OrderedMap a) (OrderedMap b) = OrderedMap $ a >>= (\ (key, value) -> maybe [] (pure . (,) key . combine value) $ Prelude.lookup key b)
 
 difference :: Eq key => OrderedMap key a -> OrderedMap key b -> OrderedMap key a
-difference (OrderedMap a) (OrderedMap b) = OrderedMap $ filter (not . (`elem` extant) . fst) a
+difference (OrderedMap a) (OrderedMap b) = OrderedMap $ Prelude.filter (not . (`elem` extant) . fst) a
   where extant = fst <$> b
+
+filter :: (a -> Bool) -> OrderedMap key a -> OrderedMap key a
+filter predicate (OrderedMap pairs) = OrderedMap $ Prelude.filter (predicate . snd) pairs
