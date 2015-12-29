@@ -162,6 +162,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         isContextBranch constructor cc (Free (Annotated (Info _ categories) syntax)) | constructor mempty == syntax, categories == cc = True
         isContextBranch _ _ _ = False
 
+        childRows :: Monoid a => (a -> Syntax String (SplitDiff String Info)) -> ([Row (SplitDiff String Info)], (Int, Int)) -> Diff String Info -> ([Row (SplitDiff String Info)], (Int, Int))
         childRows constructor (rows, previous) child = let (childRows, childRanges) = splitDiffByLines child previous sources in
           (adjoin $ rows ++ (fmap (Free . (`Annotated` constructor mempty)) <$> contextRows (makeRanges previous (starts childRanges)) categories sources) ++ childRows, ends childRanges)
 
