@@ -18,6 +18,8 @@ import System.FilePath
 import qualified Data.Text as T
 import qualified Data.Text.Lazy.IO as TextIO
 import qualified System.IO as IO
+import qualified Data.Text.ICU.Detect as Detect
+import qualified Data.Text.ICU.Convert as Convert
 
 data Renderer = Unified | Split
 
@@ -35,8 +37,8 @@ main :: IO ()
 main = do
   arguments <- execParser opts
   let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
-  aContents <- fromList <$> readFile sourceAPath
-  bContents <- fromList <$> readFile sourceBPath
+  aContents <- readAndTranscodeFile sourceAPath
+  bContents <- readAndTranscodeFile sourceBPath
   (aTerm, bTerm) <- let parse = (P.parserForType . T.pack . takeExtension) sourceAPath in do
     aTerm <- parse aContents
     bTerm <- parse bContents
@@ -68,3 +70,10 @@ replaceLeavesWithWordBranches source = replaceIn source 0
       Keyed k -> Keyed $ replaceIn substring (start range) <$> k
       _ -> syntax
     makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
+
+readAndTranscodeFile :: FilePath -> IO (Source Char)
+readAndTranscodeFile path = fromText <$> do
+  text <- B1.readFile path
+  match <- Detect.detectCharset text
+  converter <- Convert.open match Nothing
+  return $ Convert.toUnicode converter text
