@@ -151,6 +151,8 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
           (contextLines (snd ranges) (snd categories) (snd sources))
 
         adjoin = reverse . foldl (adjoinRowsBy (openDiff $ fst sources) (openDiff $ snd sources)) []
+
+        adjoinChildRows :: (Traversable t, Monoid a) => (a -> Syntax String (SplitDiff String Info)) -> t (Diff String Info) -> [Row (SplitDiff String Info)]
         adjoinChildRows constructor children = let (rows, previous) = foldl (childRows constructor) ([], starts ranges) children in
           adjoin $ rows ++ (fmap (Free . (`Annotated` constructor mempty)) <$> contextRows (makeRanges previous (ends ranges)) categories sources)
 
