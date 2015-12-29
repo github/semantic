@@ -6,19 +6,8 @@ import Test.QuickCheck hiding (Fixed)
 import Data.Text.Arbitrary ()
 
 import Categorizable
-<<<<<<< HEAD
-import Control.Comonad.Cofree
-import Control.Monad
-import GHC.Generics
-import qualified Data.List as List
-import qualified Data.Set as Set
-import qualified OrderedMap as Map
-import Diff
-import Interpreter
-=======
 import Interpreter
 import Diff
->>>>>>> origin/master
 import Syntax
 import Term
 import ArbitraryTerm

@@ -10,6 +10,7 @@ import qualified Data.List as List
 import qualified Data.Set as Set
 import GHC.Generics
 import Test.QuickCheck hiding (Fixed)
+import Data.Text.Arbitrary ()
 
 newtype ArbitraryTerm a annotation = ArbitraryTerm (annotation, Syntax a (ArbitraryTerm a annotation))
   deriving (Show, Eq, Generic)

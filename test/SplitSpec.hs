@@ -7,20 +7,15 @@ import Data.Text.Arbitrary ()
 
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
-<<<<<<< HEAD
-import qualified Data.Set as Set
 import Diff
-=======
 import qualified Data.Maybe as Maybe
 import Source hiding ((++))
 import Line
 import Row
->>>>>>> origin/master
-import Patch
 import Range
 import Split
 import Syntax
-import ArbitraryTerm
+import ArbitraryTerm ()
 
 instance Arbitrary a => Arbitrary (Row a) where
   arbitrary = oneof [
