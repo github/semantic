@@ -109,27 +109,27 @@ type HasTerm a = Lens' a (Term String Info)
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term String Info -> Source Char -> ([Line (Term String Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
-  Leaf a -> fmap (:< Leaf a) <$> contextLines range categories source
+  Leaf a -> pure . (:< Leaf a) . (`Info` categories) <$> actualLineRanges range source
   Indexed children -> wrapLineContents (wrap (iso id id) Indexed) <$> adjoinChildLines (iso id id) children
   Fixed children -> wrapLineContents (wrap (iso id id) Fixed) <$> adjoinChildLines (iso id id) children
   Keyed children -> wrapLineContents (wrap _2 $ Keyed . Map.fromList) <$> adjoinChildLines _2 (Map.toList children)
-  where adjoin :: HasTerm b -> [Line (Either Info b)] -> [Line (Either Info b)]
-        adjoin lens = reverse . foldl (adjoinLinesBy $ openEither (openInfo source) (openTerm lens source)) []
+  where adjoin :: HasTerm b -> [Line (Either Range b)] -> [Line (Either Range b)]
+        adjoin lens = reverse . foldl (adjoinLinesBy $ openEither (openRange source) (openTerm lens source)) []
 
-        adjoinChildLines :: HasTerm b -> [b] -> [Line (Either Info b)]
+        adjoinChildLines :: HasTerm b -> [b] -> [Line (Either Range b)]
         adjoinChildLines lens children = let (lines, previous) = foldl (childLines lens) ([], start range) children in
-          adjoin lens $ lines ++ (fmap Left <$> contextLines (Range previous $ end range) categories source)
+          adjoin lens $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ end range) source)
 
-        wrap :: HasTerm b -> ([b] -> Syntax String (Term String Info)) -> [Either Info b] -> Term String Info
+        wrap :: HasTerm b -> ([b] -> Syntax String (Term String Info)) -> [Either Range b] -> Term String Info
         wrap lens constructor children = (Info (fromMaybe mempty $ foldl (<>) Nothing $ Just . getRange lens <$> children) categories :<) . constructor $ rights children
 
-        getRange :: HasTerm b -> Either Info b -> Range
+        getRange :: HasTerm b -> Either Range b -> Range
         getRange lens (Right t) = case t ^. lens of (Info range _ :< _) -> range
-        getRange _ (Left (Info range _)) = range
+        getRange _ (Left range) = range
 
-        childLines :: HasTerm b -> ([Line (Either Info b)], Int) -> b -> ([Line (Either Info b)], Int)
+        childLines :: HasTerm b -> ([Line (Either Range b)], Int) -> b -> ([Line (Either Range b)], Int)
         childLines lens (lines, previous) child = let (childLines, childRange) = splitTermByLines (child ^. lens) source in
-          (adjoin lens $ lines ++ (fmap Left <$> contextLines (Range previous $ start childRange) categories source) ++ (fmap (Right . (child &) . (lens .~)) <$> childLines), end childRange)
+          (adjoin lens $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap (Right . (child &) . (lens .~)) <$> childLines), end childRange)
 
 splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax String (Diff String Info) -> [Row (SplitDiff String Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
