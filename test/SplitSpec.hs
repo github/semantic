@@ -17,7 +17,7 @@ import Patch
 import Syntax
 import ArbitraryTerm
 
-instance (Arbitrary a, Arbitrary b) => Arbitrary (Row a b) where
+instance Arbitrary a => Arbitrary (Row a) where
   arbitrary = oneof [
     Row <$> arbitrary <*> arbitrary ]
 
