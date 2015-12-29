@@ -18,6 +18,10 @@ data Info = Info { characterRange :: !Range, categories :: !(Set Category) }
 instance Categorizable Info where
   categories = Diff.categories
 
+instance Monoid Info where
+  mempty = Info mempty mempty
+  mappend (Info r1 c1) (Info r2 c2) = Info (mappend r1 r2) (mappend c1 c2)
+
 type Diff a annotation = Free (Annotated a (annotation, annotation)) (Patch (Term a annotation))
 
 diffSum :: (Patch (Term a annotation) -> Integer) -> Diff a annotation -> Integer
