@@ -177,8 +177,10 @@ openRange source range = case (source `at`) <$> maybeLastIndex range of
   Just '\n' -> Nothing
   _ -> Just range
 
-openTerm :: Source Char -> MaybeOpen (Term a Info)
-openTerm source term@(Info range _ :< _) = const term <$> openRange source range
+openTerm :: TermContainer a => Source Char -> MaybeOpen a
+openTerm source term = const term <$> openRange source range
+  where range = case toTerm term of
+          (Info range _ :< _) -> range
 
 openDiff :: Source Char -> MaybeOpen (SplitDiff a Info)
 openDiff source diff@(Free (Annotated (Info range _) _)) = const diff <$> openRange source range
