@@ -150,6 +150,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
           (contextLines (fst ranges) (fst categories) (fst sources))
           (contextLines (snd ranges) (snd categories) (snd sources))
 
+        adjoin :: [Row (SplitDiff String Info)] -> [Row (SplitDiff String Info)]
         adjoin = reverse . foldl (adjoinRowsBy (openDiff $ fst sources) (openDiff $ snd sources)) []
 
         adjoinChildRows :: (Traversable t, Monoid a) => (a -> Syntax String (SplitDiff String Info)) -> t (Diff String Info) -> [Row (SplitDiff String Info)]
