@@ -158,6 +158,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         wrap constructor categories children = Free . Annotated (Info (fromMaybe mempty $ foldl (<>) Nothing $ Just . getRange <$> children) categories) . constructor $ filter (not . isContextBranch constructor categories) children
 
+        getRange :: SplitDiff leaf Info -> Range
         getRange (Pure (Info range _ :< _)) = range
         getRange (Free (Annotated (Info range _) _)) = range
 
