@@ -45,5 +45,5 @@ actualLines source = case Source.break (== '\n') source of
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source Char -> [Range]
-actualLineRanges range = filter (not . isEmpty) . drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
+actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous string = Range (end previous) $ end previous + length string
