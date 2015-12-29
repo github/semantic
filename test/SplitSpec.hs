@@ -7,175 +7,116 @@ import Data.Text.Arbitrary ()
 
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
+<<<<<<< HEAD
 import qualified Data.Set as Set
 import Diff
+=======
+import qualified Data.Maybe as Maybe
+import Source hiding ((++))
+import Line
+import Row
+>>>>>>> origin/master
 import Patch
 import Range
 import Split
 import Syntax
+import ArbitraryTerm
 
-instance Arbitrary Row where
+instance Arbitrary a => Arbitrary (Row a) where
   arbitrary = oneof [
     Row <$> arbitrary <*> arbitrary ]
 
-
-instance Arbitrary HTML where
+instance Arbitrary a => Arbitrary (Line a) where
   arbitrary = oneof [
-    Text <$> arbitrary,
-    Span <$> arbitrary <*> arbitrary,
-    const Break <$> (arbitrary :: Gen ()) ]
-
-instance Arbitrary Line where
-  arbitrary = oneof [
-    Line <$> arbitrary <*> arbitrary,
+    makeLine <$> arbitrary,
     const EmptyLine <$> (arbitrary :: Gen ()) ]
+
+instance Arbitrary a => Arbitrary (Source a) where
+  arbitrary = fromList <$> arbitrary
+
+arbitraryLeaf :: Gen (Source Char, Info, Syntax (Source Char) f)
+arbitraryLeaf = toTuple <$> arbitrary
+  where toTuple string = (string, Info (Range 0 $ length string) mempty, Leaf string)
 
 spec :: Spec
 spec = do
-  describe "annotatedToRows" $ do
-    it "outputs one row for single-line unchanged leaves" $
-      annotatedToRows (unchanged "a" "leaf" (Leaf "")) "a" "a" `shouldBe` ([ Row (Line False [ span "a" ]) (Line False [ span "a" ]) ], (Range 0 1, Range 0 1))
+  describe "splitAnnotatedByLines" $ do
+    prop "outputs one row for single-line unchanged leaves" $
+      forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
+        \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (source, source) (range, range) (categories, categories) syntax `shouldBe` [
+          Row (makeLine [ Free $ Annotated info $ Leaf source ]) (makeLine [ Free $ Annotated info $ Leaf source ]) ]
 
-    it "outputs one row for single-line empty unchanged indexed nodes" $
-      annotatedToRows (unchanged "[]" "branch" (Indexed [])) "[]" "[]" `shouldBe` ([ Row (Line False [ Ul (Just "category-branch") [ Text "[]" ] ]) (Line False [ Ul (Just "category-branch") [ Text "[]" ] ]) ], (Range 0 2, Range 0 2))
+    prop "outputs one row for single-line empty unchanged indexed nodes" $
+      forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
+          \ source -> splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
+            Row (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) ]
 
-    it "outputs one row for single-line non-empty unchanged indexed nodes" $
-      annotatedToRows (unchanged "[ a, b ]" "branch" (Indexed [
-        Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
-        Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
-      ])) "[ a, b ]" "[ a, b ]" `shouldBe` ([ Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) ], (Range 0 8, Range 0 8))
+    prop "preserves line counts in equal sources" $
+      \ source ->
+        length (splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed . fst $ foldl combineIntoLeaves ([], 0) source)) `shouldBe` length (filter (== '\n') $ toList source) + 1
 
-    it "outputs one row for single-line non-empty formatted indexed nodes" $
-      annotatedToRows (formatted "[ a, b ]" "[ a,  b ]" "branch" (Indexed [
-        Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
-        Free . offsetAnnotated 5 6 $ unchanged "b" "leaf" (Leaf "")
-      ])) "[ a, b ]" "[ a,  b ]" `shouldBe` ([ Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ", ", span "b", Text " ]" ] ]) (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",  ", span "b", Text " ]" ] ]) ], (Range 0 8, Range 0 9))
+    prop "produces the maximum line count in inequal sources" $
+      \ sourceA sourceB ->
+        length (splitAnnotatedByLines (sourceA, sourceB) (getTotalRange sourceA, getTotalRange sourceB) (mempty, mempty) (Indexed $ zipWith (leafWithRangesInSources sourceA sourceB) (actualLineRanges (getTotalRange sourceA) sourceA) (actualLineRanges (getTotalRange sourceB) sourceB))) `shouldBe` max (length (filter (== '\n') $ toList sourceA) + 1) (length (filter (== '\n') $ toList sourceB) + 1)
 
-    it "outputs two rows for two-line non-empty unchanged indexed nodes" $
-      annotatedToRows (unchanged "[ a,\nb ]" "branch" (Indexed [
-        Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
-        Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
-      ])) "[ a,\nb ]" "[ a,\nb ]" `shouldBe`
-      ([
-          Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break ] ])
-              (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break] ]),
-          Row (Line False [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
-              (Line False [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
-       ], (Range 0 8, Range 0 8))
-
-    it "outputs two rows for two-line non-empty formatted indexed nodes" $
-      annotatedToRows (formatted "[ a,\nb ]" "[\na,\nb ]" "branch" (Indexed [
-        Free . offsetAnnotated 2 2 $ unchanged "a" "leaf" (Leaf ""),
-        Free . offsetAnnotated 5 5 $ unchanged "b" "leaf" (Leaf "")
-      ])) "[ a,\nb ]" "[\na,\nb ]" `shouldBe`
-      ([
-          Row (Line False [ Ul (Just "category-branch") [ Text "[ ", span "a", Text ",", Break ] ])
-              (Line False [ Ul (Just "category-branch") [ Text "[", Break ] ]),
-          Row EmptyLine
-              (Line False [ Ul (Just "category-branch") [ span "a", Text ",", Break ] ]),
-          Row (Line False [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
-              (Line False [ Ul (Just "category-branch") [ span "b", Text " ]" ] ])
-       ], (Range 0 8, Range 0 8))
-
-    it "" $
-      let (sourceA, sourceB) = ("[\na\n,\nb]", "[a,b]") in
-        annotatedToRows (formatted sourceA sourceB "branch" (Indexed [
-          Free . offsetAnnotated 2 1 $ unchanged "a" "leaf" (Leaf ""),
-          Free . offsetAnnotated 6 3 $ unchanged "b" "leaf" (Leaf "")
-        ])) sourceA sourceB `shouldBe`
-        ([
-            Row (Line False [ Ul (Just "category-branch") [ Text "[", Break ] ])
-                (Line False [ Ul (Just "category-branch") [ Text "[", span "a", Text ",", span "b", Text "]" ] ]),
-            Row (Line False [ Ul (Just "category-branch") [ span "a", Break ] ])
-                EmptyLine,
-            Row (Line False [ Ul (Just "category-branch") [ Text ",", Break ] ])
-                EmptyLine,
-            Row (Line False [ Ul (Just "category-branch") [ span "b", Text "]" ] ])
-                EmptyLine
-        ], (Range 0 8, Range 0 5))
-
-    it "should split multi-line deletions across multiple rows" $
-      let (sourceA, sourceB) = ("/*\n*/\na", "a") in
-        annotatedToRows (formatted sourceA sourceB "branch" (Indexed [
-          Pure . Delete $ (Info (Range 0 5) (Set.fromList ["leaf"]) :< (Leaf "")),
-          Free . offsetAnnotated 6 0 $ unchanged "a" "leaf" (Leaf "")
-        ])) sourceA sourceB `shouldBe`
-        ([
-          Row (Line True [ Ul (Just "category-branch") [ Div (Just "delete") [ span "/*", Break ] ] ]) EmptyLine,
-          Row (Line True [ Ul (Just "category-branch") [ Div (Just "delete") [ span "*/" ], Break ] ]) EmptyLine,
-          Row (Line False [ Ul (Just "category-branch") [ span "a" ] ]) (Line False [ Ul (Just "category-branch") [ span "a" ] ])
-        ], (Range 0 7, Range 0 1))
-
-    describe "unicode" $
-      it "equivalent precomposed and decomposed characters are not equal" $
-        let (sourceA, sourceB) = ("t\776", "\7831")
-            syntax = Leaf . Pure $ Replace (info sourceA "leaf" :< (Leaf "")) (info sourceB "leaf" :< (Leaf ""))
-        in
-            annotatedToRows (formatted sourceA sourceB "leaf" syntax) sourceA sourceB `shouldBe`
-            ([ Row (Line False [ span "t\776" ]) (Line False [ span "\7831"]) ], (Range 0 2, Range 0 1))
-
-
-  describe "adjoin2" $ do
-    prop "is idempotent for additions of empty rows" $
-      \ a -> adjoin2 (adjoin2 [ a ] mempty) mempty == (adjoin2 [ a ] mempty)
-
-    prop "is identity on top of empty rows" $
-      \ a -> adjoin2 [ mempty ] a == [ a ]
-
+  describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $
-      \ a -> adjoin2 [] a == [ a ]
+      \ a -> adjoinRowsBy openMaybe openMaybe [] a == [ a ]
 
-    it "appends appends HTML onto incomplete lines" $
-      adjoin2 [ rightRowText "[" ] (rightRowText "a") `shouldBe`
-              [ rightRow [ Text "[", Text "a" ] ]
+    prop "appends onto open rows" $
+      forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
+        \ (a@(Row a1 b1), b@(Row a2 b2)) ->
+          adjoinRowsBy openMaybe openMaybe [ a ] b `shouldBe` [ Row (makeLine $ unLine a1 ++ unLine a2) (makeLine $ unLine b1 ++ unLine b2) ]
 
-    it "does not append HTML onto complete lines" $
-      adjoin2 [ leftRow [ Break ] ] (leftRowText ",") `shouldBe`
-              [ leftRowText ",", leftRow [ Break ]  ]
+    prop "does not append onto closed rows" $
+      forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
+        \ (a, b) -> adjoinRowsBy openMaybe openMaybe [ a ] b `shouldBe` [ b, a ]
 
-    it "appends breaks onto incomplete lines" $
-      adjoin2 [ leftRowText "a" ] (leftRow  [ Break ]) `shouldBe`
-              [ leftRow [ Text "a", Break ] ]
+    prop "does not promote elements through empty lines onto closed lines" $
+      forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
+        \ (a, b) -> adjoinRowsBy openMaybe openMaybe [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
 
-    it "does not promote HTML through empty lines onto complete lines" $
-      adjoin2 [ rightRowText "b", leftRow [ Break ] ] (leftRowText "a") `shouldBe`
-              [ leftRowText "a", rightRowText "b", leftRow [ Break ] ]
+    prop "promotes elements through empty lines onto open lines" $
+      forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
+        \ (a, b) -> adjoinRowsBy openMaybe openMaybe [ Row EmptyLine EmptyLine, a ] b `shouldBe` Row EmptyLine EmptyLine : adjoinRowsBy openMaybe openMaybe [ a ] b
 
-    it "promotes breaks through empty lines onto incomplete lines" $
-      adjoin2 [ rightRowText "c", rowText "a" "b" ] (leftRow [ Break ]) `shouldBe`
-        [ rightRowText "c", Row (Line False [ Text "a", Break ]) (Line False [ Text "b" ]) ]
+  describe "splitTermByLines" $ do
+    prop "preserves line count" $
+      \ source -> let range = getTotalRange source in
+        splitTermByLines (Info range mempty :< Leaf source) source `shouldBe` (makeLine . (:[]) . (:< Leaf source) . (`Info` mempty) <$> actualLineRanges range source, range)
 
-  describe "termToLines" $ do
-    it "splits multi-line terms into multiple lines" $
-      termToLines (Info (Range 0 5) (Set.singleton "leaf") :< (Leaf "")) "/*\n*/"
-      `shouldBe`
-      ([
-        Line True [ span "/*", Break ],
-        Line True [ span "*/" ]
-      ], Range 0 5)
+  describe "openLineBy" $ do
+    it "produces the earliest non-empty line in a list, if open" $
+      openLineBy (openTerm $ fromList "\n ") [
+        makeLine [ Info (Range 1 2) mempty :< Leaf "" ],
+        makeLine [ Info (Range 0 1) mempty :< Leaf "" ]
+      ] `shouldBe` (Just $ makeLine [ Info (Range 1 2) mempty :< Leaf "" ])
 
-  describe "openLine" $ do
-    it "should produce the earliest non-empty line in a list, if open" $
-      openLine [
-        Line True [ Div (Just "delete") [ span "*/" ] ],
-        Line True [ Div (Just "delete") [ span " * Debugging", Break ] ],
-        Line True [ Div (Just "delete") [ span "/*", Break ] ]
-      ] `shouldBe` (Just $ Line True [ Div (Just "delete") [ span "*/" ] ])
-
-    it "should return Nothing if the earliest non-empty line is closed" $
-      openLine [
-        Line True [ Div (Just "delete") [ span " * Debugging", Break ] ]
+    it "returns Nothing if the earliest non-empty line is closed" $
+      openLineBy (openTerm $ fromList "\n") [
+        makeLine [ Info (Range 0 1) mempty :< Leaf "" ]
       ] `shouldBe` Nothing
 
+  describe "openTerm" $ do
+    it "returns Just the term if its substring does not end with a newline" $
+      let term = Info (Range 0 2) mempty :< Leaf "" in openTerm (fromList "  ") term `shouldBe` Just term
+
+    it "returns Nothing for terms whose substring ends with a newline" $
+      openTerm (fromList " \n") (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
+
     where
-      rightRowText text = rightRow [ Text text ]
-      rightRow xs = Row EmptyLine (Line False xs)
-      leftRowText text = leftRow [ Text text ]
-      leftRow xs = Row (Line False xs) EmptyLine
-      rowText a b = Row (Line False [ Text a ]) (Line False [ Text b ])
-      info source category = Info (totalRange source)  (Set.fromList [ category ])
-      unchanged source category = formatted source source category
-      formatted source1 source2 category = Annotated (info source1 category, info source2 category)
-      offsetInfo by (Info (Range start end) categories) = Info (Range (start + by) (end + by)) categories
-      offsetAnnotated by1 by2 (Annotated (left, right) syntax) = Annotated (offsetInfo by1 left, offsetInfo by2 right) syntax
-      span = Span (Just "category-leaf")
+      isOpenBy f (Row a b) = Maybe.isJust (openLineBy f [ a ]) && Maybe.isJust (openLineBy f [ b ])
+      isClosedBy f (Row a@(Line _) b@(Line _)) = Maybe.isNothing (openLineBy f [ a ]) && Maybe.isNothing (openLineBy f [ b ])
+      isClosedBy _ (Row _ _) = False
+
+      isOnSingleLine (a, _, _) = filter (/= '\n') (toList a) == toList a
+
+      getTotalRange (Source vector) = Range 0 $ length vector
+
+      combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info (Range start $ start + 1) mempty, Info (Range start $ start + 1) mempty) (Leaf [ char ]) ], start + 1)
+
+      leafWithRangesInSources sourceA sourceB rangeA rangeB = Free $ Annotated (Info rangeA mempty, Info rangeB mempty) (Leaf $ toList sourceA ++ toList sourceB)
+
+      openMaybe :: Maybe Bool -> Maybe (Maybe Bool)
+      openMaybe (Just a) = Just (Just a)
+      openMaybe Nothing =  Nothing
