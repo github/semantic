@@ -42,6 +42,7 @@ library
                      , text-show
                      , blaze-html
                      , tree-sitter-parsers
+                     , text-icu
                      , c-storable-deriving
                      , vector
   default-language:    Haskell2010
