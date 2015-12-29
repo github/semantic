@@ -51,6 +51,10 @@ instance Show a => Show (Line a) where
   show (Line elements) = "[" ++ intercalate ", " (show <$> elements) ++ "]"
   show EmptyLine = "EmptyLine"
 
+instance Applicative Line where
+  pure = makeLine . (:[])
+  a <*> b = makeLine $ unLine a <*> unLine b
+
 instance Monoid (Line a) where
   mempty = EmptyLine
   mappend EmptyLine line = line
