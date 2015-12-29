@@ -103,15 +103,15 @@ splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   where categories (Info _ left, Info _ right) = (left, right)
         ranges (Info left _, Info right _) = (left, right)
 
-class TermContainer a where
+class HasTerm a where
   toTerm :: a -> Term String Info
   setTerm :: a -> Term String Info -> a
 
-instance TermContainer (Term String Info) where
+instance HasTerm (Term String Info) where
   toTerm = id
   setTerm _ = id
 
-instance TermContainer (String, Term String Info) where
+instance HasTerm (String, Term String Info) where
   toTerm = snd
   setTerm (key, _) t = (key, t)
 
@@ -122,21 +122,21 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
   Indexed children -> wrapLineContents (wrap Indexed) <$> adjoinChildLines children
   Fixed children -> wrapLineContents (wrap Fixed) <$> adjoinChildLines children
   Keyed children -> wrapLineContents (wrap $ Keyed . Map.fromList) <$> adjoinChildLines (Map.toList children)
-  where adjoin :: TermContainer b => [Line (Either Info b)] -> [Line (Either Info b)]
+  where adjoin :: HasTerm b => [Line (Either Info b)] -> [Line (Either Info b)]
         adjoin = reverse . foldl (adjoinLinesBy $ openEither (openInfo source) (openTerm source)) []
 
-        adjoinChildLines :: TermContainer b => [b] -> [Line (Either Info b)]
+        adjoinChildLines :: HasTerm b => [b] -> [Line (Either Info b)]
         adjoinChildLines children = let (lines, previous) = foldl childLines ([], start range) children in
           adjoin $ lines ++ (fmap Left <$> contextLines (Range previous $ end range) categories source)
 
-        wrap :: TermContainer b => ([b] -> Syntax String (Term String Info)) -> [Either Info b] -> Term String Info
+        wrap :: HasTerm b => ([b] -> Syntax String (Term String Info)) -> [Either Info b] -> Term String Info
         wrap constructor children = (Info (fromMaybe mempty $ foldl (<>) Nothing $ Just . getRange <$> children) categories :<) . constructor $ rights children
 
-        getRange :: TermContainer b => Either Info b -> Range
+        getRange :: HasTerm b => Either Info b -> Range
         getRange (Right t) = case toTerm t of (Info range _ :< _) -> range
         getRange (Left (Info range _)) = range
 
-        childLines :: TermContainer b => ([Line (Either Info b)], Int) -> b -> ([Line (Either Info b)], Int)
+        childLines :: HasTerm b => ([Line (Either Info b)], Int) -> b -> ([Line (Either Info b)], Int)
         childLines (lines, previous) child = let (childLines, childRange) = splitTermByLines (toTerm child) source in
           (adjoin $ lines ++ (fmap Left <$> contextLines (Range previous $ start childRange) categories source) ++ (fmap (Right . setTerm child) <$> childLines), end childRange)
 
@@ -197,7 +197,7 @@ openRange source range = case (source `at`) <$> maybeLastIndex range of
   Just '\n' -> Nothing
   _ -> Just range
 
-openTerm :: TermContainer a => Source Char -> MaybeOpen a
+openTerm :: HasTerm a => Source Char -> MaybeOpen a
 openTerm source term = const term <$> openRange source range
   where range = case toTerm term of
           (Info range _ :< _) -> range
