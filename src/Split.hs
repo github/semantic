@@ -101,6 +101,10 @@ splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   where categories (Info _ left, Info _ right) = (left, right)
         ranges (Info left _, Info right _) = (left, right)
 
+class TermContainer a where
+  toTerm :: a -> Term String Info
+  setTerm :: a -> Term String Info -> a
+
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Eq a => Term a Info -> Source Char -> ([Line (Term a Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
