@@ -15,8 +15,10 @@ import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
+import Data.Either
 import Data.Maybe
 import Data.Monoid
+import qualified OrderedMap as Map
 import qualified Data.Set as Set
 import Source hiding ((++))
 
@@ -117,22 +119,26 @@ instance TermContainer (String, Term String Info) where
 splitTermByLines :: Term String Info -> Source Char -> ([Line (Term String Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
   Leaf a -> fmap (:< Leaf a) <$> contextLines range categories source
-  Indexed children -> wrapLineContents (wrap Indexed) <$> adjoinChildLines Indexed children
-  Fixed children -> wrapLineContents (wrap Fixed) <$> adjoinChildLines Fixed children
-  Keyed children -> adjoinChildLines Keyed children
-  where adjoin = reverse . foldl (adjoinLinesBy $ openTerm source) []
-        adjoinChildLines constructor children = let (lines, previous) = foldl (childLines constructor) ([], start range) children in
-          adjoin $ lines ++ (fmap (:< constructor mempty) <$> contextLines (Range previous $ end range) categories source)
+  Indexed children -> wrapLineContents (wrap Indexed) <$> adjoinChildLines children
+  Fixed children -> wrapLineContents (wrap Fixed) <$> adjoinChildLines children
+  Keyed children -> wrapLineContents (wrap $ Keyed . Map.fromList) <$> adjoinChildLines (Map.toList children)
+  where adjoin :: TermContainer b => [Line (Either Info b)] -> [Line (Either Info b)]
+        adjoin = reverse . foldl (adjoinLinesBy $ openEither (openInfo source) (openTerm source)) []
 
-        wrap constructor children = (Info (maybe mempty id $ foldl (<>) Nothing $ Just . getRange <$> children) categories :<) . constructor $ filter (not . isContextBranch constructor) children
+        adjoinChildLines :: TermContainer b => [b] -> [Line (Either Info b)]
+        adjoinChildLines children = let (lines, previous) = foldl childLines ([], start range) children in
+          adjoin $ lines ++ (fmap Left <$> contextLines (Range previous $ end range) categories source)
 
-        getRange (Info range _ :< _) = range
+        wrap :: TermContainer b => ([b] -> Syntax String (Term String Info)) -> [Either Info b] -> Term String Info
+        wrap constructor children = (Info (fromMaybe mempty $ foldl (<>) Nothing $ Just . getRange <$> children) categories :<) . constructor $ rights children
 
-        isContextBranch constructor (Info _ cc :< syntax) | constructor mempty == syntax, categories == cc = True
-        isContextBranch _ _ = False
+        getRange :: TermContainer b => Either Info b -> Range
+        getRange (Right t) = case toTerm t of (Info range _ :< _) -> range
+        getRange (Left (Info range _)) = range
 
-        childLines constructor (lines, previous) child = let (childLines, childRange) = splitTermByLines child source in
-          (adjoin $ lines ++ (fmap (:< constructor mempty) <$> contextLines (Range previous $ start childRange) categories source) ++ childLines, end childRange)
+        childLines :: TermContainer b => ([Line (Either Info b)], Int) -> b -> ([Line (Either Info b)], Int)
+        childLines (lines, previous) child = let (childLines, childRange) = splitTermByLines (toTerm child) source in
+          (adjoin $ lines ++ (fmap Left <$> contextLines (Range previous $ start childRange) categories source) ++ (fmap (Right . setTerm child) <$> childLines), end childRange)
 
 splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax String (Diff String Info) -> [Row (SplitDiff String Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
