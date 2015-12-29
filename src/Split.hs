@@ -115,6 +115,18 @@ instance HasTerm (String, Term String Info) where
   toTerm = snd
   setTerm (key, _) t = (key, t)
 
+class HasDiff a where
+  getDiff :: a -> SplitDiff String Info
+  setDiff :: a -> SplitDiff String Info -> a
+
+instance HasDiff (SplitDiff String Info) where
+  getDiff = id
+  setDiff _ = id
+
+instance HasDiff (String, SplitDiff String Info) where
+  getDiff = snd
+  setDiff (key, _) d = (key, d)
+
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term String Info -> Source Char -> ([Line (Term String Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
