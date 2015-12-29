@@ -146,7 +146,8 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Indexed children -> wrapRowContents (wrap Indexed (fst categories)) (wrap Indexed (snd categories)) <$> adjoinChildRows Indexed children
   Fixed children -> wrapRowContents (wrap Fixed (fst categories)) (wrap Fixed (snd categories)) <$> adjoinChildRows Fixed children
   Keyed children -> adjoinChildRows Keyed children
-  where contextRows ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine
+  where contextRows :: (Range, Range) -> (Set.Set Category, Set.Set Category) -> (Source Char, Source Char) -> [Row Info]
+        contextRows ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine
           (contextLines (fst ranges) (fst categories) (fst sources))
           (contextLines (snd ranges) (snd categories) (snd sources))
 
