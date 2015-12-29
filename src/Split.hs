@@ -25,7 +25,7 @@ type ClassName = String
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeFirst categories
 
-split :: Eq a => Diff a Info -> Source Char -> Source Char -> IO ByteString
+split :: Diff String Info -> Source Char -> Source Char -> IO ByteString
 split diff before after = return . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel (stringValue "stylesheet") ! A.href (stringValue "style.css")) <>)
@@ -88,7 +88,7 @@ instance ToMarkup (Renderable (SplitDiff a Info)) where
     where toMarkupAndRange :: Term a Info -> (Markup, Range)
           toMarkupAndRange term@(Info range _ :< _) = ((div ! A.class_ (stringValue "patch")) . toMarkup $ Renderable (source, term), range)
 
-splitDiffByLines :: Eq a => Diff a Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff a Info)], (Range, Range))
+splitDiffByLines :: Diff String Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff String Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
@@ -114,7 +114,7 @@ instance TermContainer (String, Term String Info) where
   setTerm (key, _) t = (key, t)
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
-splitTermByLines :: Eq a => Term a Info -> Source Char -> ([Line (Term a Info)], Range)
+splitTermByLines :: Term String Info -> Source Char -> ([Line (Term String Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
   Leaf a -> fmap (:< Leaf a) <$> contextLines range categories source
   Indexed children -> wrapLineContents (wrap Indexed) <$> adjoinChildLines Indexed children
@@ -134,7 +134,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
         childLines constructor (lines, previous) child = let (childLines, childRange) = splitTermByLines child source in
           (adjoin $ lines ++ (fmap (:< constructor mempty) <$> contextLines (Range previous $ start childRange) categories source) ++ childLines, end childRange)
 
-splitAnnotatedByLines :: Eq a => (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax a (Diff a Info) -> [Row (SplitDiff a Info)]
+splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax String (Diff String Info) -> [Row (SplitDiff String Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> fmap (Free . (`Annotated` Leaf a)) <$> contextRows ranges categories sources
   Indexed children -> wrapRowContents (wrap Indexed (fst categories)) (wrap Indexed (snd categories)) <$> adjoinChildRows Indexed children
@@ -182,7 +182,7 @@ openTerm source term = const term <$> openRange source range
   where range = case toTerm term of
           (Info range _ :< _) -> range
 
-openDiff :: Source Char -> MaybeOpen (SplitDiff a Info)
+openDiff :: Source Char -> MaybeOpen (SplitDiff String Info)
 openDiff source diff@(Free (Annotated (Info range _) _)) = const diff <$> openRange source range
 openDiff source diff@(Pure term) = const diff <$> openTerm source term
 
