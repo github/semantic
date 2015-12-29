@@ -136,18 +136,18 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> fmap (Free . (`Annotated` Leaf a)) <$> contextRows ranges categories sources
   Indexed children -> wrapRowContents (wrap Indexed (fst categories)) (wrap Indexed (snd categories)) <$> adjoinChildRows children
   Fixed children -> wrapRowContents (wrap Fixed (fst categories)) (wrap Fixed (snd categories)) <$> adjoinChildRows children
-  Keyed children -> dropLefts <$> adjoinChildRows children
+  Keyed children -> dropLefts Keyed <$> adjoinChildRows children
   where contextRows :: (Range, Range) -> (Set.Set Category, Set.Set Category) -> (Source Char, Source Char) -> [Row Info]
         contextRows ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine
           (contextLines (fst ranges) (fst categories) (fst sources))
           (contextLines (snd ranges) (snd categories) (snd sources))
 
-        dropLefts :: Row (Either a b) -> Row b
-        dropLefts (Row x y) = Row (dropLineLefts x) (dropLineLefts y)
+        dropLefts :: Monoid a => (a -> Syntax String (SplitDiff String Info)) -> Row (Either Info (SplitDiff String Info)) -> Row (SplitDiff String Info)
+        dropLefts constructor (Row x y) = Row (dropLineLefts constructor x) (dropLineLefts constructor y)
 
-        dropLineLefts :: Line (Either a b) -> Line b
-        dropLineLefts EmptyLine = EmptyLine
-        dropLineLefts line = makeLine . rights . unLine $ line
+        dropLineLefts :: Monoid a => (a -> Syntax String (SplitDiff String Info)) -> Line (Either Info (SplitDiff String Info)) -> Line (SplitDiff String Info)
+        dropLineLefts _ EmptyLine = EmptyLine
+        dropLineLefts constructor line = either (Free . (`Annotated` constructor mempty)) id <$> line
 
         adjoin :: [Row (Either Info (SplitDiff String Info))] -> [Row (Either Info (SplitDiff String Info))]
         adjoin = reverse . foldl (adjoinRowsBy byLeft byRight) []
