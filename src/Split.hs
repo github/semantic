@@ -143,34 +143,41 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
 splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax String (Diff String Info) -> [Row (SplitDiff String Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> fmap (Free . (`Annotated` Leaf a)) <$> contextRows ranges categories sources
-  Indexed children -> wrapRowContents (wrap Indexed (fst categories)) (wrap Indexed (snd categories)) <$> adjoinChildRows Indexed children
-  Fixed children -> wrapRowContents (wrap Fixed (fst categories)) (wrap Fixed (snd categories)) <$> adjoinChildRows Fixed children
-  Keyed children -> adjoinChildRows Keyed children
+  Indexed children -> wrapRowContents (wrap Indexed (fst categories)) (wrap Indexed (snd categories)) <$> adjoinChildRows children
+  Fixed children -> wrapRowContents (wrap Fixed (fst categories)) (wrap Fixed (snd categories)) <$> adjoinChildRows children
+  Keyed children -> dropLefts <$> adjoinChildRows children
   where contextRows :: (Range, Range) -> (Set.Set Category, Set.Set Category) -> (Source Char, Source Char) -> [Row Info]
         contextRows ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine
           (contextLines (fst ranges) (fst categories) (fst sources))
           (contextLines (snd ranges) (snd categories) (snd sources))
 
-        adjoin :: [Row (SplitDiff String Info)] -> [Row (SplitDiff String Info)]
-        adjoin = reverse . foldl (adjoinRowsBy (openDiff $ fst sources) (openDiff $ snd sources)) []
+        dropLefts :: Row (Either a b) -> Row b
+        dropLefts (Row x y) = Row (dropLineLefts x) (dropLineLefts y)
 
-        adjoinChildRows :: (Traversable t, Monoid a) => (a -> Syntax String (SplitDiff String Info)) -> t (Diff String Info) -> [Row (SplitDiff String Info)]
-        adjoinChildRows constructor children = let (rows, previous) = foldl (childRows constructor) ([], starts ranges) children in
-          adjoin $ rows ++ (fmap (Free . (`Annotated` constructor mempty)) <$> contextRows (makeRanges previous (ends ranges)) categories sources)
+        dropLineLefts :: Line (Either a b) -> Line b
+        dropLineLefts EmptyLine = EmptyLine
+        dropLineLefts line = makeLine . rights . unLine $ line
 
-        wrap :: Eq leaf => ([SplitDiff leaf Info] -> Syntax leaf (SplitDiff leaf Info)) -> Set.Set Category -> [SplitDiff leaf Info] -> SplitDiff leaf Info
-        wrap constructor categories children = Free . Annotated (Info (fromMaybe mempty $ foldl (<>) Nothing $ Just . getRange <$> children) categories) . constructor $ filter (not . isContextBranch constructor categories) children
+        adjoin :: [Row (Either Info (SplitDiff String Info))] -> [Row (Either Info (SplitDiff String Info))]
+        adjoin = reverse . foldl (adjoinRowsBy byLeft byRight) []
+        byLeft = openEither (openInfo $ fst sources) (openDiff $ fst sources)
+        byRight = openEither (openInfo $ snd sources) (openDiff $ snd sources)
 
-        getRange :: SplitDiff leaf Info -> Range
-        getRange (Pure (Info range _ :< _)) = range
-        getRange (Free (Annotated (Info range _) _)) = range
+        adjoinChildRows :: Traversable t => t (Diff String Info) -> [Row (Either Info (SplitDiff String Info))]
+        adjoinChildRows children = let (rows, previous) = foldl childRows ([], starts ranges) children in
+          adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (ends ranges)) categories sources)
 
-        isContextBranch constructor cc (Free (Annotated (Info _ categories) syntax)) | constructor mempty == syntax, categories == cc = True
-        isContextBranch _ _ _ = False
+        wrap :: Eq leaf => ([SplitDiff leaf Info] -> Syntax leaf (SplitDiff leaf Info)) -> Set.Set Category -> [Either Info (SplitDiff leaf Info)] -> SplitDiff leaf Info
+        wrap constructor categories children = Free . Annotated (Info (fromMaybe mempty $ foldl (<>) Nothing $ Just . getRange <$> children) categories) . constructor $ rights children
 
-        childRows :: Monoid a => (a -> Syntax String (SplitDiff String Info)) -> ([Row (SplitDiff String Info)], (Int, Int)) -> Diff String Info -> ([Row (SplitDiff String Info)], (Int, Int))
-        childRows constructor (rows, previous) child = let (childRows, childRanges) = splitDiffByLines child previous sources in
-          (adjoin $ rows ++ (fmap (Free . (`Annotated` constructor mempty)) <$> contextRows (makeRanges previous (starts childRanges)) categories sources) ++ childRows, ends childRanges)
+        getRange :: Either Info (SplitDiff leaf Info) -> Range
+        getRange (Right (Pure (Info range _ :< _))) = range
+        getRange (Right (Free (Annotated (Info range _) _))) = range
+        getRange (Left (Info range _)) = range
+
+        childRows :: ([Row (Either Info (SplitDiff String Info))], (Int, Int)) -> Diff String Info -> ([Row (Either Info (SplitDiff String Info))], (Int, Int))
+        childRows (rows, previous) child = let (childRows, childRanges) = splitDiffByLines child previous sources in
+          (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (starts childRanges)) categories sources) ++ (fmap Right <$> childRows), ends childRanges)
 
         starts (left, right) = (start left, start right)
         ends (left, right) = (end left, end right)
