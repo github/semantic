@@ -12,6 +12,11 @@ instance Bifunctor Row where
 bifmap :: Bifunctor f => (a -> b) -> f a a -> f b b
 bifmap f = bimap f f
 
+infixl 4 <$$>
+
+(<$$>) :: Bifunctor f => (a -> b) -> f a a -> f b b
+(<$$>) = bifmap
+
 type Row' a = Row a a
 
 wrapRowContents :: ([a] -> a') -> ([b] -> b') -> Row a b -> Row a' b'
