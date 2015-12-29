@@ -1,13 +1,18 @@
+
 module Source where
 
 import Range
 import qualified Data.Vector as Vector
+import qualified Data.Text as T
 
 newtype Source a = Source { getVector :: Vector.Vector a  }
   deriving (Eq, Show, Functor, Foldable)
 
 fromList :: [a] -> Source a
 fromList = Source . Vector.fromList
+
+fromText :: T.Text -> Source Char
+fromText = Source . Vector.fromList . T.unpack
 
 toList :: Source a -> [a]
 toList = Vector.toList . getVector
