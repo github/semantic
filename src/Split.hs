@@ -105,6 +105,10 @@ class TermContainer a where
   toTerm :: a -> Term String Info
   setTerm :: a -> Term String Info -> a
 
+instance TermContainer (Term String Info) where
+  toTerm = id
+  setTerm _ = id
+
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Eq a => Term a Info -> Source Char -> ([Line (Term a Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
