@@ -44,9 +44,6 @@ maybeLastIndex :: Range -> Maybe Int
 maybeLastIndex (Range start end) | start == end = Nothing
 maybeLastIndex (Range _ end) = Just $ end - 1
 
-isEmpty :: Range -> Bool
-isEmpty (Range start end) = start == end
-
 unionRanges :: [Range] -> Range
 unionRanges ranges = fromMaybe mempty . foldl mappend Nothing $ Just <$> ranges
 
