@@ -104,8 +104,6 @@ splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   where categories (Info _ left, Info _ right) = (left, right)
         ranges (Info left _, Info right _) = (left, right)
 
-type HasTerm a = Lens' a (Term String Info)
-
 class Functor f => Has f where
   get :: f a -> a
 
