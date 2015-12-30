@@ -81,6 +81,7 @@ nextChange start rows = case changes of
   _ -> Just (start <> mconcat (rowLength <$> leadingRows), Change (takeLast 3 leadingRows) changes, afterChanges)
   where (leadingRows, afterLeadingContext) = Prelude.break rowHasChanges rows
         (changes, afterChanges) = span rowHasChanges afterLeadingContext
+        (skippedContext, leadingContext) = splitAt (max (length leadingContext - 3) 0) leadingRows
 
 rowHasChanges :: Row (SplitDiff a Info) -> Bool
 rowHasChanges (Row left right) = lineHasChanges left || lineHasChanges right
