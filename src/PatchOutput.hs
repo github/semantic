@@ -25,7 +25,7 @@ showHunk :: Eq a => (Source Char, Source Char) -> Hunk (SplitDiff a Info) -> Str
 showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk) ++ concat ((' ' :) . lineString (snd sources) . unRight <$> trailingContext hunk)
 
 showChange :: Eq a => (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
-showChange sources change = concat (showLine ' ' (snd sources) . unRight <$> context change) ++ concat (showRow sources <$> contents change)
+showChange sources change = concat ((' ' :) . lineString (snd sources) . unRight <$> context change) ++ concat (showRow sources <$> contents change)
 
 showRow :: Eq leaf => (Source Char, Source Char) -> Row (SplitDiff leaf Info) -> String
 showRow sources (Row lineA lineB) = if lineA == lineB
