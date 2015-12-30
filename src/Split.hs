@@ -112,6 +112,9 @@ class Functor f => Has f where
 instance Has Identity where
   get = runIdentity
 
+instance Has ((,) a) where
+  get = snd
+
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term String Info -> Source Char -> ([Line (Term String Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
