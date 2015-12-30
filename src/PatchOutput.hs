@@ -63,22 +63,22 @@ header hunk = "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offs
         (offsetA, offsetB) = getSum *** getSum $ offset hunk
 
 hunks :: Diff a Info -> (Source Char, Source Char) -> [Hunk (SplitDiff a Info)]
-hunks diff sources = hunksInRows . fst $ splitDiffByLines diff (0, 0) sources
+hunks diff sources = hunksInRows (0, 0) . fst $ splitDiffByLines diff (0, 0) sources
 
-hunksInRows :: [Row (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]
-hunksInRows rows = case nextHunk rows of
+hunksInRows :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]
+hunksInRows start rows = case nextHunk start rows of
   Nothing -> []
-  Just (hunk, rest) -> hunk : hunksInRows rest
+  Just (hunk, rest) -> hunk : hunksInRows (offset hunk <> hunkLength hunk) rest
 
-nextHunk :: [Row (SplitDiff a Info)] -> Maybe (Hunk (SplitDiff a Info), [Row (SplitDiff a Info)])
-nextHunk rows = case nextChange rows of
+nextHunk :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe (Hunk (SplitDiff a Info), [Row (SplitDiff a Info)])
+nextHunk start rows = case nextChange start rows of
   Nothing -> Nothing
-  Just (change, rest) -> Just (Hunk (0, 0) [ change ] (take 3 rest), drop 3 rest)
+  Just (offset, change, rest) -> Just (Hunk offset [ change ] (take 3 rest), drop 3 rest)
 
-nextChange :: [Row (SplitDiff a Info)] -> Maybe (Change (SplitDiff a Info), [Row (SplitDiff a Info)])
-nextChange rows = case changes of
+nextChange :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe ((Sum Int, Sum Int), Change (SplitDiff a Info), [Row (SplitDiff a Info)])
+nextChange start rows = case changes of
   [] -> Nothing
-  _ -> Just (Change (takeLast 3 leadingRows) changes, afterChanges)
+  _ -> Just (start, Change (takeLast 3 leadingRows) changes, afterChanges)
   where (leadingRows, afterLeadingContext) = Prelude.break rowHasChanges rows
         (changes, afterChanges) = span rowHasChanges afterLeadingContext
 
