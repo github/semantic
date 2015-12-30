@@ -34,7 +34,7 @@ showChange sourceA sourceB change = concat (showLine ' ' sourceB . unRight <$> c
         getRange (Pure (Info range _ :< _)) = range
 
 header :: Hunk a -> String
-header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show 0 ++ " +" ++ show (offsetB hunk) ++ "," ++ show 0 ++ " @@\n"
+header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show (0 :: Int) ++ " +" ++ show (offsetB hunk) ++ "," ++ show (0 :: Int) ++ " @@\n"
 
 hunks :: Diff a Info -> Source Char -> Source Char -> [Hunk (SplitDiff a Info)]
 hunks diff sourceA sourceB = hunksInRows . fst $ splitDiffByLines diff (0, 0) (sourceA, sourceB)
