@@ -32,6 +32,9 @@ showRow sources (Row lineA lineB) = if lineA == lineB
   then showLine ' ' (snd sources) lineB
   else showLine '-' (fst sources) lineA ++ showLine '+' (snd sources) lineB
 
+lineString :: Source Char -> Line (SplitDiff leaf Info) -> String
+lineString source line = toString . (`slice` source) . unionRanges $ getRange <$> unLine line
+
 showLine :: Char -> Source Char -> Line (SplitDiff leaf Info) -> String
 showLine _ _ EmptyLine = ""
 showLine prefix source line = prefix : (toString . (`slice` source) . unionRanges $ getRange <$> unLine line)
