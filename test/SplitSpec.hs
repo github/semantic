@@ -83,14 +83,14 @@ spec = do
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
-      openLineBy (openTerm $ fromList "\n ") [
-        makeLine [ Info (Range 1 2) mempty :< Leaf "" ],
-        makeLine [ Info (Range 0 1) mempty :< Leaf "" ]
-      ] `shouldBe` (Just $ makeLine [ Info (Range 1 2) mempty :< Leaf "" ])
+      openLineBy openMaybe [
+        pure (Just True),
+        pure (Just False)
+      ] `shouldBe` (Just $ pure $ Just True)
 
     it "returns Nothing if the earliest non-empty line is closed" $
-      openLineBy (openTerm $ fromList "\n") [
-        makeLine [ Info (Range 0 1) mempty :< Leaf "" ]
+      openLineBy openMaybe [
+        pure Nothing, pure (Just ())
       ] `shouldBe` Nothing
 
   describe "openTerm" $ do
