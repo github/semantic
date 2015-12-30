@@ -173,9 +173,6 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         ends (left, right) = (end left, end right)
         makeRanges (leftStart, rightStart) (leftEnd, rightEnd) = (Range leftStart leftEnd, Range rightStart rightEnd)
 
-contextLines :: Range -> Set.Set Category -> Source Char -> [Line Info]
-contextLines range categories source = pure. (`Info` categories) <$> actualLineRanges range source
-
 openEither :: MaybeOpen a -> MaybeOpen b -> MaybeOpen (Either a b)
 openEither ifLeft ifRight which = either (fmap (const which) . ifLeft) (fmap (const which) . ifRight) which
 
