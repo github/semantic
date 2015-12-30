@@ -31,8 +31,10 @@ showChange sources change = concat (showLine ' ' (snd sources) . unRight <$> con
           else showLine '-' (fst sources) lineA ++ showLine '+' (snd sources) lineB
         showLine _ _ EmptyLine = ""
         showLine prefix source line = prefix : (toString . (`slice` source) . unionRanges $ getRange <$> unLine line)
-        getRange (Free (Annotated (Info range _) _)) = range
-        getRange (Pure (Info range _ :< _)) = range
+
+getRange :: SplitDiff leaf Info -> Range
+getRange (Free (Annotated (Info range _) _)) = range
+getRange (Pure (Info range _ :< _)) = range
 
 header :: Hunk a -> String
 header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show (0 :: Int) ++ " +" ++ show (offsetB hunk) ++ "," ++ show (0 :: Int) ++ " @@\n"
