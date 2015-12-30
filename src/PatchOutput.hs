@@ -74,11 +74,11 @@ nextHunk :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe (Hunk (Split
 nextHunk start rows = case nextChange start rows of
   Nothing -> Nothing
   Just (offset, change, rest) -> let (changes, rest') = contiguousChanges rest in Just (Hunk offset (change : changes) $ take 3 rest', drop 3 rest')
-  where contiguousChanges rows = let last = ([], rows) in if any rowHasChanges $ take 7 rows
+  where contiguousChanges rows = if any rowHasChanges $ take 7 rows
           then case changeIncludingContext rows of
-            Nothing -> last
+            Nothing -> ([], rows)
             Just (change, rest) -> let (changes, rest') = contiguousChanges rest in (change : changes, rest')
-          else last
+          else ([], rows)
 
 nextChange :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe ((Sum Int, Sum Int), Change (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextChange start rows = case changeIncludingContext leadingContext of
