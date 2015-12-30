@@ -23,8 +23,8 @@ data Hunk a = Hunk { offset :: (Sum Int, Sum Int), changes :: [Change a], traili
 data Change a = Change { context :: [Row a], contents :: [Row a] }
   deriving (Eq, Show)
 
-hunkLength :: Hunk a -> (Int, Int)
-hunkLength hunk = getSum *** getSum $ mconcat $ (changeLength <$> changes hunk) <> (rowLength <$> trailingContext hunk)
+hunkLength :: Hunk a -> (Sum Int, Sum Int)
+hunkLength hunk = mconcat $ (changeLength <$> changes hunk) <> (rowLength <$> trailingContext hunk)
 
 changeLength :: Change a -> (Sum Int, Sum Int)
 changeLength change = mconcat $ (rowLength <$> context change) <> (rowLength <$> contents change)
@@ -59,7 +59,7 @@ getRange (Pure (Info range _ :< _)) = range
 
 header :: Hunk a -> String
 header hunk = "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
-  where (lengthA, lengthB) = hunkLength hunk
+  where (lengthA, lengthB) = getSum *** getSum $ hunkLength hunk
         (offsetA, offsetB) = getSum *** getSum $ offset hunk
 
 hunks :: Diff a Info -> (Source Char, Source Char) -> [Hunk (SplitDiff a Info)]
