@@ -21,7 +21,6 @@ import Data.Monoid
 import qualified OrderedMap as Map
 import qualified Data.Set as Set
 import Source hiding ((++))
-import Control.Lens hiding (Indexed, at)
 
 type ClassName = String
 
