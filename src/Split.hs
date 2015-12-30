@@ -142,15 +142,12 @@ instance HasDiff ((,) String) where
 
 class HasSplitDiff a where
   getSplitDiff :: a -> SplitDiff String Info
-  setSplitDiff :: a -> SplitDiff String Info -> a
 
 instance HasSplitDiff (SplitDiff String Info) where
   getSplitDiff = id
-  setSplitDiff _ = id
 
 instance HasSplitDiff (String, SplitDiff String Info) where
   getSplitDiff = snd
-  setSplitDiff (key, _) s = (key, s)
 
 splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax String (Diff String Info) -> [Row (SplitDiff String Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
