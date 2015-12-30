@@ -70,7 +70,7 @@ documentToTerm constructor document contents = alloca $ \ root -> do
   return term
   where toTerm node = do
           name <- ts_node_p_name node document
-          name <- T.pack <$> peekCString name
+          name <- peekCString name
           count <- ts_node_p_named_child_count node
           children <- mapM (alloca . getChild node) $ take (fromIntegral count) [0..]
           -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.

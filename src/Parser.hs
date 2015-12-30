@@ -12,10 +12,10 @@ import Data.Text as Text
 type Parser = Source Char -> IO (Term Text Info)
 
 -- | Given a source string and a term’s annotation & production/child pairs, construct the term.
-type Constructor = Source Char -> Info -> [(Text, Term Text Info)] -> Term Text Info
+type Constructor = Source Char -> Info -> [(String, Term Text Info)] -> Term Text Info
 
 -- | Given two sets of production names, produce a Constructor.
-constructorForProductions :: Set.Set Text -> Set.Set Text -> Constructor
+constructorForProductions :: Set.Set String -> Set.Set String -> Constructor
 constructorForProductions keyed fixed source info@(Info range categories) = (info :<) . construct
   where construct [] = Leaf . pack . toList $ slice range source
         construct children | not . Set.null $ Set.intersection fixed categories = Fixed $ fmap snd children

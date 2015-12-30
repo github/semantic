@@ -25,8 +25,8 @@ import Source hiding ((++))
 
 type ClassName = T.Text
 
-classifyMarkup :: Foldable f => f T.Text -> Markup -> Markup
-classifyMarkup categories element = maybe element ((element !) . A.class_ . textValue . T.append "category-") $ maybeFirst categories
+classifyMarkup :: Foldable f => f String -> Markup -> Markup
+classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeFirst categories
 
 split :: Diff leaf Info -> Source Char -> Source Char -> IO TL.Text
 split diff before after = return . renderHtml
