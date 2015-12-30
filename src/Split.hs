@@ -140,9 +140,9 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
 splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax String (Diff String Info) -> [Row (SplitDiff String Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> fmap (Free . (`Annotated` Leaf a)) <$> contextRows ranges categories sources
-  Indexed children -> wrapRowContents (wrap (Indexed . fmap get) (fst categories)) (wrap (Indexed . fmap get) (snd categories)) <$> adjoinChildRows (Identity <$> children)
-  Fixed children -> wrapRowContents (wrap (Fixed . fmap get) (fst categories)) (wrap (Fixed . fmap get) (snd categories)) <$> adjoinChildRows (Identity <$> children)
-  Keyed children -> wrapRowContents (wrap (Keyed . Map.fromList) (fst categories)) (wrap (Keyed . Map.fromList) (snd categories)) <$> adjoinChildRows (Map.toList children)
+  Indexed children -> adjoinChildRows (Indexed . fmap get) (Identity <$> children)
+  Fixed children -> adjoinChildRows (Fixed . fmap get) (Identity <$> children)
+  Keyed children -> adjoinChildRows (Keyed . Map.fromList) (Map.toList children)
   where contextRows :: (Range, Range) -> (Set.Set Category, Set.Set Category) -> (Source Char, Source Char) -> [Row Info]
         contextRows ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine
           (pure . (`Info` fst categories) <$> actualLineRanges (fst ranges) (fst sources))
@@ -151,11 +151,11 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         adjoin :: Has f => [Row (Either Info (f (SplitDiff String Info)))] -> [Row (Either Info (f (SplitDiff String Info)))]
         adjoin = reverse . foldl (adjoinRowsBy (openEither (openInfo $ fst sources) (openDiff $ fst sources)) (openEither (openInfo $ snd sources) (openDiff $ snd sources))) []
 
-        adjoinChildRows :: (Has f) => [f (Diff String Info)] -> [Row (Either Info (f (SplitDiff String Info)))]
-        adjoinChildRows children = let (rows, previous) = foldl childRows ([], starts ranges) children in
-          adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (ends ranges)) categories sources)
+        adjoinChildRows :: (Has f) => ([f (SplitDiff String Info)] -> Syntax String (SplitDiff String Info)) -> [f (Diff String Info)] -> [Row (SplitDiff String Info)]
+        adjoinChildRows constructor children = let (rows, previous) = foldl childRows ([], starts ranges) children in
+          fmap (wrapRowContents (wrap constructor (fst categories)) (wrap constructor (snd categories))) . adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (ends ranges)) categories sources)
 
-        wrap :: Has f => ([f (SplitDiff String Info)] -> Syntax leaf (SplitDiff leaf Info)) -> Set.Set Category -> [Either Info (f (SplitDiff String Info))] -> SplitDiff leaf Info
+        wrap :: Has f => ([f (SplitDiff String Info)] -> Syntax String (SplitDiff String Info)) -> Set.Set Category -> [Either Info (f (SplitDiff String Info))] -> SplitDiff String Info
         wrap constructor categories children = Free . Annotated (Info (unionRanges $ getRange <$> children) categories) . constructor $ rights children
 
         getRange :: Has f => Either Info (f (SplitDiff String Info)) -> Range
