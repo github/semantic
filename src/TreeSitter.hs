@@ -8,6 +8,7 @@ import qualified Data.Set as Set
 import Foreign
 import Foreign.C
 import Foreign.C.Types
+import qualified Data.Text as T
 import Foreign.CStorable
 import qualified GHC.Generics as Generics
 
@@ -41,7 +42,7 @@ foreign import ccall "app/bridge.h ts_node_p_end_char" ts_node_p_end_char :: Ptr
 
 data Language = Language { getTsLanguage :: Ptr TSLanguage, getConstructor :: Constructor }
 
-languageForType :: String -> Maybe Language
+languageForType :: T.Text -> Maybe Language
 languageForType mediaType = case mediaType of
     ".h" -> c
     ".c" -> c
@@ -55,7 +56,7 @@ parseTreeSitterFile :: Language -> Parser
 parseTreeSitterFile (Language language constructor) contents = do
   document <- ts_document_make
   ts_document_set_language document language
-  withCString (toList contents) (\ source -> do
+  withCString (toList contents) (\source -> do
     ts_document_set_input_string document source
     ts_document_parse document
     term <- documentToTerm constructor document contents
@@ -74,6 +75,7 @@ documentToTerm constructor document contents = alloca $ \ root -> do
           children <- mapM (alloca . getChild node) $ take (fromIntegral count) [0..]
           -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
           range <- return $! Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
+
           return (name, constructor contents (Info range (Set.singleton name)) children)
         getChild node n out = do
           _ <- ts_node_p_named_child node n out

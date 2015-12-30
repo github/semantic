@@ -3,6 +3,7 @@ module TermSpec where
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck hiding (Fixed)
+import Data.Text.Arbitrary ()
 
 import Categorizable
 import Interpreter
