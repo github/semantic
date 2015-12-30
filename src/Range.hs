@@ -1,5 +1,6 @@
 module Range where
 
+import qualified Data.Text as T
 import Control.Applicative ((<|>))
 import qualified Data.Char as Char
 import Data.Maybe (fromMaybe)
@@ -8,14 +9,14 @@ import Data.Maybe (fromMaybe)
 data Range = Range { start :: !Int, end :: !Int }
   deriving (Eq, Show)
 
-substring :: Range -> String -> String
-substring = sublist
+substring :: Range -> T.Text -> T.Text
+substring range = T.take (end range - start range) . T.drop (start range)
 
 sublist :: Range -> [a] -> [a]
 sublist range = take (end range - start range) . drop (start range)
 
-totalRange :: [a] -> Range
-totalRange list = Range 0 $ length list
+totalRange :: T.Text -> Range
+totalRange t = Range 0 $ T.length t
 
 offsetRange :: Int -> Range -> Range
 offsetRange i (Range start end) = Range (i + start) (i + end)

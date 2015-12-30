@@ -7,9 +7,10 @@ import Source hiding ((++))
 import Syntax
 import TreeSitter
 import Control.Comonad.Cofree
+import qualified Data.Text as T
 import Data.Foldable
 
-parserForType :: String -> Parser
+parserForType :: T.Text -> Parser
 parserForType mediaType = maybe lineByLineParser parseTreeSitterFile $ languageForType mediaType
 
 lineByLineParser :: Parser
@@ -18,7 +19,8 @@ lineByLineParser input = return . root . Indexed $ case foldl' annotateLeaves ([
   where
     lines = actualLines input
     root syntax = Info (Range 0 $ length input) mempty :< syntax
-    leaf charIndex line = Info (Range charIndex $ charIndex + length line) mempty :< Leaf (Source.toList line)
+    leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) mempty :< Leaf line
     annotateLeaves (accum, charIndex) line =
-      (accum ++ [ leaf charIndex line ]
+      (accum ++ [ leaf charIndex (toText line) ]
       , charIndex + length line + 1)
+    toText = T.pack . Source.toString

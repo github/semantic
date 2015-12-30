@@ -10,11 +10,12 @@ import Syntax
 import Control.Comonad.Cofree
 import Range
 import Control.Monad.Free
-import Data.ByteString.Lazy.Internal
 import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
-import Text.Blaze.Html.Renderer.Utf8
+import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
+import Text.Blaze.Html.Renderer.Text
 import Data.Either
 import Data.Functor.Identity
 import Data.Monoid
@@ -22,15 +23,15 @@ import qualified OrderedMap as Map
 import qualified Data.Set as Set
 import Source hiding ((++))
 
-type ClassName = String
+type ClassName = T.Text
 
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeFirst categories
 
-split :: Diff leaf Info -> Source Char -> Source Char -> IO ByteString
+split :: Diff leaf Info -> Source Char -> Source Char -> IO TL.Text
 split diff before after = return . renderHtml
   . docTypeHtml
-    . ((head $ link ! A.rel (stringValue "stylesheet") ! A.href (stringValue "style.css")) <>)
+    . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body
       . (table ! A.class_ (stringValue "diff")) $
         ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)

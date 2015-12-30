@@ -30,6 +30,7 @@ unified diff before after = do
       afterChunk = maybe [] (change "+" . unifiedTerm after) $ Patch.after patch
 
     unifiedTerm :: Source Char -> Term a Info -> [Chunk String]
+ 
     unifiedTerm source term = fst $ cata (annotationAndSyntaxToChunks source) term
 
     unifiedRange :: Range -> [([Chunk String], Maybe Range)] -> Source Char -> [Chunk String]

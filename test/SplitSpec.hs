@@ -1,22 +1,22 @@
 module SplitSpec where
 
 import Test.Hspec
-import Split
-import qualified Data.Set as Set
-import Diff
-import Range
 import Test.Hspec.QuickCheck
 import Test.QuickCheck hiding (Fixed)
+import Data.Text.Arbitrary ()
+
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
+import Diff
 import qualified Data.Maybe as Maybe
 import Data.Functor.Identity
 import Source hiding ((++))
 import Line
 import Row
-import Patch
+import Range
+import Split
 import Syntax
-import ArbitraryTerm
+import ArbitraryTerm ()
 
 instance Arbitrary a => Arbitrary (Row a) where
   arbitrary = oneof [

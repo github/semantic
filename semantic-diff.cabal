@@ -32,17 +32,18 @@ library
                      , TreeSitter
                      , Source
   build-depends:       base >= 4.8 && < 5
+                     , blaze-html
+                     , bytestring
                      , containers
                      , free
                      , mtl
                      , rainbow
-                     , bytestring
-                     , blaze-html
+                     , text >= 1.2.1.3
                      , tree-sitter-parsers
                      , c-storable-deriving
                      , vector
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable, DeriveGeneric
+  default-extensions:  DeriveFunctor, FlexibleInstances, DeriveFoldable, DeriveTraversable, DeriveGeneric, OverloadedStrings
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -threaded -fprof-auto "-with-rtsopts=-N -p -s -h -i0.1"
 
 executable semantic-diff-exe
@@ -57,8 +58,11 @@ executable semantic-diff-exe
                      , bytestring
                      , optparse-applicative
                      , filepath
+                     , text >= 1.2.1.3
                      , directory
+                     , text-icu
   default-language:    Haskell2010
+  default-extensions:  OverloadedStrings
 
 executable semantic-diff-profile
   hs-source-dirs:      app
@@ -75,7 +79,10 @@ executable semantic-diff-profile
                      , bytestring
                      , optparse-applicative
                      , filepath
+                     , text >= 1.2.1.3
                      , directory
+                     , text-icu
+  default-extensions:  OverloadedStrings
   default-language:    Haskell2010
 
 test-suite semantic-diff-test
@@ -86,12 +93,14 @@ test-suite semantic-diff-test
   build-depends:       base
                      , containers
                      , free
-                     , hspec
+                     , hspec >= 2.1.10
+                     , QuickCheck >= 2.8.1
                      , semantic-diff
-                     , QuickCheck
+                     , text >= 1.2.1.3
+                     , quickcheck-text
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
-  default-extensions:  DeriveGeneric
+  default-extensions:  DeriveGeneric, OverloadedStrings
 
 source-repository head
   type:     git
