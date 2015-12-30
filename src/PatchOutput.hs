@@ -21,6 +21,10 @@ data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a], trai
 data Change a = Change { context :: [Row a], contents :: [Row a] }
   deriving (Eq, Show)
 
+lineLength :: Line a -> Sum Int
+lineLength EmptyLine = 0
+lineLength _ = 1
+
 showHunk :: (Source Char, Source Char) -> Hunk (SplitDiff a Info) -> String
 showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk) ++ concat (showRow sources <$> trailingContext hunk)
 
