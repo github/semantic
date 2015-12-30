@@ -43,6 +43,9 @@ showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hu
 showChange :: (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
 showChange sources change = concat (showRow sources <$> context change) ++ fromMaybe "" (mconcat (fmap ('-' :) . showLine (fst sources) . unLeft <$> contents change)) ++ fromMaybe "" (mconcat (fmap ('+' :) . showLine (snd sources) . unRight <$> contents change))
 
+showLines :: Source Char -> Char -> [Line (SplitDiff leaf Info)] -> String
+showLines source prefix lines = fromMaybe "" . mconcat $ fmap (prefix :) . showLine source <$> lines
+
 showRow :: (Source Char, Source Char) -> Row (SplitDiff leaf Info) -> String
 showRow sources (Row lineA lineB) = if stringA == stringB
   then maybe "" (' ' :) stringB
