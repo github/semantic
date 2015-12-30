@@ -23,6 +23,9 @@ data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a], trai
 data Change a = Change { context :: [Row a], contents :: [Row a] }
   deriving (Eq, Show)
 
+hunkLength :: Hunk a -> (Int, Int)
+hunkLength hunk = getSum *** getSum $ mconcat $ (changeLength <$> changes hunk) <> (rowLength <$> trailingContext hunk)
+
 changeLength :: Change a -> (Sum Int, Sum Int)
 changeLength change = mconcat $ (rowLength <$> context change) <> (rowLength <$> contents change)
 
