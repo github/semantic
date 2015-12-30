@@ -79,7 +79,7 @@ spec = do
   describe "splitTermByLines" $ do
     prop "preserves line count" $
       \ source -> let range = getTotalRange source in
-        splitTermByLines (Info range mempty :< Leaf (toString source)) source `shouldBe` (makeLine . (:[]) . (:< Leaf (toString source)) . (`Info` mempty) <$> actualLineRanges range source, range)
+        splitTermByLines (Info range mempty :< Leaf (toString source)) source `shouldBe` (pure . (:< Leaf (toString source)) . (`Info` mempty) <$> actualLineRanges range source, range)
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
