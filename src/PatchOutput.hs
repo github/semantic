@@ -5,6 +5,7 @@ module PatchOutput (
 
 import Diff
 import Line
+import Range
 import Row
 import Source hiding ((++))
 import Split
@@ -29,7 +30,7 @@ showChange sourceA sourceB change = concat (showLine ' ' sourceB . unRight <$> c
           then showLine ' ' sourceB lineB
           else showLine '-' sourceA lineA ++ showLine '+' sourceB lineB
         showLine _ _ EmptyLine = ""
-        showLine prefix source line = prefix : (toString . (`slice` source) . mconcat $ getRange <$> unLine line)
+        showLine prefix source line = prefix : (toString . (`slice` source) . unionRanges $ getRange <$> unLine line)
         getRange (Free (Annotated (Info range _) _)) = range
         getRange (Pure (Info range _ :< _)) = range
 
