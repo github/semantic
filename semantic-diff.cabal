@@ -39,8 +39,6 @@ library
                      , mtl
                      , rainbow
                      , text >= 1.2.1.3
-                     , text-show
-                     , blaze-html
                      , tree-sitter-parsers
                      , c-storable-deriving
                      , vector
