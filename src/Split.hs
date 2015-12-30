@@ -134,6 +134,9 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
 class HasDiff a where
   getDiff :: a -> Diff String Info
 
+instance HasDiff (Diff String Info) where
+  getDiff = id
+
 class HasSplitDiff a where
   getSplitDiff :: a -> SplitDiff String Info
   setSplitDiff :: a -> SplitDiff String Info -> a
