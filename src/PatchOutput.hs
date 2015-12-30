@@ -17,7 +17,7 @@ import Data.Monoid
 patch :: Diff a Info -> Source Char -> Source Char -> String
 patch diff sourceA sourceB = mconcat $ showHunk (sourceA, sourceB) <$> hunks diff (sourceA, sourceB)
 
-data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a], trailingContext :: [Row a] }
+data Hunk a = Hunk { offset :: (Int, Int), changes :: [Change a], trailingContext :: [Row a] }
   deriving (Eq, Show)
 
 data Change a = Change { context :: [Row a], contents :: [Row a] }
@@ -58,8 +58,9 @@ getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure (Info range _ :< _)) = range
 
 header :: Hunk a -> String
-header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show lengthA ++ " +" ++ show (offsetB hunk) ++ "," ++ show lengthB ++ " @@\n"
+header hunk = "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
   where (lengthA, lengthB) = hunkLength hunk
+        (offsetA, offsetB) = offset hunk
 
 hunks :: Diff a Info -> (Source Char, Source Char) -> [Hunk (SplitDiff a Info)]
 hunks diff sources = hunksInRows . fst $ splitDiffByLines diff (0, 0) sources
@@ -72,7 +73,7 @@ hunksInRows rows = case nextHunk rows of
 nextHunk :: [Row (SplitDiff a Info)] -> Maybe (Hunk (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextHunk rows = case nextChange rows of
   Nothing -> Nothing
-  Just (change, rest) -> Just (Hunk 0 0 [ change ] (take 3 rest), drop 3 rest)
+  Just (change, rest) -> Just (Hunk (0, 0) [ change ] (take 3 rest), drop 3 rest)
 
 nextChange :: [Row (SplitDiff a Info)] -> Maybe (Change (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextChange rows = case changes of
