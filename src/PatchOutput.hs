@@ -12,7 +12,7 @@ import Split
 import Control.Comonad.Cofree
 import Control.Monad.Free
 
-patch :: Eq a => Diff a Info -> Source Char -> Source Char -> String
+patch :: Diff a Info -> Source Char -> Source Char -> String
 patch diff sourceA sourceB = mconcat $ showHunk (sourceA, sourceB) <$> hunks diff (sourceA, sourceB)
 
 data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a], trailingContext :: [Row a] }
@@ -21,13 +21,13 @@ data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a], trai
 data Change a = Change { context :: [Row a], contents :: [Row a] }
   deriving (Eq, Show)
 
-showHunk :: Eq a => (Source Char, Source Char) -> Hunk (SplitDiff a Info) -> String
+showHunk :: (Source Char, Source Char) -> Hunk (SplitDiff a Info) -> String
 showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk) ++ concat (showRow sources <$> trailingContext hunk)
 
-showChange :: Eq a => (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
+showChange :: (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
 showChange sources change = concat (showRow sources <$> context change) ++ concat (showRow sources <$> contents change)
 
-showRow :: Eq leaf => (Source Char, Source Char) -> Row (SplitDiff leaf Info) -> String
+showRow :: (Source Char, Source Char) -> Row (SplitDiff leaf Info) -> String
 showRow sources (Row lineA lineB) = if stringA == stringB
   then ' ' : stringB
   else '-' : stringA ++ '+' : stringB
