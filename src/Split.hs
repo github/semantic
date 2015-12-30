@@ -149,15 +149,6 @@ instance HasDiff Identity where
 instance HasDiff ((,) String) where
   getDiff = snd
 
-class HasSplitDiff a where
-  getSplitDiff :: a -> SplitDiff String Info
-
-instance HasSplitDiff (SplitDiff String Info) where
-  getSplitDiff = id
-
-instance HasSplitDiff (String, SplitDiff String Info) where
-  getSplitDiff = snd
-
 splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax String (Diff String Info) -> [Row (SplitDiff String Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> fmap (Free . (`Annotated` Leaf a)) <$> contextRows ranges categories sources
