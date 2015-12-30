@@ -74,25 +74,24 @@ nextHunk :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe (Hunk (Split
 nextHunk start rows = case nextChange start rows of
   Nothing -> Nothing
   Just (offset, change, rest) -> let (changes, rest') = contiguousChanges rest in Just (Hunk offset (change : changes) $ take 3 rest', drop 3 rest')
-  where contiguousChanges rows = if any rowHasChanges $ take 7 rows
-          then case changeIncludingContext rows of
+  where contiguousChanges rows = case break rowHasChanges rows of
+          ([], _) -> ([], rows)
+          (context, changes) -> case changeIncludingContext context changes of
             Nothing -> ([], rows)
             Just (change, rest) -> let (changes, rest') = contiguousChanges rest in (change : changes, rest')
-          else ([], rows)
 
 nextChange :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe ((Sum Int, Sum Int), Change (SplitDiff a Info), [Row (SplitDiff a Info)])
-nextChange start rows = case changeIncludingContext leadingContext of
+nextChange start rows = case changeIncludingContext leadingContext changes of
   Nothing -> Nothing
   Just (change, afterChanges) -> Just (start <> mconcat (rowLength <$> skippedContext), change, afterChanges)
-  where (leadingRows, _) = break rowHasChanges rows
+  where (leadingRows, changes) = break rowHasChanges rows
         (skippedContext, leadingContext) = splitAt (max (length leadingRows - 3) 0) leadingRows
 
-changeIncludingContext :: [Row (SplitDiff a Info)] -> Maybe (Change (SplitDiff a Info), [Row (SplitDiff a Info)])
-changeIncludingContext rows = case changes of
+changeIncludingContext :: [Row (SplitDiff a Info)] -> [Row (SplitDiff a Info)] -> Maybe (Change (SplitDiff a Info), [Row (SplitDiff a Info)])
+changeIncludingContext leadingContext rows = case changes of
   [] -> Nothing
   _ -> Just (Change leadingContext changes, afterChanges)
-  where (leadingContext, afterLeadingContext) = break rowHasChanges rows
-        (changes, afterChanges) = span rowHasChanges afterLeadingContext
+  where (changes, afterChanges) = span rowHasChanges rows
 
 rowHasChanges :: Row (SplitDiff a Info) -> Bool
 rowHasChanges (Row left right) = lineHasChanges left || lineHasChanges right
