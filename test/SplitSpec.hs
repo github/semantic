@@ -90,7 +90,7 @@ spec = do
 
     it "returns Nothing if the earliest non-empty line is closed" $
       openLineBy openMaybe [
-        pure Nothing, pure (Just ())
+        pure Nothing, pure (Just True)
       ] `shouldBe` Nothing
 
   describe "openTerm" $ do
