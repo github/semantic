@@ -47,6 +47,9 @@ maybeLastIndex (Range _ end) = Just $ end - 1
 isEmpty :: Range -> Bool
 isEmpty (Range start end) = start == end
 
+unionRanges :: [Range] -> Range
+unionRanges ranges = fromMaybe mempty . foldl mappend Nothing $ Just <$> ranges
+
 instance Ord Range where
   a <= b = start a <= start b
 
