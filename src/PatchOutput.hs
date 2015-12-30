@@ -13,7 +13,7 @@ import Control.Comonad.Cofree
 import Control.Monad.Free
 
 patch :: Eq a => Diff a Info -> Source Char -> Source Char -> String
-patch diff sourceA sourceB = mconcat $ showHunk sourceA sourceB <$> hunks diff sourceA sourceB
+patch diff sourceA sourceB = mconcat $ showHunk (sourceA, sourceB) <$> hunks diff (sourceA, sourceB)
 
 data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a], trailingContext :: [Row a] }
   deriving (Eq, Show)
@@ -21,14 +21,14 @@ data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a], trai
 data Change a = Change { context :: [Row a], contents :: [Row a] }
   deriving (Eq, Show)
 
-showHunk :: Eq a => Source Char -> Source Char -> Hunk (SplitDiff a Info) -> String
-showHunk sourceA sourceB hunk = header hunk ++ concat (showChange sourceA sourceB <$> changes hunk)
+showHunk :: Eq a => (Source Char, Source Char) -> Hunk (SplitDiff a Info) -> String
+showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk)
 
-showChange :: Eq a => Source Char -> Source Char -> Change (SplitDiff a Info) -> String
-showChange sourceA sourceB change = concat (showLine ' ' sourceB . unRight <$> context change) ++ concat (showRow <$> contents change)
+showChange :: Eq a => (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
+showChange sources change = concat (showLine ' ' (snd sources) . unRight <$> context change) ++ concat (showRow <$> contents change)
   where showRow (Row lineA lineB) = if lineA == lineB
-          then showLine ' ' sourceB lineB
-          else showLine '-' sourceA lineA ++ showLine '+' sourceB lineB
+          then showLine ' ' (snd sources) lineB
+          else showLine '-' (fst sources) lineA ++ showLine '+' (snd sources) lineB
         showLine _ _ EmptyLine = ""
         showLine prefix source line = prefix : (toString . (`slice` source) . unionRanges $ getRange <$> unLine line)
         getRange (Free (Annotated (Info range _) _)) = range
@@ -37,8 +37,8 @@ showChange sourceA sourceB change = concat (showLine ' ' sourceB . unRight <$> c
 header :: Hunk a -> String
 header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show (0 :: Int) ++ " +" ++ show (offsetB hunk) ++ "," ++ show (0 :: Int) ++ " @@\n"
 
-hunks :: Diff a Info -> Source Char -> Source Char -> [Hunk (SplitDiff a Info)]
-hunks diff sourceA sourceB = hunksInRows . fst $ splitDiffByLines diff (0, 0) (sourceA, sourceB)
+hunks :: Diff a Info -> (Source Char, Source Char) -> [Hunk (SplitDiff a Info)]
+hunks diff sources = hunksInRows . fst $ splitDiffByLines diff (0, 0) sources
 
 hunksInRows :: [Row (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]
 hunksInRows rows = case nextHunk rows of
