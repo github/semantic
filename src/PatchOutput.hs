@@ -12,6 +12,7 @@ import Split
 import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad.Free
+import Data.Maybe
 import Data.Monoid
 
 patch :: Diff a Info -> Source Char -> Source Char -> String
@@ -40,7 +41,7 @@ showHunk :: (Source Char, Source Char) -> Hunk (SplitDiff a Info) -> String
 showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk) ++ concat (showRow sources <$> trailingContext hunk)
 
 showChange :: (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
-showChange sources change = concat (showRow sources <$> context change) ++ concat (showRow sources <$> contents change)
+showChange sources change = concat (showRow sources <$> context change) ++ fromMaybe "" (mconcat (fmap ('-' :) . showLine (fst sources) . unLeft <$> contents change)) ++ fromMaybe "" (mconcat (fmap ('+' :) . showLine (snd sources) . unRight <$> contents change))
 
 showRow :: (Source Char, Source Char) -> Row (SplitDiff leaf Info) -> String
 showRow sources (Row lineA lineB) = if stringA == stringB
