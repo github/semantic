@@ -175,9 +175,6 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 openEither :: MaybeOpen a -> MaybeOpen b -> MaybeOpen (Either a b)
 openEither ifLeft ifRight which = either (fmap (const which) . ifLeft) (fmap (const which) . ifRight) which
 
-openInfo :: Source Char -> MaybeOpen Info
-openInfo source info@(Info range _) = const info <$> openRange source range
-
 openRange :: Source Char -> MaybeOpen Range
 openRange source range = case (source `at`) <$> maybeLastIndex range of
   Just '\n' -> Nothing
