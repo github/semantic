@@ -7,7 +7,7 @@ import Diff
 import Line
 import Range
 import Row
-import Source hiding ((++))
+import Source hiding ((++), break)
 import Split
 import Control.Arrow
 import Control.Comonad.Cofree
@@ -87,7 +87,7 @@ nextChange :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe ((Sum Int,
 nextChange start rows = case changes of
   [] -> Nothing
   _ -> Just (start <> mconcat (rowLength <$> skippedContext), Change leadingContext changes, afterChanges)
-  where (leadingRows, afterLeadingContext) = Prelude.break rowHasChanges rows
+  where (leadingRows, afterLeadingContext) = break rowHasChanges rows
         (changes, afterChanges) = span rowHasChanges afterLeadingContext
         (skippedContext, leadingContext) = splitAt (max (length leadingRows - 3) 0) leadingRows
 
@@ -95,7 +95,7 @@ changeIncludingContext :: [Row (SplitDiff a Info)] -> Maybe (Change (SplitDiff a
 changeIncludingContext rows = case changes of
   [] -> Nothing
   _ -> Just (Change leadingContext changes, afterChanges)
-  where (leadingContext, afterLeadingContext) = Prelude.break rowHasChanges rows
+  where (leadingContext, afterLeadingContext) = break rowHasChanges rows
         (changes, afterChanges) = span rowHasChanges afterLeadingContext
 
 rowHasChanges :: Row (SplitDiff a Info) -> Bool
