@@ -212,9 +212,10 @@ openRange source range = case (source `at`) <$> maybeLastIndex range of
 openTerm :: HasTerm a -> Source Char -> MaybeOpen a
 openTerm lens source term = const term <$> openRange source (case term ^. lens of (Info range _ :< _) -> range)
 
-openDiff :: Source Char -> MaybeOpen (SplitDiff String Info)
-openDiff source diff@(Free (Annotated (Info range _) _)) = const diff <$> openRange source range
-openDiff source diff@(Pure term) = const diff <$> openTerm (iso id id) source term
+openDiff :: HasSplitDiff a => Source Char -> MaybeOpen a
+openDiff source diff = const diff <$> case getSplitDiff diff of
+  (Free (Annotated (Info range _) _)) -> openRange source range
+  (Pure (Info range _ :< _)) -> openRange source range
 
 zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
 zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++ repeat da) (b ++ repeat db)
