@@ -10,6 +10,7 @@ import Test.QuickCheck hiding (Fixed)
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
 import qualified Data.Maybe as Maybe
+import Data.Functor.Identity
 import Source hiding ((++))
 import Line
 import Row
@@ -94,10 +95,10 @@ spec = do
 
   describe "openTerm" $ do
     it "returns Just the term if its substring does not end with a newline" $
-      let term = Info (Range 0 2) mempty :< Leaf "" in openTerm (fromList "  ") term `shouldBe` Just term
+      let term = Info (Range 0 2) mempty :< Leaf "" in openTerm (fromList "  ") (Identity term) `shouldBe` Just (Identity term)
 
     it "returns Nothing for terms whose substring ends with a newline" $
-      openTerm (fromList " \n") (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
+      openTerm (fromList " \n") (Identity $ Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
 
     where
       isOpenBy f (Row a b) = Maybe.isJust (openLineBy f [ a ]) && Maybe.isJust (openLineBy f [ b ])
