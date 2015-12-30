@@ -109,6 +109,9 @@ type HasTerm a = Lens' a (Term String Info)
 class Functor f => Has f where
   get :: f a -> a
 
+instance Has Identity where
+  get = runIdentity
+
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term String Info -> Source Char -> ([Line (Term String Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
