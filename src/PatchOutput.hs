@@ -91,9 +91,3 @@ lineHasChanges = or . fmap diffHasChanges
 
 diffHasChanges :: SplitDiff a Info -> Bool
 diffHasChanges = or . fmap (const True)
-
-takeLast :: Int -> [a] -> [a]
-takeLast n = fst . foldr accum ([], 0)
-  where accum each (rest, i) = if i < n
-          then (each : rest, i + 1)
-          else (rest, i)
