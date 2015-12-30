@@ -139,12 +139,12 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
 
 splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax String (Diff String Info) -> [Row (SplitDiff String Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
-  Leaf a -> wrapRowContents (Free . (`Annotated` Leaf a) . (`Info` fst categories) . unionRanges) (Free . (`Annotated` Leaf a) . (`Info` snd categories) . unionRanges) <$> contextRows ranges categories sources
+  Leaf a -> wrapRowContents (Free . (`Annotated` Leaf a) . (`Info` fst categories) . unionRanges) (Free . (`Annotated` Leaf a) . (`Info` snd categories) . unionRanges) <$> contextRows ranges sources
   Indexed children -> adjoinChildRows (Indexed . fmap get) (Identity <$> children)
   Fixed children -> adjoinChildRows (Fixed . fmap get) (Identity <$> children)
   Keyed children -> adjoinChildRows (Keyed . Map.fromList) (Map.toList children)
-  where contextRows :: (Range, Range) -> (Set.Set Category, Set.Set Category) -> (Source Char, Source Char) -> [Row Range]
-        contextRows ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine
+  where contextRows :: (Range, Range) -> (Source Char, Source Char) -> [Row Range]
+        contextRows ranges sources = zipWithDefaults Row EmptyLine EmptyLine
           (pure <$> actualLineRanges (fst ranges) (fst sources))
           (pure <$> actualLineRanges (snd ranges) (snd sources))
 
@@ -153,7 +153,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         adjoinChildRows :: (Has f) => ([f (SplitDiff String Info)] -> Syntax String (SplitDiff String Info)) -> [f (Diff String Info)] -> [Row (SplitDiff String Info)]
         adjoinChildRows constructor children = let (rows, previous) = foldl childRows ([], starts ranges) children in
-          fmap (wrapRowContents (wrap constructor (fst categories)) (wrap constructor (snd categories))) . adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (ends ranges)) categories sources)
+          fmap (wrapRowContents (wrap constructor (fst categories)) (wrap constructor (snd categories))) . adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (ends ranges)) sources)
 
         wrap :: Has f => ([f (SplitDiff String Info)] -> Syntax String (SplitDiff String Info)) -> Set.Set Category -> [Either Range (f (SplitDiff String Info))] -> SplitDiff String Info
         wrap constructor categories children = Free . Annotated (Info (unionRanges $ getRange <$> children) categories) . constructor $ rights children
@@ -166,7 +166,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         childRows :: (Has f) => ([Row (Either Range (f (SplitDiff String Info)))], (Int, Int)) -> f (Diff String Info) -> ([Row (Either Range (f (SplitDiff String Info)))], (Int, Int))
         childRows (rows, previous) child = let (childRows, childRanges) = splitDiffByLines (get child) previous sources in
-          (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (starts childRanges)) categories sources) ++ (fmap (Right . (<$ child)) <$> childRows), ends childRanges)
+          (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (starts childRanges)) sources) ++ (fmap (Right . (<$ child)) <$> childRows), ends childRanges)
 
         starts (left, right) = (start left, start right)
         ends (left, right) = (end left, end right)
