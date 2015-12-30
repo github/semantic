@@ -76,11 +76,12 @@ nextHunk start rows = case contiguousChanges start rows of
   Just (offset, changes, rest) -> Just (Hunk offset changes $ take 3 rest, drop 3 rest)
   where contiguousChanges start rows = case nextChange start rows of
           Nothing -> Nothing
-          Just (offset, change, rest) -> if any rowHasChanges $ take 7 rest
+          Just (offset, change, rest) -> let last = Just (offset, [ change ], rest) in
+            if any rowHasChanges $ take 7 rest
               then case contiguousChanges offset rest of
-                Nothing -> Just (offset, [ change ], rest)
+                Nothing -> last
                 Just (_, changes, rest) -> Just (offset, change : changes, rest)
-              else Just (offset, [ change ], rest)
+              else last
 
 nextChange :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe ((Sum Int, Sum Int), Change (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextChange start rows = case changes of
