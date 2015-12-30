@@ -57,7 +57,8 @@ getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure (Info range _ :< _)) = range
 
 header :: Hunk a -> String
-header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show (0 :: Int) ++ " +" ++ show (offsetB hunk) ++ "," ++ show (0 :: Int) ++ " @@\n"
+header hunk = "@@ -" ++ show (offsetA hunk) ++ "," ++ show lengthA ++ " +" ++ show (offsetB hunk) ++ "," ++ show lengthB ++ " @@\n"
+  where (lengthA, lengthB) = hunkLength hunk
 
 hunks :: Diff a Info -> (Source Char, Source Char) -> [Hunk (SplitDiff a Info)]
 hunks diff sources = hunksInRows . fst $ splitDiffByLines diff (0, 0) sources
