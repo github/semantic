@@ -41,7 +41,7 @@ showHunk :: (Source Char, Source Char) -> Hunk (SplitDiff a Info) -> String
 showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk) ++ concat (showRow sources <$> trailingContext hunk)
 
 showChange :: (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
-showChange sources change = concat (showRow sources <$> context change) ++ fromMaybe "" (mconcat (fmap ('-' :) . showLine (fst sources) . unLeft <$> contents change)) ++ fromMaybe "" (mconcat (fmap ('+' :) . showLine (snd sources) . unRight <$> contents change))
+showChange sources change = concat (showRow sources <$> context change) ++ showLines (fst sources) '-' (unLeft <$> contents change) ++ showLines (snd sources) '+' (unRight <$> contents change)
 
 showLines :: Source Char -> Char -> [Line (SplitDiff leaf Info)] -> String
 showLines source prefix lines = fromMaybe "" . mconcat $ fmap (prefix :) . showLine source <$> lines
