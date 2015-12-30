@@ -50,6 +50,7 @@ showRow sources (Row lineA lineB) = if stringA == stringB
         stringB = showLine (snd sources) lineB
 
 showLine :: Source Char -> Line (SplitDiff leaf Info) -> String
+showLine _ EmptyLine = ""
 showLine source line = toString . (`slice` source) . unionRanges $ getRange <$> unLine line
 
 getRange :: SplitDiff leaf Info -> Range
