@@ -27,7 +27,7 @@ type ClassName = String
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeFirst categories
 
-split :: Diff String Info -> Source Char -> Source Char -> IO ByteString
+split :: Diff leaf Info -> Source Char -> Source Char -> IO ByteString
 split diff before after = return . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel (stringValue "stylesheet") ! A.href (stringValue "style.css")) <>)
@@ -90,7 +90,7 @@ instance ToMarkup (Renderable (SplitDiff a Info)) where
     where toMarkupAndRange :: Term a Info -> (Markup, Range)
           toMarkupAndRange term@(Info range _ :< _) = ((div ! A.class_ (stringValue "patch")) . toMarkup $ Renderable (source, term), range)
 
-splitDiffByLines :: Diff String Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff String Info)], (Range, Range))
+splitDiffByLines :: Diff leaf Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff leaf Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
@@ -113,31 +113,31 @@ instance Has ((,) a) where
   get = snd
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
-splitTermByLines :: Term String Info -> Source Char -> ([Line (Term String Info)], Range)
+splitTermByLines :: Term leaf Info -> Source Char -> ([Line (Term leaf Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
   Leaf a -> pure . (:< Leaf a) . (`Info` categories) <$> actualLineRanges range source
   Indexed children -> adjoinChildLines (Indexed . fmap get) (Identity <$> children)
   Fixed children -> adjoinChildLines (Fixed . fmap get) (Identity <$> children)
   Keyed children -> adjoinChildLines (Keyed . Map.fromList) (Map.toList children)
-  where adjoin :: Has f => [Line (Either Range (f (Term String Info)))] -> [Line (Either Range (f (Term String Info)))]
+  where adjoin :: Has f => [Line (Either Range (f (Term leaf Info)))] -> [Line (Either Range (f (Term leaf Info)))]
         adjoin = reverse . foldl (adjoinLinesBy $ openEither (openRange source) (openTerm source)) []
 
-        adjoinChildLines :: Has f => ([f (Term String Info)] -> Syntax String (Term String Info)) -> [f (Term String Info)] -> [Line (Term String Info)]
+        adjoinChildLines :: Has f => ([f (Term leaf Info)] -> Syntax leaf (Term leaf Info)) -> [f (Term leaf Info)] -> [Line (Term leaf Info)]
         adjoinChildLines constructor children = let (lines, previous) = foldl childLines ([], start range) children in
           fmap (wrapLineContents $ wrap constructor) . adjoin $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ end range) source)
 
-        wrap :: Has f => ([f (Term String Info)] -> Syntax String (Term String Info)) -> [Either Range (f (Term String Info))] -> Term String Info
+        wrap :: Has f => ([f (Term leaf Info)] -> Syntax leaf (Term leaf Info)) -> [Either Range (f (Term leaf Info))] -> Term leaf Info
         wrap constructor children = (Info (unionRanges $ getRange <$> children) categories :<) . constructor $ rights children
 
-        getRange :: Has f => Either Range (f (Term String Info)) -> Range
+        getRange :: Has f => Either Range (f (Term leaf Info)) -> Range
         getRange (Right term) = case get term of (Info range _ :< _) -> range
         getRange (Left range) = range
 
-        childLines :: Has f => ([Line (Either Range (f (Term String Info)))], Int) -> f (Term String Info) -> ([Line (Either Range (f (Term String Info)))], Int)
+        childLines :: Has f => ([Line (Either Range (f (Term leaf Info)))], Int) -> f (Term leaf Info) -> ([Line (Either Range (f (Term leaf Info)))], Int)
         childLines (lines, previous) child = let (childLines, childRange) = splitTermByLines (get child) source in
           (adjoin $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap (Right . (<$ child)) <$> childLines), end childRange)
 
-splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax String (Diff String Info) -> [Row (SplitDiff String Info)]
+splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax leaf (Diff leaf Info) -> [Row (SplitDiff leaf Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> wrapRowContents (Free . (`Annotated` Leaf a) . (`Info` fst categories) . unionRanges) (Free . (`Annotated` Leaf a) . (`Info` snd categories) . unionRanges) <$> contextRows ranges sources
   Indexed children -> adjoinChildRows (Indexed . fmap get) (Identity <$> children)
@@ -148,23 +148,23 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
           (pure <$> actualLineRanges (fst ranges) (fst sources))
           (pure <$> actualLineRanges (snd ranges) (snd sources))
 
-        adjoin :: Has f => [Row (Either Range (f (SplitDiff String Info)))] -> [Row (Either Range (f (SplitDiff String Info)))]
+        adjoin :: Has f => [Row (Either Range (f (SplitDiff leaf Info)))] -> [Row (Either Range (f (SplitDiff leaf Info)))]
         adjoin = reverse . foldl (adjoinRowsBy (openEither (openRange $ fst sources) (openDiff $ fst sources)) (openEither (openRange $ snd sources) (openDiff $ snd sources))) []
 
-        adjoinChildRows :: (Has f) => ([f (SplitDiff String Info)] -> Syntax String (SplitDiff String Info)) -> [f (Diff String Info)] -> [Row (SplitDiff String Info)]
+        adjoinChildRows :: (Has f) => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> [f (Diff leaf Info)] -> [Row (SplitDiff leaf Info)]
         adjoinChildRows constructor children = let (rows, previous) = foldl childRows ([], starts ranges) children in
           fmap (wrapRowContents (wrap constructor (fst categories)) (wrap constructor (snd categories))) . adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (ends ranges)) sources)
 
-        wrap :: Has f => ([f (SplitDiff String Info)] -> Syntax String (SplitDiff String Info)) -> Set.Set Category -> [Either Range (f (SplitDiff String Info))] -> SplitDiff String Info
+        wrap :: Has f => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> Set.Set Category -> [Either Range (f (SplitDiff leaf Info))] -> SplitDiff leaf Info
         wrap constructor categories children = Free . Annotated (Info (unionRanges $ getRange <$> children) categories) . constructor $ rights children
 
-        getRange :: Has f => Either Range (f (SplitDiff String Info)) -> Range
+        getRange :: Has f => Either Range (f (SplitDiff leaf Info)) -> Range
         getRange (Right diff) = case get diff of
           (Pure (Info range _ :< _)) -> range
           (Free (Annotated (Info range _) _)) -> range
         getRange (Left range) = range
 
-        childRows :: (Has f) => ([Row (Either Range (f (SplitDiff String Info)))], (Int, Int)) -> f (Diff String Info) -> ([Row (Either Range (f (SplitDiff String Info)))], (Int, Int))
+        childRows :: (Has f) => ([Row (Either Range (f (SplitDiff leaf Info)))], (Int, Int)) -> f (Diff leaf Info) -> ([Row (Either Range (f (SplitDiff leaf Info)))], (Int, Int))
         childRows (rows, previous) child = let (childRows, childRanges) = splitDiffByLines (get child) previous sources in
           (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (starts childRanges)) sources) ++ (fmap (Right . (<$ child)) <$> childRows), ends childRanges)
 
@@ -180,10 +180,10 @@ openRange source range = case (source `at`) <$> maybeLastIndex range of
   Just '\n' -> Nothing
   _ -> Just range
 
-openTerm :: Has f => Source Char -> MaybeOpen (f (Term String Info))
+openTerm :: Has f => Source Char -> MaybeOpen (f (Term leaf Info))
 openTerm source term = const term <$> openRange source (case get term of (Info range _ :< _) -> range)
 
-openDiff :: Has f => Source Char -> MaybeOpen (f (SplitDiff String Info))
+openDiff :: Has f => Source Char -> MaybeOpen (f (SplitDiff leaf Info))
 openDiff source diff = const diff <$> case get diff of
   (Free (Annotated (Info range _) _)) -> openRange source range
   (Pure (Info range _ :< _)) -> openRange source range
