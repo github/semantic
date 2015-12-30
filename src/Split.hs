@@ -119,26 +119,26 @@ instance Has ((,) a) where
 splitTermByLines :: Term String Info -> Source Char -> ([Line (Term String Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
   Leaf a -> pure . (:< Leaf a) . (`Info` categories) <$> actualLineRanges range source
-  Indexed children -> wrapLineContents (wrap (iso id id) Indexed) <$> adjoinChildLines (iso id id) children
-  Fixed children -> wrapLineContents (wrap (iso id id) Fixed) <$> adjoinChildLines (iso id id) children
-  Keyed children -> wrapLineContents (wrap _2 $ Keyed . Map.fromList) <$> adjoinChildLines _2 (Map.toList children)
-  where adjoin :: HasTerm b -> [Line (Either Range b)] -> [Line (Either Range b)]
-        adjoin lens = reverse . foldl (adjoinLinesBy $ openEither (openRange source) (openTerm lens source)) []
+  Indexed children -> wrapLineContents (wrap $ Indexed . fmap get) <$> adjoinChildLines (Identity <$> children)
+  Fixed children -> wrapLineContents (wrap $ Fixed . fmap get) <$> adjoinChildLines (Identity <$> children)
+  Keyed children -> wrapLineContents (wrap $ Keyed . Map.fromList) <$> adjoinChildLines (Map.toList children)
+  where adjoin :: Has f => [Line (Either Range (f (Term String Info)))] -> [Line (Either Range (f (Term String Info)))]
+        adjoin = reverse . foldl (adjoinLinesBy $ openEither (openRange source) (openTerm source)) []
 
-        adjoinChildLines :: HasTerm b -> [b] -> [Line (Either Range b)]
-        adjoinChildLines lens children = let (lines, previous) = foldl (childLines lens) ([], start range) children in
-          adjoin lens $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ end range) source)
+        adjoinChildLines :: Has f => [f (Term String Info)] -> [Line (Either Range (f (Term String Info)))]
+        adjoinChildLines children = let (lines, previous) = foldl childLines ([], start range) children in
+          adjoin $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ end range) source)
 
-        wrap :: HasTerm b -> ([b] -> Syntax String (Term String Info)) -> [Either Range b] -> Term String Info
-        wrap lens constructor children = (Info (fromMaybe mempty $ foldl (<>) Nothing $ Just . getRange lens <$> children) categories :<) . constructor $ rights children
+        wrap :: Has f => ([f (Term String Info)] -> Syntax String (Term String Info)) -> [Either Range (f (Term String Info))] -> Term String Info
+        wrap constructor children = (Info (fromMaybe mempty $ foldl (<>) Nothing $ Just . getRange <$> children) categories :<) . constructor $ rights children
 
-        getRange :: HasTerm b -> Either Range b -> Range
-        getRange lens (Right t) = case t ^. lens of (Info range _ :< _) -> range
-        getRange _ (Left range) = range
+        getRange :: Has f => Either Range (f (Term String Info)) -> Range
+        getRange (Right term) = case get term of (Info range _ :< _) -> range
+        getRange (Left range) = range
 
-        childLines :: HasTerm b -> ([Line (Either Range b)], Int) -> b -> ([Line (Either Range b)], Int)
-        childLines lens (lines, previous) child = let (childLines, childRange) = splitTermByLines (child ^. lens) source in
-          (adjoin lens $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap (Right . (child &) . (lens .~)) <$> childLines), end childRange)
+        childLines :: Has f => ([Line (Either Range (f (Term String Info)))], Int) -> f (Term String Info) -> ([Line (Either Range (f (Term String Info)))], Int)
+        childLines (lines, previous) child = let (childLines, childRange) = splitTermByLines (get child) source in
+          (adjoin $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap (Right . (<$ child)) <$> childLines), end childRange)
 
 splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax String (Diff String Info) -> [Row (SplitDiff String Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
@@ -189,8 +189,8 @@ openRange source range = case (source `at`) <$> maybeLastIndex range of
   Just '\n' -> Nothing
   _ -> Just range
 
-openTerm :: HasTerm a -> Source Char -> MaybeOpen a
-openTerm lens source term = const term <$> openRange source (case term ^. lens of (Info range _ :< _) -> range)
+openTerm :: Has f => Source Char -> MaybeOpen (f (Term String Info))
+openTerm source term = const term <$> openRange source (case get term of (Info range _ :< _) -> range)
 
 openDiff :: Has f => Source Char -> MaybeOpen (f (SplitDiff String Info))
 openDiff source diff = const diff <$> case get diff of
