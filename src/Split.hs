@@ -140,15 +140,6 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
         childLines lens (lines, previous) child = let (childLines, childRange) = splitTermByLines (child ^. lens) source in
           (adjoin lens $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap (Right . (child &) . (lens .~)) <$> childLines), end childRange)
 
-class Functor f => HasDiff f where
-  getDiff :: f (Diff String Info) -> Diff String Info
-
-instance HasDiff Identity where
-  getDiff = runIdentity
-
-instance HasDiff ((,) String) where
-  getDiff = snd
-
 splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax String (Diff String Info) -> [Row (SplitDiff String Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> fmap (Free . (`Annotated` Leaf a)) <$> contextRows ranges categories sources
