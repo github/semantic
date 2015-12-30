@@ -115,4 +115,4 @@ spec = do
 
       openMaybe :: Maybe a -> Maybe (Maybe a)
       openMaybe (Just a) = Just (Just a)
-      openMaybe Nothing =  Nothing
+      openMaybe Nothing = Nothing
