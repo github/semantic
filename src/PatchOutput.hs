@@ -29,8 +29,8 @@ showChange sources change = concat (showLine ' ' (snd sources) . unRight <$> con
 
 showRow :: Eq leaf => (Source Char, Source Char) -> Row (SplitDiff leaf Info) -> String
 showRow sources (Row lineA lineB) = if lineA == lineB
-  then showLine ' ' (snd sources) lineB
-  else showLine '-' (fst sources) lineA ++ showLine '+' (snd sources) lineB
+  then ' ' : lineString (snd sources) lineB
+  else '-' : lineString (fst sources) lineA ++ '+' : lineString (snd sources) lineB
 
 lineString :: Source Char -> Line (SplitDiff leaf Info) -> String
 lineString source line = toString . (`slice` source) . unionRanges $ getRange <$> unLine line
