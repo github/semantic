@@ -78,7 +78,7 @@ nextHunk start rows = case nextChange start rows of
 nextChange :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe ((Sum Int, Sum Int), Change (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextChange start rows = case changes of
   [] -> Nothing
-  _ -> Just (start, Change (takeLast 3 leadingRows) changes, afterChanges)
+  _ -> Just (start <> mconcat (rowLength <$> leadingRows), Change (takeLast 3 leadingRows) changes, afterChanges)
   where (leadingRows, afterLeadingContext) = Prelude.break rowHasChanges rows
         (changes, afterChanges) = span rowHasChanges afterLeadingContext
 
