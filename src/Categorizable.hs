@@ -3,10 +3,9 @@ module Categorizable where
 import Term
 import Control.Comonad.Cofree
 import Data.Set
-import qualified Data.Text as T
 
 class Categorizable a where
-  categories :: a -> Set T.Text
+  categories :: a -> Set String
 
 instance Categorizable annotation => Categorizable (Term a annotation) where
   categories (annotation :< _) = categories annotation
