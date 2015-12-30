@@ -91,6 +91,13 @@ nextChange start rows = case changes of
         (changes, afterChanges) = span rowHasChanges afterLeadingContext
         (skippedContext, leadingContext) = splitAt (max (length leadingRows - 3) 0) leadingRows
 
+changeIncludingContext :: [Row (SplitDiff a Info)] -> Maybe (Change (SplitDiff a Info), [Row (SplitDiff a Info)])
+changeIncludingContext rows = case changes of
+  [] -> Nothing
+  _ -> Just (Change leadingContext changes, afterChanges)
+  where (leadingContext, afterLeadingContext) = Prelude.break rowHasChanges rows
+        (changes, afterChanges) = span rowHasChanges afterLeadingContext
+
 rowHasChanges :: Row (SplitDiff a Info) -> Bool
 rowHasChanges (Row left right) = lineHasChanges left || lineHasChanges right
 
