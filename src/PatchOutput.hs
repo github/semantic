@@ -71,9 +71,16 @@ hunksInRows start rows = case nextHunk start rows of
   Just (hunk, rest) -> hunk : hunksInRows (offset hunk <> hunkLength hunk) rest
 
 nextHunk :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe (Hunk (SplitDiff a Info), [Row (SplitDiff a Info)])
-nextHunk start rows = case nextChange start rows of
+nextHunk start rows = case contiguousChanges start rows of
   Nothing -> Nothing
-  Just (offset, change, rest) -> Just (Hunk offset [ change ] (take 3 rest), drop 3 rest)
+  Just (offset, changes, rest) -> Just (Hunk offset changes $ take 3 rest, drop 3 rest)
+  where contiguousChanges start rows = case nextChange start rows of
+          Nothing -> Nothing
+          Just (offset, change, rest) -> if any rowHasChanges $ take 7 rest
+              then case contiguousChanges offset rest of
+                Nothing -> Just (offset, [ change ], rest)
+                Just (_, changes, rest) -> Just (offset, change : changes, rest)
+              else Just (offset, [ change ], rest)
 
 nextChange :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe ((Sum Int, Sum Int), Change (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextChange start rows = case changes of
