@@ -81,10 +81,10 @@ nextHunk start rows = case nextChange start rows of
             Just (change, rest) -> let (changes, rest') = contiguousChanges rest in (change : changes, rest')
 
 nextChange :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe ((Sum Int, Sum Int), Change (SplitDiff a Info), [Row (SplitDiff a Info)])
-nextChange start rows = case changeIncludingContext leadingContext changes of
+nextChange start rows = case changeIncludingContext leadingContext afterLeadingContext of
   Nothing -> Nothing
   Just (change, afterChanges) -> Just (start <> mconcat (rowLength <$> skippedContext), change, afterChanges)
-  where (leadingRows, changes) = break rowHasChanges rows
+  where (leadingRows, afterLeadingContext) = break rowHasChanges rows
         (skippedContext, leadingContext) = splitAt (max (length leadingRows - 3) 0) leadingRows
 
 changeIncludingContext :: [Row (SplitDiff a Info)] -> [Row (SplitDiff a Info)] -> Maybe (Change (SplitDiff a Info), [Row (SplitDiff a Info)])
