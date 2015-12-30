@@ -218,8 +218,8 @@ openRange source range = case (source `at`) <$> maybeLastIndex range of
 openTerm :: HasTerm a -> Source Char -> MaybeOpen a
 openTerm lens source term = const term <$> openRange source (case term ^. lens of (Info range _ :< _) -> range)
 
-openDiff :: HasSplitDiff a => Source Char -> MaybeOpen a
-openDiff source diff = const diff <$> case getSplitDiff diff of
+openDiff :: Has f => Source Char -> MaybeOpen (f (SplitDiff String Info))
+openDiff source diff = const diff <$> case get diff of
   (Free (Annotated (Info range _) _)) -> openRange source range
   (Pure (Info range _ :< _)) -> openRange source range
 
