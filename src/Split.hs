@@ -146,8 +146,8 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Keyed children -> wrapRowContents (wrap (Keyed . Map.fromList) (fst categories)) (wrap (Keyed . Map.fromList) (snd categories)) <$> adjoinChildRows (Map.toList children)
   where contextRows :: (Range, Range) -> (Set.Set Category, Set.Set Category) -> (Source Char, Source Char) -> [Row Info]
         contextRows ranges categories sources = zipWithDefaults Row EmptyLine EmptyLine
-          (contextLines (fst ranges) (fst categories) (fst sources))
-          (contextLines (snd ranges) (snd categories) (snd sources))
+          (pure . (`Info` fst categories) <$> actualLineRanges (fst ranges) (fst sources))
+          (pure . (`Info` snd categories) <$> actualLineRanges (snd ranges) (snd sources))
 
         adjoin :: Has f => [Row (Either Info (f (SplitDiff String Info)))] -> [Row (Either Info (f (SplitDiff String Info)))]
         adjoin = reverse . foldl (adjoinRowsBy (openEither (openInfo $ fst sources) (openDiff $ fst sources)) (openEither (openInfo $ snd sources) (openDiff $ snd sources))) []
