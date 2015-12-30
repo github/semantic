@@ -22,20 +22,20 @@ data Change a = Change { context :: [Row a], contents :: [Row a] }
   deriving (Eq, Show)
 
 showHunk :: Eq a => (Source Char, Source Char) -> Hunk (SplitDiff a Info) -> String
-showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk) ++ concat ((' ' :) . lineString (snd sources) . unRight <$> trailingContext hunk)
+showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk) ++ concat ((' ' :) . showLine (snd sources) . unRight <$> trailingContext hunk)
 
 showChange :: Eq a => (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
-showChange sources change = concat ((' ' :) . lineString (snd sources) . unRight <$> context change) ++ concat (showRow sources <$> contents change)
+showChange sources change = concat ((' ' :) . showLine (snd sources) . unRight <$> context change) ++ concat (showRow sources <$> contents change)
 
 showRow :: Eq leaf => (Source Char, Source Char) -> Row (SplitDiff leaf Info) -> String
 showRow sources (Row lineA lineB) = if stringA == stringB
   then ' ' : stringB
   else '-' : stringA ++ '+' : stringB
-  where stringA = lineString (fst sources) lineA
-        stringB = lineString (snd sources) lineB
+  where stringA = showLine (fst sources) lineA
+        stringB = showLine (snd sources) lineB
 
-lineString :: Source Char -> Line (SplitDiff leaf Info) -> String
-lineString source line = toString . (`slice` source) . unionRanges $ getRange <$> unLine line
+showLine :: Source Char -> Line (SplitDiff leaf Info) -> String
+showLine source line = toString . (`slice` source) . unionRanges $ getRange <$> unLine line
 
 getRange :: SplitDiff leaf Info -> Range
 getRange (Free (Annotated (Info range _) _)) = range
