@@ -22,10 +22,10 @@ data Change a = Change { context :: [Row a], contents :: [Row a] }
   deriving (Eq, Show)
 
 showHunk :: Eq a => (Source Char, Source Char) -> Hunk (SplitDiff a Info) -> String
-showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk) ++ concat ((' ' :) . showLine (snd sources) . unRight <$> trailingContext hunk)
+showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk) ++ concat (showRow sources <$> trailingContext hunk)
 
 showChange :: Eq a => (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
-showChange sources change = concat ((' ' :) . showLine (snd sources) . unRight <$> context change) ++ concat (showRow sources <$> contents change)
+showChange sources change = concat (showRow sources <$> context change) ++ concat (showRow sources <$> contents change)
 
 showRow :: Eq leaf => (Source Char, Source Char) -> Row (SplitDiff leaf Info) -> String
 showRow sources (Row lineA lineB) = if stringA == stringB
