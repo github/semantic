@@ -137,6 +137,9 @@ class HasDiff a where
 instance HasDiff (Diff String Info) where
   getDiff = id
 
+instance HasDiff (String, Diff String Info) where
+  getDiff = snd
+
 class HasSplitDiff a where
   getSplitDiff :: a -> SplitDiff String Info
   setSplitDiff :: a -> SplitDiff String Info -> a
