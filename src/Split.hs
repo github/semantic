@@ -116,15 +116,15 @@ instance Has ((,) a) where
 splitTermByLines :: Term String Info -> Source Char -> ([Line (Term String Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
   Leaf a -> pure . (:< Leaf a) . (`Info` categories) <$> actualLineRanges range source
-  Indexed children -> wrapLineContents (wrap $ Indexed . fmap get) <$> adjoinChildLines (Identity <$> children)
-  Fixed children -> wrapLineContents (wrap $ Fixed . fmap get) <$> adjoinChildLines (Identity <$> children)
-  Keyed children -> wrapLineContents (wrap $ Keyed . Map.fromList) <$> adjoinChildLines (Map.toList children)
+  Indexed children -> adjoinChildLines (Indexed . fmap get) (Identity <$> children)
+  Fixed children -> adjoinChildLines (Fixed . fmap get) (Identity <$> children)
+  Keyed children -> adjoinChildLines (Keyed . Map.fromList) (Map.toList children)
   where adjoin :: Has f => [Line (Either Range (f (Term String Info)))] -> [Line (Either Range (f (Term String Info)))]
         adjoin = reverse . foldl (adjoinLinesBy $ openEither (openRange source) (openTerm source)) []
 
-        adjoinChildLines :: Has f => [f (Term String Info)] -> [Line (Either Range (f (Term String Info)))]
-        adjoinChildLines children = let (lines, previous) = foldl childLines ([], start range) children in
-          adjoin $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ end range) source)
+        adjoinChildLines :: Has f => ([f (Term String Info)] -> Syntax String (Term String Info)) -> [f (Term String Info)] -> [Line (Term String Info)]
+        adjoinChildLines constructor children = let (lines, previous) = foldl childLines ([], start range) children in
+          fmap (wrapLineContents $ wrap constructor) . adjoin $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ end range) source)
 
         wrap :: Has f => ([f (Term String Info)] -> Syntax String (Term String Info)) -> [Either Range (f (Term String Info))] -> Term String Info
         wrap constructor children = (Info (unionRanges $ getRange <$> children) categories :<) . constructor $ rights children
