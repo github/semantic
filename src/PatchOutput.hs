@@ -38,7 +38,7 @@ lineLength EmptyLine = 0
 lineLength _ = 1
 
 showHunk :: (Source Char, Source Char) -> Hunk (SplitDiff a Info) -> String
-showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk) ++ concat (showRow sources <$> trailingContext hunk)
+showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (unRight <$> trailingContext hunk)
 
 showChange :: (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
 showChange sources change = showLines (snd sources) ' ' (unRight <$> context change) ++ showLines (fst sources) '-' (unLeft <$> contents change) ++ showLines (snd sources) '+' (unRight <$> contents change)
