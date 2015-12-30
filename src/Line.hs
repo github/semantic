@@ -18,18 +18,24 @@ unLine :: Line a -> [a]
 unLine EmptyLine = []
 unLine (Line elements) = Vector.toList elements
 
+wrapLineContents :: ([a] -> b) -> Line a -> Line b
+wrapLineContents _ EmptyLine = EmptyLine
+wrapLineContents transform line = makeLine [ transform (unLine line) ]
+
 maybeFirst :: Foldable f => f a -> Maybe a
 maybeFirst = foldr (const . Just) Nothing
 
 maybeLast :: Vector.Vector a -> Maybe a
 maybeLast vector = if Vector.null vector then Nothing else Just $ Vector.last vector
 
-openLineBy :: (a -> Maybe a) -> [Line a] -> Maybe (Line a)
+type MaybeOpen a = a -> Maybe a
+
+openLineBy :: MaybeOpen a -> [Line a] -> Maybe (Line a)
 openLineBy _ [] = Nothing
 openLineBy f (EmptyLine : rest) = openLineBy f rest
 openLineBy f (line@(Line vector) : _) = const line <$> (f =<< maybeLast vector)
 
-adjoinLinesBy :: (a -> Maybe a) -> [Line a] -> Line a -> [Line a]
+adjoinLinesBy :: MaybeOpen a -> [Line a] -> Line a -> [Line a]
 adjoinLinesBy _ [] line = [line]
 adjoinLinesBy f (EmptyLine : xs) line | Just _ <- openLineBy f xs = EmptyLine : adjoinLinesBy f xs line
 adjoinLinesBy f (prev:rest) line | Just _ <- openLineBy f [ prev ] = (prev <> line) : rest
@@ -44,6 +50,10 @@ intercalate separator elements = concatMap Foldable.toList $ intersperse separat
 instance Show a => Show (Line a) where
   show (Line elements) = "[" ++ intercalate ", " (show <$> elements) ++ "]"
   show EmptyLine = "EmptyLine"
+
+instance Applicative Line where
+  pure = makeLine . (:[])
+  a <*> b = makeLine $ unLine a <*> unLine b
 
 instance Monoid (Line a) where
   mempty = EmptyLine

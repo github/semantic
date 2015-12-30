@@ -9,6 +9,7 @@ import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
 import Diff
 import qualified Data.Maybe as Maybe
+import Data.Functor.Identity
 import Source hiding ((++))
 import Line
 import Row
@@ -78,26 +79,26 @@ spec = do
   describe "splitTermByLines" $ do
     prop "preserves line count" $
       \ source -> let range = getTotalRange source in
-        splitTermByLines (Info range mempty :< Leaf source) source `shouldBe` (makeLine . (:[]) . (:< Leaf source) . (`Info` mempty) <$> actualLineRanges range source, range)
+        splitTermByLines (Info range mempty :< Leaf source) source `shouldBe` (pure . (:< Leaf source) . (`Info` mempty) <$> actualLineRanges range source, range)
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
-      openLineBy (openTerm $ fromList "\n ") [
-        makeLine [ Info (Range 1 2) mempty :< Leaf "" ],
-        makeLine [ Info (Range 0 1) mempty :< Leaf "" ]
-      ] `shouldBe` (Just $ makeLine [ Info (Range 1 2) mempty :< Leaf "" ])
+      openLineBy openMaybe [
+        pure (Just True),
+        pure (Just False)
+      ] `shouldBe` (Just $ pure $ Just True)
 
     it "returns Nothing if the earliest non-empty line is closed" $
-      openLineBy (openTerm $ fromList "\n") [
-        makeLine [ Info (Range 0 1) mempty :< Leaf "" ]
+      openLineBy openMaybe [
+        pure Nothing, pure (Just True)
       ] `shouldBe` Nothing
 
   describe "openTerm" $ do
     it "returns Just the term if its substring does not end with a newline" $
-      let term = Info (Range 0 2) mempty :< Leaf "" in openTerm (fromList "  ") term `shouldBe` Just term
+      let term = Info (Range 0 2) mempty :< Leaf "" in openTerm (fromList "  ") (Identity term) `shouldBe` Just (Identity term)
 
     it "returns Nothing for terms whose substring ends with a newline" $
-      openTerm (fromList " \n") (Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
+      openTerm (fromList " \n") (Identity $ Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
 
     where
       isOpenBy f (Row a b) = Maybe.isJust (openLineBy f [ a ]) && Maybe.isJust (openLineBy f [ b ])
@@ -114,4 +115,4 @@ spec = do
 
       openMaybe :: Maybe Bool -> Maybe (Maybe Bool)
       openMaybe (Just a) = Just (Just a)
-      openMaybe Nothing =  Nothing
+      openMaybe Nothing = Nothing

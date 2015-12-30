@@ -45,5 +45,12 @@ maybeLastIndex :: Range -> Maybe Int
 maybeLastIndex (Range start end) | start == end = Nothing
 maybeLastIndex (Range _ end) = Just $ end - 1
 
+unionRanges :: [Range] -> Range
+unionRanges ranges = fromMaybe mempty . foldl mappend Nothing $ Just <$> ranges
+
 instance Ord Range where
   a <= b = start a <= start b
+
+instance Monoid Range where
+  mempty = Range 0 0
+  mappend (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
