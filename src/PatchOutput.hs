@@ -25,10 +25,12 @@ showHunk :: Eq a => (Source Char, Source Char) -> Hunk (SplitDiff a Info) -> Str
 showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk)
 
 showChange :: Eq a => (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
-showChange sources change = concat (showLine ' ' (snd sources) . unRight <$> context change) ++ concat (showRow <$> contents change)
-  where showRow (Row lineA lineB) = if lineA == lineB
-          then showLine ' ' (snd sources) lineB
-          else showLine '-' (fst sources) lineA ++ showLine '+' (snd sources) lineB
+showChange sources change = concat (showLine ' ' (snd sources) . unRight <$> context change) ++ concat (showRow sources <$> contents change)
+
+showRow :: Eq leaf => (Source Char, Source Char) -> Row (SplitDiff leaf Info) -> String
+showRow sources (Row lineA lineB) = if lineA == lineB
+  then showLine ' ' (snd sources) lineB
+  else showLine '-' (fst sources) lineA ++ showLine '+' (snd sources) lineB
 
 showLine :: Char -> Source Char -> Line (SplitDiff leaf Info) -> String
 showLine _ _ EmptyLine = ""
