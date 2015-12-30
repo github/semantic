@@ -113,6 +113,6 @@ spec = do
 
       leafWithRangesInSources sourceA sourceB rangeA rangeB = Free $ Annotated (Info rangeA mempty, Info rangeB mempty) (Leaf $ toList sourceA ++ toList sourceB)
 
-      openMaybe :: Maybe a -> Maybe (Maybe a)
+      openMaybe :: Maybe Bool -> Maybe (Maybe Bool)
       openMaybe (Just a) = Just (Just a)
       openMaybe Nothing = Nothing
