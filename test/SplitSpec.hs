@@ -30,9 +30,9 @@ instance Arbitrary a => Arbitrary (Line a) where
 instance Arbitrary a => Arbitrary (Source a) where
   arbitrary = fromList <$> arbitrary
 
-arbitraryLeaf :: Gen (Source Char, Info, Syntax String f)
+arbitraryLeaf :: Gen (Source Char, Info, Syntax (Source Char) f)
 arbitraryLeaf = toTuple <$> arbitrary
-  where toTuple source = (source, Info (Range 0 $ length source) mempty, Leaf (toString source))
+  where toTuple string = (string, Info (Range 0 $ length string) mempty, Leaf string)
 
 spec :: Spec
 spec = do
@@ -40,7 +40,7 @@ spec = do
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
         \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (source, source) (range, range) (categories, categories) syntax `shouldBe` [
-          Row (makeLine [ Free $ Annotated info $ Leaf (toString source) ]) (makeLine [ Free $ Annotated info $ Leaf (toString source) ]) ]
+          Row (makeLine [ Free $ Annotated info $ Leaf source ]) (makeLine [ Free $ Annotated info $ Leaf source ]) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
@@ -79,7 +79,7 @@ spec = do
   describe "splitTermByLines" $ do
     prop "preserves line count" $
       \ source -> let range = getTotalRange source in
-        splitTermByLines (Info range mempty :< Leaf (toString source)) source `shouldBe` (pure . (:< Leaf (toString source)) . (`Info` mempty) <$> actualLineRanges range source, range)
+        splitTermByLines (Info range mempty :< Leaf source) source `shouldBe` (pure . (:< Leaf source) . (`Info` mempty) <$> actualLineRanges range source, range)
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
