@@ -9,8 +9,10 @@ import Range
 import Row
 import Source hiding ((++))
 import Split
+import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad.Free
+import Data.Monoid
 
 patch :: Diff a Info -> Source Char -> Source Char -> String
 patch diff sourceA sourceB = mconcat $ showHunk (sourceA, sourceB) <$> hunks diff (sourceA, sourceB)
@@ -20,6 +22,9 @@ data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a], trai
 
 data Change a = Change { context :: [Row a], contents :: [Row a] }
   deriving (Eq, Show)
+
+changeLength :: Change a -> (Int, Int)
+changeLength change = getSum *** getSum $ mconcat $ (rowLength <$> context change) <> (rowLength <$> contents change)
 
 rowLength :: Row a -> (Sum Int, Sum Int)
 rowLength (Row a b) = (lineLength a, lineLength b)
