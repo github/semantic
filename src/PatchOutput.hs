@@ -21,6 +21,9 @@ data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a], trai
 data Change a = Change { context :: [Row a], contents :: [Row a] }
   deriving (Eq, Show)
 
+rowLength :: Row a -> (Sum Int, Sum Int)
+rowLength (Row a b) = (lineLength a, lineLength b)
+
 lineLength :: Line a -> Sum Int
 lineLength EmptyLine = 0
 lineLength _ = 1
