@@ -23,8 +23,8 @@ data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a], trai
 data Change a = Change { context :: [Row a], contents :: [Row a] }
   deriving (Eq, Show)
 
-changeLength :: Change a -> (Int, Int)
-changeLength change = getSum *** getSum $ mconcat $ (rowLength <$> context change) <> (rowLength <$> contents change)
+changeLength :: Change a -> (Sum Int, Sum Int)
+changeLength change = mconcat $ (rowLength <$> context change) <> (rowLength <$> contents change)
 
 rowLength :: Row a -> (Sum Int, Sum Int)
 rowLength (Row a b) = (lineLength a, lineLength b)
