@@ -44,14 +44,14 @@ showChange sources change = concat (showRow sources <$> context change) ++ conca
 
 showRow :: (Source Char, Source Char) -> Row (SplitDiff leaf Info) -> String
 showRow sources (Row lineA lineB) = if stringA == stringB
-  then ' ' : stringB
-  else '-' : stringA ++ '+' : stringB
+  then maybe "" (' ' :) stringB
+  else maybe "" ('-' :) stringA ++ maybe "" ('+' :) stringB
   where stringA = showLine (fst sources) lineA
         stringB = showLine (snd sources) lineB
 
-showLine :: Source Char -> Line (SplitDiff leaf Info) -> String
-showLine _ EmptyLine = ""
-showLine source line = toString . (`slice` source) . unionRanges $ getRange <$> unLine line
+showLine :: Source Char -> Line (SplitDiff leaf Info) -> Maybe String
+showLine _ EmptyLine = Nothing
+showLine source line = Just . toString . (`slice` source) . unionRanges $ getRange <$> unLine line
 
 getRange :: SplitDiff leaf Info -> Range
 getRange (Free (Annotated (Info range _) _)) = range
