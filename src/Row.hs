@@ -5,7 +5,10 @@ import Line
 data Row a = Row { unLeft :: !(Line a), unRight :: !(Line a) }
   deriving (Eq, Functor)
 
-adjoinRowsBy :: (a -> Maybe a) -> (a -> Maybe a) -> [Row a] -> Row a -> [Row a]
+wrapRowContents :: ([a] -> b) -> ([a] -> b) -> Row a -> Row b
+wrapRowContents transformLeft transformRight (Row left right) = Row (wrapLineContents transformLeft left) (wrapLineContents transformRight right)
+
+adjoinRowsBy :: MaybeOpen a -> MaybeOpen a -> [Row a] -> Row a -> [Row a]
 adjoinRowsBy _ _ [] row = [row]
 
 adjoinRowsBy f g rows (Row left' right') | Just _ <- openLineBy f $ unLeft <$> rows, Just _ <- openLineBy g $ unRight <$> rows = zipWith Row lefts rights
