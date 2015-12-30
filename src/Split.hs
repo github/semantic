@@ -17,7 +17,6 @@ import qualified Text.Blaze.Html5.Attributes as A
 import Text.Blaze.Html.Renderer.Utf8
 import Data.Either
 import Data.Functor.Identity
-import Data.Maybe
 import Data.Monoid
 import qualified OrderedMap as Map
 import qualified Data.Set as Set
@@ -128,7 +127,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
           adjoin $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ end range) source)
 
         wrap :: Has f => ([f (Term String Info)] -> Syntax String (Term String Info)) -> [Either Range (f (Term String Info))] -> Term String Info
-        wrap constructor children = (Info (fromMaybe mempty $ foldl (<>) Nothing $ Just . getRange <$> children) categories :<) . constructor $ rights children
+        wrap constructor children = (Info (unionRanges $ getRange <$> children) categories :<) . constructor $ rights children
 
         getRange :: Has f => Either Range (f (Term String Info)) -> Range
         getRange (Right term) = case get term of (Info range _ :< _) -> range
@@ -157,7 +156,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
           adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (ends ranges)) categories sources)
 
         wrap :: Has f => ([f (SplitDiff String Info)] -> Syntax leaf (SplitDiff leaf Info)) -> Set.Set Category -> [Either Info (f (SplitDiff String Info))] -> SplitDiff leaf Info
-        wrap constructor categories children = Free . Annotated (Info (fromMaybe mempty $ foldl (<>) Nothing $ Just . getRange <$> children) categories) . constructor $ rights children
+        wrap constructor categories children = Free . Annotated (Info (unionRanges $ getRange <$> children) categories) . constructor $ rights children
 
         getRange :: Has f => Either Info (f (SplitDiff String Info)) -> Range
         getRange (Right diff) = case get diff of
