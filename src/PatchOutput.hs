@@ -15,7 +15,7 @@ import Control.Monad.Free
 patch :: Eq a => Diff a Info -> Source Char -> Source Char -> String
 patch diff sourceA sourceB = mconcat $ showHunk sourceA sourceB <$> hunks diff sourceA sourceB
 
-data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a] }
+data Hunk a = Hunk { offsetA :: Int, offsetB :: Int, changes :: [Change a], trailingContext :: [Row a] }
   deriving (Eq, Show)
 
 data Change a = Change { context :: [Row a], contents :: [Row a] }
@@ -48,7 +48,7 @@ hunksInRows rows = case nextHunk rows of
 nextHunk :: [Row (SplitDiff a Info)] -> Maybe (Hunk (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextHunk rows = case nextChange rows of
   Nothing -> Nothing
-  Just (change, rest) -> Just (Hunk 0 0 [ change ], rest)
+  Just (change, rest) -> Just (Hunk 0 0 [ change ] (take 3 rest), drop 3 rest)
 
 nextChange :: [Row (SplitDiff a Info)] -> Maybe (Change (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextChange rows = case changes of
