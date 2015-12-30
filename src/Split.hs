@@ -131,13 +131,13 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
         childLines lens (lines, previous) child = let (childLines, childRange) = splitTermByLines (child ^. lens) source in
           (adjoin lens $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap (Right . (child &) . (lens .~)) <$> childLines), end childRange)
 
-class HasDiff a where
-  getDiff :: a -> Diff String Info
+class Functor f => HasDiff f where
+  getDiff :: f (Diff String Info) -> Diff String Info
 
-instance HasDiff (Diff String Info) where
-  getDiff = id
+instance HasDiff Identity where
+  getDiff = runIdentity
 
-instance HasDiff (String, Diff String Info) where
+instance HasDiff ((,) String) where
   getDiff = snd
 
 class HasSplitDiff a where
