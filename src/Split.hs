@@ -17,6 +17,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import Text.Blaze.Html.Renderer.Text
 import Data.Either
+import Data.Foldable
 import Data.Functor.Identity
 import Data.Monoid
 import qualified OrderedMap as Map
