@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 module ArbitraryTerm where
 
 import Categorizable
