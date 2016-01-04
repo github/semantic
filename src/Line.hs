@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveFunctor, DeriveFoldable, FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
 module Line where
 
 import qualified Data.Foldable as Foldable

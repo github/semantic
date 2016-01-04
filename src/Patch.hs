@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveFunctor #-}
 module Patch where
 
 data Patch a =

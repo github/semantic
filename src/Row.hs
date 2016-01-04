@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveFunctor #-}
 module Row where
 
 import Line
