@@ -6,6 +6,7 @@ import Interpreter
 import qualified Parsers as P
 import Syntax
 import Range
+import qualified PatchOutput
 import Split
 import Term
 import Unified
@@ -21,13 +22,14 @@ import qualified System.IO as IO
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
 
-data Renderer = Unified | Split
+data Renderer = Unified | Split | Patch
 
 data Argument = Argument { renderer :: Renderer, output :: Maybe FilePath, sourceA :: FilePath, sourceB :: FilePath }
 
 arguments :: Parser Argument
 arguments = Argument
   <$> (flag Split Unified (long "unified" <> help "output a unified diff")
+  <|> flag Split Patch (long "patch" <> help "output a patch(1)-compatible diff")
   <|> flag' Split (long "split" <> help "output a split diff"))
   <*> (optional $ strOption (long "output" <> short 'o' <> help "output directory for split diffs, defaulting to stdout if unspecified"))
   <*> strArgument (metavar "FILE a")
@@ -55,6 +57,8 @@ main = do
             isDir <- doesDirectoryExist path
             IO.withFile (if isDir then path </> (takeFileName sourceBPath -<.> ".html") else path) IO.WriteMode (write rendered)
           Nothing -> TextIO.putStr rendered
+      Patch -> do
+        putStr $ PatchOutput.patch diff aContents bContents
     where
     opts = info (helper <*> arguments)
       (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")

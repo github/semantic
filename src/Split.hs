@@ -18,6 +18,7 @@ import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import Text.Blaze.Html.Renderer.Text
 import Data.Either
+import Data.Foldable
 import Data.Functor.Identity
 import Data.Monoid
 import qualified OrderedMap as Map
@@ -39,7 +40,7 @@ split diff before after = return . renderHtml
         . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
     rows = fst (splitDiffByLines diff (0, 0) (before, after))
-    numbered = foldl numberRows [] rows
+    numbered = foldl' numberRows [] rows
     maxNumber = case numbered of
       [] -> 0
       ((x, _, y, _) : _) -> max x y
@@ -81,7 +82,7 @@ instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
     where markupForSeparatorAndChild :: ToMarkup f => ([Markup], Int) -> (f, Range) -> ([Markup], Int)
           markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string  (toString $ slice (Range previous $ start $ snd child) source), toMarkup $ fst child ], end $ snd child)
 
-          contentElements children = let (elements, previous) = foldl markupForSeparatorAndChild ([], start range) children in
+          contentElements children = let (elements, previous) = foldl' markupForSeparatorAndChild ([], start range) children in
             elements ++ [ string . toString $ slice (Range previous $ end range) source ]
 
 instance ToMarkup (Renderable (Term a Info)) where
