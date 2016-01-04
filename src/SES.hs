@@ -14,15 +14,15 @@ type Compare a annotation = Term a annotation -> Term a annotation -> Maybe (Dif
 type Cost a annotation = Diff a annotation -> Integer
 
 ses :: Compare a annotation -> Cost a annotation -> [Term a annotation] -> [Term a annotation] -> [Diff a annotation]
-ses diffTerms cost as bs = fmap fst $ evalState diffState Map.empty where
+ses diffTerms cost as bs = fst <$> evalState diffState Map.empty where
   diffState = diffAt diffTerms cost (0, 0) as bs
 
 diffAt :: Compare a annotation -> Cost a annotation -> (Integer, Integer) -> [Term a annotation] -> [Term a annotation] -> State (Map.Map (Integer, Integer) [(Diff a annotation, Integer)]) [(Diff a annotation, Integer)]
 diffAt _ _ _ [] [] = return []
 diffAt _ cost _ [] bs = return $ foldr toInsertions [] bs where
-  toInsertions each rest = consWithCost cost (Pure . Insert $ each) rest
+  toInsertions each = consWithCost cost (Pure . Insert $ each)
 diffAt _ cost _ as [] = return $ foldr toDeletions [] as where
-  toDeletions each rest = consWithCost cost (Pure . Delete $ each) rest
+  toDeletions each = consWithCost cost (Pure . Delete $ each)
 diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
   cachedDiffs <- get
   case Map.lookup (i, j) cachedDiffs of
@@ -33,7 +33,7 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
       nomination <- fmap best $ case diffTerms a b of
         Just diff -> do
           diagonal <- recur (succ i, succ j) as bs
-          return $ [ delete down, insert right, consWithCost cost diff diagonal ]
+          return [ delete down, insert right, consWithCost cost diff diagonal ]
         Nothing -> return [ delete down, insert right ]
       cachedDiffs' <- get
       put $ Map.insert (i, j) nomination cachedDiffs'
@@ -41,9 +41,10 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
   where
     delete = consWithCost cost (Pure . Delete $ a)
     insert = consWithCost cost (Pure . Insert $ b)
-    sumCost script = sum $ snd <$> script
-    best options = minimumBy (comparing sumCost) options
+    costOf [] = 0
+    costOf ((_, c) : _) = c
+    best = minimumBy (comparing costOf)
     recur = diffAt diffTerms cost
 
 consWithCost :: Cost a annotation -> Diff a annotation -> [(Diff a annotation, Integer)] -> [(Diff a annotation, Integer)]
-consWithCost cost diff rest = (diff, cost diff + (maybe 0 snd $ fst <$> uncons rest)) : rest
+consWithCost cost diff rest = (diff, cost diff + maybe 0 snd (fst <$> uncons rest)) : rest

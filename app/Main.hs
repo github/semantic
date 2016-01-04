@@ -6,6 +6,7 @@ import Interpreter
 import qualified Parsers as P
 import Syntax
 import Range
+import qualified PatchOutput
 import Split
 import Term
 import Unified
@@ -23,13 +24,14 @@ import qualified Data.Text.ICU.Convert as Convert
 import Data.Conduit.Binary as CB
 import qualified Data.Conduit as C
 
-data Renderer = Unified | Split
+data Renderer = Unified | Split | Patch
 
 data Argument = Argument { renderer :: Renderer, output :: Maybe FilePath, sourceA :: FilePath, sourceB :: FilePath }
 
 arguments :: Parser Argument
 arguments = Argument
   <$> (flag Split Unified (long "unified" <> help "output a unified diff")
+  <|> flag Split Patch (long "patch" <> help "output a patch(1)-compatible diff")
   <|> flag' Split (long "split" <> help "output a split diff"))
   <*> (optional $ strOption (long "output" <> short 'o' <> help "output directory for split diffs, defaulting to stdout if unspecified"))
   <*> strArgument (metavar "FILE a")
@@ -64,6 +66,8 @@ printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments 
                          else path
         IO.withFile outputPath IO.WriteMode (write rendered)
       Nothing -> TextIO.putStr rendered
+  Patch -> do
+    putStr $ PatchOutput.patch diff aSource bSource
   where diff = interpret comparable aTerm bTerm
         write rendered h = TextIO.hPutStr h rendered
 
