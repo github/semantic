@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveFunctor, DeriveFoldable #-}
 module Diff where
 
 import Syntax

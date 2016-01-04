@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveFunctor #-}
 module Operation where
 
 import Diff
