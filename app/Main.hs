@@ -21,8 +21,6 @@ import qualified Data.Text.Lazy.IO as TextIO
 import qualified System.IO as IO
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
-import Data.Conduit.Binary as CB
-import qualified Data.Conduit as C
 import Data.Biapplicative
 import Data.Bifunctor.Join
 
