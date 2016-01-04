@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Categorizable where
 
 import Term

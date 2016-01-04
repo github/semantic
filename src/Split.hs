@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Split where
 
 import Prelude hiding (div, head, span)
