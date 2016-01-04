@@ -43,7 +43,6 @@ library
                      , c-storable-deriving
                      , vector
   default-language:    Haskell2010
-  default-extensions:  OverloadedStrings
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -threaded -fprof-auto "-with-rtsopts=-N -p -s -h -i0.1"
 
 executable semantic-diff-exe
@@ -62,7 +61,6 @@ executable semantic-diff-exe
                      , directory
                      , text-icu
   default-language:    Haskell2010
-  default-extensions:  OverloadedStrings
 
 executable semantic-diff-profile
   hs-source-dirs:      app
@@ -82,7 +80,6 @@ executable semantic-diff-profile
                      , text >= 1.2.1.3
                      , directory
                      , text-icu
-  default-extensions:  OverloadedStrings
   default-language:    Haskell2010
 
 test-suite semantic-diff-test
@@ -100,7 +97,6 @@ test-suite semantic-diff-test
                      , quickcheck-text
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
-  default-extensions:  OverloadedStrings
 
 source-repository head
   type:     git
