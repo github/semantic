@@ -5,6 +5,9 @@ import Line
 data Row a = Row { unLeft :: !(Line a), unRight :: !(Line a) }
   deriving (Eq, Functor)
 
+unRow :: Row a -> (Line a, Line a)
+unRow (Row a b) = (a, b)
+
 wrapRowContents :: ([a] -> b) -> ([a] -> b) -> Row a -> Row b
 wrapRowContents transformLeft transformRight (Row left right) = Row (wrapLineContents transformLeft left) (wrapLineContents transformRight right)
 
