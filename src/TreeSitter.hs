@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveGeneric #-}
 module TreeSitter where
 
 import Diff
