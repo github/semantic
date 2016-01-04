@@ -6,3 +6,4 @@ xcuserdata
 *.xccheckout
 .stack-work
 semantic-diff-profile.*
+tags
