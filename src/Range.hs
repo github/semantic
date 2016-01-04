@@ -45,7 +45,7 @@ maybeLastIndex :: Range -> Maybe Int
 maybeLastIndex (Range start end) | start == end = Nothing
 maybeLastIndex (Range _ end) = Just $ end - 1
 
-unionRanges :: [Range] -> Range
+unionRanges :: (Functor f, Foldable f) => f Range -> Range
 unionRanges ranges = fromMaybe mempty . foldl mappend Nothing $ Just <$> ranges
 
 instance Ord Range where
