@@ -21,6 +21,8 @@ import qualified Data.Text.Lazy.IO as TextIO
 import qualified System.IO as IO
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
+import Data.Biapplicative
+import Data.Bifunctor.Join
 
 data Renderer = Unified | Split | Patch
 
@@ -39,30 +41,33 @@ main :: IO ()
 main = do
   arguments <- execParser opts
   let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
-  aContents <- readAndTranscodeFile sourceAPath
-  bContents <- readAndTranscodeFile sourceBPath
-  (aTerm, bTerm) <- let parse = (P.parserForType . T.pack . takeExtension) sourceAPath in do
-    aTerm <- parse aContents
-    bTerm <- parse bContents
-    return (replaceLeavesWithWordBranches aContents aTerm, replaceLeavesWithWordBranches bContents bTerm)
-  let diff = interpret comparable aTerm bTerm in
-    case renderer arguments of
-      Unified -> do
-        rendered <- unified diff aContents bContents
-        B1.putStr rendered
-      Split -> do
-        rendered <- split diff aContents bContents
-        case output arguments of
-          Just path -> do
-            isDir <- doesDirectoryExist path
-            IO.withFile (if isDir then path </> (takeFileName sourceBPath -<.> ".html") else path) IO.WriteMode (write rendered)
-          Nothing -> TextIO.putStr rendered
-      Patch -> do
-        putStr $ PatchOutput.patch diff aContents bContents
-    where
-    opts = info (helper <*> arguments)
-      (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
-    write rendered h = TextIO.hPutStr h rendered
+  sources <- sequence $ readAndTranscodeFile <$> Join (sourceAPath, sourceBPath)
+  let parse = (P.parserForType . T.pack . takeExtension) sourceAPath
+  terms <- sequence $ parse <$> sources
+  let replaceLeaves = replaceLeavesWithWordBranches <$> sources
+  printDiff arguments (runJoin sources) (runJoin $ replaceLeaves <*> terms)
+  where opts = info (helper <*> arguments)
+          (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
+
+printDiff :: Argument -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
+printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments of
+  Unified -> do
+    rendered <- unified diff aSource bSource
+    B1.putStr rendered
+  Split -> do
+    rendered <- split diff aSource bSource
+    case output arguments of
+      Just path -> do
+        isDir <- doesDirectoryExist path
+        let outputPath = if isDir
+                         then path </> (takeFileName (sourceB arguments) -<.> ".html")
+                         else path
+        IO.withFile outputPath IO.WriteMode (write rendered)
+      Nothing -> TextIO.putStr rendered
+  Patch -> do
+    putStr $ PatchOutput.patch diff aSource bSource
+  where diff = interpret comparable aTerm bTerm
+        write rendered h = TextIO.hPutStr h rendered
 
 replaceLeavesWithWordBranches :: Source Char -> Term T.Text Info -> Term T.Text Info
 replaceLeavesWithWordBranches source = replaceIn source 0
