@@ -43,7 +43,7 @@ library
                      , c-storable-deriving
                      , vector
   default-language:    Haskell2010
-  default-extensions:  FlexibleInstances, OverloadedStrings
+  default-extensions:  OverloadedStrings
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -threaded -fprof-auto "-with-rtsopts=-N -p -s -h -i0.1"
 
 executable semantic-diff-exe
