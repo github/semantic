@@ -54,8 +54,6 @@ executable semantic-diff-exe
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , bytestring
-                     , conduit
-                     , conduit-extra >= 1.1.9.1
                      , containers
                      , directory
                      , filepath
@@ -78,8 +76,6 @@ executable semantic-diff-profile
                        "-with-rtsopts=-N -p -s -h -i0.1"
   build-depends:       base
                      , bytestring
-                     , conduit
-                     , conduit-extra >= 1.1.9.1
                      , containers
                      , directory
                      , filepath
