@@ -23,6 +23,8 @@ import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
 import Data.Conduit.Binary as CB
 import qualified Data.Conduit as C
+import Data.Biapplicative
+import Data.Bifunctor.Join
 
 data Renderer = Unified | Split | Patch
 
@@ -41,13 +43,11 @@ main :: IO ()
 main = do
   arguments <- execParser opts
   let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
-  aSource <- readAndTranscodeFile sourceAPath
-  bSource <- readAndTranscodeFile sourceBPath
-  (aTerm, bTerm) <- let parse = (P.parserForType . T.pack . takeExtension) sourceAPath in do
-    aTerm <- parse aSource
-    bTerm <- parse bSource
-    return (replaceLeavesWithWordBranches aSource aTerm, replaceLeavesWithWordBranches bSource bTerm)
-  printDiff arguments (aSource, bSource) (aTerm, bTerm)
+  sources <- sequence $ fmap readAndTranscodeFile $ Join (sourceAPath, sourceBPath)
+  let parse = (P.parserForType . T.pack . takeExtension) sourceAPath
+  terms <- sequence $ parse <$> sources
+  let replaceLeaves = replaceLeavesWithWordBranches <$> sources
+  printDiff arguments (runJoin sources) (runJoin $ replaceLeaves <*> terms)
   where opts = info (helper <*> arguments)
           (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 

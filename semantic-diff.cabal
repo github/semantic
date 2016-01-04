@@ -64,6 +64,7 @@ executable semantic-diff-exe
                      , semantic-diff
                      , text >= 1.2.1.3
                      , text-icu
+                     , bifunctors
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings
 
@@ -87,6 +88,7 @@ executable semantic-diff-profile
                      , semantic-diff
                      , text >= 1.2.1.3
                      , text-icu
+                     , bifunctors
   default-extensions:  OverloadedStrings
   default-language:    Haskell2010
 
