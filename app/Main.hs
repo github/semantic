@@ -43,7 +43,7 @@ main :: IO ()
 main = do
   arguments <- execParser opts
   let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
-  sources <- sequence $ fmap readAndTranscodeFile $ Join (sourceAPath, sourceBPath)
+  sources <- sequence $ readAndTranscodeFile <$> Join (sourceAPath, sourceBPath)
   let parse = (P.parserForType . T.pack . takeExtension) sourceAPath
   terms <- sequence $ parse <$> sources
   let replaceLeaves = replaceLeavesWithWordBranches <$> sources
