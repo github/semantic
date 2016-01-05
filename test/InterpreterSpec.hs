@@ -11,7 +11,7 @@ import Categorizable
 import Test.Hspec
 
 spec :: Spec
-spec = do
+spec = parallel $ do
   describe "interpret" $ do
     it "returns a replacement when comparing two unicode equivalent terms" $
       I.interpret comparable (Info range mempty :< Leaf "t\776") (Info range2 mempty :< Leaf "\7831") `shouldBe`

@@ -4,7 +4,7 @@ import OrderedMap as Map
 import Test.Hspec
 
 spec :: Spec
-spec = do
+spec = parallel $ do
   describe "difference" $ do
     it "should return those elements of a not in b" $
       Map.difference a b `shouldBe` (Map.fromList [ ("a", 1) ])
