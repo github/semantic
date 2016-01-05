@@ -5,7 +5,7 @@ description:         Please see README.md
 homepage:            http://github.com/github/semantic-diff#readme
 author:              Rob Rix, Josh Vera
 maintainer:          rob.rix@github.com
-copyright:           2015 GitHub
+copyright:           2016 GitHub
 category:            Web
 build-type:          Simple
 -- extra-source-files:
