@@ -7,14 +7,14 @@ spec :: Spec
 spec = parallel $ do
   describe "difference" $ do
     it "should return those elements of a not in b" $
-      Map.difference a b `shouldBe` (Map.fromList [ ("a", 1) ])
+      Map.difference a b `shouldBe` Map.fromList [ ("a", 1) ]
 
     it "is asymmetrical" $ do
       Map.difference a b `shouldNotBe` Map.difference b a
 
   describe "union" $ do
     it "should return those elements in either a or b" $
-      Map.union a b `shouldBe` (Map.fromList $ Map.toList a ++ [ ("d", -4) ])
+      Map.union a b `shouldBe` Map.fromList (Map.toList a ++ [ ("d", -4) ])
 
     it "is asymmetrical" $ do
       Map.union a b `shouldNotBe` Map.union b a
@@ -28,7 +28,7 @@ spec = parallel $ do
 
   describe "intersectionWith" $ do
     it "should return those elements in both a and b, combined with a function" $
-      Map.intersectionWith (-) a b `shouldBe` (Map.fromList [ ("b", 4), ("c", 6) ])
+      Map.intersectionWith (-) a b `shouldBe` Map.fromList [ ("b", 4), ("c", 6) ]
 
     it "is asymmetrical" $ do
       Map.intersectionWith (-) a b `shouldNotBe` Map.intersectionWith (-) b a
