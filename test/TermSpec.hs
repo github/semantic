@@ -9,9 +9,6 @@ import Interpreter
 import Diff
 import ArbitraryTerm
 
-main :: IO ()
-main = hspec spec
-
 spec :: Spec
 spec = parallel $ do
   describe "Term" $ do
