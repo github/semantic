@@ -9,7 +9,7 @@ import Control.Monad.Free
 import Test.Hspec
 
 spec :: Spec
-spec = do
+spec = parallel $ do
   describe "hunks" $ do
     it "empty diffs have no hunks" $
       hunks (Free . Annotated (Info (Range 0 0) mempty, Info (Range 0 0) mempty) $ Leaf "") (fromList "", fromList "") `shouldBe` []
