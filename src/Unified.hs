@@ -10,7 +10,7 @@ import Control.Arrow
 import Control.Monad.Free
 import Control.Comonad.Cofree
 import Data.List hiding (foldl)
-import qualified OrderedMap as Map
+import qualified Data.OrderedMap as Map
 import Rainbow
 
 unified :: Diff a Info -> Source Char -> Source Char -> IO ByteString
@@ -30,7 +30,7 @@ unified diff before after = do
       afterChunk = maybe [] (change "+" . unifiedTerm after) $ Patch.after patch
 
     unifiedTerm :: Source Char -> Term a Info -> [Chunk String]
- 
+
     unifiedTerm source term = fst $ cata (annotationAndSyntaxToChunks source) term
 
     unifiedRange :: Range -> [([Chunk String], Maybe Range)] -> Source Char -> [Chunk String]
