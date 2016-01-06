@@ -1,3 +1,4 @@
+{-# LANGUAGE RecordWildCards #-}
 module Main where
 
 import Categorizable
@@ -23,10 +24,15 @@ import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
 import Data.Biapplicative
 import Data.Bifunctor.Join
+import Git.Libgit2
+import Git.Types
+import Git.Repository
+import Data.Tagged
+import Control.Monad.Reader
 
 data Renderer = Unified | Split | Patch
 
-data Argument = Argument { renderer :: Renderer, output :: Maybe FilePath, sourceA :: FilePath, sourceB :: FilePath }
+data Argument = Argument { renderer :: Renderer, output :: Maybe FilePath, shaA :: String, shaB :: String, repoPath :: FilePath, filepath :: FilePath }
 
 arguments :: Parser Argument
 arguments = Argument
@@ -34,20 +40,39 @@ arguments = Argument
   <|> flag Split Patch (long "patch" <> help "output a patch(1)-compatible diff")
   <|> flag' Split (long "split" <> help "output a split diff"))
   <*> (optional $ strOption (long "output" <> short 'o' <> help "output directory for split diffs, defaulting to stdout if unspecified"))
-  <*> strArgument (metavar "FILE a")
-  <*> strArgument (metavar "FILE b")
+  <*> strArgument (metavar "SHA_A")
+  <*> strArgument (metavar "SHA_B")
+  <*> strArgument (metavar "REPO_PATH")
+  <*> strArgument (metavar "FILE")
 
 main :: IO ()
 main = do
-  arguments <- execParser opts
-  let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
-  sources <- sequence $ readAndTranscodeFile <$> Join (sourceAPath, sourceBPath)
-  let parse = (P.parserForType . T.pack . takeExtension) sourceAPath
+  arguments@Argument{..} <- execParser opts
+  let shas = Join (shaA, shaB)
+  sources <- sequence $ (fetchFromGitRepo repoPath filepath <$> shas)
+  let parse = (P.parserForType . T.pack . takeExtension) filepath
   terms <- sequence $ parse <$> sources
   let replaceLeaves = replaceLeavesWithWordBranches <$> sources
   printDiff arguments (runJoin sources) (runJoin $ replaceLeaves <*> terms)
   where opts = info (helper <*> arguments)
           (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
+
+fetchFromGitRepo :: FilePath ->FilePath -> String -> IO (Source Char)
+fetchFromGitRepo repoPath path sha = join $ withRepository lgFactory repoPath $ do
+    object <- unTagged <$> parseObjOid (T.pack sha)
+    commitIHope <- lookupObject object
+    commit <- case commitIHope of
+      (CommitObj commit) -> return commit
+      obj -> error $ "Expected commit SHA"
+    tree <- lookupTree (commitTree commit)
+    entry <- treeEntry tree (B1.pack path)
+    bytestring <- case entry of
+                 Nothing -> return mempty
+                 Just BlobEntry {..} -> do
+                   blob <- lookupBlob blobEntryOid
+                   let (BlobString s) = blobContents blob
+                   return s
+    return $ transcode bytestring
 
 printDiff :: Argument -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
 printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments of
@@ -60,7 +85,7 @@ printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments 
       Just path -> do
         isDir <- doesDirectoryExist path
         let outputPath = if isDir
-                         then path </> (takeFileName (sourceB arguments) -<.> ".html")
+                         then path </> (takeFileName (filepath arguments) -<.> ".html")
                          else path
         IO.withFile outputPath IO.WriteMode (write rendered)
       Nothing -> TextIO.putStr rendered
@@ -81,8 +106,12 @@ replaceLeavesWithWordBranches source = replaceIn source 0
     makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
 
 readAndTranscodeFile :: FilePath -> IO (Source Char)
-readAndTranscodeFile path = fromText <$> do
+readAndTranscodeFile path = do
   text <- B1.readFile path
+  transcode text
+
+transcode :: B1.ByteString -> IO (Source Char)
+transcode text = fromText <$> do
   match <- Detect.detectCharset text
   converter <- Convert.open match Nothing
   return $ Convert.toUnicode converter text
