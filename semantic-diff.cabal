@@ -64,6 +64,9 @@ executable semantic-diff-exe
                      , text >= 1.2.1.3
                      , text-icu
                      , gitlib
+                     , gitlib-libgit2
+                     , tagged
+                     , mtl
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings
 
@@ -87,6 +90,9 @@ executable semantic-diff-profile
                      , text >= 1.2.1.3
                      , text-icu
                      , gitlib
+                     , gitlib-libgit2
+                     , tagged
+                     , mtl
   default-extensions:  OverloadedStrings
   default-language:    Haskell2010
 
