@@ -20,7 +20,7 @@ library
                      , Interpreter
                      , Line
                      , Row
-                     , OrderedMap
+                     , Data.OrderedMap
                      , Patch
                      , PatchOutput
                      , SES

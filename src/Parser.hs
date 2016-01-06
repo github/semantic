@@ -4,7 +4,7 @@ import Diff
 import Syntax
 import Term
 import Control.Comonad.Cofree
-import qualified OrderedMap as Map
+import qualified Data.OrderedMap as Map
 import qualified Data.Set as Set
 import Source
 import Data.Text as Text

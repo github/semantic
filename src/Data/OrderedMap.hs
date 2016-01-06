@@ -1,10 +1,10 @@
-module OrderedMap (
+module Data.OrderedMap (
     OrderedMap
   , fromList
   , toList
   , keys
   , (!)
-  , OrderedMap.lookup
+  , Data.OrderedMap.lookup
   , size
   , empty
   , union
@@ -31,7 +31,7 @@ keys (OrderedMap pairs) = fst <$> pairs
 infixl 9 !
 
 (!) :: Eq key => OrderedMap key value -> key -> value
-map ! key = Maybe.fromMaybe (error "no value found for key") $ OrderedMap.lookup key map
+map ! key = Maybe.fromMaybe (error "no value found for key") $ Data.OrderedMap.lookup key map
 
 lookup :: Eq key => key -> OrderedMap key value -> Maybe value
 lookup key = Prelude.lookup key . toList

@@ -1,7 +1,7 @@
 module Operation where
 
 import Diff
-import OrderedMap
+import Data.OrderedMap
 import qualified Data.Text as T
 import Term
 
