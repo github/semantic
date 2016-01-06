@@ -16,7 +16,7 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = do
+spec = parallel $ do
   describe "Term" $ do
     prop "equality is reflexive" $
       \ a -> unTerm a == unTerm (a :: ArbitraryTerm String ())

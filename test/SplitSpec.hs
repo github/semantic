@@ -35,7 +35,7 @@ arbitraryLeaf = toTuple <$> arbitrary
   where toTuple string = (string, Info (Range 0 $ length string) mempty, Leaf string)
 
 spec :: Spec
-spec = do
+spec = parallel $ do
   describe "splitAnnotatedByLines" $ do
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
