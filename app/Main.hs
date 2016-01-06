@@ -26,10 +26,10 @@ import Data.Bifunctor.Join
 
 data Renderer = Unified | Split | Patch
 
-data Argument = Argument { renderer :: Renderer, output :: Maybe FilePath, sourceA :: FilePath, sourceB :: FilePath }
+data Arguments = Arguments { renderer :: Renderer, output :: Maybe FilePath, sourceA :: FilePath, sourceB :: FilePath }
 
-arguments :: Parser Argument
-arguments = Argument
+arguments :: Parser Arguments
+arguments = Arguments
   <$> (flag Split Unified (long "unified" <> help "output a unified diff")
   <|> flag Split Patch (long "patch" <> help "output a patch(1)-compatible diff")
   <|> flag' Split (long "split" <> help "output a split diff"))
@@ -49,7 +49,7 @@ main = do
   where opts = info (helper <*> arguments)
           (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
-printDiff :: Argument -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
+printDiff :: Arguments -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
 printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments of
   Unified -> do
     rendered <- unified diff aSource bSource
