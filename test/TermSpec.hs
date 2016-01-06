@@ -2,18 +2,12 @@ module TermSpec where
 
 import Test.Hspec
 import Test.Hspec.QuickCheck
-import Test.QuickCheck hiding (Fixed)
 import Data.Text.Arbitrary ()
 
 import Categorizable
 import Interpreter
 import Diff
-import Syntax
-import Term
 import ArbitraryTerm
-
-main :: IO ()
-main = hspec spec
 
 spec :: Spec
 spec = parallel $ do

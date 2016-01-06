@@ -5,7 +5,7 @@ description:         Please see README.md
 homepage:            http://github.com/github/semantic-diff#readme
 author:              Rob Rix, Josh Vera
 maintainer:          rob.rix@github.com
-copyright:           2015 GitHub
+copyright:           2016 GitHub
 category:            Web
 build-type:          Simple
 -- extra-source-files:
@@ -20,7 +20,7 @@ library
                      , Interpreter
                      , Line
                      , Row
-                     , OrderedMap
+                     , Data.OrderedMap
                      , Patch
                      , PatchOutput
                      , SES
@@ -93,6 +93,11 @@ test-suite semantic-diff-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       ArbitraryTerm
+                     , InterpreterSpec
+                     , OrderedMapSpec
+                     , PatchOutputSpec
+                     , SplitSpec
+                     , TermSpec
   build-depends:       base
                      , containers
                      , free
