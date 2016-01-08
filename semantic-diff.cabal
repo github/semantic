@@ -65,7 +65,7 @@ executable semantic-diff-exe
                      , text-icu
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings
-  extra-libraries:     stdc++, icui18n
+  extra-libraries:     stdc++, icui18n, icuuc, icutu, iculx, icule, icuio, icudata
 
 executable semantic-diff-profile
   hs-source-dirs:      app
@@ -88,7 +88,7 @@ executable semantic-diff-profile
                      , text-icu
   default-extensions:  OverloadedStrings
   default-language:    Haskell2010
-  extra-libraries:     stdc++, icui18n
+  extra-libraries:     stdc++, icui18n, icuuc, icutu, iculx, icule, icuio, icudata
 
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
