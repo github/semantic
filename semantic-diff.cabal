@@ -7,7 +7,7 @@ author:              Rob Rix, Josh Vera
 maintainer:          rob.rix@github.com
 copyright:           2016 GitHub
 category:            Web
-build-type:          Simple
+build-type:          Custom
 -- extra-source-files:
 cabal-version:       >=1.10
 
