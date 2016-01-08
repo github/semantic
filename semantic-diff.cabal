@@ -47,48 +47,48 @@ library
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, OverloadedStrings
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -threaded -fprof-auto "-with-rtsopts=-N -p -s -h -i0.1"
 
-executable semantic-diff-exe
-  hs-source-dirs:      app
-  main-is:             Main.hs
-  other-modules:       Parsers
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -static
-  build-depends:       base
-                     , bifunctors
-                     , bytestring
-                     , containers
-                     , directory
-                     , filepath
-                     , free
-                     , optparse-applicative
-                     , semantic-diff
-                     , text >= 1.2.1.3
-                     , text-icu
-  default-language:    Haskell2010
-  default-extensions:  OverloadedStrings
-  extra-libraries:     stdc++, icuuc
-
-executable semantic-diff-profile
-  hs-source-dirs:      app
-  main-is:             Main.hs
-  other-modules:       Parsers
-  ghc-options:         -O2
-                       -threaded
-                       -fprof-auto
-                       "-with-rtsopts=-N -p -s -h -i0.1"
-  build-depends:       base
-                     , bifunctors
-                     , bytestring
-                     , containers
-                     , directory
-                     , filepath
-                     , free
-                     , optparse-applicative
-                     , semantic-diff
-                     , text >= 1.2.1.3
-                     , text-icu
-  default-extensions:  OverloadedStrings
-  default-language:    Haskell2010
-  extra-libraries:     stdc++, icuuc
+-- executable semantic-diff-exe
+--   hs-source-dirs:      app
+--   main-is:             Main.hs
+--   other-modules:       Parsers
+--   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -static
+--   build-depends:       base
+--                      , bifunctors
+--                      , bytestring
+--                      , containers
+--                      , directory
+--                      , filepath
+--                      , free
+--                      , optparse-applicative
+--                      , semantic-diff
+--                      , text >= 1.2.1.3
+--                      , text-icu
+--   default-language:    Haskell2010
+--   default-extensions:  OverloadedStrings
+--   extra-libraries:     stdc++, icuuc
+--
+-- executable semantic-diff-profile
+--   hs-source-dirs:      app
+--   main-is:             Main.hs
+--   other-modules:       Parsers
+--   ghc-options:         -O2
+--                        -threaded
+--                        -fprof-auto
+--                        "-with-rtsopts=-N -p -s -h -i0.1"
+--   build-depends:       base
+--                      , bifunctors
+--                      , bytestring
+--                      , containers
+--                      , directory
+--                      , filepath
+--                      , free
+--                      , optparse-applicative
+--                      , semantic-diff
+--                      , text >= 1.2.1.3
+--                      , text-icu
+--   default-extensions:  OverloadedStrings
+--   default-language:    Haskell2010
+--   extra-libraries:     stdc++, icuuc
 
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
