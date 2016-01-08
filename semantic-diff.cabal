@@ -52,6 +52,7 @@ executable semantic-diff-exe
   main-is:             Main.hs
   other-modules:       Parsers
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -static
+  cc-options:          -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
                      , bifunctors
                      , bytestring
@@ -75,6 +76,7 @@ executable semantic-diff-profile
                        -threaded
                        -fprof-auto
                        "-with-rtsopts=-N -p -s -h -i0.1"
+  cc-options:          -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
                      , bifunctors
                      , bytestring
