@@ -51,7 +51,7 @@ executable semantic-diff-exe
   hs-source-dirs:      app
   main-is:             Main.hs
   other-modules:       Parsers
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -static -optl-static
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -static
   build-depends:       base
                      , bifunctors
                      , bytestring
