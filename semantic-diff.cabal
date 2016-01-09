@@ -54,7 +54,7 @@ executable semantic-diff-exe
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -static
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   cpp-options: -DU_STATIC_IMPLEMENTATION=1
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -static -optl-static -optl-pthread
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -static -optl-static
   build-depends:       base
                      , bifunctors
                      , bytestring
