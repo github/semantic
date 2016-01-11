@@ -52,7 +52,7 @@ executable semantic-diff-exe
   main-is:             Main.hs
   other-modules:       Parsers
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -static
-  ld-options:          -static -pthread -licuuc -licudata -licui18n -dynamic
+  ld-options:          -static -pthread -dynamic
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
@@ -79,7 +79,7 @@ executable semantic-diff-profile
                        -fprof-auto
                        "-with-rtsopts=-N -p -s -h -i0.1"
                        -static
-  ld-options:          -static -pthread -licuuc -licudata -licui18n -dynamic
+  ld-options:          -static -pthread -dynamic
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
                      , bifunctors
