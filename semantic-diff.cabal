@@ -77,6 +77,8 @@ executable semantic-diff-profile
                        -threaded
                        -fprof-auto
                        "-with-rtsopts=-N -p -s -h -i0.1"
+                       -static
+                       -optl-static
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
                      , bifunctors
