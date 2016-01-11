@@ -69,31 +69,6 @@ executable semantic-diff-exe
   default-extensions:  OverloadedStrings
   extra-libraries:     stdc++
 
-executable semantic-diff-profile
-  hs-source-dirs:      app
-  main-is:             Main.hs
-  other-modules:       Parsers
-  ghc-options:         -O2
-                       -threaded
-                       -fprof-auto
-                       "-with-rtsopts=-N -p -s -h -i0.1"
-                       -static
-  cc-options:          -DU_STATIC_IMPLEMENTATION=1
-  build-depends:       base
-                     , bifunctors
-                     , bytestring
-                     , containers
-                     , directory
-                     , filepath
-                     , free
-                     , optparse-applicative
-                     , semantic-diff
-                     , text >= 1.2.1.3
-                     , text-icu
-  default-extensions:  OverloadedStrings
-  default-language:    Haskell2010
-  extra-libraries:     stdc++
-
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
