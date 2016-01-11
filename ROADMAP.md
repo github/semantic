@@ -6,6 +6,12 @@
 
 2. [Semantic diffing on .com](https://github.com/github/semantic-diff/milestones/Dot%20Calm). General release of semantic diffs for the supported languages.
 
+
+## Q2–Q4 2016
+
+We will discuss future milestones at the **@github/network-intelligence** minisummit mid-Q1 2016, and document them here at that point.
+ 
+
 ## Ongoing
 
 - Creation, curation, and cultivation of grammars for semantic diffs.
