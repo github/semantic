@@ -70,13 +70,13 @@ printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments 
         write rendered h = TextIO.hPutStr h rendered
 
 replaceLeavesWithWordBranches :: Source Char -> Term T.Text Info -> Term T.Text Info
-replaceLeavesWithWordBranches source = replaceIn source 0
+replaceLeavesWithWordBranches source = replaceIn
   where
-    replaceIn source startIndex (info@(Info range categories) :< syntax) | substring <- slice (offsetRange (negate startIndex) range) source = info :< case syntax of
-      Leaf _ | ranges <- rangesAndWordsFrom (start range) (toList substring), length ranges > 1 -> Indexed $ makeLeaf categories <$> ranges
-      Indexed i -> Indexed $ replaceIn substring (start range) <$> i
-      Fixed f -> Fixed $ replaceIn substring (start range) <$> f
-      Keyed k -> Keyed $ replaceIn substring (start range) <$> k
+    replaceIn (info@(Info range categories) :< syntax) = info :< case syntax of
+      Leaf _ | ranges <- rangesAndWordsFrom (start range) (toList $ slice range source), length ranges > 1 -> Indexed $ makeLeaf categories <$> ranges
+      Indexed i -> Indexed $ replaceIn <$> i
+      Fixed f -> Fixed $ replaceIn <$> f
+      Keyed k -> Keyed $ replaceIn <$> k
       _ -> syntax
     makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
 
