@@ -21,7 +21,7 @@ import Data.Either
 import Data.Foldable
 import Data.Functor.Identity
 import Data.Monoid
-import qualified OrderedMap as Map
+import qualified Data.OrderedMap as Map
 import qualified Data.Set as Set
 import Source hiding ((++))
 

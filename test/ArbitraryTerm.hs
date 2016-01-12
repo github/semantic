@@ -5,7 +5,7 @@ import Syntax
 import Term
 import Control.Comonad.Cofree
 import Control.Monad
-import qualified OrderedMap as Map
+import qualified Data.OrderedMap as Map
 import qualified Data.List as List
 import qualified Data.Set as Set
 import GHC.Generics

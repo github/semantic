@@ -10,8 +10,8 @@ import Syntax
 import Term
 import Control.Monad.Free
 import Control.Comonad.Cofree hiding (unwrap)
-import qualified OrderedMap as Map
-import OrderedMap ((!))
+import qualified Data.OrderedMap as Map
+import Data.OrderedMap ((!))
 import qualified Data.List as List
 import Data.List ((\\))
 import Data.Maybe

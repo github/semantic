@@ -1,6 +1,6 @@
 module Syntax where
 
-import OrderedMap
+import Data.OrderedMap
 import qualified Data.Text as T
 
 -- | A node in an abstract syntax tree.
