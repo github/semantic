@@ -51,10 +51,10 @@ executable semantic-diff-exe
   hs-source-dirs:      app
   main-is:             Main.hs
   other-modules:       Parsers
-  ghc-options:         if os(darwin)
-                         -threaded -rtsopts -with-rtsopts=-N -static
-                       else
-                         -threaded -rtsopts -with-rtsopts=-N -static -pgml=script/g++
+  if os(darwin)
+    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -static
+  else
+    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -static -pgml=script/g++
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
