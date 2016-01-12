@@ -9,11 +9,14 @@ import Data.Maybe (fromMaybe)
 data Range = Range { start :: !Int, end :: !Int }
   deriving (Eq, Show)
 
+rangeLength :: Range -> Int
+rangeLength range = end range - start range
+
 substring :: Range -> T.Text -> T.Text
-substring range = T.take (end range - start range) . T.drop (start range)
+substring range = T.take (rangeLength range) . T.drop (start range)
 
 sublist :: Range -> [a] -> [a]
-sublist range = take (end range - start range) . drop (start range)
+sublist range = take (rangeLength range) . drop (start range)
 
 totalRange :: T.Text -> Range
 totalRange t = Range 0 $ T.length t
