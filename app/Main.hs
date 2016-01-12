@@ -70,13 +70,10 @@ printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments 
         write rendered h = TextIO.hPutStr h rendered
 
 replaceLeavesWithWordBranches :: Source Char -> Term T.Text Info -> Term T.Text Info
-replaceLeavesWithWordBranches source term = cata replaceIn term
+replaceLeavesWithWordBranches source = cata replaceIn
   where
-    replaceIn info syntax = info :< case syntax of
-      Leaf _ | (Info range categories) <- info ->
-        let ranges = rangesAndWordsFrom (start range) (toList $ slice range source) in
-          if length ranges > 1 then Indexed $ makeLeaf categories <$> ranges else syntax
-      _ -> syntax
+    replaceIn info@(Info range categories) (Leaf _) | ranges <- rangesAndWordsFrom (start range) (toList $ slice range source), length ranges > 1 = info :< (Indexed $ makeLeaf categories <$> ranges)
+    replaceIn info syntax = info :< syntax
     makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
 
 readAndTranscodeFile :: FilePath -> IO (Source Char)
