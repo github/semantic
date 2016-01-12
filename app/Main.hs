@@ -21,7 +21,6 @@ import qualified Data.Text.Lazy.IO as TextIO
 import qualified System.IO as IO
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
-import Data.Biapplicative
 import Data.Bifunctor.Join
 
 data Renderer = Unified | Split | Patch
@@ -33,7 +32,7 @@ arguments = Arguments
   <$> (flag Split Unified (long "unified" <> help "output a unified diff")
   <|> flag Split Patch (long "patch" <> help "output a patch(1)-compatible diff")
   <|> flag' Split (long "split" <> help "output a split diff"))
-  <*> (optional $ strOption (long "output" <> short 'o' <> help "output directory for split diffs, defaulting to stdout if unspecified"))
+  <*> optional (strOption (long "output" <> short 'o' <> help "output directory for split diffs, defaulting to stdout if unspecified"))
   <*> strArgument (metavar "FILE a")
   <*> strArgument (metavar "FILE b")
 
@@ -64,8 +63,7 @@ printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments 
                          else path
         IO.withFile outputPath IO.WriteMode (write rendered)
       Nothing -> TextIO.putStr rendered
-  Patch -> do
-    putStr $ PatchOutput.patch diff aSource bSource
+  Patch -> putStr $ PatchOutput.patch diff aSource bSource
   where diff = interpret comparable aTerm bTerm
         write rendered h = TextIO.hPutStr h rendered
 
