@@ -72,8 +72,8 @@ printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments 
 replaceLeavesWithWordBranches :: Source Char -> Term T.Text Info -> Term T.Text Info
 replaceLeavesWithWordBranches source = replaceIn
   where
-    replaceIn (info@(Info range categories) :< syntax) = info :< case syntax of
-      Leaf _ ->
+    replaceIn (info :< syntax) = info :< case syntax of
+      Leaf _ | (Info range categories) <- info ->
         let ranges = rangesAndWordsFrom (start range) (toList $ slice range source) in
           if length ranges > 1 then Indexed $ makeLeaf categories <$> ranges else syntax
       Indexed i -> Indexed $ replaceIn <$> i
