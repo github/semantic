@@ -73,11 +73,12 @@ replaceLeavesWithWordBranches :: Source Char -> Term T.Text Info -> Term T.Text 
 replaceLeavesWithWordBranches source = replaceIn
   where
     replaceIn (info@(Info range categories) :< syntax) = info :< case syntax of
-      Leaf _ | ranges <- rangesAndWordsFrom (start range) (toList $ slice range source), length ranges > 1 -> Indexed $ makeLeaf categories <$> ranges
+      Leaf _ ->
+        let ranges = rangesAndWordsFrom (start range) (toList $ slice range source) in
+          if length ranges > 1 then Indexed $ makeLeaf categories <$> ranges else syntax
       Indexed i -> Indexed $ replaceIn <$> i
       Fixed f -> Fixed $ replaceIn <$> f
       Keyed k -> Keyed $ replaceIn <$> k
-      _ -> syntax
     makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
 
 readAndTranscodeFile :: FilePath -> IO (Source Char)
