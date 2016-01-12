@@ -28,10 +28,11 @@ import Git.Types
 import Git.Repository
 import Data.Tagged
 import Control.Monad.Reader
+import System.Environment
 
 data Renderer = Unified | Split | Patch
 
-data Arguments = Arguments { renderer :: Renderer, output :: Maybe FilePath, shaA :: String, shaB :: String, repositoryPath :: FilePath, filepath :: FilePath }
+data Arguments = Arguments { renderer :: Renderer, output :: Maybe FilePath, shaA :: String, shaB :: String, filepath :: FilePath }
 
 arguments :: Parser Arguments
 arguments = Arguments
@@ -41,14 +42,14 @@ arguments = Arguments
   <*> optional (strOption (long "output" <> short 'o' <> help "output directory for split diffs, defaulting to stdout if unspecified"))
   <*> strArgument (metavar "SHA_A")
   <*> strArgument (metavar "SHA_B")
-  <*> strArgument (metavar "REPO_PATH")
   <*> strArgument (metavar "FILE")
 
 main :: IO ()
 main = do
+  gitDir <- getEnv "GIT_DIR"
   arguments@Arguments{..} <- execParser opts
   let shas = Join (shaA, shaB)
-  sources <- sequence $ fetchFromGitRepo repositoryPath filepath <$> shas
+  sources <- sequence $ fetchFromGitRepo gitDir filepath <$> shas
   let parse = (P.parserForType . T.pack . takeExtension) filepath
   terms <- sequence $ parse <$> sources
   let replaceLeaves = breakDownLeavesByWord <$> sources
