@@ -72,6 +72,8 @@ executable semantic-diff-exe
   default-extensions:  OverloadedStrings
   if os(darwin)
     extra-libraries:   stdc++ icuuc icudata icui18n
+  if os(darwin)
+    extra-lib-dirs:    /usr/local/opt/icu4c/lib
 
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
