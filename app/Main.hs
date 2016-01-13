@@ -32,7 +32,7 @@ import System.Environment
 
 data Renderer = Unified | Split | Patch
 
-data Arguments = Arguments { renderer :: Renderer, output :: Maybe FilePath, shaA :: String, shaB :: String, filepath :: FilePath }
+data Arguments = Arguments { renderer :: Renderer, output :: Maybe FilePath, shaA :: String, shaB :: String, filepaths :: [FilePath] }
 
 arguments :: Parser Arguments
 arguments = Arguments
@@ -42,22 +42,23 @@ arguments = Arguments
   <*> optional (strOption (long "output" <> short 'o' <> help "output directory for split diffs, defaulting to stdout if unspecified"))
   <*> strArgument (metavar "SHA_A")
   <*> strArgument (metavar "SHA_B")
-  <*> strArgument (metavar "FILE")
+  <*> many (strArgument (metavar "FILE"))
 
 main :: IO ()
 main = do
   gitDir <- getEnv "GIT_DIR"
   arguments@Arguments{..} <- execParser opts
   let shas = Join (shaA, shaB)
-  sources <- sequence $ fetchFromGitRepo gitDir filepath <$> shas
-  let parse = (P.parserForType . T.pack . takeExtension) filepath
-  terms <- sequence $ parse <$> sources
-  let replaceLeaves = breakDownLeavesByWord <$> sources
-  printDiff arguments (runJoin sources) (runJoin $ replaceLeaves <*> terms)
-  where opts = info (helper <*> arguments)
-          (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
+  forM_ filepaths $ \filepath -> do
+    sources <- sequence $ fetchFromGitRepo gitDir filepath <$> shas
+    let parse = (P.parserForType . T.pack . takeExtension) filepath
+    terms <- sequence $ parse <$> sources
+    let replaceLeaves = breakDownLeavesByWord <$> sources
+    printDiff arguments filepath (runJoin sources) (runJoin $ replaceLeaves <*> terms)
+    where opts = info (helper <*> arguments)
+            (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
-fetchFromGitRepo :: FilePath ->FilePath -> String -> IO (Source Char)
+fetchFromGitRepo :: FilePath -> FilePath -> String -> IO (Source Char)
 fetchFromGitRepo repoPath path sha = join $ withRepository lgFactory repoPath $ do
     object <- unTagged <$> parseObjOid (T.pack sha)
     commitIHope <- lookupObject object
@@ -74,8 +75,8 @@ fetchFromGitRepo repoPath path sha = join $ withRepository lgFactory repoPath $ 
                    return s
     return $ transcode bytestring
 
-printDiff :: Arguments -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
-printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments of
+printDiff :: Arguments -> FilePath -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
+printDiff arguments filepath (aSource, bSource) (aTerm, bTerm) = case renderer arguments of
   Unified -> do
     rendered <- unified diff aSource bSource
     B1.putStr rendered
@@ -85,7 +86,7 @@ printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments 
       Just path -> do
         isDir <- doesDirectoryExist path
         let outputPath = if isDir
-                         then path </> (takeFileName (filepath arguments) -<.> ".html")
+                         then path </> (takeFileName filepath -<.> ".html")
                          else path
         IO.withFile outputPath IO.WriteMode (write rendered)
       Nothing -> TextIO.putStr rendered
