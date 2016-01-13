@@ -35,13 +35,14 @@ library
   build-depends:       base >= 4.8 && < 5
                      , blaze-html
                      , bytestring
+                     , c-storable-deriving
                      , containers
                      , free
                      , mtl
                      , rainbow
+                     , semigroups
                      , text >= 1.2.1.3
                      , tree-sitter-parsers
-                     , c-storable-deriving
                      , vector
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, OverloadedStrings

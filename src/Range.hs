@@ -1,9 +1,11 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Range where
 
 import qualified Data.Text as T
 import Control.Applicative ((<|>))
 import qualified Data.Char as Char
 import Data.Maybe (fromMaybe)
+import Data.Semigroup
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: !Int, end :: !Int }
@@ -48,12 +50,14 @@ maybeLastIndex :: Range -> Maybe Int
 maybeLastIndex (Range start end) | start == end = Nothing
 maybeLastIndex (Range _ end) = Just $ end - 1
 
+unionRange :: Range -> Range -> Range
+unionRange (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
+
 unionRanges :: (Functor f, Foldable f) => f Range -> Range
-unionRanges ranges = fromMaybe mempty . foldl mappend Nothing $ Just <$> ranges
+unionRanges ranges = option (Range 0 0) id . foldl mappend mempty $ Option . Just <$> ranges
+
+instance Semigroup Range where
+  (<>) = unionRange
 
 instance Ord Range where
   a <= b = start a <= start b
-
-instance Monoid Range where
-  mempty = Range 0 0
-  mappend (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
