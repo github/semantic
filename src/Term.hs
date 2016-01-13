@@ -22,7 +22,7 @@ cata :: (annotation -> Syntax a b -> b) -> Term a annotation -> b
 cata f (annotation :< syntax) = f annotation $ cata f <$> syntax
 
 termSize :: Term a annotation -> Integer
-termSize term = cata size term where
+termSize = cata size where
   size _ (Leaf _) = 1
   size _ (Indexed i) = sum i
   size _ (Fixed f) = sum f
