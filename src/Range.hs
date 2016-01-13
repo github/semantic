@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Range where
 
 import qualified Data.Text as T
@@ -20,6 +21,9 @@ sublist range = take (rangeLength range) . drop (start range)
 
 totalRange :: T.Text -> Range
 totalRange t = Range 0 $ T.length t
+
+unionRange :: Range -> Range -> Range
+unionRange (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
 
 offsetRange :: Int -> Range -> Range
 offsetRange i (Range start end) = Range (i + start) (i + end)
@@ -49,11 +53,15 @@ maybeLastIndex (Range start end) | start == end = Nothing
 maybeLastIndex (Range _ end) = Just $ end - 1
 
 unionRanges :: (Functor f, Foldable f) => f Range -> Range
-unionRanges ranges = fromMaybe mempty . foldl mappend Nothing $ Just <$> ranges
+unionRanges ranges = fromMaybe (Range 0 0) . getUnion . foldl mappend mempty $ Union . Just <$> ranges
+
+newtype Union a = Union { getUnion :: a }
+
+instance Monoid (Union (Maybe Range)) where
+  mempty = Union Nothing
+  mappend (Union (Just range1)) (Union (Just range2)) = Union $ Just $ unionRange range1 range2
+  mappend (Union Nothing) maybe = maybe
+  mappend maybe _ = maybe
 
 instance Ord Range where
   a <= b = start a <= start b
-
-instance Monoid Range where
-  mempty = Range 0 0
-  mappend (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
