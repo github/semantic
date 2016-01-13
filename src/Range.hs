@@ -34,11 +34,11 @@ rangesAndWordsFrom startIndex string = fromMaybe [] $ take isWord <|> take isPun
     take = parse (Just . save)
     skip = parse (const Nothing)
     endFor parsed = startIndex + length parsed
-    match predicate transform = case span predicate string of
+    match transform predicate = case span predicate string of
       ([], _) -> Nothing
       (parsed, rest) -> Just $ transform parsed rest
     recurse transform parsed rest = maybe id (:) (transform parsed) $ rangesAndWordsFrom (endFor parsed) rest
-    parse transform predicate = match predicate $ recurse transform
+    parse transform = match (recurse transform)
     -- | Is this a word character?
     -- | Word characters are defined as in [Ruby’s `\p{Word}` syntax](http://ruby-doc.org/core-2.1.1/Regexp.html#class-Regexp-label-Character+Properties), i.e.:
     -- | > A member of one of the following Unicode general category _Letter_, _Mark_, _Number_, _Connector_Punctuation_
