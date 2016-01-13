@@ -28,22 +28,20 @@ offsetRange i (Range start end) = Range (i + start) (i + end)
 
 rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom _ "" = []
-rangesAndWordsFrom startIndex string = fromMaybe [] $ takeAndContinue <$> (word <|> punctuation) <|> skipAndContinue <$> space
+rangesAndWordsFrom startIndex string = fromMaybe [] $ take isWord <|> take isPunctuation <|> skip Char.isSpace
   where
-    word = parse isWord string
-    punctuation = parse (not . isWordOrSpace) string
-    space = parse Char.isSpace string
-    takeAndContinue (parsed, rest) = (Range startIndex $ endFor parsed, parsed) : rangesAndWordsFrom (endFor parsed) rest
-    skipAndContinue (parsed, rest) = rangesAndWordsFrom (endFor parsed) rest
+    save parsed = (Range startIndex $ endFor parsed, parsed)
+    take = parse (Just . save)
+    skip = parse (const Nothing)
     endFor parsed = startIndex + length parsed
-    parse predicate string = case span predicate string of
+    parse transform predicate = case span predicate string of
       ([], _) -> Nothing
-      (parsed, rest) -> Just (parsed, rest)
-    isWordOrSpace c = Char.isSpace c || isWord c
+      (parsed, rest) -> Just $ maybe id (:) (transform parsed) $ rangesAndWordsFrom (endFor parsed) rest
     -- | Is this a word character?
     -- | Word characters are defined as in [Ruby’s `\p{Word}` syntax](http://ruby-doc.org/core-2.1.1/Regexp.html#class-Regexp-label-Character+Properties), i.e.:
     -- | > A member of one of the following Unicode general category _Letter_, _Mark_, _Number_, _Connector_Punctuation_
     isWord c = Char.isLetter c || Char.isNumber c || Char.isMark c || Char.generalCategory c == Char.ConnectorPunctuation
+    isPunctuation c = not (Char.isSpace c || isWord c)
 
 -- | Return Just the last index from a non-empty range, or if the range is empty, Nothing.
 maybeLastIndex :: Range -> Maybe Int
