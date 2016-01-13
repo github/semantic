@@ -78,6 +78,8 @@ executable semantic-diff-exe
     extra-libraries:   stdc++ icuuc icudata icui18n
   if os(darwin)
     extra-lib-dirs:    /usr/local/opt/icu4c/lib
+  if os(darwin)
+    extra-include-dirs: /usr/local/opt/icu4c/include
 
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
