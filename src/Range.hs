@@ -30,12 +30,13 @@ rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom _ "" = []
 rangesAndWordsFrom startIndex string = fromMaybe [] $ take isWord <|> take isPunctuation <|> skip Char.isSpace
   where
-    take predicate = match predicate $ \ parsed rest -> (Range startIndex $ endFor parsed, parsed) : rangesAndWordsFrom (endFor parsed) rest
-    skip predicate = match predicate $ \ parsed rest -> rangesAndWordsFrom (endFor parsed) rest
+    take predicate = parse predicate $ \ parsed -> Just (Range startIndex $ endFor parsed, parsed)
+    skip predicate = parse predicate (const Nothing)
     endFor parsed = startIndex + length parsed
     match predicate transform = case span predicate string of
       ([], _) -> Nothing
       (parsed, rest) -> Just $ transform parsed rest
+    parse predicate transform = match predicate $ \ parsed rest -> maybe id (:) (transform parsed) $ rangesAndWordsFrom (endFor parsed) rest
     -- | Is this a word character?
     -- | Word characters are defined as in [Ruby’s `\p{Word}` syntax](http://ruby-doc.org/core-2.1.1/Regexp.html#class-Regexp-label-Character+Properties), i.e.:
     -- | > A member of one of the following Unicode general category _Letter_, _Mark_, _Number_, _Connector_Punctuation_
