@@ -30,12 +30,12 @@ rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom _ "" = []
 rangesAndWordsFrom startIndex string = fromMaybe [] $ take isWord <|> take isPunctuation <|> skip Char.isSpace
   where
-    take predicate = recurse <$> parse predicate string
+    take predicate = recurse <$> parse predicate
       where recurse (parsed, rest) = (Range startIndex $ endFor parsed, parsed) : rangesAndWordsFrom (endFor parsed) rest
-    skip predicate = recurse <$> parse predicate string
+    skip predicate = recurse <$> parse predicate
       where recurse (parsed, rest) = rangesAndWordsFrom (endFor parsed) rest
     endFor parsed = startIndex + length parsed
-    parse predicate string = case span predicate string of
+    parse predicate = case span predicate string of
       ([], _) -> Nothing
       (parsed, rest) -> Just (parsed, rest)
     -- | Is this a word character?
