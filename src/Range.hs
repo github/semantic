@@ -31,7 +31,7 @@ rangesAndWordsFrom _ "" = []
 rangesAndWordsFrom startIndex string = fromMaybe [] $ take <$> (word <|> punctuation) <|> skip <$> space
   where
     word = parse isWord string
-    punctuation = parse (not . isWordOrSpace) string
+    punctuation = parse isPunctuation string
     space = parse Char.isSpace string
     take (parsed, rest) = (Range startIndex $ endFor parsed, parsed) : rangesAndWordsFrom (endFor parsed) rest
     skip (parsed, rest) = rangesAndWordsFrom (endFor parsed) rest
@@ -39,7 +39,7 @@ rangesAndWordsFrom startIndex string = fromMaybe [] $ take <$> (word <|> punctua
     parse predicate string = case span predicate string of
       ([], _) -> Nothing
       (parsed, rest) -> Just (parsed, rest)
-    isWordOrSpace c = Char.isSpace c || isWord c
+    isPunctuation c = not (Char.isSpace c || isWord c)
     -- | Is this a word character?
     -- | Word characters are defined as in [Ruby’s `\p{Word}` syntax](http://ruby-doc.org/core-2.1.1/Regexp.html#class-Regexp-label-Character+Properties), i.e.:
     -- | > A member of one of the following Unicode general category _Letter_, _Mark_, _Number_, _Connector_Punctuation_
