@@ -23,9 +23,6 @@ sublist range = take (rangeLength range) . drop (start range)
 totalRange :: T.Text -> Range
 totalRange t = Range 0 $ T.length t
 
-unionRange :: Range -> Range -> Range
-unionRange (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
-
 offsetRange :: Int -> Range -> Range
 offsetRange i (Range start end) = Range (i + start) (i + end)
 
@@ -52,6 +49,9 @@ rangesAndWordsFrom startIndex string = fromMaybe [] $ takeAndContinue <$> (word 
 maybeLastIndex :: Range -> Maybe Int
 maybeLastIndex (Range start end) | start == end = Nothing
 maybeLastIndex (Range _ end) = Just $ end - 1
+
+unionRange :: Range -> Range -> Range
+unionRange (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
 
 unionRanges :: (Functor f, Foldable f) => f Range -> Range
 unionRanges ranges = fromMaybe (Range 0 0) . getOption . foldl mappend mempty $ Option . Just <$> ranges
