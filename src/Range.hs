@@ -11,21 +11,29 @@ import Data.Semigroup
 data Range = Range { start :: !Int, end :: !Int }
   deriving (Eq, Show)
 
+-- | Return the length of the range.
 rangeLength :: Range -> Int
 rangeLength range = end range - start range
 
+-- | Return the portion of the text identified by the given range.
 substring :: Range -> T.Text -> T.Text
 substring range = T.take (rangeLength range) . T.drop (start range)
 
+-- | Return the portion of the list identified by the given range.
 sublist :: Range -> [a] -> [a]
 sublist range = take (rangeLength range) . drop (start range)
 
+-- | Return a range that covers the entire text.
 totalRange :: T.Text -> Range
 totalRange t = Range 0 $ T.length t
 
+-- | Return a range that has its start and end offset by the given amount.
 offsetRange :: Int -> Range -> Range
 offsetRange i (Range start end) = Range (i + start) (i + end)
 
+-- | Break a string down into words and sequences of punctuation. Return a list
+-- | strings with ranges, assuming that the first character in the string is
+-- | at the given index.
 rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom _ "" = []
 rangesAndWordsFrom startIndex string = fromMaybe [] $ take isWord <|> take isPunctuation <|> skip Char.isSpace
@@ -48,9 +56,11 @@ maybeLastIndex :: Range -> Maybe Int
 maybeLastIndex (Range start end) | start == end = Nothing
 maybeLastIndex (Range _ end) = Just $ end - 1
 
+-- | Return a range that contains both the given ranges.
 unionRange :: Range -> Range -> Range
 unionRange (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
 
+-- | Return a range that contains all the ranges in f.
 unionRanges :: (Functor f, Foldable f) => f Range -> Range
 unionRanges ranges = option (Range 0 0) id . foldl mappend mempty $ Option . Just <$> ranges
 

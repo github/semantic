@@ -23,10 +23,13 @@ import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
 import Data.Bifunctor.Join
 
+-- | The available types of diff rendering.
 data Renderer = Unified | Split | Patch
 
+-- | The command line arguments to the application.
 data Arguments = Arguments { renderer :: Renderer, output :: Maybe FilePath, sourceA :: FilePath, sourceB :: FilePath }
 
+-- | A parser for the application's command-line arguments.
 arguments :: Parser Arguments
 arguments = Arguments
   <$> (flag Split Unified (long "unified" <> help "output a unified diff")
@@ -48,6 +51,7 @@ main = do
   where opts = info (helper <*> arguments)
           (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
+-- | Print a diff, given the command-line arguments, source files, and terms.
 printDiff :: Arguments -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
 printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments of
   Unified -> do
@@ -67,6 +71,7 @@ printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments 
   where diff = interpret comparable aTerm bTerm
         write rendered h = TextIO.hPutStr h rendered
 
+-- | Replace every string leaf with leaves of the words in the string.
 breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
 breakDownLeavesByWord source = cata replaceIn
   where
@@ -75,6 +80,7 @@ breakDownLeavesByWord source = cata replaceIn
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toList $ slice range source)
     makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
 
+-- | Read the file and convert it to Unicode.
 readAndTranscodeFile :: FilePath -> IO (Source Char)
 readAndTranscodeFile path = fromText <$> do
   text <- B1.readFile path
