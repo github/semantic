@@ -5,6 +5,7 @@ import qualified Data.Text as T
 import Control.Applicative ((<|>))
 import qualified Data.Char as Char
 import Data.Maybe (fromMaybe)
+import Data.Semigroup
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: !Int, end :: !Int }
@@ -53,15 +54,10 @@ maybeLastIndex (Range start end) | start == end = Nothing
 maybeLastIndex (Range _ end) = Just $ end - 1
 
 unionRanges :: (Functor f, Foldable f) => f Range -> Range
-unionRanges ranges = fromMaybe (Range 0 0) . getUnion . foldl mappend mempty $ Union . Just <$> ranges
+unionRanges ranges = fromMaybe (Range 0 0) . getOption . foldl mappend mempty $ Option . Just <$> ranges
 
-newtype Union a = Union { getUnion :: a }
-
-instance Monoid (Union (Maybe Range)) where
-  mempty = Union Nothing
-  mappend (Union (Just range1)) (Union (Just range2)) = Union $ Just $ unionRange range1 range2
-  mappend (Union Nothing) maybe = maybe
-  mappend maybe _ = maybe
+instance Semigroup Range where
+  (<>) = unionRange
 
 instance Ord Range where
   a <= b = start a <= start b
