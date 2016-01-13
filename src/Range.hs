@@ -30,7 +30,8 @@ rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom _ "" = []
 rangesAndWordsFrom startIndex string = fromMaybe [] $ take isWord <|> take isPunctuation <|> skip Char.isSpace
   where
-    take predicate = parse predicate $ \ parsed -> Just (Range startIndex $ endFor parsed, parsed)
+    save parsed = (Range startIndex $ endFor parsed, parsed)
+    take predicate = parse predicate (Just . save)
     skip predicate = parse predicate (const Nothing)
     endFor parsed = startIndex + length parsed
     match predicate transform = case span predicate string of
