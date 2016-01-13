@@ -28,13 +28,13 @@ offsetRange i (Range start end) = Range (i + start) (i + end)
 
 rangesAndWordsFrom :: Int -> String -> [(Range, String)]
 rangesAndWordsFrom _ "" = []
-rangesAndWordsFrom startIndex string = fromMaybe [] $ takeAndContinue <$> (word <|> punctuation) <|> skipAndContinue <$> space
+rangesAndWordsFrom startIndex string = fromMaybe [] $ take <$> (word <|> punctuation) <|> skip <$> space
   where
     word = parse isWord string
     punctuation = parse (not . isWordOrSpace) string
     space = parse Char.isSpace string
-    takeAndContinue (parsed, rest) = (Range startIndex $ endFor parsed, parsed) : rangesAndWordsFrom (endFor parsed) rest
-    skipAndContinue (parsed, rest) = rangesAndWordsFrom (endFor parsed) rest
+    take (parsed, rest) = (Range startIndex $ endFor parsed, parsed) : rangesAndWordsFrom (endFor parsed) rest
+    skip (parsed, rest) = rangesAndWordsFrom (endFor parsed) rest
     endFor parsed = startIndex + length parsed
     parse predicate string = case span predicate string of
       ([], _) -> Nothing
