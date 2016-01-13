@@ -54,7 +54,7 @@ unionRange :: Range -> Range -> Range
 unionRange (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
 
 unionRanges :: (Functor f, Foldable f) => f Range -> Range
-unionRanges ranges = fromMaybe (Range 0 0) . getOption . foldl mappend mempty $ Option . Just <$> ranges
+unionRanges ranges = option (Range 0 0) id . foldl mappend mempty $ Option . Just <$> ranges
 
 instance Semigroup Range where
   (<>) = unionRange
