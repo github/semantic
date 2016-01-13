@@ -53,7 +53,7 @@ break predicate (Source vector) = let (start, remainder) = Vector.break predicat
 (++) :: Source a -> Source a -> Source a
 (++) (Source a) = Source . (a Vector.++) . getVector
 
--- | Split the contents of the source by newlines.
+-- | Split the contents of the source after newlines.
 actualLines :: Source Char -> [Source Char]
 actualLines source | Source.null source = [ source ]
 actualLines source = case Source.break (== '\n') source of
