@@ -32,7 +32,7 @@ classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeFirst categories
 
 split :: Renderer leaf (IO TL.Text)
-split diff before after = return . renderHtml
+split diff (before, after) = return . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body

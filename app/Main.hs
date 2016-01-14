@@ -57,12 +57,12 @@ diff = interpret comparable
 
 -- | Print a diff, given the command-line arguments, source files, and terms.
 printDiff :: Arguments -> Diff T.Text Info -> (Source Char, Source Char) -> IO ()
-printDiff arguments diff (aSource, bSource) = case format arguments of
+printDiff arguments diff sources = case format arguments of
   Unified -> do
-    rendered <- unified diff aSource bSource
+    rendered <- unified diff sources
     B1.putStr rendered
   Split -> do
-    rendered <- split diff aSource bSource
+    rendered <- split diff sources
     case output arguments of
       Just path -> do
         isDir <- doesDirectoryExist path
@@ -71,7 +71,7 @@ printDiff arguments diff (aSource, bSource) = case format arguments of
                          else path
         IO.withFile outputPath IO.WriteMode (flip TextIO.hPutStr rendered)
       Nothing -> TextIO.putStr rendered
-  Patch -> putStr $ PatchOutput.patch diff aSource bSource
+  Patch -> putStr $ PatchOutput.patch diff sources
 
 -- | Replace every string leaf with leaves of the words in the string.
 breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
