@@ -15,7 +15,7 @@ import qualified Data.OrderedMap as Map
 import Rainbow
 
 unified :: Renderer a (IO ByteString)
-unified diff before after = do
+unified diff (before, after) = do
   renderer <- byteStringMakerFromEnvironment
   return . mconcat . chunksToByteStrings renderer . fst $ iter g mapped where
     mapped = fmap (unifiedPatch &&& range) diff
