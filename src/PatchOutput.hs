@@ -6,6 +6,7 @@ module PatchOutput (
 import Diff
 import Line
 import Range
+import Renderer
 import Row
 import Source hiding ((++), break)
 import Split
@@ -15,7 +16,7 @@ import Control.Monad.Free
 import Data.Maybe
 import Data.Monoid
 
-patch :: Diff a Info -> Source Char -> Source Char -> String
+patch :: Renderer a String
 patch diff sourceA sourceB = mconcat $ showHunk (sourceA, sourceB) <$> hunks diff (sourceA, sourceB)
 
 data Hunk a = Hunk { offset :: (Sum Int, Sum Int), changes :: [Change a], trailingContext :: [Row a] }

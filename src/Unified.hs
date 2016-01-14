@@ -5,6 +5,7 @@ import Patch
 import Syntax
 import Term
 import Range
+import Renderer
 import Source hiding ((++))
 import Control.Arrow
 import Control.Monad.Free
@@ -13,7 +14,7 @@ import Data.List hiding (foldl)
 import qualified Data.OrderedMap as Map
 import Rainbow
 
-unified :: Diff a Info -> Source Char -> Source Char -> IO ByteString
+unified :: Renderer a (IO ByteString)
 unified diff before after = do
   renderer <- byteStringMakerFromEnvironment
   return . mconcat . chunksToByteStrings renderer . fst $ iter g mapped where
