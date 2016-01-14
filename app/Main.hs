@@ -31,9 +31,10 @@ import Control.Monad.Reader
 import System.Environment
 
 -- | The available types of diff rendering.
-data Renderer = Unified | Split | Patch
+data Format = Unified | Split | Patch
 
-data Arguments = Arguments { renderer :: Renderer, output :: Maybe FilePath, shaA :: String, shaB :: String, filepaths :: [FilePath] }
+-- | The command line arguments to the application.
+ data Arguments = Arguments { renderer :: Renderer, output :: Maybe FilePath, shaA :: String, shaB :: String, filepaths :: [FilePath] }
 
 -- | A parser for the application's command-line arguments.
 arguments :: Parser Arguments
@@ -78,7 +79,8 @@ fetchFromGitRepo repoPath path sha = join $ withRepository lgFactory repoPath $ 
                    return s
     return $ transcode bytestring
 
-printDiff :: Arguments -> FilePath -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
+-- | Print a diff, given the command-line arguments, source files, and terms.
+ printDiff :: Arguments -> FilePath -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
 printDiff arguments filepath (aSource, bSource) (aTerm, bTerm) = case renderer arguments of
   Unified -> do
     rendered <- unified diff aSource bSource
