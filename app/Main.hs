@@ -47,7 +47,7 @@ main = do
   let parse = (P.parserForType . T.pack . takeExtension) sourceAPath
   terms <- sequence $ parse <$> sources
   let replaceLeaves = breakDownLeavesByWord <$> sources
-  printDiff arguments (runJoin sources) (uncurry diff $ runJoin $ replaceLeaves <*> terms)
+  printDiff arguments (uncurry diff $ runJoin $ replaceLeaves <*> terms) (runJoin sources)
   where opts = info (helper <*> arguments)
           (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
@@ -56,8 +56,8 @@ diff :: (Eq a, Eq annotation, Categorizable annotation) => Term a annotation -> 
 diff = interpret comparable
 
 -- | Print a diff, given the command-line arguments, source files, and terms.
-printDiff :: Arguments -> (Source Char, Source Char) -> Diff T.Text Info -> IO ()
-printDiff arguments (aSource, bSource) diff = case format arguments of
+printDiff :: Arguments -> Diff T.Text Info -> (Source Char, Source Char) -> IO ()
+printDiff arguments diff (aSource, bSource) = case format arguments of
   Unified -> do
     rendered <- unified diff aSource bSource
     B1.putStr rendered
