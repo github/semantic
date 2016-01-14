@@ -30,10 +30,12 @@ import Data.Tagged
 import Control.Monad.Reader
 import System.Environment
 
+-- | The available types of diff rendering.
 data Renderer = Unified | Split | Patch
 
 data Arguments = Arguments { renderer :: Renderer, output :: Maybe FilePath, shaA :: String, shaB :: String, filepaths :: [FilePath] }
 
+-- | A parser for the application's command-line arguments.
 arguments :: Parser Arguments
 arguments = Arguments
   <$> (flag Split Unified (long "unified" <> help "output a unified diff")
@@ -94,6 +96,7 @@ printDiff arguments filepath (aSource, bSource) (aTerm, bTerm) = case renderer a
   where diff = interpret comparable aTerm bTerm
         write rendered h = TextIO.hPutStr h rendered
 
+-- | Replace every string leaf with leaves of the words in the string.
 breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
 breakDownLeavesByWord source = cata replaceIn
   where
@@ -102,6 +105,7 @@ breakDownLeavesByWord source = cata replaceIn
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toList $ slice range source)
     makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
 
+-- | Read the file and convert it to Unicode.
 readAndTranscodeFile :: FilePath -> IO (Source Char)
 readAndTranscodeFile path = do
   text <- B1.readFile path
