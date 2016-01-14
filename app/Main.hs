@@ -24,10 +24,10 @@ import qualified Data.Text.ICU.Convert as Convert
 import Data.Bifunctor.Join
 
 -- | The available types of diff rendering.
-data Renderer = Unified | Split | Patch
+data Format = Unified | Split | Patch
 
 -- | The command line arguments to the application.
-data Arguments = Arguments { renderer :: Renderer, output :: Maybe FilePath, sourceA :: FilePath, sourceB :: FilePath }
+data Arguments = Arguments { format :: Format, output :: Maybe FilePath, sourceA :: FilePath, sourceB :: FilePath }
 
 -- | A parser for the application's command-line arguments.
 arguments :: Parser Arguments
@@ -53,7 +53,7 @@ main = do
 
 -- | Print a diff, given the command-line arguments, source files, and terms.
 printDiff :: Arguments -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
-printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments of
+printDiff arguments (aSource, bSource) (aTerm, bTerm) = case format arguments of
   Unified -> do
     rendered <- unified diff aSource bSource
     B1.putStr rendered
