@@ -60,16 +60,15 @@ diff = interpret comparable
 printDiff :: Arguments -> Renderer T.Text (IO ())
 printDiff arguments diff sources = case format arguments of
   Unified -> B1.putStr =<< unified diff sources
-  Split -> do
-    rendered <- split diff sources
-    case output arguments of
-      Just path -> do
+  Split -> put (output arguments) =<< split diff sources
+    where
+      put Nothing rendered = TextIO.putStr rendered
+      put (Just path) rendered = do
         isDir <- doesDirectoryExist path
         let outputPath = if isDir
                          then path </> (takeFileName (sourceB arguments) -<.> ".html")
                          else path
         IO.withFile outputPath IO.WriteMode (flip TextIO.hPutStr rendered)
-      Nothing -> TextIO.putStr rendered
   Patch -> putStr $ PatchOutput.patch diff sources
 
 -- | Replace every string leaf with leaves of the words in the string.
