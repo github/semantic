@@ -56,7 +56,7 @@ main = do
 diff :: (Eq a, Eq annotation, Categorizable annotation) => Term a annotation -> Term a annotation -> Diff a annotation
 diff = interpret comparable
 
--- | Print a diff, given the command-line arguments, source files, and terms.
+-- | Return a renderer from the command-line arguments that will print the diff.
 printDiff :: Arguments -> Renderer T.Text (IO ())
 printDiff arguments diff sources = case format arguments of
   Unified -> B1.putStr =<< unified diff sources
