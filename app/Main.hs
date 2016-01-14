@@ -60,7 +60,7 @@ main = do
     where opts = info (helper <*> arguments)
             (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
--- Returns a file source given an absolute repo path, a relative file path, and the sha to look up.
+-- | Returns a file source given an absolute repo path, a relative file path, and the sha to look up.
 fetchFromGitRepo :: FilePath -> FilePath -> String -> IO (Source Char)
 fetchFromGitRepo repoPath path sha = join $ withRepository lgFactory repoPath $ do
     object <- unTagged <$> parseObjOid (T.pack sha)
@@ -106,12 +106,7 @@ breakDownLeavesByWord source = cata replaceIn
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toList $ slice range source)
     makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
 
--- | Read the file and convert it to Unicode.
-readAndTranscodeFile :: FilePath -> IO (Source Char)
-readAndTranscodeFile path = do
-  text <- B1.readFile path
-  transcode text
-
+-- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
 transcode text = fromText <$> do
   match <- Detect.detectCharset text
