@@ -7,6 +7,7 @@ import qualified Parsers as P
 import Syntax
 import Range
 import qualified PatchOutput
+import Renderer
 import Split
 import Term
 import Unified
@@ -56,7 +57,7 @@ diff :: (Eq a, Eq annotation, Categorizable annotation) => Term a annotation -> 
 diff = interpret comparable
 
 -- | Print a diff, given the command-line arguments, source files, and terms.
-printDiff :: Arguments -> Diff T.Text Info -> (Source Char, Source Char) -> IO ()
+printDiff :: Arguments -> Renderer T.Text (IO ())
 printDiff arguments diff sources = case format arguments of
   Unified -> do
     rendered <- unified diff sources
