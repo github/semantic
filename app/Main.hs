@@ -60,6 +60,7 @@ main = do
     where opts = info (helper <*> arguments)
             (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
+-- Returns a file source given an absolute repo path, a relative file path, and the sha to look up.
 fetchFromGitRepo :: FilePath -> FilePath -> String -> IO (Source Char)
 fetchFromGitRepo repoPath path sha = join $ withRepository lgFactory repoPath $ do
     object <- unTagged <$> parseObjOid (T.pack sha)
