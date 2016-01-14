@@ -8,20 +8,29 @@ import Term
 import Range
 import Categorizable
 
+-- | An annotated node in an abstract syntax tree.
 data Annotated a annotation f = Annotated !annotation !(Syntax a f)
   deriving (Functor, Eq, Show, Foldable)
 
+-- | A semantic category.
 type Category = String
+
+-- | An annotation for a source file, including the source range and semantic
+-- | categories.
 data Info = Info { characterRange :: !Range, categories :: !(Set Category) }
   deriving (Eq, Show)
 
 instance Categorizable Info where
   categories = Diff.categories
 
+-- | An annotated series of patches of terms.
 type Diff a annotation = Free (Annotated a (annotation, annotation)) (Patch (Term a annotation))
 
+-- | Sum the result of a transform applied to all the patches in the diff.
 diffSum :: (Patch (Term a annotation) -> Integer) -> Diff a annotation -> Integer
 diffSum patchCost diff = sum $ fmap patchCost diff
 
+-- | The total cost of the diff.
+-- | This is the number of all leaves in all nodes in all patches of the diff.
 diffCost :: Diff a annotation -> Integer
 diffCost = diffSum $ patchSum termSize
