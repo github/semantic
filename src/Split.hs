@@ -6,6 +6,7 @@ import Diff
 import Line
 import Row
 import Patch
+import Renderer
 import Term
 import Syntax
 import Control.Comonad.Cofree
@@ -30,7 +31,7 @@ type ClassName = T.Text
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeFirst categories
 
-split :: Diff leaf Info -> Source Char -> Source Char -> IO TL.Text
+split :: Renderer leaf (IO TL.Text)
 split diff before after = return . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
