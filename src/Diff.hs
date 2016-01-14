@@ -8,7 +8,7 @@ import Term
 import Range
 import Categorizable
 
--- | An annotated node in an abstract syntax tree.
+-- | An annotated syntax in a diff tree.
 data Annotated a annotation f = Annotated !annotation !(Syntax a f)
   deriving (Functor, Eq, Show, Foldable)
 
