@@ -47,13 +47,17 @@ main = do
   let parse = (P.parserForType . T.pack . takeExtension) sourceAPath
   terms <- sequence $ parse <$> sources
   let replaceLeaves = breakDownLeavesByWord <$> sources
-  printDiff arguments (runJoin sources) (runJoin $ replaceLeaves <*> terms)
+  printDiff arguments (runJoin sources) (uncurry diff $ runJoin $ replaceLeaves <*> terms)
   where opts = info (helper <*> arguments)
           (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
+-- | Diff two terms.
+diff :: (Eq a, Eq annotation, Categorizable annotation) => Term a annotation -> Term a annotation -> Diff a annotation
+diff = interpret comparable
+
 -- | Print a diff, given the command-line arguments, source files, and terms.
-printDiff :: Arguments -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
-printDiff arguments (aSource, bSource) (aTerm, bTerm) = case format arguments of
+printDiff :: Arguments -> (Source Char, Source Char) -> Diff T.Text Info -> IO ()
+printDiff arguments (aSource, bSource) diff = case format arguments of
   Unified -> do
     rendered <- unified diff aSource bSource
     B1.putStr rendered
@@ -68,8 +72,7 @@ printDiff arguments (aSource, bSource) (aTerm, bTerm) = case format arguments of
         IO.withFile outputPath IO.WriteMode (write rendered)
       Nothing -> TextIO.putStr rendered
   Patch -> putStr $ PatchOutput.patch diff aSource bSource
-  where diff = interpret comparable aTerm bTerm
-        write rendered h = TextIO.hPutStr h rendered
+  where write rendered h = TextIO.hPutStr h rendered
 
 -- | Replace every string leaf with leaves of the words in the string.
 breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
