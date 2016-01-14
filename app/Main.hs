@@ -69,10 +69,9 @@ printDiff arguments (aSource, bSource) diff = case format arguments of
         let outputPath = if isDir
                          then path </> (takeFileName (sourceB arguments) -<.> ".html")
                          else path
-        IO.withFile outputPath IO.WriteMode (write rendered)
+        IO.withFile outputPath IO.WriteMode (flip TextIO.hPutStr rendered)
       Nothing -> TextIO.putStr rendered
   Patch -> putStr $ PatchOutput.patch diff aSource bSource
-  where write rendered h = TextIO.hPutStr h rendered
 
 -- | Replace every string leaf with leaves of the words in the string.
 breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
