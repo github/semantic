@@ -59,9 +59,7 @@ diff = interpret comparable
 -- | Print a diff, given the command-line arguments, source files, and terms.
 printDiff :: Arguments -> Renderer T.Text (IO ())
 printDiff arguments diff sources = case format arguments of
-  Unified -> do
-    rendered <- unified diff sources
-    B1.putStr rendered
+  Unified -> B1.putStr =<< unified diff sources
   Split -> do
     rendered <- split diff sources
     case output arguments of
