@@ -31,6 +31,6 @@ diffSum :: (Patch (Term a annotation) -> Integer) -> Diff a annotation -> Intege
 diffSum patchCost diff = sum $ fmap patchCost diff
 
 -- | The total cost of the diff.
--- | This is the number of all leaves in all nodes in all patches of the diff.
+-- | This is the number of all leaves in all terms in all patches of the diff.
 diffCost :: Diff a annotation -> Integer
 diffCost = diffSum $ patchSum termSize
