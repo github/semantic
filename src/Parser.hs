@@ -9,6 +9,9 @@ import qualified Data.Set as Set
 import Source
 import Data.Text as Text
 
+-- | A function that takes a source file and returns an annotated AST.
+-- | The return is in the IO monad because some of the parsers are written in C
+-- | and aren't pure.
 type Parser = Source Char -> IO (Term Text Info)
 
 -- | Given a source string and a term’s annotation & production/child pairs, construct the term.
