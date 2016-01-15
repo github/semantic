@@ -8,6 +8,7 @@ import qualified Parsers as P
 import Syntax
 import Range
 import qualified PatchOutput
+import Renderer
 import Split
 import Term
 import Unified
@@ -57,7 +58,7 @@ main = do
     let parse = (P.parserForType . T.pack . takeExtension) filepath
     terms <- sequence $ parse <$> sources
     let replaceLeaves = breakDownLeavesByWord <$> sources
-    printDiff arguments filepath (runJoin sources) (runJoin $ replaceLeaves <*> terms)
+    printDiff arguments filepath (uncurry diff . runJoin $ replaceLeaves <*> terms) (runJoin sources) 
     where opts = info (helper <*> arguments)
             (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
@@ -79,25 +80,24 @@ fetchFromGitRepo repoPath path sha = join $ withRepository lgFactory repoPath $ 
                    return s
     return $ transcode bytestring
 
--- | Print a diff, given the command-line arguments, source files, and terms.
-printDiff :: Arguments -> FilePath -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
-printDiff arguments filepath (aSource, bSource) (aTerm, bTerm) = case format arguments of
-  Unified -> do
-    rendered <- unified diff aSource bSource
-    B1.putStr rendered
-  Split -> do
-    rendered <- split diff aSource bSource
-    case output arguments of
-      Just path -> do
+-- | Diff two terms.
+diff :: (Eq a, Eq annotation, Categorizable annotation) => Term a annotation -> Term a annotation -> Diff a annotation
+diff = interpret comparable
+
+-- | Return a renderer from the command-line arguments that will print the diff.
+printDiff :: Arguments -> FilePath -> Renderer T.Text (IO ())
+printDiff arguments filepath diff sources = case format arguments of
+  Unified -> B1.putStr =<< unified diff sources
+  Split -> put (output arguments) =<< split diff sources
+    where
+      put Nothing rendered = TextIO.putStr rendered
+      put (Just path) rendered = do
         isDir <- doesDirectoryExist path
         let outputPath = if isDir
                          then path </> (takeFileName filepath -<.> ".html")
                          else path
-        IO.withFile outputPath IO.WriteMode (write rendered)
-      Nothing -> TextIO.putStr rendered
-  Patch -> putStr $ PatchOutput.patch diff aSource bSource
-  where diff = interpret comparable aTerm bTerm
-        write rendered h = TextIO.hPutStr h rendered
+        IO.withFile outputPath IO.WriteMode (flip TextIO.hPutStr rendered)
+  Patch -> putStr $ PatchOutput.patch diff sources
 
 -- | Replace every string leaf with leaves of the words in the string.
 breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
