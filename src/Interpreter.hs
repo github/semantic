@@ -20,9 +20,11 @@ import Data.Maybe
 -- | Returns whether two terms are comparable
 type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
 
+-- | Diff two terms, given a function that determines whether two terms can be compared.
 interpret :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
 interpret comparable a b = fromMaybe (Pure $ Replace a b) $ constructAndRun comparable a b
 
+-- | A hylomorphism. Given an `a`, unfold and then refold into a `b`.
 hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
 hylo down up a = down annotation $ hylo down up <$> syntax where
   (annotation, syntax) = up a
