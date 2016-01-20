@@ -52,7 +52,7 @@ fetchFromGitRepo repoPath path sha = join $ withRepository lgFactory repoPath $ 
     commitIHope <- lookupObject object
     commit <- case commitIHope of
       (CommitObj commit) -> return commit
-      obj -> error "Expected commit SHA"
+      _ -> error "Expected commit SHA"
     tree <- lookupTree (commitTree commit)
     entry <- treeEntry tree (B1.pack path)
     bytestring <- case entry of
