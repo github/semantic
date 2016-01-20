@@ -43,7 +43,7 @@ main = do
   sources <- sequence $ readAndTranscodeFile <$> Join (sourceAPath, sourceBPath)
   let parse = (P.parserForType . T.pack . takeExtension) sourceAPath
   terms <- sequence $ parse <$> sources
-  let replaceLeaves = breakDownLeavesByWord <$> sources
+  let replaceLeaves = P.breakDownLeavesByWord <$> sources
   printDiff arguments (runJoin sources) (runJoin $ replaceLeaves <*> terms)
   where opts = info (helper <*> arguments)
           (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
@@ -64,16 +64,8 @@ printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments 
         IO.withFile outputPath IO.WriteMode (write rendered)
       Nothing -> TextIO.putStr rendered
   Patch -> putStr $ PatchOutput.patch diff (aSource, bSource)
-  where diff = interpret comparable aTerm bTerm
+  where diff = diffTerms aTerm bTerm
         write rendered h = TextIO.hPutStr h rendered
-
-breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
-breakDownLeavesByWord source = cata replaceIn
-  where
-    replaceIn info@(Info range categories) (Leaf _) | ranges <- rangesAndWordsInSource range, length ranges > 1 = info :< (Indexed $ makeLeaf categories <$> ranges)
-    replaceIn info syntax = info :< syntax
-    rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toList $ slice range source)
-    makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
 
 readAndTranscodeFile :: FilePath -> IO (Source Char)
 readAndTranscodeFile path = fromText <$> do

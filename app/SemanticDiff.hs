@@ -1,7 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 module Main where
 
-import Categorizable
 import Diff
 import Interpreter
 import qualified Parsers as P
@@ -57,8 +56,8 @@ main = do
     sources <- sequence $ fetchFromGitRepo gitDir filepath <$> shas
     let parse = (P.parserForType . T.pack . takeExtension) filepath
     terms <- sequence $ parse <$> sources
-    let replaceLeaves = breakDownLeavesByWord <$> sources
-    printDiff arguments filepath (uncurry diff . runJoin $ replaceLeaves <*> terms) (runJoin sources) 
+    let replaceLeaves = P.breakDownLeavesByWord <$> sources
+    printDiff arguments filepath (uncurry diffTerms . runJoin $ replaceLeaves <*> terms) (runJoin sources) 
     where opts = info (helper <*> arguments)
             (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
 
@@ -80,10 +79,6 @@ fetchFromGitRepo repoPath path sha = join $ withRepository lgFactory repoPath $ 
                    return s
     return $ transcode bytestring
 
--- | Diff two terms.
-diff :: (Eq a, Eq annotation, Categorizable annotation) => Term a annotation -> Term a annotation -> Diff a annotation
-diff = interpret comparable
-
 -- | Return a renderer from the command-line arguments that will print the diff.
 printDiff :: Arguments -> FilePath -> Renderer T.Text (IO ())
 printDiff arguments filepath diff sources = case format arguments of
@@ -98,15 +93,6 @@ printDiff arguments filepath diff sources = case format arguments of
                          else path
         IO.withFile outputPath IO.WriteMode (flip TextIO.hPutStr rendered)
   Patch -> putStr $ PatchOutput.patch diff sources
-
--- | Replace every string leaf with leaves of the words in the string.
-breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
-breakDownLeavesByWord source = cata replaceIn
-  where
-    replaceIn info@(Info range categories) (Leaf _) | ranges <- rangesAndWordsInSource range, length ranges > 1 = info :< (Indexed $ makeLeaf categories <$> ranges)
-    replaceIn info syntax = info :< syntax
-    rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toList $ slice range source)
-    makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
