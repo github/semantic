@@ -9,7 +9,6 @@ import TreeSitter
 import Control.Comonad.Cofree
 import qualified Data.Text as T
 import Data.Foldable
-import Term
 
 parserForType :: T.Text -> Parser
 parserForType mediaType = maybe lineByLineParser parseTreeSitterFile $ languageForType mediaType
@@ -25,13 +24,4 @@ lineByLineParser input = return . root . Indexed $ case foldl' annotateLeaves ([
       (accum ++ [ leaf charIndex (toText line) ]
       , charIndex + length line + 1)
     toText = T.pack . Source.toString
-
--- | Replace every string leaf with leaves of the words in the string.
-breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
-breakDownLeavesByWord source = cata replaceIn
-  where
-    replaceIn info@(Info range categories) (Leaf _) | ranges <- rangesAndWordsInSource range, length ranges > 1 = info :< (Indexed $ makeLeaf categories <$> ranges)
-    replaceIn info syntax = info :< syntax
-    rangesAndWordsInSource range = rangesAndWordsFrom (start range) (Source.toList $ slice range source)
-    makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
 

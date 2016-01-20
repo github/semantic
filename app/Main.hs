@@ -22,6 +22,7 @@ import qualified System.IO as IO
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
 import Data.Bifunctor.Join
+import DiffOutput
 
 data Renderer = Unified | Split | Patch
 
@@ -43,7 +44,7 @@ main = do
   sources <- sequence $ readAndTranscodeFile <$> Join (sourceAPath, sourceBPath)
   let parse = (P.parserForType . T.pack . takeExtension) sourceAPath
   terms <- sequence $ parse <$> sources
-  let replaceLeaves = P.breakDownLeavesByWord <$> sources
+  let replaceLeaves = breakDownLeavesByWord <$> sources
   printDiff arguments (runJoin sources) (runJoin $ replaceLeaves <*> terms)
   where opts = info (helper <*> arguments)
           (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
@@ -66,10 +67,3 @@ printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments 
   Patch -> putStr $ PatchOutput.patch diff (aSource, bSource)
   where diff = diffTerms aTerm bTerm
         write rendered h = TextIO.hPutStr h rendered
-
-readAndTranscodeFile :: FilePath -> IO (Source Char)
-readAndTranscodeFile path = fromText <$> do
-  text <- B1.readFile path
-  match <- Detect.detectCharset text
-  converter <- Convert.open match Nothing
-  return $ Convert.toUnicode converter text
