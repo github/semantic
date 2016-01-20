@@ -1,4 +1,4 @@
-module Parsers where
+module Parsers (parserForType, Parser, lineByLineParser) where
 
 import Diff
 import Range
