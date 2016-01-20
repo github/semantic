@@ -51,10 +51,10 @@ main = do
 printDiff :: Arguments -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
 printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments of
   Unified -> do
-    rendered <- unified diff aSource bSource
+    rendered <- unified diff (aSource, bSource)
     B1.putStr rendered
   Split -> do
-    rendered <- split diff aSource bSource
+    rendered <- split diff (aSource, bSource)
     case output arguments of
       Just path -> do
         isDir <- doesDirectoryExist path
@@ -63,7 +63,7 @@ printDiff arguments (aSource, bSource) (aTerm, bTerm) = case renderer arguments 
                          else path
         IO.withFile outputPath IO.WriteMode (write rendered)
       Nothing -> TextIO.putStr rendered
-  Patch -> putStr $ PatchOutput.patch diff aSource bSource
+  Patch -> putStr $ PatchOutput.patch diff (aSource, bSource)
   where diff = interpret comparable aTerm bTerm
         write rendered h = TextIO.hPutStr h rendered
 
