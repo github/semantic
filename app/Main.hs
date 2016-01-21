@@ -60,9 +60,11 @@ diff = interpret comparable
 -- | Return a renderer from the command-line arguments that will print the diff.
 printDiff :: Arguments -> Renderer T.Text (IO ())
 printDiff arguments diff sources = case format arguments of
-  Unified ->  B1.putStr =<< render <$> byteStringMakerFromEnvironment
+  Unified -> put $ unified diff sources
     where
-      render renderer = unified renderer diff sources
+      put chunks = do
+        renderer <- byteStringMakerFromEnvironment
+        B1.putStr $ mconcat $ chunksToByteStrings renderer chunks
   Split -> put (output arguments) =<< split diff sources
     where
       put Nothing rendered = TextIO.putStr rendered
