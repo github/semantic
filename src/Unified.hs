@@ -16,28 +16,31 @@ import Rainbow
 
 -- | Render a diff with the unified format.
 unified :: Renderer a [Chunk String]
-unified diff (before, after) = fst $ iter g $ fmap (unifiedPatch &&& range) diff
+unified diff (before, after) = fst $ iter g mapped
   where
+    mapped = fmap (unifiedPatch &&& range) diff
+    toChunk = chunk . toList
     g (Annotated (_, info) syntax) = annotationAndSyntaxToChunks after info syntax
-    annotationAndSyntaxToChunks source (Info range _) (Leaf _) = (pure . chunk . toList $ slice range source, Just range)
+    annotationAndSyntaxToChunks source (Info range _) (Leaf _) = ([ toChunk $ slice range source ], Just range)
     annotationAndSyntaxToChunks source (Info range _) (Indexed i) = (unifiedRange range i source, Just range)
     annotationAndSyntaxToChunks source (Info range _) (Fixed f) = (unifiedRange range f source, Just range)
     annotationAndSyntaxToChunks source (Info range _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) source, Just range)
 
     unifiedPatch :: Patch (Term a Info) -> [Chunk String]
-    unifiedPatch patch = (fore red . bold <$> beforeChunk) <> (fore green . bold <$> afterChunk)
+    unifiedPatch patch = (fore red . bold <$> beforeChunks) <> (fore green . bold <$> afterChunks)
       where
-        beforeChunk = maybe [] (change "-" . unifiedTerm before) $ Patch.before patch
-        afterChunk = maybe [] (change "+" . unifiedTerm after) $ Patch.after patch
+        beforeChunks = maybe [] (change "-" . unifiedTerm before) $ Patch.before patch
+        afterChunks = maybe [] (change "+" . unifiedTerm after) $ Patch.after patch
 
     unifiedTerm :: Source Char -> Term a Info -> [Chunk String]
     unifiedTerm source term = fst $ cata (annotationAndSyntaxToChunks source) term
 
     unifiedRange :: Range -> [([Chunk String], Maybe Range)] -> Source Char -> [Chunk String]
-    unifiedRange range children source = out <> (pure . chunk . toList $ slice Range { start = previous, end = end range } source) where
-      (out, previous) = foldl' accumulateContext ([], start range) children
-      accumulateContext (out, previous) (child, Just range) = (mconcat [ out, pure . chunk . toList $ slice Range { start = previous, end = start range } source, child ], end range)
-      accumulateContext (out, previous) (child, _) = (out <> child, previous)
+    unifiedRange range children source = out <> [ toChunk $ slice Range { start = previous, end = end range } source ]
+      where
+        (out, previous) = foldl' accumulateContext ([], start range) children
+        accumulateContext (out, previous) (child, Just range) = (out <> [ toChunk $ slice Range { start = previous, end = start range } source ] <> child, end range)
+        accumulateContext (out, previous) (child, _) = (out <> child, previous)
 
 range :: Patch (Term a Info) -> Maybe Range
 range patch = range . extract <$> after patch where
