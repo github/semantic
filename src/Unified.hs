@@ -14,10 +14,9 @@ import Data.List hiding (foldl)
 import qualified Data.OrderedMap as Map
 import Rainbow
 
-unified :: Renderer a (IO ByteString)
-unified diff (before, after) = do
-  renderer <- byteStringMakerFromEnvironment
-  return . mconcat . chunksToByteStrings renderer . fst $ iter g mapped where
+unified :: (Chunk String -> [ByteString] -> [ByteString]) -> Renderer a ByteString
+unified renderer diff (before, after) =
+  mconcat . chunksToByteStrings renderer . fst $ iter g mapped where
     mapped = fmap (unifiedPatch &&& range) diff
     g (Annotated (_, info) syntax) = annotationAndSyntaxToChunks after info syntax
     annotationAndSyntaxToChunks source (Info range _) (Leaf _) = (pure . chunk . toList $ slice range source, Just range)

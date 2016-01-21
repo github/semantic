@@ -23,6 +23,7 @@ import qualified System.IO as IO
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
 import Data.Bifunctor.Join
+import Rainbow
 
 -- | The available types of diff rendering.
 data Format = Unified | Split | Patch
@@ -59,7 +60,9 @@ diff = interpret comparable
 -- | Return a renderer from the command-line arguments that will print the diff.
 printDiff :: Arguments -> Renderer T.Text (IO ())
 printDiff arguments diff sources = case format arguments of
-  Unified -> B1.putStr =<< unified diff sources
+  Unified ->  B1.putStr =<< render <$> byteStringMakerFromEnvironment
+    where
+      render renderer = unified renderer diff sources
   Split -> put (output arguments) =<< split diff sources
     where
       put Nothing rendered = TextIO.putStr rendered
