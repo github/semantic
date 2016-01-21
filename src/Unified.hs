@@ -16,8 +16,8 @@ import Rainbow
 
 -- | Render a diff with the unified format.
 unified :: (Chunk String -> [ByteString] -> [ByteString]) -> Renderer a ByteString
-unified renderer diff (before, after) =
-  mconcat . chunksToByteStrings renderer . fst $ iter g mapped where
+unified renderer diff (before, after) = mconcat . chunksToByteStrings renderer . fst $ iter g mapped
+  where
     mapped = fmap (unifiedPatch &&& range) diff
     g (Annotated (_, info) syntax) = annotationAndSyntaxToChunks after info syntax
     annotationAndSyntaxToChunks source (Info range _) (Leaf _) = (pure . chunk . toList $ slice range source, Just range)
