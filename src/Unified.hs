@@ -14,6 +14,7 @@ import Data.List hiding (foldl)
 import qualified Data.OrderedMap as Map
 import Rainbow
 
+-- | Render a diff with the unified format.
 unified :: (Chunk String -> [ByteString] -> [ByteString]) -> Renderer a ByteString
 unified renderer diff (before, after) =
   mconcat . chunksToByteStrings renderer . fst $ iter g mapped where
