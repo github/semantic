@@ -26,9 +26,10 @@ unified diff (before, after) = do
     annotationAndSyntaxToChunks source (Info range _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) source, Just range)
 
     unifiedPatch :: Patch (Term a Info) -> [Chunk String]
-    unifiedPatch patch = (fore red . bold <$> beforeChunk) <> (fore green . bold <$> afterChunk) where
-      beforeChunk = maybe [] (change "-" . unifiedTerm before) $ Patch.before patch
-      afterChunk = maybe [] (change "+" . unifiedTerm after) $ Patch.after patch
+    unifiedPatch patch = (fore red . bold <$> beforeChunk) <> (fore green . bold <$> afterChunk)
+      where
+        beforeChunk = maybe [] (change "-" . unifiedTerm before) $ Patch.before patch
+        afterChunk = maybe [] (change "+" . unifiedTerm after) $ Patch.after patch
 
     unifiedTerm :: Source Char -> Term a Info -> [Chunk String]
 
