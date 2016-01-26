@@ -32,7 +32,7 @@ classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeFirst categories
 
 split :: Renderer leaf (IO TL.Text)
-split diff (before, after) = return . renderHtml
+split diff (beforeBlob, afterBlob) = return . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body
@@ -40,6 +40,8 @@ split diff (before, after) = return . renderHtml
         ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
         . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
+    before = Source.source beforeBlob
+    after = Source.source afterBlob
     rows = fst (splitDiffByLines diff (0, 0) (before, after))
     numbered = foldl' numberRows [] rows
     maxNumber = case numbered of

@@ -15,11 +15,11 @@ import qualified Data.OrderedMap as Map
 import Rainbow
 
 unified :: Renderer a (IO ByteString)
-unified diff (before, after) = do
+unified diff (beforeBlob, afterBlob) = do
   renderer <- byteStringMakerFromEnvironment
   return . mconcat . chunksToByteStrings renderer . fst $ iter g mapped where
     mapped = fmap (unifiedPatch &&& range) diff
-    g (Annotated (_, info) syntax) = annotationAndSyntaxToChunks after info syntax
+    g (Annotated (_, info) syntax) = annotationAndSyntaxToChunks (source afterBlob) info syntax
     annotationAndSyntaxToChunks source (Info range _) (Leaf _) = (pure . chunk . toList $ slice range source, Just range)
     annotationAndSyntaxToChunks source (Info range _) (Indexed i) = (unifiedRange range i source, Just range)
     annotationAndSyntaxToChunks source (Info range _) (Fixed f) = (unifiedRange range f source, Just range)
@@ -27,6 +27,8 @@ unified diff (before, after) = do
 
     unifiedPatch :: Patch (Term a Info) -> [Chunk String]
     unifiedPatch patch = (fore red . bold <$> beforeChunk) <> (fore green . bold <$> afterChunk) where
+      before = source beforeBlob
+      after = source afterBlob
       beforeChunk = maybe [] (change "-" . unifiedTerm before) $ Patch.before patch
       afterChunk = maybe [] (change "+" . unifiedTerm after) $ Patch.after patch
 

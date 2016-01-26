@@ -44,7 +44,8 @@ main = do
   let parse = DO.parserForFilepath sourceAPath
   terms <- sequence $ parse <$> sources
   let replaceLeaves = DO.breakDownLeavesByWord <$> sources
-  DO.printDiff (args arguments) (runJoin sources) (runJoin $ replaceLeaves <*> terms)
+  let sourceBlobs = runJoin $ (\s -> SourceBlob s T.empty) <$> sources
+  DO.printDiff (args arguments) sourceBlobs (runJoin $ replaceLeaves <*> terms)
   where opts = info (helper <*> arguments)
           (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
         args Arguments{..} = DO.DiffArguments { format = format, output = output, outputPath = sourceA }

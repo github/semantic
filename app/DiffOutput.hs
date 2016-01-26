@@ -49,7 +49,7 @@ readAndTranscodeFile path = do
   text <- B1.readFile path
   transcode text
 
-printDiff :: DiffArguments -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
+printDiff :: DiffArguments -> (SourceBlob, SourceBlob) -> (Term T.Text Info, Term T.Text Info) -> IO ()
 printDiff arguments (aSource, bSource) (aTerm, bTerm) = case format arguments of
   Unified -> do
     rendered <- unified diff (aSource, bSource)

@@ -17,7 +17,10 @@ import Data.Maybe
 import Data.Monoid
 
 patch :: Renderer a String
-patch diff (sourceA, sourceB) = mconcat $ showHunk (sourceA, sourceB) <$> hunks diff (sourceA, sourceB)
+patch diff (beforeBlob, afterBlob) = mconcat $ showHunk (before, after) <$> hunks diff (before, after)
+  where
+    before = source beforeBlob
+    after = source afterBlob
 
 data Hunk a = Hunk { offset :: (Sum Int, Sum Int), changes :: [Change a], trailingContext :: [Row a] }
   deriving (Eq, Show)
