@@ -51,7 +51,7 @@ main = do
           args Arguments{..} filepath = DO.DiffArguments { format = format, output = output, outputPath = filepath }
 
 -- | Returns a file source given an absolute repo path, a relative file path, and the sha to look up.
-fetchFromGitRepo :: FilePath -> FilePath -> String -> IO (Source Char, T.Text)
+fetchFromGitRepo :: FilePath -> FilePath -> String -> IO (Source Char, String)
 fetchFromGitRepo repoPath path sha = withRepository lgFactory repoPath $ do
     object <- unTagged <$> parseObjOid (T.pack sha)
     commitIHope <- lookupObject object
@@ -68,4 +68,4 @@ fetchFromGitRepo repoPath path sha = withRepository lgFactory repoPath $ do
                                     let oid = renderObjOid $ blobOid blob
                                     return (s, oid)
     s <- liftIO $ DO.transcode bytestring
-    return (s, oid)
+    return (s, T.unpack oid)

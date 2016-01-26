@@ -17,7 +17,7 @@ import Data.Maybe
 import Data.Monoid
 
 patch :: Renderer a String
-patch diff (beforeBlob, afterBlob) = mconcat $ showHunk (before, after) <$> hunks diff (before, after)
+patch diff (beforeBlob, afterBlob) = mconcat $ showHunk (beforeBlob, afterBlob) <$> hunks diff (before, after)
   where
     before = source beforeBlob
     after = source afterBlob
@@ -41,8 +41,9 @@ lineLength :: Line a -> Sum Int
 lineLength EmptyLine = 0
 lineLength _ = 1
 
-showHunk :: (Source Char, Source Char) -> Hunk (SplitDiff a Info) -> String
-showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (unRight <$> trailingContext hunk)
+showHunk :: (SourceBlob, SourceBlob) -> Hunk (SplitDiff a Info) -> String
+showHunk blobs@(beforeBlob, afterBlob) hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (unRight <$> trailingContext hunk)
+  where sources = (source beforeBlob, source afterBlob)
 
 showChange :: (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
 showChange sources change = showLines (snd sources) ' ' (unRight <$> context change) ++ showLines (fst sources) '-' (unLeft <$> contents change) ++ showLines (snd sources) '+' (unRight <$> contents change)
