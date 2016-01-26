@@ -59,8 +59,9 @@ getRange :: SplitDiff leaf Info -> Range
 getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure (Info range _ :< _)) = range
 
-header :: Hunk a -> String
-header hunk = "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
+header :: (SourceBlob, SourceBlob) -> Hunk a -> String
+header blobs hunk = "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n" ++
+  "index " ++ oid (fst blobs) ++ " " ++ oid (snd blobs) ++ "\n"
   where (lengthA, lengthB) = getSum *** getSum $ hunkLength hunk
         (offsetA, offsetB) = getSum *** getSum $ offset hunk
 
