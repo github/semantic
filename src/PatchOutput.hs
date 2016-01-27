@@ -60,8 +60,8 @@ getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure (Info range _ :< _)) = range
 
 header :: (SourceBlob, SourceBlob) -> Hunk a -> String
-header blobs hunk = "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n" ++
-  "index " ++ oid (fst blobs) ++ " " ++ oid (snd blobs) ++ "\n"
+header blobs hunk = "index " ++ oid (fst blobs) ++ " " ++ oid (snd blobs) ++ "\n" ++
+  "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
   where (lengthA, lengthB) = getSum *** getSum $ hunkLength hunk
         (offsetA, offsetB) = getSum *** getSum $ offset hunk
 
