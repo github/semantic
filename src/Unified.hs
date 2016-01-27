@@ -24,7 +24,7 @@ unified diff (before, after) = fst $ iter g mapped
     annotationAndSyntaxToChunks source (Info range _) (Leaf _) = ([ toChunk $ slice range source ], Just range)
     annotationAndSyntaxToChunks source (Info range _) (Indexed i) = (unifiedRange range i source, Just range)
     annotationAndSyntaxToChunks source (Info range _) (Fixed f) = (unifiedRange range f source, Just range)
-    annotationAndSyntaxToChunks source (Info range _) (Keyed k) = (unifiedRange range (sort $ snd <$> Map.toList k) source, Just range)
+    annotationAndSyntaxToChunks source (Info range _) (Keyed k) = (unifiedRange range (snd <$> Map.toList k) source, Just range)
 
     unifiedPatch :: Patch (Term a Info) -> [Chunk String]
     unifiedPatch patch = (fore red . bold <$> beforeChunks) <> (fore green . bold <$> afterChunks)
