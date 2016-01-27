@@ -67,6 +67,7 @@ executable semantic-diff-exe
                      , filepath
                      , free
                      , optparse-applicative
+                     , rainbow
                      , semantic-diff
                      , text >= 1.2.1.3
                      , text-icu
