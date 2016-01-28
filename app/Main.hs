@@ -65,7 +65,7 @@ printDiff arguments diff sources = case format arguments of
       put chunks = do
         renderer <- byteStringMakerFromEnvironment
         B1.putStr $ mconcat $ chunksToByteStrings renderer chunks
-  Split -> put (output arguments) =<< split diff sources
+  Split -> put (output arguments) $ split diff sources
     where
       put Nothing rendered = TextIO.putStr rendered
       put (Just path) rendered = do
