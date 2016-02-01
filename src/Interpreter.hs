@@ -1,4 +1,4 @@
-module Interpreter (interpret, Comparable) where
+module Interpreter (interpret, Comparable, diffTerms) where
 
 import Prelude hiding (lookup)
 import Algorithm
@@ -8,6 +8,7 @@ import Patch
 import SES
 import Syntax
 import Term
+import Categorizable
 import Control.Monad.Free
 import Control.Comonad.Cofree hiding (unwrap)
 import qualified Data.OrderedMap as Map
@@ -19,6 +20,10 @@ import Data.Maybe
 
 -- | Returns whether two terms are comparable
 type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
+
+-- | Diff two terms, given the default Categorizable.comparable function.
+diffTerms :: (Eq a, Eq annotation, Categorizable annotation) => Term a annotation -> Term a annotation -> Diff a annotation
+diffTerms = interpret comparable
 
 -- | Diff two terms, given a function that determines whether two terms can be compared.
 interpret :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
