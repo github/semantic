@@ -19,6 +19,7 @@ import qualified Data.Text.Lazy.IO as TextIO
 import qualified PatchOutput
 import Interpreter
 import qualified Parsers as P
+import Rainbow
 
 -- | The available types of diff rendering.
 data Format = Unified | Split | Patch
@@ -51,9 +52,10 @@ readAndTranscodeFile path = do
 
 printDiff :: DiffArguments -> (Source Char, Source Char) -> (Term T.Text Info, Term T.Text Info) -> IO ()
 printDiff arguments (aSource, bSource) (aTerm, bTerm) = case format arguments of
-  Unified -> do
-    rendered <- unified diff (aSource, bSource)
-    B1.putStr rendered
+  Unified -> put $ unified diff (aSource, bSource)
+    where put chunks = do
+            renderer <- byteStringMakerFromEnvironment
+            B1.putStr $ mconcat $ chunksToByteStrings renderer chunks
   Split -> do
     rendered <- split diff (aSource, bSource)
     case output arguments of

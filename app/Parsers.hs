@@ -22,6 +22,6 @@ lineByLineParser input = return . root . Indexed $ case foldl' annotateLeaves ([
     leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) mempty :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum ++ [ leaf charIndex (toText line) ]
-      , charIndex + length line + 1)
+      , charIndex + length line)
     toText = T.pack . Source.toString
 
