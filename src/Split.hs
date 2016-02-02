@@ -60,14 +60,14 @@ split diff (before, after) = renderHtml
     hasChanges diff = or $ const True <$> diff
 
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
-    numberRows [] (Row EmptyLine EmptyLine) = []
-    numberRows [] (Row left@(Line _) EmptyLine) = [(1, left, 0, EmptyLine)]
-    numberRows [] (Row EmptyLine right@(Line _)) = [(0, EmptyLine, 1, right)]
-    numberRows [] (Row left right) = [(1, left, 1, right)]
-    numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine EmptyLine) = (leftCount, EmptyLine, rightCount, EmptyLine):rows
-    numberRows rows@((leftCount, _, rightCount, _):_) (Row left@(Line _) EmptyLine) = (leftCount + 1, left, rightCount, EmptyLine):rows
-    numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine right@(Line _)) = (leftCount, EmptyLine, rightCount + 1, right):rows
-    numberRows rows@((leftCount, _, rightCount, _):_) (Row left right) = (leftCount + 1, left, rightCount + 1, right):rows
+    numberRows rows (Row left right) = (leftCount rows + valueOf left, left, rightCount rows + valueOf right, right) : rows
+      where
+        leftCount [] = 0
+        leftCount ((x, _, _, _):_) = x
+        rightCount [] = 0
+        rightCount ((_, _, x, _):_) = x
+        valueOf EmptyLine = 0
+        valueOf _ = 1
 
 -- | A diff with only one side’s annotations.
 type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf annotation)
