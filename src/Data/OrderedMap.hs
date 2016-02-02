@@ -43,8 +43,7 @@ empty :: OrderedMap key value
 empty = OrderedMap []
 
 union :: Eq key => OrderedMap key value -> OrderedMap key value -> OrderedMap key value
-union (OrderedMap a) (OrderedMap b) = OrderedMap $ a ++ filter (not . (`elem` extant) . fst) b
-  where extant = fst <$> a
+union a b = OrderedMap $ toList a ++ toList (difference b a)
 
 unions :: Eq key => [OrderedMap key value] -> OrderedMap key value
 unions = foldl union empty
