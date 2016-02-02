@@ -1,4 +1,4 @@
-module Parsers where
+module Parsers (parserForType, Parser, lineByLineParser) where
 
 import Diff
 import Range
@@ -24,3 +24,4 @@ lineByLineParser input = return . root . Indexed $ case foldl' annotateLeaves ([
       (accum ++ [ leaf charIndex (toText line) ]
       , charIndex + length line)
     toText = T.pack . Source.toString
+

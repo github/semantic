@@ -21,20 +21,25 @@ unified diff (before, after) = fst $ iter g mapped
     mapped = fmap (unifiedPatch &&& range) diff
     toChunk = chunk . toList
     g (Annotated (_, info) syntax) = annotationAndSyntaxToChunks after info syntax
+    -- | Render an annotation and syntax into a list of chunks.
     annotationAndSyntaxToChunks source (Info range _) (Leaf _) = ([ toChunk $ slice range source ], Just range)
     annotationAndSyntaxToChunks source (Info range _) (Indexed i) = (unifiedRange range i source, Just range)
     annotationAndSyntaxToChunks source (Info range _) (Fixed f) = (unifiedRange range f source, Just range)
     annotationAndSyntaxToChunks source (Info range _) (Keyed k) = (unifiedRange range (snd <$> Map.toList k) source, Just range)
 
+    -- | Render a Patch into a list of chunks.
     unifiedPatch :: Patch (Term a Info) -> [Chunk String]
     unifiedPatch patch = (fore red . bold <$> beforeChunks) <> (fore green . bold <$> afterChunks)
       where
         beforeChunks = maybe [] (change "-" . unifiedTerm before) $ Patch.before patch
         afterChunks = maybe [] (change "+" . unifiedTerm after) $ Patch.after patch
 
+    -- | Render the contents of a Term as a series of chunks.
     unifiedTerm :: Source Char -> Term a Info -> [Chunk String]
     unifiedTerm source term = fst $ cata (annotationAndSyntaxToChunks source) term
 
+    -- | Given a range and a list of pairs of chunks and a range, render the
+    -- | entire range from the source as a single list of chunks.
     unifiedRange :: Range -> [([Chunk String], Maybe Range)] -> Source Char -> [Chunk String]
     unifiedRange range children source = out <> [ toChunk $ slice Range { start = previous, end = end range } source ]
       where
@@ -42,10 +47,12 @@ unified diff (before, after) = fst $ iter g mapped
         accumulateContext (out, previous) (child, Just range) = (out <> [ toChunk $ slice Range { start = previous, end = start range } source ] <> child, end range)
         accumulateContext (out, previous) (child, _) = (out <> child, previous)
 
+-- | Return the range of the after side of the patch, or Nothing if it's not a replacement.
 range :: Patch (Term a Info) -> Maybe Range
 range patch = range . extract <$> after patch where
   extract (annotation :< _) = annotation
   range (Info range _) = range
 
+-- | Add chunks to the beginning and end of the list with curly braces and the given string.
 change :: String -> [Chunk String] -> [Chunk String]
 change bound content = [ chunk "{", chunk bound ] ++ content ++ [ chunk bound, chunk "}" ]
