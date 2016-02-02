@@ -60,7 +60,7 @@ header hunk = "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offs
   where (lengthA, lengthB) = getSum *** getSum $ hunkLength hunk
         (offsetA, offsetB) = getSum *** getSum $ offset hunk
 
-hunks :: Diff a Info -> (Source Char, Source Char) -> [Hunk (SplitDiff a Info)]
+hunks :: Renderer a [Hunk (SplitDiff a Info)]
 hunks diff sources = hunksInRows (1, 1) . fst $ splitDiffByLines diff (0, 0) sources
 
 hunksInRows :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]
