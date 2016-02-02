@@ -1,27 +1,8 @@
 {-# LANGUAGE RecordWildCards #-}
  module Main where
 
-import Categorizable
-import Diff
 import Interpreter
-import qualified Parsers as P
-import Syntax
-import Range
-import qualified PatchOutput
-import Split
-import Term
-import Unified
-import Source
-import Control.Comonad.Cofree
-import qualified Data.ByteString.Char8 as B1
 import Options.Applicative
-import System.Directory
-import System.FilePath
-import qualified Data.Text as T
-import qualified Data.Text.Lazy.IO as TextIO
-import qualified System.IO as IO
-import qualified Data.Text.ICU.Detect as Detect
-import qualified Data.Text.ICU.Convert as Convert
 import Data.Bifunctor.Join
 import qualified DiffOutput as DO
 
