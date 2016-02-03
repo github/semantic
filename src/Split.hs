@@ -28,11 +28,14 @@ import Source hiding ((++))
 
 type ClassName = T.Text
 
+-- | Add the first category from a Foldable of categories as a class name as a
+-- | class name on the markup, prefixed by `category-`.
 classifyMarkup :: Foldable f => f String -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeFirst categories
 
-split :: Renderer leaf (IO TL.Text)
-split diff (before, after) = return . renderHtml
+-- | Render a diff as an HTML split diff.
+split :: Renderer leaf TL.Text
+split diff (before, after) = renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body
@@ -46,12 +49,14 @@ split diff (before, after) = return . renderHtml
       [] -> 0
       ((x, _, y, _) : _) -> max x y
 
+    -- | The number of digits in a number (e.g. 342 has 3 digits).
     digits :: Int -> Int
     digits n = let base = 10 :: Int in
       ceiling (logBase (fromIntegral base) (fromIntegral n) :: Double)
 
     columnWidth = max (20 + digits maxNumber * 8) 40
 
+    -- | Render a line with numbers as an HTML row.
     numberedLinesToMarkup :: (Int, Line (SplitDiff a Info), Int, Line (SplitDiff a Info)) -> Markup
     numberedLinesToMarkup (m, left, n, right) = tr $ toMarkup (or $ hasChanges <$> left, m, renderable before left) <> toMarkup (or $ hasChanges <$> right, n, renderable after right) <> string "\n"
 
@@ -59,19 +64,22 @@ split diff (before, after) = return . renderHtml
 
     hasChanges diff = or $ const True <$> diff
 
+    -- | Add a row to list of tuples of ints and lines, where the ints denote
+    -- | how many non-empty lines exist on that side up to that point.
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
-    numberRows [] (Row EmptyLine EmptyLine) = []
-    numberRows [] (Row left@(Line _) EmptyLine) = [(1, left, 0, EmptyLine)]
-    numberRows [] (Row EmptyLine right@(Line _)) = [(0, EmptyLine, 1, right)]
-    numberRows [] (Row left right) = [(1, left, 1, right)]
-    numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine EmptyLine) = (leftCount, EmptyLine, rightCount, EmptyLine):rows
-    numberRows rows@((leftCount, _, rightCount, _):_) (Row left@(Line _) EmptyLine) = (leftCount + 1, left, rightCount, EmptyLine):rows
-    numberRows rows@((leftCount, _, rightCount, _):_) (Row EmptyLine right@(Line _)) = (leftCount, EmptyLine, rightCount + 1, right):rows
-    numberRows rows@((leftCount, _, rightCount, _):_) (Row left right) = (leftCount + 1, left, rightCount + 1, right):rows
+    numberRows rows (Row left right) = (leftCount rows + valueOf left, left, rightCount rows + valueOf right, right) : rows
+      where
+        leftCount [] = 0
+        leftCount ((x, _, _, _):_) = x
+        rightCount [] = 0
+        rightCount ((_, _, x, _):_) = x
+        valueOf EmptyLine = 0
+        valueOf _ = 1
 
 -- | A diff with only one side’s annotations.
 type SplitDiff leaf annotation = Free (Annotated leaf annotation) (Term leaf annotation)
 
+-- | Something that can be rendered as markup.
 newtype Renderable a = Renderable (Source Char, a)
 
 instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
@@ -94,6 +102,7 @@ instance ToMarkup (Renderable (SplitDiff a Info)) where
     where toMarkupAndRange :: Term a Info -> (Markup, Range)
           toMarkupAndRange term@(Info range _ :< _) = ((div ! A.class_ (stringValue "patch")) . toMarkup $ Renderable (source, term), range)
 
+-- | Split a diff, which may span multiple lines, into rows of split diffs.
 splitDiffByLines :: Diff leaf Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff leaf Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
@@ -107,6 +116,7 @@ splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   where categories (Info _ left, Info _ right) = (left, right)
         ranges (Info left _, Info right _) = (left, right)
 
+-- | A functor that can return its content.
 class Functor f => Has f where
   get :: f a -> a
 
@@ -141,6 +151,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
         childLines (lines, previous) child = let (childLines, childRange) = splitTermByLines (get child) source in
           (adjoin $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap (Right . (<$ child)) <$> childLines), end childRange)
 
+-- | Split a annotated diff into rows of split diffs.
 splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax leaf (Diff leaf Info) -> [Row (SplitDiff leaf Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> wrapRowContents (Free . (`Annotated` Leaf a) . (`Info` fst categories) . unionRanges) (Free . (`Annotated` Leaf a) . (`Info` snd categories) . unionRanges) <$> contextRows ranges sources
@@ -176,21 +187,31 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         ends (left, right) = (end left, end right)
         makeRanges (leftStart, rightStart) (leftEnd, rightEnd) = (Range leftStart leftEnd, Range rightStart rightEnd)
 
+-- | Returns a function that takes an Either, applies either the left or right
+-- | MaybeOpen, and returns Nothing or the original either.
 openEither :: MaybeOpen a -> MaybeOpen b -> MaybeOpen (Either a b)
 openEither ifLeft ifRight which = either (fmap (const which) . ifLeft) (fmap (const which) . ifRight) which
 
+-- | Given a source and a range, returns nothing if it ends with a `\n`;
+-- | otherwise returns the range.
 openRange :: Source Char -> MaybeOpen Range
 openRange source range = case (source `at`) <$> maybeLastIndex range of
   Just '\n' -> Nothing
   _ -> Just range
 
+-- | Given a source and something that has a term, returns nothing if the term
+-- | ends with a `\n`; otherwise returns the term.
 openTerm :: Has f => Source Char -> MaybeOpen (f (Term leaf Info))
 openTerm source term = const term <$> openRange source (case get term of (Info range _ :< _) -> range)
 
+-- | Given a source and something that has a split diff, returns nothing if the
+-- | diff ends with a `\n`; otherwise returns the diff.
 openDiff :: Has f => Source Char -> MaybeOpen (f (SplitDiff leaf Info))
 openDiff source diff = const diff <$> case get diff of
   (Free (Annotated (Info range _) _)) -> openRange source range
   (Pure (Info range _ :< _)) -> openRange source range
 
+-- | Zip two lists by applying a function, using the default values to extend
+-- | the shorter list.
 zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
 zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++ repeat da) (b ++ repeat db)
