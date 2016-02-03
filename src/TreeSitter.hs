@@ -40,8 +40,10 @@ foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child 
 foreign import ccall "app/bridge.h ts_node_p_start_char" ts_node_p_start_char :: Ptr TSNode -> CSize
 foreign import ccall "app/bridge.h ts_node_p_end_char" ts_node_p_end_char :: Ptr TSNode -> CSize
 
+-- | A language in the eyes of semantic-diff.
 data Language = Language { getTsLanguage :: Ptr TSLanguage, getConstructor :: Constructor }
 
+-- | Returns a Language based on the file extension (including the ".").
 languageForType :: T.Text -> Maybe Language
 languageForType mediaType = case mediaType of
     ".h" -> c
@@ -52,6 +54,7 @@ languageForType mediaType = case mediaType of
     _ -> Nothing
   where c = Just . Language ts_language_c $ constructorForProductions mempty (Set.fromList [ "assignment_expression", "logical_expression", "pointer_expression", "field_expression", "relational_expression", "designator", "call_expression", "math_expression" ])
 
+-- | Returns a parser for the given language.
 parseTreeSitterFile :: Language -> Parser
 parseTreeSitterFile (Language language constructor) contents = do
   document <- ts_document_make
@@ -63,6 +66,7 @@ parseTreeSitterFile (Language language constructor) contents = do
     ts_document_free document
     return term)
 
+-- | Given a constructor and a tree sitter document, return a parser.
 documentToTerm :: Constructor -> Ptr TSDocument -> Parser
 documentToTerm constructor document contents = alloca $ \ root -> do
   ts_document_root_node_p document root
