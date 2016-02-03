@@ -13,11 +13,11 @@ data Line a =
   | EmptyLine
   deriving (Eq, Functor, Foldable)
 
--- | Create a list from a vector.
+-- | Create a line from a list of items.
 makeLine :: [a] -> Line a
 makeLine = Line . Vector.fromList
 
--- | Create a vector from a list.
+-- | Return a list of items from a line.
 unLine :: Line a -> [a]
 unLine EmptyLine = []
 unLine (Line elements) = Vector.toList elements
