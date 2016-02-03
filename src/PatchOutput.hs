@@ -77,13 +77,15 @@ header hunk = "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offs
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
 hunks diff sources = hunksInRows (1, 1) . fst $ splitDiffByLines diff (0, 0) sources
 
--- | Given beginning line numbers, turn rows in a split diff into hunks in a tach.
+-- | Given beginning line numbers, turn rows in a split diff into hunks in a
+-- | patch.
 hunksInRows :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]
 hunksInRows start rows = case nextHunk start rows of
   Nothing -> []
   Just (hunk, rest) -> hunk : hunksInRows (offset hunk <> hunkLength hunk) rest
 
--- |
+-- | Given beginning line numbers, return the next hunk and the remaining rows
+-- | of the split diff.
 nextHunk :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe (Hunk (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextHunk start rows = case nextChange start rows of
   Nothing -> Nothing
@@ -94,7 +96,8 @@ nextHunk start rows = case nextChange start rows of
             Nothing -> ([], rows)
             Just (change, rest) -> let (changes, rest') = contiguousChanges rest in (change : changes, rest')
 
--- |
+-- | Given beginning line numbers, return the number of lines to the next
+-- | the next change, and the remaining rows of the split diff.
 nextChange :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> Maybe ((Sum Int, Sum Int), Change (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextChange start rows = case changeIncludingContext leadingContext afterLeadingContext of
   Nothing -> Nothing
