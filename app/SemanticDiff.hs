@@ -2,7 +2,6 @@
 module Main where
 
 import Interpreter
-import Renderer
 import Source
 import Options.Applicative
 import qualified Data.ByteString.Char8 as B1
@@ -40,7 +39,7 @@ main = do
     let parse = DO.parserForFilepath filepath
     terms <- sequence $ parse <$> sources
     let replaceLeaves = DO.breakDownLeavesByWord <$> sources
-    DO.printDiff (args arguments filepath) (runJoin sources) (runJoin $ replaceLeaves <*> terms)
+    DO.printDiff (args arguments filepath) (uncurry diffTerms $ runJoin $ replaceLeaves <*> terms) (runJoin sources)
     where opts = info (helper <*> arguments)
             (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
           args Arguments{..} filepath = DO.DiffArguments { format = format, output = output, outputPath = filepath }
