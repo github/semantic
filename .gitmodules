@@ -6,4 +6,4 @@
 	url = https://github.com/joshvera/text-icu
 [submodule "vendor/gitlib"]
 	path = vendor/gitlib
-	url = https://github.com/jwiegley/gitlib
+	url = https://github.com/joshvera/gitlib
