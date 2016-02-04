@@ -5,6 +5,15 @@ import Term
 import Control.Comonad.Cofree
 import Data.Set
 
+-- | A standardized category of AST node. Used to determine the semantics for
+-- | semantic diffing and define comparability of nodes.
+data Category =
+  -- | A literal key-value data structure.
+  DictionaryLiteral
+  -- | A non-standard category, which can be used for comparability.
+  | Other String
+  deriving Eq
+
 -- | The class of types that have categories.
 class Categorizable a where
   categories :: a -> Set String
