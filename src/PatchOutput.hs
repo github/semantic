@@ -10,11 +10,12 @@ import Renderer
 import Row
 import Source hiding ((++), break)
 import Split
-import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Maybe
 import Data.Monoid
+import Control.Monad
+import Data.Bifunctor
 
 patch :: Renderer a String
 patch diff (sourceA, sourceB) = mconcat $ showHunk (sourceA, sourceB) <$> hunks diff (sourceA, sourceB)
@@ -56,9 +57,10 @@ getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure (Info range _ :< _)) = range
 
 header :: Hunk a -> String
-header hunk = "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
-  where (lengthA, lengthB) = getSum *** getSum $ hunkLength hunk
-        (offsetA, offsetB) = getSum *** getSum $ offset hunk
+header hunk = "diff --git a/path.txt b/path.txt\n" ++
+  "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
+  where (lengthA, lengthB) = join bimap getSum $ hunkLength hunk
+        (offsetA, offsetB) = join bimap getSum $ offset hunk
 
 hunks :: Diff a Info -> (Source Char, Source Char) -> [Hunk (SplitDiff a Info)]
 hunks diff sources = hunksInRows (1, 1) . fst $ splitDiffByLines diff (0, 0) sources
