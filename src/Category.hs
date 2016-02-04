@@ -1,5 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
-module Categorizable where
+module Category where
 
 import Term
 import Control.Comonad.Cofree

@@ -6,7 +6,7 @@ import Control.Monad.Free
 import Patch
 import Term
 import Range
-import Categorizable
+import Category
 
 -- | An annotated syntax in a diff tree.
 data Annotated a annotation f = Annotated !annotation !(Syntax a f)

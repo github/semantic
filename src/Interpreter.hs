@@ -8,7 +8,7 @@ import Patch
 import SES
 import Syntax
 import Term
-import Categorizable
+import Category
 import Control.Monad.Free
 import Control.Comonad.Cofree hiding (unwrap)
 import qualified Data.OrderedMap as Map

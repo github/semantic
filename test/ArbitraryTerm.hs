@@ -1,6 +1,6 @@
 module ArbitraryTerm where
 
-import Categorizable
+import Category
 import Syntax
 import Term
 import Control.Comonad.Cofree
