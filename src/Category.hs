@@ -12,7 +12,7 @@ data Category =
   DictionaryLiteral
   -- | A non-standard category, which can be used for comparability.
   | Other String
-  deriving Eq
+  deriving (Eq, Show)
 
 -- | The class of types that have categories.
 class Categorizable a where
