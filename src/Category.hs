@@ -16,7 +16,7 @@ data Category =
 
 -- | The class of types that have categories.
 class Categorizable a where
-  categories :: a -> Set String
+  categories :: a -> Set Category
 
 instance Categorizable annotation => Categorizable (Term a annotation) where
   categories (annotation :< _) = categories annotation
