@@ -12,9 +12,6 @@ import Category
 data Annotated a annotation f = Annotated !annotation !(Syntax a f)
   deriving (Functor, Eq, Show, Foldable)
 
--- | A semantic category.
-type Category = String
-
 -- | An annotation for a source file, including the source range and semantic
 -- | categories.
 data Info = Info { characterRange :: !Range, categories :: !(Set Category) }
