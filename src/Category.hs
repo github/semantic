@@ -10,6 +10,8 @@ import Data.Set
 data Category =
   -- | A literal key-value data structure.
   DictionaryLiteral
+  -- | A call to a function.
+  | FunctionCall
   -- | A non-standard category, which can be used for comparability.
   | Other String
   deriving (Eq, Show, Ord)
