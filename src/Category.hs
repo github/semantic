@@ -8,8 +8,10 @@ import Data.Set
 -- | A standardized category of AST node. Used to determine the semantics for
 -- | semantic diffing and define comparability of nodes.
 data Category =
+  -- | An operator with 2 operands.
+  BinaryOperator
   -- | A literal key-value data structure.
-  DictionaryLiteral
+  | DictionaryLiteral
   -- | A call to a function.
   | FunctionCall
   -- | A non-standard category, which can be used for comparability.
