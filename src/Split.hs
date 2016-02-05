@@ -2,6 +2,7 @@
 module Split where
 
 import Prelude hiding (div, head, span)
+import Category
 import Diff
 import Line
 import Row
@@ -30,8 +31,14 @@ type ClassName = T.Text
 
 -- | Add the first category from a Foldable of categories as a class name as a
 -- | class name on the markup, prefixed by `category-`.
-classifyMarkup :: Foldable f => f String -> Markup -> Markup
-classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . ("category-" ++)) $ maybeFirst categories
+classifyMarkup :: Foldable f => f Category -> Markup -> Markup
+classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . styleName) $ maybeFirst categories
+
+-- | Return the appropriate style name for the given category.
+styleName :: Category -> String
+styleName category = "category-" ++ case category of
+  DictionaryLiteral -> "dictionary"
+  Other string -> string
 
 -- | Render a diff as an HTML split diff.
 split :: Renderer leaf TL.Text
