@@ -37,7 +37,9 @@ classifyMarkup categories element = maybe element ((element !) . A.class_ . stri
 -- | Return the appropriate style name for the given category.
 styleName :: Category -> String
 styleName category = "category-" ++ case category of
+  BinaryOperator -> "binary-operator"
   DictionaryLiteral -> "dictionary"
+  FunctionCall -> "function-call"
   Other string -> string
 
 -- | Render a diff as an HTML split diff.
