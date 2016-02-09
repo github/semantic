@@ -6,6 +6,9 @@ import Source
 import Options.Applicative
 import qualified Data.ByteString.Char8 as B1
 import qualified Data.Text as T
+import Control.Monad
+import Control.Arrow
+import Data.Bifunctor
 import Data.Bifunctor.Join
 import Git.Libgit2
 import Git.Types
@@ -35,18 +38,20 @@ main = do
   arguments@Arguments{..} <- execParser opts
   let shas = Join (shaA, shaB)
   forM_ filepaths $ \filepath -> do
-    sources <- sequence $ fetchFromGitRepo gitDir filepath <$> shas
+    sourcesAndOids <- sequence $ fetchFromGitRepo gitDir filepath <$> shas
+    let (sources, oids)= (Join . join bimap fst $ runJoin sourcesAndOids, join bimap snd $ runJoin sourcesAndOids)
     let parse = DO.parserForFilepath filepath
     terms <- sequence $ parse <$> sources
     let replaceLeaves = DO.breakDownLeavesByWord <$> sources
-    DO.printDiff (args arguments filepath) (uncurry diffTerms $ runJoin $ replaceLeaves <*> terms) (runJoin sources)
+    let sourceBlobs = ((SourceBlob (fst $ runJoin sources) *** SourceBlob (snd $ runJoin sources)) oids)
+    DO.printDiff (args arguments filepath) (uncurry diffTerms . runJoin $ replaceLeaves <*> terms) sourceBlobs
     where opts = info (helper <*> arguments)
             (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
           args Arguments{..} filepath = DO.DiffArguments { format = format, output = output, outputPath = filepath }
 
 -- | Returns a file source given an absolute repo path, a relative file path, and the sha to look up.
-fetchFromGitRepo :: FilePath -> FilePath -> String -> IO (Source Char)
-fetchFromGitRepo repoPath path sha = join $ withRepository lgFactory repoPath $ do
+fetchFromGitRepo :: FilePath -> FilePath -> String -> IO (Source Char, String)
+fetchFromGitRepo repoPath path sha = withRepository lgFactory repoPath $ do
     object <- unTagged <$> parseObjOid (T.pack sha)
     commitIHope <- lookupObject object
     commit <- case commitIHope of
@@ -54,10 +59,12 @@ fetchFromGitRepo repoPath path sha = join $ withRepository lgFactory repoPath $ 
       _ -> error "Expected commit SHA"
     tree <- lookupTree (commitTree commit)
     entry <- treeEntry tree (B1.pack path)
-    bytestring <- case entry of
-                 Nothing -> return mempty
-                 Just BlobEntry {..} -> do
-                   blob <- lookupBlob blobEntryOid
-                   let (BlobString s) = blobContents blob
-                   return s
-    return $ DO.transcode bytestring
+    (bytestring, oid) <- case entry of
+                                  Nothing -> return (mempty, mempty)
+                                  Just BlobEntry {..} -> do
+                                    blob <- lookupBlob blobEntryOid
+                                    let (BlobString s) = blobContents blob
+                                    let oid = renderObjOid $ blobOid blob
+                                    return (s, oid)
+    s <- liftIO $ DO.transcode bytestring
+    return (s, T.unpack oid)

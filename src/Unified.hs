@@ -16,11 +16,10 @@ import Rainbow
 
 -- | Render a diff with the unified format.
 unified :: Renderer a [Chunk String]
-unified diff (before, after) = fst $ iter g mapped
-  where
+unified diff (beforeBlob, afterBlob) = fst $ iter g mapped where
     mapped = fmap (unifiedPatch &&& range) diff
     toChunk = chunk . toList
-    g (Annotated (_, info) syntax) = annotationAndSyntaxToChunks after info syntax
+    g (Annotated (_, info) syntax) = annotationAndSyntaxToChunks (source afterBlob) info syntax
     -- | Render an annotation and syntax into a list of chunks.
     annotationAndSyntaxToChunks source (Info range _) (Leaf _) = ([ toChunk $ slice range source ], Just range)
     annotationAndSyntaxToChunks source (Info range _) (Indexed i) = (unifiedRange range i source, Just range)
@@ -29,10 +28,11 @@ unified diff (before, after) = fst $ iter g mapped
 
     -- | Render a Patch into a list of chunks.
     unifiedPatch :: Patch (Term a Info) -> [Chunk String]
-    unifiedPatch patch = (fore red . bold <$> beforeChunks) <> (fore green . bold <$> afterChunks)
-      where
-        beforeChunks = maybe [] (change "-" . unifiedTerm before) $ Patch.before patch
-        afterChunks = maybe [] (change "+" . unifiedTerm after) $ Patch.after patch
+    unifiedPatch patch = (fore red . bold <$> beforeChunk) <> (fore green . bold <$> afterChunk) where
+      before = source beforeBlob
+      after = source afterBlob
+      beforeChunk = maybe [] (change "-" . unifiedTerm before) $ Patch.before patch
+      afterChunk = maybe [] (change "+" . unifiedTerm after) $ Patch.after patch
 
     -- | Render the contents of a Term as a series of chunks.
     unifiedTerm :: Source Char -> Term a Info -> [Chunk String]

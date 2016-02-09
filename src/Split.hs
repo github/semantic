@@ -35,7 +35,7 @@ classifyMarkup categories element = maybe element ((element !) . A.class_ . stri
 
 -- | Render a diff as an HTML split diff.
 split :: Renderer leaf TL.Text
-split diff (before, after) = renderHtml
+split diff (beforeBlob, afterBlob) = renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body
@@ -43,6 +43,8 @@ split diff (before, after) = renderHtml
         ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
         . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
+    before = Source.source beforeBlob
+    after = Source.source afterBlob
     rows = fst (splitDiffByLines diff (0, 0) (before, after))
     numbered = foldl' numberRows [] rows
     maxNumber = case numbered of

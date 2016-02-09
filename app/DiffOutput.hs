@@ -51,6 +51,7 @@ readAndTranscodeFile path = do
   text <- B1.readFile path
   transcode text
 
+-- <<<<<<< HEAD
 -- | Return a renderer from the command-line arguments that will print the diff.
 printDiff :: DiffArguments -> Renderer T.Text (IO ())
 printDiff arguments diff sources = case format arguments of
@@ -63,6 +64,17 @@ printDiff arguments diff sources = case format arguments of
     where
       put Nothing rendered = TextIO.putStr rendered
       put (Just path) rendered = do
+-- =======
+-- printDiff :: DiffArguments -> (SourceBlob, SourceBlob) -> (Term T.Text Info, Term T.Text Info) -> IO ()
+-- printDiff arguments (aSource, bSource) (aTerm, bTerm) = case format arguments of
+--   Unified -> do
+--     rendered <- unified diff (aSource, bSource)
+--     B1.putStr rendered
+--   Split -> do
+--     rendered <- split diff (aSource, bSource)
+--     case output arguments of
+--       Just path -> do
+-- >>>>>>> source-blobs
         isDir <- doesDirectoryExist path
         let outputPath = if isDir
                          then path </> (takeFileName outputPath -<.> ".html")

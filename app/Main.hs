@@ -2,6 +2,7 @@
  module Main where
 
 import Interpreter
+import Source
 import Options.Applicative
 import Data.Bifunctor.Join
 import qualified DiffOutput as DO
@@ -25,7 +26,8 @@ main = do
   let parse = DO.parserForFilepath sourceAPath
   terms <- sequence $ parse <$> sources
   let replaceLeaves = DO.breakDownLeavesByWord <$> sources
-  DO.printDiff (args arguments) (uncurry diffTerms $ runJoin $ replaceLeaves <*> terms) (runJoin sources)
+  let sourceBlobs = runJoin $ (\s -> SourceBlob s mempty) <$> sources
+  DO.printDiff (args arguments) (uncurry diffTerms . runJoin $ replaceLeaves <*> terms) sourceBlobs 
   where opts = info (helper <*> arguments)
           (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
         args Arguments{..} = DO.DiffArguments { format = format, output = output, outputPath = sourceA }
