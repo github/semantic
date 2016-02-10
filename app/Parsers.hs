@@ -12,7 +12,7 @@ import Data.Foldable
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: T.Text -> Parser
-parserForType mediaType = maybe lineByLineParser parseTreeSitterFile $ languageForType mediaType
+parserForType mediaType = maybe lineByLineParser treeSitterParser $ languageForType mediaType
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser

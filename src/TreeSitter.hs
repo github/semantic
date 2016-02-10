@@ -52,8 +52,8 @@ languageForType mediaType = case mediaType of
     _ -> Nothing
 
 -- | Returns a parser for the given language.
-parseTreeSitterFile :: Language -> Parser
-parseTreeSitterFile (Language language constructor) contents = do
+treeSitterParser :: Language -> Parser
+treeSitterParser (Language language constructor) contents = do
   document <- ts_document_make
   ts_document_set_language document language
   withCString (toList contents) (\source -> do
