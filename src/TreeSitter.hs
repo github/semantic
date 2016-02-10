@@ -52,7 +52,7 @@ treeSitterParser language = parserForGrammar <$> grammar
       _ -> Nothing
 
     -- | Given a node name from TreeSitter, return the correct category.
-    categoryMapping = categoryForNodeName
+    categoryMapping = defaultCategoryForNodeName
 
     -- | Returns a parser for the given TreeSitter language.
     parserForGrammar :: Ptr TSLanguage -> Parser
@@ -67,8 +67,8 @@ treeSitterParser language = parserForGrammar <$> grammar
         return term)
 
 -- | Given a node name from TreeSitter, return the correct category.
-categoryForNodeName :: String -> Set.Set Category
-categoryForNodeName name = case name of
+defaultCategoryForNodeName :: String -> Set.Set Category
+defaultCategoryForNodeName name = case name of
   "function_call" -> Set.singleton FunctionCall
   _ -> Set.singleton (Other name)
 
