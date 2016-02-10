@@ -51,6 +51,9 @@ treeSitterParser language = parserForGrammar <$> grammar
       JavaScript -> Just ts_language_javascript
       _ -> Nothing
 
+    -- | Given a node name from TreeSitter, return the correct category.
+    categoryMapping = categoryForNodeName
+
     -- | Returns a parser for the given TreeSitter language.
     parserForGrammar :: Ptr TSLanguage -> Parser
     parserForGrammar language contents = do
@@ -59,7 +62,7 @@ treeSitterParser language = parserForGrammar <$> grammar
       withCString (toList contents) (\source -> do
         ts_document_set_input_string document source
         ts_document_parse document
-        term <- documentToTerm (termConstructor categoryForNodeName) document contents
+        term <- documentToTerm (termConstructor categoryMapping) document contents
         ts_document_free document
         return term)
 
