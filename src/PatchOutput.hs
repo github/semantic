@@ -70,7 +70,7 @@ getRange (Pure (Info range _ :< _)) = range
 
 header :: (SourceBlob, SourceBlob) -> Hunk a -> String
 header blobs hunk = "diff --git a/path.txt b/path.txt\n" ++
-  "index " ++ oid (fst blobs) ++ " " ++ oid (snd blobs) ++ "\n" ++
+  "index " ++ oid (fst blobs) ++ ".." ++ oid (snd blobs) ++ "\n" ++
   "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
   where (lengthA, lengthB) = join bimap getSum $ hunkLength hunk
         (offsetA, offsetB) = join bimap getSum $ offset hunk
