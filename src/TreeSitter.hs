@@ -1,8 +1,9 @@
 module TreeSitter where
 
 import Category
-import Range
+import Language
 import Parser
+import Range
 import Source
 import qualified Data.Set as Set
 import Foreign
@@ -39,11 +40,6 @@ foreign import ccall "app/bridge.h ts_node_p_named_child_count" ts_node_p_named_
 foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child :: Ptr TSNode -> CSize -> Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_start_char" ts_node_p_start_char :: Ptr TSNode -> CSize
 foreign import ccall "app/bridge.h ts_node_p_end_char" ts_node_p_end_char :: Ptr TSNode -> CSize
-
--- | A programming language.
-data Language =
-    C
-    | JavaScript
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: T.Text -> Maybe Language
