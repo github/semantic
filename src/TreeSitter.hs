@@ -42,11 +42,11 @@ foreign import ccall "app/bridge.h ts_node_p_end_char" ts_node_p_end_char :: Ptr
 
 -- | Returns a TreeSitter parser for the given language.
 treeSitterParser :: Language -> Maybe Parser
-treeSitterParser language = parserForGrammar <$> grammarForLanguage language
+treeSitterParser language = parserForGrammar <$> grammar
   where
-    -- | Returns the TreeSitter language for the given language.
-    grammarForLanguage :: Language -> Maybe (Ptr TSLanguage)
-    grammarForLanguage language = case language of
+    -- | The TreeSitter language for the given language.
+    grammar :: Maybe (Ptr TSLanguage)
+    grammar = case language of
       C -> Just ts_language_c
       JavaScript -> Just ts_language_javascript
       _ -> Nothing
