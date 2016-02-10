@@ -1,6 +1,7 @@
 module Parsers (parserForType, Parser, lineByLineParser) where
 
 import Diff
+import Language
 import Range
 import Parser
 import Source hiding ((++))

@@ -9,7 +9,6 @@ import qualified Data.Set as Set
 import Foreign
 import Foreign.C
 import Foreign.C.Types
-import qualified Data.Text as T
 import Foreign.CStorable
 import qualified GHC.Generics as Generics
 
@@ -40,14 +39,6 @@ foreign import ccall "app/bridge.h ts_node_p_named_child_count" ts_node_p_named_
 foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child :: Ptr TSNode -> CSize -> Ptr TSNode -> IO CSize
 foreign import ccall "app/bridge.h ts_node_p_start_char" ts_node_p_start_char :: Ptr TSNode -> CSize
 foreign import ccall "app/bridge.h ts_node_p_end_char" ts_node_p_end_char :: Ptr TSNode -> CSize
-
--- | Returns a Language based on the file extension (including the ".").
-languageForType :: T.Text -> Maybe Language
-languageForType mediaType = case mediaType of
-    ".h" -> Just C
-    ".c" -> Just C
-    ".js" -> Just JavaScript
-    _ -> Nothing
 
 -- | Returns the TreeSitter language for the given language.
 grammarForLanguage :: Language -> Maybe (Ptr TSLanguage)
