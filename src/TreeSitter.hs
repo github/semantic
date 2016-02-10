@@ -40,31 +40,17 @@ foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child 
 foreign import ccall "app/bridge.h ts_node_p_start_char" ts_node_p_start_char :: Ptr TSNode -> CSize
 foreign import ccall "app/bridge.h ts_node_p_end_char" ts_node_p_end_char :: Ptr TSNode -> CSize
 
--- | Returns a TreeSitter parser for the given language.
-treeSitterParser :: Language -> Maybe Parser
-treeSitterParser language = parserForGrammar <$> grammar
-  where
-    -- | The TreeSitter language for the given language.
-    grammar :: Maybe (Ptr TSLanguage)
-    grammar = case language of
-      C -> Just ts_language_c
-      JavaScript -> Just ts_language_javascript
-      _ -> Nothing
-
-    -- | Given a node name from TreeSitter, return the correct category.
-    categoryMapping = categoriesForLanguage language
-
-    -- | Returns a parser for the given TreeSitter language.
-    parserForGrammar :: Ptr TSLanguage -> Parser
-    parserForGrammar language contents = do
-      document <- ts_document_make
-      ts_document_set_language document language
-      withCString (toList contents) (\source -> do
-        ts_document_set_input_string document source
-        ts_document_parse document
-        term <- documentToTerm (termConstructor categoryMapping) document contents
-        ts_document_free document
-        return term)
+-- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
+treeSitterParser :: Language -> Ptr TSLanguage -> Parser
+treeSitterParser language grammar contents = do
+  document <- ts_document_make
+  ts_document_set_language document grammar
+  withCString (toList contents) (\source -> do
+    ts_document_set_input_string document source
+    ts_document_parse document
+    term <- documentToTerm (termConstructor $ categoriesForLanguage language) document contents
+    ts_document_free document
+    return term)
 
 -- Given a language and a node name, return the correct categories.
 categoriesForLanguage :: Language -> String -> Set.Set Category

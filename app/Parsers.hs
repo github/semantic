@@ -10,11 +10,13 @@ import TreeSitter
 import Control.Comonad.Cofree
 import qualified Data.Text as T
 import Data.Foldable
-import Data.Maybe
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: T.Text -> Parser
-parserForType mediaType = fromMaybe lineByLineParser (languageForType mediaType >>= treeSitterParser)
+parserForType mediaType = case languageForType mediaType of
+  Just C -> treeSitterParser C ts_language_c
+  Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
+  _ -> lineByLineParser
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser
