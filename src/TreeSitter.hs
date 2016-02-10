@@ -40,28 +40,28 @@ foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child 
 foreign import ccall "app/bridge.h ts_node_p_start_char" ts_node_p_start_char :: Ptr TSNode -> CSize
 foreign import ccall "app/bridge.h ts_node_p_end_char" ts_node_p_end_char :: Ptr TSNode -> CSize
 
--- | Returns the TreeSitter language for the given language.
-grammarForLanguage :: Language -> Maybe (Ptr TSLanguage)
-grammarForLanguage language = case language of
-    C -> Just ts_language_c
-    JavaScript -> Just ts_language_javascript
-    _ -> Nothing
-
--- | Returns a parser for the given TreeSitter language.
-parserForGrammar :: Ptr TSLanguage -> Parser
-parserForGrammar language contents = do
-  document <- ts_document_make
-  ts_document_set_language document language
-  withCString (toList contents) (\source -> do
-    ts_document_set_input_string document source
-    ts_document_parse document
-    term <- documentToTerm (termConstructor categoryForNodeName) document contents
-    ts_document_free document
-    return term)
-
 -- | Returns a TreeSitter parser for the given language.
 treeSitterParser :: Language -> Maybe Parser
 treeSitterParser language = parserForGrammar <$> grammarForLanguage language
+  where
+    -- | Returns the TreeSitter language for the given language.
+    grammarForLanguage :: Language -> Maybe (Ptr TSLanguage)
+    grammarForLanguage language = case language of
+      C -> Just ts_language_c
+      JavaScript -> Just ts_language_javascript
+      _ -> Nothing
+
+    -- | Returns a parser for the given TreeSitter language.
+    parserForGrammar :: Ptr TSLanguage -> Parser
+    parserForGrammar language contents = do
+      document <- ts_document_make
+      ts_document_set_language document language
+      withCString (toList contents) (\source -> do
+        ts_document_set_input_string document source
+        ts_document_parse document
+        term <- documentToTerm (termConstructor categoryForNodeName) document contents
+        ts_document_free document
+        return term)
 
 -- | Given a node name from TreeSitter, return the correct category.
 categoryForNodeName :: String -> Set.Set Category
