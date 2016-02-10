@@ -39,7 +39,7 @@ styleName :: Category -> String
 styleName category = "category-" ++ case category of
   BinaryOperator -> "binary-operator"
   DictionaryLiteral -> "dictionary"
-  FunctionCall -> "function-call"
+  FunctionCall -> "function_call"
   Other string -> string
 
 -- | Render a diff as an HTML split diff.
