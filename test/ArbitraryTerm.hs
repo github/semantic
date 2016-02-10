@@ -1,6 +1,6 @@
 module ArbitraryTerm where
 
-import Categorizable
+import Category
 import Syntax
 import Term
 import Control.Comonad.Cofree
@@ -39,10 +39,10 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
 data CategorySet = A | B | C | D deriving (Eq, Show)
 
 instance Categorizable CategorySet where
-  categories A = Set.fromList [ "a" ]
-  categories B = Set.fromList [ "b" ]
-  categories C = Set.fromList [ "c" ]
-  categories D = Set.fromList [ "d" ]
+  categories A = Set.fromList [ Other "a" ]
+  categories B = Set.fromList [ Other "b" ]
+  categories C = Set.fromList [ Other "c" ]
+  categories D = Set.fromList [ Other "d" ]
 
 instance Arbitrary CategorySet where
   arbitrary = elements [ A, B, C, D ]

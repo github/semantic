@@ -24,7 +24,7 @@ library
                      , Patch
                      , PatchOutput
                      , SES
-                     , Categorizable
+                     , Category
                      , Term
                      , Range
                      , Split

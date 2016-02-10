@@ -7,7 +7,7 @@ import Control.Comonad.Cofree
 import Control.Monad.Free
 import Patch
 import Diff
-import Categorizable
+import Category
 import Test.Hspec
 
 spec :: Spec

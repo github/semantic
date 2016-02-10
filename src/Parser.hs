@@ -1,5 +1,6 @@
 module Parser where
 
+import Category
 import Diff
 import Syntax
 import Term
@@ -17,13 +18,22 @@ type Parser = Source Char -> IO (Term Text Info)
 -- | Given a source string and a term’s annotation & production/child pairs, construct the term.
 type Constructor = Source Char -> Info -> [(String, Term Text Info)] -> Term Text Info
 
+-- | Categories that are treated as keyed nodes.
+keyedCategories :: Set.Set Category
+keyedCategories = Set.fromList [ DictionaryLiteral ]
+
+-- | Categories that are treated as fixed nodes.
+fixedCategories :: Set.Set Category
+fixedCategories = Set.fromList [ BinaryOperator ]
+
 -- | Given two sets of production names, produce a Constructor.
-constructorForProductions :: Set.Set String -> Set.Set String -> Constructor
-constructorForProductions keyed fixed source info@(Info range categories) = (info :<) . construct
+termConstructor :: Constructor
+termConstructor source info@(Info range categories) = (info :<) . construct
   where construct [] = Leaf . pack . toList $ slice range source
-        construct children | not . Set.null $ Set.intersection fixed categories = Fixed $ fmap snd children
-        construct children | not . Set.null $ Set.intersection keyed categories = Keyed . Map.fromList $ assignKey <$> children
+        construct children | categories `intersect` fixedCategories = Fixed $ fmap snd children
+        construct children | categories `intersect` keyedCategories = Keyed . Map.fromList $ assignKey <$> children
         construct children = Indexed $ snd <$> children
+        intersect a b = not . Set.null $ Set.intersection a b
         assignKey ("pair", node@(_ :< Fixed (key : _))) = (getSubstring key, node)
         assignKey (_, node) = (getSubstring node, node)
         getSubstring (Info range _ :< _) = pack . toList $ slice range source
