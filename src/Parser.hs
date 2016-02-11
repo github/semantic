@@ -16,7 +16,8 @@ import Data.Text as Text
 -- | and aren't pure.
 type Parser = Source Char -> IO (Term Text Info)
 
--- | Given a source string and a term’s annotation & production/child pairs, construct the term.
+-- | Given a source string, the term's range, production name, and
+-- | production/child pairs, construct the term.
 type Constructor = Source Char -> Range -> String -> [(String, Term Text Info)] -> Term Text Info
 
 -- | Categories that are treated as keyed nodes.
