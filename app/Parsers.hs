@@ -1,6 +1,7 @@
 module Parsers (parserForType, Parser, lineByLineParser) where
 
 import Diff
+import Language
 import Range
 import Parser
 import Source hiding ((++))
@@ -12,7 +13,10 @@ import Data.Foldable
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: T.Text -> Parser
-parserForType mediaType = maybe lineByLineParser parseTreeSitterFile $ languageForType mediaType
+parserForType mediaType = case languageForType mediaType of
+  Just C -> treeSitterParser C ts_language_c
+  Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
+  _ -> lineByLineParser
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser
