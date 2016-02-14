@@ -39,6 +39,6 @@ termConstructor mapping source range name = (Info range categories :<) . constru
     construct children | categories `intersect` keyedCategories = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed $ snd <$> children
     intersect a b = not . Set.null $ Set.intersection a b
-    assignKey ("pair", node@(_ :< Fixed (key : _))) = (getSubstring key, node)
+    assignKey (_, node@(Info _ categories :< Fixed (key : _))) | Set.member Pair categories = (getSubstring key, node)
     assignKey (_, node) = (getSubstring node, node)
     getSubstring (Info range _ :< _) = pack . toList $ slice range source
