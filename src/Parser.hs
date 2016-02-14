@@ -26,7 +26,7 @@ keyedCategories = Set.fromList [ DictionaryLiteral ]
 
 -- | Categories that are treated as fixed nodes.
 fixedCategories :: Set.Set Category
-fixedCategories = Set.fromList [ BinaryOperator ]
+fixedCategories = Set.fromList [ BinaryOperator, Pair ]
 
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
