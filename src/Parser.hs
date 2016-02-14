@@ -20,9 +20,9 @@ type Parser = Source Char -> IO (Term Text Info)
 -- | production/child pairs, construct the term.
 type Constructor = Source Char -> Range -> String -> [Term Text Info] -> Term Text Info
 
--- | Categories that are treated as keyed nodes.
-keyedCategories :: Set.Set Category
-keyedCategories = Set.fromList [ DictionaryLiteral ]
+-- | Should these categories be treated as keyed nodes?
+isKeyed :: Set.Set Category -> Bool
+isKeyed = not . Set.null . Set.intersection (Set.fromList [ DictionaryLiteral ])
 
 -- | Should these categories be treated as fixed nodes?
 isFixed :: Set.Set Category -> Bool
@@ -36,7 +36,7 @@ termConstructor mapping source range name = (Info range categories :<) . constru
     categories = mapping name
     construct [] = Leaf . pack . toList $ slice range source
     construct children | isFixed categories = Fixed children
-    construct children | categories `intersect` keyedCategories = Keyed . Map.fromList $ assignKey <$> children
+    construct children | isKeyed categories = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed children
     intersect a b = not . Set.null $ Set.intersection a b
     assignKey node@(Info _ categories :< Fixed (key : _)) | Set.member Pair categories = (getSubstring key, node)
