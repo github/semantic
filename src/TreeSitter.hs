@@ -69,8 +69,7 @@ defaultCategoryForNodeName name = case name of
 documentToTerm :: Constructor -> Ptr TSDocument -> Parser
 documentToTerm constructor document contents = alloca $ \ root -> do
   ts_document_root_node_p document root
-  (_, term) <- toTerm root
-  return term
+  toTerm root
   where toTerm node = do
           name <- ts_node_p_name node document
           name <- peekCString name
@@ -79,7 +78,7 @@ documentToTerm constructor document contents = alloca $ \ root -> do
           -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
           range <- return $! Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
 
-          return (name, constructor contents range name children)
+          return $! constructor contents range name children
         getChild node n out = do
           _ <- ts_node_p_named_child node n out
           toTerm out
