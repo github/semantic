@@ -39,6 +39,7 @@ styleName :: Category -> String
 styleName category = "category-" ++ case category of
   BinaryOperator -> "binary-operator"
   DictionaryLiteral -> "dictionary"
+  Pair -> "pair"
   FunctionCall -> "function_call"
   Other string -> string
 
