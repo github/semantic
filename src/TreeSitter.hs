@@ -56,6 +56,7 @@ treeSitterParser language grammar contents = do
 categoriesForLanguage :: Language -> String -> Set.Set Category
 categoriesForLanguage language name = case (language, name) of
   (JavaScript, "object") -> Set.singleton DictionaryLiteral
+  (JavaScript, "pair") -> Set.singleton Pair
   _ -> defaultCategoryForNodeName name
 
 -- | Given a node name from TreeSitter, return the correct categories.
