@@ -24,9 +24,9 @@ type Constructor = Source Char -> Range -> String -> [Term Text Info] -> Term Te
 keyedCategories :: Set.Set Category
 keyedCategories = Set.fromList [ DictionaryLiteral ]
 
--- | Categories that are treated as fixed nodes.
-fixedCategories :: Set.Set Category
-fixedCategories = Set.fromList [ BinaryOperator, Pair ]
+-- | Should these categories be treated as fixed nodes?
+isFixed :: Set.Set Category -> Bool
+isFixed = not . Set.null . Set.intersection (Set.fromList [ BinaryOperator, Pair ])
 
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
@@ -35,7 +35,7 @@ termConstructor mapping source range name = (Info range categories :<) . constru
   where
     categories = mapping name
     construct [] = Leaf . pack . toList $ slice range source
-    construct children | categories `intersect` fixedCategories = Fixed children
+    construct children | isFixed categories = Fixed children
     construct children | categories `intersect` keyedCategories = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed children
     intersect a b = not . Set.null $ Set.intersection a b
