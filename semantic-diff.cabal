@@ -125,6 +125,7 @@ test-suite semantic-diff-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       ArbitraryTerm
+                     , CorpusSpec
                      , InterpreterSpec
                      , OrderedMapSpec
                      , PatchOutputSpec
