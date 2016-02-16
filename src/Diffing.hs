@@ -40,6 +40,7 @@ lineByLineParser input = return . root . Indexed $ case foldl' annotateLeaves ([
       , charIndex + length line)
     toText = T.pack . Source.toString
 
+-- | Return the parser that should be used for a given path.
 parserForFilepath :: FilePath -> Parser
 parserForFilepath = parserForType . T.pack . takeExtension
 
@@ -65,6 +66,8 @@ readAndTranscodeFile path = do
   text <- B1.readFile path
   transcode text
 
+-- | Given a parser and renderer, diff two sources and return the rendered
+-- | result.
 diffFiles :: Parser -> Renderer T.Text b -> (Source Char, Source Char) -> IO b
 diffFiles parser renderer sources = do
   terms <- sequence $ parser <$> Join sources
