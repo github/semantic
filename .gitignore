@@ -5,7 +5,7 @@ xcuserdata
 *.xcuserdatad
 *.xccheckout
 .stack-work
-semantic-diff-profile.*
+profiles
 tags
 
 vendor/icu/tools
