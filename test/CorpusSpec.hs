@@ -32,13 +32,13 @@ spec = do
     runTestsIn directory = do
       paths <- runIO $ examples directory
       let tests = correctTests =<< paths
-      mapM_ (\ (renderer, a, b, output) -> it (normalizeName a) $ testDiff renderer a b output `shouldReturn` True) tests
+      mapM_ (\ (formatName, renderer, a, b, output) -> it (normalizeName a ++ " (" ++ formatName ++ ")") $ testDiff renderer a b output `shouldReturn` True) tests
 
-    correctTests :: (FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(Renderer a String, FilePath, FilePath, Maybe FilePath)]
+    correctTests :: (FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, FilePath, FilePath, Maybe FilePath)]
     correctTests paths@(_, _, Nothing, Nothing, Nothing) = testsForPaths paths
-    correctTests paths = List.filter (\(_, _, _, output) -> isJust output) $ testsForPaths paths
-    testsForPaths :: (FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(Renderer a String, FilePath, FilePath, Maybe FilePath)]
-    testsForPaths (a, b, patch, split, unified) = [ (PatchOutput.patch, a, b, patch), (testSplit, a, b, split), (testUnified, a, b, unified) ]
+    correctTests paths = List.filter (\(_, _, _, _, output) -> isJust output) $ testsForPaths paths
+    testsForPaths :: (FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, FilePath, FilePath, Maybe FilePath)]
+    testsForPaths (a, b, patch, split, unified) = [ ("patch", PatchOutput.patch, a, b, patch), ("split", testSplit, a, b, split), ("unified", testUnified, a, b, unified) ]
     testSplit :: Renderer a String
     testSplit diff sources = TL.unpack $ Split.split diff sources
     testUnified :: Renderer a String
