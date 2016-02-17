@@ -2,6 +2,7 @@ module CorpusSpec where
 
 import Diffing
 import Renderer
+import Split
 import Unified
 
 import Data.Bifunctor.Join
@@ -10,6 +11,7 @@ import Data.List as List
 import Data.Map as Map
 import Data.Set as Set
 import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
 import Rainbow
 import System.FilePath
 import System.FilePath.Glob
@@ -28,6 +30,8 @@ spec = do
     runTestsIn directory = do
       tests <- runIO $ examples directory
       mapM_ (\ (a, b, diff) -> it (normalizeName a) $ testDiff testUnified a b diff `shouldReturn` True) tests
+    testSplit :: Renderer a String
+    testSplit diff sources = TL.unpack $ Split.split diff sources
     testUnified :: Renderer a String
     testUnified diff sources = B1.unpack $ mconcat $ chunksToByteStrings toByteStringsColors0 $ unified diff sources
 
