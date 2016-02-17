@@ -6,6 +6,7 @@ import Renderer
 import Split
 import Unified
 
+import Control.DeepSeq
 import Data.Bifunctor.Join
 import qualified Data.ByteString.Char8 as B1
 import Data.List as List
@@ -21,18 +22,20 @@ import Test.Hspec
 
 spec :: Spec
 spec = do
-  describe "crashers should not crash" $ runTestsIn "test/crashers/"
-  describe "should produce the correct diff" $ runTestsIn "test/diffs/"
+  describe "crashers crash" $ runTestsIn "test/crashers-todo/" shouldThrow anyException
+  describe "crashers should not crash" $ runTestsIn "test/crashers/" shouldReturn True
+  describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" shouldReturn False
+  describe "should produce the correct diff" $ runTestsIn "test/diffs/" shouldReturn True
 
   it "lists example fixtures" $ do
     examples "test/crashers/" `shouldNotReturn` []
     examples "test/diffs/" `shouldNotReturn` []
 
   where
-    runTestsIn directory = do
+    runTestsIn directory matcher value = do
       paths <- runIO $ examples directory
       let tests = correctTests =<< paths
-      mapM_ (\ (formatName, renderer, a, b, output) -> it (normalizeName a ++ " (" ++ formatName ++ ")") $ testDiff renderer a b output `shouldReturn` True) tests
+      mapM_ (\ (formatName, renderer, a, b, output) -> it (normalizeName a ++ " (" ++ formatName ++ ")") $ testDiff renderer a b output `matcher` value) tests
 
     correctTests :: (FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, FilePath, FilePath, Maybe FilePath)]
     correctTests paths@(_, _, Nothing, Nothing, Nothing) = testsForPaths paths
@@ -76,7 +79,7 @@ testDiff renderer a b diff = do
   sources <- sequence $ readAndTranscodeFile <$> Join (a, b)
   actual <- diffFiles parser renderer (runJoin sources)
   case diff of
-    Nothing -> return $ actual /= "<should not be a thing>"
+    Nothing -> actual `deepseq` return True
     Just file -> do
       expected <- readFile file
       return $ expected == actual
