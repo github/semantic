@@ -12,6 +12,8 @@ data Category =
   BinaryOperator
   -- | A literal key-value data structure.
   | DictionaryLiteral
+  -- | A pair, e.g. of a key & value
+  | Pair
   -- | A call to a function.
   | FunctionCall
   -- | A non-standard category, which can be used for comparability.

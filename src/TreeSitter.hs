@@ -56,20 +56,21 @@ treeSitterParser language grammar contents = do
 categoriesForLanguage :: Language -> String -> Set.Set Category
 categoriesForLanguage language name = case (language, name) of
   (JavaScript, "object") -> Set.singleton DictionaryLiteral
+  (JavaScript, "rel_op") -> Set.singleton BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
   _ -> defaultCategoryForNodeName name
 
 -- | Given a node name from TreeSitter, return the correct categories.
 defaultCategoryForNodeName :: String -> Set.Set Category
 defaultCategoryForNodeName name = case name of
   "function_call" -> Set.singleton FunctionCall
+  "pair" -> Set.singleton Pair
   _ -> Set.singleton (Other name)
 
 -- | Given a constructor and a tree sitter document, return a parser.
 documentToTerm :: Constructor -> Ptr TSDocument -> Parser
 documentToTerm constructor document contents = alloca $ \ root -> do
   ts_document_root_node_p document root
-  (_, term) <- toTerm root
-  return term
+  toTerm root
   where toTerm node = do
           name <- ts_node_p_name node document
           name <- peekCString name
@@ -78,7 +79,7 @@ documentToTerm constructor document contents = alloca $ \ root -> do
           -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
           range <- return $! Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
 
-          return (name, constructor contents range name children)
+          return $! constructor contents range name children
         getChild node n out = do
           _ <- ts_node_p_named_child node n out
           toTerm out
