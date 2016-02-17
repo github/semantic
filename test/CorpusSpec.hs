@@ -29,7 +29,7 @@ spec = do
   where
     runTestsIn directory = do
       tests <- runIO $ examples directory
-      mapM_ (\ (a, b, diff) -> it (normalizeName a) $ testDiff testUnified a b diff `shouldReturn` True) tests
+      mapM_ (\ (a, b, _, _, unified) -> it (normalizeName a) $ testDiff testUnified a b unified `shouldReturn` True) tests
     testSplit :: Renderer a String
     testSplit diff sources = TL.unpack $ Split.split diff sources
     testUnified :: Renderer a String
@@ -37,15 +37,17 @@ spec = do
 
 
 -- | Return all the examples from the given directory. Examples are expected to
--- | have the form "foo.A.js", "foo.B.js", "foo.diff.js". Diffs are not
+-- | have the form "foo.A.js", "foo.B.js", "foo.unified.js". Diffs are not
 -- | required as the test may be verifying that the inputs don't crash.
-examples :: FilePath -> IO [(FilePath, FilePath, Maybe FilePath)]
+examples :: FilePath -> IO [(FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath)]
 examples directory = do
   as <- toDict <$> globFor "*.A.*"
   bs <- toDict <$> globFor "*.B.*"
+  patches <- toDict <$> globFor "*.patch.*"
+  splits <- toDict <$> globFor "*.split.*"
   unifieds <- toDict <$> globFor "*.unified.*"
   let keys = Set.unions $ keysSet <$> [as, bs]
-  return $ (\name -> (as ! name, bs ! name, Map.lookup name unifieds)) <$> sort (Set.toList keys)
+  return $ (\name -> (as ! name, bs ! name, Map.lookup name patches, Map.lookup name splits, Map.lookup name unifieds)) <$> sort (Set.toList keys)
 
   where
     globFor :: String -> IO [FilePath]
