@@ -1,7 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
 module Main where
 
-import Interpreter
+import Diffing
 import Source
 import Options.Applicative
 import qualified Data.ByteString.Char8 as B1
@@ -36,10 +36,7 @@ main = do
   let shas = Join (shaA, shaB)
   forM_ filepaths $ \filepath -> do
     sources <- sequence $ fetchFromGitRepo gitDir filepath <$> shas
-    let parse = DO.parserForFilepath filepath
-    terms <- sequence $ parse <$> sources
-    let replaceLeaves = DO.breakDownLeavesByWord <$> sources
-    DO.printDiff (args arguments filepath) (uncurry diffTerms $ runJoin $ replaceLeaves <*> terms) (runJoin sources)
+    DO.printDiff (parserForFilepath filepath) (args arguments filepath) (runJoin sources)
     where opts = info (helper <*> arguments)
             (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
           args Arguments{..} filepath = DO.DiffArguments { format = format, output = output, outputPath = filepath }
@@ -60,4 +57,4 @@ fetchFromGitRepo repoPath path sha = join $ withRepository lgFactory repoPath $ 
                    blob <- lookupBlob blobEntryOid
                    let (BlobString s) = blobContents blob
                    return s
-    return $ DO.transcode bytestring
+    return $ transcode bytestring
