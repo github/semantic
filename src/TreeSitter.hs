@@ -56,7 +56,6 @@ treeSitterParser language grammar contents = do
 categoriesForLanguage :: Language -> String -> Set.Set Category
 categoriesForLanguage language name = case (language, name) of
   (JavaScript, "object") -> Set.singleton DictionaryLiteral
-  (JavaScript, "pair") -> Set.singleton Pair
   (JavaScript, "rel_op") -> Set.singleton BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
   _ -> defaultCategoryForNodeName name
 
@@ -64,6 +63,7 @@ categoriesForLanguage language name = case (language, name) of
 defaultCategoryForNodeName :: String -> Set.Set Category
 defaultCategoryForNodeName name = case name of
   "function_call" -> Set.singleton FunctionCall
+  "pair" -> Set.singleton Pair
   _ -> Set.singleton (Other name)
 
 -- | Given a constructor and a tree sitter document, return a parser.
