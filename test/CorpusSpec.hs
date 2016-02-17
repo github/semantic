@@ -25,18 +25,18 @@ spec = do
   where
     runTestsIn directory = do
       tests <- runIO $ examples directory
-      mapM_ (\ (a, b, diff) -> it (normalizeName $ oneOf a b) $ testDiff a b diff `shouldReturn` True) tests
+      mapM_ (\ (a, b, diff) -> it (normalizeName a) $ testDiff a b diff `shouldReturn` True) tests
 
 -- | Return all the examples from the given directory. Examples are expected to
 -- | have the form "foo.A.js", "foo.B.js", "foo.diff.js". Diffs are not
 -- | required as the test may be verifying that the inputs don't crash.
-examples :: FilePath -> IO [(Maybe FilePath, Maybe FilePath, Maybe FilePath)]
+examples :: FilePath -> IO [(FilePath, FilePath, Maybe FilePath)]
 examples directory = do
   aDict <- toDict <$> globFor "*.A.*"
   bDict <- toDict <$> globFor "*.B.*"
   diffDict <- toDict <$> globFor "*.diff.*"
   let keys = Set.unions $ keysSet <$> [aDict, bDict]
-  return $ (\name -> (Map.lookup name aDict, Map.lookup name bDict, Map.lookup name diffDict)) <$> sort (Set.toList keys)
+  return $ (\name -> (aDict ! name, bDict ! name, Map.lookup name diffDict)) <$> sort (Set.toList keys)
 
   where
     globFor :: String -> IO [FilePath]
@@ -50,11 +50,9 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | Given file paths for A, B, and, optionally, a diff, return whether diffing
 -- | the files will produce the diff. If no diff is provided, then the result
 -- | is true, but the diff will still be calculated.
-testDiff :: Maybe FilePath -> Maybe FilePath -> Maybe FilePath -> IO Bool
+testDiff :: FilePath -> FilePath -> Maybe FilePath -> IO Bool
 testDiff a b diff = do
-  let parser = parserForFilepath $ oneOf a b
-  Just a <- return a
-  Just b <- return b
+  let parser = parserForFilepath a
   sources <- sequence $ readAndTranscodeFile <$> Join (a, b)
   chunks <- diffFiles parser unified (runJoin sources)
   let actual = mconcat $ chunksToByteStrings toByteStringsColors0 chunks
@@ -63,10 +61,3 @@ testDiff a b diff = do
     Just file -> do
       expected <- B1.readFile file
       return $ expected == actual
-
--- | Given two Maybes, at least one of which is known to be a Just, return the
--- | thing inside.
-oneOf :: Maybe a -> Maybe a -> a
-oneOf (Just a) _ = a
-oneOf _ (Just b) = b
-oneOf _ _ = error "oneOf expects one of its arguments to be Just a thing"
