@@ -30,11 +30,11 @@ fixedCategories = Set.fromList [ BinaryOperator, Pair ]
 
 -- | Should these categories be treated as keyed nodes?
 isKeyed :: Set.Set Category -> Bool
-isKeyed = not . Set.null . Set.intersection (Set.fromList [ DictionaryLiteral ])
+isKeyed = not . Set.null . Set.intersection keyedCategories
 
 -- | Should these categories be treated as fixed nodes?
 isFixed :: Set.Set Category -> Bool
-isFixed = not . Set.null . Set.intersection (Set.fromList [ BinaryOperator, Pair ])
+isFixed = not . Set.null . Set.intersection fixedCategories
 
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
