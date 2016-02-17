@@ -21,7 +21,7 @@ import System.FilePath.Glob
 import Test.Hspec
 
 spec :: Spec
-spec = do
+spec = parallel $ do
   describe "crashers crash" $ runTestsIn "test/crashers-todo/" shouldThrow anyException
   describe "crashers should not crash" $ runTestsIn "test/crashers/" shouldReturn True
   describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" shouldReturn False
