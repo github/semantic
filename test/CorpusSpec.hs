@@ -18,8 +18,9 @@ spec = do
   describe "crashers should not crash" $ runTestsIn "test/crashers/"
   describe "should produce the correct diff" $ runTestsIn "test/diffs/"
 
-  it "lists example fixtures" $
+  it "lists example fixtures" $ do
     examples "test/crashers/" `shouldNotReturn` []
+    examples "test/diffs/" `shouldNotReturn` []
 
   where
     runTestsIn directory = do
