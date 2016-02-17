@@ -37,11 +37,11 @@ spec = do
 -- | required as the test may be verifying that the inputs don't crash.
 examples :: FilePath -> IO [(FilePath, FilePath, Maybe FilePath)]
 examples directory = do
-  aDict <- toDict <$> globFor "*.A.*"
-  bDict <- toDict <$> globFor "*.B.*"
-  diffDict <- toDict <$> globFor "*.diff.*"
-  let keys = Set.unions $ keysSet <$> [aDict, bDict]
-  return $ (\name -> (aDict ! name, bDict ! name, Map.lookup name diffDict)) <$> sort (Set.toList keys)
+  as <- toDict <$> globFor "*.A.*"
+  bs <- toDict <$> globFor "*.B.*"
+  diffs <- toDict <$> globFor "*.diff.*"
+  let keys = Set.unions $ keysSet <$> [as, bs]
+  return $ (\name -> (as ! name, bs ! name, Map.lookup name diffs)) <$> sort (Set.toList keys)
 
   where
     globFor :: String -> IO [FilePath]
