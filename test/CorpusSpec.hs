@@ -39,9 +39,9 @@ examples :: FilePath -> IO [(FilePath, FilePath, Maybe FilePath)]
 examples directory = do
   as <- toDict <$> globFor "*.A.*"
   bs <- toDict <$> globFor "*.B.*"
-  diffs <- toDict <$> globFor "*.diff.*"
+  unifieds <- toDict <$> globFor "*.unified.*"
   let keys = Set.unions $ keysSet <$> [as, bs]
-  return $ (\name -> (as ! name, bs ! name, Map.lookup name diffs)) <$> sort (Set.toList keys)
+  return $ (\name -> (as ! name, bs ! name, Map.lookup name unifieds)) <$> sort (Set.toList keys)
 
   where
     globFor :: String -> IO [FilePath]
