@@ -139,6 +139,7 @@ test-suite semantic-diff-test
                      , bifunctors
                      , bytestring
                      , containers
+                     , deepseq
                      , filepath
                      , free
                      , Glob
