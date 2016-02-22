@@ -46,6 +46,7 @@ lineLength :: Line a -> Sum Int
 lineLength EmptyLine = 0
 lineLength _ = 1
 
+-- | Given the before and after sources, render a hunk to a string.
 showHunk :: (SourceBlob, SourceBlob) -> Hunk (SplitDiff a Info) -> String
 showHunk blobs@(beforeBlob, afterBlob) hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (unRight <$> trailingContext hunk)
   where sources = (source beforeBlob, source afterBlob)
@@ -70,6 +71,7 @@ getRange :: SplitDiff leaf Info -> Range
 getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure (Info range _ :< _)) = range
 
+-- | Returns the header given two source blobs and a hunk.
 header :: (SourceBlob, SourceBlob) -> Hunk a -> String
 header blobs hunk = "diff --git a/" ++ path (fst blobs) ++ " b/" ++ path (snd blobs) ++ "\n" ++
   "index " ++ oid (fst blobs) ++ ".." ++ oid (snd blobs) ++ "\n" ++
