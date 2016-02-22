@@ -6,6 +6,7 @@ import Renderer
 import Split
 import Unified
 
+import qualified Source as S
 import Control.DeepSeq
 import Data.Bifunctor.Join
 import qualified Data.ByteString.Char8 as B1
@@ -78,7 +79,9 @@ testDiff :: Renderer T.Text String -> FilePath -> FilePath -> Maybe FilePath -> 
 testDiff renderer a b diff matcher = do
   let parser = parserForFilepath a
   sources <- sequence $ readAndTranscodeFile <$> Join (a, b)
-  actual <- diffFiles parser renderer (runJoin sources)
+  let srcs = runJoin sources
+  let sourceBlobs = (S.SourceBlob (fst srcs) mempty a, S.SourceBlob (snd srcs) mempty b)
+  actual <- diffFiles parser renderer sourceBlobs
   case diff of
     Nothing -> actual `deepseq` matcher (actual, actual)
     Just file -> do
