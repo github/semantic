@@ -19,7 +19,7 @@ data Format = Unified | Split | Patch
 data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath, outputPath :: FilePath }
 
 -- | Return a renderer from the command-line arguments that will print the diff.
-printDiff :: Parser -> DiffArguments -> (Source Char, Source Char) -> IO ()
+printDiff :: Parser -> DiffArguments -> (SourceBlob, SourceBlob) -> IO ()
 printDiff parser arguments sources = case format arguments of
   Unified -> put =<< diffFiles parser unified sources
     where
