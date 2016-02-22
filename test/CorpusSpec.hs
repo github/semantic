@@ -22,20 +22,20 @@ import Test.Hspec
 
 spec :: Spec
 spec = parallel $ do
-  describe "crashers crash" $ runTestsIn "test/crashers-todo/" shouldThrow anyException
-  describe "crashers should not crash" $ runTestsIn "test/crashers/" shouldReturn True
-  describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" shouldReturn False
-  describe "should produce the correct diff" $ runTestsIn "test/diffs/" shouldReturn True
+  describe "crashers crash" $ runTestsIn "test/crashers-todo/" (`shouldThrow` anyException)
+  describe "crashers should not crash" $ runTestsIn "test/crashers/" (`shouldReturn` True)
+  describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" (`shouldReturn` False)
+  describe "should produce the correct diff" $ runTestsIn "test/diffs/" (`shouldReturn` True)
 
   it "lists example fixtures" $ do
     examples "test/crashers/" `shouldNotReturn` []
     examples "test/diffs/" `shouldNotReturn` []
 
   where
-    runTestsIn directory matcher value = do
+    runTestsIn directory matcher = do
       paths <- runIO $ examples directory
       let tests = correctTests =<< paths
-      mapM_ (\ (formatName, renderer, a, b, output) -> it (normalizeName a ++ " (" ++ formatName ++ ")") $ testDiff renderer a b output `matcher` value) tests
+      mapM_ (\ (formatName, renderer, a, b, output) -> it (normalizeName a ++ " (" ++ formatName ++ ")") . matcher $ testDiff renderer a b output) tests
 
     correctTests :: (FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, FilePath, FilePath, Maybe FilePath)]
     correctTests paths@(_, _, Nothing, Nothing, Nothing) = testsForPaths paths
