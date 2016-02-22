@@ -58,6 +58,8 @@ categoriesForLanguage :: Language -> String -> Set.Set Category
 categoriesForLanguage language name = case (language, name) of
   (JavaScript, "object") -> Set.singleton DictionaryLiteral
   (JavaScript, "rel_op") -> Set.singleton BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
+
+  (Ruby, "hash") -> Set.singleton DictionaryLiteral
   _ -> defaultCategoryForNodeName name
 
 -- | Given a node name from TreeSitter, return the correct categories.
