@@ -22,20 +22,21 @@ import Test.Hspec
 
 spec :: Spec
 spec = parallel $ do
-  describe "crashers crash" $ runTestsIn "test/crashers-todo/" shouldThrow anyException
-  describe "crashers should not crash" $ runTestsIn "test/crashers/" shouldReturn True
-  describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" shouldReturn False
-  describe "should produce the correct diff" $ runTestsIn "test/diffs/" shouldReturn True
+  -- describe "crashers crash" $ runTestsIn "test/crashers-todo/" ((`shouldThrow` anyException) . return)
+  describe "crashers should not crash" $ runTestsIn "test/crashers/" (uncurry shouldBe)
+  describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" (uncurry shouldNotBe)
+  describe "should produce the correct diff" $ runTestsIn "test/diffs/" (uncurry shouldBe)
 
   it "lists example fixtures" $ do
     examples "test/crashers/" `shouldNotReturn` []
     examples "test/diffs/" `shouldNotReturn` []
 
   where
-    runTestsIn directory matcher value = do
+    runTestsIn :: String -> ((String, String) -> Expectation) -> SpecWith ()
+    runTestsIn directory matcher = do
       paths <- runIO $ examples directory
       let tests = correctTests =<< paths
-      mapM_ (\ (formatName, renderer, a, b, output) -> it (normalizeName a ++ " (" ++ formatName ++ ")") $ testDiff renderer a b output `matcher` value) tests
+      mapM_ (\ (formatName, renderer, a, b, output) -> it (normalizeName a ++ " (" ++ formatName ++ ")") $ testDiff renderer a b output matcher) tests
 
     correctTests :: (FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, FilePath, FilePath, Maybe FilePath)]
     correctTests paths@(_, _, Nothing, Nothing, Nothing) = testsForPaths paths
@@ -73,13 +74,13 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | Given file paths for A, B, and, optionally, a diff, return whether diffing
 -- | the files will produce the diff. If no diff is provided, then the result
 -- | is true, but the diff will still be calculated.
-testDiff :: Renderer T.Text String -> FilePath -> FilePath -> Maybe FilePath -> IO Bool
-testDiff renderer a b diff = do
+testDiff :: Renderer T.Text String -> FilePath -> FilePath -> Maybe FilePath -> ((String, String) -> Expectation) -> Expectation
+testDiff renderer a b diff matcher = do
   let parser = parserForFilepath a
   sources <- sequence $ readAndTranscodeFile <$> Join (a, b)
   actual <- diffFiles parser renderer (runJoin sources)
   case diff of
-    Nothing -> actual `deepseq` return True
+    Nothing -> actual `deepseq` matcher (actual, actual)
     Just file -> do
       expected <- readFile file
-      return $ expected == actual
+      matcher (actual, expected)
