@@ -4,7 +4,7 @@ import Test.Hspec
 import Test.Hspec.QuickCheck
 import Data.Text.Arbitrary ()
 
-import Categorizable
+import Category
 import Interpreter
 import Diff
 import ArbitraryTerm

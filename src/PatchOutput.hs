@@ -56,7 +56,9 @@ showChange sources change = showLines (snd sources) ' ' (unRight <$> context cha
 
 -- | Given a source, render a set of lines to a string with a prefix.
 showLines :: Source Char -> Char -> [Line (SplitDiff leaf Info)] -> String
-showLines source prefix lines = fromMaybe "" . mconcat $ fmap (prefix :) . showLine source <$> lines
+showLines source prefix lines = fromMaybe "" . mconcat $ fmap prepend . showLine source <$> lines
+  where prepend "" = ""
+        prepend source = prefix : source
 
 -- | Given a source, render a line to a string.
 showLine :: Source Char -> Line (SplitDiff leaf Info) -> Maybe String

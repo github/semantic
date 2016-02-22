@@ -1,14 +1,14 @@
 module TreeSitter where
 
-import Diff
-import Range
+import Category
+import Language
 import Parser
+import Range
 import Source
 import qualified Data.Set as Set
 import Foreign
 import Foreign.C
 import Foreign.C.Types
-import qualified Data.Text as T
 import Foreign.CStorable
 import qualified GHC.Generics as Generics
 
@@ -40,38 +40,37 @@ foreign import ccall "app/bridge.h ts_node_p_named_child" ts_node_p_named_child 
 foreign import ccall "app/bridge.h ts_node_p_start_char" ts_node_p_start_char :: Ptr TSNode -> CSize
 foreign import ccall "app/bridge.h ts_node_p_end_char" ts_node_p_end_char :: Ptr TSNode -> CSize
 
--- | A language in the eyes of semantic-diff.
-data Language = Language { getTsLanguage :: Ptr TSLanguage, getConstructor :: Constructor }
-
--- | Returns a Language based on the file extension (including the ".").
-languageForType :: T.Text -> Maybe Language
-languageForType mediaType = case mediaType of
-    ".h" -> c
-    ".c" -> c
-    ".js" -> Just . Language ts_language_javascript $ constructorForProductions
-      (Set.fromList [ "object" ])
-      (Set.fromList [ "pair", "rel_op", "math_op", "bool_op", "bitwise_op", "type_op", "math_assignment", "assignment", "subscript_access", "member_access", "new_expression", "function_call", "function", "ternary" ])
-    _ -> Nothing
-  where c = Just . Language ts_language_c $ constructorForProductions mempty (Set.fromList [ "assignment_expression", "logical_expression", "pointer_expression", "field_expression", "relational_expression", "designator", "call_expression", "math_expression" ])
-
--- | Returns a parser for the given language.
-parseTreeSitterFile :: Language -> Parser
-parseTreeSitterFile (Language language constructor) contents = do
+-- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
+treeSitterParser :: Language -> Ptr TSLanguage -> Parser
+treeSitterParser language grammar contents = do
   document <- ts_document_make
-  ts_document_set_language document language
+  ts_document_set_language document grammar
   withCString (toList contents) (\source -> do
     ts_document_set_input_string document source
     ts_document_parse document
-    term <- documentToTerm constructor document contents
+    term <- documentToTerm (termConstructor $ categoriesForLanguage language) document contents
     ts_document_free document
     return term)
+
+-- Given a language and a node name, return the correct categories.
+categoriesForLanguage :: Language -> String -> Set.Set Category
+categoriesForLanguage language name = case (language, name) of
+  (JavaScript, "object") -> Set.singleton DictionaryLiteral
+  (JavaScript, "rel_op") -> Set.singleton BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
+  _ -> defaultCategoryForNodeName name
+
+-- | Given a node name from TreeSitter, return the correct categories.
+defaultCategoryForNodeName :: String -> Set.Set Category
+defaultCategoryForNodeName name = case name of
+  "function_call" -> Set.singleton FunctionCall
+  "pair" -> Set.singleton Pair
+  _ -> Set.singleton (Other name)
 
 -- | Given a constructor and a tree sitter document, return a parser.
 documentToTerm :: Constructor -> Ptr TSDocument -> Parser
 documentToTerm constructor document contents = alloca $ \ root -> do
   ts_document_root_node_p document root
-  (_, term) <- toTerm root
-  return term
+  toTerm root
   where toTerm node = do
           name <- ts_node_p_name node document
           name <- peekCString name
@@ -80,7 +79,7 @@ documentToTerm constructor document contents = alloca $ \ root -> do
           -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
           range <- return $! Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
 
-          return (name, constructor contents (Info range (Set.singleton name)) children)
+          return $! constructor contents range name children
         getChild node n out = do
           _ <- ts_node_p_named_child node n out
           toTerm out

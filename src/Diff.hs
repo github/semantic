@@ -6,14 +6,11 @@ import Control.Monad.Free
 import Patch
 import Term
 import Range
-import Categorizable
+import Category
 
 -- | An annotated syntax in a diff tree.
 data Annotated a annotation f = Annotated !annotation !(Syntax a f)
   deriving (Functor, Eq, Show, Foldable)
-
--- | A semantic category.
-type Category = String
 
 -- | An annotation for a source file, including the source range and semantic
 -- | categories.

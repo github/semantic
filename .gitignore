@@ -5,7 +5,7 @@ xcuserdata
 *.xcuserdatad
 *.xccheckout
 .stack-work
-semantic-diff-profile.*
+profiles
 tags
 
 vendor/icu/tools
@@ -26,3 +26,4 @@ vendor/icu/config.log
 vendor/icu/common/
 vendor/icu/bin/
 vendor/icu/Makefile
+bin/
