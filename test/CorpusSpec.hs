@@ -22,7 +22,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = parallel $ do
-  -- describe "crashers crash" $ runTestsIn "test/crashers-todo/" ((`shouldThrow` anyException) . uncurry (==))
+  -- describe "crashers crash" $ runTestsIn "test/crashers-todo/" ((`shouldThrow` anyException) . return)
   describe "crashers should not crash" $ runTestsIn "test/crashers/" (uncurry shouldBe)
   describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" (uncurry shouldNotBe)
   describe "should produce the correct diff" $ runTestsIn "test/diffs/" (uncurry shouldBe)
