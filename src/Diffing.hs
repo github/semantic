@@ -25,6 +25,7 @@ parserForType :: T.Text -> Parser
 parserForType mediaType = case languageForType mediaType of
   Just C -> treeSitterParser C ts_language_c
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
+  Just Ruby -> treeSitterParser Ruby ts_language_ruby
   _ -> lineByLineParser
 
 -- | A fallback parser that treats a file simply as rows of strings.
