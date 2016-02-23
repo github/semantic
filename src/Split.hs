@@ -88,6 +88,9 @@ split diff (beforeBlob, afterBlob) = renderHtml
         valueOf EmptyLine = 0
         valueOf _ = 1
 
+-- | A patch to only one side of a diff.
+data SplitPatch a = SplitInsert a | SplitDelete a | SplitReplace a
+
 -- | A diff with only one side’s annotations.
 type SplitDiff leaf annotation = Free (Annotated leaf annotation) (String, Term leaf annotation)
 
