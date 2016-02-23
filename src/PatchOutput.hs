@@ -10,15 +10,16 @@ import Renderer
 import Row
 import Source hiding ((++), break)
 import Split
-import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Maybe
 import Data.Monoid
+import Data.Bifunctor
+import Control.Monad
 
 -- | Render a diff in the traditional patch format.
 patch :: Renderer a String
-patch diff (sourceA, sourceB) = mconcat $ showHunk (sourceA, sourceB) <$> hunks diff (sourceA, sourceB)
+patch diff sources = mconcat $ showHunk sources <$> hunks diff sources
 
 -- | A hunk in a patch, including the offset, changes, and context.
 data Hunk a = Hunk { offset :: (Sum Int, Sum Int), changes :: [Change a], trailingContext :: [Row a] }
@@ -46,8 +47,9 @@ lineLength EmptyLine = 0
 lineLength _ = 1
 
 -- | Given the before and after sources, render a hunk to a string.
-showHunk :: (Source Char, Source Char) -> Hunk (SplitDiff a Info) -> String
-showHunk sources hunk = header hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (unRight <$> trailingContext hunk)
+showHunk :: (SourceBlob, SourceBlob) -> Hunk (SplitDiff a Info) -> String
+showHunk blobs@(beforeBlob, afterBlob) hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (unRight <$> trailingContext hunk)
+  where sources = (source beforeBlob, source afterBlob)
 
 -- | Given the before and after sources, render a change to a string.
 showChange :: (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
@@ -69,16 +71,20 @@ getRange :: SplitDiff leaf Info -> Range
 getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure (Info range _ :< _)) = range
 
--- | Return the header for a hunk as a string.
-header :: Hunk a -> String
-header hunk = "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
-  where (lengthA, lengthB) = getSum *** getSum $ hunkLength hunk
-        (offsetA, offsetB) = getSum *** getSum $ offset hunk
+-- | Returns the header given two source blobs and a hunk.
+header :: (SourceBlob, SourceBlob) -> Hunk a -> String
+header blobs hunk = "diff --git a/" ++ path (fst blobs) ++ " b/" ++ path (snd blobs) ++ "\n" ++
+  "index " ++ oid (fst blobs) ++ ".." ++ oid (snd blobs) ++ "\n" ++
+  "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
+  where (lengthA, lengthB) = join bimap getSum $ hunkLength hunk
+        (offsetA, offsetB) = join bimap getSum $ offset hunk
 
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
-hunks diff sources = hunksInRows (1, 1) . fst $ splitDiffByLines diff (0, 0) sources
-
+hunks diff (beforeBlob, afterBlob) = hunksInRows (1, 1) . fst $ splitDiffByLines diff (0, 0) (before, after)
+  where
+    before = source beforeBlob
+    after = source afterBlob
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
 hunksInRows :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]

@@ -12,6 +12,7 @@ import Term
 import TreeSitter
 
 import Control.Comonad.Cofree
+import Control.Arrow
 import Data.Bifunctor.Join
 import qualified Data.ByteString.Char8 as B1
 import Data.Foldable
@@ -69,8 +70,9 @@ readAndTranscodeFile path = do
 
 -- | Given a parser and renderer, diff two sources and return the rendered
 -- | result.
-diffFiles :: Parser -> Renderer T.Text b -> (Source Char, Source Char) -> IO b
-diffFiles parser renderer sources = do
-  terms <- sequence $ parser <$> Join sources
-  let replaceLeaves = breakDownLeavesByWord <$> Join sources
-  return $ renderer (uncurry diffTerms $ runJoin $ replaceLeaves <*> terms) sources
+diffFiles :: Parser -> Renderer T.Text b -> (SourceBlob, SourceBlob) -> IO b
+diffFiles parser renderer sourceBlobs = do
+  let sources = Join $ (source *** source) sourceBlobs
+  terms <- sequence $ parser <$> sources
+  let replaceLeaves = breakDownLeavesByWord <$> sources
+  return $ renderer (uncurry diffTerms $ runJoin $ replaceLeaves <*> terms) sourceBlobs

@@ -1,6 +1,7 @@
 {-# LANGUAGE RecordWildCards #-}
  module Main where
 
+import Source
 import Data.Bifunctor.Join
 import Diffing
 import Options.Applicative
@@ -20,8 +21,11 @@ arguments = Arguments
 main :: IO ()
 main = do
   arguments <- execParser opts
-  sources <- sequence $ readAndTranscodeFile <$> Join (sourceA arguments, sourceB arguments)
-  DO.printDiff (parserForFilepath $ sourceA arguments) (args arguments) (runJoin sources)
+  let (sourceAPath, sourceBPath) = (sourceA arguments, sourceB arguments)
+  sources <- sequence $ readAndTranscodeFile <$> Join (sourceAPath, sourceBPath)
+  let srcs = runJoin sources
+  let sourceBlobs = (SourceBlob (fst srcs) mempty sourceAPath, SourceBlob (snd srcs) mempty sourceBPath)
+  DO.printDiff (parserForFilepath $ sourceA arguments) (args arguments) sourceBlobs
   where opts = info (helper <*> arguments)
           (fullDesc <> progDesc "Diff some things" <> header "semantic-diff - diff semantically")
         args Arguments{..} = DO.DiffArguments { format = format, output = output, outputPath = sourceA }
