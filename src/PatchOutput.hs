@@ -69,7 +69,7 @@ showLine source line = Just . toString . (`slice` source) . unionRanges $ getRan
 -- | Return the range from a split diff.
 getRange :: SplitDiff leaf Info -> Range
 getRange (Free (Annotated (Info range _) _)) = range
-getRange (Pure (Info range _ :< _)) = range
+getRange (Pure (_, Info range _ :< _)) = range
 
 -- | Returns the header given two source blobs and a hunk.
 header :: (SourceBlob, SourceBlob) -> Hunk a -> String
