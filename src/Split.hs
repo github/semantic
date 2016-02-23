@@ -92,7 +92,7 @@ split diff (beforeBlob, afterBlob) = renderHtml
 data SplitPatch a = SplitInsert a | SplitDelete a | SplitReplace a
 
 -- | A diff with only one side’s annotations.
-type SplitDiff leaf annotation = Free (Annotated leaf annotation) (String, Term leaf annotation)
+type SplitDiff leaf annotation = Free (Annotated leaf annotation) (SplitPatch (Term leaf annotation))
 
 -- | Something that can be rendered as markup.
 newtype Renderable a = Renderable (Source Char, a)
@@ -114,8 +114,9 @@ instance ToMarkup (Renderable (Term a Info)) where
 
 instance ToMarkup (Renderable (SplitDiff a Info)) where
   toMarkup (Renderable (source, diff)) = fst $ iter (\ (Annotated info@(Info range _) syntax) -> (toMarkup $ Renderable (source, (info, syntax)), range)) $ toMarkupAndRange <$> diff
-    where toMarkupAndRange :: (String, Term a Info) -> (Markup, Range)
-          toMarkupAndRange (className, term@(Info range _ :< _)) = ((div ! A.class_ (stringValue $ "patch " ++ className)) . toMarkup $ Renderable (source, term), range)
+    where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
+          toMarkupAndRange patch = let term@(Info range _ :< _) = getSplitTerm patch in
+            ((div ! A.class_ (splitPatchToClassName patch)) . toMarkup $ Renderable (source, term), range)
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue
@@ -135,12 +136,12 @@ splitDiffByLines :: Diff leaf Info -> (Int, Int) -> (Source Char, Source Char) -
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
-    (Row EmptyLine . fmap (Pure . (,) "insert") <$> lines, (Range prevLeft prevLeft, range))
+    (Row EmptyLine . fmap (Pure . SplitInsert) <$> lines, (Range prevLeft prevLeft, range))
   Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst sources) in
-    (flip Row EmptyLine . fmap (Pure . (,) "delete") <$> lines, (range, Range prevRight prevRight))
+    (flip Row EmptyLine . fmap (Pure . SplitDelete) <$> lines, (range, Range prevRight prevRight))
   Pure (Replace leftTerm rightTerm) -> let (leftLines, leftRange) = splitTermByLines leftTerm (fst sources)
                                            (rightLines, rightRange) = splitTermByLines rightTerm (snd sources) in
-                                           (zipWithDefaults Row EmptyLine EmptyLine (fmap (Pure . (,) "replace") <$> leftLines) (fmap (Pure . (,) "replace") <$> rightLines), (leftRange, rightRange))
+                                           (zipWithDefaults Row EmptyLine EmptyLine (fmap (Pure . SplitReplace) <$> leftLines) (fmap (Pure . SplitReplace) <$> rightLines), (leftRange, rightRange))
   where categories (Info _ left, Info _ right) = (left, right)
         ranges (Info left _, Info right _) = (left, right)
 
@@ -203,7 +204,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         getRange :: Has f => Either Range (f (SplitDiff leaf Info)) -> Range
         getRange (Right diff) = case get diff of
-          (Pure (_, Info range _ :< _)) -> range
+          (Pure patch) -> let Info range _ :< _ = getSplitTerm patch in range
           (Free (Annotated (Info range _) _)) -> range
         getRange (Left range) = range
 
@@ -237,7 +238,7 @@ openTerm source term = const term <$> openRange source (case get term of (Info r
 openDiff :: Has f => Source Char -> MaybeOpen (f (SplitDiff leaf Info))
 openDiff source diff = const diff <$> case get diff of
   (Free (Annotated (Info range _) _)) -> openRange source range
-  (Pure (_, Info range _ :< _)) -> openRange source range
+  (Pure patch) -> let Info range _ :< _ = getSplitTerm patch in openRange source range
 
 -- | Zip two lists by applying a function, using the default values to extend
 -- | the shorter list.
