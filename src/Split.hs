@@ -117,6 +117,13 @@ instance ToMarkup (Renderable (SplitDiff a Info)) where
     where toMarkupAndRange :: (String, Term a Info) -> (Markup, Range)
           toMarkupAndRange (className, term@(Info range _ :< _)) = ((div ! A.class_ (stringValue $ "patch " ++ className)) . toMarkup $ Renderable (source, term), range)
 
+-- | Pick the class name for a split patch.
+splitPatchToClassName :: SplitPatch a -> AttributeValue
+splitPatchToClassName patch = stringValue $ "patch " ++ case patch of
+  SplitInsert _ -> "insert"
+  SplitDelete _ -> "delete"
+  SplitReplace _ -> "replace"
+
 -- | Split a diff, which may span multiple lines, into rows of split diffs.
 splitDiffByLines :: Diff leaf Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff leaf Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
