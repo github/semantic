@@ -131,7 +131,6 @@ getSplitTerm :: SplitPatch a -> a
 getSplitTerm (SplitInsert a) = a
 getSplitTerm (SplitDelete a) = a
 getSplitTerm (SplitReplace a) = a
->>>>>>> master
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs.
 splitDiffByLines :: Diff leaf Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff leaf Info)], (Range, Range))
