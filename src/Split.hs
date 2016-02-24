@@ -112,7 +112,7 @@ instance ToMarkup (Renderable (Term a Info)) where
 instance ToMarkup (Renderable (SplitDiff a Info)) where
   toMarkup (Renderable (source, diff)) = fst $ iter (\ (Annotated info@(Info range _) syntax) -> (toMarkup $ Renderable (source, (info, syntax)), range)) $ toMarkupAndRange <$> diff
     where toMarkupAndRange :: Term a Info -> (Markup, Range)
-          toMarkupAndRange term@(Info range _ :< _) = ((div ! A.class_ (stringValue "patch")) . toMarkup $ Renderable (source, term), range)
+          toMarkupAndRange term@(Info range _ :< _) = ((div ! A.class_ (stringValue "patch") ! A.data_ (stringValue . show $ termSize term)) . toMarkup $ Renderable (source, term), range)
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs.
 splitDiffByLines :: Diff leaf Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff leaf Info)], (Range, Range))
