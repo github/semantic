@@ -98,9 +98,9 @@ newtype Renderable a = Renderable (Source Char, a)
 instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
   toMarkup (Renderable (source, (Info range categories, syntax))) = classifyMarkup categories $ case syntax of
     Leaf _ -> span . string . toString $ slice range source
-    Indexed children -> ul . mconcat $ contentElements children
-    Fixed children -> ul . mconcat $ contentElements children
-    Keyed children -> dl . mconcat $ contentElements children
+    Indexed children -> ul . mconcat $ wrapIn li <$> contentElements children
+    Fixed children -> ul . mconcat $ wrapIn li <$> contentElements children
+    Keyed children -> dl . mconcat $ wrapIn dl <$> contentElements children
     where markupForSeparatorAndChild :: ToMarkup f => ([Markup], Int) -> (f, Range) -> ([Markup], Int)
           markupForSeparatorAndChild (rows, previous) (child, range) = (rows ++ [ string  (toString $ slice (Range previous $ start range) source), toMarkup child ], end range)
 
