@@ -90,7 +90,7 @@ split diff (beforeBlob, afterBlob) = renderHtml
 
 -- | A patch to only one side of a diff.
 data SplitPatch a = SplitInsert a | SplitDelete a | SplitReplace a
-  deriving Show
+  deriving (Show, Eq)
 
 -- | A diff with only one side’s annotations.
 type SplitDiff leaf annotation = Free (Annotated leaf annotation) (SplitPatch (Term leaf annotation))
