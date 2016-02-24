@@ -15,6 +15,7 @@ import Range
 import Control.Monad.Free
 import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
+import qualified Text.Blaze.Internal as Blaze
 import qualified Text.Blaze.Html5.Attributes as A
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
@@ -102,6 +103,12 @@ instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
     Keyed children -> dl . mconcat $ contentElements children
     where markupForSeparatorAndChild :: ToMarkup f => ([Markup], Int) -> (f, Range) -> ([Markup], Int)
           markupForSeparatorAndChild (rows, previous) (child, range) = (rows ++ [ string  (toString $ slice (Range previous $ start range) source), toMarkup child ], end range)
+
+          wrapIn _ l@Blaze.Leaf{} = l
+          wrapIn _ l@Blaze.CustomLeaf{} = l
+          wrapIn _ l@Blaze.Content{} = l
+          wrapIn _ l@Blaze.Comment{} = l
+          wrapIn f p = f p
 
           contentElements children = let (elements, previous) = foldl' markupForSeparatorAndChild ([], start range) children in
             elements ++ [ string . toString $ slice (Range previous $ end range) source ]
