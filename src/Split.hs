@@ -101,7 +101,7 @@ instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
     Fixed children -> ul . mconcat $ contentElements children
     Keyed children -> dl . mconcat $ contentElements children
     where markupForSeparatorAndChild :: ToMarkup f => ([Markup], Int) -> (f, Range) -> ([Markup], Int)
-          markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string  (toString $ slice (Range previous $ start $ snd child) source), toMarkup $ fst child ], end $ snd child)
+          markupForSeparatorAndChild (rows, previous) (child, range) = (rows ++ [ string  (toString $ slice (Range previous $ start range) source), toMarkup child ], end range)
 
           contentElements children = let (elements, previous) = foldl' markupForSeparatorAndChild ([], start range) children in
             elements ++ [ string . toString $ slice (Range previous $ end range) source ]
