@@ -67,6 +67,9 @@ defaultCategoryForNodeName :: String -> Set.Set Category
 defaultCategoryForNodeName name = case name of
   "function_call" -> Set.singleton FunctionCall
   "pair" -> Set.singleton Pair
+  "string" -> Set.singleton StringLiteral
+  "integer" -> Set.singleton IntegerLiteral
+  "symbol" -> Set.singleton SymbolLiteral
   _ -> Set.singleton (Other name)
 
 -- | Given a constructor and a tree sitter document, return a parser.
