@@ -116,8 +116,11 @@ body {
 .diff .category-undefined,
 .diff .category-number,
 .diff .category-function_call>li>.category-identifier,
+.diff .category-function_call>li>.category-argument_list>li>.category-identifier,
 .diff .category-function_call>li>.category-member_access>.category-identifier,
-.diff .category-member_access>:not(:first-child)>.category-identifier {
+.diff .category-member_access>:not(:first-child)>.category-identifier,
+.diff .category-scope_resolution_expression>li>.category-identifier,
+.diff .category-symbol {
   color: #0086b3;
 }
 
@@ -127,6 +130,10 @@ body {
 
 .diff [class^="category-"][class$="_op"],
 .diff .category-ternary,
+.diff .category-conditional,
+.diff .category-additive,
+.diff .category-multiplicative,
+.diff .category-complement,
 .diff .category-var_declaration,
 .diff .category-new_expression,
 .diff .category-if_statement,
@@ -136,13 +143,23 @@ body {
 .diff .category-return_statement,
 .diff .category-function,
 .diff .category-assignment,
-.diff .category-var_assignment {
+.diff .category-var_assignment,
+.diff .category-method_declaration,
+.diff .category-case_statement,
+.diff .category-else_block,
+.diff .category-when_block,
+.diff .category-then_block,
+.diff .category-class_declaration,
+.diff .category-module_declaration {
   color: #a71d5d;
 }
 
 .diff .category-function>li:first-child>.category-identifier,
+.diff .category-method_declaration>li:first-child>.category-identifier,
 .diff .category-new_expression>li>.category-function_call>li:first-child>.category-identifier,
 .diff .category-pair>li:first-child>.category-identifier,
-.diff .category-assignment>li:first-child>.category-member_access>:not(:first-child)>.category-identifier {
+.diff .category-assignment>li:first-child>.category-member_access>:not(:first-child)>.category-identifier,
+.diff .category-class_declaration>li>.category-identifier,
+.diff .category-module_declaration>li>.category-identifier {
   color: #795da3;
 }
