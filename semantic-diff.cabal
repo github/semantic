@@ -38,6 +38,7 @@ library
   build-depends:       base >= 4.8 && < 5
                      , bifunctors
                      , blaze-html
+                     , blaze-markup
                      , bytestring
                      , c-storable-deriving
                      , containers
