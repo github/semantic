@@ -4,7 +4,7 @@ module Renderer.JSON (
 
 import Diff
 import Row
-import Source
+import Source hiding ((++))
 import Renderer
 import Renderer.Split
 
@@ -13,3 +13,6 @@ data JSON a = JSON { rows :: [Row (SplitDiff a Info)] }
 
 json :: Renderer a String
 json diff sources = ""
+
+instance Show (JSON a) where
+  show (JSON _) = "{" ++ "'rows':" ++ "[" ++ "]" ++ "}"
