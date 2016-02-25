@@ -27,4 +27,5 @@ languageForType mediaType = case mediaType of
     ".h" -> Just C
     ".c" -> Just C
     ".js" -> Just JavaScript
+    ".rb" -> Just Ruby
     _ -> Nothing

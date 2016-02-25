@@ -26,6 +26,7 @@ parserForType :: T.Text -> Parser
 parserForType mediaType = case languageForType mediaType of
   Just C -> treeSitterParser C ts_language_c
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
+  Just Ruby -> treeSitterParser Ruby ts_language_ruby
   _ -> lineByLineParser
 
 -- | A fallback parser that treats a file simply as rows of strings.
@@ -49,7 +50,7 @@ parserForFilepath = parserForType . T.pack . takeExtension
 breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
 breakDownLeavesByWord source = cata replaceIn
   where
-    replaceIn info@(Info range categories) (Leaf _) | ranges <- rangesAndWordsInSource range, length ranges > 1 = info :< (Indexed $ makeLeaf categories <$> ranges)
+    replaceIn info@(Info range categories) (Leaf _) | ranges <- rangesAndWordsInSource range, length ranges > 1 = info :< Indexed (makeLeaf categories <$> ranges)
     replaceIn info syntax = info :< syntax
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (Source.toList $ slice range source)
     makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)

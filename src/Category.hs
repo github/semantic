@@ -16,6 +16,12 @@ data Category =
   | Pair
   -- | A call to a function.
   | FunctionCall
+  -- | A string literal.
+  | StringLiteral
+  -- | An integer literal.
+  | IntegerLiteral
+  -- | A symbol literal.
+  | SymbolLiteral
   -- | A non-standard category, which can be used for comparability.
   | Other String
   deriving (Eq, Show, Ord)
