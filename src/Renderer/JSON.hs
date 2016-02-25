@@ -26,7 +26,7 @@ instance Show (JSON a) where
           showLine EmptyLine = "null"
           showLine (Line diffs) = mconcat (showDiff <$> toList diffs)
           showDiff (Pure patch) = "{}"
-          showDiff (Free (Annotated (Info r c) syntax)) = "{}"
+          showDiff (Free (Annotated info syntax)) = showInfoSyntax info syntax
           showPatch (SplitInsert term) = "{'insert':" ++ showTerm term ++ "}"
           showPatch (SplitDelete term) = "{'delete':" ++ showTerm term ++ "}"
           showPatch (SplitReplace term) = "{'replace':" ++ showTerm term ++ "}"
