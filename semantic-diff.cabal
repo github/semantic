@@ -25,6 +25,7 @@ library
                      , Data.OrderedMap
                      , Patch
                      , Renderer
+                     , Renderer.JSON
                      , Renderer.Patch
                      , Renderer.Split
                      , Renderer.Unified
