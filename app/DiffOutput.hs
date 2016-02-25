@@ -37,4 +37,4 @@ printDiff parser arguments sources = case format arguments of
                          else path
         IO.withFile outputPath IO.WriteMode (`TextIO.hPutStr` rendered)
   Patch -> putStr =<< diffFiles parser P.patch sources
-  JSON -> putStr ""
+  JSON -> putStr =<< diffFiles parser J.json sources
