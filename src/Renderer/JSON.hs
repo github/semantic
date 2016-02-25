@@ -33,6 +33,6 @@ instance Show (JSON a) where
           showPatch (SplitReplace term) = "{'replace':" ++ showTerm term ++ "}"
           showTerm (info :< syntax) = showInfoSyntax info syntax
           showInfoSyntax (Info range categories) syntax = "{'range':" ++ showRange range ++ ",'categories':" ++ showCategories categories ++ ",'syntax':" ++ showSyntax syntax ++ "}"
-          showRange (Range start end) = "{}"
+          showRange (Range start end) = "{'start':" ++ show start ++ ",'end':" ++ show end ++ "}"
           showCategories c = "{}"
           showSyntax syntax = "{}"
