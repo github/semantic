@@ -1,7 +1,7 @@
 module PatchOutputSpec where
 
 import Diff
-import Renderer.PatchOutput
+import Renderer.Patch
 import Range
 import Source
 import Syntax

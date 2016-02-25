@@ -10,7 +10,7 @@ import System.Directory
 import System.FilePath
 import qualified System.IO as IO
 import qualified Data.Text.Lazy.IO as TextIO
-import qualified Renderer.PatchOutput as PO
+import qualified Renderer.Patch as P
 import Rainbow
 
 -- | The available types of diff rendering.
@@ -35,4 +35,4 @@ printDiff parser arguments sources = case format arguments of
                          then path </> (takeFileName outputPath -<.> ".html")
                          else path
         IO.withFile outputPath IO.WriteMode (flip TextIO.hPutStr rendered)
-  Patch -> putStr =<< diffFiles parser PO.patch sources
+  Patch -> putStr =<< diffFiles parser P.patch sources

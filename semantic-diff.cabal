@@ -24,7 +24,7 @@ library
                      , Row
                      , Data.OrderedMap
                      , Patch
-                     , Renderer.PatchOutput
+                     , Renderer.Patch
                      , SES
                      , Category
                      , Term
