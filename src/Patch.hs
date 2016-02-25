@@ -21,4 +21,4 @@ before _ = Nothing
 
 -- | Calculate the cost of the patch given a function to compute the cost of a item.
 patchSum :: (a -> Integer) -> Patch a -> Integer
-patchSum termCost patch = (maybe 0 termCost $ before patch) + (maybe 0 termCost $ after patch)
+patchSum termCost patch = maybe 0 termCost (before patch) + maybe 0 termCost (after patch)

@@ -15,6 +15,7 @@ import Range
 import Control.Monad.Free
 import Text.Blaze.Html
 import Text.Blaze.Html5 hiding (map)
+import qualified Text.Blaze.Internal as Blaze
 import qualified Text.Blaze.Html5.Attributes as A
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
@@ -41,6 +42,9 @@ styleName category = "category-" ++ case category of
   DictionaryLiteral -> "dictionary"
   Pair -> "pair"
   FunctionCall -> "function_call"
+  StringLiteral -> "string"
+  SymbolLiteral -> "symbol"
+  IntegerLiteral -> "integer"
   Other string -> string
 
 -- | Render a diff as an HTML split diff.
@@ -101,11 +105,17 @@ newtype Renderable a = Renderable (Source Char, a)
 instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
   toMarkup (Renderable (source, (Info range categories, syntax))) = classifyMarkup categories $ case syntax of
     Leaf _ -> span . string . toString $ slice range source
-    Indexed children -> ul . mconcat $ contentElements children
-    Fixed children -> ul . mconcat $ contentElements children
-    Keyed children -> dl . mconcat $ contentElements children
+    Indexed children -> ul . mconcat $ wrapIn li <$> contentElements children
+    Fixed children -> ul . mconcat $ wrapIn li <$> contentElements children
+    Keyed children -> dl . mconcat $ wrapIn dl <$> contentElements children
     where markupForSeparatorAndChild :: ToMarkup f => ([Markup], Int) -> (f, Range) -> ([Markup], Int)
-          markupForSeparatorAndChild (rows, previous) child = (rows ++ [ string  (toString $ slice (Range previous $ start $ snd child) source), toMarkup $ fst child ], end $ snd child)
+          markupForSeparatorAndChild (rows, previous) (child, range) = (rows ++ [ string  (toString $ slice (Range previous $ start range) source), toMarkup child ], end range)
+
+          wrapIn _ l@Blaze.Leaf{} = l
+          wrapIn _ l@Blaze.CustomLeaf{} = l
+          wrapIn _ l@Blaze.Content{} = l
+          wrapIn _ l@Blaze.Comment{} = l
+          wrapIn f p = f p
 
           contentElements children = let (elements, previous) = foldl' markupForSeparatorAndChild ([], start range) children in
             elements ++ [ string . toString $ slice (Range previous $ end range) source ]
@@ -117,7 +127,7 @@ instance ToMarkup (Renderable (SplitDiff a Info)) where
   toMarkup (Renderable (source, diff)) = fst $ iter (\ (Annotated info@(Info range _) syntax) -> (toMarkup $ Renderable (source, (info, syntax)), range)) $ toMarkupAndRange <$> diff
     where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
           toMarkupAndRange patch = let term@(Info range _ :< _) = getSplitTerm patch in
-            ((div ! A.class_ (splitPatchToClassName patch)) . toMarkup $ Renderable (source, term), range)
+            ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue . show $ termSize term)) . toMarkup $ Renderable (source, term), range)
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue
