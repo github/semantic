@@ -36,6 +36,6 @@ instance Show (JSON a) where
           showRange (Range start end) = "{'start':" ++ show start ++ ",'end':" ++ show end ++ "}"
           showCategories categories = "{" ++ mconcat (show <$> toList categories) ++ "}"
           showSyntax (Leaf _) = "type:'leaf'"
-          showSyntax (Indexed i) = "{}"
+          showSyntax (Indexed children) = "type:'indexed',children:" ++ mconcat children
           showSyntax (Fixed f) = "{}"
           showSyntax (Keyed k) = "{}"
