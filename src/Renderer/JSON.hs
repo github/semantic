@@ -6,9 +6,11 @@ module Renderer.JSON (
 import Diff
 import Line
 import Row
-import Source hiding ((++))
 import Renderer
 import Renderer.Split
+import Source hiding ((++), toList)
+import Control.Monad.Free
+import Data.Foldable
 
 -- | JSON representing an aligned diff.
 newtype JSON a = JSON { rows :: [Row (SplitDiff a Info)] }
@@ -21,4 +23,6 @@ instance Show (JSON a) where
   show (JSON rows) = "{'rows':[" ++ mconcat (showRow <$> rows) ++ "]}"
     where showRow (Row left right) = "{'left':" ++ showLine left ++ ",'right':" ++ showLine right ++ "}"
           showLine EmptyLine = "null"
-          showLine (Line _) = "{}"
+          showLine (Line diffs) = mconcat (showDiff <$> toList diffs)
+          showDiff (Pure term) = "{}"
+          showDiff (Free (Annotated (Info r c) syntax)) = "{}"
