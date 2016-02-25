@@ -5,6 +5,7 @@ module Renderer.JSON (
 
 import Diff
 import Line
+import Range
 import Row
 import Renderer
 import Renderer.Split
@@ -31,4 +32,7 @@ instance Show (JSON a) where
           showPatch (SplitDelete term) = "{'delete':" ++ showTerm term ++ "}"
           showPatch (SplitReplace term) = "{'replace':" ++ showTerm term ++ "}"
           showTerm (info :< syntax) = showInfoSyntax info syntax
-          showInfoSyntax info syntax = "{}"
+          showInfoSyntax (Info range categories) syntax = "{'range':" ++ showRange range ++ ",'categories':" ++ showCategories categories ++ ",'syntax':" ++ showSyntax syntax ++ "}"
+          showRange (Range start end) = "{}"
+          showCategories c = "{}"
+          showSyntax syntax = "{}"
