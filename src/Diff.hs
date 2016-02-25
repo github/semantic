@@ -9,7 +9,7 @@ import Range
 import Category
 
 -- | An annotated syntax in a diff tree.
-data Annotated a annotation f = Annotated !annotation !(Syntax a f)
+data Annotated a annotation f = Annotated { getAnnotation :: !annotation, getSyntax :: !(Syntax a f) }
   deriving (Functor, Eq, Show, Foldable)
 
 -- | An annotation for a source file, including the source range and semantic
