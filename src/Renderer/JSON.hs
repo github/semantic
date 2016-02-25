@@ -1,8 +1,10 @@
+{-# LANGUAGE NoOverloadedStrings #-}
 module Renderer.JSON (
   json
 ) where
 
 import Diff
+import Line
 import Row
 import Source hiding ((++))
 import Renderer
@@ -17,4 +19,6 @@ json diff (a, b) = show . JSON . fst $ splitDiffByLines diff (0, 0) (source a, s
 
 instance Show (JSON a) where
   show (JSON rows) = "{'rows':[" ++ mconcat (showRow <$> rows) ++ "]}"
-    where showRow (Row left right) = "{'left':{},'right':{}}"
+    where showRow (Row left right) = "{'left':" ++ showLine left ++ ",'right':" ++ showLine right ++ "}"
+          showLine EmptyLine = "null"
+          showLine (Line _) = "{}"
