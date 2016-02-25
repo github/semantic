@@ -37,5 +37,5 @@ instance Show (JSON a) where
           showCategories categories = "{" ++ mconcat (show <$> toList categories) ++ "}"
           showSyntax (Leaf _) = "type:'leaf'"
           showSyntax (Indexed children) = "type:'indexed',children:[" ++ intercalate "," children ++ "]"
-          showSyntax (Fixed f) = "{}"
+          showSyntax (Fixed children) = "type:'fixed',children:[" ++ intercalate "," children ++ "]"
           showSyntax (Keyed k) = "{}"
