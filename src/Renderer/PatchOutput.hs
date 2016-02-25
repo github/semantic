@@ -1,4 +1,4 @@
-module PatchOutput (
+module Renderer.PatchOutput (
   patch,
   hunks
 ) where

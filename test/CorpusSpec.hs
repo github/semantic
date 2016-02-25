@@ -1,7 +1,7 @@
 module CorpusSpec where
 
 import Diffing
-import PatchOutput
+import qualified Renderer.PatchOutput as PO
 import Renderer
 import Split
 import Unified
@@ -43,7 +43,7 @@ spec = parallel $ do
     correctTests paths@(_, _, Nothing, Nothing, Nothing) = testsForPaths paths
     correctTests paths = List.filter (\(_, _, _, _, output) -> isJust output) $ testsForPaths paths
     testsForPaths :: (FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, FilePath, FilePath, Maybe FilePath)]
-    testsForPaths (a, b, patch, split, unified) = [ ("patch", PatchOutput.patch, a, b, patch), ("split", testSplit, a, b, split), ("unified", testUnified, a, b, unified) ]
+    testsForPaths (a, b, patch, split, unified) = [ ("patch", PO.patch, a, b, patch), ("split", testSplit, a, b, split), ("unified", testUnified, a, b, unified) ]
     testSplit :: Renderer a String
     testSplit diff sources = TL.unpack $ Split.split diff sources
     testUnified :: Renderer a String
