@@ -4,7 +4,7 @@ import Diffing
 import Renderer
 import qualified Renderer.Patch as P
 import qualified Renderer.Split as Split
-import Unified
+import qualified Renderer.Unified as Unified
 
 import qualified Source as S
 import Control.DeepSeq
@@ -47,7 +47,7 @@ spec = parallel $ do
     testSplit :: Renderer a String
     testSplit diff sources = TL.unpack $ Split.split diff sources
     testUnified :: Renderer a String
-    testUnified diff sources = B1.unpack $ mconcat $ chunksToByteStrings toByteStringsColors0 $ unified diff sources
+    testUnified diff sources = B1.unpack $ mconcat $ chunksToByteStrings toByteStringsColors0 $ Unified.unified diff sources
 
 
 -- | Return all the examples from the given directory. Examples are expected to

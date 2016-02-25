@@ -26,11 +26,11 @@ library
                      , Patch
                      , Renderer.Patch
                      , Renderer.Split
+                     , Renderer.Unified
                      , SES
                      , Category
                      , Term
                      , Range
-                     , Unified
                      , Parser
                      , Renderer
                      , TreeSitter

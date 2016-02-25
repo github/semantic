@@ -4,13 +4,13 @@ import Diffing
 import qualified Data.ByteString.Char8 as B1
 import Parser
 import Source
-import Unified
 import System.Directory
 import System.FilePath
 import qualified System.IO as IO
 import qualified Data.Text.Lazy.IO as TextIO
 import qualified Renderer.Patch as P
 import Renderer.Split
+import Renderer.Unified
 import Rainbow
 
 -- | The available types of diff rendering.
