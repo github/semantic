@@ -1,9 +1,9 @@
 module CorpusSpec where
 
 import Diffing
-import qualified Renderer.Patch as P
 import Renderer
-import Split
+import qualified Renderer.Patch as P
+import qualified Renderer.Split as Split
 import Unified
 
 import qualified Source as S

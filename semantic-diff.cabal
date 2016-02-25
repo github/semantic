@@ -25,11 +25,11 @@ library
                      , Data.OrderedMap
                      , Patch
                      , Renderer.Patch
+                     , Renderer.Split
                      , SES
                      , Category
                      , Term
                      , Range
-                     , Split
                      , Unified
                      , Parser
                      , Renderer
