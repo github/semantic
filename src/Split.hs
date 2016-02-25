@@ -42,6 +42,9 @@ styleName category = "category-" ++ case category of
   DictionaryLiteral -> "dictionary"
   Pair -> "pair"
   FunctionCall -> "function_call"
+  StringLiteral -> "string"
+  SymbolLiteral -> "symbol"
+  IntegerLiteral -> "integer"
   Other string -> string
 
 -- | Render a diff as an HTML split diff.

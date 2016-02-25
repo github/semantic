@@ -15,6 +15,7 @@ import qualified GHC.Generics as Generics
 data TSLanguage = TsLanguage deriving (Show, Eq)
 foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_c" ts_language_c :: Ptr TSLanguage
 foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_javascript" ts_language_javascript :: Ptr TSLanguage
+foreign import ccall "prototype/doubt-difftool/doubt-difftool-Bridging-Header.h ts_language_ruby" ts_language_ruby :: Ptr TSLanguage
 
 data TSDocument = TsDocument deriving (Show, Eq)
 foreign import ccall "prototype/External/tree-sitter/include/tree_sitter/runtime.h ts_document_make" ts_document_make :: IO (Ptr TSDocument)
@@ -57,6 +58,8 @@ categoriesForLanguage :: Language -> String -> Set.Set Category
 categoriesForLanguage language name = case (language, name) of
   (JavaScript, "object") -> Set.singleton DictionaryLiteral
   (JavaScript, "rel_op") -> Set.singleton BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
+
+  (Ruby, "hash") -> Set.singleton DictionaryLiteral
   _ -> defaultCategoryForNodeName name
 
 -- | Given a node name from TreeSitter, return the correct categories.
@@ -64,6 +67,9 @@ defaultCategoryForNodeName :: String -> Set.Set Category
 defaultCategoryForNodeName name = case name of
   "function_call" -> Set.singleton FunctionCall
   "pair" -> Set.singleton Pair
+  "string" -> Set.singleton StringLiteral
+  "integer" -> Set.singleton IntegerLiteral
+  "symbol" -> Set.singleton SymbolLiteral
   _ -> Set.singleton (Other name)
 
 -- | Given a constructor and a tree sitter document, return a parser.
