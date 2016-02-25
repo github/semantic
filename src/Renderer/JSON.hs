@@ -25,7 +25,7 @@ instance Show (JSON a) where
     where showRow (Row left right) = "{'left':" ++ showLine left ++ ",'right':" ++ showLine right ++ "}"
           showLine EmptyLine = "null"
           showLine (Line diffs) = mconcat (showDiff <$> toList diffs)
-          showDiff (Pure patch) = "{}"
+          showDiff (Pure patch) = showPatch patch
           showDiff (Free (Annotated info syntax)) = showInfoSyntax info syntax
           showPatch (SplitInsert term) = "{'insert':" ++ showTerm term ++ "}"
           showPatch (SplitDelete term) = "{'delete':" ++ showTerm term ++ "}"
