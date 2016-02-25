@@ -9,6 +9,7 @@ import Row
 import Renderer
 import Renderer.Split
 import Source hiding ((++), toList)
+import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Foldable
 
@@ -29,4 +30,5 @@ instance Show (JSON a) where
           showPatch (SplitInsert term) = "{'insert':" ++ showTerm term ++ "}"
           showPatch (SplitDelete term) = "{'delete':" ++ showTerm term ++ "}"
           showPatch (SplitReplace term) = "{'replace':" ++ showTerm term ++ "}"
-          showTerm term = "{}"
+          showTerm (info :< syntax) = showInfoSyntax info syntax
+          showInfoSyntax info syntax = "{}"
