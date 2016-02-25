@@ -9,7 +9,7 @@ import Renderer
 import Renderer.Split
 
 -- | JSON representing an aligned diff.
-data JSON a = JSON { rows :: [Row (SplitDiff a Info)] }
+newtype JSON a = JSON { rows :: [Row (SplitDiff a Info)] }
 
 -- | Render a diff to a string representing its JSON.
 json :: Renderer a String
