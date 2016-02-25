@@ -107,7 +107,7 @@ instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
     Leaf _ -> span . string . toString $ slice range source
     Indexed children -> ul . mconcat $ wrapIn li <$> contentElements children
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements children
-    Keyed children -> dl . mconcat $ wrapIn dl <$> contentElements children
+    Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements children
     where markupForSeparatorAndChild :: ToMarkup f => ([Markup], Int) -> (f, Range) -> ([Markup], Int)
           markupForSeparatorAndChild (rows, previous) (child, range) = (rows ++ [ string  (toString $ slice (Range previous $ start range) source), toMarkup child ], end range)
 
