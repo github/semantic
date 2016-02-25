@@ -10,6 +10,7 @@ import Row
 import Renderer
 import Renderer.Split
 import Source hiding ((++), toList)
+import Syntax
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Foldable
@@ -32,7 +33,10 @@ instance Show (JSON a) where
           showPatch (SplitDelete term) = "{'delete':" ++ showTerm term ++ "}"
           showPatch (SplitReplace term) = "{'replace':" ++ showTerm term ++ "}"
           showTerm (info :< syntax) = showInfoSyntax info syntax
-          showInfoSyntax (Info range categories) syntax = "{'range':" ++ showRange range ++ ",'categories':" ++ showCategories categories ++ ",'syntax':" ++ showSyntax syntax ++ "}"
+          showInfoSyntax (Info range categories) syntax = "{'range':" ++ showRange range ++ ",'categories':" ++ showCategories categories ++ "," ++ showSyntax syntax ++ "}"
           showRange (Range start end) = "{'start':" ++ show start ++ ",'end':" ++ show end ++ "}"
           showCategories categories = "{" ++ mconcat (show <$> toList categories) ++ "}"
-          showSyntax syntax = "{}"
+          showSyntax (Leaf _) = "type:'leaf'"
+          showSyntax (Indexed i) = "{}"
+          showSyntax (Fixed f) = "{}"
+          showSyntax (Keyed k) = "{}"
