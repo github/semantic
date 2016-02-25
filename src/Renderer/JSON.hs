@@ -11,6 +11,7 @@ import Renderer.Split
 -- | JSON representing an aligned diff.
 data JSON a = JSON { rows :: [Row (SplitDiff a Info)] }
 
+-- | Render a diff to a string representing its JSON.
 json :: Renderer a String
 json diff (a, b) = show . JSON . fst $ splitDiffByLines diff (0, 0) (source a, source b)
 
