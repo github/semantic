@@ -5,6 +5,7 @@ module Renderer.JSON (
 
 import Diff
 import Line
+import qualified Data.OrderedMap as Map
 import Range
 import Row
 import Renderer
@@ -38,4 +39,5 @@ instance Show (JSON a) where
           showSyntax (Leaf _) = "type:'leaf'"
           showSyntax (Indexed children) = "type:'indexed',children:[" ++ intercalate "," children ++ "]"
           showSyntax (Fixed children) = "type:'fixed',children:[" ++ intercalate "," children ++ "]"
-          showSyntax (Keyed k) = "{}"
+          showSyntax (Keyed children) = "type:'keyed',children:{" ++ intercalate "," (uncurry showKeyValue <$> Map.toList children) ++ "}"
+          showKeyValue key value = "'" ++ show key ++ "': " ++ value
