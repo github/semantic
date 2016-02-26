@@ -25,17 +25,19 @@ library
                      , Row
                      , Data.OrderedMap
                      , Patch
-                     , PatchOutput
+                     , Renderer
+                     , Renderer.Patch
+                     , Renderer.Split
+                     , Renderer.Unified
                      , SES
                      , Category
                      , Term
                      , Range
-                     , Split
-                     , Unified
                      , Parser
-                     , Renderer
                      , TreeSitter
                      , Source
+                     , Control.Monad.Free
+                     , Control.Comonad.Cofree
   build-depends:       base >= 4.8 && < 5
                      , bifunctors
                      , blaze-html
@@ -45,7 +47,6 @@ library
                      , containers
                      , directory
                      , filepath
-                     , free
                      , mtl
                      , rainbow
                      , semigroups
@@ -72,7 +73,6 @@ executable semantic-diff
                      , containers
                      , directory
                      , filepath
-                     , free
                      , optparse-applicative
                      , semantic-diff
                      , text >= 1.2.1.3
@@ -108,7 +108,6 @@ test-suite semantic-diff-test
                      , containers
                      , deepseq
                      , filepath
-                     , free
                      , Glob
                      , hspec >= 2.1.10
                      , QuickCheck >= 2.8.1

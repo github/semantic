@@ -1,4 +1,4 @@
-module Unified (unified, substring) where
+module Renderer.Unified (unified, substring) where
 
 import Diff
 import Patch

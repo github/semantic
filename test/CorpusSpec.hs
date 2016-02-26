@@ -1,10 +1,10 @@
 module CorpusSpec where
 
 import Diffing
-import PatchOutput
 import Renderer
-import Split
-import Unified
+import qualified Renderer.Patch as P
+import qualified Renderer.Split as Split
+import qualified Renderer.Unified as Unified
 
 import qualified Source as S
 import Control.DeepSeq
@@ -43,11 +43,11 @@ spec = parallel $ do
     correctTests paths@(_, _, Nothing, Nothing, Nothing) = testsForPaths paths
     correctTests paths = List.filter (\(_, _, _, _, output) -> isJust output) $ testsForPaths paths
     testsForPaths :: (FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, FilePath, FilePath, Maybe FilePath)]
-    testsForPaths (a, b, patch, split, unified) = [ ("patch", PatchOutput.patch, a, b, patch), ("split", testSplit, a, b, split), ("unified", testUnified, a, b, unified) ]
+    testsForPaths (a, b, patch, split, unified) = [ ("patch", P.patch, a, b, patch), ("split", testSplit, a, b, split), ("unified", testUnified, a, b, unified) ]
     testSplit :: Renderer a String
     testSplit diff sources = TL.unpack $ Split.split diff sources
     testUnified :: Renderer a String
-    testUnified diff sources = B1.unpack $ mconcat $ chunksToByteStrings toByteStringsColors0 $ unified diff sources
+    testUnified diff sources = B1.unpack $ mconcat $ chunksToByteStrings toByteStringsColors0 $ Unified.unified diff sources
 
 
 -- | Return all the examples from the given directory. Examples are expected to
