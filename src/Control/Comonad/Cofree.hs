@@ -9,3 +9,6 @@ instance (Eq annotation, Eq (functor (Cofree functor annotation))) => Eq (Cofree
 
 unwrap :: Cofree functor annotation -> functor (Cofree functor annotation)
 unwrap (_ :< f) = f
+
+unfold :: Functor functor => (seed -> (annotation, functor seed)) -> seed -> Cofree functor annotation
+unfold grow seed = case grow seed of (annotation, functor) -> annotation :< (unfold grow <$> functor)
