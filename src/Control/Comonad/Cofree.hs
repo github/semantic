@@ -7,6 +7,9 @@ data Cofree functor annotation = annotation :< (functor (Cofree functor annotati
 instance (Eq annotation, Eq (functor (Cofree functor annotation))) => Eq (Cofree functor annotation) where
   a :< f == b :< g = a == b && f == g
 
+instance (Show annotation, Show (functor (Cofree functor annotation))) => Show (Cofree functor annotation) where
+  showsPrec n (a :< f) = showsPrec n a . (" :< " ++) . showsPrec n f
+
 unwrap :: Cofree functor annotation -> functor (Cofree functor annotation)
 unwrap (_ :< f) = f
 
