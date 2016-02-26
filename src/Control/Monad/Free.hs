@@ -8,3 +8,7 @@ instance (Eq pure, Eq (functor (Free functor pure))) => Eq (Free functor pure) w
   Pure a == Pure b = a == b
   Free f == Free g = f == g
   _ == _ = False
+
+iter :: Functor functor => (functor pure -> pure) -> Free functor pure -> pure
+iter _ (Pure a) = a
+iter f (Free g) = f (iter f <$> g)
