@@ -37,8 +37,8 @@ library
                      , Source
                      , Control.Monad.Free
                      , Control.Comonad.Cofree
+                     , Data.Bifunctor.Join
   build-depends:       base >= 4.8 && < 5
-                     , bifunctors
                      , blaze-html
                      , blaze-markup
                      , bytestring
@@ -67,7 +67,6 @@ executable semantic-diff-exe
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
-                     , bifunctors
                      , bytestring
                      , containers
                      , directory
@@ -101,7 +100,6 @@ executable semantic-diff
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
-                     , bifunctors
                      , bytestring
                      , containers
                      , directory
@@ -136,7 +134,6 @@ test-suite semantic-diff-test
                      , SplitSpec
                      , TermSpec
   build-depends:       base
-                     , bifunctors
                      , bytestring
                      , containers
                      , deepseq
