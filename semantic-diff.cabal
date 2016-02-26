@@ -24,15 +24,15 @@ library
                      , Row
                      , Data.OrderedMap
                      , Patch
-                     , PatchOutput
+                     , Renderer
+                     , Renderer.Patch
+                     , Renderer.Split
+                     , Renderer.Unified
                      , SES
                      , Category
                      , Term
                      , Range
-                     , Split
-                     , Unified
                      , Parser
-                     , Renderer
                      , TreeSitter
                      , Source
                      , Control.Monad.Free

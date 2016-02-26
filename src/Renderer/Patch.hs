@@ -1,4 +1,4 @@
-module PatchOutput (
+module Renderer.Patch (
   patch,
   hunks
 ) where
@@ -9,7 +9,7 @@ import Range
 import Renderer
 import Row
 import Source hiding ((++), break)
-import Split
+import Renderer.Split
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Maybe

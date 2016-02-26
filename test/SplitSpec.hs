@@ -14,7 +14,7 @@ import Source hiding ((++))
 import Line
 import Row
 import Range
-import Split
+import Renderer.Split
 import Syntax
 import ArbitraryTerm ()
 

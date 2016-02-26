@@ -1,5 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
-module Split where
+module Renderer.Split where
 
 import Prelude hiding (div, head, span)
 import Category
