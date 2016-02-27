@@ -15,7 +15,6 @@ import Data.Maybe
 import Data.Set as Set
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
-import Rainbow
 import System.FilePath
 import System.FilePath.Glob
 import Test.Hspec
