@@ -27,7 +27,6 @@ library
                      , Renderer
                      , Renderer.Patch
                      , Renderer.Split
-                     , Renderer.Unified
                      , SES
                      , Category
                      , Term
@@ -46,7 +45,6 @@ library
                      , containers
                      , filepath
                      , mtl
-                     , rainbow
                      , semigroups
                      , text >= 1.2.1.3
                      , text-icu
@@ -72,7 +70,6 @@ executable semantic-diff-exe
                      , directory
                      , filepath
                      , optparse-applicative
-                     , rainbow
                      , semantic-diff
                      , text >= 1.2.1.3
                      , text-icu
@@ -110,7 +107,6 @@ executable semantic-diff
                      , text-icu
                      , gitlib
                      , gitlib-libgit2
-                     , rainbow
                      , tagged
                      , mtl
   default-language:    Haskell2010
@@ -141,7 +137,6 @@ test-suite semantic-diff-test
                      , Glob
                      , hspec >= 2.1.10
                      , QuickCheck >= 2.8.1
-                     , rainbow
                      , semantic-diff
                      , text >= 1.2.1.3
                      , quickcheck-text
