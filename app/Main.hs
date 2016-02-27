@@ -11,8 +11,7 @@ data Arguments = Arguments { format :: DO.Format, output :: Maybe FilePath, sour
 
 arguments :: Parser Arguments
 arguments = Arguments
-  <$> (flag DO.Split DO.Unified (long "unified" <> help "output a unified diff")
-  <|> flag DO.Split DO.Patch (long "patch" <> help "output a patch(1)-compatible diff")
+  <$> (flag DO.Split DO.Patch (long "patch" <> help "output a patch(1)-compatible diff")
   <|> flag' DO.Split (long "split" <> help "output a split diff"))
   <*> optional (strOption (long "output" <> short 'o' <> help "output directory for split diffs, defaulting to stdout if unspecified"))
   <*> strArgument (metavar "FILE a")
