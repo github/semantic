@@ -18,6 +18,7 @@ library
                      , Operation
                      , Algorithm
                      , Diffing
+                     , DiffOutput
                      , Interpreter
                      , Language
                      , Line
@@ -43,6 +44,7 @@ library
                      , bytestring
                      , c-storable-deriving
                      , containers
+                     , directory
                      , filepath
                      , mtl
                      , semigroups
@@ -54,42 +56,9 @@ library
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, OverloadedStrings
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -threaded -fprof-auto "-with-rtsopts=-N -p -s -h -i0.1" -j
 
-executable semantic-diff-exe
-  hs-source-dirs:      app
-  main-is:             Main.hs
-  other-modules:       DiffOutput
-  if os(darwin)
-    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -static -j
-  else
-    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -static -j -pgml=script/g++
-  cc-options:          -DU_STATIC_IMPLEMENTATION=1
-  cpp-options:         -DU_STATIC_IMPLEMENTATION=1
-  build-depends:       base
-                     , bytestring
-                     , containers
-                     , directory
-                     , filepath
-                     , optparse-applicative
-                     , semantic-diff
-                     , text >= 1.2.1.3
-                     , text-icu
-                     , gitlib
-                     , gitlib-libgit2
-                     , tagged
-                     , mtl
-  default-language:    Haskell2010
-  default-extensions:  OverloadedStrings
-  if os(darwin)
-    extra-libraries:   stdc++ icuuc icudata icui18n
-  if os(darwin)
-    extra-lib-dirs:    /usr/local/opt/icu4c/lib
-  if os(darwin)
-    include-dirs:      /usr/local/opt/icu4c/include
-
 executable semantic-diff
   hs-source-dirs:      app
   main-is:             SemanticDiff.hs
-  other-modules:       DiffOutput
   if os(darwin)
     ghc-options:       -threaded -rtsopts -with-rtsopts=-N -static -j
   else
