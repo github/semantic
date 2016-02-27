@@ -37,6 +37,7 @@ library
                      , Control.Monad.Free
                      , Control.Comonad.Cofree
                      , Data.Bifunctor.Join
+                     , Data.Option
   build-depends:       base >= 4.8 && < 5
                      , blaze-html
                      , blaze-markup
