@@ -27,7 +27,6 @@ library
                      , Renderer
                      , Renderer.Patch
                      , Renderer.Split
-                     , Renderer.Unified
                      , SES
                      , Category
                      , Term
