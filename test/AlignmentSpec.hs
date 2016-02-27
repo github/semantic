@@ -58,7 +58,7 @@ spec = parallel $ do
     prop "produces the maximum line count in inequal sources" $
       \ sources ->
         let (sourceA, sourceB) = runBoth sources in
-          length (splitAnnotatedByLines sources (getTotalRange <$> sources) (pure mempty) (Indexed $ zipWith (leafWithRangesInSources sourceA sourceB) (actualLineRanges (getTotalRange sourceA) sourceA) (actualLineRanges (getTotalRange sourceB) sourceB))) `shouldBe` max (length (filter (== '\n') $ toList sourceA) + 1) (length (filter (== '\n') $ toList sourceB) + 1)
+          length (splitAnnotatedByLines sources (getTotalRange <$> sources) (pure mempty) (Indexed $ Prelude.zipWith (leafWithRangesInSources sourceA sourceB) (actualLineRanges (getTotalRange sourceA) sourceA) (actualLineRanges (getTotalRange sourceB) sourceB))) `shouldBe` max (length (filter (== '\n') $ toList sourceA) + 1) (length (filter (== '\n') $ toList sourceB) + 1)
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $
