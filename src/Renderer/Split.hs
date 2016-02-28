@@ -9,6 +9,7 @@ import Row
 import Patch
 import Renderer
 import Term
+import SplitDiff
 import Syntax
 import Control.Comonad.Cofree
 import Range
@@ -91,13 +92,6 @@ split diff (beforeBlob, afterBlob) = renderHtml
         rightCount ((_, _, x, _):_) = x
         valueOf EmptyLine = 0
         valueOf _ = 1
-
--- | A patch to only one side of a diff.
-data SplitPatch a = SplitInsert a | SplitDelete a | SplitReplace a
-  deriving (Show, Eq)
-
--- | A diff with only one side’s annotations.
-type SplitDiff leaf annotation = Free (Annotated leaf annotation) (SplitPatch (Term leaf annotation))
 
 -- | Something that can be rendered as markup.
 newtype Renderable a = Renderable (Source Char, a)

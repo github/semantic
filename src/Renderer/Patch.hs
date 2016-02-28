@@ -9,6 +9,7 @@ import Range
 import Renderer
 import Row
 import Source hiding ((++), break)
+import SplitDiff
 import Renderer.Split
 import Control.Comonad.Cofree
 import Control.Monad.Free
