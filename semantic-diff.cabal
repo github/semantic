@@ -14,6 +14,7 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Algorithm
+                     , Alignment
                      , Category
                      , Control.Comonad.Cofree
                      , Control.Monad.Free
