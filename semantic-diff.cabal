@@ -13,32 +13,32 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Diff
-                     , Syntax
-                     , Operation
-                     , Algorithm
+  exposed-modules:     Algorithm
+                     , Category
+                     , Control.Comonad.Cofree
+                     , Control.Monad.Free
+                     , Data.Bifunctor.Join
+                     , Data.Option
+                     , Data.OrderedMap
+                     , Diff
                      , Diffing
                      , DiffOutput
                      , Interpreter
                      , Language
                      , Line
-                     , Row
-                     , Data.OrderedMap
+                     , Operation
+                     , Parser
                      , Patch
+                     , Range
                      , Renderer
                      , Renderer.Patch
                      , Renderer.Split
+                     , Row
                      , SES
-                     , Category
-                     , Term
-                     , Range
-                     , Parser
-                     , TreeSitter
                      , Source
-                     , Control.Monad.Free
-                     , Control.Comonad.Cofree
-                     , Data.Bifunctor.Join
-                     , Data.Option
+                     , Syntax
+                     , Term
+                     , TreeSitter
   build-depends:       base >= 4.8 && < 5
                      , blaze-html
                      , blaze-markup
