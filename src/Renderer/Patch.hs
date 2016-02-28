@@ -3,6 +3,7 @@ module Renderer.Patch (
   hunks
 ) where
 
+import Alignment
 import Diff
 import Line
 import Range
@@ -10,7 +11,6 @@ import Renderer
 import Row
 import Source hiding ((++), break)
 import SplitDiff
-import Renderer.Split
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Maybe

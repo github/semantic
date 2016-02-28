@@ -5,6 +5,7 @@ import Test.Hspec.QuickCheck
 import Test.QuickCheck hiding (Fixed)
 import Data.Text.Arbitrary ()
 
+import Alignment
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
 import Diff
@@ -14,7 +15,6 @@ import Source hiding ((++))
 import Line
 import Row
 import Range
-import Renderer.Split
 import Syntax
 import ArbitraryTerm ()
 
