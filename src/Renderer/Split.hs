@@ -130,12 +130,6 @@ splitPatchToClassName patch = stringValue $ "patch " ++ case patch of
   SplitDelete _ -> "delete"
   SplitReplace _ -> "replace"
 
--- | Get the term from a split patch.
-getSplitTerm :: SplitPatch a -> a
-getSplitTerm (SplitInsert a) = a
-getSplitTerm (SplitDelete a) = a
-getSplitTerm (SplitReplace a) = a
-
 -- | Split a diff, which may span multiple lines, into rows of split diffs.
 splitDiffByLines :: Diff leaf Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff leaf Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
