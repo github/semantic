@@ -61,12 +61,12 @@ test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       ArbitraryTerm
+  other-modules:       AlignmentSpec
+                     , ArbitraryTerm
                      , CorpusSpec
                      , InterpreterSpec
                      , OrderedMapSpec
                      , PatchOutputSpec
-                     , SplitSpec
                      , TermSpec
   build-depends:       base
                      , bytestring

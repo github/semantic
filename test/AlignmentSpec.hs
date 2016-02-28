@@ -1,4 +1,4 @@
-module SplitSpec where
+module AlignmentSpec where
 
 import Test.Hspec
 import Test.Hspec.QuickCheck
