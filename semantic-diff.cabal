@@ -18,6 +18,7 @@ library
                      , Operation
                      , Algorithm
                      , Diffing
+                     , DiffOutput
                      , Interpreter
                      , Language
                      , Line
@@ -28,7 +29,6 @@ library
                      , Renderer.JSON
                      , Renderer.Patch
                      , Renderer.Split
-                     , Renderer.Unified
                      , SES
                      , Category
                      , Term
@@ -36,18 +36,19 @@ library
                      , Parser
                      , TreeSitter
                      , Source
+                     , Control.Monad.Free
+                     , Control.Comonad.Cofree
+                     , Data.Bifunctor.Join
+                     , Data.Option
   build-depends:       base >= 4.8 && < 5
-                     , bifunctors
                      , blaze-html
                      , blaze-markup
                      , bytestring
                      , c-storable-deriving
                      , containers
+                     , directory
                      , filepath
-                     , free
                      , mtl
-                     , rainbow
-                     , semigroups
                      , text >= 1.2.1.3
                      , text-icu
                      , tree-sitter-parsers
@@ -56,45 +57,9 @@ library
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, OverloadedStrings
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -threaded -fprof-auto "-with-rtsopts=-N -p -s -h -i0.1" -j
 
-executable semantic-diff-exe
-  hs-source-dirs:      app
-  main-is:             Main.hs
-  other-modules:       DiffOutput
-  if os(darwin)
-    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -static -j
-  else
-    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -static -j -pgml=script/g++
-  cc-options:          -DU_STATIC_IMPLEMENTATION=1
-  cpp-options:         -DU_STATIC_IMPLEMENTATION=1
-  build-depends:       base
-                     , bifunctors
-                     , bytestring
-                     , containers
-                     , directory
-                     , filepath
-                     , free
-                     , optparse-applicative
-                     , rainbow
-                     , semantic-diff
-                     , text >= 1.2.1.3
-                     , text-icu
-                     , gitlib
-                     , gitlib-libgit2
-                     , tagged
-                     , mtl
-  default-language:    Haskell2010
-  default-extensions:  OverloadedStrings
-  if os(darwin)
-    extra-libraries:   stdc++ icuuc icudata icui18n
-  if os(darwin)
-    extra-lib-dirs:    /usr/local/opt/icu4c/lib
-  if os(darwin)
-    include-dirs:      /usr/local/opt/icu4c/include
-
 executable semantic-diff
   hs-source-dirs:      app
   main-is:             SemanticDiff.hs
-  other-modules:       DiffOutput
   if os(darwin)
     ghc-options:       -threaded -rtsopts -with-rtsopts=-N -static -j
   else
@@ -102,19 +67,16 @@ executable semantic-diff
   cc-options:          -DU_STATIC_IMPLEMENTATION=1
   cpp-options:         -DU_STATIC_IMPLEMENTATION=1
   build-depends:       base
-                     , bifunctors
                      , bytestring
                      , containers
                      , directory
                      , filepath
-                     , free
                      , optparse-applicative
                      , semantic-diff
                      , text >= 1.2.1.3
                      , text-icu
                      , gitlib
                      , gitlib-libgit2
-                     , rainbow
                      , tagged
                      , mtl
   default-language:    Haskell2010
@@ -138,16 +100,13 @@ test-suite semantic-diff-test
                      , SplitSpec
                      , TermSpec
   build-depends:       base
-                     , bifunctors
                      , bytestring
                      , containers
                      , deepseq
                      , filepath
-                     , free
                      , Glob
                      , hspec >= 2.1.10
                      , QuickCheck >= 2.8.1
-                     , rainbow
                      , semantic-diff
                      , text >= 1.2.1.3
                      , quickcheck-text
