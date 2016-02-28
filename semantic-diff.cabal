@@ -36,6 +36,7 @@ library
                      , Row
                      , SES
                      , Source
+                     , SplitDiff
                      , Syntax
                      , Term
                      , TreeSitter
