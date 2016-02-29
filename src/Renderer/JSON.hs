@@ -55,4 +55,5 @@ instance JSON (JSONWrapper (Term leaf Info)) where
 
 instance JSON recur => JSON (JSONWrapper (Syntax leaf recur)) where
   showJSON (JSONWrapper (Leaf _)) = JSObject $ toJSObject [ ("type", JSString $ toJSString "leaf") ]
+  showJSON (JSONWrapper (Indexed i)) = JSObject $ toJSObject [ ("type", JSString $ toJSString "indexed"), ("children", showJSON i) ]
   showJSON _ = JSNull
