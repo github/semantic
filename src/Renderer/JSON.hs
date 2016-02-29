@@ -17,6 +17,7 @@ import Source hiding ((++), toList)
 import SplitDiff
 import Syntax
 import Term
+import Text.JSON
 
 -- | JSON representing an aligned diff.
 newtype JSON a = JSON { rows :: [Row (SplitDiff a Info)] }
@@ -42,3 +43,8 @@ instance Show (JSON a) where
           showSyntax (Fixed children) = "'type':'fixed','children':[" ++ intercalate "," children ++ "]"
           showSyntax (Keyed children) = "'type':'keyed','children':{" ++ intercalate "," (uncurry showKeyValue <$> Map.toList children) ++ "}"
           showKeyValue key value = "'" ++ show key ++ "': " ++ value
+
+newtype JSONWrapper a = JSONWrapper { unWrap :: a }
+
+instance JSON a => JSON (JSONWrapper a) where
+  showJSON = showJSON . unWrap
