@@ -68,7 +68,7 @@ split diff blobs = renderHtml
     numbered = foldl' numberRows [] rows
     maxNumber = case numbered of
       [] -> 0
-      ((x, _, y, _) : _) -> max x y
+      (row : _) -> uncurry max . runBoth $ fst <$> row
 
     -- | The number of digits in a number (e.g. 342 has 3 digits).
     digits :: Int -> Int
@@ -78,8 +78,8 @@ split diff blobs = renderHtml
     columnWidth = max (20 + digits maxNumber * 8) 40
 
     -- | Render a line with numbers as an HTML row.
-    numberedLinesToMarkup :: (Int, Line (SplitDiff a Info), Int, Line (SplitDiff a Info)) -> Markup
-    numberedLinesToMarkup (m, left, n, right) = tr $ toMarkup (or $ hasChanges <$> left, m, renderable before left) <> toMarkup (or $ hasChanges <$> right, n, renderable after right) <> string "\n"
+    numberedLinesToMarkup :: Both (Int, Line (SplitDiff a Info)) -> Markup
+    numberedLinesToMarkup numberedLines = tr $ uncurry (<>) (runBoth (renderLine <$> numberedLines <*> sources)) <> string "\n"
 
     renderLine :: (Int, Line (SplitDiff leaf Info)) -> Source Char -> Markup
     renderLine (number, line) source = toMarkup (or $ hasChanges <$> line, number, renderable source line)
@@ -90,15 +90,11 @@ split diff blobs = renderHtml
 
     -- | Add a row to list of tuples of ints and lines, where the ints denote
     -- | how many non-empty lines exist on that side up to that point.
-    numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
-    numberRows rows (Row (Both (left, right))) = (leftCount rows + valueOf left, left, rightCount rows + valueOf right, right) : rows
-      where
-        leftCount [] = 0
-        leftCount ((x, _, _, _):_) = x
-        rightCount [] = 0
-        rightCount ((_, _, x, _):_) = x
-        valueOf EmptyLine = 0
-        valueOf _ = 1
+    numberRows :: [Both (Int, Line a)] -> Row a -> [Both (Int, Line a)]
+    numberRows rows row = ((,) <$> ((+) <$> count rows <*> (valueOf <$> unRow row)) <*> unRow row) : rows
+      where count = maybe (pure 0) (fmap fst) . maybeFirst
+            valueOf EmptyLine = 0
+            valueOf _ = 1
 
 -- | Something that can be rendered as markup.
 newtype Renderable a = Renderable (Source Char, a)
