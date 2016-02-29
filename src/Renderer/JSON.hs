@@ -37,8 +37,8 @@ instance Show (JSON a) where
           showInfoSyntax (Info range categories) syntax = "{'range':" ++ showRange range ++ ",'categories':" ++ showCategories categories ++ "," ++ showSyntax syntax ++ "}"
           showRange (Range start end) = "{'start':" ++ show start ++ ",'end':" ++ show end ++ "}"
           showCategories categories = "{" ++ mconcat (show <$> toList categories) ++ "}"
-          showSyntax (Leaf _) = "type:'leaf'"
-          showSyntax (Indexed children) = "type:'indexed',children:[" ++ intercalate "," children ++ "]"
-          showSyntax (Fixed children) = "type:'fixed',children:[" ++ intercalate "," children ++ "]"
-          showSyntax (Keyed children) = "type:'keyed',children:{" ++ intercalate "," (uncurry showKeyValue <$> Map.toList children) ++ "}"
+          showSyntax (Leaf _) = "'type':'leaf'"
+          showSyntax (Indexed children) = "'type':'indexed','children':[" ++ intercalate "," children ++ "]"
+          showSyntax (Fixed children) = "'type':'fixed','children':[" ++ intercalate "," children ++ "]"
+          showSyntax (Keyed children) = "'type':'keyed','children':{" ++ intercalate "," (uncurry showKeyValue <$> Map.toList children) ++ "}"
           showKeyValue key value = "'" ++ show key ++ "': " ++ value
