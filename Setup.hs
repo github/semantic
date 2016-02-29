@@ -21,12 +21,13 @@ conf x flags = do
       icuLibDirExists <- doesDirectoryExist icuLibDir
       icuSourceDirExists <- doesDirectoryExist icuSourceDir
       let extraLibDirs = P.extraLibDirs libraryBuildInfo
+      let includeDirs = P.includeDirs libraryBuildInfo
       return localBuildInfo {
         localPkgDescr = packageDescription {
           P.library = Just $ library {
             P.libBuildInfo = libraryBuildInfo {
               P.extraLibDirs = if icuLibDirExists then icuLibDir : extraLibDirs else extraLibDirs,
-              P.includeDirs = ((icuSourceDir ++) <$> relativeIncludeDirs) ++ P.includeDirs libraryBuildInfo
+              P.includeDirs = ((icuSourceDir ++) <$> relativeIncludeDirs) ++ includeDirs
             }
           }
         }
