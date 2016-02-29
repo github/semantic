@@ -75,9 +75,8 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Fixed children -> adjoinChildRows (Fixed . fmap get) (Identity <$> children)
   Keyed children -> adjoinChildRows (Keyed . Map.fromList) (Map.toList children)
   where contextRows :: Both Range -> Both (Source Char) -> [Row Range]
-        contextRows ranges sources = zipWithDefaults Row EmptyLine EmptyLine
-          (pure <$> actualLineRanges (fst $ runBoth ranges) (fst $ runBoth sources))
-          (pure <$> actualLineRanges (snd $ runBoth ranges) (snd $ runBoth sources))
+        contextRows ranges sources = uncurry (zipWithDefaults Row EmptyLine EmptyLine) $
+          runBoth (fmap pure <$> (actualLineRanges <$> ranges <*> sources))
 
         adjoin :: Has f => [Row (Either Range (f (SplitDiff leaf Info)))] -> [Row (Either Range (f (SplitDiff leaf Info)))]
         adjoin = reverse . foldl (adjoinRowsBy (openEither (openRange . fst $ runBoth sources) (openDiff . fst $ runBoth sources)) (openEither (openRange . snd $ runBoth sources) (openDiff . snd $ runBoth sources))) []
