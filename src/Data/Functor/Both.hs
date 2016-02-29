@@ -2,6 +2,7 @@ module Data.Functor.Both where
 
 import Prelude hiding (zipWith)
 
+-- | A computation over both sides of a pair.
 newtype Both a = Both { runBoth :: (a, a) }
   deriving (Eq, Show, Functor, Foldable, Traversable)
 
