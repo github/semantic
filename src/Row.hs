@@ -21,7 +21,7 @@ wrapRowContents transformLeft transformRight (Row left right) = Row (wrapLineCon
 adjoinRowsBy :: MaybeOpen a -> MaybeOpen a -> [Row a] -> Row a -> [Row a]
 adjoinRowsBy _ _ [] row = [row]
 
-adjoinRowsBy f g rows (Row left' right') | Just _ <- openLineBy f $ unLeft <$> rows, Just _ <- openLineBy g $ unRight <$> rows = uncurry (zipWith Row) . runBoth $ both <*> Both (left', right')
+adjoinRowsBy f g rows (Row left' right') | Both (Just _, Just _) <- openLineBy <$> Both (f, g) <*> Both (unzip $ runBoth . unRow <$> rows) = uncurry (zipWith Row) . runBoth $ both <*> Both (left', right')
   where both = adjoinLinesBy <$> Both (f, g) <*> Both (unzip $ runBoth . unRow <$> rows)
 
 adjoinRowsBy f _ rows (Row left' right') | Just _ <- openLineBy f $ unLeft <$> rows = case right' of
