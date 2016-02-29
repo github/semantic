@@ -75,8 +75,7 @@ testDiff renderer a b diff matcher = do
   let paths = Join (a, b)
   let parser = parserForFilepath a
   sources <- sequence $ readAndTranscodeFile <$> paths
-  let srcs = runJoin sources
-  let sourceBlobs = (S.SourceBlob (fst srcs) mempty a, S.SourceBlob (snd srcs) mempty b)
+  let sourceBlobs = Join (S.SourceBlob, S.SourceBlob) <*> sources <*> Join (mempty, mempty) <*> paths
   actual <- diffFiles parser renderer sourceBlobs
   case diff of
     Nothing -> actual `deepseq` matcher (actual, actual)

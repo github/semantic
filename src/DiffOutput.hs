@@ -1,7 +1,8 @@
 module DiffOutput where
 
-import Diffing
+import Data.Bifunctor.Join
 import qualified Data.ByteString.Char8 as B1
+import Diffing
 import Parser
 import Source
 import System.Directory
@@ -17,7 +18,7 @@ data Format = Split | Patch
 data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath, outputPath :: FilePath }
 
 -- | Return a renderer from the command-line arguments that will print the diff.
-printDiff :: Parser -> DiffArguments -> (SourceBlob, SourceBlob) -> IO ()
+printDiff :: Parser -> DiffArguments -> Join SourceBlob -> IO ()
 printDiff parser arguments sources = case format arguments of
   Split -> put (output arguments) =<< diffFiles parser split sources
     where

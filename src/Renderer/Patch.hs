@@ -16,6 +16,7 @@ import Control.Monad.Free
 import Data.Maybe
 import Data.Monoid
 import Data.Bifunctor
+import Data.Bifunctor.Join
 import Control.Monad
 
 -- | Render a diff in the traditional patch format.
@@ -48,9 +49,9 @@ lineLength EmptyLine = 0
 lineLength _ = 1
 
 -- | Given the before and after sources, render a hunk to a string.
-showHunk :: (SourceBlob, SourceBlob) -> Hunk (SplitDiff a Info) -> String
-showHunk blobs@(beforeBlob, afterBlob) hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (unRight <$> trailingContext hunk)
-  where sources = (source beforeBlob, source afterBlob)
+showHunk :: Join SourceBlob -> Hunk (SplitDiff a Info) -> String
+showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (unRight <$> trailingContext hunk)
+  where sources = runJoin $ source <$> blobs
 
 -- | Given the before and after sources, render a change to a string.
 showChange :: (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
@@ -73,19 +74,20 @@ getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure patch) = let Info range _ :< _ = getSplitTerm patch in range
 
 -- | Returns the header given two source blobs and a hunk.
-header :: (SourceBlob, SourceBlob) -> Hunk a -> String
-header blobs hunk = "diff --git a/" ++ path (fst blobs) ++ " b/" ++ path (snd blobs) ++ "\n" ++
-  "index " ++ oid (fst blobs) ++ ".." ++ oid (snd blobs) ++ "\n" ++
+header :: Join SourceBlob -> Hunk a -> String
+header blobs hunk = "diff --git a/" ++ pathA ++ " b/" ++ pathB ++ "\n" ++
+  "index " ++ oidA ++ ".." ++ oidB ++ "\n" ++
   "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
   where (lengthA, lengthB) = join bimap getSum $ hunkLength hunk
         (offsetA, offsetB) = join bimap getSum $ offset hunk
+        (pathA, pathB) = runJoin $ path <$> blobs
+        (oidA, oidB) = runJoin $ oid <$> blobs
 
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
-hunks diff (beforeBlob, afterBlob) = hunksInRows (1, 1) . fst $ splitDiffByLines diff (0, 0) (before, after)
+hunks diff blobs = hunksInRows (1, 1) . fst $ splitDiffByLines diff (0, 0) (before, after)
   where
-    before = source beforeBlob
-    after = source afterBlob
+    (before, after) = runJoin $ source <$> blobs
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
