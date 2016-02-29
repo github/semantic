@@ -3,14 +3,15 @@ module Renderer.JSON (
   json
 ) where
 
+import Alignment
 import Diff
 import Line
 import qualified Data.OrderedMap as Map
 import Range
 import Row
 import Renderer
-import Renderer.Split
 import Source hiding ((++), toList)
+import SplitDiff
 import Syntax
 import Term
 import Control.Arrow
