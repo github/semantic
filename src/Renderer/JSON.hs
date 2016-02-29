@@ -23,7 +23,7 @@ import Text.JSON
 
 -- | Render a diff to a string representing its JSON.
 json :: Renderer a String
-json diff (a, b) = show . showJSON . fst $ splitDiffByLines diff (0, 0) (source a, source b)
+json diff (a, b) = show . showJSON . JSONWrapper . fmap (fmap JSONWrapper) . fst $ splitDiffByLines diff (0, 0) (source a, source b)
 
 newtype JSONWrapper a = JSONWrapper { unWrap :: a }
 
