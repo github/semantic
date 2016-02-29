@@ -22,16 +22,16 @@ import Test.Hspec
 spec :: Spec
 spec = parallel $ do
   -- describe "crashers crash" $ runTestsIn "test/crashers-todo/" ((`shouldThrow` anyException) . return)
-  describe "crashers should not crash" $ runTestsIn "test/crashers/" (uncurry shouldBe)
-  describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" (uncurry shouldNotBe)
-  describe "should produce the correct diff" $ runTestsIn "test/diffs/" (uncurry shouldBe)
+  describe "crashers should not crash" $ runTestsIn "test/crashers/" shouldBe
+  describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" shouldNotBe
+  describe "should produce the correct diff" $ runTestsIn "test/diffs/" shouldBe
 
   it "lists example fixtures" $ do
     examples "test/crashers/" `shouldNotReturn` []
     examples "test/diffs/" `shouldNotReturn` []
 
   where
-    runTestsIn :: String -> ((String, String) -> Expectation) -> SpecWith ()
+    runTestsIn :: String -> (String -> String -> Expectation) -> SpecWith ()
     runTestsIn directory matcher = do
       paths <- runIO $ examples directory
       let tests = correctTests =<< paths
@@ -70,14 +70,14 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | Given file paths for A, B, and, optionally, a diff, return whether diffing
 -- | the files will produce the diff. If no diff is provided, then the result
 -- | is true, but the diff will still be calculated.
-testDiff :: Renderer T.Text String -> Both FilePath -> Maybe FilePath -> ((String, String) -> Expectation) -> Expectation
+testDiff :: Renderer T.Text String -> Both FilePath -> Maybe FilePath -> (String -> String -> Expectation) -> Expectation
 testDiff renderer paths diff matcher = do
   let parser = parserForFilepath (fst $ runBoth paths)
   sources <- sequence $ readAndTranscodeFile <$> paths
   let sourceBlobs = Both (S.SourceBlob, S.SourceBlob) <*> sources <*> Both (mempty, mempty) <*> paths
   actual <- diffFiles parser renderer sourceBlobs
   case diff of
-    Nothing -> actual `deepseq` matcher (actual, actual)
+    Nothing -> actual `deepseq` matcher actual actual
     Just file -> do
       expected <- readFile file
-      matcher (actual, expected)
+      matcher actual expected
