@@ -22,9 +22,9 @@ import Term
 splitDiffByLines :: Diff leaf Info -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
 splitDiffByLines diff previous sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
-  Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd $ runBoth sources) in
+  Pure (Insert term) -> let (lines, range) = splitTermByLines term (runRight sources) in
     (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (Range prevLeft prevLeft, range))
-  Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst $ runBoth sources) in
+  Pure (Delete term) -> let (lines, range) = splitTermByLines term (runLeft sources) in
     (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, Range prevRight prevRight))
   Pure (Replace leftTerm rightTerm) -> let Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
                                            (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange)) in
