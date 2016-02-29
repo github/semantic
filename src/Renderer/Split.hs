@@ -63,7 +63,6 @@ split diff blobs = renderHtml
         . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
     sources = Source.source <$> blobs
-    (before, after) = runBoth sources
     rows = fst (splitDiffByLines diff (pure 0) sources)
     numbered = foldl' numberRows [] rows
     maxNumber = case numbered of
