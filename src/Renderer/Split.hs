@@ -81,9 +81,7 @@ split diff blobs = renderHtml
     numberedLinesToMarkup numberedLines = tr $ uncurry (<>) (runBoth (renderLine <$> numberedLines <*> sources)) <> string "\n"
 
     renderLine :: (Int, Line (SplitDiff leaf Info)) -> Source Char -> Markup
-    renderLine (number, line) source = toMarkup (or $ hasChanges <$> line, number, renderable source line)
-
-    renderable source = fmap (Renderable . (,) source)
+    renderLine (number, line) source = toMarkup (or $ hasChanges <$> line, number, Renderable . (,) source <$> line)
 
     hasChanges diff = or $ const True <$> diff
 
