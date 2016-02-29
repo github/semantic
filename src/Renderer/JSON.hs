@@ -36,7 +36,7 @@ instance Show (JSON a) where
           showPatch (SplitReplace term) = "{'replace':" ++ cata showInfoSyntax term ++ "}"
           showInfoSyntax (Info range categories) syntax = "{'range':" ++ showRange range ++ ",'categories':" ++ showCategories categories ++ "," ++ showSyntax syntax ++ "}"
           showRange (Range start end) = "{'start':" ++ show start ++ ",'end':" ++ show end ++ "}"
-          showCategories categories = "{" ++ intercalate "," (show <$> toList categories) ++ "}"
+          showCategories categories = "[" ++ intercalate "," (show <$> toList categories) ++ "]"
           showSyntax (Leaf _) = "'type':'leaf'"
           showSyntax (Indexed children) = "'type':'indexed','children':[" ++ intercalate "," children ++ "]"
           showSyntax (Fixed children) = "'type':'fixed','children':[" ++ intercalate "," children ++ "]"
