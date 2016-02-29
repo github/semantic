@@ -27,7 +27,7 @@ conf x flags = do
           P.library = Just $ library {
             P.libBuildInfo = libraryBuildInfo {
               P.extraLibDirs = if icuLibDirExists then icuLibDir : extraLibDirs else extraLibDirs,
-              P.includeDirs = ((icuSourceDir ++) <$> relativeIncludeDirs) ++ includeDirs
+              P.includeDirs = if icuSourceDirExists then ((icuSourceDir ++) <$> relativeIncludeDirs) ++ includeDirs else includeDirs
             }
           }
         }
