@@ -74,7 +74,7 @@ testDiff :: Renderer T.Text String -> Both FilePath -> Maybe FilePath -> (String
 testDiff renderer paths diff matcher = do
   let parser = parserForFilepath (fst $ runBoth paths)
   sources <- sequence $ readAndTranscodeFile <$> paths
-  let sourceBlobs = Both (S.SourceBlob, S.SourceBlob) <*> sources <*> Both (mempty, mempty) <*> paths
+  let sourceBlobs = Both (S.SourceBlob, S.SourceBlob) <*> sources <*> pure mempty <*> paths
   actual <- diffFiles parser renderer sourceBlobs
   case diff of
     Nothing -> actual `deepseq` matcher actual actual
