@@ -1,12 +1,12 @@
 module Diff where
 
-import Syntax
-import Data.Set
-import Control.Monad.Free
-import Patch
-import Term
-import Range
 import Category
+import Control.Monad.Free
+import Data.Set
+import Patch
+import Range
+import Syntax
+import Term
 
 -- | An annotated syntax in a diff tree.
 data Annotated a annotation f = Annotated !annotation !(Syntax a f)
