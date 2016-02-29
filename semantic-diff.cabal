@@ -43,7 +43,6 @@ library
                      , blaze-html
                      , blaze-markup
                      , bytestring
-                     , c-storable-deriving
                      , containers
                      , directory
                      , filepath
