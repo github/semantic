@@ -7,13 +7,16 @@ data JSValue
   | JSString JSString
   | JSArray [JSValue]
   | JSObject (JSObject JSValue)
+  deriving (Eq, Show)
 
 newtype JSString = JSONString { fromJSString :: String }
+  deriving (Eq, Show)
 
 toJSString :: String -> JSString
 toJSString = JSONString
 
 newtype JSObject value = JSONObject { fromJSObject :: [(String, value)] }
+  deriving (Eq, Show)
 
 toJSObject :: [(String, value)] -> JSObject value
 toJSObject = JSONObject
