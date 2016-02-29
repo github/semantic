@@ -23,15 +23,14 @@ splitDiffByLines :: Diff leaf Info -> Both Int -> Both (Source Char) -> ([Row (S
 splitDiffByLines diff previous sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (runRight sources) in
-    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (rangeAt prevLeft, range))
+    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (rangeAt $ runLeft previous, range))
   Pure (Delete term) -> let (lines, range) = splitTermByLines term (runLeft sources) in
-    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, rangeAt prevRight))
+    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, rangeAt $ runRight previous))
   Pure (Replace leftTerm rightTerm) -> let Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
                                            (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange)) in
                                            (uncurry (zipWithDefaults makeRow EmptyLine EmptyLine) . runBoth $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
   where categories annotations = Diff.categories <$> Both annotations
         ranges annotations = characterRange <$> Both annotations
-        (prevLeft, prevRight) = runBoth previous
 
 -- | A functor that can return its content.
 class Functor f => Has f where
