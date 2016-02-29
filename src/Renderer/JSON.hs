@@ -51,7 +51,7 @@ instance JSON a => JSON (JSONWrapper (SplitPatch a)) where
   showJSON _ = JSNull
 
 instance JSON (JSONWrapper (Term leaf Info)) where
-  showJSON (JSONWrapper (info :< syntax)) = JSNull
+  showJSON (JSONWrapper (info :< syntax)) = JSObject $ toJSObject [("info", showJSON (JSONWrapper info)), ("syntax", showJSON (JSONWrapper $ JSONWrapper <$> syntax))]
 
 instance JSON recur => JSON (JSONWrapper (Syntax leaf recur)) where
   showJSON (JSONWrapper (Leaf _)) = JSObject $ toJSObject [ ("type", JSString $ toJSString "leaf") ]
