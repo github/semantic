@@ -26,7 +26,7 @@ json :: Renderer a String
 json diff (a, b) = show . JSON . fst $ splitDiffByLines diff (0, 0) (source a, source b)
 
 instance Show (JSON a) where
-  show (JSON rows) = "{'rows':[" ++ mconcat (showRow <$> rows) ++ "]}"
+  show (JSON rows) = "{'rows':[" ++ intercalate "," (showRow <$> rows) ++ "]}"
     where showRow (Row left right) = "{'left':" ++ showLine left ++ ",'right':" ++ showLine right ++ "}"
           showLine EmptyLine = "null"
           showLine (Line diffs) = "[" ++ intercalate "," (showDiff <$> toList diffs) ++ "]"
