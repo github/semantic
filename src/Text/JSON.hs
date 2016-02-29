@@ -29,3 +29,6 @@ instance JSON Char where
 
 instance JSON Integer where
   showJSON = JSRational False . fromIntegral
+
+instance JSON Int where
+  showJSON = JSRational False . fromIntegral
