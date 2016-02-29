@@ -15,9 +15,7 @@ import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Maybe
 import Data.Monoid
-import Data.Bifunctor
 import Data.Functor.Both
-import Control.Monad
 
 -- | Render a diff in the traditional patch format.
 patch :: Renderer a String
