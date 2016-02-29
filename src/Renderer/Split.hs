@@ -81,7 +81,7 @@ split diff blobs = renderHtml
     numberedLinesToMarkup numberedLines = tr $ uncurry (<>) (runBoth (renderLine <$> numberedLines <*> sources)) <> string "\n"
 
     renderLine :: (Int, Line (SplitDiff leaf Info)) -> Source Char -> Markup
-    renderLine (number, line) source = toMarkup (or $ hasChanges <$> line, number, Renderable . (,) source <$> line)
+    renderLine (number, line) source = toMarkup $ Renderable (or $ hasChanges <$> line, number, Renderable . (,) source <$> line)
 
     hasChanges diff = or $ const True <$> diff
 
@@ -124,8 +124,8 @@ instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
             ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue . show $ termSize term)) . toMarkup $ Renderable (source, term), range)
 
 
-instance ToMarkup a => ToMarkup (Bool, Int, Line a) where
-  toMarkup (_, _, EmptyLine) = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell") <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell") <> string "\n"
-  toMarkup (hasChanges, num, line)
+instance ToMarkup a => ToMarkup (Renderable (Bool, Int, Line a)) where
+  toMarkup (Renderable (_, _, EmptyLine)) = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell") <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell") <> string "\n"
+  toMarkup (Renderable (hasChanges, num, line))
     = td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
     <> td (mconcat $ toMarkup <$> unLine line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code") <> string "\n"
