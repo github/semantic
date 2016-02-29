@@ -7,7 +7,7 @@ import qualified Renderer.Split as Split
 
 import qualified Source as S
 import Control.DeepSeq
-import Data.Bifunctor.Join
+import Data.Functor.Both
 import qualified Data.ByteString.Char8 as B1
 import Data.List as List
 import Data.Map as Map
@@ -72,10 +72,10 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | is true, but the diff will still be calculated.
 testDiff :: Renderer T.Text String -> FilePath -> FilePath -> Maybe FilePath -> ((String, String) -> Expectation) -> Expectation
 testDiff renderer a b diff matcher = do
-  let paths = Join (a, b)
+  let paths = Both (a, b)
   let parser = parserForFilepath a
   sources <- sequence $ readAndTranscodeFile <$> paths
-  let sourceBlobs = Join (S.SourceBlob, S.SourceBlob) <*> sources <*> Join (mempty, mempty) <*> paths
+  let sourceBlobs = Both (S.SourceBlob, S.SourceBlob) <*> sources <*> Both (mempty, mempty) <*> paths
   actual <- diffFiles parser renderer sourceBlobs
   case diff of
     Nothing -> actual `deepseq` matcher (actual, actual)

@@ -16,7 +16,7 @@ import Control.Monad.Free
 import Data.Maybe
 import Data.Monoid
 import Data.Bifunctor
-import Data.Bifunctor.Join
+import Data.Functor.Both
 import Control.Monad
 
 -- | Render a diff in the traditional patch format.
@@ -24,7 +24,7 @@ patch :: Renderer a String
 patch diff sources = mconcat $ showHunk sources <$> hunks diff sources
 
 -- | A hunk in a patch, including the offset, changes, and context.
-data Hunk a = Hunk { offset :: Join (Sum Int), changes :: [Change a], trailingContext :: [Row a] }
+data Hunk a = Hunk { offset :: Both (Sum Int), changes :: [Change a], trailingContext :: [Row a] }
   deriving (Eq, Show)
 
 -- | A change in a patch hunk, along with its preceding context.
@@ -32,16 +32,16 @@ data Change a = Change { context :: [Row a], contents :: [Row a] }
   deriving (Eq, Show)
 
 -- | The number of lines in the hunk before and after.
-hunkLength :: Hunk a -> Join (Sum Int)
+hunkLength :: Hunk a -> Both (Sum Int)
 hunkLength hunk = mconcat $ (changeLength <$> changes hunk) <> (rowLength <$> trailingContext hunk)
 
 -- | The number of lines in change before and after.
-changeLength :: Change a -> Join (Sum Int)
+changeLength :: Change a -> Both (Sum Int)
 changeLength change = mconcat $ (rowLength <$> context change) <> (rowLength <$> contents change)
 
 -- | The number of lines in the row, each being either 0 or 1.
-rowLength :: Row a -> Join (Sum Int)
-rowLength (Row a b) = pure lineLength <*> Join (a, b)
+rowLength :: Row a -> Both (Sum Int)
+rowLength (Row a b) = pure lineLength <*> Both (a, b)
 
 -- | The length of the line, being either 0 or 1.
 lineLength :: Line a -> Sum Int
@@ -49,14 +49,14 @@ lineLength EmptyLine = 0
 lineLength _ = 1
 
 -- | Given the before and after sources, render a hunk to a string.
-showHunk :: Join SourceBlob -> Hunk (SplitDiff a Info) -> String
-showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd $ runJoin sources) ' ' (unRight <$> trailingContext hunk)
+showHunk :: Both SourceBlob -> Hunk (SplitDiff a Info) -> String
+showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd $ runBoth sources) ' ' (unRight <$> trailingContext hunk)
   where sources = source <$> blobs
 
 -- | Given the before and after sources, render a change to a string.
-showChange :: Join (Source Char) -> Change (SplitDiff a Info) -> String
-showChange sources change = showLines (snd $ runJoin sources) ' ' (unRight <$> context change) ++ deleted ++ inserted
-  where (deleted, inserted) = runJoin $ pure showLines <*> sources <*> Join ('-', '+') <*> (pure fmap <*> Join (unLeft, unRight) <*> pure (contents change))
+showChange :: Both (Source Char) -> Change (SplitDiff a Info) -> String
+showChange sources change = showLines (snd $ runBoth sources) ' ' (unRight <$> context change) ++ deleted ++ inserted
+  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> Both ('-', '+') <*> (pure fmap <*> Both (unLeft, unRight) <*> pure (contents change))
 
 -- | Given a source, render a set of lines to a string with a prefix.
 showLines :: Source Char -> Char -> [Line (SplitDiff leaf Info)] -> String
@@ -75,31 +75,31 @@ getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure patch) = let Info range _ :< _ = getSplitTerm patch in range
 
 -- | Returns the header given two source blobs and a hunk.
-header :: Join SourceBlob -> Hunk a -> String
+header :: Both SourceBlob -> Hunk a -> String
 header blobs hunk = "diff --git a/" ++ pathA ++ " b/" ++ pathB ++ "\n" ++
   "index " ++ oidA ++ ".." ++ oidB ++ "\n" ++
   "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
-  where (lengthA, lengthB) = runJoin . fmap getSum $ hunkLength hunk
-        (offsetA, offsetB) = runJoin . fmap getSum $ offset hunk
-        (pathA, pathB) = runJoin $ path <$> blobs
-        (oidA, oidB) = runJoin $ oid <$> blobs
+  where (lengthA, lengthB) = runBoth . fmap getSum $ hunkLength hunk
+        (offsetA, offsetB) = runBoth . fmap getSum $ offset hunk
+        (pathA, pathB) = runBoth $ path <$> blobs
+        (oidA, oidB) = runBoth $ oid <$> blobs
 
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
-hunks diff blobs = hunksInRows (Join (1, 1)) . fst $ splitDiffByLines diff (0, 0) (before, after)
+hunks diff blobs = hunksInRows (Both (1, 1)) . fst $ splitDiffByLines diff (0, 0) (before, after)
   where
-    (before, after) = runJoin $ source <$> blobs
+    (before, after) = runBoth $ source <$> blobs
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
-hunksInRows :: Join (Sum Int) -> [Row (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]
+hunksInRows :: Both (Sum Int) -> [Row (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]
 hunksInRows start rows = case nextHunk start rows of
   Nothing -> []
   Just (hunk, rest) -> hunk : hunksInRows (offset hunk <> hunkLength hunk) rest
 
 -- | Given beginning line numbers, return the next hunk and the remaining rows
 -- | of the split diff.
-nextHunk :: Join (Sum Int) -> [Row (SplitDiff a Info)] -> Maybe (Hunk (SplitDiff a Info), [Row (SplitDiff a Info)])
+nextHunk :: Both (Sum Int) -> [Row (SplitDiff a Info)] -> Maybe (Hunk (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextHunk start rows = case nextChange start rows of
   Nothing -> Nothing
   Just (offset, change, rest) -> let (changes, rest') = contiguousChanges rest in Just (Hunk offset (change : changes) $ take 3 rest', drop 3 rest')
@@ -111,7 +111,7 @@ nextHunk start rows = case nextChange start rows of
 
 -- | Given beginning line numbers, return the number of lines to the next
 -- | the next change, and the remaining rows of the split diff.
-nextChange :: Join (Sum Int) -> [Row (SplitDiff a Info)] -> Maybe (Join (Sum Int), Change (SplitDiff a Info), [Row (SplitDiff a Info)])
+nextChange :: Both (Sum Int) -> [Row (SplitDiff a Info)] -> Maybe (Both (Sum Int), Change (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextChange start rows = case changeIncludingContext leadingContext afterLeadingContext of
   Nothing -> Nothing
   Just (change, afterChanges) -> Just (start <> mconcat (rowLength <$> skippedContext), change, afterChanges)

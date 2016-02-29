@@ -21,7 +21,7 @@ import qualified Text.Blaze.Html5.Attributes as A
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import Text.Blaze.Html.Renderer.Text
-import Data.Bifunctor.Join
+import Data.Functor.Both
 import Data.Foldable
 import Data.Monoid
 import Source hiding ((++))
@@ -62,7 +62,7 @@ split diff blobs = renderHtml
         ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
         . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
-    (before, after) = runJoin $ Source.source <$> blobs
+    (before, after) = runBoth $ Source.source <$> blobs
     rows = fst (splitDiffByLines diff (0, 0) (before, after))
     numbered = foldl' numberRows [] rows
     maxNumber = case numbered of
