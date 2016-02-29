@@ -50,12 +50,13 @@ lineLength _ = 1
 
 -- | Given the before and after sources, render a hunk to a string.
 showHunk :: Join SourceBlob -> Hunk (SplitDiff a Info) -> String
-showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (unRight <$> trailingContext hunk)
-  where sources = runJoin $ source <$> blobs
+showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd $ runJoin sources) ' ' (unRight <$> trailingContext hunk)
+  where sources = source <$> blobs
 
 -- | Given the before and after sources, render a change to a string.
-showChange :: (Source Char, Source Char) -> Change (SplitDiff a Info) -> String
-showChange sources change = showLines (snd sources) ' ' (unRight <$> context change) ++ showLines (fst sources) '-' (unLeft <$> contents change) ++ showLines (snd sources) '+' (unRight <$> contents change)
+showChange :: Join (Source Char) -> Change (SplitDiff a Info) -> String
+showChange sources change = showLines (snd $ runJoin sources) ' ' (unRight <$> context change) ++ deleted ++ inserted
+  where (deleted, inserted) = runJoin $ pure showLines <*> sources <*> Join ('-', '+') <*> (pure fmap <*> Join (unLeft, unRight) <*> pure (contents change))
 
 -- | Given a source, render a set of lines to a string with a prefix.
 showLines :: Source Char -> Char -> [Line (SplitDiff leaf Info)] -> String
