@@ -20,11 +20,12 @@ conf x flags = do
       let icuSourceDir = dir ++ "/vendor/icu/source/"
       icuLibDirExists <- doesDirectoryExist icuLibDir
       icuSourceDirExists <- doesDirectoryExist icuSourceDir
+      let extraLibDirs = P.extraLibDirs libraryBuildInfo
       return localBuildInfo {
         localPkgDescr = packageDescription {
           P.library = Just $ library {
             P.libBuildInfo = libraryBuildInfo {
-              P.extraLibDirs = icuLibDir : P.extraLibDirs libraryBuildInfo,
+              P.extraLibDirs = icuLibDir : extraLibDirs,
               P.includeDirs = ((icuSourceDir ++) <$> relativeIncludeDirs) ++ P.includeDirs libraryBuildInfo
             }
           }
