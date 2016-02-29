@@ -25,7 +25,7 @@ conf x flags = do
         localPkgDescr = packageDescription {
           P.library = Just $ library {
             P.libBuildInfo = libraryBuildInfo {
-              P.extraLibDirs = icuLibDir : extraLibDirs,
+              P.extraLibDirs = if icuLibDirExists then icuLibDir : extraLibDirs else extraLibDirs,
               P.includeDirs = ((icuSourceDir ++) <$> relativeIncludeDirs) ++ P.includeDirs libraryBuildInfo
             }
           }
