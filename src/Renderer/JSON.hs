@@ -45,7 +45,8 @@ instance JSON (JSONWrapper Category) where
   showJSON (JSONWrapper s) = JSString . toJSString $ show s
 
 instance JSON (JSONWrapper (SplitDiff a Info)) where
-  showJSON _ = JSNull
+  showJSON (JSONWrapper (Free (Annotated info syntax))) = JSObject $ toJSObject [("info", showJSON (JSONWrapper info)), ("syntax", showJSON (JSONWrapper $ JSONWrapper <$> syntax))]
+  showJSON (JSONWrapper (Pure patch)) = showJSON (JSONWrapper $ JSONWrapper <$> patch)
 
 instance JSON a => JSON (JSONWrapper (SplitPatch a)) where
   showJSON (JSONWrapper (SplitInsert term)) = JSObject $ toJSObject [ ("insert", showJSON term) ]
