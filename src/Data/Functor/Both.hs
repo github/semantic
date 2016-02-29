@@ -41,4 +41,4 @@ instance Applicative Both where
 
 instance Monoid a => Monoid (Both a) where
   mempty = pure mempty
-  mappend a b = pure mappend <*> a <*> b
+  mappend a b = mappend <$> a <*> b
