@@ -64,7 +64,7 @@ split diff blobs = renderHtml
   where
     sources = Source.source <$> blobs
     (before, after) = runBoth sources
-    rows = fst (splitDiffByLines diff (0, 0) sources)
+    rows = fst (splitDiffByLines diff (pure 0) sources)
     numbered = foldl' numberRows [] rows
     maxNumber = case numbered of
       [] -> 0

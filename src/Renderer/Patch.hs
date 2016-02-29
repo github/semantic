@@ -84,7 +84,7 @@ header blobs hunk = "diff --git a/" ++ pathA ++ " b/" ++ pathB ++ "\n" ++
 
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
-hunks diff blobs = hunksInRows (Both (1, 1)) . fst $ splitDiffByLines diff (0, 0) (source <$> blobs)
+hunks diff blobs = hunksInRows (Both (1, 1)) . fst $ splitDiffByLines diff (pure 0) (source <$> blobs)
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
