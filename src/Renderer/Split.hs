@@ -7,7 +7,6 @@ import Category
 import Diff
 import Line
 import Row
-import Patch
 import Renderer
 import Term
 import SplitDiff
@@ -22,12 +21,8 @@ import qualified Text.Blaze.Html5.Attributes as A
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import Text.Blaze.Html.Renderer.Text
-import Data.Either
 import Data.Foldable
-import Data.Functor.Identity
 import Data.Monoid
-import qualified Data.OrderedMap as Map
-import qualified Data.Set as Set
 import Source hiding ((++))
 
 type ClassName = T.Text
