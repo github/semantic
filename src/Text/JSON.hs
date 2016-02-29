@@ -18,3 +18,7 @@ newtype JSObject value = JSONObject { fromJSObject :: [(String, value)] }
 toJSObject :: [(String, value)] -> JSObject value
 toJSObject = JSONObject
 
+class JSON a where
+  showJSON :: a -> JSValue
+  showJSONs :: [a] -> JSValue
+  showJSONs = JSArray . fmap showJSON
