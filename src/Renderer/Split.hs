@@ -124,3 +124,10 @@ instance ToMarkup (Renderable (SplitDiff a Info)) where
     where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
           toMarkupAndRange patch = let term@(Info range _ :< _) = getSplitTerm patch in
             ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue . show $ termSize term)) . toMarkup $ Renderable (source, term), range)
+
+
+instance ToMarkup a => ToMarkup (Bool, Int, Line a) where
+  toMarkup (_, _, EmptyLine) = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell") <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell") <> string "\n"
+  toMarkup (hasChanges, num, line)
+    = td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
+    <> td (mconcat $ toMarkup <$> unLine line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code") <> string "\n"
