@@ -25,7 +25,15 @@ newtype JSString = JSONString { fromJSString :: String }
   deriving (Eq)
 
 instance Show JSString where
-  show (JSONString s) =  "\"" ++ s ++ "\""
+  show (JSONString s) =  "\"" ++ (s >>= escape) ++ "\""
+    where escape '\\' = "\\"
+          escape '\n' = "\\n"
+          escape '\r' = "\\r"
+          escape '\t' = "\\t"
+          escape '\b' = "\\b"
+          escape '\"' = "\\\""
+          escape '\'' = "\\'"
+          escape c = pure c
 
 toJSString :: String -> JSString
 toJSString = JSONString
