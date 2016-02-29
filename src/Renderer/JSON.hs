@@ -48,7 +48,9 @@ instance JSON (JSONWrapper (SplitDiff a Info)) where
   showJSON _ = JSNull
 
 instance JSON a => JSON (JSONWrapper (SplitPatch a)) where
-  showJSON _ = JSNull
+  showJSON (JSONWrapper (SplitInsert term)) = JSObject $ toJSObject [ ("insert", showJSON term) ]
+  showJSON (JSONWrapper (SplitDelete term)) = JSObject $ toJSObject [ ("delete", showJSON term) ]
+  showJSON (JSONWrapper (SplitReplace term)) = JSObject $ toJSObject [ ("replace", showJSON term) ]
 
 instance JSON (JSONWrapper (Term leaf Info)) where
   showJSON (JSONWrapper (info :< syntax)) = JSObject $ toJSObject [("info", showJSON (JSONWrapper info)), ("syntax", showJSON (JSONWrapper $ JSONWrapper <$> syntax))]
