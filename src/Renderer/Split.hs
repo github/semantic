@@ -94,10 +94,10 @@ split diff blobs = renderHtml
             valueOf _ = 1
 
 -- | Something that can be rendered as markup.
-newtype Renderable a = Renderable (Source Char, a)
+newtype Renderable a = Renderable a
 
-instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
-  toMarkup (Renderable (source, (Info range categories, syntax))) = classifyMarkup categories $ case syntax of
+instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Range))) where
+  toMarkup (Renderable (source, Info range categories, syntax)) = classifyMarkup categories $ case syntax of
     Leaf _ -> span . string . toString $ slice range source
     Indexed children -> ul . mconcat $ wrapIn li <$> contentElements children
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements children
@@ -114,11 +114,11 @@ instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
           contentElements children = let (elements, previous) = foldl' markupForSeparatorAndChild ([], start range) children in
             elements ++ [ string . toString $ slice (Range previous $ end range) source ]
 
-instance ToMarkup (Renderable (Term a Info)) where
-  toMarkup (Renderable (source, term)) = fst $ cata (\ info@(Info range _) syntax -> (toMarkup $ Renderable (source, (info, syntax)), range)) term
+instance ToMarkup (Renderable (Source Char, Term a Info)) where
+  toMarkup (Renderable (source, term)) = fst $ cata (\ info@(Info range _) syntax -> (toMarkup $ Renderable (source, info, syntax), range)) term
 
-instance ToMarkup (Renderable (SplitDiff a Info)) where
-  toMarkup (Renderable (source, diff)) = fst $ iter (\ (Annotated info@(Info range _) syntax) -> (toMarkup $ Renderable (source, (info, syntax)), range)) $ toMarkupAndRange <$> diff
+instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
+  toMarkup (Renderable (source, diff)) = fst $ iter (\ (Annotated info@(Info range _) syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) $ toMarkupAndRange <$> diff
     where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
           toMarkupAndRange patch = let term@(Info range _ :< _) = getSplitTerm patch in
             ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue . show $ termSize term)) . toMarkup $ Renderable (source, term), range)
