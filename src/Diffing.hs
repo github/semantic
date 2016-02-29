@@ -10,6 +10,7 @@ import Source hiding ((++))
 import Syntax
 import Term
 import TreeSitter
+import Text.Parser.TreeSitter.Language
 
 import Control.Comonad.Cofree
 import Control.Arrow
