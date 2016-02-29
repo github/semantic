@@ -8,7 +8,7 @@ import Data.Text.Arbitrary ()
 import Alignment
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
-import Data.Functor.Both
+import Data.Functor.Both as Both
 import Diff
 import qualified Data.Maybe as Maybe
 import Data.Functor.Identity
@@ -56,8 +56,7 @@ spec = parallel $ do
 
     prop "produces the maximum line count in inequal sources" $
       \ sources ->
-        let (sourceA, sourceB) = runBoth sources in
-          length (splitAnnotatedByLines sources (getTotalRange <$> sources) (pure mempty) (Indexed $ Prelude.zipWith (leafWithRangesInSources sourceA sourceB) (actualLineRanges (getTotalRange sourceA) sourceA) (actualLineRanges (getTotalRange sourceB) sourceB))) `shouldBe` max (length (filter (== '\n') $ toList sourceA) + 1) (length (filter (== '\n') $ toList sourceB) + 1)
+        length (splitAnnotatedByLines sources (getTotalRange <$> sources) (pure mempty) (Indexed $ leafWithRangesInSources sources <$> Both.zip (actualLineRanges <$> (getTotalRange <$> sources) <*> sources))) `shouldBe` uncurry max (runBoth ((+ 1) . length . filter (== '\n') . toList <$> sources))
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $
@@ -115,7 +114,7 @@ spec = parallel $ do
 
       combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Both (Info (Range start $ start + 1) mempty, Info (Range start $ start + 1) mempty)) (Leaf [ char ]) ], start + 1)
 
-      leafWithRangesInSources sourceA sourceB rangeA rangeB = Free $ Annotated (Both (Info rangeA mempty, Info rangeB mempty)) (Leaf $ toList sourceA ++ toList sourceB)
+      leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty) (Leaf $ toList (runLeft sources) ++ toList (runRight sources))
 
       openMaybe :: Maybe Bool -> Maybe (Maybe Bool)
       openMaybe (Just a) = Just (Just a)
