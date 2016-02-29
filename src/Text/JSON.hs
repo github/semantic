@@ -26,3 +26,6 @@ class JSON a where
 instance JSON Char where
   showJSON = showJSONs . pure
   showJSONs = JSString . toJSString
+
+instance JSON Integer where
+  showJSON = JSRational False . fromIntegral
