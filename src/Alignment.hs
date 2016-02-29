@@ -23,12 +23,12 @@ splitDiffByLines :: Diff leaf Info -> Both Int -> Both (Source Char) -> ([Row (S
 splitDiffByLines diff previous sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd $ runBoth sources) in
-    (Row EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (Range prevLeft prevLeft, range))
+    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (Range prevLeft prevLeft, range))
   Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst $ runBoth sources) in
-    (flip Row EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, Range prevRight prevRight))
+    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, Range prevRight prevRight))
   Pure (Replace leftTerm rightTerm) -> let Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
                                            (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange)) in
-                                           (uncurry (zipWithDefaults Row EmptyLine EmptyLine) . runBoth $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
+                                           (uncurry (zipWithDefaults makeRow EmptyLine EmptyLine) . runBoth $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
   where categories annotations = Diff.categories <$> Both annotations
         ranges annotations = characterRange <$> Both annotations
         (prevLeft, prevRight) = runBoth previous
@@ -76,7 +76,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Fixed children -> adjoinChildRows (Fixed . fmap get) (Identity <$> children)
   Keyed children -> adjoinChildRows (Keyed . Map.fromList) (Map.toList children)
   where contextRows :: Both Range -> Both (Source Char) -> [Row Range]
-        contextRows ranges sources = uncurry (zipWithDefaults Row EmptyLine EmptyLine) $
+        contextRows ranges sources = uncurry (zipWithDefaults makeRow EmptyLine EmptyLine) $
           runBoth (fmap pure <$> (actualLineRanges <$> ranges <*> sources))
 
         adjoin :: Has f => [Row (Either Range (f (SplitDiff leaf Info)))] -> [Row (Either Range (f (SplitDiff leaf Info)))]

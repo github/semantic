@@ -23,8 +23,7 @@ instance Arbitrary a => Arbitrary (Both a) where
   arbitrary = pure (curry Both) <*> arbitrary <*> arbitrary
 
 instance Arbitrary a => Arbitrary (Row a) where
-  arbitrary = oneof [
-    Row <$> arbitrary <*> arbitrary ]
+  arbitrary = Row <$> arbitrary
 
 instance Arbitrary a => Arbitrary (Line a) where
   arbitrary = oneof [
@@ -44,12 +43,12 @@ spec = parallel $ do
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
         \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (pure source) (pure range) (pure categories) syntax `shouldBe` [
-          Row (makeLine [ Free $ Annotated info $ Leaf source ]) (makeLine [ Free $ Annotated info $ Leaf source ]) ]
+          makeRow (makeLine [ Free $ Annotated info $ Leaf source ]) (makeLine [ Free $ Annotated info $ Leaf source ]) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
           \ source -> splitAnnotatedByLines (pure source) (pure (getTotalRange source)) (pure mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
-            Row (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) ]
+            makeRow (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) ]
 
     prop "preserves line counts in equal sources" $
       \ source ->
@@ -66,8 +65,8 @@ spec = parallel $ do
 
     prop "appends onto open rows" $
       forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
-        \ (a@(Row a1 b1), b@(Row a2 b2)) ->
-          adjoinRowsBy (pure openMaybe) [ a ] b `shouldBe` [ Row (makeLine $ unLine a1 ++ unLine a2) (makeLine $ unLine b1 ++ unLine b2) ]
+        \ (a@(Row (Both (a1, b1))), b@(Row (Both (a2, b2)))) ->
+          adjoinRowsBy (pure openMaybe) [ a ] b `shouldBe` [ makeRow (makeLine $ unLine a1 ++ unLine a2) (makeLine $ unLine b1 ++ unLine b2) ]
 
     prop "does not append onto closed rows" $
       forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
@@ -75,11 +74,11 @@ spec = parallel $ do
 
     prop "does not promote elements through empty lines onto closed lines" $
       forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
-        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
+        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ makeRow EmptyLine EmptyLine, a ] b `shouldBe` [ b, makeRow EmptyLine EmptyLine, a ]
 
     prop "promotes elements through empty lines onto open lines" $
       forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
-        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ Row EmptyLine EmptyLine, a ] b `shouldBe` Row EmptyLine EmptyLine : adjoinRowsBy (pure openMaybe) [ a ] b
+        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ makeRow EmptyLine EmptyLine, a ] b `shouldBe` makeRow EmptyLine EmptyLine : adjoinRowsBy (pure openMaybe) [ a ] b
 
   describe "splitTermByLines" $ do
     prop "preserves line count" $
@@ -106,9 +105,9 @@ spec = parallel $ do
       openTerm (fromList " \n") (Identity $ Info (Range 0 2) mempty :< Leaf "") `shouldBe` Nothing
 
     where
-      isOpenBy f (Row a b) = Maybe.isJust (openLineBy f [ a ]) && Maybe.isJust (openLineBy f [ b ])
-      isClosedBy f (Row a@(Line _) b@(Line _)) = Maybe.isNothing (openLineBy f [ a ]) && Maybe.isNothing (openLineBy f [ b ])
-      isClosedBy _ (Row _ _) = False
+      isOpenBy f (Row lines) = and (Maybe.isJust . openLineBy f . pure <$> lines)
+      isClosedBy f (Row lines@(Both (Line _, Line _))) = and (Maybe.isNothing . openLineBy f . pure <$> lines)
+      isClosedBy _ _ = False
 
       isOnSingleLine (a, _, _) = filter (/= '\n') (toList a) == toList a
 

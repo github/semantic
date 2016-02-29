@@ -88,7 +88,7 @@ split diff blobs = renderHtml
     -- | Add a row to list of tuples of ints and lines, where the ints denote
     -- | how many non-empty lines exist on that side up to that point.
     numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
-    numberRows rows (Row left right) = (leftCount rows + valueOf left, left, rightCount rows + valueOf right, right) : rows
+    numberRows rows (Row (Both (left, right))) = (leftCount rows + valueOf left, left, rightCount rows + valueOf right, right) : rows
       where
         leftCount [] = 0
         leftCount ((x, _, _, _):_) = x

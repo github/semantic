@@ -39,7 +39,7 @@ changeLength change = mconcat $ (rowLength <$> context change) <> (rowLength <$>
 
 -- | The number of lines in the row, each being either 0 or 1.
 rowLength :: Row a -> Both (Sum Int)
-rowLength (Row a b) = pure lineLength <*> Both (a, b)
+rowLength = fmap lineLength . unRow
 
 -- | The length of the line, being either 0 or 1.
 lineLength :: Line a -> Sum Int
@@ -125,7 +125,7 @@ changeIncludingContext leadingContext rows = case changes of
 
 -- | Whether a row has changes on either side.
 rowHasChanges :: Row (SplitDiff a Info) -> Bool
-rowHasChanges (Row left right) = lineHasChanges left || lineHasChanges right
+rowHasChanges (Row lines) = or (lineHasChanges <$> lines)
 
 -- | Whether a line has changes.
 lineHasChanges :: Line (SplitDiff a Info) -> Bool
