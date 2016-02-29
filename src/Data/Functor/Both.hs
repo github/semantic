@@ -3,6 +3,9 @@ module Data.Functor.Both where
 newtype Both a = Both { runBoth :: (a, a) }
   deriving (Eq, Show, Functor, Foldable, Traversable)
 
+both :: a -> a -> Both a
+both = curry Both
+
 instance Applicative Both where
   pure a = Both (a, a)
   Both (f, g) <*> Both (a, b) = Both (f a, g b)
