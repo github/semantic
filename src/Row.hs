@@ -41,3 +41,7 @@ adjoinRowsBy _ _ rows row = row : rows
 
 instance Show a => Show (Row a) where
   show (Row left right) = "\n" ++ show left ++ " | " ++ show right
+
+instance Applicative Row where
+  pure a = let a' = pure a in Row a' a'
+  Row f g <*> Row a b = Row (f <*> a) (g <*> b)
