@@ -4,6 +4,7 @@ module Renderer.JSON (
 ) where
 
 import Alignment
+import Category
 import Control.Arrow
 import Control.Monad.Free
 import Data.Foldable
@@ -32,5 +33,16 @@ instance JSON a => JSON (JSONWrapper (Line a)) where
   showJSON (JSONWrapper EmptyLine) = JSNull
   showJSON (JSONWrapper (Line a)) = showJSONs (toList a)
 
-instance JSON Range where
-  showJSON (Range start end) = showJSON [ start, end ]
+instance JSON (JSONWrapper Range) where
+  showJSON (JSONWrapper (Range start end)) = showJSON [ start, end ]
+
+instance JSON (JSONWrapper Info) where
+  showJSON (JSONWrapper (Info range categories)) = JSObject $ toJSObject [("range", showJSON (JSONWrapper range)), ("categories", showJSON (showCategory <$> toList categories))]
+    where showCategory (Other s) = s
+          showCategory s = show s
+
+instance JSON (JSONWrapper (SplitDiff a Info)) where
+  showJSON _ = JSNull
+
+instance JSON a => JSON (JSONWrapper (SplitPatch a)) where
+  showJSON _ = JSNull
