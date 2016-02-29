@@ -1,5 +1,7 @@
 module Text.JSON where
 
+import Data.List
+
 data JSValue
   = JSNull
   | JSBool !Bool
@@ -19,7 +21,11 @@ toJSString :: String -> JSString
 toJSString = JSONString
 
 newtype JSObject value = JSONObject { fromJSObject :: [(String, value)] }
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show value => Show (JSObject value) where
+  show (JSONObject pairs) = "{" ++ intercalate "," (showPair <$> pairs) ++ "}"
+    where showPair (key, value) = show (toJSString key) ++ ":" ++ show value
 
 toJSObject :: [(String, value)] -> JSObject value
 toJSObject = JSONObject
