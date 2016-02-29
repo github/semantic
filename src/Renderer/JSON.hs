@@ -52,3 +52,6 @@ instance JSON a => JSON (JSONWrapper (Row a)) where
 instance JSON a => JSON (JSONWrapper (Line a)) where
   showJSON (JSONWrapper EmptyLine) = JSNull
   showJSON (JSONWrapper (Line a)) = showJSONs (toList a)
+
+instance JSON Range where
+  showJSON (Range start end) = showJSON [ start, end ]
