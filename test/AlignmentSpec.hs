@@ -112,7 +112,7 @@ spec = parallel $ do
 
       getTotalRange (Source vector) = Range 0 $ length vector
 
-      combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Both (Info (Range start $ start + 1) mempty, Info (Range start $ start + 1) mempty)) (Leaf [ char ]) ], start + 1)
+      combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info <$> (pure (Range start $ start + 1)) <*> mempty) (Leaf [ char ]) ], start + 1)
 
       leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty) (Leaf $ toList (runLeft sources) ++ toList (runRight sources))
 
