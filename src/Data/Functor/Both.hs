@@ -14,8 +14,8 @@ zip :: Both [a] -> [Both a]
 zip = zipWith both
 
 zipWith :: (a -> a -> b) -> Both [a] -> [b]
-zipWith f (Both ([], _)) = []
-zipWith f (Both (_, [])) = []
+zipWith _ (Both ([], _)) = []
+zipWith _ (Both (_, [])) = []
 zipWith f (Both (a : as, b : bs)) = f a b : zipWith f (both as bs)
 
 unzip :: [Both a] -> Both [a]
