@@ -1,8 +1,8 @@
 module Term where
 
-import Data.OrderedMap hiding (size)
-import Data.Maybe
 import Control.Comonad.Cofree
+import Data.Maybe
+import Data.OrderedMap hiding (size)
 import Syntax
 
 -- | An annotated node (Syntax) in an abstract syntax tree.
