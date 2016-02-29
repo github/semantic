@@ -86,6 +86,7 @@ hunks diff (beforeBlob, afterBlob) = hunksInRows (1, 1) . fst $ splitDiffByLines
   where
     before = source beforeBlob
     after = source afterBlob
+
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
 hunksInRows :: (Sum Int, Sum Int) -> [Row (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]
