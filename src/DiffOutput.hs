@@ -1,7 +1,6 @@
 module DiffOutput where
 
 import Data.Functor.Both
-import qualified Data.ByteString.Char8 as B1
 import Diffing
 import Parser
 import Source
