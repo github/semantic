@@ -18,6 +18,8 @@ conf x flags = do
       dir <- getCurrentDirectory
       let icuLibDir = dir ++ "/vendor/icu/lib"
       let icuSourceDir = dir ++ "/vendor/icu/source/"
+      icuLibDirExists <- doesDirectoryExist icuLibDir
+      icuSourceDirExists <- doesDirectoryExist icuSourceDir
       return localBuildInfo {
         localPkgDescr = packageDescription {
           P.library = Just $ library {
