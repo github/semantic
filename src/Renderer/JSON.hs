@@ -59,4 +59,4 @@ instance JSON recur => JSON (JSONWrapper (Syntax leaf recur)) where
   showJSON (JSONWrapper (Leaf _)) = JSObject $ toJSObject [ ("type", JSString $ toJSString "leaf") ]
   showJSON (JSONWrapper (Indexed i)) = JSObject $ toJSObject [ ("type", JSString $ toJSString "indexed"), ("children", showJSON i) ]
   showJSON (JSONWrapper (Fixed i)) = JSObject $ toJSObject [ ("type", JSString $ toJSString "fixed"), ("children", showJSON i) ]
-  showJSON _ = JSNull
+  showJSON (JSONWrapper (Keyed k)) = JSObject $ toJSObject [ ("type", JSString $ toJSString "fixed"), ("children", JSObject $ toJSObject ((\ (k, v) -> (show k, showJSON v)) <$> (Map.toList k))) ]
