@@ -10,6 +10,14 @@ newtype Both a = Both { runBoth :: (a, a) }
 both :: a -> a -> Both a
 both = curry Both
 
+-- | Runs the left side of a `Both`.
+runLeft :: Both a -> a
+runLeft = fst . runBoth
+
+-- | Runs the right side of a `Both`.
+runRight :: Both a -> a
+runRight = snd . runBoth
+
 zip :: Both [a] -> [Both a]
 zip = zipWith both
 
