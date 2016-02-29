@@ -81,7 +81,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         adjoin :: Has f => [Row (Either Range (f (SplitDiff leaf Info)))] -> [Row (Either Range (f (SplitDiff leaf Info)))]
         adjoin = reverse . foldl (adjoinRowsBy (openEither (openRange . fst $ runBoth sources) (openDiff . fst $ runBoth sources)) (openEither (openRange . snd $ runBoth sources) (openDiff . snd $ runBoth sources))) []
 
-        adjoinChildRows :: (Has f) => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> [f (Diff leaf Info)] -> [Row (SplitDiff leaf Info)]
+        adjoinChildRows :: Has f => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> [f (Diff leaf Info)] -> [Row (SplitDiff leaf Info)]
         adjoinChildRows constructor children = let (rows, previous) = foldl childRows ([], runBoth $ start <$> ranges) children in
           fmap (wrapRowContents (wrap constructor (fst $ runBoth categories)) (wrap constructor (snd $ runBoth categories))) . adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (end <$> ranges)) sources)
 
