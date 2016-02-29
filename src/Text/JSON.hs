@@ -32,3 +32,6 @@ instance JSON Integer where
 
 instance JSON Int where
   showJSON = JSRational False . fromIntegral
+
+instance JSON a => JSON [a] where
+  showJSON = JSArray . fmap showJSON
