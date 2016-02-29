@@ -12,10 +12,10 @@ makeRow :: Line a -> Line a -> Row a
 makeRow a = Row . both a
 
 unLeft :: Row a -> Line a
-unLeft = fst . runBoth . unRow
+unLeft = runLeft . unRow
 
 unRight :: Row a -> Line a
-unRight = snd . runBoth . unRow
+unRight = runRight . unRow
 
 -- | Map over both sides of a row with the given functions.
 wrapRowContents :: Both ([a] -> b) -> Row a -> Row b
