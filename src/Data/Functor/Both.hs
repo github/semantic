@@ -7,6 +7,10 @@ newtype Both a = Both { runBoth :: (a, a) }
 both :: a -> a -> Both a
 both = curry Both
 
+unzip :: [Both a] -> Both [a]
+unzip = foldr pair (pure [])
+  where pair (Both (a, b)) (Both (as, bs)) = Both (a : as, b : bs)
+
 instance Applicative Both where
   pure a = Both (a, a)
   Both (f, g) <*> Both (a, b) = Both (f a, g b)
