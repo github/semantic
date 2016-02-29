@@ -4,19 +4,19 @@ module Renderer.JSON (
 ) where
 
 import Alignment
+import Control.Arrow
+import Control.Monad.Free
+import Data.Foldable
+import qualified Data.OrderedMap as Map
 import Diff
 import Line
-import qualified Data.OrderedMap as Map
 import Range
-import Row
 import Renderer
+import Row
 import Source hiding ((++), toList)
 import SplitDiff
 import Syntax
 import Term
-import Control.Arrow
-import Control.Monad.Free
-import Data.Foldable
 
 -- | JSON representing an aligned diff.
 newtype JSON a = JSON { rows :: [Row (SplitDiff a Info)] }
