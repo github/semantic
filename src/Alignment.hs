@@ -29,8 +29,8 @@ splitDiffByLines diff previous sources = case diff of
   Pure (Replace leftTerm rightTerm) -> let Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
                                            (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange)) in
                                            (uncurry (zipWithDefaults makeRow EmptyLine EmptyLine) . runBoth $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
-  where categories annotations = Diff.categories <$> Both annotations
-        ranges annotations = characterRange <$> Both annotations
+  where categories annotations = Diff.categories <$> annotations
+        ranges annotations = characterRange <$> annotations
 
 -- | A functor that can return its content.
 class Functor f => Has f where

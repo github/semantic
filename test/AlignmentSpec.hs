@@ -113,9 +113,9 @@ spec = parallel $ do
 
       getTotalRange (Source vector) = Range 0 $ length vector
 
-      combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info (Range start $ start + 1) mempty, Info (Range start $ start + 1) mempty) (Leaf [ char ]) ], start + 1)
+      combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Both (Info (Range start $ start + 1) mempty, Info (Range start $ start + 1) mempty)) (Leaf [ char ]) ], start + 1)
 
-      leafWithRangesInSources sourceA sourceB rangeA rangeB = Free $ Annotated (Info rangeA mempty, Info rangeB mempty) (Leaf $ toList sourceA ++ toList sourceB)
+      leafWithRangesInSources sourceA sourceB rangeA rangeB = Free $ Annotated (Both (Info rangeA mempty, Info rangeB mempty)) (Leaf $ toList sourceA ++ toList sourceB)
 
       openMaybe :: Maybe Bool -> Maybe (Maybe Bool)
       openMaybe (Just a) = Just (Just a)

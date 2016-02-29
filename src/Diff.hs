@@ -2,6 +2,7 @@ module Diff where
 
 import Category
 import Control.Monad.Free
+import Data.Functor.Both
 import Data.Set
 import Patch
 import Range
@@ -21,7 +22,7 @@ instance Categorizable Info where
   categories = Diff.categories
 
 -- | An annotated series of patches of terms.
-type Diff a annotation = Free (Annotated a (annotation, annotation)) (Patch (Term a annotation))
+type Diff a annotation = Free (Annotated a (Both annotation)) (Patch (Term a annotation))
 
 -- | Sum the result of a transform applied to all the patches in the diff.
 diffSum :: (Patch (Term a annotation) -> Integer) -> Diff a annotation -> Integer
