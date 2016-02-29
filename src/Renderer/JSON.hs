@@ -37,9 +37,11 @@ instance JSON (JSONWrapper Range) where
   showJSON (JSONWrapper (Range start end)) = showJSON [ start, end ]
 
 instance JSON (JSONWrapper Info) where
-  showJSON (JSONWrapper (Info range categories)) = JSObject $ toJSObject [("range", showJSON (JSONWrapper range)), ("categories", showJSON (showCategory <$> toList categories))]
-    where showCategory (Other s) = s
-          showCategory s = show s
+  showJSON (JSONWrapper (Info range categories)) = JSObject $ toJSObject [("range", showJSON (JSONWrapper range)), ("categories", showJSON (JSONWrapper <$> toList categories))]
+
+instance JSON (JSONWrapper Category) where
+  showJSON (JSONWrapper (Other s)) = JSString $ toJSString s
+  showJSON (JSONWrapper s) = JSString . toJSString $ show s
 
 instance JSON (JSONWrapper (SplitDiff a Info)) where
   showJSON _ = JSNull
