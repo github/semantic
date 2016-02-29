@@ -26,9 +26,9 @@ splitDiffByLines diff previous sources = case diff of
     (Row EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (Range prevLeft prevLeft, range))
   Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst $ runBoth sources) in
     (flip Row EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, Range prevRight prevRight))
-  Pure (Replace leftTerm rightTerm) -> let (leftLines, leftRange) = splitTermByLines leftTerm (fst $ runBoth sources)
-                                           (rightLines, rightRange) = splitTermByLines rightTerm (snd $ runBoth sources) in
-                                           (zipWithDefaults Row EmptyLine EmptyLine (fmap (Pure . SplitReplace) <$> leftLines) (fmap (Pure . SplitReplace) <$> rightLines), Both (leftRange, rightRange))
+  Pure (Replace leftTerm rightTerm) -> let Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
+                                           (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange)) in
+                                           (uncurry (zipWithDefaults Row EmptyLine EmptyLine) . runBoth $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
   where categories annotations = Diff.categories <$> Both annotations
         ranges annotations = characterRange <$> Both annotations
         (prevLeft, prevRight) = runBoth previous
