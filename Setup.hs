@@ -16,12 +16,14 @@ conf x flags = do
       libraryBuildInfo = P.libBuildInfo library
       relativeIncludeDirs = [ "common", "i18n" ] in do
       dir <- getCurrentDirectory
+      let icuLibDir = dir ++ "/vendor/icu/lib"
+      let icuSourceDir = dir ++ "/vendor/icu/source/"
       return localBuildInfo {
         localPkgDescr = packageDescription {
           P.library = Just $ library {
             P.libBuildInfo = libraryBuildInfo {
-              P.extraLibDirs = (dir ++ "/vendor/icu/lib") : P.extraLibDirs libraryBuildInfo,
-              P.includeDirs = (((dir ++ "/vendor/icu/source/") ++) <$> relativeIncludeDirs) ++ P.includeDirs libraryBuildInfo
+              P.extraLibDirs = icuLibDir : P.extraLibDirs libraryBuildInfo,
+              P.includeDirs = ((icuSourceDir ++) <$> relativeIncludeDirs) ++ P.includeDirs libraryBuildInfo
             }
           }
         }
