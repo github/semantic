@@ -64,8 +64,7 @@ spec = parallel $ do
 
     prop "appends onto open rows" $
       forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
-        \ (a@(Row (Both (a1, b1))), b@(Row (Both (a2, b2)))) ->
-          adjoinRowsBy (pure openMaybe) [ a ] b `shouldBe` [ Row $ makeLine <$> ((++) <$> (unLine <$> unRow a) <*> (unLine <$> unRow b)) ]
+        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ a ] b `shouldBe` [ Row $ makeLine <$> ((++) <$> (unLine <$> unRow a) <*> (unLine <$> unRow b)) ]
 
     prop "does not append onto closed rows" $
       forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
