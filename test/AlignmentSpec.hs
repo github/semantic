@@ -62,24 +62,24 @@ spec = parallel $ do
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $
-      \ a -> adjoinRowsBy openMaybe openMaybe [] a == [ a ]
+      \ a -> adjoinRowsBy (pure openMaybe) [] a == [ a ]
 
     prop "appends onto open rows" $
       forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
         \ (a@(Row a1 b1), b@(Row a2 b2)) ->
-          adjoinRowsBy openMaybe openMaybe [ a ] b `shouldBe` [ Row (makeLine $ unLine a1 ++ unLine a2) (makeLine $ unLine b1 ++ unLine b2) ]
+          adjoinRowsBy (pure openMaybe) [ a ] b `shouldBe` [ Row (makeLine $ unLine a1 ++ unLine a2) (makeLine $ unLine b1 ++ unLine b2) ]
 
     prop "does not append onto closed rows" $
       forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
-        \ (a, b) -> adjoinRowsBy openMaybe openMaybe [ a ] b `shouldBe` [ b, a ]
+        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ a ] b `shouldBe` [ b, a ]
 
     prop "does not promote elements through empty lines onto closed lines" $
       forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
-        \ (a, b) -> adjoinRowsBy openMaybe openMaybe [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
+        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ Row EmptyLine EmptyLine, a ] b `shouldBe` [ b, Row EmptyLine EmptyLine, a ]
 
     prop "promotes elements through empty lines onto open lines" $
       forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
-        \ (a, b) -> adjoinRowsBy openMaybe openMaybe [ Row EmptyLine EmptyLine, a ] b `shouldBe` Row EmptyLine EmptyLine : adjoinRowsBy openMaybe openMaybe [ a ] b
+        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ Row EmptyLine EmptyLine, a ] b `shouldBe` Row EmptyLine EmptyLine : adjoinRowsBy (pure openMaybe) [ a ] b
 
   describe "splitTermByLines" $ do
     prop "preserves line count" $
