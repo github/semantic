@@ -10,7 +10,10 @@ data JSValue
   deriving (Eq, Show)
 
 newtype JSString = JSONString { fromJSString :: String }
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show JSString where
+  show (JSONString s) =  "\"" ++ s ++ "\""
 
 toJSString :: String -> JSString
 toJSString = JSONString
