@@ -128,4 +128,4 @@ openDiff source diff = const diff <$> case get diff of
 -- | Zip two lists by applying a function, using the default values to extend
 -- | the shorter list.
 zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
-zipWithDefaults f da db a b = take (max (length a) (length b)) $ zipWith f (a ++ repeat da) (b ++ repeat db)
+zipWithDefaults f da db a b = take (max (length a) (length b)) $ Prelude.zipWith f (a ++ repeat da) (b ++ repeat db)

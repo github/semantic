@@ -1,7 +1,7 @@
 module Row where
 
 import Control.Arrow
-import Data.Functor.Both
+import Data.Functor.Both as Both
 import Line
 
 -- | A row in a split diff, composed of a before line and an after line.
@@ -21,20 +21,20 @@ wrapRowContents transformLeft transformRight (Row left right) = Row (wrapLineCon
 adjoinRowsBy :: MaybeOpen a -> MaybeOpen a -> [Row a] -> Row a -> [Row a]
 adjoinRowsBy _ _ [] row = [row]
 
-adjoinRowsBy f g rows (Row left' right') | Both (Just _, Just _) <- openLineBy <$> Both (f, g) <*> Both (unzip $ runBoth . unRow <$> rows) = uncurry (zipWith Row) . runBoth $ both <*> Both (left', right')
-  where both = adjoinLinesBy <$> Both (f, g) <*> Both (unzip $ runBoth . unRow <$> rows)
+adjoinRowsBy f g rows (Row left' right') | Both (Just _, Just _) <- openLineBy <$> Both (f, g) <*> (Both.unzip $ unRow <$> rows) = Both.zipWith Row $ both <*> Both (left', right')
+  where both = adjoinLinesBy <$> Both (f, g) <*> (Both.unzip $ unRow <$> rows)
 
 adjoinRowsBy f _ rows (Row left' right') | Just _ <- openLineBy f $ unLeft <$> rows = case right' of
   EmptyLine -> rest
   _ -> Row EmptyLine right' : rest
-  where rest = zipWith Row (lefts left') rights
-        (lefts, rights) = first (adjoinLinesBy f) $ unzip $ runBoth . unRow <$> rows
+  where rest = Prelude.zipWith Row (lefts left') rights
+        (lefts, rights) = first (adjoinLinesBy f) . runBoth $ Both.unzip $ unRow <$> rows
 
 adjoinRowsBy _ g rows (Row left' right') | Just _ <- openLineBy g $ unRight <$> rows = case left' of
   EmptyLine -> rest
   _ -> Row left' EmptyLine : rest
-  where rest = zipWith Row lefts (rights right')
-        (lefts, rights) = second (adjoinLinesBy g) $ unzip $ runBoth . unRow <$> rows
+  where rest = Prelude.zipWith Row lefts (rights right')
+        (lefts, rights) = second (adjoinLinesBy g) . runBoth $ Both.unzip $ unRow <$> rows
 
 adjoinRowsBy _ _ rows row = row : rows
 
