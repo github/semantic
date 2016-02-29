@@ -8,6 +8,7 @@ import Data.Text.Arbitrary ()
 import Alignment
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
+import Data.Functor.Both
 import Diff
 import qualified Data.Maybe as Maybe
 import Data.Functor.Identity
@@ -17,6 +18,9 @@ import Row
 import Range
 import Syntax
 import ArbitraryTerm ()
+
+instance Arbitrary a => Arbitrary (Both a) where
+  arbitrary = pure (curry Both) <*> arbitrary <*> arbitrary
 
 instance Arbitrary a => Arbitrary (Row a) where
   arbitrary = oneof [
@@ -39,21 +43,22 @@ spec = parallel $ do
   describe "splitAnnotatedByLines" $ do
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
-        \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (source, source) (range, range) (categories, categories) syntax `shouldBe` [
+        \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (pure source) (range, range) (categories, categories) syntax `shouldBe` [
           Row (makeLine [ Free $ Annotated info $ Leaf source ]) (makeLine [ Free $ Annotated info $ Leaf source ]) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
-          \ source -> splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
+          \ source -> splitAnnotatedByLines (pure source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
             Row (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) ]
 
     prop "preserves line counts in equal sources" $
       \ source ->
-        length (splitAnnotatedByLines (source, source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed . fst $ foldl combineIntoLeaves ([], 0) source)) `shouldBe` length (filter (== '\n') $ toList source) + 1
+        length (splitAnnotatedByLines (pure source) (getTotalRange source, getTotalRange source) (mempty, mempty) (Indexed . fst $ foldl combineIntoLeaves ([], 0) source)) `shouldBe` length (filter (== '\n') $ toList source) + 1
 
     prop "produces the maximum line count in inequal sources" $
-      \ sourceA sourceB ->
-        length (splitAnnotatedByLines (sourceA, sourceB) (getTotalRange sourceA, getTotalRange sourceB) (mempty, mempty) (Indexed $ zipWith (leafWithRangesInSources sourceA sourceB) (actualLineRanges (getTotalRange sourceA) sourceA) (actualLineRanges (getTotalRange sourceB) sourceB))) `shouldBe` max (length (filter (== '\n') $ toList sourceA) + 1) (length (filter (== '\n') $ toList sourceB) + 1)
+      \ sources ->
+        let (sourceA, sourceB) = runBoth sources in
+          length (splitAnnotatedByLines sources (getTotalRange sourceA, getTotalRange sourceB) (mempty, mempty) (Indexed $ zipWith (leafWithRangesInSources sourceA sourceB) (actualLineRanges (getTotalRange sourceA) sourceA) (actualLineRanges (getTotalRange sourceB) sourceB))) `shouldBe` max (length (filter (== '\n') $ toList sourceA) + 1) (length (filter (== '\n') $ toList sourceB) + 1)
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $

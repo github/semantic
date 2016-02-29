@@ -13,9 +13,9 @@ import Source hiding ((++), break)
 import SplitDiff
 import Control.Comonad.Cofree
 import Control.Monad.Free
+import Data.Functor.Both
 import Data.Maybe
 import Data.Monoid
-import Data.Functor.Both
 
 -- | Render a diff in the traditional patch format.
 patch :: Renderer a String
@@ -84,9 +84,7 @@ header blobs hunk = "diff --git a/" ++ pathA ++ " b/" ++ pathB ++ "\n" ++
 
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
-hunks diff blobs = hunksInRows (Both (1, 1)) . fst $ splitDiffByLines diff (0, 0) (before, after)
-  where
-    (before, after) = runBoth $ source <$> blobs
+hunks diff blobs = hunksInRows (Both (1, 1)) . fst $ splitDiffByLines diff (0, 0) (source <$> blobs)
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.

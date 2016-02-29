@@ -62,8 +62,9 @@ split diff blobs = renderHtml
         ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
         . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
-    (before, after) = runBoth $ Source.source <$> blobs
-    rows = fst (splitDiffByLines diff (0, 0) (before, after))
+    sources = Source.source <$> blobs
+    (before, after) = runBoth sources
+    rows = fst (splitDiffByLines diff (0, 0) sources)
     numbered = foldl' numberRows [] rows
     maxNumber = case numbered of
       [] -> 0

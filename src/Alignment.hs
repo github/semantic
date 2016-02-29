@@ -4,6 +4,7 @@ import Category
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Either
+import Data.Functor.Both
 import Data.Functor.Identity
 import qualified Data.OrderedMap as Map
 import qualified Data.Set as Set
@@ -18,15 +19,15 @@ import Syntax
 import Term
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs.
-splitDiffByLines :: Diff leaf Info -> (Int, Int) -> (Source Char, Source Char) -> ([Row (SplitDiff leaf Info)], (Range, Range))
+splitDiffByLines :: Diff leaf Info -> (Int, Int) -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], (Range, Range))
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
-  Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
+  Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd $ runBoth sources) in
     (Row EmptyLine . fmap (Pure . SplitInsert) <$> lines, (Range prevLeft prevLeft, range))
-  Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst sources) in
+  Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst $ runBoth sources) in
     (flip Row EmptyLine . fmap (Pure . SplitDelete) <$> lines, (range, Range prevRight prevRight))
-  Pure (Replace leftTerm rightTerm) -> let (leftLines, leftRange) = splitTermByLines leftTerm (fst sources)
-                                           (rightLines, rightRange) = splitTermByLines rightTerm (snd sources) in
+  Pure (Replace leftTerm rightTerm) -> let (leftLines, leftRange) = splitTermByLines leftTerm (fst $ runBoth sources)
+                                           (rightLines, rightRange) = splitTermByLines rightTerm (snd $ runBoth sources) in
                                            (zipWithDefaults Row EmptyLine EmptyLine (fmap (Pure . SplitReplace) <$> leftLines) (fmap (Pure . SplitReplace) <$> rightLines), (leftRange, rightRange))
   where categories (Info _ left, Info _ right) = (left, right)
         ranges (Info left _, Info right _) = (left, right)
@@ -67,19 +68,19 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
           (adjoin $ lines ++ (pure . Left <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap (Right . (<$ child)) <$> childLines), end childRange)
 
 -- | Split a annotated diff into rows of split diffs.
-splitAnnotatedByLines :: (Source Char, Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax leaf (Diff leaf Info) -> [Row (SplitDiff leaf Info)]
+splitAnnotatedByLines :: Both (Source Char) -> (Range, Range) -> (Set.Set Category, Set.Set Category) -> Syntax leaf (Diff leaf Info) -> [Row (SplitDiff leaf Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> wrapRowContents (Free . (`Annotated` Leaf a) . (`Info` fst categories) . unionRanges) (Free . (`Annotated` Leaf a) . (`Info` snd categories) . unionRanges) <$> contextRows ranges sources
   Indexed children -> adjoinChildRows (Indexed . fmap get) (Identity <$> children)
   Fixed children -> adjoinChildRows (Fixed . fmap get) (Identity <$> children)
   Keyed children -> adjoinChildRows (Keyed . Map.fromList) (Map.toList children)
-  where contextRows :: (Range, Range) -> (Source Char, Source Char) -> [Row Range]
+  where contextRows :: (Range, Range) -> Both (Source Char) -> [Row Range]
         contextRows ranges sources = zipWithDefaults Row EmptyLine EmptyLine
-          (pure <$> actualLineRanges (fst ranges) (fst sources))
-          (pure <$> actualLineRanges (snd ranges) (snd sources))
+          (pure <$> actualLineRanges (fst ranges) (fst $ runBoth sources))
+          (pure <$> actualLineRanges (snd ranges) (snd $ runBoth sources))
 
         adjoin :: Has f => [Row (Either Range (f (SplitDiff leaf Info)))] -> [Row (Either Range (f (SplitDiff leaf Info)))]
-        adjoin = reverse . foldl (adjoinRowsBy (openEither (openRange $ fst sources) (openDiff $ fst sources)) (openEither (openRange $ snd sources) (openDiff $ snd sources))) []
+        adjoin = reverse . foldl (adjoinRowsBy (openEither (openRange . fst $ runBoth sources) (openDiff . fst $ runBoth sources)) (openEither (openRange . snd $ runBoth sources) (openDiff . snd $ runBoth sources))) []
 
         adjoinChildRows :: (Has f) => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> [f (Diff leaf Info)] -> [Row (SplitDiff leaf Info)]
         adjoinChildRows constructor children = let (rows, previous) = foldl childRows ([], starts ranges) children in
