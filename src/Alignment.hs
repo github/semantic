@@ -28,7 +28,7 @@ splitDiffByLines diff previous sources = case diff of
     (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, rangeAt $ runRight previous))
   Pure (Replace leftTerm rightTerm) -> let Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
                                            (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange)) in
-                                           (uncurry (zipWithDefaults makeRow EmptyLine EmptyLine) . runBoth $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
+                                           (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
   where categories annotations = Diff.categories <$> annotations
         ranges annotations = characterRange <$> annotations
 
@@ -75,8 +75,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Fixed children -> adjoinChildRows (Fixed . fmap get) (Identity <$> children)
   Keyed children -> adjoinChildRows (Keyed . Map.fromList) (Map.toList children)
   where contextRows :: Both Range -> Both (Source Char) -> [Row Range]
-        contextRows ranges sources = uncurry (zipWithDefaults makeRow EmptyLine EmptyLine) $
-          runBoth (fmap pure <$> (actualLineRanges <$> ranges <*> sources))
+        contextRows ranges sources = zipWithDefaults makeRow (pure mempty) (fmap pure <$> (actualLineRanges <$> ranges <*> sources))
 
         adjoin :: Has f => [Row (Either Range (f (SplitDiff leaf Info)))] -> [Row (Either Range (f (SplitDiff leaf Info)))]
         adjoin = reverse . foldl (adjoinRowsBy (openEither <$> (openRange <$> sources) <*> (openDiff <$> sources))) []
@@ -123,8 +122,3 @@ openDiff :: Has f => Source Char -> MaybeOpen (f (SplitDiff leaf Info))
 openDiff source diff = const diff <$> case get diff of
   (Free (Annotated (Info range _) _)) -> openRange source range
   (Pure patch) -> let Info range _ :< _ = getSplitTerm patch in openRange source range
-
--- | Zip two lists by applying a function, using the default values to extend
--- | the shorter list.
-zipWithDefaults :: (a -> b -> c) -> a -> b -> [a] -> [b] -> [c]
-zipWithDefaults f da db a b = take (max (length a) (length b)) $ Prelude.zipWith f (a ++ repeat da) (b ++ repeat db)
