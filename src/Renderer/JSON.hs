@@ -47,9 +47,7 @@ instance Show (JSON a) where
 newtype JSONWrapper a = JSONWrapper { unWrap :: a }
 
 instance JSON a => JSON (JSONWrapper (Row a)) where
-  showJSON (JSONWrapper (Row left right)) = JSObject $ toJSObject [("left", showLine left), ("right", showLine right)]
-    where showLine EmptyLine = JSNull
-          showLine (Line a) = showJSONs (toList a)
+  showJSON (JSONWrapper (Row left right)) = JSObject $ toJSObject [("left", showJSON (JSONWrapper left)), ("right", showJSON (JSONWrapper right))]
 
 instance JSON a => JSON (JSONWrapper (Line a)) where
   showJSON (JSONWrapper EmptyLine) = JSNull
