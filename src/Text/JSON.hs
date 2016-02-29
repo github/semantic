@@ -1,6 +1,7 @@
 module Text.JSON where
 
 import Data.List
+import Data.Ratio
 
 data JSValue
   = JSNull
@@ -9,7 +10,16 @@ data JSValue
   | JSString JSString
   | JSArray [JSValue]
   | JSObject (JSObject JSValue)
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show JSValue where
+  show JSNull = "null"
+  show (JSBool isTrue) = if isTrue then "true" else "false"
+  show (JSRational True rational) = show (fromRational rational :: Double)
+  show (JSRational False rational) = show (numerator rational :: Integer)
+  show (JSString s) = show s
+  show (JSArray v) = "[" ++ intercalate "," (show <$> v) ++ "]"
+  show (JSObject o) = show o
 
 newtype JSString = JSONString { fromJSString :: String }
   deriving (Eq)
