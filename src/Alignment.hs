@@ -19,16 +19,16 @@ import Syntax
 import Term
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs.
-splitDiffByLines :: Diff leaf Info -> (Int, Int) -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], (Range, Range))
+splitDiffByLines :: Diff leaf Info -> (Int, Int) -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
 splitDiffByLines diff (prevLeft, prevRight) sources = case diff of
-  Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
+  Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, Both $ ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd $ runBoth sources) in
-    (Row EmptyLine . fmap (Pure . SplitInsert) <$> lines, (Range prevLeft prevLeft, range))
+    (Row EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (Range prevLeft prevLeft, range))
   Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst $ runBoth sources) in
-    (flip Row EmptyLine . fmap (Pure . SplitDelete) <$> lines, (range, Range prevRight prevRight))
+    (flip Row EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, Range prevRight prevRight))
   Pure (Replace leftTerm rightTerm) -> let (leftLines, leftRange) = splitTermByLines leftTerm (fst $ runBoth sources)
                                            (rightLines, rightRange) = splitTermByLines rightTerm (snd $ runBoth sources) in
-                                           (zipWithDefaults Row EmptyLine EmptyLine (fmap (Pure . SplitReplace) <$> leftLines) (fmap (Pure . SplitReplace) <$> rightLines), (leftRange, rightRange))
+                                           (zipWithDefaults Row EmptyLine EmptyLine (fmap (Pure . SplitReplace) <$> leftLines) (fmap (Pure . SplitReplace) <$> rightLines), Both (leftRange, rightRange))
   where categories (Info _ left, Info _ right) = (left, right)
         ranges (Info left _, Info right _) = (left, right)
 
@@ -97,7 +97,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         childRows :: (Has f) => ([Row (Either Range (f (SplitDiff leaf Info)))], (Int, Int)) -> f (Diff leaf Info) -> ([Row (Either Range (f (SplitDiff leaf Info)))], (Int, Int))
         childRows (rows, previous) child = let (childRows, childRanges) = splitDiffByLines (get child) previous sources in
-          (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (starts childRanges)) sources) ++ (fmap (Right . (<$ child)) <$> childRows), ends childRanges)
+          (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (starts $ runBoth childRanges)) sources) ++ (fmap (Right . (<$ child)) <$> childRows), ends (runBoth childRanges))
 
         starts (left, right) = (start left, start right)
         ends (left, right) = (end left, end right)
