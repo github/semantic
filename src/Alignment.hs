@@ -23,9 +23,9 @@ splitDiffByLines :: Diff leaf Info -> Both Int -> Both (Source Char) -> ([Row (S
 splitDiffByLines diff previous sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (runRight sources) in
-    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (Range prevLeft prevLeft, range))
+    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (rangeAt prevLeft, range))
   Pure (Delete term) -> let (lines, range) = splitTermByLines term (runLeft sources) in
-    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, Range prevRight prevRight))
+    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, rangeAt prevRight))
   Pure (Replace leftTerm rightTerm) -> let Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
                                            (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange)) in
                                            (uncurry (zipWithDefaults makeRow EmptyLine EmptyLine) . runBoth $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
