@@ -13,8 +13,8 @@ unRow :: Row a -> Both (Line a)
 unRow (Row a b) = Both (a, b)
 
 -- | Map over both sides of a row with the given functions.
-wrapRowContents :: ([a] -> b) -> ([a] -> b) -> Row a -> Row b
-wrapRowContents transformLeft transformRight (Row left right) = Row (wrapLineContents transformLeft left) (wrapLineContents transformRight right)
+wrapRowContents :: Both ([a] -> b) -> Row a -> Row b
+wrapRowContents transform row = uncurry Row . runBoth $ wrapLineContents <$> transform <*> unRow row
 
 -- | Given functions that determine whether an item is open, add a row to a
 -- | first open, non-empty item in a list of rows, or add it as a new row.
