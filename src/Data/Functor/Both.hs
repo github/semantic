@@ -7,6 +7,11 @@ newtype Both a = Both { runBoth :: (a, a) }
 both :: a -> a -> Both a
 both = curry Both
 
+zip :: Both [a] -> [Both a]
+zip (Both ([], _)) = []
+zip (Both (_, [])) = []
+zip (Both (a : as, b : bs)) = both a b : Data.Functor.Both.zip (both as bs)
+
 unzip :: [Both a] -> Both [a]
 unzip = foldr pair (pure [])
   where pair (Both (a, b)) (Both (as, bs)) = Both (a : as, b : bs)
