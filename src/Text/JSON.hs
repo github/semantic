@@ -22,3 +22,7 @@ class JSON a where
   showJSON :: a -> JSValue
   showJSONs :: [a] -> JSValue
   showJSONs = JSArray . fmap showJSON
+
+instance JSON Char where
+  showJSON = showJSONs . pure
+  showJSONs = JSString . toJSString
