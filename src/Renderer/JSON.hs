@@ -6,6 +6,7 @@ module Renderer.JSON (
 import Alignment
 import Category
 import Control.Arrow
+import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Foldable
 import qualified Data.OrderedMap as Map
@@ -48,3 +49,6 @@ instance JSON (JSONWrapper (SplitDiff a Info)) where
 
 instance JSON a => JSON (JSONWrapper (SplitPatch a)) where
   showJSON _ = JSNull
+
+instance JSON (JSONWrapper (Term leaf Info)) where
+  showJSON (JSONWrapper (info :< syntax)) = JSNull
