@@ -31,7 +31,6 @@ instance (ToJSON leaf, ToJSON annotation, ToJSON recur) => ToJSON (Annotated lea
 instance ToJSON Category where
   toJSON (Other s) = String $ T.pack s
   toJSON s = String . T.pack $ show s
-instance ToJSON a => ToJSON (Line a)
 instance ToJSON Range where
   toJSON (Range start end) = Array (fromList [ toJSON start, toJSON end ])
 instance ToJSON a => ToJSON (Row a) where
