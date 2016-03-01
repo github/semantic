@@ -60,7 +60,7 @@ instance ToJSON (Term leaf Info) where
   toEncoding (info :< syntax) = pairs (termSeries info syntax)
 
 termSeries :: ToJSON recur => Info -> Syntax leaf recur -> Series
-termSeries (Info range categories) syntax = "range" .= toJSON range <> "categories" .= toJSON categories <> "syntax" .= toJSON syntax
+termSeries info = mconcat . termFields info
 
 termFields :: (ToJSON recur, KeyValue kv) => Info -> Syntax leaf recur -> [kv]
 termFields (Info range categories) syntax = [ "range" .= toJSON range, "categories" .= toJSON categories, "syntax" .= toJSON syntax ]
