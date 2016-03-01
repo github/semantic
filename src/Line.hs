@@ -4,7 +4,6 @@ module Line where
 import qualified Data.Foldable as Foldable
 import Data.Monoid
 import qualified Data.Vector as Vector
-import GHC.Generics
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 
@@ -12,7 +11,7 @@ import qualified Text.Blaze.Html5.Attributes as A
 data Line a =
   Line (Vector.Vector a)
   | EmptyLine
-  deriving (Eq, Foldable, Functor, Generic, Traversable)
+  deriving (Eq, Functor, Foldable)
 
 -- | Create a line from a list of items.
 makeLine :: [a] -> Line a

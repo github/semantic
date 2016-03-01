@@ -1,8 +1,8 @@
 module Source where
 
-import qualified Data.Text as T
-import qualified Data.Vector as Vector
 import Range
+import qualified Data.Vector as Vector
+import qualified Data.Text as T
 
 data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath }
 

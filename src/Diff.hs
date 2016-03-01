@@ -1,22 +1,21 @@
 module Diff where
 
-import Category
-import Control.Monad.Free
-import Data.Set
-import GHC.Generics
-import Patch
-import Range
 import Syntax
+import Data.Set
+import Control.Monad.Free
+import Patch
 import Term
+import Range
+import Category
 
 -- | An annotated syntax in a diff tree.
 data Annotated a annotation f = Annotated { getAnnotation :: !annotation, getSyntax :: !(Syntax a f) }
-  deriving (Foldable, Functor, Generic, Eq, Show, Traversable)
+  deriving (Functor, Eq, Show, Foldable)
 
 -- | An annotation for a source file, including the source range and semantic
 -- | categories.
 data Info = Info { characterRange :: !Range, categories :: !(Set Category) }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Show)
 
 instance Categorizable Info where
   categories = Diff.categories

@@ -1,12 +1,11 @@
 module Row where
 
 import Control.Arrow
-import GHC.Generics
 import Line
 
 -- | A row in a split diff, composed of a before line and an after line.
 data Row a = Row { unLeft :: !(Line a), unRight :: !(Line a) }
-  deriving (Eq, Foldable, Functor, Generic, Traversable)
+  deriving (Eq, Functor)
 
 -- | Return a tuple of lines from the row.
 unRow :: Row a -> (Line a, Line a)
