@@ -12,6 +12,7 @@ import Data.Aeson hiding (json)
 import Data.ByteString.Builder
 import Data.ByteString.Lazy
 import Data.Functor.Both
+import Data.Monoid
 import Data.OrderedMap hiding (fromList)
 import qualified Data.Text as T
 import Data.Vector hiding (toList)
@@ -50,3 +51,4 @@ instance (ToJSON recur) => ToJSON (Syntax leaf recur) where
   toJSON (Keyed c) = object [ "type" .= String "fixed", "children" .= object (uncurry (.=) <$> toList c) ]
 instance ToJSON (Term leaf Info) where
   toJSON (Info range categories :< syntax) = object [ "range" .= toJSON range, "categories" .= toJSON categories, "syntax" .= toJSON syntax ]
+  toEncoding (Info range categories :< syntax) = pairs ("range" .= toJSON range <> "categories" .= toJSON categories <> "syntax" .= toJSON syntax)
