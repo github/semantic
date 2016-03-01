@@ -51,4 +51,7 @@ instance (ToJSON recur) => ToJSON (Syntax leaf recur) where
   toJSON (Keyed c) = object [ "type" .= String "fixed", "children" .= object (uncurry (.=) <$> toList c) ]
 instance ToJSON (Term leaf Info) where
   toJSON (Info range categories :< syntax) = object [ "range" .= toJSON range, "categories" .= toJSON categories, "syntax" .= toJSON syntax ]
-  toEncoding (Info range categories :< syntax) = pairs ("range" .= toJSON range <> "categories" .= toJSON categories <> "syntax" .= toJSON syntax)
+  toEncoding (info :< syntax) = pairs (termSeries info syntax)
+
+termSeries :: ToJSON recur => Info -> Syntax leaf recur -> Series
+termSeries (Info range categories) syntax = "range" .= toJSON range <> "categories" .= toJSON categories <> "syntax" .= toJSON syntax
