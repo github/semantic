@@ -41,11 +41,11 @@ instance ToJSON (SplitDiff leaf Info) where
   toJSON (Free (Annotated info syntax)) = object (termFields info syntax)
   toJSON (Pure patch) = toJSON patch
   toEncoding (Free (Annotated info syntax)) = pairs (termSeries info syntax)
-  toEncoding (Pure patch) = pairs . series $ case patch of
+  toEncoding (Pure patch) = pairs . fields $ case patch of
     SplitInsert a -> ("insert", a)
     SplitDelete a -> ("delete", a)
     SplitReplace a -> ("replace", a)
-    where series (kind, (info :< syntax)) = termSeries info syntax <> "patch" .= T.pack kind
+    where fields (kind, (info :< syntax)) = termSeries info syntax <> "patch" .= T.pack kind
 instance ToJSON a => ToJSON (SplitPatch a) where
   toJSON (SplitInsert a) = object [ "insert" .= toJSON a ]
   toJSON (SplitDelete a) = object [ "delete" .= toJSON a ]
