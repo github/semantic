@@ -32,4 +32,4 @@ termSize = cata size where
   size _ (Leaf _) = 1
   size _ (Indexed i) = sum i
   size _ (Fixed f) = sum f
-  size _ (Keyed k) = sum $ snd <$> toList k
+  size _ (Keyed k) = sum k
