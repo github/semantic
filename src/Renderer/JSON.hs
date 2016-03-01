@@ -27,7 +27,6 @@ import Term
 json :: ToJSON a => Renderer a ByteString
 json diff (a, b) = encode . fst $ splitDiffByLines diff (0, 0) (source a, source b)
 
-instance (ToJSON leaf, ToJSON annotation, ToJSON recur) => ToJSON (Annotated leaf annotation recur)
 instance ToJSON Category where
   toJSON (Other s) = String $ T.pack s
   toJSON s = String . T.pack $ show s
