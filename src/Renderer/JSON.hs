@@ -39,7 +39,7 @@ instance ToJSON a => ToJSON (Row a) where
 instance ToJSON (SplitDiff leaf Info) where
   toJSON (Free (Annotated info syntax)) = object (termFields info syntax)
   toJSON (Pure patch) = object (patchFields patch)
-  toEncoding (Free (Annotated info syntax)) = pairs (termSeries info syntax)
+  toEncoding (Free (Annotated info syntax)) = pairs $ mconcat (termFields info syntax)
   toEncoding (Pure patch) = pairs $ mconcat (patchFields patch)
 instance ToJSON a => ToJSON (SplitPatch a) where
   toJSON (SplitInsert a) = object [ "insert" .= toJSON a ]
@@ -52,10 +52,7 @@ instance (ToJSON recur) => ToJSON (Syntax leaf recur) where
   toJSON (Keyed c) = object [ "type" .= String "fixed", "children" .= object (uncurry (.=) <$> toList c) ]
 instance ToJSON (Term leaf Info) where
   toJSON (info :< syntax) = object (termFields info syntax)
-  toEncoding (info :< syntax) = pairs (termSeries info syntax)
-
-termSeries :: ToJSON recur => Info -> Syntax leaf recur -> Series
-termSeries info = mconcat . termFields info
+  toEncoding (info :< syntax) = pairs $ mconcat (termFields info syntax)
 
 termFields :: (ToJSON recur, KeyValue kv) => Info -> Syntax leaf recur -> [kv]
 termFields (Info range categories) syntax = [ "range" .= toJSON range, "categories" .= toJSON categories, "syntax" .= toJSON syntax ]
