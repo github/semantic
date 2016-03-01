@@ -34,6 +34,7 @@ instance ToJSON Category where
   toJSON s = String . T.pack $ show s
 instance ToJSON Range where
   toJSON (Range start end) = Array . fromList $ toJSON <$> [ start, end ]
+  toEncoding (Range start end) = foldable [ start,  end ]
 instance ToJSON a => ToJSON (Row a) where
   toJSON (Row both) = toJSON both
   toEncoding (Row both) = toEncoding both
