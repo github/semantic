@@ -6,6 +6,7 @@ module Renderer.JSON (
 
 import Alignment
 import Category
+import Control.Comonad.Cofree
 import Data.Aeson hiding (json)
 import Data.ByteString.Lazy
 import Data.OrderedMap hiding (fromList)
@@ -44,4 +45,5 @@ instance (ToJSON leaf, ToJSON recur) => ToJSON (Syntax leaf recur) where
   toJSON (Indexed c) = object [ "type" .= String "indexed", "children" .= Array (fromList $ toJSON <$> c) ]
   toJSON (Fixed c) = object [ "type" .= String "fixed", "children" .= Array (fromList $ toJSON <$> c) ]
   toJSON (Keyed c) = object [ "type" .= String "fixed", "children" .= object (uncurry (.=) <$> toList c) ]
-instance ToJSON leaf => ToJSON (Term leaf Info)
+instance ToJSON leaf => ToJSON (Term leaf Info) where
+  toJSON (Info range categories :< syntax) = object [ "range" .= toJSON range, "categories" .= toJSON categories, "syntax" .= toJSON syntax ]
