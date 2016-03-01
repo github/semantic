@@ -8,7 +8,7 @@ import Alignment
 import Category
 import Control.Comonad.Cofree
 import Control.Monad.Free
-import Data.Aeson hiding (json)
+import Data.Aeson.Types
 import Data.ByteString.Builder
 import Data.ByteString.Lazy
 import Data.Functor.Both
@@ -61,3 +61,6 @@ instance ToJSON (Term leaf Info) where
 
 termSeries :: ToJSON recur => Info -> Syntax leaf recur -> Series
 termSeries (Info range categories) syntax = "range" .= toJSON range <> "categories" .= toJSON categories <> "syntax" .= toJSON syntax
+
+termPairs :: ToJSON recur => Info -> Syntax leaf recur -> [Pair]
+termPairs (Info range categories) syntax = [ "range" .= toJSON range, "categories" .= toJSON categories, "syntax" .= toJSON syntax ]
