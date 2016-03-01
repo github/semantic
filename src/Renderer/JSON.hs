@@ -12,6 +12,7 @@ import Data.Aeson hiding (json)
 import Data.ByteString.Builder
 import Data.ByteString.Lazy
 import Data.Functor.Both
+import Data.Monoid
 import Data.OrderedMap hiding (fromList)
 import qualified Data.Text as T
 import Data.Vector hiding (toList)
@@ -27,7 +28,7 @@ import Term
 
 -- | Render a diff to a string representing its JSON.
 json :: Renderer a ByteString
-json diff sources = toLazyByteString . fromEncoding $ pairs ("rows" .= Prelude.fst (splitDiffByLines diff (pure 0) (source <$> sources)))
+json diff sources = toLazyByteString . fromEncoding $ pairs ("rows" .= Prelude.fst (splitDiffByLines diff (pure 0) (source <$> sources)) <> "oids" .= (oid <$> sources))
 
 instance ToJSON Category where
   toJSON (Other s) = String $ T.pack s
