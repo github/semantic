@@ -8,7 +8,7 @@ import Alignment
 import Category
 import Control.Comonad.Cofree
 import Control.Monad.Free
-import Data.Aeson.Types
+import Data.Aeson hiding (json)
 import Data.ByteString.Builder
 import Data.ByteString.Lazy
 import Data.Functor.Both
