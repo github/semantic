@@ -28,7 +28,7 @@ import Term
 
 -- | Render a diff to a string representing its JSON.
 json :: Renderer a ByteString
-json diff sources = toLazyByteString . fromEncoding $ pairs ("rows" .= Prelude.fst (splitDiffByLines diff (pure 0) (source <$> sources)) <> "oids" .= (oid <$> sources))
+json diff sources = toLazyByteString . fromEncoding $ pairs ("rows" .= Prelude.fst (splitDiffByLines diff (pure 0) (source <$> sources)) <> "oids" .= (oid <$> sources) <> "paths" .= (path <$> sources))
 
 instance ToJSON Category where
   toJSON (Other s) = String $ T.pack s
