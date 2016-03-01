@@ -1,9 +1,10 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Category where
 
-import Term
 import Control.Comonad.Cofree
 import Data.Set
+import GHC.Generics
+import Term
 
 -- | A standardized category of AST node. Used to determine the semantics for
 -- | semantic diffing and define comparability of nodes.
@@ -24,7 +25,7 @@ data Category =
   | SymbolLiteral
   -- | A non-standard category, which can be used for comparability.
   | Other String
-  deriving (Eq, Show, Ord)
+  deriving (Eq, Ord, Generic, Show)
 
 -- | The class of types that have categories.
 class Categorizable a where

@@ -1,8 +1,10 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Control.Comonad.Cofree where
 
+import GHC.Generics
+
 data Cofree functor annotation = annotation :< (functor (Cofree functor annotation))
-  deriving (Functor, Foldable, Traversable)
+  deriving (Functor, Foldable, Generic, Traversable)
 
 instance (Eq annotation, Eq (functor (Cofree functor annotation))) => Eq (Cofree functor annotation) where
   a :< f == b :< g = a == b && f == g

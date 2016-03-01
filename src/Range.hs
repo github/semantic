@@ -1,15 +1,16 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Range where
 
-import qualified Data.Text as T
 import Control.Applicative ((<|>))
 import qualified Data.Char as Char
 import Data.Maybe (fromMaybe)
 import Data.Option
+import qualified Data.Text as T
+import GHC.Generics
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: !Int, end :: !Int }
-  deriving (Eq, Show)
+  deriving (Eq, Show, Generic)
 
 -- | Return the length of the range.
 rangeLength :: Range -> Int

@@ -1,8 +1,10 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Control.Monad.Free where
 
+import GHC.Generics
+
 data Free functor pure = Free (functor (Free functor pure)) | Pure pure
-  deriving (Functor, Foldable, Traversable)
+  deriving (Functor, Foldable, Generic, Traversable)
 
 instance (Eq pure, Eq (functor (Free functor pure))) => Eq (Free functor pure) where
   Pure a == Pure b = a == b
