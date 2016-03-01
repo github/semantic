@@ -46,6 +46,9 @@ instance ToJSON recur => ToJSON (Syntax leaf recur) where
   toJSON (Indexed c) = object [ "type" .= String "indexed", "children" .= Array (fromList $ toJSON <$> c) ]
   toJSON (Fixed c) = object [ "type" .= String "fixed", "children" .= Array (fromList $ toJSON <$> c) ]
   toJSON (Keyed c) = object [ "type" .= String "fixed", "children" .= object (uncurry (.=) <$> toList c) ]
+instance ToJSON value => ToJSON (OrderedMap T.Text value) where
+  toJSON map = object $ uncurry (.=) <$> toList map
+  toEncoding map = pairs . mconcat $ uncurry (.=) <$> toList map
 instance ToJSON (Term leaf Info) where
   toJSON (info :< syntax) = object (termFields info syntax)
   toEncoding (info :< syntax) = pairs $ mconcat (termFields info syntax)
