@@ -36,6 +36,9 @@ instance ToJSON Range where
   toJSON (Range start end) = Array . fromList $ toJSON <$> [ start, end ]
 instance ToJSON a => ToJSON (Row a) where
   toJSON (Row (Both (left, right))) = Array . fromList $ toJSON . fromList . unLine <$> [ left, right ]
+instance ToJSON a => ToJSON (Line a) where
+  toJSON = Array . fromList . fmap toJSON . unLine
+  toEncoding = foldable . unLine
 instance ToJSON a => ToJSON (Both a) where
   toJSON (Both (a, b)) = Array . fromList $ toJSON <$> [ a, b ]
   toEncoding both = foldable both
