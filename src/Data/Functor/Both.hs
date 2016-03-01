@@ -11,6 +11,10 @@ newtype Both a = Both { runBoth :: (a, a) }
 both :: a -> a -> Both a
 both = curry Both
 
+-- | Apply a function to `Both` sides of a computation.
+runBothWith :: (a -> a -> b) -> Both a -> b
+runBothWith f = uncurry f . runBoth
+
 -- | Runs the left side of a `Both`.
 fst :: Both a -> a
 fst = Prelude.fst . runBoth
