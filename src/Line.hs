@@ -4,8 +4,6 @@ module Line where
 import qualified Data.Foldable as Foldable
 import Data.Monoid
 import qualified Data.Vector as Vector
-import Text.Blaze.Html5 hiding (map)
-import qualified Text.Blaze.Html5.Attributes as A
 
 -- | A line of items or an empty line.
 data Line a =
@@ -79,9 +77,3 @@ instance Monoid (Line a) where
   mappend EmptyLine line = line
   mappend line EmptyLine = line
   mappend (Line xs) (Line ys) = Line (xs <> ys)
-
-instance ToMarkup a => ToMarkup (Bool, Int, Line a) where
-  toMarkup (_, _, EmptyLine) = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell") <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell") <> string "\n"
-  toMarkup (hasChanges, num, Line contents)
-    = td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
-    <> td (mconcat . Vector.toList $ toMarkup <$> contents) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code") <> string "\n"

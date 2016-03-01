@@ -18,7 +18,7 @@ library
                      , Category
                      , Control.Comonad.Cofree
                      , Control.Monad.Free
-                     , Data.Bifunctor.Join
+                     , Data.Functor.Both
                      , Data.Option
                      , Data.OrderedMap
                      , Diff

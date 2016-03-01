@@ -1,12 +1,13 @@
 module Diff where
 
-import Syntax
-import Data.Set
-import Control.Monad.Free
-import Patch
-import Term
-import Range
 import Category
+import Control.Monad.Free
+import Data.Functor.Both
+import Data.Set
+import Patch
+import Range
+import Syntax
+import Term
 
 -- | An annotated syntax in a diff tree.
 data Annotated a annotation f = Annotated { getAnnotation :: !annotation, getSyntax :: !(Syntax a f) }
@@ -21,7 +22,7 @@ instance Categorizable Info where
   categories = Diff.categories
 
 -- | An annotated series of patches of terms.
-type Diff a annotation = Free (Annotated a (annotation, annotation)) (Patch (Term a annotation))
+type Diff a annotation = Free (Annotated a (Both annotation)) (Patch (Term a annotation))
 
 -- | Sum the result of a transform applied to all the patches in the diff.
 diffSum :: (Patch (Term a annotation) -> Integer) -> Diff a annotation -> Integer

@@ -1,7 +1,8 @@
 module DiffOutput where
 
-import qualified Data.Text.Lazy.IO as TextIO
 import qualified Data.ByteString.Lazy as B
+import qualified Data.Text.Lazy.IO as TextIO
+import Data.Functor.Both
 import Diffing
 import Parser
 import qualified Renderer.JSON as J
@@ -18,7 +19,7 @@ data Format = Split | Patch | JSON
 data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath, outputPath :: FilePath }
 
 -- | Return a renderer from the command-line arguments that will print the diff.
-printDiff :: Parser -> DiffArguments -> (SourceBlob, SourceBlob) -> IO ()
+printDiff :: Parser -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = case format arguments of
   Split -> put (output arguments) =<< diffFiles parser split sources
     where
