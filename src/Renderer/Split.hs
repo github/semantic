@@ -15,7 +15,6 @@ import Line
 import Prelude hiding (div, head, span, fst, snd)
 import qualified Prelude
 import Range
-import Row
 import Renderer
 import Source hiding ((++))
 import SplitDiff
@@ -65,7 +64,7 @@ split diff blobs = renderHtml
   where
     sources = Source.source <$> blobs
     rows = Prelude.fst (splitDiffByLines diff (pure 0) sources)
-    numbered = foldl' numberRows [] rows
+    numbered = numberedRows rows
     maxNumber = case numbered of
       [] -> 0
       (row : _) -> runBothWith max $ Prelude.fst <$> row
@@ -85,14 +84,6 @@ split diff blobs = renderHtml
     renderLine (number, line) source = toMarkup $ Renderable (or $ hasChanges <$> line, number, Renderable . (,) source <$> line)
 
     hasChanges diff = or $ const True <$> diff
-
-    -- | Add a row to list of tuples of ints and lines, where the ints denote
-    -- | how many non-empty lines exist on that side up to that point.
-    numberRows :: [Both (Int, Line a)] -> Row a -> [Both (Int, Line a)]
-    numberRows rows row = ((,) <$> ((+) <$> count rows <*> (valueOf <$> unRow row)) <*> unRow row) : rows
-      where count = maybe (pure 0) (fmap Prelude.fst) . maybeFirst
-            valueOf EmptyLine = 0
-            valueOf _ = 1
 
 -- | Something that can be rendered as markup.
 newtype Renderable a = Renderable a
