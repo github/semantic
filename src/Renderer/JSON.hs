@@ -64,3 +64,10 @@ termSeries info = mconcat . termFields info
 
 termFields :: (ToJSON recur, KeyValue kv) => Info -> Syntax leaf recur -> [kv]
 termFields (Info range categories) syntax = [ "range" .= toJSON range, "categories" .= toJSON categories, "syntax" .= toJSON syntax ]
+
+patchFields :: KeyValue kv => SplitPatch (Cofree (Syntax leaf) Info) -> [kv]
+patchFields patch = case patch of
+  SplitInsert term -> fields "insert" term
+  SplitDelete term -> fields "delete" term
+  SplitReplace term -> fields "replace" term
+  where fields kind (info :< syntax) = "patch" .= T.pack kind : termFields info syntax
