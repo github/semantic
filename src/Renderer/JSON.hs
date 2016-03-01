@@ -12,7 +12,6 @@ import Data.Aeson hiding (json)
 import Data.ByteString.Builder
 import Data.ByteString.Lazy
 import Data.Functor.Both
-import Data.Monoid
 import Data.OrderedMap hiding (fromList)
 import qualified Data.Text as T
 import Data.Vector hiding (toList)
@@ -39,13 +38,9 @@ instance ToJSON a => ToJSON (Row a) where
   toJSON (Row (Both (left, right))) = Array . fromList $ toJSON . fromList . unLine <$> [ left, right ]
 instance ToJSON (SplitDiff leaf Info) where
   toJSON (Free (Annotated info syntax)) = object (termFields info syntax)
-  toJSON (Pure patch) = toJSON patch
+  toJSON (Pure patch) = object (patchFields patch)
   toEncoding (Free (Annotated info syntax)) = pairs (termSeries info syntax)
-  toEncoding (Pure patch) = pairs . fields $ case patch of
-    SplitInsert a -> ("insert", a)
-    SplitDelete a -> ("delete", a)
-    SplitReplace a -> ("replace", a)
-    where fields (kind, (info :< syntax)) = termSeries info syntax <> "patch" .= T.pack kind
+  toEncoding (Pure patch) = pairs $ mconcat (patchFields patch)
 instance ToJSON a => ToJSON (SplitPatch a) where
   toJSON (SplitInsert a) = object [ "insert" .= toJSON a ]
   toJSON (SplitDelete a) = object [ "delete" .= toJSON a ]
