@@ -41,10 +41,6 @@ instance ToJSON (SplitDiff leaf Info) where
   toJSON (Pure patch) = object (patchFields patch)
   toEncoding (Free (Annotated info syntax)) = pairs $ mconcat (termFields info syntax)
   toEncoding (Pure patch) = pairs $ mconcat (patchFields patch)
-instance ToJSON a => ToJSON (SplitPatch a) where
-  toJSON (SplitInsert a) = object [ "insert" .= toJSON a ]
-  toJSON (SplitDelete a) = object [ "delete" .= toJSON a ]
-  toJSON (SplitReplace a) = object [ "replace" .= toJSON a ]
 instance (ToJSON recur) => ToJSON (Syntax leaf recur) where
   toJSON (Leaf _) = object [ "type" .= String "leaf" ]
   toJSON (Indexed c) = object [ "type" .= String "indexed", "children" .= Array (fromList $ toJSON <$> c) ]
