@@ -32,7 +32,7 @@ json diff sources = toLazyByteString . fromEncoding . pairs $
      "rows" .= annotateRows (Prelude.fst (splitDiffByLines diff (pure 0) (source <$> sources)))
   <> "oids" .= (oid <$> sources)
   <> "paths" .= (path <$> sources)
-  where annotateRows = fmap unRow
+  where annotateRows = fmap (fmap (fromList . unLine) . unRow)
 
 instance ToJSON Category where
   toJSON (Other s) = String $ T.pack s
