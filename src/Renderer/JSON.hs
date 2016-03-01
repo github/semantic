@@ -34,7 +34,10 @@ instance ToJSON a => ToJSON (Line a)
 instance ToJSON Range
 instance ToJSON a => ToJSON (Row a)
 instance ToJSON leaf => ToJSON (SplitDiff leaf Info)
-instance ToJSON a => ToJSON (SplitPatch a)
+instance ToJSON a => ToJSON (SplitPatch a) where
+  toJSON (SplitInsert a) = object [ "insert" .= toJSON a ]
+  toJSON (SplitDelete a) = object [ "delete" .= toJSON a ]
+  toJSON (SplitReplace a) = object [ "replace" .= toJSON a ]
 instance (ToJSON leaf, ToJSON recur) => ToJSON (Syntax leaf recur) where
   toJSON (Leaf _) = object [ "type" .= String "leaf" ]
   toJSON (Indexed c) = object [ "type" .= String "indexed", "children" .= Array (fromList $ toJSON <$> c) ]
