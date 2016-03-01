@@ -42,14 +42,14 @@ library
                      , Syntax
                      , Term
                      , TreeSitter
-  build-depends:       base >= 4.8 && < 5
+  build-depends:       aeson
+                     , base >= 4.8 && < 5
                      , blaze-html
                      , blaze-markup
                      , bytestring
                      , containers
                      , directory
                      , filepath
-                     , json
                      , mtl
                      , text >= 1.2.1.3
                      , text-icu

@@ -1,15 +1,16 @@
 module DiffOutput where
 
+import qualified Data.Text.Lazy.IO as TextIO
+import qualified Data.ByteString.Lazy as B
 import Diffing
 import Parser
+import qualified Renderer.JSON as J
+import qualified Renderer.Patch as P
+import Renderer.Split
 import Source
 import System.Directory
 import System.FilePath
 import qualified System.IO as IO
-import qualified Data.Text.Lazy.IO as TextIO
-import qualified Renderer.JSON as J
-import qualified Renderer.Patch as P
-import Renderer.Split
 
 -- | The available types of diff rendering.
 data Format = Split | Patch | JSON
@@ -29,4 +30,4 @@ printDiff parser arguments sources = case format arguments of
                          else path
         IO.withFile outputPath IO.WriteMode (`TextIO.hPutStr` rendered)
   Patch -> putStr =<< diffFiles parser P.patch sources
-  JSON -> putStr =<< diffFiles parser J.json sources
+  JSON -> B.putStr =<< diffFiles parser J.json sources

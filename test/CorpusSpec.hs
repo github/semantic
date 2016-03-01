@@ -9,7 +9,7 @@ import qualified Renderer.Split as Split
 import qualified Source as S
 import Control.DeepSeq
 import Data.Bifunctor.Join
-import qualified Data.ByteString.Char8 as B1
+import qualified Data.ByteString.Lazy.Char8 as B
 import Data.List as List
 import Data.Map as Map
 import Data.Maybe
@@ -38,13 +38,15 @@ spec = parallel $ do
       let tests = correctTests =<< paths
       mapM_ (\ (formatName, renderer, a, b, output) -> it (normalizeName a ++ " (" ++ formatName ++ ")") $ testDiff renderer a b output matcher) tests
 
-    correctTests :: (FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, FilePath, FilePath, Maybe FilePath)]
+    correctTests :: (FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer T.Text String, FilePath, FilePath, Maybe FilePath)]
     correctTests paths@(_, _, Nothing, Nothing, Nothing) = testsForPaths paths
     correctTests paths = List.filter (\(_, _, _, _, output) -> isJust output) $ testsForPaths paths
-    testsForPaths :: (FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, FilePath, FilePath, Maybe FilePath)]
-    testsForPaths (a, b, json, patch, split) = [ ("json", J.json, a, b, json), ("patch", P.patch, a, b, patch), ("split", testSplit, a, b, split) ]
-    testSplit :: Renderer a String
+    testsForPaths :: (FilePath, FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer T.Text String, FilePath, FilePath, Maybe FilePath)]
+    testsForPaths (a, b, json, patch, split) = [ ("json", testJSON, a, b, json), ("patch", P.patch, a, b, patch), ("split", testSplit, a, b, split) ]
+    testSplit :: Renderer T.Text String
     testSplit diff sources = TL.unpack $ Split.split diff sources
+    testJSON :: Renderer T.Text String
+    testJSON diff sources = B.unpack $ J.json diff sources
 
 
 -- | Return all the examples from the given directory. Examples are expected to
