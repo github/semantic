@@ -2,12 +2,12 @@
 module Renderer.Split where
 
 import Alignment
-import Prelude hiding (div, head, span)
 import Category
 import Diff
 import Line
+import Prelude hiding (div, head, span, fst, snd)
+import qualified Prelude
 import Row
-import Patch
 import Renderer
 import Term
 import SplitDiff
@@ -22,12 +22,9 @@ import qualified Text.Blaze.Html5.Attributes as A
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import Text.Blaze.Html.Renderer.Text
-import Data.Either
+import Data.Functor.Both
 import Data.Foldable
-import Data.Functor.Identity
 import Data.Monoid
-import qualified Data.OrderedMap as Map
-import qualified Data.Set as Set
 import Source hiding ((++))
 
 type ClassName = T.Text
@@ -58,7 +55,7 @@ splitPatchToClassName patch = stringValue $ "patch " ++ case patch of
 
 -- | Render a diff as an HTML split diff.
 split :: Renderer leaf TL.Text
-split diff (beforeBlob, afterBlob) = renderHtml
+split diff blobs = renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body
@@ -66,13 +63,12 @@ split diff (beforeBlob, afterBlob) = renderHtml
         ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
         . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
-    before = Source.source beforeBlob
-    after = Source.source afterBlob
-    rows = fst (splitDiffByLines diff (0, 0) (before, after))
+    sources = Source.source <$> blobs
+    rows = Prelude.fst (splitDiffByLines diff (pure 0) sources)
     numbered = foldl' numberRows [] rows
     maxNumber = case numbered of
       [] -> 0
-      ((x, _, y, _) : _) -> max x y
+      (row : _) -> runBothWith max $ Prelude.fst <$> row
 
     -- | The number of digits in a number (e.g. 342 has 3 digits).
     digits :: Int -> Int
@@ -82,30 +78,27 @@ split diff (beforeBlob, afterBlob) = renderHtml
     columnWidth = max (20 + digits maxNumber * 8) 40
 
     -- | Render a line with numbers as an HTML row.
-    numberedLinesToMarkup :: (Int, Line (SplitDiff a Info), Int, Line (SplitDiff a Info)) -> Markup
-    numberedLinesToMarkup (m, left, n, right) = tr $ toMarkup (or $ hasChanges <$> left, m, renderable before left) <> toMarkup (or $ hasChanges <$> right, n, renderable after right) <> string "\n"
+    numberedLinesToMarkup :: Both (Int, Line (SplitDiff a Info)) -> Markup
+    numberedLinesToMarkup numberedLines = tr $ (runBothWith (<>) (renderLine <$> numberedLines <*> sources)) <> string "\n"
 
-    renderable source = fmap (Renderable . (,) source)
+    renderLine :: (Int, Line (SplitDiff leaf Info)) -> Source Char -> Markup
+    renderLine (number, line) source = toMarkup $ Renderable (or $ hasChanges <$> line, number, Renderable . (,) source <$> line)
 
     hasChanges diff = or $ const True <$> diff
 
     -- | Add a row to list of tuples of ints and lines, where the ints denote
     -- | how many non-empty lines exist on that side up to that point.
-    numberRows :: [(Int, Line a, Int, Line a)] -> Row a -> [(Int, Line a, Int, Line a)]
-    numberRows rows (Row left right) = (leftCount rows + valueOf left, left, rightCount rows + valueOf right, right) : rows
-      where
-        leftCount [] = 0
-        leftCount ((x, _, _, _):_) = x
-        rightCount [] = 0
-        rightCount ((_, _, x, _):_) = x
-        valueOf EmptyLine = 0
-        valueOf _ = 1
+    numberRows :: [Both (Int, Line a)] -> Row a -> [Both (Int, Line a)]
+    numberRows rows row = ((,) <$> ((+) <$> count rows <*> (valueOf <$> unRow row)) <*> unRow row) : rows
+      where count = maybe (pure 0) (fmap Prelude.fst) . maybeFirst
+            valueOf EmptyLine = 0
+            valueOf _ = 1
 
 -- | Something that can be rendered as markup.
-newtype Renderable a = Renderable (Source Char, a)
+newtype Renderable a = Renderable a
 
-instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
-  toMarkup (Renderable (source, (Info range categories, syntax))) = classifyMarkup categories $ case syntax of
+instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Range))) where
+  toMarkup (Renderable (source, Info range categories, syntax)) = classifyMarkup categories $ case syntax of
     Leaf _ -> span . string . toString $ slice range source
     Indexed children -> ul . mconcat $ wrapIn li <$> contentElements children
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements children
@@ -122,11 +115,18 @@ instance ToMarkup f => ToMarkup (Renderable (Info, Syntax a (f, Range))) where
           contentElements children = let (elements, previous) = foldl' markupForSeparatorAndChild ([], start range) children in
             elements ++ [ string . toString $ slice (Range previous $ end range) source ]
 
-instance ToMarkup (Renderable (Term a Info)) where
-  toMarkup (Renderable (source, term)) = fst $ cata (\ info@(Info range _) syntax -> (toMarkup $ Renderable (source, (info, syntax)), range)) term
+instance ToMarkup (Renderable (Source Char, Term a Info)) where
+  toMarkup (Renderable (source, term)) = Prelude.fst $ cata (\ info@(Info range _) syntax -> (toMarkup $ Renderable (source, info, syntax), range)) term
 
-instance ToMarkup (Renderable (SplitDiff a Info)) where
-  toMarkup (Renderable (source, diff)) = fst $ iter (\ (Annotated info@(Info range _) syntax) -> (toMarkup $ Renderable (source, (info, syntax)), range)) $ toMarkupAndRange <$> diff
+instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
+  toMarkup (Renderable (source, diff)) = Prelude.fst $ iter (\ (Annotated info@(Info range _) syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) $ toMarkupAndRange <$> diff
     where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
           toMarkupAndRange patch = let term@(Info range _ :< _) = getSplitTerm patch in
             ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue . show $ termSize term)) . toMarkup $ Renderable (source, term), range)
+
+
+instance ToMarkup a => ToMarkup (Renderable (Bool, Int, Line a)) where
+  toMarkup (Renderable (_, _, EmptyLine)) = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell") <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell") <> string "\n"
+  toMarkup (Renderable (hasChanges, num, line))
+    = td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
+    <> td (mconcat $ toMarkup <$> unLine line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code") <> string "\n"
