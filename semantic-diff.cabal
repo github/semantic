@@ -79,7 +79,10 @@ test-suite semantic-diff-test
                      , quickcheck-text
                      , semantic-diff
                      , text >= 1.2.1.3
-  ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j
+  if os(darwin)
+    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j
+  else
+    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -pgml=script/g++
   default-language:    Haskell2010
   default-extensions:  DeriveGeneric, OverloadedStrings
   if os(darwin)
