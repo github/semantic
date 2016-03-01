@@ -29,7 +29,7 @@ zip = zipWith both
 -- | Zip two lists by applying a function, using the default values to extend
 -- | the shorter list.
 zipWithDefaults :: (a -> a -> b) -> Both a -> Both [a] -> [b]
-zipWithDefaults f ds as = take (uncurry max $ runBoth (length <$> as)) $ zipWith f ((++) <$> as <*> (repeat <$> ds))
+zipWithDefaults f ds as = take (runBothWith max (length <$> as)) $ zipWith f ((++) <$> as <*> (repeat <$> ds))
 
 zipWith :: (a -> a -> b) -> Both [a] -> [b]
 zipWith _ (Both ([], _)) = []

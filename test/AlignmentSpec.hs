@@ -58,7 +58,7 @@ spec = parallel $ do
 
     prop "produces the maximum line count in inequal sources" $
       \ sources ->
-        length (splitAnnotatedByLines sources (getTotalRange <$> sources) (pure mempty) (Indexed $ leafWithRangesInSources sources <$> Both.zip (actualLineRanges <$> (getTotalRange <$> sources) <*> sources))) `shouldBe` uncurry max (runBoth ((+ 1) . length . filter (== '\n') . toList <$> sources))
+        length (splitAnnotatedByLines sources (getTotalRange <$> sources) (pure mempty) (Indexed $ leafWithRangesInSources sources <$> Both.zip (actualLineRanges <$> (getTotalRange <$> sources) <*> sources))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toList <$> sources)
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $

@@ -68,7 +68,7 @@ split diff blobs = renderHtml
     numbered = foldl' numberRows [] rows
     maxNumber = case numbered of
       [] -> 0
-      (row : _) -> uncurry max . runBoth $ Prelude.fst <$> row
+      (row : _) -> runBothWith max $ Prelude.fst <$> row
 
     -- | The number of digits in a number (e.g. 342 has 3 digits).
     digits :: Int -> Int
@@ -79,7 +79,7 @@ split diff blobs = renderHtml
 
     -- | Render a line with numbers as an HTML row.
     numberedLinesToMarkup :: Both (Int, Line (SplitDiff a Info)) -> Markup
-    numberedLinesToMarkup numberedLines = tr $ uncurry (<>) (runBoth (renderLine <$> numberedLines <*> sources)) <> string "\n"
+    numberedLinesToMarkup numberedLines = tr $ (runBothWith (<>) (renderLine <$> numberedLines <*> sources)) <> string "\n"
 
     renderLine :: (Int, Line (SplitDiff leaf Info)) -> Source Char -> Markup
     renderLine (number, line) source = toMarkup $ Renderable (or $ hasChanges <$> line, number, Renderable . (,) source <$> line)
