@@ -31,7 +31,8 @@ instance ToJSON Category where
   toJSON s = String . T.pack $ show s
 instance ToJSON Info
 instance ToJSON a => ToJSON (Line a)
-instance ToJSON Range
+instance ToJSON Range where
+  toJSON (Range start end) = Array (fromList [ toJSON start, toJSON end ])
 instance ToJSON a => ToJSON (Row a)
 instance ToJSON leaf => ToJSON (SplitDiff leaf Info)
 instance ToJSON a => ToJSON (SplitPatch a) where
