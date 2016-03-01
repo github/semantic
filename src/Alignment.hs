@@ -11,6 +11,8 @@ import qualified Data.Set as Set
 import Diff
 import Line
 import Patch
+import Prelude hiding (fst, snd)
+import qualified Prelude
 import Range
 import Row
 import Source hiding ((++))
@@ -22,10 +24,10 @@ import Term
 splitDiffByLines :: Diff leaf Info -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
 splitDiffByLines diff previous sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
-  Pure (Insert term) -> let (lines, range) = splitTermByLines term (runRight sources) in
-    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (rangeAt $ runLeft previous, range))
-  Pure (Delete term) -> let (lines, range) = splitTermByLines term (runLeft sources) in
-    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, rangeAt $ runRight previous))
+  Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
+    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (rangeAt $ fst previous, range))
+  Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst sources) in
+    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, rangeAt $ snd previous))
   Pure (Replace leftTerm rightTerm) -> let Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
                                            (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange)) in
                                            (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
@@ -40,7 +42,7 @@ instance Has Identity where
   get = runIdentity
 
 instance Has ((,) a) where
-  get = snd
+  get = Prelude.snd
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term leaf Info -> Source Char -> ([Line (Term leaf Info)], Range)

@@ -2,10 +2,11 @@
 module Renderer.Split where
 
 import Alignment
-import Prelude hiding (div, head, span)
 import Category
 import Diff
 import Line
+import Prelude hiding (div, head, span, fst, snd)
+import qualified Prelude
 import Row
 import Renderer
 import Term
@@ -63,11 +64,11 @@ split diff blobs = renderHtml
         . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
     sources = Source.source <$> blobs
-    rows = fst (splitDiffByLines diff (pure 0) sources)
+    rows = Prelude.fst (splitDiffByLines diff (pure 0) sources)
     numbered = foldl' numberRows [] rows
     maxNumber = case numbered of
       [] -> 0
-      (row : _) -> uncurry max . runBoth $ fst <$> row
+      (row : _) -> uncurry max . runBoth $ Prelude.fst <$> row
 
     -- | The number of digits in a number (e.g. 342 has 3 digits).
     digits :: Int -> Int
@@ -89,7 +90,7 @@ split diff blobs = renderHtml
     -- | how many non-empty lines exist on that side up to that point.
     numberRows :: [Both (Int, Line a)] -> Row a -> [Both (Int, Line a)]
     numberRows rows row = ((,) <$> ((+) <$> count rows <*> (valueOf <$> unRow row)) <*> unRow row) : rows
-      where count = maybe (pure 0) (fmap fst) . maybeFirst
+      where count = maybe (pure 0) (fmap Prelude.fst) . maybeFirst
             valueOf EmptyLine = 0
             valueOf _ = 1
 
@@ -115,10 +116,10 @@ instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Ran
             elements ++ [ string . toString $ slice (Range previous $ end range) source ]
 
 instance ToMarkup (Renderable (Source Char, Term a Info)) where
-  toMarkup (Renderable (source, term)) = fst $ cata (\ info@(Info range _) syntax -> (toMarkup $ Renderable (source, info, syntax), range)) term
+  toMarkup (Renderable (source, term)) = Prelude.fst $ cata (\ info@(Info range _) syntax -> (toMarkup $ Renderable (source, info, syntax), range)) term
 
 instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
-  toMarkup (Renderable (source, diff)) = fst $ iter (\ (Annotated info@(Info range _) syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) $ toMarkupAndRange <$> diff
+  toMarkup (Renderable (source, diff)) = Prelude.fst $ iter (\ (Annotated info@(Info range _) syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) $ toMarkupAndRange <$> diff
     where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
           toMarkupAndRange patch = let term@(Info range _ :< _) = getSplitTerm patch in
             ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue . show $ termSize term)) . toMarkup $ Renderable (source, term), range)

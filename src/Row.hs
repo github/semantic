@@ -3,6 +3,7 @@ module Row where
 import Control.Arrow
 import Data.Functor.Both as Both
 import Line
+import Prelude hiding (fst, snd)
 
 -- | A row in a split diff, composed of a before line and an after line.
 newtype Row a = Row { unRow :: Both (Line a) }
@@ -12,10 +13,10 @@ makeRow :: Line a -> Line a -> Row a
 makeRow a = Row . both a
 
 unLeft :: Row a -> Line a
-unLeft = runLeft . unRow
+unLeft = fst . unRow
 
 unRight :: Row a -> Line a
-unRight = runRight . unRow
+unRight = snd . unRow
 
 -- | Map over both sides of a row with the given functions.
 wrapRowContents :: Both ([a] -> b) -> Row a -> Row b

@@ -1,6 +1,7 @@
 module Data.Functor.Both where
 
-import Prelude hiding (zipWith)
+import Prelude hiding (zipWith, fst, snd)
+import qualified Prelude
 
 -- | A computation over both sides of a pair.
 newtype Both a = Both { runBoth :: (a, a) }
@@ -11,12 +12,12 @@ both :: a -> a -> Both a
 both = curry Both
 
 -- | Runs the left side of a `Both`.
-runLeft :: Both a -> a
-runLeft = fst . runBoth
+fst :: Both a -> a
+fst = Prelude.fst . runBoth
 
 -- | Runs the right side of a `Both`.
-runRight :: Both a -> a
-runRight = snd . runBoth
+snd :: Both a -> a
+snd = Prelude.snd . runBoth
 
 zip :: Both [a] -> [Both a]
 zip = zipWith both

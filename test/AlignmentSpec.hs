@@ -6,18 +6,20 @@ import Test.QuickCheck hiding (Fixed)
 import Data.Text.Arbitrary ()
 
 import Alignment
+import ArbitraryTerm ()
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
 import Data.Functor.Both as Both
 import Diff
 import qualified Data.Maybe as Maybe
 import Data.Functor.Identity
-import Source hiding ((++))
 import Line
+import Prelude hiding (fst, snd)
+import qualified Prelude
 import Row
 import Range
+import Source hiding ((++))
 import Syntax
-import ArbitraryTerm ()
 
 instance Arbitrary a => Arbitrary (Both a) where
   arbitrary = pure (curry Both) <*> arbitrary <*> arbitrary
@@ -52,7 +54,7 @@ spec = parallel $ do
 
     prop "preserves line counts in equal sources" $
       \ source ->
-        length (splitAnnotatedByLines (pure source) (pure (getTotalRange source)) (pure mempty) (Indexed . fst $ foldl combineIntoLeaves ([], 0) source)) `shouldBe` length (filter (== '\n') $ toList source) + 1
+        length (splitAnnotatedByLines (pure source) (pure (getTotalRange source)) (pure mempty) (Indexed . Prelude.fst $ foldl combineIntoLeaves ([], 0) source)) `shouldBe` length (filter (== '\n') $ toList source) + 1
 
     prop "produces the maximum line count in inequal sources" $
       \ sources ->
@@ -113,7 +115,7 @@ spec = parallel $ do
 
       combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info <$> (pure (Range start $ start + 1)) <*> mempty) (Leaf [ char ]) ], start + 1)
 
-      leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty) (Leaf $ toList (runLeft sources) ++ toList (runRight sources))
+      leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty) (Leaf $ toList (fst sources) ++ toList (snd sources))
 
       openMaybe :: Maybe Bool -> Maybe (Maybe Bool)
       openMaybe (Just a) = Just (Just a)

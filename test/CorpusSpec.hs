@@ -5,7 +5,6 @@ import Renderer
 import qualified Renderer.Patch as P
 import qualified Renderer.Split as Split
 
-import qualified Source as S
 import Control.DeepSeq
 import Data.Functor.Both
 import qualified Data.ByteString.Char8 as B1
@@ -15,6 +14,9 @@ import Data.Maybe
 import Data.Set as Set
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
+import Prelude hiding (fst, snd)
+import qualified Prelude
+import qualified Source as S
 import System.FilePath
 import System.FilePath.Glob
 import Test.Hspec
@@ -35,7 +37,7 @@ spec = parallel $ do
     runTestsIn directory matcher = do
       paths <- runIO $ examples directory
       let tests = correctTests =<< paths
-      mapM_ (\ (formatName, renderer, paths, output) -> it (normalizeName (fst $ runBoth paths) ++ " (" ++ formatName ++ ")") $ testDiff renderer paths output matcher) tests
+      mapM_ (\ (formatName, renderer, paths, output) -> it (normalizeName (fst paths) ++ " (" ++ formatName ++ ")") $ testDiff renderer paths output matcher) tests
 
     correctTests :: (Both FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, Both FilePath, Maybe FilePath)]
     correctTests paths@(_, Nothing, Nothing) = testsForPaths paths
@@ -72,7 +74,7 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | is true, but the diff will still be calculated.
 testDiff :: Renderer T.Text String -> Both FilePath -> Maybe FilePath -> (String -> String -> Expectation) -> Expectation
 testDiff renderer paths diff matcher = do
-  let parser = parserForFilepath (fst $ runBoth paths)
+  let parser = parserForFilepath (fst paths)
   sources <- sequence $ readAndTranscodeFile <$> paths
   let sourceBlobs = Both (S.SourceBlob, S.SourceBlob) <*> sources <*> pure mempty <*> paths
   actual <- diffFiles parser renderer sourceBlobs

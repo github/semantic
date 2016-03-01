@@ -6,6 +6,8 @@ module Renderer.Patch (
 import Alignment
 import Diff
 import Line
+import Prelude hiding (fst, snd)
+import qualified Prelude
 import Range
 import Renderer
 import Row
@@ -48,12 +50,12 @@ lineLength _ = 1
 
 -- | Given the before and after sources, render a hunk to a string.
 showHunk :: Both SourceBlob -> Hunk (SplitDiff a Info) -> String
-showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd $ runBoth sources) ' ' (unRight <$> trailingContext hunk)
+showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (unRight <$> trailingContext hunk)
   where sources = source <$> blobs
 
 -- | Given the before and after sources, render a change to a string.
 showChange :: Both (Source Char) -> Change (SplitDiff a Info) -> String
-showChange sources change = showLines (snd $ runBoth sources) ' ' (unRight <$> context change) ++ deleted ++ inserted
+showChange sources change = showLines (snd sources) ' ' (unRight <$> context change) ++ deleted ++ inserted
   where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> Both ('-', '+') <*> (pure fmap <*> Both (unLeft, unRight) <*> pure (contents change))
 
 -- | Given a source, render a set of lines to a string with a prefix.
@@ -84,7 +86,7 @@ header blobs hunk = "diff --git a/" ++ pathA ++ " b/" ++ pathB ++ "\n" ++
 
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
-hunks diff blobs = hunksInRows (Both (1, 1)) . fst $ splitDiffByLines diff (pure 0) (source <$> blobs)
+hunks diff blobs = hunksInRows (Both (1, 1)) . Prelude.fst $ splitDiffByLines diff (pure 0) (source <$> blobs)
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
