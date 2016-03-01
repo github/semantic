@@ -1,6 +1,7 @@
 module Renderer.Patch (
   patch,
-  hunks
+  hunks,
+  Hunk(..)
 ) where
 
 import Alignment
@@ -88,13 +89,14 @@ header blobs hunk = filepathHeader ++ blobOidHeader ++ maybeOffsetHeader
 
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
+hunks diff blobs | (Both (True, True) ==) $ Source.null . source <$> blobs = [Hunk { offset = Both (0, 0), changes = [], trailingContext = [] }]
 hunks diff blobs = hunksInRows (Both (1, 1)) . Prelude.fst $ splitDiffByLines diff (pure 0) (source <$> blobs)
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
 hunksInRows :: Both (Sum Int) -> [Row (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]
 hunksInRows start rows = case nextHunk start rows of
-  Nothing -> [Hunk { offset = Both (0, 0), changes = [], trailingContext = [] }]
+  Nothing -> []
   Just (hunk, rest) -> hunk : hunksInRows (offset hunk <> hunkLength hunk) rest
 
 -- | Given beginning line numbers, return the next hunk and the remaining rows
