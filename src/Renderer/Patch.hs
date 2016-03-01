@@ -76,13 +76,15 @@ getRange (Pure patch) = let Info range _ :< _ = getSplitTerm patch in range
 
 -- | Returns the header given two source blobs and a hunk.
 header :: Both SourceBlob -> Hunk a -> String
-header blobs hunk = "diff --git a/" ++ pathA ++ " b/" ++ pathB ++ "\n" ++
-  "index " ++ oidA ++ ".." ++ oidB ++ "\n" ++
-  "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
-  where (lengthA, lengthB) = runBoth . fmap getSum $ hunkLength hunk
-        (offsetA, offsetB) = runBoth . fmap getSum $ offset hunk
-        (pathA, pathB) = runBoth $ path <$> blobs
-        (oidA, oidB) = runBoth $ oid <$> blobs
+header blobs hunk = filepathHeader ++ blobOidHeader ++ maybeOffsetHeader
+   where filepathHeader = "diff --git a/" ++ pathA ++ " b/" ++ pathB ++ "\n"
+         blobOidHeader = "index " ++ oidA ++ ".." ++ oidB ++ "\n"
+         maybeOffsetHeader = if lengthA > 0 && lengthB > 0 then offsetHeader else mempty
+         offsetHeader = "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
+         (lengthA, lengthB) = runBoth . fmap getSum $ hunkLength hunk
+         (offsetA, offsetB) = runBoth . fmap getSum $ offset hunk
+         (pathA, pathB) = runBoth $ path <$> blobs
+         (oidA, oidB) = runBoth $ oid <$> blobs
 
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
