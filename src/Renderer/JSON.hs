@@ -38,7 +38,7 @@ instance ToJSON Range where
 instance ToJSON a => ToJSON (Row a) where
   toJSON (Row (Both (left, right))) = Array . fromList $ toJSON . fromList . unLine <$> [ left, right ]
 instance ToJSON (SplitDiff leaf Info) where
-  toJSON (Free (Annotated (Info range categories) syntax)) = object [ "range" .= toJSON range, "categories" .= toJSON categories, "syntax" .= toJSON syntax ]
+  toJSON (Free (Annotated info syntax)) = object (termFields info syntax)
   toJSON (Pure patch) = toJSON patch
   toEncoding (Free (Annotated info syntax)) = pairs (termSeries info syntax)
   toEncoding (Pure patch) = pairs . series $ case patch of
