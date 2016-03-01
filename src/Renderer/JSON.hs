@@ -64,3 +64,6 @@ termSeries (Info range categories) syntax = "range" .= toJSON range <> "categori
 
 termPairs :: ToJSON recur => Info -> Syntax leaf recur -> [Pair]
 termPairs (Info range categories) syntax = [ "range" .= toJSON range, "categories" .= toJSON categories, "syntax" .= toJSON syntax ]
+
+termFields :: (ToJSON recur, KeyValue kv) => Info -> Syntax leaf recur -> [kv]
+termFields (Info range categories) syntax = [ "range" .= toJSON range, "categories" .= toJSON categories, "syntax" .= toJSON syntax ]
