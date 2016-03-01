@@ -94,7 +94,7 @@ hunks diff blobs = hunksInRows (Both (1, 1)) . Prelude.fst $ splitDiffByLines di
 -- | patch.
 hunksInRows :: Both (Sum Int) -> [Row (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]
 hunksInRows start rows = case nextHunk start rows of
-  Nothing -> []
+  Nothing -> [Hunk { offset = Both (0, 0), changes = [], trailingContext = [] }]
   Just (hunk, rest) -> hunk : hunksInRows (offset hunk <> hunkLength hunk) rest
 
 -- | Given beginning line numbers, return the next hunk and the remaining rows
