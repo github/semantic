@@ -41,11 +41,6 @@ instance ToJSON (SplitDiff leaf Info) where
   toJSON (Pure patch) = object (patchFields patch)
   toEncoding (Free (Annotated info syntax)) = pairs $ mconcat (termFields info syntax)
   toEncoding (Pure patch) = pairs $ mconcat (patchFields patch)
-instance ToJSON recur => ToJSON (Syntax leaf recur) where
-  toJSON (Leaf _) = object [ "type" .= String "leaf" ]
-  toJSON (Indexed c) = object [ "type" .= String "indexed", "children" .= Array (fromList $ toJSON <$> c) ]
-  toJSON (Fixed c) = object [ "type" .= String "fixed", "children" .= Array (fromList $ toJSON <$> c) ]
-  toJSON (Keyed c) = object [ "type" .= String "fixed", "children" .= c ]
 instance ToJSON value => ToJSON (OrderedMap T.Text value) where
   toJSON map = object $ uncurry (.=) <$> toList map
   toEncoding map = pairs . mconcat $ uncurry (.=) <$> toList map
