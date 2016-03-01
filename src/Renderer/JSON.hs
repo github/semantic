@@ -40,6 +40,8 @@ instance ToJSON a => ToJSON (Row a) where
 instance ToJSON (SplitDiff leaf Info) where
   toJSON (Free (Annotated (Info range categories) syntax)) = object [ "range" .= toJSON range, "categories" .= toJSON categories, "syntax" .= toJSON syntax ]
   toJSON (Pure patch) = toJSON patch
+  toEncoding (Free (Annotated info syntax)) = pairs (termSeries info syntax)
+  toEncoding (Pure patch) = toEncoding patch
 instance ToJSON a => ToJSON (SplitPatch a) where
   toJSON (SplitInsert a) = object [ "insert" .= toJSON a ]
   toJSON (SplitDelete a) = object [ "delete" .= toJSON a ]
