@@ -112,6 +112,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         childRows (rows, previous) child = let (childRows, childRanges) = splitDiffByLines (get child) previous sources in
           (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (start <$> childRanges)) sources) ++ (fmap (Right . (<$ child)) <$> childRows), end <$> childRanges)
 
+        makeRanges :: Both Int -> Both Int -> Both Range
         makeRanges (Both (leftStart, rightStart)) (Both (leftEnd, rightEnd)) = Both (Range leftStart leftEnd, Range rightStart rightEnd)
 
 -- | Produces the starting indices of a diff.
