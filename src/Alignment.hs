@@ -37,7 +37,7 @@ hasChanges = or . fmap (or . (True <$))
 -- | Split a diff, which may span multiple lines, into rows of split diffs.
 splitDiffByLines :: Diff leaf Info -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
 splitDiffByLines diff previous sources = case diff of
-  Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
+  Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (Diff.categories <$> annotation) syntax, ranges annotation)
   Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
     (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (rangeAt $ fst previous, range))
   Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst sources) in
