@@ -52,7 +52,7 @@ splitPatchByLines patch previous sources = case patch of
   Replace leftTerm rightTerm -> (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
     where (lines, ranges) = unpackLinesAndRanges $ splitTermByLines <$> both leftTerm rightTerm <*> sources
           unpackLinesAndRanges :: Both ([Line (Term leaf Info)], Range) -> (Both [Line (Term leaf Info)], Both Range)
-          unpackLinesAndRanges = uncurry (uncurry bimap) . first (bimap both both) . runBoth
+          unpackLinesAndRanges = runBothWith (uncurry bimap . bimap both both)
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term leaf Info -> Source Char -> ([Line (Term leaf Info)], Range)
