@@ -35,7 +35,7 @@ json diff sources = toLazyByteString . fromEncoding . pairs $
 
 newtype NumberedLine a = NumberedLine (Int, Line a)
 
-instance ToJSON a => ToJSON (NumberedLine a) where
+instance ToJSON (NumberedLine (SplitDiff leaf Info)) where
   toJSON (NumberedLine (n, a)) = object (lineFields n a)
   toEncoding (NumberedLine (n, a)) = pairs $ mconcat (lineFields n a)
 instance ToJSON Category where
@@ -59,8 +59,8 @@ instance ToJSON (Term leaf Info) where
   toJSON (info :< syntax) = object (termFields info syntax)
   toEncoding (info :< syntax) = pairs $ mconcat (termFields info syntax)
 
-lineFields :: (ToJSON a, KeyValue kv) => Int -> Line a -> [kv]
-lineFields n line = [ "number" .= n, "terms" .= unLine line ]
+lineFields :: KeyValue kv => Int -> Line (SplitDiff leaf Info) -> [kv]
+lineFields n line = [ "number" .= n, "terms" .= unLine line, "hasChanges" .= Prelude.or (Prelude.or . (True <$) <$> line) ]
 
 termFields :: (ToJSON recur, KeyValue kv) => Info -> Syntax leaf recur -> [kv]
 termFields (Info range categories) syntax = "range" .= range : "categories" .= categories : case syntax of
