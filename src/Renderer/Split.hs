@@ -3,29 +3,28 @@ module Renderer.Split where
 
 import Alignment
 import Category
+import Control.Comonad.Cofree
+import Control.Monad.Free
+import Data.Foldable
+import Data.Functor.Both
+import Data.Monoid
+import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
 import Diff
 import Line
 import Prelude hiding (div, head, span, fst, snd)
 import qualified Prelude
-import Row
+import Range
 import Renderer
-import Term
+import Source hiding ((++))
 import SplitDiff
 import Syntax
-import Control.Comonad.Cofree
-import Range
-import Control.Monad.Free
+import Term
 import Text.Blaze.Html
-import Text.Blaze.Html5 hiding (map)
-import qualified Text.Blaze.Internal as Blaze
-import qualified Text.Blaze.Html5.Attributes as A
-import qualified Data.Text as T
-import qualified Data.Text.Lazy as TL
 import Text.Blaze.Html.Renderer.Text
-import Data.Functor.Both
-import Data.Foldable
-import Data.Monoid
-import Source hiding ((++))
+import Text.Blaze.Html5 hiding (map)
+import qualified Text.Blaze.Html5.Attributes as A
+import qualified Text.Blaze.Internal as Blaze
 
 type ClassName = T.Text
 
@@ -65,7 +64,7 @@ split diff blobs = renderHtml
   where
     sources = Source.source <$> blobs
     rows = Prelude.fst (splitDiffByLines diff (pure 0) sources)
-    numbered = foldl' numberRows [] rows
+    numbered = numberedRows rows
     maxNumber = case numbered of
       [] -> 0
       (row : _) -> runBothWith max $ Prelude.fst <$> row
@@ -82,17 +81,7 @@ split diff blobs = renderHtml
     numberedLinesToMarkup numberedLines = tr $ (runBothWith (<>) (renderLine <$> numberedLines <*> sources)) <> string "\n"
 
     renderLine :: (Int, Line (SplitDiff leaf Info)) -> Source Char -> Markup
-    renderLine (number, line) source = toMarkup $ Renderable (or $ hasChanges <$> line, number, Renderable . (,) source <$> line)
-
-    hasChanges diff = or $ const True <$> diff
-
-    -- | Add a row to list of tuples of ints and lines, where the ints denote
-    -- | how many non-empty lines exist on that side up to that point.
-    numberRows :: [Both (Int, Line a)] -> Row a -> [Both (Int, Line a)]
-    numberRows rows row = ((,) <$> ((+) <$> count rows <*> (valueOf <$> unRow row)) <*> unRow row) : rows
-      where count = maybe (pure 0) (fmap Prelude.fst) . maybeFirst
-            valueOf EmptyLine = 0
-            valueOf _ = 1
+    renderLine (number, line) source = toMarkup $ Renderable (hasChanges line, number, Renderable . (,) source <$> line)
 
 -- | Something that can be rendered as markup.
 newtype Renderable a = Renderable a
