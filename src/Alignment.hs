@@ -7,6 +7,7 @@ import Data.Either
 import Data.Foldable (foldl')
 import Data.Functor.Both
 import Data.Functor.Identity
+import qualified Data.List as List
 import qualified Data.OrderedMap as Map
 import qualified Data.Set as Set
 import Diff
@@ -88,7 +89,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> wrapRowContents (((Free . (`Annotated` Leaf a)) .) <$> ((. unionRanges) . flip Info <$> categories)) <$> contextRows ranges sources
   Indexed children -> adjoinChildRows (Indexed . fmap get) (Identity <$> children)
   Fixed children -> adjoinChildRows (Fixed . fmap get) (Identity <$> children)
-  Keyed children -> adjoinChildRows (Keyed . Map.fromList) (Map.toList children)
+  Keyed children -> adjoinChildRows (Keyed . Map.fromList) (List.sortOn (diffRanges . Prelude.snd) $ Map.toList children)
   where contextRows :: Both Range -> Both (Source Char) -> [Row Range]
         contextRows ranges sources = zipWithDefaults makeRow (pure mempty) (fmap pure <$> (actualLineRanges <$> ranges <*> sources))
 
@@ -112,7 +113,13 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         childRows (rows, previous) child = let (childRows, childRanges) = splitDiffByLines (get child) previous sources in
           (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (start <$> childRanges)) sources) ++ (fmap (Right . (<$ child)) <$> childRows), end <$> childRanges)
 
-        makeRanges (Both (leftStart, rightStart)) (Both (leftEnd, rightEnd)) = Both (Range leftStart leftEnd, Range rightStart rightEnd)
+        makeRanges :: Both Int -> Both Int -> Both Range
+        makeRanges a b = runBothWith Range <$> sequenceA (both a b)
+
+-- | Produces the starting indices of a diff.
+diffRanges :: Diff leaf Info -> Both (Maybe Range)
+diffRanges (Free (Annotated infos _)) = Just . characterRange <$> infos
+diffRanges (Pure patch) = fmap (characterRange . extract) <$> unPatch patch
 
 -- | Returns a function that takes an Either, applies either the left or right
 -- | MaybeOpen, and returns Nothing or the original either.

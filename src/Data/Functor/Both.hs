@@ -5,7 +5,7 @@ import qualified Prelude
 
 -- | A computation over both sides of a pair.
 newtype Both a = Both { runBoth :: (a, a) }
-  deriving (Eq, Show, Functor, Foldable, Traversable)
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 -- | Given two operands returns a functor operating on `Both`. This is a curried synonym for Both.
 both :: a -> a -> Both a
