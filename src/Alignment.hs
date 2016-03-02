@@ -3,7 +3,6 @@ module Alignment where
 import Category
 import Control.Comonad.Cofree
 import Control.Monad.Free
-import Data.Bifunctor
 import Data.Either
 import Data.Foldable (foldl')
 import Data.Functor.Both
@@ -50,7 +49,7 @@ splitPatchByLines patch previous sources = case patch of
   Delete term -> let (lines, range) = splitTermByLines term (fst sources) in
     (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, both range (rangeAt $ snd previous))
   Replace leftTerm rightTerm -> (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
-    where (lines, ranges) = runBothWith (uncurry bimap . bimap both both) $ splitTermByLines <$> both leftTerm rightTerm <*> sources
+    where (lines, ranges) = transpose $ splitTermByLines <$> both leftTerm rightTerm <*> sources
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term leaf Info -> Source Char -> ([Line (Term leaf Info)], Range)
