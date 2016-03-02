@@ -45,8 +45,7 @@ splitDiffByLines diff previous sources = case diff of
   Pure (Replace leftTerm rightTerm) -> let Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
                                            (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange)) in
                                            (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
-  where categories annotations = Diff.categories <$> annotations
-        ranges annotations = characterRange <$> annotations
+  where ranges annotations = characterRange <$> annotations
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term leaf Info -> Source Char -> ([Line (Term leaf Info)], Range)
