@@ -113,7 +113,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
           (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (start <$> childRanges)) sources) ++ (fmap (Right . (<$ child)) <$> childRows), end <$> childRanges)
 
         makeRanges :: Both Int -> Both Int -> Both Range
-        makeRanges (Both (leftStart, rightStart)) (Both (leftEnd, rightEnd)) = Both (Range leftStart leftEnd, Range rightStart rightEnd)
+        makeRanges a b = fmap (runBothWith Range) <$> sequenceA (both a b)
 
 -- | Produces the starting indices of a diff.
 diffRanges :: Diff leaf Info -> Both (Maybe Range)
