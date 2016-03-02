@@ -20,7 +20,6 @@ import Diff
 import Line
 import Range
 import Renderer
-import Row
 import Source hiding (fromList, toList)
 import SplitDiff
 import Syntax
@@ -32,8 +31,13 @@ json diff sources = toLazyByteString . fromEncoding . pairs $
      "rows" .= annotateRows (Prelude.fst (splitDiffByLines diff (pure 0) (source <$> sources)))
   <> "oids" .= (oid <$> sources)
   <> "paths" .= (path <$> sources)
-  where annotateRows = fmap (fmap (fromList . unLine) . unRow)
+  where annotateRows = fmap (fmap NumberedLine) . Prelude.reverse . numberedRows
 
+newtype NumberedLine a = NumberedLine (Int, Line a)
+
+instance ToJSON a => ToJSON (NumberedLine a) where
+  toJSON (NumberedLine (n, a)) = object [ "number" .= n, "terms" .= unLine a ]
+  toEncoding (NumberedLine (n, a)) = pairs ("number" .= n <> "terms" .= unLine a)
 instance ToJSON Category where
   toJSON (Other s) = String $ T.pack s
   toJSON s = String . T.pack $ show s
