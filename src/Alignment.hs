@@ -48,9 +48,10 @@ splitPatchByLines patch previous sources = case patch of
     (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (rangeAt $ fst previous, range))
   Delete term -> let (lines, range) = splitTermByLines term (fst sources) in
     (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, rangeAt $ snd previous))
-  Replace leftTerm rightTerm -> let Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
-                                    (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange)) in
-                                    (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
+  Replace leftTerm rightTerm -> (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
+    where Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
+          (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange))
+
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term leaf Info -> Source Char -> ([Line (Term leaf Info)], Range)
