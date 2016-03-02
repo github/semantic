@@ -46,9 +46,9 @@ splitDiffByLines diff previous sources = case diff of
 splitPatchByLines :: Patch (Term leaf Info) -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
 splitPatchByLines patch previous sources = case patch of
   Insert term -> let (lines, range) = splitTermByLines term (snd sources) in
-    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (rangeAt $ fst previous, range))
+    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, both (rangeAt $ fst previous) range)
   Delete term -> let (lines, range) = splitTermByLines term (fst sources) in
-    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, rangeAt $ snd previous))
+    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, both range (rangeAt $ snd previous))
   Replace leftTerm rightTerm -> (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
     where (lines, ranges) = runBothWith (uncurry bimap . bimap both both) $ splitTermByLines <$> both leftTerm rightTerm <*> sources
 
