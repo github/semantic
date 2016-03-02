@@ -115,11 +115,11 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         makeRanges (Both (leftStart, rightStart)) (Both (leftEnd, rightEnd)) = Both (Range leftStart leftEnd, Range rightStart rightEnd)
 
 -- | Produces the starting indices of a diff.
-diffStarts :: Diff leaf Info -> (Maybe Int, Maybe Int)
-diffStarts (Free (Annotated (Both (Info (Range s1 _) _, Info (Range s2 _) _)) _)) = (Just s1, Just s2)
-diffStarts (Pure (Delete (Info (Range s1 _) _ :< _))) = (Just s1, Nothing)
-diffStarts (Pure (Insert (Info (Range s2 _) _ :< _))) = (Just s2, Nothing)
-diffStarts (Pure (Replace (Info (Range s1 _) _ :< _) (Info (Range s2 _) _ :< _))) = (Just s1, Just s2)
+diffRanges :: Diff leaf Info -> (Maybe Range, Maybe Range)
+diffRanges (Free (Annotated (Both (Info r1 _, Info r2 _)) _)) = (Just r1, Just r2)
+diffRanges (Pure (Delete (Info r1 _ :< _))) = (Just r1, Nothing)
+diffRanges (Pure (Insert (Info r2 _ :< _))) = (Just r2, Nothing)
+diffRanges (Pure (Replace (Info r1 _ :< _) (Info r2 _ :< _))) = (Just r1, Just r2)
 
 -- | Returns a function that takes an Either, applies either the left or right
 -- | MaybeOpen, and returns Nothing or the original either.
