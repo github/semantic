@@ -41,6 +41,7 @@ splitDiffByLines diff previous sources = case diff of
   Pure patch -> splitPatchByLines patch previous sources
   where ranges annotations = characterRange <$> annotations
 
+-- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Patch (Term leaf Info) -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
 splitPatchByLines patch previous sources = case patch of
   Insert term -> let (lines, range) = splitTermByLines term (snd sources) in
