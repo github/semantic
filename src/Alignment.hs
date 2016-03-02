@@ -48,16 +48,6 @@ splitDiffByLines diff previous sources = case diff of
   where categories annotations = Diff.categories <$> annotations
         ranges annotations = characterRange <$> annotations
 
--- | A functor that can return its content.
-class Functor f => Has f where
-  get :: f a -> a
-
-instance Has Identity where
-  get = runIdentity
-
-instance Has ((,) a) where
-  get = Prelude.snd
-
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term leaf Info -> Source Char -> ([Line (Term leaf Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
@@ -144,3 +134,13 @@ openDiff :: Has f => Source Char -> MaybeOpen (f (SplitDiff leaf Info))
 openDiff source diff = const diff <$> case get diff of
   (Free (Annotated (Info range _) _)) -> openRange source range
   (Pure patch) -> let Info range _ :< _ = getSplitTerm patch in openRange source range
+
+-- | A functor that can return its content.
+class Functor f => Has f where
+  get :: f a -> a
+
+instance Has Identity where
+  get = runIdentity
+
+instance Has ((,) a) where
+  get = Prelude.snd
