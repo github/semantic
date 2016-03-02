@@ -38,14 +38,18 @@ hasChanges = or . fmap (or . (True <$))
 splitDiffByLines :: Diff leaf Info -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
 splitDiffByLines diff previous sources = case diff of
   Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (Diff.categories <$> annotation) syntax, ranges annotation)
-  Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
-    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (rangeAt $ fst previous, range))
-  Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst sources) in
-    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, rangeAt $ snd previous))
-  Pure (Replace leftTerm rightTerm) -> let Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
-                                           (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange)) in
-                                           (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
+  Pure patch -> splitPatchByLines patch previous sources
   where ranges annotations = characterRange <$> annotations
+
+splitPatchByLines :: Patch (Term leaf Info) -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
+splitPatchByLines patch previous sources = case patch of
+  Insert term -> let (lines, range) = splitTermByLines term (snd sources) in
+    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (rangeAt $ fst previous, range))
+  Delete term -> let (lines, range) = splitTermByLines term (fst sources) in
+    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, rangeAt $ snd previous))
+  Replace leftTerm rightTerm -> let Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
+                                    (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange)) in
+                                    (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term leaf Info -> Source Char -> ([Line (Term leaf Info)], Range)
