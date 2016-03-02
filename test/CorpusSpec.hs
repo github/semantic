@@ -2,12 +2,13 @@ module CorpusSpec where
 
 import Diffing
 import Renderer
+import qualified Renderer.JSON as J
 import qualified Renderer.Patch as P
 import qualified Renderer.Split as Split
 
 import Control.DeepSeq
 import Data.Functor.Both
-import qualified Data.ByteString.Char8 as B1
+import qualified Data.ByteString.Lazy.Char8 as B
 import Data.List as List
 import Data.Map as Map
 import Data.Maybe
@@ -39,27 +40,29 @@ spec = parallel $ do
       let tests = correctTests =<< paths
       mapM_ (\ (formatName, renderer, paths, output) -> it (normalizeName (fst paths) ++ " (" ++ formatName ++ ")") $ testDiff renderer paths output matcher) tests
 
-    correctTests :: (Both FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, Both FilePath, Maybe FilePath)]
-    correctTests paths@(_, Nothing, Nothing) = testsForPaths paths
+    correctTests :: (Both FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, Both FilePath, Maybe FilePath)]
+    correctTests paths@(_, Nothing, Nothing, Nothing) = testsForPaths paths
     correctTests paths = List.filter (\(_, _, _, output) -> isJust output) $ testsForPaths paths
-    testsForPaths :: (Both FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, Both FilePath, Maybe FilePath)]
-    testsForPaths (paths, patch, split) = [ ("patch", P.patch, paths, patch), ("split", testSplit, paths, split) ]
+    testsForPaths :: (Both FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, Both FilePath, Maybe FilePath)]
+    testsForPaths (paths, json, patch, split) = [ ("json", testJSON, paths, json), ("patch", P.patch, paths, patch), ("split", testSplit, paths, split) ]
     testSplit :: Renderer a String
     testSplit diff sources = TL.unpack $ Split.split diff sources
+    testJSON :: Renderer a String
+    testJSON diff sources = B.unpack $ J.json diff sources
 
 
 -- | Return all the examples from the given directory. Examples are expected to
 -- | have the form "foo.A.js", "foo.B.js", "foo.patch.js". Diffs are not
 -- | required as the test may be verifying that the inputs don't crash.
-examples :: FilePath -> IO [(Both FilePath, Maybe FilePath, Maybe FilePath)]
+examples :: FilePath -> IO [(Both FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath)]
 examples directory = do
   as <- toDict <$> globFor "*.A.*"
   bs <- toDict <$> globFor "*.B.*"
+  jsons <- toDict <$> globFor "*.json.*"
   patches <- toDict <$> globFor "*.patch.*"
   splits <- toDict <$> globFor "*.split.*"
   let keys = Set.unions $ keysSet <$> [as, bs]
-  return $ (\name -> (Both (as ! name, bs ! name), Map.lookup name patches, Map.lookup name splits)) <$> sort (Set.toList keys)
-
+  return $ (\name -> (Both (as ! name, bs ! name), Map.lookup name jsons, Map.lookup name patches, Map.lookup name splits)) <$> sort (Set.toList keys)
   where
     globFor :: String -> IO [FilePath]
     globFor p = globDir1 (compile p) directory
