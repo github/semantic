@@ -60,6 +60,7 @@ instance ToJSON (Term leaf Info) where
   toEncoding (info :< syntax) = pairs $ mconcat (termFields info syntax)
 
 lineFields :: KeyValue kv => Int -> Line (SplitDiff leaf Info) -> [kv]
+lineFields _ EmptyLine = []
 lineFields n line = [ "number" .= n, "terms" .= unLine line, "range" .= unionRanges (getRange <$> line), "hasChanges" .= hasChanges line ]
   where getRange (Free (Annotated (Info range _) _)) = range
         getRange (Pure patch) = case getSplitTerm patch of Info range _ :< _ -> range
