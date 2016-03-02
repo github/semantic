@@ -4,6 +4,7 @@ import Category
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Either
+import Data.Foldable (foldl')
 import Data.Functor.Both
 import Data.Functor.Identity
 import qualified Data.OrderedMap as Map
@@ -19,6 +20,18 @@ import Source hiding ((++))
 import SplitDiff
 import Syntax
 import Term
+
+-- | Assign line numbers to the lines on each side of a list of rows.
+numberedRows :: [Row a] -> [Both (Int, Line a)]
+numberedRows = foldl' numberRows []
+  where numberRows rows row = ((,) <$> ((+) <$> count rows <*> (valueOf <$> unRow row)) <*> unRow row) : rows
+        count = maybe (pure 0) (fmap Prelude.fst) . maybeFirst
+        valueOf EmptyLine = 0
+        valueOf _ = 1
+
+-- | Determine whether a line contains any patches.
+hasChanges :: Line (SplitDiff leaf Info) -> Bool
+hasChanges = or . fmap (or . (True <$))
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs.
 splitDiffByLines :: Diff leaf Info -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)

@@ -32,6 +32,7 @@ library
                      , Patch
                      , Range
                      , Renderer
+                     , Renderer.JSON
                      , Renderer.Patch
                      , Renderer.Split
                      , Row
@@ -41,7 +42,8 @@ library
                      , Syntax
                      , Term
                      , TreeSitter
-  build-depends:       base >= 4.8 && < 5
+  build-depends:       aeson
+                     , base >= 4.8 && < 5
                      , blaze-html
                      , blaze-markup
                      , bytestring
