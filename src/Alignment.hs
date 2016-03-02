@@ -29,6 +29,10 @@ numberedRows = foldl' numberRows []
         valueOf EmptyLine = 0
         valueOf _ = 1
 
+-- | Determine whether a line contains any patches.
+hasChanges :: Line (SplitDiff leaf Info) -> Bool
+hasChanges = or . fmap (or . (True <$))
+
 -- | Split a diff, which may span multiple lines, into rows of split diffs.
 splitDiffByLines :: Diff leaf Info -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
 splitDiffByLines diff previous sources = case diff of

@@ -83,9 +83,6 @@ split diff blobs = renderHtml
     renderLine :: (Int, Line (SplitDiff leaf Info)) -> Source Char -> Markup
     renderLine (number, line) source = toMarkup $ Renderable (hasChanges line, number, Renderable . (,) source <$> line)
 
-    hasChanges :: Line (SplitDiff leaf Info) -> Bool
-    hasChanges = or . fmap (or . (True <$))
-
 -- | Something that can be rendered as markup.
 newtype Renderable a = Renderable a
 
