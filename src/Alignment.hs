@@ -52,7 +52,6 @@ splitPatchByLines patch previous sources = case patch of
     where Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
           (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange))
 
-
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term leaf Info -> Source Char -> ([Line (Term leaf Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
