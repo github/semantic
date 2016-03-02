@@ -3,6 +3,7 @@ module Alignment where
 import Category
 import Control.Comonad.Cofree
 import Control.Monad.Free
+import Data.Bifunctor
 import Data.Either
 import Data.Foldable (foldl')
 import Data.Functor.Both
@@ -51,7 +52,7 @@ splitPatchByLines patch previous sources = case patch of
   Replace leftTerm rightTerm -> (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
     where (lines, ranges) = unpackLinesAndRanges $ splitTermByLines <$> both leftTerm rightTerm <*> sources
           unpackLinesAndRanges :: Both ([Line (Term leaf Info)], Range) -> (Both [Line (Term leaf Info)], Both Range)
-          unpackLinesAndRanges (Both ((leftLines, leftRange), (rightLines, rightRange))) = (Both (leftLines, rightLines), Both (leftRange, rightRange))
+          unpackLinesAndRanges = uncurry (uncurry bimap) . first (bimap both both) . runBoth
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term leaf Info -> Source Char -> ([Line (Term leaf Info)], Range)
