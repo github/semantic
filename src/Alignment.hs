@@ -117,9 +117,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 -- | Produces the starting indices of a diff.
 diffRanges :: Diff leaf Info -> Both (Maybe Range)
 diffRanges (Free (Annotated infos _)) = Just . characterRange <$> infos
-diffRanges (Pure (Delete (Info r1 _ :< _))) = Both (Just r1, Nothing)
-diffRanges (Pure (Insert (Info r2 _ :< _))) = Both (Just r2, Nothing)
-diffRanges (Pure (Replace (Info r1 _ :< _) (Info r2 _ :< _))) = Both (Just r1, Just r2)
+diffRanges (Pure patch) = fmap (characterRange . extract) <$> unPatch patch
 
 -- | Returns a function that takes an Either, applies either the left or right
 -- | MaybeOpen, and returns Nothing or the original either.
