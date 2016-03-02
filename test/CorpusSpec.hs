@@ -24,7 +24,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = parallel $ do
-  -- describe "crashers crash" $ runTestsIn "test/crashers-todo/" ((`shouldThrow` anyException) . return)
+  describe "crashers crash" $ runTestsIn "test/crashers-todo/" $ \ a b -> a `deepseq` return (a == b) `shouldThrow` anyException
   describe "crashers should not crash" $ runTestsIn "test/crashers/" shouldBe
   describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" shouldNotBe
   describe "should produce the correct diff" $ runTestsIn "test/diffs/" shouldBe
@@ -82,7 +82,7 @@ testDiff renderer paths diff matcher = do
   let sourceBlobs = Both (S.SourceBlob, S.SourceBlob) <*> sources <*> pure mempty <*> paths
   actual <- diffFiles parser renderer sourceBlobs
   case diff of
-    Nothing -> actual `deepseq` matcher actual actual
+    Nothing -> matcher actual actual
     Just file -> do
       expected <- readFile file
       matcher actual expected
