@@ -99,6 +99,11 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
           (Pure patch) -> let Info range _ :< _ = getSplitTerm patch in range
           (Free (Annotated (Info range _) _)) -> range
 
+        getInfo :: Copointed f => f (SplitDiff leaf Info) -> Info
+        getInfo diff = case copoint diff of
+          (Pure patch) -> copoint (getSplitTerm patch)
+          (Free (Annotated info _)) -> info
+
         childRows :: (Copointed f, Functor f) => ([Row (Range, Maybe (f (SplitDiff leaf Info)))], Both Int) -> f (Diff leaf Info) -> ([Row (Range, Maybe (f (SplitDiff leaf Info)))], Both Int)
         childRows (rows, previous) child = let (childRows, childRanges) = splitDiffByLines (copoint child) previous sources in
           (adjoin $ rows ++ (fmap (flip (,) Nothing) <$> contextRows (makeRanges previous (start <$> childRanges)) sources) ++ (rowMap ((. (Just . (<$ child))) . (,) <$> childRanges) <$> childRows), end <$> childRanges)
