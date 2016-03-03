@@ -70,10 +70,6 @@ splitAbstractedTerm getInfo getSyntax makeTerm source term = flip (,) (character
         childLines (lines, previous) child = let (childLines, childRange) = splitAbstractedTerm getInfo getSyntax makeTerm source (copoint child) in
           (adjoin $ lines ++ (pure . flip (,) Nothing <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap ((,) childRange . Just . (<$ child)) <$> childLines), end childRange)
 
--- | Takes a term and a source and returns a list of lines and their range within source.
-splitTermByLines :: Term leaf Info -> Source Char -> ([Line (Term leaf Info)], Range)
-splitTermByLines term source = splitAbstractedTerm copoint unwrap (:<) source term
-
 -- | Split a annotated diff into rows of split diffs.
 splitAnnotatedByLines :: Both (Source Char) -> Both Range -> Both (Set.Set Category) -> Syntax leaf (Diff leaf Info) -> [Row (SplitDiff leaf Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
