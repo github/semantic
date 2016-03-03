@@ -26,8 +26,6 @@ import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 import qualified Text.Blaze.Internal as Blaze
 
-type ClassName = T.Text
-
 -- | Add the first category from a Foldable of categories as a class name as a
 -- | class name on the markup, prefixed by `category-`.
 classifyMarkup :: Foldable f => f Category -> Markup -> Markup
