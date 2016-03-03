@@ -81,10 +81,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Indexed children -> adjoinChildRows (Indexed . fmap copoint) (Identity <$> children)
   Fixed children -> adjoinChildRows (Fixed . fmap copoint) (Identity <$> children)
   Keyed children -> adjoinChildRows (Keyed . Map.fromList) (List.sortOn (diffRanges . Prelude.snd) $ Map.toList children)
-  where contextRows :: Both Range -> Both (Source Char) -> [Both Range]
-        contextRows ranges sources = sequenceA (actualLineRanges <$> ranges <*> sources)
-
-        adjoin :: Copointed f => [Row (Range, Maybe (f (SplitDiff leaf Info)))] -> [Row (Range, Maybe (f (SplitDiff leaf Info)))]
+  where adjoin :: Copointed f => [Row (Range, Maybe (f (SplitDiff leaf Info)))] -> [Row (Range, Maybe (f (SplitDiff leaf Info)))]
         adjoin = reverse . foldl (adjoinRowsBy (openRangePair <$> sources)) []
 
         adjoinChildRows :: (Copointed f, Functor f) => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> [f (Diff leaf Info)] -> [Row (SplitDiff leaf Info)]
