@@ -53,7 +53,7 @@ splitPatchByLines patch previous sources = case patch of
   Replace leftTerm rightTerm -> (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
     where (lines, ranges) = transpose $ splitAbstractedTerm copoint unwrap (:<) <$> sources <*> both leftTerm rightTerm
 
--- | Split a `term` (abstracted by two destructors and one constructor) up into one `term` per line in `Source`.
+-- | Split an `inTerm` (abstracted by two destructors) up into one `outTerm` (abstracted by a constructor) per line in `Source`.
 splitAbstractedTerm :: (inTerm -> Info) -> (inTerm -> Syntax leaf inTerm) -> (Info -> Syntax leaf outTerm -> outTerm) -> Source Char -> inTerm -> ([Line outTerm], Range)
 splitAbstractedTerm getInfo getSyntax makeTerm source term = flip (,) (characterRange (getInfo term)) $ case getSyntax term of
   Leaf a -> pure . (`makeTerm` Leaf a) . (`Info` (Diff.categories (getInfo term))) <$> actualLineRanges (characterRange (getInfo term)) source
