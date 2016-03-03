@@ -54,7 +54,7 @@ splitPatchByLines patch previous sources = case patch of
     where (lines, ranges) = transpose $ splitAbstractedTerm copoint unwrap (:<) <$> sources <*> both leftTerm rightTerm
 
 -- | Split a `term` (abstracted by two destructors and one constructor) up into one `term` per line in `Source`.
-splitAbstractedTerm :: (term -> Info) -> (term -> Syntax leaf term) -> (Info -> Syntax leaf term -> term) -> Source Char -> term -> ([Line term], Range)
+splitAbstractedTerm :: (inTerm -> Info) -> (inTerm -> Syntax leaf inTerm) -> (Info -> Syntax leaf outTerm -> outTerm) -> Source Char -> inTerm -> ([Line outTerm], Range)
 splitAbstractedTerm getInfo getSyntax makeTerm source term = flip (,) (characterRange (getInfo term)) $ case getSyntax term of
   Leaf a -> pure . (`makeTerm` Leaf a) . (`Info` (Diff.categories (getInfo term))) <$> actualLineRanges (characterRange (getInfo term)) source
   Indexed children -> adjoinChildLines (Indexed . fmap copoint) (Identity <$> children)
