@@ -67,7 +67,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
         adjoinChildLines constructor children = let (lines, previous) = foldl childLines ([], start range) children in
           fmap (wrapLineContents $ wrap constructor) . adjoin $ lines ++ (pure . flip (,) Nothing <$> actualLineRanges (safeRange previous $ end range) source)
 
-        wrap :: Copointed f => ([f (Term leaf Info)] -> Syntax leaf (Term leaf Info)) -> [(Range, Maybe (f (Term leaf Info)))] -> Term leaf Info
+        wrap :: ([f (Term leaf Info)] -> Syntax leaf (Term leaf Info)) -> [(Range, Maybe (f (Term leaf Info)))] -> Term leaf Info
         wrap constructor children = (Info (unionRanges $ Prelude.fst <$> children) categories :<) . constructor . catMaybes $ Prelude.snd <$> children
 
         childLines :: (Copointed f, Functor f) => ([Line (Range, Maybe (f (Term leaf Info)))], Int) -> f (Term leaf Info) -> ([Line (Range, Maybe (f (Term leaf Info)))], Int)
@@ -91,7 +91,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         adjoinChildRows constructor children = let (rows, previous) = foldl childRows ([], start <$> ranges) children in
           fmap (wrapRowContents (wrap constructor <$> categories)) . adjoin $ rows ++ (fmap (flip (,) Nothing) <$> contextRows (makeRanges previous (end <$> ranges)) sources)
 
-        wrap :: Copointed f => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> Set.Set Category -> [(Range, Maybe (f (SplitDiff leaf Info)))] -> SplitDiff leaf Info
+        wrap :: ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> Set.Set Category -> [(Range, Maybe (f (SplitDiff leaf Info)))] -> SplitDiff leaf Info
         wrap constructor categories children = Free . Annotated (Info (unionRanges $ Prelude.fst <$> children) categories) . constructor . catMaybes $ Prelude.snd <$> children
 
         getRange :: SplitDiff leaf Info -> Range
