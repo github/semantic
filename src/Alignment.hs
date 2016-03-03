@@ -107,7 +107,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
           (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (start <$> childRanges)) sources) ++ (fmap (Right . (<$ child)) <$> childRows), end <$> childRanges)
 
         makeRanges :: Both Int -> Both Int -> Both Range
-        makeRanges a b = runBothWith safeRange <$> sequenceA (both a b)
+        makeRanges a b = runBothWith Range <$> sequenceA (both a b)
 
         -- | Constructs a Range such that its end is clamped to its start.
         safeRange start end = Range start (max start end)
