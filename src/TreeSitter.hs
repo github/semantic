@@ -40,6 +40,7 @@ defaultCategoryForNodeName name = case name of
   "string" -> Set.singleton StringLiteral
   "integer" -> Set.singleton IntegerLiteral
   "symbol" -> Set.singleton SymbolLiteral
+  "array" -> Set.singleton ArrayLiteral
   _ -> Set.singleton (Other name)
 
 -- | Given a constructor and a tree sitter document, return a parser.
