@@ -53,6 +53,22 @@ splitPatchByLines patch previous sources = case patch of
   Replace leftTerm rightTerm -> (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
     where (lines, ranges) = transpose $ splitTermByLines <$> both leftTerm rightTerm <*> sources
 
+splitAbstractedTerm :: (term -> Info) -> (term -> Syntax leaf term) -> (Info -> Syntax leaf term -> term) -> Source Char -> term -> ([Line term], Range)
+splitAbstractedTerm getInfo getSyntax makeTerm source term = flip (,) (characterRange (getInfo term)) $ case getSyntax term of
+  Leaf a -> pure . (`makeTerm` Leaf a) . (`Info` (Diff.categories (getInfo term))) <$> actualLineRanges (characterRange (getInfo term)) source
+  Indexed children -> adjoinChildLines (Indexed . fmap copoint) (Identity <$> children)
+  Fixed children -> adjoinChildLines (Fixed . fmap copoint) (Identity <$> children)
+  Keyed children -> adjoinChildLines (Keyed . Map.fromList) (Map.toList children)
+  where adjoin = reverse . foldl (adjoinLinesBy (openRangePair source)) []
+
+        adjoinChildLines constructor children = let (lines, previous) = foldl childLines ([], start (characterRange (getInfo term))) children in
+          fmap (wrapLineContents $ wrap constructor) . adjoin $ lines ++ (pure . flip (,) Nothing <$> actualLineRanges (Range previous $ end (characterRange (getInfo term))) source)
+
+        wrap constructor children = (makeTerm $ Info (unionRanges $ Prelude.fst <$> children) (Diff.categories (getInfo term))) . constructor . catMaybes $ Prelude.snd <$> children
+
+        childLines (lines, previous) child = let (childLines, childRange) = splitAbstractedTerm getInfo getSyntax makeTerm source (copoint child) in
+          (adjoin $ lines ++ (pure . flip (,) Nothing <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap ((,) childRange . Just . (<$ child)) <$> childLines), end childRange)
+
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term leaf Info -> Source Char -> ([Line (Term leaf Info)], Range)
 splitTermByLines (Info range categories :< syntax) source = flip (,) range $ case syntax of
