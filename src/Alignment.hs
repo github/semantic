@@ -70,7 +70,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
         wrap constructor children = (Info (unionRanges $ getRange <$> children) categories :<) . constructor $ rights children
 
         getRange :: Copointed f => Either Range (f (Term leaf Info)) -> Range
-        getRange (Right term) = case copoint term of (Info range _ :< _) -> range
+        getRange (Right term) = characterRange (copoint (copoint term))
         getRange (Left range) = range
 
         childLines :: (Copointed f, Functor f) => ([Line (Either Range (f (Term leaf Info)))], Int) -> f (Term leaf Info) -> ([Line (Either Range (f (Term leaf Info)))], Int)
