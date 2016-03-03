@@ -22,6 +22,7 @@ import qualified Prelude
 import Row
 import Range
 import Source hiding ((++))
+import qualified Source
 import Syntax
 
 instance Arbitrary a => Arbitrary (Both a) where
@@ -93,6 +94,11 @@ spec = parallel $ do
     prop "preserves line count" $
       \ source -> let range = getTotalRange source in
         splitAbstractedTerm copoint unwrap (:<) source (Info range mempty :< Leaf source) `shouldBe` (pure . ((:< Leaf source) . (`Info` mempty) &&& id) <$> actualLineRanges range source)
+
+  describe "splitPatchByLines" $ do
+    prop "starts at initial indices" $
+      \ patch sources -> let indices = length <$> sources in
+        start <$> (Prelude.snd (splitPatchByLines (patchWithBoth patch (leafWithRangeInSource <$> sources <*> (Range <$> indices <*> ((2 *) <$> indices)))) indices ((Source.++) <$> sources <*> sources))) `shouldBe` indices
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
