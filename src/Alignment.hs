@@ -138,13 +138,3 @@ openDiff :: Copointed f => Source Char -> MaybeOpen (f (SplitDiff leaf Info))
 openDiff source diff = const diff <$> case copoint diff of
   (Free (Annotated (Info range _) _)) -> openRange source range
   (Pure patch) -> let Info range _ :< _ = getSplitTerm patch in openRange source range
-
--- | A functor that can return its content.
-class Functor f => Has f where
-  get :: f a -> a
-
-instance Has Identity where
-  get = runIdentity
-
-instance Has ((,) a) where
-  get = Prelude.snd
