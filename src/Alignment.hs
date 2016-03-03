@@ -96,8 +96,8 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         getRange :: Copointed f => f (SplitDiff leaf Info) -> Range
         getRange diff = case copoint diff of
-          (Pure patch) -> let Info range _ :< _ = getSplitTerm patch in range
-          (Free (Annotated (Info range _) _)) -> range
+          (Pure patch) -> characterRange (copoint (getSplitTerm patch))
+          (Free (Annotated info _)) -> characterRange info
 
         getInfo :: Copointed f => f (SplitDiff leaf Info) -> Info
         getInfo diff = case copoint diff of
