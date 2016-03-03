@@ -2,8 +2,10 @@ module Interpreter (interpret, Comparable, diffTerms) where
 
 import Algorithm
 import Category
-import Control.Comonad.Cofree hiding (unwrap)
+import Control.Arrow
+import Control.Comonad.Cofree
 import Control.Monad.Free
+import Data.Copointed
 import Data.Functor.Both
 import qualified Data.OrderedMap as Map
 import qualified Data.List as List
@@ -38,7 +40,7 @@ hylo down up a = down annotation $ hylo down up <$> syntax where
 constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
 constructAndRun _ a b | a == b = hylo introduce eliminate <$> zipTerms a b where
   eliminate :: Cofree f a -> (a, f (Cofree f a))
-  eliminate (extract :< unwrap) = (extract, unwrap)
+  eliminate = copoint &&& unwrap
   introduce :: Both annotation -> Syntax a (Diff a annotation) -> Diff a annotation
   introduce ann syntax = Free $ Annotated ann syntax
 constructAndRun comparable a b | not $ comparable a b = Nothing
