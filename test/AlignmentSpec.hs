@@ -9,6 +9,7 @@ import Alignment
 import ArbitraryTerm ()
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
+import Data.Copointed
 import Data.Functor.Both as Both
 import Diff
 import qualified Data.Maybe as Maybe
@@ -80,10 +81,10 @@ spec = parallel $ do
       forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
         \ (a, b) -> adjoinRowsBy (pure openMaybe) [ makeRow EmptyLine EmptyLine, a ] b `shouldBe` makeRow EmptyLine EmptyLine : adjoinRowsBy (pure openMaybe) [ a ] b
 
-  describe "splitTermByLines" $ do
+  describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
       \ source -> let range = getTotalRange source in
-        splitTermByLines (Info range mempty :< Leaf source) source `shouldBe` (pure . (:< Leaf source) . (`Info` mempty) <$> actualLineRanges range source, range)
+        splitAbstractedTerm copoint unwrap (:<) source (Info range mempty :< Leaf source) `shouldBe` (pure . (:< Leaf source) . (`Info` mempty) <$> actualLineRanges range source, range)
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
