@@ -18,7 +18,6 @@ import SES
 import Syntax
 import Term
 
-
 -- | Returns whether two terms are comparable
 type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
 
