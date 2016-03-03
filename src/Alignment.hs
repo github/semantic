@@ -5,7 +5,6 @@ import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Copointed
-import Data.Either
 import Data.Foldable (foldl')
 import Data.Functor.Both
 import Data.Functor.Identity
