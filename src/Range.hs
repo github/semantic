@@ -68,6 +68,10 @@ unionRange (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (
 unionRanges :: (Functor f, Foldable f) => f Range -> Range
 unionRanges ranges = option (Range 0 0) id . foldl mappend mempty $ Option . Just <$> ranges
 
+-- | Return a range that contains all the ranges in a Foldable, or the passed Range if the Foldable is empty.
+unionRangesFrom :: (Functor f, Foldable f) => Range -> f Range -> Range
+unionRangesFrom range ranges = option range id . foldl mappend mempty $ Option . Just <$> ranges
+
 instance Monoid (Option Range) where
   mempty = Option Nothing
   mappend (Option (Just a)) (Option (Just b)) = Option (Just (unionRange a b))
