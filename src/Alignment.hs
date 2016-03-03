@@ -1,7 +1,6 @@
 module Alignment where
 
 import Category
-import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Copointed
@@ -73,9 +72,6 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
 
         getRange :: Copointed f => Either Range (f (Term leaf Info)) -> Range
         getRange = either id (characterRange . copoint . copoint)
-
-        pairEither :: Copointed f => Either Range (f (Term leaf Info)) -> (Range, Maybe (f (Term leaf Info)))
-        pairEither = either (flip (,) Nothing) ((characterRange . copoint . copoint) &&& Just)
 
         childLines :: (Copointed f, Functor f) => ([Line (Range, Maybe (f (Term leaf Info)))], Int) -> f (Term leaf Info) -> ([Line (Range, Maybe (f (Term leaf Info)))], Int)
         childLines (lines, previous) child = let (childLines, childRange) = splitTermByLines (copoint child) source in
