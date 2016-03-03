@@ -1,22 +1,22 @@
 module Interpreter (interpret, Comparable, diffTerms) where
 
-import Prelude hiding (lookup)
 import Algorithm
-import Diff
-import Operation
-import Patch
-import SES
-import Syntax
-import Term
 import Category
-import Control.Monad.Free
 import Control.Comonad.Cofree hiding (unwrap)
+import Control.Monad.Free
 import Data.Functor.Both
 import qualified Data.OrderedMap as Map
-import Data.OrderedMap ((!))
 import qualified Data.List as List
 import Data.List ((\\))
 import Data.Maybe
+import Data.OrderedMap ((!))
+import Diff
+import Operation
+import Patch
+import Prelude hiding (lookup)
+import SES
+import Syntax
+import Term
 
 
 -- | Returns whether two terms are comparable
