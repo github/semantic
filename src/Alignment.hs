@@ -47,7 +47,7 @@ splitDiffByLines diff previous sources = case diff of
 splitPatchByLines :: Patch (Term leaf Info) -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
 splitPatchByLines patch previous sources = (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . constructor patch . Prelude.fst)) <$> lines, ranges)
     where lines = (maybe [] . splitAbstractedTerm copoint unwrap (:<) <$> sources) <*> unPatch patch
-          ranges = foldl' unionRange <$> (rangeAt <$> previous) <*> (fmap (unionRanges . fmap Prelude.snd) <$> lines)
+          ranges = unionRangesFrom . rangeAt <$> previous <*> ((>>= unLine . fmap Prelude.snd) <$> lines)
           constructor (Replace _ _) = SplitReplace
           constructor (Insert _) = SplitInsert
           constructor (Delete _) = SplitDelete
