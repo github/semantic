@@ -61,7 +61,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
   Fixed children -> adjoinChildLines (Fixed . fmap copoint) (Identity <$> children)
   Keyed children -> adjoinChildLines (Keyed . Map.fromList) (Map.toList children)
   where adjoin :: Copointed f => [Line (Range, Maybe (f (Term leaf Info)))] -> [Line (Range, Maybe (f (Term leaf Info)))]
-        adjoin = reverse . foldl (adjoinLinesBy $ (\ (range, rest) -> (range, rest) <$ openRange source range)) []
+        adjoin = reverse . foldl (adjoinLinesBy (openRangePair source)) []
 
         adjoinChildLines :: (Copointed f, Functor f) => ([f (Term leaf Info)] -> Syntax leaf (Term leaf Info)) -> [f (Term leaf Info)] -> [Line (Term leaf Info)]
         adjoinChildLines constructor children = let (lines, previous) = foldl childLines ([], start range) children in
