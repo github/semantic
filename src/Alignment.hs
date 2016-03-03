@@ -111,11 +111,6 @@ diffRanges :: Diff leaf Info -> Both (Maybe Range)
 diffRanges (Free (Annotated infos _)) = Just . characterRange <$> infos
 diffRanges (Pure patch) = fmap (characterRange . copoint) <$> unPatch patch
 
--- | Returns a function that takes an Either, applies either the left or right
--- | MaybeOpen, and returns Nothing or the original either.
-openEither :: MaybeOpen a -> MaybeOpen b -> MaybeOpen (Either a b)
-openEither ifLeft ifRight which = either (fmap (const which) . ifLeft) (fmap (const which) . ifRight) which
-
 -- | MaybeOpen test for (Range, a) pairs.
 openRangePair :: Source Char -> MaybeOpen (Range, a)
 openRangePair source pair = pair <$ openRange source (Prelude.fst pair)
