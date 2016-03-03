@@ -104,7 +104,9 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         childRows :: Has f => ([Row (Either Range (f (SplitDiff leaf Info)))], Both Int) -> f (Diff leaf Info) -> ([Row (Either Range (f (SplitDiff leaf Info)))], Both Int)
         childRows (rows, previous) child = let (childRows, childRanges) = splitDiffByLines (get child) previous sources in
-          (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (start <$> childRanges)) sources) ++ (fmap (Right . (<$ child)) <$> childRows), end <$> childRanges)
+          if or $ (<) . start <$> childRanges <*> previous
+            then (rows, previous)
+            else (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (start <$> childRanges)) sources) ++ (fmap (Right . (<$ child)) <$> childRows), end <$> childRanges)
 
         makeRanges :: Both Int -> Both Int -> Both Range
         makeRanges a b = runBothWith Range <$> sequenceA (both a b)
