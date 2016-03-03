@@ -1,23 +1,24 @@
 module Interpreter (interpret, Comparable, diffTerms) where
 
-import Prelude hiding (lookup)
 import Algorithm
-import Diff
-import Operation
-import Patch
-import SES
-import Syntax
-import Term
 import Category
+import Control.Arrow
+import Control.Comonad.Cofree
 import Control.Monad.Free
-import Control.Comonad.Cofree hiding (unwrap)
+import Data.Copointed
 import Data.Functor.Both
 import qualified Data.OrderedMap as Map
-import Data.OrderedMap ((!))
 import qualified Data.List as List
 import Data.List ((\\))
 import Data.Maybe
-
+import Data.OrderedMap ((!))
+import Diff
+import Operation
+import Patch
+import Prelude hiding (lookup)
+import SES
+import Syntax
+import Term
 
 -- | Returns whether two terms are comparable
 type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
@@ -37,12 +38,10 @@ hylo down up a = down annotation $ hylo down up <$> syntax where
 
 -- | Constructs an algorithm and runs it
 constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
-constructAndRun _ a b | a == b = hylo introduce eliminate <$> zipTerms a b where
-  eliminate :: Cofree f a -> (a, f (Cofree f a))
-  eliminate (extract :< unwrap) = (extract, unwrap)
-  introduce :: Both annotation -> Syntax a (Diff a annotation) -> Diff a annotation
-  introduce ann syntax = Free $ Annotated ann syntax
+constructAndRun _ a b | a == b = hylo (curry $ Free . uncurry Annotated) (copoint &&& unwrap) <$> zipTerms a b where
+
 constructAndRun comparable a b | not $ comparable a b = Nothing
+
 constructAndRun comparable (annotation1 :< a) (annotation2 :< b) =
   run comparable $ algorithm a b where
     algorithm (Indexed a') (Indexed b') = Free $ ByIndex a' b' (annotate . Indexed)

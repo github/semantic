@@ -1,6 +1,8 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Control.Comonad.Cofree where
 
+import Data.Copointed
+
 data Cofree functor annotation = annotation :< (functor (Cofree functor annotation))
   deriving (Functor, Foldable, Traversable)
 
@@ -13,8 +15,8 @@ instance (Show annotation, Show (functor (Cofree functor annotation))) => Show (
 unwrap :: Cofree functor annotation -> functor (Cofree functor annotation)
 unwrap (_ :< f) = f
 
-extract :: Cofree functor annotation -> annotation
-extract (a :< _) = a
-
 unfold :: Functor functor => (seed -> (annotation, functor seed)) -> seed -> Cofree functor annotation
 unfold grow seed = case grow seed of (annotation, functor) -> annotation :< (unfold grow <$> functor)
+
+instance Copointed (Cofree functor) where
+  copoint (annotation :< _) = annotation
