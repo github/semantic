@@ -121,11 +121,6 @@ openRange source range = case (source `at`) <$> maybeLastIndex range of
   Just '\n' -> Nothing
   _ -> Just range
 
--- | Given a source and something that has a term, returns nothing if the term
--- | ends with a `\n`; otherwise returns the term.
-openTerm :: Copointed f => Source Char -> MaybeOpen (f (Term leaf Info))
-openTerm source term = const term <$> openRange source (case copoint term of (Info range _ :< _) -> range)
-
 -- | Given a source and something that has a split diff, returns nothing if the
 -- | diff ends with a `\n`; otherwise returns the diff.
 openDiff :: Copointed f => Source Char -> MaybeOpen (f (SplitDiff leaf Info))
