@@ -45,28 +45,32 @@ splitDiffByLines diff previous sources = case diff of
 
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Patch (Term leaf Info) -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
-splitPatchByLines patch previous sources = (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . constructor patch)) <$> lines, ranges)
-    where (lines, ranges) = transpose $ maybe . (,) [] . rangeAt <$> previous <*> (splitAbstractedTerm copoint unwrap (:<) <$> sources) <*> unPatch patch
+splitPatchByLines patch previous sources = (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . constructor patch . Prelude.fst)) <$> lines, ranges)
+    where lines = (maybe [] . splitAbstractedTerm copoint unwrap (:<) <$> sources) <*> unPatch patch
+          ranges = foldl' unionRange <$> (rangeAt <$> previous) <*> (fmap (unionRanges . fmap Prelude.snd) <$> lines)
           constructor (Replace _ _) = SplitReplace
           constructor (Insert _) = SplitInsert
           constructor (Delete _) = SplitDelete
 
 -- | Split an `inTerm` (abstracted by two destructors) up into one `outTerm` (abstracted by a constructor) per line in `Source`.
-splitAbstractedTerm :: (inTerm -> Info) -> (inTerm -> Syntax leaf inTerm) -> (Info -> Syntax leaf outTerm -> outTerm) -> Source Char -> inTerm -> ([Line outTerm], Range)
-splitAbstractedTerm getInfo getSyntax makeTerm source term = flip (,) (characterRange (getInfo term)) $ case getSyntax term of
-  Leaf a -> pure . (`makeTerm` Leaf a) . (`Info` (Diff.categories (getInfo term))) <$> actualLineRanges (characterRange (getInfo term)) source
-  Indexed children -> adjoinChildLines (Indexed . fmap copoint) (Identity <$> children)
-  Fixed children -> adjoinChildLines (Fixed . fmap copoint) (Identity <$> children)
-  Keyed children -> adjoinChildLines (Keyed . Map.fromList) (Map.toList children)
+splitAbstractedTerm :: (inTerm -> Info) -> (inTerm -> Syntax leaf inTerm) -> (Info -> Syntax leaf outTerm -> outTerm) -> Source Char -> inTerm -> [Line (outTerm, Range)]
+splitAbstractedTerm getInfo getSyntax makeTerm source term = case getSyntax term of
+  Leaf a -> pure . ((`makeTerm` Leaf a) . (`Info` (Diff.categories (getInfo term))) &&& id) <$> actualLineRanges (characterRange (getInfo term)) source
+  Indexed children -> adjoinChildLines (Indexed . fmap (Prelude.fst . copoint)) (Identity <$> children)
+  Fixed children -> adjoinChildLines (Fixed . fmap (Prelude.fst . copoint)) (Identity <$> children)
+  Keyed children -> adjoinChildLines (Keyed . fmap Prelude.fst . Map.fromList) (Map.toList children)
   where adjoin = reverse . foldl (adjoinLinesBy (openRangePair source)) []
 
         adjoinChildLines constructor children = let (lines, previous) = foldl childLines ([], start (characterRange (getInfo term))) children in
-          fmap (wrapLineContents $ wrap constructor) . adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end (characterRange (getInfo term))) source)
+          fmap (wrapLineContents (wrap constructor &&& (unionRanges . fmap Prelude.snd))) . adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end (characterRange (getInfo term))) source)
 
         wrap constructor children = (makeTerm $ Info (unionRanges $ Prelude.snd <$> children) (Diff.categories (getInfo term))) . constructor . catMaybes $ Prelude.fst <$> children
 
-        childLines (lines, previous) child = let (childLines, childRange) = splitAbstractedTerm getInfo getSyntax makeTerm source (copoint child) in
-          (adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap (flip (,) childRange . Just . (<$ child)) <$> childLines), end childRange)
+        childLines (lines, previous) child = let childLines = splitAbstractedTerm getInfo getSyntax makeTerm source (copoint child) in
+          (adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ start (rangeForChildLines childLines)) source) ++ (fmap (flip (,) (rangeForChildLines childLines) . Just . (<$ child)) <$> childLines), end (rangeForChildLines childLines))
+
+        rangeForChildLines :: [Line (a, Range)] -> Range
+        rangeForChildLines lines = unionRanges (lines >>= (fmap Prelude.snd . unLine))
 
 -- | Split a annotated diff into rows of split diffs.
 splitAnnotatedByLines :: Both (Source Char) -> Both Range -> Both (Set.Set Category) -> Syntax leaf (Diff leaf Info) -> [Row (SplitDiff leaf Info)]

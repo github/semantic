@@ -7,6 +7,7 @@ import Data.Text.Arbitrary ()
 
 import Alignment
 import ArbitraryTerm ()
+import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
 import Data.Copointed
@@ -84,7 +85,7 @@ spec = parallel $ do
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
       \ source -> let range = getTotalRange source in
-        splitAbstractedTerm copoint unwrap (:<) source (Info range mempty :< Leaf source) `shouldBe` (pure . (:< Leaf source) . (`Info` mempty) <$> actualLineRanges range source, range)
+        splitAbstractedTerm copoint unwrap (:<) source (Info range mempty :< Leaf source) `shouldBe` (pure . ((:< Leaf source) . (`Info` mempty) &&& id) <$> actualLineRanges range source)
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
