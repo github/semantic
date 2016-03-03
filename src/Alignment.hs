@@ -51,7 +51,7 @@ splitPatchByLines patch previous sources = case patch of
   Delete term -> let (lines, range) = splitAbstractedTerm copoint unwrap (:<) (fst sources) term in
     (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, both range (rangeAt $ snd previous))
   Replace leftTerm rightTerm -> (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
-    where (lines, ranges) = transpose $ splitAbstractedTerm copoint unwrap (:<) <$> sources <*> both leftTerm rightTerm
+    where Just (lines, ranges) = fmap transpose . sequenceA $ fmap . splitAbstractedTerm copoint unwrap (:<) <$> sources <*> unPatch patch
 
 -- | Split an `inTerm` (abstracted by two destructors) up into one `outTerm` (abstracted by a constructor) per line in `Source`.
 splitAbstractedTerm :: (inTerm -> Info) -> (inTerm -> Syntax leaf inTerm) -> (Info -> Syntax leaf outTerm -> outTerm) -> Source Char -> inTerm -> ([Line outTerm], Range)
