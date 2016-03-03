@@ -61,12 +61,12 @@ splitAbstractedTerm getInfo getSyntax makeTerm source term = flip (,) (character
   where adjoin = reverse . foldl (adjoinLinesBy (openRangePair source)) []
 
         adjoinChildLines constructor children = let (lines, previous) = foldl childLines ([], start (characterRange (getInfo term))) children in
-          fmap (wrapLineContents $ wrap constructor) . adjoin $ lines ++ (pure . flip (,) Nothing <$> actualLineRanges (Range previous $ end (characterRange (getInfo term))) source)
+          fmap (wrapLineContents $ wrap constructor) . adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end (characterRange (getInfo term))) source)
 
-        wrap constructor children = (makeTerm $ Info (unionRanges $ Prelude.fst <$> children) (Diff.categories (getInfo term))) . constructor . catMaybes $ Prelude.snd <$> children
+        wrap constructor children = (makeTerm $ Info (unionRanges $ Prelude.snd <$> children) (Diff.categories (getInfo term))) . constructor . catMaybes $ Prelude.fst <$> children
 
         childLines (lines, previous) child = let (childLines, childRange) = splitAbstractedTerm getInfo getSyntax makeTerm source (copoint child) in
-          (adjoin $ lines ++ (pure . flip (,) Nothing <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap ((,) childRange . Just . (<$ child)) <$> childLines), end childRange)
+          (adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap (flip (,) childRange . Just . (<$ child)) <$> childLines), end childRange)
 
 -- | Split a annotated diff into rows of split diffs.
 splitAnnotatedByLines :: Both (Source Char) -> Both Range -> Both (Set.Set Category) -> Syntax leaf (Diff leaf Info) -> [Row (SplitDiff leaf Info)]
@@ -75,26 +75,26 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Indexed children -> adjoinChildRows (Indexed . fmap copoint) (Identity <$> children)
   Fixed children -> adjoinChildRows (Fixed . fmap copoint) (Identity <$> children)
   Keyed children -> adjoinChildRows (Keyed . Map.fromList) (List.sortOn (diffRanges . Prelude.snd) $ Map.toList children)
-  where adjoin :: [Row (Range, Maybe (f (SplitDiff leaf Info)))] -> [Row (Range, Maybe (f (SplitDiff leaf Info)))]
+  where adjoin :: [Row (Maybe (f (SplitDiff leaf Info)), Range)] -> [Row (Maybe (f (SplitDiff leaf Info)), Range)]
         adjoin = reverse . foldl (adjoinRowsBy (openRangePair <$> sources)) []
 
         adjoinChildRows :: (Copointed f, Functor f) => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> [f (Diff leaf Info)] -> [Row (SplitDiff leaf Info)]
         adjoinChildRows constructor children = let (rows, previous) = foldl childRows ([], start <$> ranges) children in
-          fmap (wrapRowContents (wrap constructor <$> categories)) . adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . flip (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (end <$> ranges)) <*> sources))
+          fmap (wrapRowContents (wrap constructor <$> categories)) . adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (end <$> ranges)) <*> sources))
 
-        wrap :: ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> Set.Set Category -> [(Range, Maybe (f (SplitDiff leaf Info)))] -> SplitDiff leaf Info
-        wrap constructor categories children = Free . Annotated (Info (unionRanges $ Prelude.fst <$> children) categories) . constructor . catMaybes $ Prelude.snd <$> children
+        wrap :: ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> Set.Set Category -> [(Maybe (f (SplitDiff leaf Info)), Range)] -> SplitDiff leaf Info
+        wrap constructor categories children = Free . Annotated (Info (unionRanges $ Prelude.snd <$> children) categories) . constructor . catMaybes $ Prelude.fst <$> children
 
         getRange :: SplitDiff leaf Info -> Range
         getRange (Pure patch) = characterRange (copoint (getSplitTerm patch))
         getRange (Free (Annotated info _)) = characterRange info
 
-        childRows :: (Copointed f, Functor f) => ([Row (Range, Maybe (f (SplitDiff leaf Info)))], Both Int) -> f (Diff leaf Info) -> ([Row (Range, Maybe (f (SplitDiff leaf Info)))], Both Int)
+        childRows :: (Copointed f, Functor f) => ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int) -> f (Diff leaf Info) -> ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int)
         childRows (rows, previous) child = let (childRows, childRanges) = splitDiffByLines (copoint child) previous sources in
           -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
           if or $ (<) . start <$> childRanges <*> previous
             then (rows, previous)
-            else (adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . flip (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (start <$> childRanges)) <*> sources)) ++ (fmap (getRange &&& Just . (<$ child)) <$> childRows), end <$> childRanges)
+            else (adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (start <$> childRanges)) <*> sources)) ++ (fmap (Just . (<$ child) &&& getRange) <$> childRows), end <$> childRanges)
 
         makeRanges :: Both Int -> Both Int -> Both Range
         makeRanges a b = runBothWith Range <$> sequenceA (both a b)
@@ -105,8 +105,8 @@ diffRanges (Free (Annotated infos _)) = Just . characterRange <$> infos
 diffRanges (Pure patch) = fmap (characterRange . copoint) <$> unPatch patch
 
 -- | MaybeOpen test for (Range, a) pairs.
-openRangePair :: Source Char -> MaybeOpen (Range, a)
-openRangePair source pair = pair <$ openRange source (Prelude.fst pair)
+openRangePair :: Source Char -> MaybeOpen (a, Range)
+openRangePair source pair = pair <$ openRange source (Prelude.snd pair)
 
 -- | Given a source and a range, returns nothing if it ends with a `\n`;
 -- | otherwise returns the range.
