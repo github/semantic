@@ -38,9 +38,7 @@ hylo down up a = down annotation $ hylo down up <$> syntax where
 
 -- | Constructs an algorithm and runs it
 constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
-constructAndRun _ a b | a == b = hylo introduce (copoint &&& unwrap) <$> zipTerms a b where
-  introduce :: Both annotation -> Syntax a (Diff a annotation) -> Diff a annotation
-  introduce ann = Free . Annotated ann
+constructAndRun _ a b | a == b = hylo (curry $ Free . uncurry Annotated) (copoint &&& unwrap) <$> zipTerms a b where
 
 constructAndRun comparable a b | not $ comparable a b = Nothing
 
