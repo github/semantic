@@ -94,10 +94,9 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         wrap :: Copointed f => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> Set.Set Category -> [(Range, Maybe (f (SplitDiff leaf Info)))] -> SplitDiff leaf Info
         wrap constructor categories children = Free . Annotated (Info (unionRanges $ Prelude.fst <$> children) categories) . constructor . catMaybes $ Prelude.snd <$> children
 
-        getRange :: Copointed f => f (SplitDiff leaf Info) -> Range
-        getRange diff = case copoint diff of
-          (Pure patch) -> characterRange (copoint (getSplitTerm patch))
-          (Free (Annotated info _)) -> characterRange info
+        getRange :: SplitDiff leaf Info -> Range
+        getRange (Pure patch) = characterRange (copoint (getSplitTerm patch))
+        getRange (Free (Annotated info _)) = characterRange info
 
         getInfo :: SplitDiff leaf Info -> Info
         getInfo (Pure patch) = copoint (getSplitTerm patch)
