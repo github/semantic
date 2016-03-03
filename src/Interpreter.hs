@@ -41,7 +41,9 @@ constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Term a an
 constructAndRun _ a b | a == b = hylo introduce (copoint &&& unwrap) <$> zipTerms a b where
   introduce :: Both annotation -> Syntax a (Diff a annotation) -> Diff a annotation
   introduce ann = Free . Annotated ann
+
 constructAndRun comparable a b | not $ comparable a b = Nothing
+
 constructAndRun comparable (annotation1 :< a) (annotation2 :< b) =
   run comparable $ algorithm a b where
     algorithm (Indexed a') (Indexed b') = Free $ ByIndex a' b' (annotate . Indexed)
