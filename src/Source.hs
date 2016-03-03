@@ -70,3 +70,4 @@ actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start rang
 
 instance Foldable Source where
   foldMap f = foldMap f . getVector
+  length = Vector.length . getVector
