@@ -119,6 +119,10 @@ spec = parallel $ do
 
       leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty) (Leaf $ toList (fst sources) ++ toList (snd sources))
 
+      patchWithBoth (Insert ()) = Insert . snd
+      patchWithBoth (Delete ()) = Delete . fst
+      patchWithBoth (Replace () ()) = runBothWith Replace
+
       openMaybe :: Maybe Bool -> Maybe (Maybe Bool)
       openMaybe (Just a) = Just (Just a)
       openMaybe Nothing = Nothing
