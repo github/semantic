@@ -7,7 +7,7 @@ import qualified Data.Text as T
 data SourceKind = PlainBlob | ExecutableBlob | SymlinkBlob
   deriving (Show, Eq, Enum)
 
-data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: SourceKind }
+data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
   deriving (Show, Eq)
 
 -- | The contents of a source file, backed by a vector for efficient slicing.
