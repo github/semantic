@@ -18,10 +18,6 @@ unLeft = fst . unRow
 unRight :: Row a -> Line a
 unRight = snd . unRow
 
--- | Like fmap but applies Both functions.
-rowMap :: Both (a -> b) -> Row a -> Row b
-rowMap transform row = Row $ fmap <$> transform <*> unRow row
-
 -- | Map over both sides of a row with the given functions.
 wrapRowContents :: Both ([a] -> b) -> Row a -> Row b
 wrapRowContents transform row = Row $ wrapLineContents <$> transform <*> unRow row
