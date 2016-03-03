@@ -117,7 +117,7 @@ spec = parallel $ do
 
       combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info <$> (pure (Range start $ start + 1)) <*> mempty) (Leaf [ char ]) ], start + 1)
 
-      leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty) (Leaf $ toList (fst sources) ++ toList (snd sources))
+      leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty) (Leaf $ runBothWith (++) (toList <$> sources))
 
       patchWithBoth (Insert ()) = Insert . snd
       patchWithBoth (Delete ()) = Delete . fst
