@@ -7,6 +7,11 @@ import qualified Data.Text as T
 data SourceKind = PlainBlob | ExecutableBlob | SymlinkBlob
   deriving (Show, Eq, Enum)
 
+modeToDigits :: SourceKind -> String
+modeToDigits PlainBlob = "100644"
+modeToDigits ExecutableBlob = "100755"
+modeToDigits SymlinkBlob = "120000"
+
 data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
   deriving (Show, Eq)
 
