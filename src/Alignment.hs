@@ -89,7 +89,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         adjoinChildRows :: (Copointed f, Functor f) => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> [f (Diff leaf Info)] -> [Row (SplitDiff leaf Info)]
         adjoinChildRows constructor children = let (rows, previous) = foldl childRows ([], start <$> ranges) children in
-          fmap (wrapRowContents (wrap constructor <$> categories)) . adjoin $ rows ++ (Row . fmap (pure . flip (,) Nothing) <$> contextRows (makeRanges previous (end <$> ranges)) sources)
+          fmap (wrapRowContents (wrap constructor <$> categories)) . adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . flip (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (end <$> ranges)) <*> sources))
 
         wrap :: ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> Set.Set Category -> [(Range, Maybe (f (SplitDiff leaf Info)))] -> SplitDiff leaf Info
         wrap constructor categories children = Free . Annotated (Info (unionRanges $ Prelude.fst <$> children) categories) . constructor . catMaybes $ Prelude.snd <$> children
