@@ -1,6 +1,7 @@
 module Alignment where
 
 import Category
+import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Copointed
@@ -104,7 +105,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         childRows :: (Copointed f, Functor f) => ([Row (Range, Maybe (f (SplitDiff leaf Info)))], Both Int) -> f (Diff leaf Info) -> ([Row (Range, Maybe (f (SplitDiff leaf Info)))], Both Int)
         childRows (rows, previous) child = let (childRows, childRanges) = splitDiffByLines (copoint child) previous sources in
-          (adjoin $ rows ++ (fmap (flip (,) Nothing) <$> contextRows (makeRanges previous (start <$> childRanges)) sources) ++ (rowMap ((. (Just . (<$ child))) . (,) <$> childRanges) <$> childRows), end <$> childRanges)
+          (adjoin $ rows ++ (fmap (flip (,) Nothing) <$> contextRows (makeRanges previous (start <$> childRanges)) sources) ++ (fmap (getRange &&& Just . (<$ child)) <$> childRows), end <$> childRanges)
 
         makeRanges :: Both Int -> Both Int -> Both Range
         makeRanges a b = runBothWith safeRange <$> sequenceA (both a b)
