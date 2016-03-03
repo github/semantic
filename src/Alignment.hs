@@ -10,6 +10,7 @@ import Data.Foldable (foldl')
 import Data.Functor.Both
 import Data.Functor.Identity
 import qualified Data.List as List
+import Data.Maybe
 import qualified Data.OrderedMap as Map
 import qualified Data.Set as Set
 import Diff
@@ -60,15 +61,15 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
   Indexed children -> adjoinChildLines (Indexed . fmap copoint) (Identity <$> children)
   Fixed children -> adjoinChildLines (Fixed . fmap copoint) (Identity <$> children)
   Keyed children -> adjoinChildLines (Keyed . Map.fromList) (Map.toList children)
-  where adjoin :: Copointed f => [Line (Either Range (f (Term leaf Info)))] -> [Line (Either Range (f (Term leaf Info)))]
-        adjoin = reverse . foldl (adjoinLinesBy $ openEither (openRange source) (openTerm source)) []
+  where adjoin :: Copointed f => [Line (Range, Maybe (f (Term leaf Info)))] -> [Line (Range, Maybe (f (Term leaf Info)))]
+        adjoin = reverse . foldl (adjoinLinesBy $ (\ (range, rest) -> (range, rest) <$ openRange source range)) []
 
         adjoinChildLines :: (Copointed f, Functor f) => ([f (Term leaf Info)] -> Syntax leaf (Term leaf Info)) -> [f (Term leaf Info)] -> [Line (Term leaf Info)]
         adjoinChildLines constructor children = let (lines, previous) = foldl childLines ([], start range) children in
-          fmap (wrapLineContents $ wrap constructor) . adjoin $ lines ++ (pure . Left <$> actualLineRanges (safeRange previous $ end range) source)
+          fmap (wrapLineContents $ wrap constructor) . adjoin $ lines ++ (pure . flip (,) Nothing <$> actualLineRanges (safeRange previous $ end range) source)
 
-        wrap :: Copointed f => ([f (Term leaf Info)] -> Syntax leaf (Term leaf Info)) -> [Either Range (f (Term leaf Info))] -> Term leaf Info
-        wrap constructor children = (Info (unionRanges $ getRange <$> children) categories :<) . constructor $ rights children
+        wrap :: Copointed f => ([f (Term leaf Info)] -> Syntax leaf (Term leaf Info)) -> [(Range, Maybe (f (Term leaf Info)))] -> Term leaf Info
+        wrap constructor children = (Info (unionRanges $ Prelude.fst <$> children) categories :<) . constructor . catMaybes $ Prelude.snd <$> children
 
         getRange :: Copointed f => Either Range (f (Term leaf Info)) -> Range
         getRange = either id (characterRange . copoint . copoint)
@@ -76,9 +77,9 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
         pairEither :: Copointed f => Either Range (f (Term leaf Info)) -> (Range, Maybe (f (Term leaf Info)))
         pairEither = either (flip (,) Nothing) ((characterRange . copoint . copoint) &&& Just)
 
-        childLines :: (Copointed f, Functor f) => ([Line (Either Range (f (Term leaf Info)))], Int) -> f (Term leaf Info) -> ([Line (Either Range (f (Term leaf Info)))], Int)
+        childLines :: (Copointed f, Functor f) => ([Line (Range, Maybe (f (Term leaf Info)))], Int) -> f (Term leaf Info) -> ([Line (Range, Maybe (f (Term leaf Info)))], Int)
         childLines (lines, previous) child = let (childLines, childRange) = splitTermByLines (copoint child) source in
-          (adjoin $ lines ++ (pure . Left <$> actualLineRanges (safeRange previous $ start childRange) source) ++ (fmap (Right . (<$ child)) <$> childLines), end childRange)
+          (adjoin $ lines ++ (pure . flip (,) Nothing <$> actualLineRanges (safeRange previous $ start childRange) source) ++ (fmap ((,) childRange . Just . (<$ child)) <$> childLines), end childRange)
 
 -- | Split a annotated diff into rows of split diffs.
 splitAnnotatedByLines :: Both (Source Char) -> Both Range -> Both (Set.Set Category) -> Syntax leaf (Diff leaf Info) -> [Row (SplitDiff leaf Info)]
