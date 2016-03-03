@@ -60,7 +60,7 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
   Indexed children -> adjoinChildLines (Indexed . fmap copoint) (Identity <$> children)
   Fixed children -> adjoinChildLines (Fixed . fmap copoint) (Identity <$> children)
   Keyed children -> adjoinChildLines (Keyed . Map.fromList) (Map.toList children)
-  where adjoin :: Copointed f => [Line (Range, Maybe (f (Term leaf Info)))] -> [Line (Range, Maybe (f (Term leaf Info)))]
+  where adjoin :: [Line (Range, Maybe (f (Term leaf Info)))] -> [Line (Range, Maybe (f (Term leaf Info)))]
         adjoin = reverse . foldl (adjoinLinesBy (openRangePair source)) []
 
         adjoinChildLines :: (Copointed f, Functor f) => ([f (Term leaf Info)] -> Syntax leaf (Term leaf Info)) -> [f (Term leaf Info)] -> [Line (Term leaf Info)]
@@ -81,7 +81,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Indexed children -> adjoinChildRows (Indexed . fmap copoint) (Identity <$> children)
   Fixed children -> adjoinChildRows (Fixed . fmap copoint) (Identity <$> children)
   Keyed children -> adjoinChildRows (Keyed . Map.fromList) (List.sortOn (diffRanges . Prelude.snd) $ Map.toList children)
-  where adjoin :: Copointed f => [Row (Range, Maybe (f (SplitDiff leaf Info)))] -> [Row (Range, Maybe (f (SplitDiff leaf Info)))]
+  where adjoin :: [Row (Range, Maybe (f (SplitDiff leaf Info)))] -> [Row (Range, Maybe (f (SplitDiff leaf Info)))]
         adjoin = reverse . foldl (adjoinRowsBy (openRangePair <$> sources)) []
 
         adjoinChildRows :: (Copointed f, Functor f) => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> [f (Diff leaf Info)] -> [Row (SplitDiff leaf Info)]
