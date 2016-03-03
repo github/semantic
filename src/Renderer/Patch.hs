@@ -77,7 +77,7 @@ getRange (Pure patch) = let Info range _ :< _ = getSplitTerm patch in range
 
 -- | Returns the header given two source blobs and a hunk.
 header :: Both SourceBlob -> Hunk a -> String
-header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, blobOidHeader, maybeOffsetHeader]
+header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, blobOidHeader, beforeFilepath, afterFilepath, maybeOffsetHeader]
    where filepathHeader = "diff --git a/" ++ pathA ++ " b/" ++ pathB
          fileModeHeader = case (modeA, modeB) of
                           (Nothing, Just mode) -> "new file mode " ++ modeToDigits mode
@@ -85,7 +85,15 @@ header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, blobOidHea
                           (Just mode1, Just mode2) | mode1 == mode2 -> "index " ++ oidA ++ ".." ++ oidB
                           (Just mode1, Just mode2) -> "index " ++ oidA ++ ".." ++ oidB ++ " " ++ modeToDigits mode2
          blobOidHeader = "index " ++ oidA ++ ".." ++ oidB
-         maybeOffsetHeader = if lengthA > 0 && lengthB > 0 then offsetHeader else mempty
+         beforeFilepath = "--- " ++ case modeA of
+                                        Just mode -> "a/" ++ pathA
+                                        Nothing -> "/dev/null"
+         afterFilepath = "+++ " ++ case modeB of
+                                       Just mode -> "b/" ++ pathB
+                                       Nothing -> "/dev/null"
+         maybeOffsetHeader = if lengthA > 0 && lengthB > 0
+                             then offsetHeader
+                             else mempty
          offsetHeader = "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
          (lengthA, lengthB) = runBoth . fmap getSum $ hunkLength hunk
          (offsetA, offsetB) = runBoth . fmap getSum $ offset hunk
