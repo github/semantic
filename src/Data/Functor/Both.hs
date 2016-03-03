@@ -27,6 +27,7 @@ snd = Prelude.snd . runBoth
 zip :: Both [a] -> [Both a]
 zip = zipWith both
 
+-- | Split a `Both` of pairs into a pair of `Both`s.
 transpose :: Both (a, b) -> (Both a, Both b)
 transpose = runBothWith (uncurry bimap . bimap both both)
 
