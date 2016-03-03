@@ -77,20 +77,20 @@ getRange (Pure patch) = let Info range _ :< _ = getSplitTerm patch in range
 
 -- | Returns the header given two source blobs and a hunk.
 header :: Both SourceBlob -> Hunk a -> String
-header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, blobOidHeader, beforeFilepath, afterFilepath, maybeOffsetHeader]
+header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFilepath, afterFilepath, maybeOffsetHeader]
    where filepathHeader = "diff --git a/" ++ pathA ++ " b/" ++ pathB
          fileModeHeader = case (modeA, modeB) of
-                          (Nothing, Just mode) -> "new file mode " ++ modeToDigits mode
-                          (Just mode, Nothing) -> "old file mode " ++ modeToDigits mode
-                          (Just mode1, Just mode2) | mode1 == mode2 -> "index " ++ oidA ++ ".." ++ oidB
-                          (Just mode1, Just mode2) -> "index " ++ oidA ++ ".." ++ oidB ++ " " ++ modeToDigits mode2
+                            (Nothing, Just mode) -> "new file mode " ++ modeToDigits mode ++ "\n" ++ blobOidHeader
+                            (Just mode, Nothing) -> "old file mode " ++ modeToDigits mode ++ "\n" ++ blobOidHeader
+                            (Just mode1, Just mode2) | mode1 == mode2 -> "index " ++ oidA ++ ".." ++ oidB ++ " " ++ modeToDigits mode2
+                            (Just mode1, Just mode2) -> "old mode " ++ modeToDigits mode1 ++ "\n" ++ "new mode " ++ modeToDigits mode2 ++ "\n" ++ blobOidHeader
          blobOidHeader = "index " ++ oidA ++ ".." ++ oidB
          beforeFilepath = "--- " ++ case modeA of
-                                        Just mode -> "a/" ++ pathA
-                                        Nothing -> "/dev/null"
+                                      Just mode -> "a/" ++ pathA
+                                      Nothing -> "/dev/null"
          afterFilepath = "+++ " ++ case modeB of
-                                       Just mode -> "b/" ++ pathB
-                                       Nothing -> "/dev/null"
+                                     Just mode -> "b/" ++ pathB
+                                     Nothing -> "/dev/null"
          maybeOffsetHeader = if lengthA > 0 && lengthB > 0
                              then offsetHeader
                              else mempty
