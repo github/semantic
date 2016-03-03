@@ -65,14 +65,14 @@ splitTermByLines (Info range categories :< syntax) source = flip (,) range $ cas
 
         adjoinChildLines :: (Copointed f, Functor f) => ([f (Term leaf Info)] -> Syntax leaf (Term leaf Info)) -> [f (Term leaf Info)] -> [Line (Term leaf Info)]
         adjoinChildLines constructor children = let (lines, previous) = foldl childLines ([], start range) children in
-          fmap (wrapLineContents $ wrap constructor) . adjoin $ lines ++ (pure . flip (,) Nothing <$> actualLineRanges (safeRange previous $ end range) source)
+          fmap (wrapLineContents $ wrap constructor) . adjoin $ lines ++ (pure . flip (,) Nothing <$> actualLineRanges (Range previous $ end range) source)
 
         wrap :: ([f (Term leaf Info)] -> Syntax leaf (Term leaf Info)) -> [(Range, Maybe (f (Term leaf Info)))] -> Term leaf Info
         wrap constructor children = (Info (unionRanges $ Prelude.fst <$> children) categories :<) . constructor . catMaybes $ Prelude.snd <$> children
 
         childLines :: (Copointed f, Functor f) => ([Line (Range, Maybe (f (Term leaf Info)))], Int) -> f (Term leaf Info) -> ([Line (Range, Maybe (f (Term leaf Info)))], Int)
         childLines (lines, previous) child = let (childLines, childRange) = splitTermByLines (copoint child) source in
-          (adjoin $ lines ++ (pure . flip (,) Nothing <$> actualLineRanges (safeRange previous $ start childRange) source) ++ (fmap ((,) childRange . Just . (<$ child)) <$> childLines), end childRange)
+          (adjoin $ lines ++ (pure . flip (,) Nothing <$> actualLineRanges (Range previous $ start childRange) source) ++ (fmap ((,) childRange . Just . (<$ child)) <$> childLines), end childRange)
 
 -- | Split a annotated diff into rows of split diffs.
 splitAnnotatedByLines :: Both (Source Char) -> Both Range -> Both (Set.Set Category) -> Syntax leaf (Diff leaf Info) -> [Row (SplitDiff leaf Info)]
@@ -97,10 +97,13 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         childRows :: (Copointed f, Functor f) => ([Row (Range, Maybe (f (SplitDiff leaf Info)))], Both Int) -> f (Diff leaf Info) -> ([Row (Range, Maybe (f (SplitDiff leaf Info)))], Both Int)
         childRows (rows, previous) child = let (childRows, childRanges) = splitDiffByLines (copoint child) previous sources in
-          (adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . flip (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (start <$> childRanges)) <*> sources)) ++ (fmap (getRange &&& Just . (<$ child)) <$> childRows), end <$> childRanges)
+          -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
+          if or $ (<) . start <$> childRanges <*> previous
+            then (rows, previous)
+            else (adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . flip (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (start <$> childRanges)) <*> sources)) ++ (fmap (getRange &&& Just . (<$ child)) <$> childRows), end <$> childRanges)
 
         makeRanges :: Both Int -> Both Int -> Both Range
-        makeRanges a b = runBothWith safeRange <$> sequenceA (both a b)
+        makeRanges a b = runBothWith Range <$> sequenceA (both a b)
 
 -- | Produces the starting indices of a diff.
 diffRanges :: Diff leaf Info -> Both (Maybe Range)

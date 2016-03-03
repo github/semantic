@@ -15,10 +15,6 @@ data Range = Range { start :: !Int, end :: !Int }
 rangeAt :: Int -> Range
 rangeAt a = Range a a
 
--- | Constructs a Range such that its end is clamped to its start.
-safeRange :: Int -> Int -> Range
-safeRange start end = Range start (max start end)
-
 -- | Return the length of the range.
 rangeLength :: Range -> Int
 rangeLength range = end range - start range
