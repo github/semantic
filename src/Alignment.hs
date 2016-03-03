@@ -46,13 +46,12 @@ splitDiffByLines diff previous sources = case diff of
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Patch (Term leaf Info) -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
 splitPatchByLines patch previous sources = case patch of
-  Insert term -> let (lines, range) = splitTermByLines term (snd sources) in
+  Insert term -> let (lines, range) = splitAbstractedTerm copoint unwrap (:<) (snd sources) term in
     (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, both (rangeAt $ fst previous) range)
-  Delete term -> let (lines, range) = splitTermByLines term (fst sources) in
+  Delete term -> let (lines, range) = splitAbstractedTerm copoint unwrap (:<) (fst sources) term in
     (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, both range (rangeAt $ snd previous))
   Replace leftTerm rightTerm -> (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
-    where (lines, ranges) = transpose $ split <$> sources <*> both leftTerm rightTerm
-          split = splitAbstractedTerm copoint unwrap (:<)
+    where (lines, ranges) = transpose $ splitAbstractedTerm copoint unwrap (:<) <$> sources <*> both leftTerm rightTerm
 
 splitAbstractedTerm :: (term -> Info) -> (term -> Syntax leaf term) -> (Info -> Syntax leaf term -> term) -> Source Char -> term -> ([Line term], Range)
 splitAbstractedTerm getInfo getSyntax makeTerm source term = flip (,) (characterRange (getInfo term)) $ case getSyntax term of
