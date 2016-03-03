@@ -9,7 +9,7 @@ data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: Fil
 
 -- | The contents of a source file, backed by a vector for efficient slicing.
 newtype Source a = Source { getVector :: Vector.Vector a  }
-  deriving (Eq, Show, Functor, Foldable, Traversable)
+  deriving (Eq, Show, Functor, Traversable)
 
 -- | Return a Source from a list of items.
 fromList :: [a] -> Source a
@@ -67,3 +67,6 @@ actualLines source = case Source.break (== '\n') source of
 actualLineRanges :: Range -> Source Char -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous string = Range (end previous) $ end previous + length string
+
+instance Foldable Source where
+  foldMap f = foldMap f . getVector
