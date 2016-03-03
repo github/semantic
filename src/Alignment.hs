@@ -109,9 +109,6 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         makeRanges :: Both Int -> Both Int -> Both Range
         makeRanges a b = runBothWith Range <$> sequenceA (both a b)
 
-        -- | Constructs a Range such that its end is clamped to its start.
-        safeRange start end = Range start (max start end)
-
 -- | Produces the starting indices of a diff.
 diffRanges :: Diff leaf Info -> Both (Maybe Range)
 diffRanges (Free (Annotated infos _)) = Just . characterRange <$> infos
