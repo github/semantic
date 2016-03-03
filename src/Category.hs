@@ -22,6 +22,8 @@ data Category =
   | IntegerLiteral
   -- | A symbol literal.
   | SymbolLiteral
+  -- | An array literal.
+  | ArrayLiteral
   -- | A non-standard category, which can be used for comparability.
   | Other String
   deriving (Eq, Show, Ord)

@@ -40,6 +40,7 @@ styleName category = "category-" ++ case category of
   StringLiteral -> "string"
   SymbolLiteral -> "symbol"
   IntegerLiteral -> "integer"
+  ArrayLiteral -> "array"
   Other string -> string
 
 -- | Pick the class name for a split patch.
