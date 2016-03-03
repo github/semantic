@@ -1,5 +1,6 @@
 module Data.Functor.Both where
 
+import Data.Bifunctor
 import Prelude hiding (zipWith, fst, snd)
 import qualified Prelude
 
@@ -25,6 +26,10 @@ snd = Prelude.snd . runBoth
 
 zip :: Both [a] -> [Both a]
 zip = zipWith both
+
+-- | Split a `Both` of pairs into a pair of `Both`s.
+transpose :: Both (a, b) -> (Both a, Both b)
+transpose = runBothWith (uncurry bimap . bimap both both)
 
 -- | Zip two lists by applying a function, using the default values to extend
 -- | the shorter list.

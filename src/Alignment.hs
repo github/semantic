@@ -37,26 +37,19 @@ hasChanges = or . fmap (or . (True <$))
 -- | Split a diff, which may span multiple lines, into rows of split diffs.
 splitDiffByLines :: Diff leaf Info -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
 splitDiffByLines diff previous sources = case diff of
-  Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (categories annotation) syntax, ranges annotation)
-  Pure (Insert term) -> let (lines, range) = splitTermByLines term (snd sources) in
-    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, Both (rangeAt $ fst previous, range))
-  Pure (Delete term) -> let (lines, range) = splitTermByLines term (fst sources) in
-    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, Both (range, rangeAt $ snd previous))
-  Pure (Replace leftTerm rightTerm) -> let Both ((leftLines, leftRange), (rightLines, rightRange)) = splitTermByLines <$> Both (leftTerm, rightTerm) <*> sources
-                                           (lines, ranges) = (Both (leftLines, rightLines), Both (leftRange, rightRange)) in
-                                           (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
-  where categories annotations = Diff.categories <$> annotations
-        ranges annotations = characterRange <$> annotations
+  Free (Annotated annotation syntax) -> (splitAnnotatedByLines sources (ranges annotation) (Diff.categories <$> annotation) syntax, ranges annotation)
+  Pure patch -> splitPatchByLines patch previous sources
+  where ranges annotations = characterRange <$> annotations
 
--- | A functor that can return its content.
-class Functor f => Has f where
-  get :: f a -> a
-
-instance Has Identity where
-  get = runIdentity
-
-instance Has ((,) a) where
-  get = Prelude.snd
+-- | Split a patch, which may span multiple lines, into rows of split diffs.
+splitPatchByLines :: Patch (Term leaf Info) -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
+splitPatchByLines patch previous sources = case patch of
+  Insert term -> let (lines, range) = splitTermByLines term (snd sources) in
+    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, both (rangeAt $ fst previous) range)
+  Delete term -> let (lines, range) = splitTermByLines term (fst sources) in
+    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, both range (rangeAt $ snd previous))
+  Replace leftTerm rightTerm -> (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
+    where (lines, ranges) = transpose $ splitTermByLines <$> both leftTerm rightTerm <*> sources
 
 -- | Takes a term and a source and returns a list of lines and their range within source.
 splitTermByLines :: Term leaf Info -> Source Char -> ([Line (Term leaf Info)], Range)
@@ -111,7 +104,10 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         childRows :: Has f => ([Row (Either Range (f (SplitDiff leaf Info)))], Both Int) -> f (Diff leaf Info) -> ([Row (Either Range (f (SplitDiff leaf Info)))], Both Int)
         childRows (rows, previous) child = let (childRows, childRanges) = splitDiffByLines (get child) previous sources in
-          (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (start <$> childRanges)) sources) ++ (fmap (Right . (<$ child)) <$> childRows), end <$> childRanges)
+          -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
+          if or $ (<) . start <$> childRanges <*> previous
+            then (rows, previous)
+            else (adjoin $ rows ++ (fmap Left <$> contextRows (makeRanges previous (start <$> childRanges)) sources) ++ (fmap (Right . (<$ child)) <$> childRows), end <$> childRanges)
 
         makeRanges :: Both Int -> Both Int -> Both Range
         makeRanges a b = runBothWith Range <$> sequenceA (both a b)
@@ -144,3 +140,13 @@ openDiff :: Has f => Source Char -> MaybeOpen (f (SplitDiff leaf Info))
 openDiff source diff = const diff <$> case get diff of
   (Free (Annotated (Info range _) _)) -> openRange source range
   (Pure patch) -> let Info range _ :< _ = getSplitTerm patch in openRange source range
+
+-- | A functor that can return its content.
+class Functor f => Has f where
+  get :: f a -> a
+
+instance Has Identity where
+  get = runIdentity
+
+instance Has ((,) a) where
+  get = Prelude.snd
