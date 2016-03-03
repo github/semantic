@@ -4,7 +4,10 @@ import Range
 import qualified Data.Vector as Vector
 import qualified Data.Text as T
 
-data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath }
+data SourceKind = PlainBlob | ExecutableBlob | SymlinkBlob
+  deriving (Show, Eq, Enum)
+
+data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: SourceKind }
   deriving (Show, Eq)
 
 -- | The contents of a source file, backed by a vector for efficient slicing.
