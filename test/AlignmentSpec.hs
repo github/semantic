@@ -16,6 +16,7 @@ import Diff
 import qualified Data.Maybe as Maybe
 import Data.Functor.Identity
 import Line
+import Patch
 import Prelude hiding (fst, snd)
 import qualified Prelude
 import Row
@@ -33,6 +34,12 @@ instance Arbitrary a => Arbitrary (Line a) where
   arbitrary = oneof [
     makeLine <$> arbitrary,
     const EmptyLine <$> (arbitrary :: Gen ()) ]
+
+instance Arbitrary a => Arbitrary (Patch a) where
+  arbitrary = oneof [
+    Insert <$> arbitrary,
+    Delete <$> arbitrary,
+    Replace <$> arbitrary <*> arbitrary ]
 
 instance Arbitrary a => Arbitrary (Source a) where
   arbitrary = fromList <$> arbitrary
