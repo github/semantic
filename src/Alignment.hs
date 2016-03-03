@@ -120,10 +120,3 @@ openRange :: Source Char -> MaybeOpen Range
 openRange source range = case (source `at`) <$> maybeLastIndex range of
   Just '\n' -> Nothing
   _ -> Just range
-
--- | Given a source and something that has a split diff, returns nothing if the
--- | diff ends with a `\n`; otherwise returns the diff.
-openDiff :: Copointed f => Source Char -> MaybeOpen (f (SplitDiff leaf Info))
-openDiff source diff = const diff <$> case copoint diff of
-  (Free (Annotated (Info range _) _)) -> openRange source range
-  (Pure patch) -> let Info range _ :< _ = getSplitTerm patch in openRange source range
