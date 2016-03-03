@@ -50,7 +50,7 @@ splitPatchByLines patch previous sources = case patch of
     (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, both (rangeAt $ fst previous) range)
   Delete term -> let (lines, range) = splitAbstractedTerm copoint unwrap (:<) (fst sources) term in
     (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, both range (rangeAt $ snd previous))
-  Replace leftTerm rightTerm -> (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
+  Replace _ _ -> (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . SplitReplace)) <$> lines, ranges)
     where (lines, ranges) = transpose $ maybe . (,) [] . rangeAt <$> previous <*> (splitAbstractedTerm copoint unwrap (:<) <$> sources) <*> unPatch patch
 
 -- | Split an `inTerm` (abstracted by two destructors) up into one `outTerm` (abstracted by a constructor) per line in `Source`.
