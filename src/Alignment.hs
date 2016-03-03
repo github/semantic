@@ -3,6 +3,7 @@ module Alignment where
 import Category
 import Control.Comonad.Cofree
 import Control.Monad.Free
+import Data.Copointed
 import Data.Either
 import Data.Foldable (foldl')
 import Data.Functor.Both
@@ -119,7 +120,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 -- | Produces the starting indices of a diff.
 diffRanges :: Diff leaf Info -> Both (Maybe Range)
 diffRanges (Free (Annotated infos _)) = Just . characterRange <$> infos
-diffRanges (Pure patch) = fmap (characterRange . extract) <$> unPatch patch
+diffRanges (Pure patch) = fmap (characterRange . copoint) <$> unPatch patch
 
 -- | Returns a function that takes an Either, applies either the left or right
 -- | MaybeOpen, and returns Nothing or the original either.
