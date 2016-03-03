@@ -45,12 +45,7 @@ splitDiffByLines diff previous sources = case diff of
 
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Patch (Term leaf Info) -> Both Int -> Both (Source Char) -> ([Row (SplitDiff leaf Info)], Both Range)
-splitPatchByLines patch previous sources = case patch of
-  Insert term -> let (lines, range) = splitAbstractedTerm copoint unwrap (:<) (snd sources) term in
-    (makeRow EmptyLine . fmap (Pure . SplitInsert) <$> lines, both (rangeAt $ fst previous) range)
-  Delete term -> let (lines, range) = splitAbstractedTerm copoint unwrap (:<) (fst sources) term in
-    (flip makeRow EmptyLine . fmap (Pure . SplitDelete) <$> lines, both range (rangeAt $ snd previous))
-  Replace _ _ -> (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . constructor patch)) <$> lines, ranges)
+splitPatchByLines patch previous sources = (zipWithDefaults makeRow (pure mempty) $ fmap (fmap (Pure . constructor patch)) <$> lines, ranges)
     where (lines, ranges) = transpose $ maybe . (,) [] . rangeAt <$> previous <*> (splitAbstractedTerm copoint unwrap (:<) <$> sources) <*> unPatch patch
           constructor (Replace _ _) = SplitReplace
           constructor (Insert _) = SplitInsert
