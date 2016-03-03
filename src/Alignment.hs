@@ -110,7 +110,6 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         makeRanges a b = runBothWith safeRange <$> sequenceA (both a b)
 
         -- | Constructs a Range such that its end is clamped to its start.
-        safeRange :: Int -> Int -> Range
         safeRange start end = Range start (max start end)
 
 -- | Produces the starting indices of a diff.
