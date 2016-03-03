@@ -117,6 +117,9 @@ diffRanges (Pure patch) = fmap (characterRange . copoint) <$> unPatch patch
 openEither :: MaybeOpen a -> MaybeOpen b -> MaybeOpen (Either a b)
 openEither ifLeft ifRight which = either (fmap (const which) . ifLeft) (fmap (const which) . ifRight) which
 
+openRangePair :: Source Char -> MaybeOpen (Range, a)
+openRangePair source pair = pair <$ openRange source (Prelude.fst pair)
+
 -- | Given a source and a range, returns nothing if it ends with a `\n`;
 -- | otherwise returns the range.
 openRange :: Source Char -> MaybeOpen Range
