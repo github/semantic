@@ -62,7 +62,7 @@ splitAbstractedTerm getInfo getSyntax makeTerm source term = case getSyntax term
   where adjoin = reverse . foldl (adjoinLinesBy (openRangePair source)) []
 
         adjoinChildLines constructor children = let (lines, previous) = foldl childLines ([], start (characterRange (getInfo term))) children in
-          fmap (wrapLineContents (wrap (\ info -> makeTerm info . constructor) (Diff.categories (getInfo term)) &&& (unionRanges . fmap Prelude.snd))) . adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end (characterRange (getInfo term))) source)
+          fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) (Diff.categories (getInfo term)) &&& (unionRanges . fmap Prelude.snd))) . adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end (characterRange (getInfo term))) source)
 
         childLines (lines, previous) child = let childLines = splitAbstractedTerm getInfo getSyntax makeTerm source (copoint child) in
           (adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ start (rangeForChildLines childLines)) source) ++ (fmap (flip (,) (rangeForChildLines childLines) . Just . (<$ child)) <$> childLines), end (rangeForChildLines childLines))
@@ -82,7 +82,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         adjoinChildRows :: (Copointed f, Functor f) => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> [f (Diff leaf Info)] -> [Row (SplitDiff leaf Info)]
         adjoinChildRows constructor children = let (rows, previous) = foldl childRows ([], start <$> ranges) children in
-          fmap (wrapRowContents (wrap (\ info -> Free . Annotated info . constructor) <$> categories)) . adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (end <$> ranges)) <*> sources))
+          fmap (wrapRowContents (makeBranchTerm (\ info -> Free . Annotated info . constructor) <$> categories)) . adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (end <$> ranges)) <*> sources))
 
         childRows :: (Copointed f, Functor f) => ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int) -> f (Diff leaf Info) -> ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int)
         childRows (rows, previous) child = let (childRows, childRanges) = splitDiffByLines (copoint child) previous sources in
@@ -95,8 +95,8 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         makeRanges a b = runBothWith Range <$> sequenceA (both a b)
 
 -- | Wrap a list of child terms in a branch.
-wrap :: (Info -> [inTerm] -> outTerm) -> Set.Set Category -> [(Maybe inTerm, Range)] -> outTerm
-wrap constructor categories children = constructor (Info (unionRanges $ Prelude.snd <$> children) categories) . catMaybes $ Prelude.fst <$> children
+makeBranchTerm :: (Info -> [inTerm] -> outTerm) -> Set.Set Category -> [(Maybe inTerm, Range)] -> outTerm
+makeBranchTerm constructor categories children = constructor (Info (unionRanges $ Prelude.snd <$> children) categories) . catMaybes $ Prelude.fst <$> children
 
 -- | Produces the starting indices of a diff.
 diffRanges :: Diff leaf Info -> Both (Maybe Range)
