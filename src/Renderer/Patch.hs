@@ -97,9 +97,9 @@ header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFile
         maybeOffsetHeader = if lengthA > 0 && lengthB > 0
                             then offsetHeader
                             else mempty
-        offsetHeader = intercalate "," ["@@ -", show offsetA, show lengthA, show offsetB, show lengthB, " @@"] ++ "\n"
+        offsetHeader = "@@ -" ++ offsetA ++ "," ++ show lengthA ++ " +" ++ offsetB ++ "," ++ show lengthB ++ " @@" ++ "\n"
         (lengthA, lengthB) = runBoth . fmap getSum $ hunkLength hunk
-        (offsetA, offsetB) = runBoth . fmap getSum $ offset hunk
+        (offsetA, offsetB) = runBoth . fmap (show . getSum) $ offset hunk
         (pathA, pathB) = runBoth $ path <$> blobs
         (oidA, oidB) = runBoth $ oid <$> blobs
         (modeA, modeB) = runBoth $ blobKind <$> blobs
