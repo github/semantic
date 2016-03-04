@@ -88,15 +88,15 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
             then (rows, previous)
             else (adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (start <$> childRanges)) <*> sources)) ++ (fmap (Just . (<$ child) &&& characterRange . getSplitAnnotation) <$> childRows), end <$> childRanges)
 
-        makeRanges :: Both Int -> Both Int -> Both Range
-        makeRanges a b = runBothWith Range <$> sequenceA (both a b)
-
 -- | Wrap a list of child terms in a branch.
 makeBranchTerm :: (Info -> [inTerm] -> outTerm) -> Set.Set Category -> [(Maybe inTerm, Range)] -> outTerm
 makeBranchTerm constructor categories children = constructor (Info (unionRanges $ Prelude.snd <$> children) categories) . catMaybes $ Prelude.fst <$> children
 
 unionLineRanges :: [Line (a, Range)] -> Range
 unionLineRanges lines = unionRanges (lines >>= (fmap Prelude.snd . unLine))
+
+makeRanges :: Both Int -> Both Int -> Both Range
+makeRanges a b = runBothWith Range <$> sequenceA (both a b)
 
 -- | Produces the starting indices of a diff.
 diffRanges :: Diff leaf Info -> Both (Maybe Range)
