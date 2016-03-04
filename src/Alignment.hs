@@ -65,7 +65,7 @@ splitAbstractedTerm getInfo getSyntax makeTerm source term = case getSyntax term
           fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) (Diff.categories (getInfo term)) &&& (unionRanges . fmap Prelude.snd))) . adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end (characterRange (getInfo term))) source)
 
         childLines (lines, previous) child = let childLines = splitAbstractedTerm getInfo getSyntax makeTerm source (copoint child) in
-          (adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ start (rangeForChildLines childLines)) source) ++ (fmap (flip (,) (rangeForChildLines childLines) . Just . (<$ child)) <$> childLines), end (rangeForChildLines childLines))
+          (adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ start (unionLineRanges childLines)) source) ++ (fmap (flip (,) (unionLineRanges childLines) . Just . (<$ child)) <$> childLines), end (unionLineRanges childLines))
 
 -- | Split a annotated diff into rows of split diffs.
 splitAnnotatedByLines :: Both (Source Char) -> Both Range -> Both (Set.Set Category) -> Syntax leaf (Diff leaf Info) -> [Row (SplitDiff leaf Info)]
@@ -95,8 +95,8 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 makeBranchTerm :: (Info -> [inTerm] -> outTerm) -> Set.Set Category -> [(Maybe inTerm, Range)] -> outTerm
 makeBranchTerm constructor categories children = constructor (Info (unionRanges $ Prelude.snd <$> children) categories) . catMaybes $ Prelude.fst <$> children
 
-rangeForChildLines :: [Line (a, Range)] -> Range
-rangeForChildLines lines = unionRanges (lines >>= (fmap Prelude.snd . unLine))
+unionLineRanges :: [Line (a, Range)] -> Range
+unionLineRanges lines = unionRanges (lines >>= (fmap Prelude.snd . unLine))
 
 -- | Produces the starting indices of a diff.
 diffRanges :: Diff leaf Info -> Both (Maybe Range)
