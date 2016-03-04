@@ -40,12 +40,12 @@ hasChanges = or . fmap (or . (True <$))
 splitDiffByLines :: Diff leaf Info -> Both Int -> Both (Source Char) -> [Row (SplitDiff leaf Info, Range)]
 splitDiffByLines diff previous sources = case diff of
   Free (Annotated annotation syntax) -> splitAnnotatedByLines sources (ranges annotation) (Diff.categories <$> annotation) syntax
-  Pure patch -> splitPatchByLines patch previous sources
+  Pure patch -> splitPatchByLines patch sources
   where ranges annotations = characterRange <$> annotations
 
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
-splitPatchByLines :: Patch (Term leaf Info) -> Both Int -> Both (Source Char) -> [Row (SplitDiff leaf Info, Range)]
-splitPatchByLines patch _ sources = zipWithDefaults makeRow (pure mempty) $ fmap (fmap (first (Pure . constructor patch))) <$> lines
+splitPatchByLines :: Patch (Term leaf Info) -> Both (Source Char) -> [Row (SplitDiff leaf Info, Range)]
+splitPatchByLines patch sources = zipWithDefaults makeRow (pure mempty) $ fmap (fmap (first (Pure . constructor patch))) <$> lines
     where lines = (maybe [] . splitAbstractedTerm copoint unwrap (:<) <$> sources) <*> unPatch patch
           constructor (Replace _ _) = SplitReplace
           constructor (Insert _) = SplitInsert
