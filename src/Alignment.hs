@@ -92,6 +92,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 makeBranchTerm :: (Info -> [inTerm] -> outTerm) -> Set.Set Category -> [(Maybe inTerm, Range)] -> outTerm
 makeBranchTerm constructor categories children = constructor (Info (unionRanges $ Prelude.snd <$> children) categories) . catMaybes $ Prelude.fst <$> children
 
+-- | Compute the union of the ranges in a list of ranged lines.
 unionLineRanges :: [Line (a, Range)] -> Range
 unionLineRanges lines = unionRanges (lines >>= (fmap Prelude.snd . unLine))
 
