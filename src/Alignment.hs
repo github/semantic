@@ -96,10 +96,6 @@ makeBranchTerm constructor categories previous children = (constructor (Info ran
 unionLineRangesFrom :: Range -> [Line (a, Range)] -> Range
 unionLineRangesFrom start lines = unionRangesFrom start (lines >>= (fmap Prelude.snd . unLine))
 
--- | Construct Both Ranges from Both starting and ending indices.
-makeRanges :: Both Int -> Both Int -> Both Range
-makeRanges a b = Range <$> a <*> b
-
 -- | Produces the starting indices of a diff.
 diffRanges :: Diff leaf Info -> Both (Maybe Range)
 diffRanges (Free (Annotated infos _)) = Just . characterRange <$> infos
