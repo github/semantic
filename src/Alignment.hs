@@ -64,8 +64,6 @@ splitAbstractedTerm getInfo getSyntax makeTerm source term = case getSyntax term
         adjoinChildLines constructor children = let (lines, previous) = foldl childLines ([], start (characterRange (getInfo term))) children in
           fmap (wrapLineContents (wrap constructor makeTerm (Diff.categories (getInfo term)) &&& (unionRanges . fmap Prelude.snd))) . adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end (characterRange (getInfo term))) source)
 
-        wrap constructor makeTerm categories children = (makeTerm $ Info (unionRanges $ Prelude.snd <$> children) categories) . constructor . catMaybes $ Prelude.fst <$> children
-
         childLines (lines, previous) child = let childLines = splitAbstractedTerm getInfo getSyntax makeTerm source (copoint child) in
           (adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ start (rangeForChildLines childLines)) source) ++ (fmap (flip (,) (rangeForChildLines childLines) . Just . (<$ child)) <$> childLines), end (rangeForChildLines childLines))
 
