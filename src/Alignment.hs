@@ -64,7 +64,7 @@ splitAbstractedTerm getInfo getSyntax makeTerm source term = case getSyntax term
           fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) (Diff.categories (getInfo term)) &&& unionRanges . fmap Prelude.snd)) . adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end (characterRange (getInfo term))) source)
 
         childLines (lines, previous) child = let childLines = splitAbstractedTerm getInfo getSyntax makeTerm source (copoint child) in
-          (adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ start (unionLineRanges childLines)) source) ++ (fmap (flip (,) (unionLineRanges childLines) . Just . (<$ child)) <$> childLines), end (unionLineRanges childLines))
+          (adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ start (unionLineRangesFrom (rangeAt previous) childLines)) source) ++ (fmap (flip (,) (unionLineRangesFrom (rangeAt previous) childLines) . Just . (<$ child)) <$> childLines), end (unionLineRangesFrom (rangeAt previous) childLines))
 
 -- | Split a annotated diff into rows of split diffs.
 splitAnnotatedByLines :: Both (Source Char) -> Both Range -> Both (Set.Set Category) -> Syntax leaf (Diff leaf Info) -> [Row (SplitDiff leaf Info, Range)]
@@ -83,17 +83,17 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         childRows :: (Copointed f, Functor f) => ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int) -> f (Diff leaf Info) -> ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int)
         childRows (rows, previous) child = let childRows = splitDiffByLines (copoint child) previous sources in
           -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
-          if or $ (<) . start . unionLineRanges <$> sequenceA (unRow <$> childRows) <*> previous
+          if or $ (<) . start <$> (unionLineRangesFrom <$> (rangeAt <$> previous) <*> sequenceA (unRow <$> childRows)) <*> previous
             then (rows, previous)
-            else (adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (start . unionLineRanges <$> sequenceA (unRow <$> childRows))) <*> sources)) ++ (fmap (first (Just . (<$ child))) <$> childRows), end . unionLineRanges <$> sequenceA (unRow <$> childRows))
+            else (adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (start <$> (unionLineRangesFrom <$> (rangeAt <$> previous) <*> sequenceA (unRow <$> childRows)))) <*> sources)) ++ (fmap (first (Just . (<$ child))) <$> childRows), end <$> (unionLineRangesFrom <$> (rangeAt <$> previous) <*> sequenceA (unRow <$> childRows)))
 
 -- | Wrap a list of child terms in a branch.
 makeBranchTerm :: (Info -> [inTerm] -> outTerm) -> Set.Set Category -> [(Maybe inTerm, Range)] -> outTerm
 makeBranchTerm constructor categories children = constructor (Info (unionRanges $ Prelude.snd <$> children) categories) . catMaybes $ Prelude.fst <$> children
 
 -- | Compute the union of the ranges in a list of ranged lines.
-unionLineRanges :: [Line (a, Range)] -> Range
-unionLineRanges lines = unionRanges (lines >>= (fmap Prelude.snd . unLine))
+unionLineRangesFrom :: Range -> [Line (a, Range)] -> Range
+unionLineRangesFrom start lines = unionRangesFrom start (lines >>= (fmap Prelude.snd . unLine))
 
 -- | Construct Both Ranges from Both starting and ending indices.
 makeRanges :: Both Int -> Both Int -> Both Range
