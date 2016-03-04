@@ -16,6 +16,3 @@ instance (Show pure, Show (functor (Free functor pure))) => Show (Free functor p
 iter :: Functor functor => (functor pure -> pure) -> Free functor pure -> pure
 iter _ (Pure a) = a
 iter f (Free g) = f (iter f <$> g)
-
-unfold :: Functor functor => (seed -> Either pure (functor seed)) -> seed -> Free functor pure
-unfold unroll seed = either Pure (Free . fmap (unfold unroll)) (unroll seed)
