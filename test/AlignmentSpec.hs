@@ -55,12 +55,12 @@ spec = parallel $ do
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
         \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (pure source) (pure range) (pure categories) syntax `shouldBe` [
-          makeRow (makeLine [ Free $ Annotated info $ Leaf source ]) (makeLine [ Free $ Annotated info $ Leaf source ]) ]
+          makeRow (pure (Free $ Annotated info $ Leaf source, Range 0 (length source))) (pure (Free $ Annotated info $ Leaf source, Range 0 (length source))) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
           \ source -> splitAnnotatedByLines (pure source) (pure (getTotalRange source)) (pure mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
-            makeRow (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) (makeLine [ Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [] ]) ]
+            makeRow (pure (Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
     prop "preserves line counts in equal sources" $
       \ source ->
@@ -98,7 +98,7 @@ spec = parallel $ do
   describe "splitPatchByLines" $ do
     prop "starts at initial indices" $
       \ patch sources -> let indices = length <$> sources in
-        start <$> (Prelude.snd (splitPatchByLines (patchWithBoth patch (leafWithRangeInSource <$> sources <*> (Range <$> indices <*> ((2 *) <$> indices)))) indices ((Source.++) <$> sources <*> sources))) `shouldBe` indices
+        fmap start . maybeFirst . Maybe.catMaybes <$> Both.unzip (fmap maybeFirst . unRow . fmap Prelude.snd <$> (splitPatchByLines (patchWithBoth patch (leafWithRangeInSource <$> sources <*> (Range <$> indices <*> ((2 *) <$> indices)))) indices ((Source.++) <$> sources <*> sources))) `shouldBe` (<$) <$> indices <*> unPatch patch
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $

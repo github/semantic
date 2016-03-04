@@ -61,8 +61,7 @@ split diff blobs = renderHtml
         . mconcat $ numberedLinesToMarkup <$> reverse numbered
   where
     sources = Source.source <$> blobs
-    rows = Prelude.fst (splitDiffByLines diff (pure 0) sources)
-    numbered = numberedRows rows
+    numbered = numberedRows (fmap Prelude.fst <$> splitDiffByLines diff (pure 0) sources)
     maxNumber = case numbered of
       [] -> 0
       (row : _) -> runBothWith max $ Prelude.fst <$> row

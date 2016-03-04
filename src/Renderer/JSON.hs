@@ -28,14 +28,14 @@ import Term
 -- | Render a diff to a string representing its JSON.
 json :: Renderer a ByteString
 json diff sources = toLazyByteString . fromEncoding . pairs $
-     "rows" .= annotateRows (Prelude.fst (splitDiffByLines diff (pure 0) (source <$> sources)))
+     "rows" .= annotateRows (splitDiffByLines diff (pure 0) (source <$> sources))
   <> "oids" .= (oid <$> sources)
   <> "paths" .= (path <$> sources)
   where annotateRows = fmap (fmap NumberedLine) . Prelude.reverse . numberedRows
 
 newtype NumberedLine a = NumberedLine (Int, Line a)
 
-instance ToJSON (NumberedLine (SplitDiff leaf Info)) where
+instance ToJSON (NumberedLine (SplitDiff leaf Info, Range)) where
   toJSON (NumberedLine (n, a)) = object (lineFields n a)
   toEncoding (NumberedLine (n, a)) = pairs $ mconcat (lineFields n a)
 instance ToJSON Category where
@@ -59,11 +59,9 @@ instance ToJSON (Term leaf Info) where
   toJSON (info :< syntax) = object (termFields info syntax)
   toEncoding (info :< syntax) = pairs $ mconcat (termFields info syntax)
 
-lineFields :: KeyValue kv => Int -> Line (SplitDiff leaf Info) -> [kv]
+lineFields :: KeyValue kv => Int -> Line (SplitDiff leaf Info, Range) -> [kv]
 lineFields _ EmptyLine = []
-lineFields n line = [ "number" .= n, "terms" .= unLine line, "range" .= unionRanges (getRange <$> line), "hasChanges" .= hasChanges line ]
-  where getRange (Free (Annotated (Info range _) _)) = range
-        getRange (Pure patch) = case getSplitTerm patch of Info range _ :< _ -> range
+lineFields n line = [ "number" .= n, "terms" .= unLine (Prelude.fst <$> line), "range" .= unionRanges (Prelude.snd <$> line), "hasChanges" .= hasChanges (Prelude.fst <$> line) ]
 
 termFields :: (ToJSON recur, KeyValue kv) => Info -> Syntax leaf recur -> [kv]
 termFields (Info range categories) syntax = "range" .= range : "categories" .= categories : case syntax of
