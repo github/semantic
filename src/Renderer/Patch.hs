@@ -90,7 +90,7 @@ header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFile
         blobOidHeader = "index " ++ oidA ++ ".." ++ oidB
         modeHeader :: String -> Maybe SourceKind -> String -> String
         modeHeader ty maybeMode path = case maybeMode of
-           Just mode -> ty ++ "a" ++ path
+           Just mode -> ty ++ "/" ++ path
            Nothing -> "/dev/null"
         beforeFilepath = "--- " ++ modeHeader "a" modeA pathA
         afterFilepath = "+++ " ++ modeHeader "b" modeB pathB
