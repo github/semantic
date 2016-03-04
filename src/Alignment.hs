@@ -96,6 +96,7 @@ makeBranchTerm constructor categories children = constructor (Info (unionRanges 
 unionLineRanges :: [Line (a, Range)] -> Range
 unionLineRanges lines = unionRanges (lines >>= (fmap Prelude.snd . unLine))
 
+-- | Construct Both Ranges from Both starting and ending indices.
 makeRanges :: Both Int -> Both Int -> Both Range
 makeRanges a b = runBothWith Range <$> sequenceA (both a b)
 
