@@ -1,7 +1,7 @@
 module SplitDiff where
 
-import Diff (Annotated)
-import Control.Monad.Free (Free)
+import Control.Monad.Free (Free(..))
+import Diff (Annotated(..))
 import Term (Term)
 
 -- | A patch to only one side of a diff.
