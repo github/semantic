@@ -1,7 +1,6 @@
 module SplitDiff where
 
 import Control.Monad.Free (Free(..))
-import Data.Copointed (copoint)
 import Diff (Annotated(..))
 import Term (Term)
 
@@ -17,8 +16,3 @@ getSplitTerm (SplitReplace a) = a
 
 -- | A diff with only one side’s annotations.
 type SplitDiff leaf annotation = Free (Annotated leaf annotation) (SplitPatch (Term leaf annotation))
-
--- | Get the Info from a split diff
-getSplitAnnotation :: SplitDiff leaf annotation -> annotation
-getSplitAnnotation (Pure patch) = copoint (getSplitTerm patch)
-getSplitAnnotation (Free annotated) = annotation annotated
