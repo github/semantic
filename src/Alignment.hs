@@ -73,7 +73,7 @@ splitAbstractedTerm getInfo getSyntax makeTerm source term = case getSyntax term
 -- | Split a annotated diff into rows of split diffs.
 splitAnnotatedByLines :: Both (Source Char) -> Both Range -> Both (Set.Set Category) -> Syntax leaf (Diff leaf Info) -> [Row (SplitDiff leaf Info)]
 splitAnnotatedByLines sources ranges categories syntax = case syntax of
-  Leaf a -> zipWithDefaults makeRow (pure mempty) $ fmap <$> (((pure . Free . (`Annotated` Leaf a)) .) <$> flip Info <$> categories) <*> (actualLineRanges <$> ranges <*> sources)
+  Leaf a -> zipWithDefaults makeRow (pure mempty) $ fmap <$> (((pure . Free . (`Annotated` Leaf a)) .) . flip Info <$> categories) <*> (actualLineRanges <$> ranges <*> sources)
   Indexed children -> adjoinChildRows (Indexed . fmap copoint) (Identity <$> children)
   Fixed children -> adjoinChildRows (Fixed . fmap copoint) (Identity <$> children)
   Keyed children -> adjoinChildRows (Keyed . Map.fromList) (List.sortOn (diffRanges . Prelude.snd) $ Map.toList children)
