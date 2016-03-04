@@ -101,7 +101,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         makeRanges a b = runBothWith Range <$> sequenceA (both a b)
 
 wrap :: ([f term] -> Syntax leaf term) -> (Info -> Syntax leaf term -> term) -> Set.Set Category -> [(Maybe (f term), Range)] -> term
-wrap constructor makeTerm categories children = (makeTerm $ (Info (unionRanges $ Prelude.snd <$> children) categories)) . constructor . catMaybes $ Prelude.fst <$> children
+wrap constructor makeTerm categories children = (makeTerm $ Info (unionRanges $ Prelude.snd <$> children) categories) . constructor . catMaybes $ Prelude.fst <$> children
 
 -- | Produces the starting indices of a diff.
 diffRanges :: Diff leaf Info -> Both (Maybe Range)
