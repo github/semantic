@@ -21,4 +21,4 @@ iter f (Free g) = f (iter f <$> g)
 -- |
 -- | Each time the function is applied to a seed, it can return either a `pure` value (which terminates this branch of the unfolding) or a value of `functor` parameterized by the seeds of its choice. In this way, the unrolling function can lazily construct infinite values in `Free`.
 unfold :: Functor functor => (seed -> Either pure (functor seed)) -> seed -> Free functor pure
-unfold unroll = either Pure (Free . fmap (unfold unroll)) . unroll
+unfold unroll seed = either Pure (Free . fmap (unfold unroll)) (unroll seed)
