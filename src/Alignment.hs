@@ -98,6 +98,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
         makeRanges :: Both Int -> Both Int -> Both Range
         makeRanges a b = runBothWith Range <$> sequenceA (both a b)
 
+-- | Wrap a list of child terms in a branch.
 wrap :: ([inTerm] -> Syntax leaf outTerm) -> (Info -> Syntax leaf outTerm -> outTerm) -> Set.Set Category -> [(Maybe inTerm, Range)] -> outTerm
 wrap constructor makeTerm categories children = (makeTerm $ Info (unionRanges $ Prelude.snd <$> children) categories) . constructor . catMaybes $ Prelude.fst <$> children
 
