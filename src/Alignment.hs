@@ -78,14 +78,14 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
 
         adjoinChildRows :: (Copointed f, Functor f) => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> [f (Diff leaf Info)] -> [Row (SplitDiff leaf Info, Range)]
         adjoinChildRows constructor children = let (rows, previous) = foldl childRows ([], start <$> ranges) children in
-          fmap (wrapRowContents (makeBranchTerm (\ info -> Free . Annotated info . constructor) <$> categories <*> previous)) . adjoin $ rows ++ (zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (end <$> ranges)) <*> sources)))
+          fmap (wrapRowContents (makeBranchTerm (\ info -> Free . Annotated info . constructor) <$> categories <*> previous)) . adjoin $ rows ++ (zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> previous <*> (end <$> ranges)) <*> sources)))
 
         childRows :: (Copointed f, Functor f) => ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int) -> f (Diff leaf Info) -> ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int)
         childRows (rows, previous) child = let childRows = splitDiffByLines (copoint child) sources in
           -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
           if or $ (<) . start <$> (unionLineRangesFrom <$> (rangeAt <$> previous) <*> sequenceA (unRow <$> childRows)) <*> previous
             then (rows, previous)
-            else (adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (makeRanges previous (start <$> (unionLineRangesFrom <$> (rangeAt <$> previous) <*> sequenceA (unRow <$> childRows)))) <*> sources)) ++ (fmap (first (Just . (<$ child))) <$> childRows), end <$> (unionLineRangesFrom <$> (rangeAt <$> previous) <*> sequenceA (unRow <$> childRows)))
+            else (adjoin $ rows ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> previous <*> (start <$> (unionLineRangesFrom <$> (rangeAt <$> previous) <*> sequenceA (unRow <$> childRows)))) <*> sources)) ++ (fmap (first (Just . (<$ child))) <$> childRows), end <$> (unionLineRangesFrom <$> (rangeAt <$> previous) <*> sequenceA (unRow <$> childRows)))
 
 -- | Wrap a list of child terms in a branch.
 makeBranchTerm :: (Info -> [inTerm] -> outTerm) -> Set.Set Category -> Int -> [(Maybe inTerm, Range)] -> (outTerm, Range)
