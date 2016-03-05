@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances, UndecidableInstances #-}
 module Data.Adjoined where
 
 newtype Adjoined a = Adjoined { unAdjoined :: Maybe a }
@@ -5,3 +6,6 @@ newtype Adjoined a = Adjoined { unAdjoined :: Maybe a }
 
 class PartialSemigroup a where
   coalesce :: a -> a -> Maybe a
+
+instance Monoid a => PartialSemigroup a where
+  coalesce = (Just .) . mappend
