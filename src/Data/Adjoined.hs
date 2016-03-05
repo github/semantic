@@ -2,7 +2,7 @@ module Data.Adjoined where
 
 import Control.Monad
 
-data Adjoined a = Separated (Adjoined a) (Adjoined a) | Adjoined a | Empty
+data Adjoined a = Separated (Adjoined a) (Adjoined a) | Adjoined (Maybe a)
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
 -- | A partial semigroup consists of a set and a binary operation which is associative but not necessarily closed.
@@ -16,17 +16,17 @@ instance Applicative Adjoined where
   (<*>) = ap
 
 instance Monad Adjoined where
-  return = Adjoined
-  Empty >>= _ = Empty
-  Adjoined a >>= f = f a
+  return = Adjoined . Just
+  Adjoined Nothing >>= _ = Adjoined Nothing
+  Adjoined (Just a) >>= f = f a
   Separated a b >>= f = Separated (a >>= f) (b >>= f)
 
 instance PartialSemigroup a => Monoid (Adjoined a) where
-  mempty = Empty
+  mempty = Adjoined Nothing
   mappend a b = case (a, b) of
-    (_, Empty) -> a
-    (Empty, _) -> b
-    (Adjoined a, Adjoined b) -> maybe (Separated (Adjoined a) (Adjoined b)) Adjoined $ coalesce a b
+    (_, Adjoined Nothing) -> a
+    (Adjoined Nothing, _) -> b
+    (Adjoined (Just a'), Adjoined (Just b')) -> maybe (Separated a b) (Adjoined . Just) $ coalesce a' b'
     (a, Separated b c) -> Separated (a `mappend` b) c
     (Separated a b, c) -> Separated a (b `mappend` c)
 
