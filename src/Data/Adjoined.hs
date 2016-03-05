@@ -32,3 +32,8 @@ instance PartialSemigroup a => Monoid (Adjoined a) where
 instance PartialSemigroup Bool where
   coalesce True = Just
   coalesce False = const Nothing
+
+instance Monoid a => PartialSemigroup (Maybe a) where
+  coalesce Nothing _ = Nothing
+  coalesce _ Nothing = Nothing
+  coalesce (Just a) (Just b) = Just (Just (a `mappend` b))
