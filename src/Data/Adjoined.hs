@@ -1,6 +1,6 @@
 module Data.Adjoined where
 
-newtype Adjoined a = Adjoined { unAdjoined :: [a] }
+newtype Adjoined a = Adjoined { unAdjoined :: Maybe a }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
 class PartialSemigroup a where
