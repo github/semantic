@@ -45,8 +45,7 @@ splitDiffByLines sources = iter (\ (Annotated info syntax) -> (splitAnnotatedByL
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> [Row (SplitDiff leaf Info, Range)]
 splitPatchByLines sources patch = zipWithDefaults makeRow (pure mempty) $ fmap (fmap (first (Pure . constructor patch))) <$> lines
-    where lines = (\ source -> maybe [] $ cata (tearDown source)) <$> sources <*> unPatch patch
-          tearDown source info syntax = splitAbstractedTerm (:<) source info syntax
+    where lines = (\ source -> maybe [] $ cata (splitAbstractedTerm (:<) source)) <$> sources <*> unPatch patch
           constructor (Replace _ _) = SplitReplace
           constructor (Insert _) = SplitInsert
           constructor (Delete _) = SplitDelete
