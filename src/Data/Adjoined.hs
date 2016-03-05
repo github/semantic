@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleInstances, UndecidableInstances #-}
 module Data.Adjoined where
 
 import Control.Monad
