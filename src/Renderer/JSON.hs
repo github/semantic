@@ -28,7 +28,7 @@ import Term
 -- | Render a diff to a string representing its JSON.
 json :: Renderer a ByteString
 json diff sources = toLazyByteString . fromEncoding . pairs $
-     "rows" .= annotateRows (splitDiffByLines diff (source <$> sources))
+     "rows" .= annotateRows (splitDiffByLines (source <$> sources) diff)
   <> "oids" .= (oid <$> sources)
   <> "paths" .= (path <$> sources)
   where annotateRows = fmap (fmap NumberedLine) . Prelude.reverse . numberedRows

@@ -37,8 +37,8 @@ hasChanges :: Line (SplitDiff leaf Info) -> Bool
 hasChanges = or . fmap (or . (True <$))
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs.
-splitDiffByLines :: Diff leaf Info -> Both (Source Char) -> [Row (SplitDiff leaf Info, Range)]
-splitDiffByLines diff sources = case diff of
+splitDiffByLines :: Both (Source Char) -> Diff leaf Info -> [Row (SplitDiff leaf Info, Range)]
+splitDiffByLines sources diff = case diff of
   Free (Annotated annotation syntax) -> splitAnnotatedByLines sources (ranges annotation) (Diff.categories <$> annotation) syntax
   Pure patch -> splitPatchByLines sources patch
   where ranges annotations = characterRange <$> annotations
@@ -81,7 +81,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
           fmap (wrapRowContents (makeBranchTerm (\ info -> Free . Annotated info . constructor) <$> categories <*> previous)) . adjoin $ rows ++ (zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> previous <*> (end <$> ranges)) <*> sources)))
 
         childRows :: (Copointed f, Functor f) => ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int) -> f (Diff leaf Info) -> ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int)
-        childRows (rows, previous) child = let childRows = splitDiffByLines (copoint child) sources in
+        childRows (rows, previous) child = let childRows = splitDiffByLines sources (copoint child) in
           -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
           if or $ (<) . start <$> (unionLineRangesFrom <$> (rangeAt <$> previous) <*> sequenceA (unRow <$> childRows)) <*> previous
             then (rows, previous)

@@ -90,7 +90,7 @@ header blobs hunk = filepathHeader ++ blobOidHeader ++ maybeOffsetHeader
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
 hunks _ blobs | Both (True, True) <- Source.null . source <$> blobs = [Hunk { offset = mempty, changes = [], trailingContext = [] }]
-hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap Prelude.fst <$> splitDiffByLines diff (source <$> blobs)
+hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap Prelude.fst <$> splitDiffByLines (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
