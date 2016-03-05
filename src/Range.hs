@@ -69,8 +69,8 @@ unionRanges :: (Functor f, Foldable f) => f Range -> Range
 unionRanges = unionRangesFrom (Range 0 0)
 
 -- | Return a range that contains all the ranges in a Foldable, or the passed Range if the Foldable is empty.
-unionRangesFrom :: (Functor f, Foldable f) => Range -> f Range -> Range
-unionRangesFrom range ranges = option range id . foldl mappend mempty $ Option . Just <$> ranges
+unionRangesFrom :: Foldable f => Range -> f Range -> Range
+unionRangesFrom range = fromMaybe range . maybeConcat
 
 -- | Return Just the union of all the ranges in a Foldable, or else Nothing.
 maybeUnionRanges :: Foldable f => f Range -> Maybe Range
