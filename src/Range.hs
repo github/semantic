@@ -65,7 +65,7 @@ unionRange :: Range -> Range -> Range
 unionRange (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
 
 -- | Return a range that contains all the ranges in a Foldable, or Range 0 0 if it’s empty.
-unionRanges :: (Functor f, Foldable f) => f Range -> Range
+unionRanges :: Foldable f => f Range -> Range
 unionRanges = unionRangesFrom (Range 0 0)
 
 -- | Return a range that contains all the ranges in a Foldable, or the passed Range if the Foldable is empty.
