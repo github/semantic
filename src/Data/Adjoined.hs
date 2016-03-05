@@ -9,3 +9,7 @@ class PartialSemigroup a where
 
 instance Monoid a => PartialSemigroup a where
   coalesce = (Just .) . mappend
+
+instance Applicative Adjoined where
+  pure = Adjoined . pure
+  Adjoined f <*> Adjoined a = Adjoined $ f <*> a
