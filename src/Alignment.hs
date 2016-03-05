@@ -66,7 +66,7 @@ splitAbstractedTerm getInfo getSyntax makeTerm source term = case getSyntax term
         childLines (lines, previous) child = let childLines = copoint child in
           (adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ start (unionLineRangesFrom (rangeAt previous) childLines)) source) ++ (fmap (flip (,) (unionLineRangesFrom (rangeAt previous) childLines) . Just . (<$ child)) <$> childLines), end (unionLineRangesFrom (rangeAt previous) childLines))
 
--- | Split a annotated diff into rows of split diffs.
+-- | Split an annotated diff into rows of split diffs.
 splitAnnotatedByLines :: Both (Source Char) -> Both Info -> Syntax leaf [Row (SplitDiff leaf Info, Range)] -> [Row (SplitDiff leaf Info, Range)]
 splitAnnotatedByLines sources infos syntax = case syntax of
   Leaf a -> zipWithDefaults makeRow (pure mempty) $ fmap <$> ((\ categories range -> pure (Free (Annotated (Info range categories) (Leaf a)), range)) <$> categories) <*> (actualLineRanges <$> ranges <*> sources)
