@@ -3,13 +3,15 @@ module Alignment where
 import Category
 import Control.Arrow
 import Control.Comonad.Cofree
+import Control.Monad
 import Control.Monad.Free
 import Data.Copointed
 import Data.Foldable (foldl')
-import Data.Functor.Both
+import Data.Functor.Both as Both
 import Data.Functor.Identity
 import qualified Data.List as List
 import Data.Maybe
+import Data.Option
 import qualified Data.OrderedMap as Map
 import qualified Data.Set as Set
 import Diff
@@ -94,10 +96,9 @@ makeBranchTerm constructor categories previous children = (constructor (Info ran
 unionLineRangesFrom :: Range -> [Line (a, Range)] -> Range
 unionLineRangesFrom start lines = unionRangesFrom start (lines >>= (fmap Prelude.snd . unLine))
 
--- | Produces the starting indices of a diff.
-diffRanges :: Diff leaf Info -> Both (Maybe Range)
-diffRanges (Free (Annotated infos _)) = Just . characterRange <$> infos
-diffRanges (Pure patch) = fmap (characterRange . copoint) <$> unPatch patch
+-- | Returns the ranges of a list of Rows.
+rowRanges :: [Row (a, Range)] -> Both (Maybe Range)
+rowRanges rows = maybeConcat . join <$> (Both.unzip (fmap (fmap Prelude.snd . unLine) . unRow <$> rows))
 
 -- | MaybeOpen test for (Range, a) pairs.
 openRangePair :: Source Char -> MaybeOpen (a, Range)
