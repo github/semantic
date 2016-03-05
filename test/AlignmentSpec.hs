@@ -95,7 +95,7 @@ spec = parallel $ do
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
       \ source -> let range = getTotalRange source in
-        splitAbstractedTerm copoint (([] <$) . unwrap) (:<) source (Info range mempty :< Leaf source) `shouldBe` (pure . ((:< Leaf source) . (`Info` mempty) &&& id) <$> actualLineRanges range source)
+        splitAbstractedTerm (:<) source (Info range mempty) (Leaf source) `shouldBe` (pure . ((:< Leaf source) . (`Info` mempty) &&& id) <$> actualLineRanges range source)
 
   describe "splitPatchByLines" $ do
     prop "starts at initial indices" $

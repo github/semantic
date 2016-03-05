@@ -46,22 +46,22 @@ splitDiffByLines sources = iter (\ (Annotated info syntax) -> (splitAnnotatedByL
 splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> [Row (SplitDiff leaf Info, Range)]
 splitPatchByLines sources patch = zipWithDefaults makeRow (pure mempty) $ fmap (fmap (first (Pure . constructor patch))) <$> lines
     where lines = (\ source -> maybe [] $ cata (tearDown source)) <$> sources <*> unPatch patch
-          tearDown source info syntax = splitAbstractedTerm (const info) (const syntax) (:<) source ()
+          tearDown source info syntax = splitAbstractedTerm (:<) source info syntax
           constructor (Replace _ _) = SplitReplace
           constructor (Insert _) = SplitInsert
           constructor (Delete _) = SplitDelete
 
--- | Split an `inTerm` (abstracted by two destructors) up into one `outTerm` (abstracted by a constructor) per line in `Source`.
-splitAbstractedTerm :: (inTerm -> Info) -> (inTerm -> Syntax leaf [Line (outTerm, Range)]) -> (Info -> Syntax leaf outTerm -> outTerm) -> Source Char -> inTerm -> [Line (outTerm, Range)]
-splitAbstractedTerm getInfo getSyntax makeTerm source term = case getSyntax term of
-  Leaf a -> pure . ((`makeTerm` Leaf a) . (`Info` (Diff.categories (getInfo term))) &&& id) <$> actualLineRanges (characterRange (getInfo term)) source
+-- | Split a term comprised of an Info & Syntax up into one `outTerm` (abstracted by a constructor) per line in `Source`.
+splitAbstractedTerm :: (Info -> Syntax leaf outTerm -> outTerm) -> Source Char -> Info -> Syntax leaf [Line (outTerm, Range)] -> [Line (outTerm, Range)]
+splitAbstractedTerm makeTerm source (Info range categories) syntax = case syntax of
+  Leaf a -> pure . ((`makeTerm` Leaf a) . (`Info` categories) &&& id) <$> actualLineRanges range source
   Indexed children -> adjoinChildLines (Indexed . fmap (Prelude.fst . copoint)) (Identity <$> children)
   Fixed children -> adjoinChildLines (Fixed . fmap (Prelude.fst . copoint)) (Identity <$> children)
   Keyed children -> adjoinChildLines (Keyed . fmap Prelude.fst . Map.fromList) (Map.toList children)
   where adjoin = reverse . foldl' (adjoinLinesBy (openRangePair source)) []
 
-        adjoinChildLines constructor children = let (lines, previous) = foldl' childLines ([], start (characterRange (getInfo term))) children in
-          fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) (Diff.categories (getInfo term)) previous)) . adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end (characterRange (getInfo term))) source)
+        adjoinChildLines constructor children = let (lines, previous) = foldl' childLines ([], start range) children in
+          fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) categories previous)) . adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end range) source)
 
         childLines (lines, previous) child = let childLines = copoint child in
           (adjoin $ lines ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ start (unionLineRangesFrom (rangeAt previous) childLines)) source) ++ (fmap (flip (,) (unionLineRangesFrom (rangeAt previous) childLines) . Just . (<$ child)) <$> childLines), end (unionLineRangesFrom (rangeAt previous) childLines))
