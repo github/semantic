@@ -13,3 +13,7 @@ instance Monoid a => PartialSemigroup a where
 instance Applicative Adjoined where
   pure = Adjoined . pure
   Adjoined f <*> Adjoined a = Adjoined $ f <*> a
+
+instance Monad Adjoined where
+  return = pure
+  Adjoined a >>= f = Adjoined $ a >>= unAdjoined . f
