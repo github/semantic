@@ -19,3 +19,7 @@ instance Monad Adjoined where
 instance PartialSemigroup a => Monoid (Adjoined a) where
   mempty = Adjoined Nothing
   mappend (Adjoined a) (Adjoined b) = Adjoined . join $ coalesce <$> a <*> b
+
+instance PartialSemigroup Bool where
+  coalesce True = Just
+  coalesce False = const Nothing
