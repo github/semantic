@@ -9,9 +9,6 @@ newtype Adjoined a = Adjoined { unAdjoined :: Maybe a }
 class PartialSemigroup a where
   coalesce :: a -> a -> Maybe a
 
-instance Monoid a => PartialSemigroup a where
-  coalesce = (Just .) . mappend
-
 instance Applicative Adjoined where
   pure = Adjoined . pure
   Adjoined f <*> Adjoined a = Adjoined $ f <*> a
