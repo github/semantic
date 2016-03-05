@@ -18,6 +18,7 @@ library
                      , Category
                      , Control.Comonad.Cofree
                      , Control.Monad.Free
+                     , Data.Adjoined
                      , Data.Copointed
                      , Data.Functor.Both
                      , Data.Option
