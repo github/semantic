@@ -23,6 +23,7 @@ import Row
 import Range
 import Source hiding ((++))
 import qualified Source
+import SplitDiff
 import Syntax
 
 instance Arbitrary a => Arbitrary (Both a) where
@@ -59,7 +60,7 @@ spec = parallel $ do
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
-          \ source -> splitAnnotatedByLines (pure source) (pure (getTotalRange source)) (pure mempty) (Indexed [] :: Syntax String (Diff String Info)) `shouldBe` [
+          \ source -> splitAnnotatedByLines (pure source) (pure (getTotalRange source)) (pure mempty) (Indexed [] :: Syntax String [Row (SplitDiff leaf Info, Range)]) `shouldBe` [
             makeRow (pure (Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
   describe "splitDiffByLines" $ do
