@@ -5,6 +5,9 @@ import Control.Monad
 newtype Adjoined a = Adjoined { unAdjoined :: Maybe a }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
+-- | A partial semigroup consists of a set and a binary operation which is associative but not necessarily closed.
+-- |
+-- | This is one possible generalization of semigroups, alongside the better-known Magma, which has a binary operation which is closed but not necessarily associative.
 class PartialSemigroup a where
   coalesce :: a -> a -> Maybe a
 
