@@ -74,7 +74,7 @@ unionRangesFrom range ranges = option range id . foldl mappend mempty $ Option .
 
 -- | Return Just the union of all the ranges in a Foldable, or else Nothing.
 maybeUnionRanges :: Foldable f => f Range -> Maybe Range
-maybeUnionRanges ranges = getOption $ foldMap (Option . Just) ranges
+maybeUnionRanges = maybeConcat
 
 instance Monoid (Option Range) where
   mempty = Option Nothing
