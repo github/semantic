@@ -1,6 +1,8 @@
 {-# LANGUAGE FlexibleInstances, UndecidableInstances #-}
 module Data.Adjoined where
 
+import Control.Monad
+
 newtype Adjoined a = Adjoined { unAdjoined :: Maybe a }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
@@ -17,3 +19,7 @@ instance Applicative Adjoined where
 instance Monad Adjoined where
   return = pure
   Adjoined a >>= f = Adjoined $ a >>= unAdjoined . f
+
+instance PartialSemigroup a => Monoid (Adjoined a) where
+  mempty = Adjoined Nothing
+  mappend (Adjoined a) (Adjoined b) = Adjoined . join $ coalesce <$> a <*> b
