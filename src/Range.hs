@@ -72,6 +72,9 @@ unionRanges = unionRangesFrom (Range 0 0)
 unionRangesFrom :: (Functor f, Foldable f) => Range -> f Range -> Range
 unionRangesFrom range ranges = option range id . foldl mappend mempty $ Option . Just <$> ranges
 
+maybeUnionRanges :: (Functor f, Foldable f) => f Range -> Maybe Range
+maybeUnionRanges ranges = getOption $ foldl mappend mempty $ Option . Just <$> ranges
+
 instance Monoid (Option Range) where
   mempty = Option Nothing
   mappend (Option (Just a)) (Option (Just b)) = Option (Just (unionRange a b))
