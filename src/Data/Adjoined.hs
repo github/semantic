@@ -2,7 +2,7 @@ module Data.Adjoined where
 
 import Control.Monad
 
-data Adjoined a = Separated (Adjoined a) (Adjoined a) | Adjoined (Maybe a)
+newtype Adjoined a = Adjoined { unAdjoined :: [a] }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
 -- | A partial semigroup consists of a set and a binary operation which is associative but not necessarily closed.
@@ -16,19 +16,17 @@ instance Applicative Adjoined where
   (<*>) = ap
 
 instance Monad Adjoined where
-  return = Adjoined . Just
-  Adjoined Nothing >>= _ = Adjoined Nothing
-  Adjoined (Just a) >>= f = f a
-  Separated a b >>= f = Separated (a >>= f) (b >>= f)
+  return = Adjoined . return
+  Adjoined [] >>= _ = Adjoined []
+  Adjoined (a : as) >>= f = Adjoined $ unAdjoined (f a) ++ unAdjoined (Adjoined as >>= f)
 
 instance PartialSemigroup a => Monoid (Adjoined a) where
-  mempty = Adjoined Nothing
-  mappend a b = case (a, b) of
-    (_, Adjoined Nothing) -> a
-    (Adjoined Nothing, _) -> b
-    (Adjoined (Just a'), Adjoined (Just b')) -> maybe (Separated a b) (Adjoined . Just) $ coalesce a' b'
-    (a, Separated b c) -> Separated (a `mappend` b) c
-    (Separated a b, c) -> Separated a (b `mappend` c)
+  mempty = Adjoined []
+  mappend a (Adjoined []) = a
+  mappend (Adjoined as) (Adjoined (b : bs)) = Adjoined (adjoinRight as)
+    where adjoinRight [] = b : bs
+          adjoinRight [a] = maybe (a : b : bs) (:bs) (coalesce a b)
+          adjoinRight (a : as) = a : adjoinRight as
 
 instance PartialSemigroup Bool where
   coalesce True = Just
