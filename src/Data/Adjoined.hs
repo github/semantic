@@ -1,8 +1,9 @@
 module Data.Adjoined where
 
 import Control.Monad
+import Data.Sequence
 
-newtype Adjoined a = Adjoined { unAdjoined :: [a] }
+newtype Adjoined a = Adjoined { unAdjoined :: Seq a }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
 -- | A partial semigroup consists of a set and a binary operation which is associative but not necessarily closed.
@@ -17,16 +18,16 @@ instance Applicative Adjoined where
 
 instance Monad Adjoined where
   return = Adjoined . return
-  Adjoined [] >>= _ = Adjoined []
-  Adjoined (a : as) >>= f = Adjoined $ unAdjoined (f a) ++ unAdjoined (Adjoined as >>= f)
+  Adjoined a >>= f = case viewl a of
+    EmptyL -> Adjoined empty
+    (a :< as) -> Adjoined $ unAdjoined (f a) >< unAdjoined (Adjoined as >>= f)
 
 instance PartialSemigroup a => Monoid (Adjoined a) where
-  mempty = Adjoined []
-  mappend a (Adjoined []) = a
-  mappend (Adjoined as) (Adjoined (b : bs)) = Adjoined (adjoinRight as)
-    where adjoinRight [] = b : bs
-          adjoinRight [a] = maybe (a : b : bs) (:bs) (coalesce a b)
-          adjoinRight (a : as) = a : adjoinRight as
+  mempty = Adjoined empty
+  mappend (Adjoined a) (Adjoined b) = case (viewr a, viewl b) of
+    (_, EmptyL) -> Adjoined a
+    (EmptyR, _) -> Adjoined b
+    (as :> a', b' :< bs) -> Adjoined $ maybe (a >< b) ((as ><) . (<| bs)) (coalesce a' b')
 
 instance PartialSemigroup Bool where
   coalesce True = Just
