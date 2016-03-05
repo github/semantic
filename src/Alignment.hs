@@ -72,7 +72,7 @@ splitAnnotatedByLines sources ranges categories syntax = case syntax of
   Leaf a -> zipWithDefaults makeRow (pure mempty) $ fmap <$> ((\ categories range -> pure (Free (Annotated (Info range categories) (Leaf a)), range)) <$> categories) <*> (actualLineRanges <$> ranges <*> sources)
   Indexed children -> adjoinChildRows (Indexed . fmap copoint) (Identity <$> children)
   Fixed children -> adjoinChildRows (Fixed . fmap copoint) (Identity <$> children)
-  Keyed children -> adjoinChildRows (Keyed . Map.fromList) ({-List.sortOn (diffRanges . Prelude.snd) $ -}Map.toList children)
+  Keyed children -> adjoinChildRows (Keyed . Map.fromList) (List.sortOn (rowRanges . Prelude.snd) $ Map.toList children)
   where adjoin :: [Row (Maybe (f (SplitDiff leaf Info)), Range)] -> [Row (Maybe (f (SplitDiff leaf Info)), Range)]
         adjoin = reverse . foldl' (adjoinRowsBy (openRangePair <$> sources)) []
 
