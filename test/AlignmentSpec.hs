@@ -55,12 +55,12 @@ spec = parallel $ do
   describe "splitAnnotatedByLines" $ do
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
-        \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (pure source) (pure range) (pure categories) syntax `shouldBe` [
+        \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (pure source) (pure $ Info range categories) syntax `shouldBe` [
           makeRow (pure (Free $ Annotated info $ Leaf source, Range 0 (length source))) (pure (Free $ Annotated info $ Leaf source, Range 0 (length source))) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
-          \ source -> splitAnnotatedByLines (pure source) (pure (getTotalRange source)) (pure mempty) (Indexed [] :: Syntax String [Row (SplitDiff leaf Info, Range)]) `shouldBe` [
+          \ source -> splitAnnotatedByLines (pure source) (pure $ Info (getTotalRange source) mempty) (Indexed [] :: Syntax String [Row (SplitDiff leaf Info, Range)]) `shouldBe` [
             makeRow (pure (Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
   describe "splitDiffByLines" $ do
