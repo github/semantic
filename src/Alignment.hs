@@ -38,7 +38,7 @@ numberedRows = foldl' numberRows []
 hasChanges :: Line (SplitDiff leaf Info) -> Bool
 hasChanges = or . fmap (or . (True <$))
 
--- | Split a diff, which may span multiple lines, into rows of split diffs.
+-- | Split a diff, which may span multiple lines, into rows of split diffs paired with the Range of characters spanned by that Row on each side of the diff.
 splitDiffByLines :: Both (Source Char) -> Diff leaf Info -> [Row (SplitDiff leaf Info, Range)]
 splitDiffByLines sources = iter (\ (Annotated info syntax) -> (splitAnnotatedByLines sources) info syntax) . fmap (splitPatchByLines sources)
 
