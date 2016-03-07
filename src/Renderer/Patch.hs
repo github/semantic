@@ -16,7 +16,7 @@ import Source hiding ((++), break)
 import SplitDiff
 import Control.Comonad.Cofree
 import Control.Monad.Free
-import Data.Functor.Both
+import Data.Functor.Both as Both
 import Data.Maybe
 import Data.Monoid
 
@@ -57,7 +57,7 @@ showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> change
 -- | Given the before and after sources, render a change to a string.
 showChange :: Both (Source Char) -> Change (SplitDiff a Info) -> String
 showChange sources change = showLines (snd sources) ' ' (unRight <$> context change) ++ deleted ++ inserted
-  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> Both ('-', '+') <*> (fmap <$> Both (unLeft, unRight) <*> pure (contents change))
+  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> Both ('-', '+') <*> Both.unzip (unRow <$> contents change)
 
 -- | Given a source, render a set of lines to a string with a prefix.
 showLines :: Source Char -> Char -> [Line (SplitDiff leaf Info)] -> String
