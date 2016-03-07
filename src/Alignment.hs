@@ -57,15 +57,14 @@ splitAbstractedTerm makeTerm source (Info range categories) syntax = case syntax
   Indexed children -> adjoinChildLines (Indexed . fmap (Prelude.fst . copoint)) (Identity <$> children)
   Fixed children -> adjoinChildLines (Fixed . fmap (Prelude.fst . copoint)) (Identity <$> children)
   Keyed children -> adjoinChildLines (Keyed . fmap Prelude.fst . Map.fromList) (Map.toList children)
-  where adjoinChildLines constructor children = let (lines, previous) = foldl' childLines ([], start range) children in
-          fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) categories previous)) . reverse . foldl' (adjoinLinesBy (openRangePair source)) []
-            $  lines
-            ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end range) source)
+  where adjoinChildLines constructor children = let (lines, next) = foldr childLines ([], end range) children in
+          fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) categories next)) . reverse . foldl' (adjoinLinesBy (openRangePair source)) []
+            $  (pure . (,) Nothing <$> actualLineRanges (Range (start range) next) source) ++ lines
 
-        childLines (lines, previous) child = let childRange = unionLineRangesFrom (rangeAt previous) (copoint child) in
-             (lines
-          ++ (pure . (,) Nothing <$> actualLineRanges (Range previous (start childRange)) source)
-          ++ (fmap (flip (,) childRange . Just . (<$ child)) <$> copoint child), end childRange)
+        childLines child (lines, next) = let childRange = unionLineRangesFrom (rangeAt next) (copoint child) in
+             ((fmap (flip (,) childRange . Just . (<$ child)) <$> copoint child)
+          ++ (pure . (,) Nothing <$> actualLineRanges (Range (end childRange) next) source)
+          ++ lines, start childRange)
 
 -- | Split an annotated diff into rows of split diffs.
 splitAnnotatedByLines :: Both (Source Char) -> Both Info -> Syntax leaf [Row (SplitDiff leaf Info, Range)] -> [Row (SplitDiff leaf Info, Range)]
@@ -94,8 +93,8 @@ splitAnnotatedByLines sources infos syntax = case syntax of
 
 -- | Wrap a list of child terms in a branch.
 makeBranchTerm :: (Info -> [inTerm] -> outTerm) -> Set.Set Category -> Int -> [(Maybe inTerm, Range)] -> (outTerm, Range)
-makeBranchTerm constructor categories previous children = (constructor (Info range categories) . catMaybes $ Prelude.fst <$> children, range)
-  where range = unionRangesFrom (rangeAt previous) $ Prelude.snd <$> children
+makeBranchTerm constructor categories next children = (constructor (Info range categories) . catMaybes $ Prelude.fst <$> children, range)
+  where range = unionRangesFrom (rangeAt next) $ Prelude.snd <$> children
 
 -- | Compute the union of the ranges in a list of ranged lines.
 unionLineRangesFrom :: Range -> [Line (a, Range)] -> Range
