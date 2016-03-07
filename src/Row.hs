@@ -27,8 +27,8 @@ wrapRowContents transform row = Row $ wrapLineContents <$> transform <*> unRow r
 adjoinRowsBy :: Both (MaybeOpen a) -> [Row a] -> Row a -> [Row a]
 adjoinRowsBy _ [] row = [row]
 
-adjoinRowsBy f rows (Row bothLines) | Both (Just _, Just _) <- openLineBy <$> f <*> (Both.unzip $ unRow <$> rows) = Both.zipWith makeRow $ both <*> bothLines
-  where both = adjoinLinesBy <$> f <*> (Both.unzip $ unRow <$> rows)
+adjoinRowsBy f rows (Row bothLines) | Both (Just _, Just _) <- openLineBy <$> f <*> Both.unzip (unRow <$> rows) = Both.zipWith makeRow $ both <*> bothLines
+  where both = adjoinLinesBy <$> f <*> Both.unzip (unRow <$> rows)
 
 adjoinRowsBy (Both (f, _)) rows (Row (Both (left', right'))) | Just _ <- openLineBy f $ unLeft <$> rows = case right' of
   EmptyLine -> rest
