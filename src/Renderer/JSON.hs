@@ -46,7 +46,7 @@ instance ToJSON Range where
   toEncoding (Range start end) = foldable [ start,  end ]
 instance ToJSON a => ToJSON (Both a) where
   toJSON (Both (a, b)) = Array . fromList $ toJSON <$> [ a, b ]
-  toEncoding both = foldable both
+  toEncoding = foldable
 instance ToJSON (SplitDiff leaf Info) where
   toJSON (Free (Annotated info syntax)) = object (termFields info syntax)
   toJSON (Pure patch) = object (patchFields patch)

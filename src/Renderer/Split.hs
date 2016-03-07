@@ -75,7 +75,7 @@ split diff blobs = renderHtml
 
     -- | Render a line with numbers as an HTML row.
     numberedLinesToMarkup :: Both (Int, Line (SplitDiff a Info)) -> Markup
-    numberedLinesToMarkup numberedLines = tr $ (runBothWith (<>) (renderLine <$> numberedLines <*> sources)) <> string "\n"
+    numberedLinesToMarkup numberedLines = tr $ runBothWith (<>) (renderLine <$> numberedLines <*> sources) <> string "\n"
 
     renderLine :: (Int, Line (SplitDiff leaf Info)) -> Source Char -> Markup
     renderLine (number, line) source = toMarkup $ Renderable (hasChanges line, number, Renderable . (,) source <$> line)
