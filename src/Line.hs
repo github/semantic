@@ -60,6 +60,7 @@ adjoinLinesBy _ lines line = line : lines
 
 adjoinLinesByR :: MaybeOpen a -> Line a -> [Line a] -> [Line a]
 adjoinLinesByR _ line [] = [line]
+adjoinLinesByR f EmptyLine (next:rest) | isOpenLineBy f next = next : adjoinLinesByR f EmptyLine rest
 adjoinLinesByR f line (next:rest) | isOpenLineBy f line = (line <> next) : rest
 adjoinLinesByR _ line lines = line : lines
 
