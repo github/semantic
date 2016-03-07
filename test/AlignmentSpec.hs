@@ -74,7 +74,7 @@ spec = parallel $ do
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $
-      \ a -> adjoinRowsBy (pure openMaybe) [] a == [ a ]
+      \ a -> adjoinRowsBy (pure openMaybe) [] a `shouldBe` [ a ]
 
     prop "appends onto open rows" $
       forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
