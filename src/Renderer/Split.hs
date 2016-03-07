@@ -58,7 +58,7 @@ split diff blobs = renderHtml
     . body
       . (table ! A.class_ (stringValue "diff")) $
         ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
-        . mconcat $ numberedLinesToMarkup <$> reverse numbered
+        . mconcat $ numberedLinesToMarkup <$> numbered
   where
     sources = Source.source <$> blobs
     numbered = numberedRows (fmap Prelude.fst <$> splitDiffByLines sources diff)

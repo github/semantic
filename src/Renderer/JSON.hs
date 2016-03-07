@@ -31,7 +31,7 @@ json diff sources = toLazyByteString . fromEncoding . pairs $
      "rows" .= annotateRows (splitDiffByLines (source <$> sources) diff)
   <> "oids" .= (oid <$> sources)
   <> "paths" .= (path <$> sources)
-  where annotateRows = fmap (fmap NumberedLine) . Prelude.reverse . numberedRows
+  where annotateRows = fmap (fmap NumberedLine) . numberedRows
 
 newtype NumberedLine a = NumberedLine (Int, Line a)
 
