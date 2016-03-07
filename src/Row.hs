@@ -43,8 +43,6 @@ adjoinRowsBy _ rows row = row : rows
 
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
 adjoinRowsByR :: Both (MaybeOpen a) -> Row a -> [Row a] -> [Row a]
-adjoinRowsByR _ row [] = [row]
-
 adjoinRowsByR f (Row lines) (Row nextLines : rest) | runBothWith (&&) (isOpenLineBy <$> f <*> lines) = Row ((<>) <$> lines <*> nextLines) : rest
 
 adjoinRowsByR (Both (f, _)) (Row (Both (left', right'))) rows | isOpenLineBy f left' = case right' of
