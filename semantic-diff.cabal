@@ -19,7 +19,6 @@ library
                      , Control.Comonad.Cofree
                      , Control.Monad.Free
                      , Data.Adjoined
-                     , Data.Align
                      , Data.Bifunctor.These
                      , Data.Copointed
                      , Data.Functor.Both
