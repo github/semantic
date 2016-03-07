@@ -57,7 +57,7 @@ showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> change
 -- | Given the before and after sources, render a change to a string.
 showChange :: Both (Source Char) -> Change (SplitDiff a Info) -> String
 showChange sources change = showLines (snd sources) ' ' (unRight <$> context change) ++ deleted ++ inserted
-  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> Both ('-', '+') <*> (pure fmap <*> Both (unLeft, unRight) <*> pure (contents change))
+  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> Both ('-', '+') <*> (fmap <$> Both (unLeft, unRight) <*> pure (contents change))
 
 -- | Given a source, render a set of lines to a string with a prefix.
 showLines :: Source Char -> Char -> [Line (SplitDiff leaf Info)] -> String
