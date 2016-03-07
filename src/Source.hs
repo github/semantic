@@ -3,14 +3,15 @@ module Source where
 import Range
 import qualified Data.Vector as Vector
 import qualified Data.Text as T
+import Foreign.C.Types
 
-data SourceKind = PlainBlob | ExecutableBlob | SymlinkBlob
-  deriving (Show, Eq, Enum)
+data SourceKind = PlainBlob CUInt  | ExecutableBlob CUInt | SymlinkBlob CUInt
+  deriving (Show, Eq)
 
 modeToDigits :: SourceKind -> String
-modeToDigits PlainBlob = "100644"
-modeToDigits ExecutableBlob = "100755"
-modeToDigits SymlinkBlob = "120000"
+modeToDigits (PlainBlob mode) = show mode
+modeToDigits (ExecutableBlob mode) = show mode
+modeToDigits (SymlinkBlob mode) = show mode
 
 data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
   deriving (Show, Eq)
