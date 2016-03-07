@@ -28,9 +28,9 @@ import Term
 
 -- | Assign line numbers to the lines on each side of a list of rows.
 numberedRows :: [Row a] -> [Both (Int, Line a)]
-numberedRows = foldl' numberRows []
-  where numberRows rows row = ((,) <$> ((+) <$> count rows <*> (valueOf <$> unRow row)) <*> unRow row) : rows
-        count = maybe (pure 0) (fmap Prelude.fst) . maybeFirst
+numberedRows = countUp (pure 1)
+  where countUp from (Row row : rows) = ((,) <$> from <*> row) : countUp ((+) <$> from <*> (valueOf <$> row)) rows
+        countUp _ [] = []
         valueOf EmptyLine = 0
         valueOf _ = 1
 
