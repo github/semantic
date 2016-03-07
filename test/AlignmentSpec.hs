@@ -100,7 +100,7 @@ spec = parallel $ do
   describe "splitPatchByLines" $ do
     prop "starts at initial indices" $
       \ patch sources -> let indices = length <$> sources in
-        fmap start . maybeFirst . Maybe.catMaybes <$> Both.unzip (fmap maybeFirst . unRow . fmap Prelude.snd <$> (splitPatchByLines ((Source.++) <$> sources <*> sources) (patchWithBoth patch (leafWithRangeInSource <$> sources <*> (Range <$> indices <*> ((2 *) <$> indices)))))) `shouldBe` (<$) <$> indices <*> unPatch patch
+        fmap start . maybeFirst . Maybe.catMaybes <$> Both.unzip (fmap maybeFirst . unRow . fmap Prelude.snd <$> splitPatchByLines ((Source.++) <$> sources <*> sources) (patchWithBoth patch (leafWithRangeInSource <$> sources <*> (Range <$> indices <*> ((2 *) <$> indices))))) `shouldBe` (<$) <$> indices <*> unPatch patch
 
   describe "openLineBy" $ do
     it "produces the earliest non-empty line in a list, if open" $
@@ -123,11 +123,11 @@ spec = parallel $ do
 
       getTotalRange (Source vector) = Range 0 $ length vector
 
-      combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info <$> (pure (Range start $ start + 1)) <*> mempty) (Leaf [ char ]) ], start + 1)
+      combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info <$> pure (Range start $ start + 1) <*> mempty) (Leaf [ char ]) ], start + 1)
 
       leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty) (Leaf $ runBothWith (++) (toList <$> sources))
 
-      leafWithRangeInSource source range = (Info range mempty :< Leaf source)
+      leafWithRangeInSource source range = Info range mempty :< Leaf source
 
       patchWithBoth (Insert ()) = Insert . snd
       patchWithBoth (Delete ()) = Delete . fst
