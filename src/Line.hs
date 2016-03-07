@@ -55,7 +55,6 @@ adjoinLinesBy _ lines line = line : lines
 
 adjoinLinesByR :: MaybeOpen a -> Line a -> [Line a] -> [Line a]
 adjoinLinesByR _ line [] = [line]
-adjoinLinesByR f line (EmptyLine : xs) | Just _ <- openLineBy f xs = EmptyLine : adjoinLinesByR f line xs
 adjoinLinesByR f line (next:rest) | Just _ <- openLineBy f [ line ] = (line <> next) : rest
 adjoinLinesByR _ line lines = line : lines
 
