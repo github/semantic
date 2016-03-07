@@ -18,10 +18,6 @@ unLeft = fst . unRow
 unRight :: Row a -> Line a
 unRight = snd . unRow
 
--- | Map over both sides of a row with the given functions.
-wrapRowContents :: Both ([a] -> b) -> Row a -> Row b
-wrapRowContents transform row = Row $ wrapLineContents <$> transform <*> unRow row
-
 -- | Given functions that determine whether an item is open, add a row to a
 -- | first open, non-empty item in a list of rows, or add it as a new row.
 adjoinRowsBy :: Both (MaybeOpen a) -> [Row a] -> Row a -> [Row a]
