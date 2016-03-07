@@ -24,10 +24,13 @@ instance Monad Adjoined where
 
 instance PartialSemigroup a => Monoid (Adjoined a) where
   mempty = Adjoined empty
-  mappend (Adjoined a) (Adjoined b) = case (viewr a, viewl b) of
-    (_, EmptyL) -> Adjoined a
-    (EmptyR, _) -> Adjoined b
-    (as :> a', b' :< bs) -> Adjoined $ maybe (a >< b) ((as ><) . (<| bs)) (coalesce a' b')
+  mappend = mappendBy coalesce
+
+mappendBy :: (a -> a -> Maybe a) -> Adjoined a -> Adjoined a -> Adjoined a
+mappendBy coalesce (Adjoined a) (Adjoined b) = case (viewr a, viewl b) of
+  (_, EmptyL) -> Adjoined a
+  (EmptyR, _) -> Adjoined b
+  (as :> a', b' :< bs) -> Adjoined $ maybe (a >< b) ((as ><) . (<| bs)) (coalesce a' b')
 
 instance PartialSemigroup Bool where
   coalesce True = Just
