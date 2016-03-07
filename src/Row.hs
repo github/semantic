@@ -2,6 +2,7 @@ module Row where
 
 import Control.Arrow
 import Data.Functor.Both as Both
+import Data.Bifunctor.These
 import Line
 import Prelude hiding (fst, snd)
 
@@ -11,6 +12,11 @@ newtype Row a = Row { unRow :: Both (Line a) }
 
 makeRow :: Line a -> Line a -> Row a
 makeRow a = Row . both a
+
+makeRowWithThese :: These (Line a) (Line a) -> Row a
+makeRowWithThese (This a) = makeRow a EmptyLine
+makeRowWithThese (That b) = makeRow EmptyLine b
+makeRowWithThese (These a b) = makeRow a b
 
 unLeft :: Row a -> Line a
 unLeft = fst . unRow
