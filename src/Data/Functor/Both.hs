@@ -55,8 +55,11 @@ instance Monoid a => Monoid (Both a) where
   mappend a b = mappend <$> a <*> b
 
 instance (PartialSemigroup a, Monoid a) => PartialSemigroup (Both a) where
-  coalesce a b = case coalesce <$> a <*> b of
-    Both (Just l, Just r) -> Just (both l r)
-    Both (Nothing, Just r) -> Just (both (fst a `mappend` fst b) r)
-    Both (Just l, Nothing) -> Just (both l (snd a `mappend` snd b))
-    Both (Nothing, Nothing) -> Nothing
+  coalesce = coalesceBy coalesce
+
+coalesceBy :: Monoid a => (a -> a -> Maybe a) -> Both a -> Both a -> Maybe (Both a)
+coalesceBy coalesce a b = case coalesce <$> a <*> b of
+  Both (Just l, Just r) -> Just (both l r)
+  Both (Nothing, Just r) -> Just (both (fst a `mappend` fst b) r)
+  Both (Just l, Nothing) -> Just (both l (snd a `mappend` snd b))
+  Both (Nothing, Nothing) -> Nothing
