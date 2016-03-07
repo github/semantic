@@ -57,12 +57,10 @@ splitAbstractedTerm makeTerm source (Info range categories) syntax = case syntax
   Indexed children -> adjoinChildLines (Indexed . fmap (Prelude.fst . copoint)) (Identity <$> children)
   Fixed children -> adjoinChildLines (Fixed . fmap (Prelude.fst . copoint)) (Identity <$> children)
   Keyed children -> adjoinChildLines (Keyed . fmap Prelude.fst . Map.fromList) (Map.toList children)
-  where adjoin = reverse . foldl' (adjoinLinesBy (openRangePair source)) []
-
-        adjoinChildLines constructor children = let (lines, previous) = foldl' childLines ([], start range) children in
-          fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) categories previous))
-            . adjoin $  lines
-                     ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end range) source)
+  where adjoinChildLines constructor children = let (lines, previous) = foldl' childLines ([], start range) children in
+          fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) categories previous)) . reverse . foldl' (adjoinLinesBy (openRangePair source)) []
+            $  lines
+            ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end range) source)
 
         childLines (lines, previous) child = let childRange = unionLineRangesFrom (rangeAt previous) (copoint child) in
              (lines
@@ -79,23 +77,20 @@ splitAnnotatedByLines sources infos syntax = case syntax of
   where ranges = characterRange <$> infos
         categories = Diff.categories <$> infos
 
-        adjoin :: [Row (Maybe (f (SplitDiff leaf Info)), Range)] -> [Row (Maybe (f (SplitDiff leaf Info)), Range)]
-        adjoin = reverse . foldl' (adjoinRowsBy (openRangePair <$> sources)) []
-
         adjoinChildRows :: (Copointed f, Functor f) => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> [f [Row (SplitDiff leaf Info, Range)]] -> [Row (SplitDiff leaf Info, Range)]
         adjoinChildRows constructor children = let (rows, previous) = foldl' childRows ([], start <$> ranges) children in
-          fmap (Row . (wrapLineContents <$> (makeBranchTerm (\ info -> Free . Annotated info . constructor) <$> categories <*> previous) <*>) . unRow)
-            . adjoin $  rows
-                     ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> previous <*> (end <$> ranges)) <*> sources))
+          fmap (Row . (wrapLineContents <$> (makeBranchTerm (\ info -> Free . Annotated info . constructor) <$> categories <*> previous) <*>) . unRow) . reverse . foldl' (adjoinRowsBy (openRangePair <$> sources)) []
+            $  rows
+            ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> previous <*> (end <$> ranges)) <*> sources))
 
         childRows :: (Copointed f, Functor f) => ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int) -> f [Row (SplitDiff leaf Info, Range)] -> ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int)
         childRows (rows, previous) child = let childRanges = unionLineRangesFrom <$> (rangeAt <$> previous) <*> sequenceA (unRow <$> copoint child) in
           -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
           if or $ (<) . start <$> childRanges <*> previous
             then (rows, previous)
-            else (adjoin $  rows
-                         ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> previous <*> (start <$> childRanges)) <*> sources))
-                         ++ (fmap (first (Just . (<$ child))) <$> copoint child), end <$> childRanges)
+            else    (rows
+                 ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> previous <*> (start <$> childRanges)) <*> sources))
+                 ++ (fmap (first (Just . (<$ child))) <$> copoint child), end <$> childRanges)
 
 -- | Wrap a list of child terms in a branch.
 makeBranchTerm :: (Info -> [inTerm] -> outTerm) -> Set.Set Category -> Int -> [(Maybe inTerm, Range)] -> (outTerm, Range)
