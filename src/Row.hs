@@ -2,6 +2,7 @@ module Row where
 
 import Control.Arrow
 import Data.Functor.Both as Both
+import Data.Monoid
 import Line
 import Prelude hiding (fst, snd)
 
@@ -43,8 +44,7 @@ adjoinRowsBy _ rows row = row : rows
 adjoinRowsByR :: Both (MaybeOpen a) -> Row a -> [Row a] -> [Row a]
 adjoinRowsByR _ row [] = [row]
 
-adjoinRowsByR f (Row bothLines) rows | runBothWith (&&) $ isOpenLineBy <$> f <*> bothLines = Both.zipWith makeRow $
-  adjoinLinesByR <$> f <*> bothLines <*> Both.unzip (unRow <$> rows)
+adjoinRowsByR f (Row lines) (Row nextLines : rest) | runBothWith (&&) $ isOpenLineBy <$> f <*> lines = (Row $ (<>) <$> lines <*> nextLines) : rest
 
 adjoinRowsByR (Both (f, _)) (Row (Both (left', right'))) rows | isOpenLineBy f left' = case right' of
   EmptyLine -> rest
