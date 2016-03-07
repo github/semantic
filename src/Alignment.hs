@@ -40,12 +40,12 @@ hasChanges = or . fmap (or . (True <$))
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs paired with the Range of characters spanned by that Row on each side of the diff.
 splitDiffByLines :: Both (Source Char) -> Diff leaf Info -> [Row (SplitDiff leaf Info, Range)]
-splitDiffByLines sources = iter (\ (Annotated info syntax) -> (splitAnnotatedByLines sources) info syntax) . fmap (splitPatchByLines sources)
+splitDiffByLines sources = iter (\ (Annotated info syntax) -> splitAnnotatedByLines sources info syntax) . fmap (splitPatchByLines sources)
 
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> [Row (SplitDiff leaf Info, Range)]
 splitPatchByLines sources patch = zipWithDefaults makeRow (pure mempty) $ fmap (fmap (first (Pure . constructor patch))) <$> lines
-    where lines = (\ source -> maybe [] $ cata (splitAbstractedTerm (:<) source)) <$> sources <*> unPatch patch
+    where lines = maybe [] . cata . splitAbstractedTerm (:<) <$> sources <*> unPatch patch
           constructor (Replace _ _) = SplitReplace
           constructor (Insert _) = SplitInsert
           constructor (Delete _) = SplitDelete
@@ -86,7 +86,7 @@ splitAnnotatedByLines sources infos syntax = case syntax of
         adjoinChildRows constructor children = let (rows, previous) = foldl' childRows ([], start <$> ranges) children in
           fmap (wrapRowContents (makeBranchTerm (\ info -> Free . Annotated info . constructor) <$> categories <*> previous))
             . adjoin $  rows
-                     ++ (zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> previous <*> (end <$> ranges)) <*> sources)))
+                     ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> previous <*> (end <$> ranges)) <*> sources))
 
         childRows :: (Copointed f, Functor f) => ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int) -> f [Row (SplitDiff leaf Info, Range)] -> ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int)
         childRows (rows, previous) child = let childRanges = unionLineRangesFrom <$> (rangeAt <$> previous) <*> sequenceA (unRow <$> copoint child) in
@@ -108,7 +108,7 @@ unionLineRangesFrom start lines = unionRangesFrom start (lines >>= (fmap Prelude
 
 -- | Returns the ranges of a list of Rows.
 rowRanges :: [Row (a, Range)] -> Both (Maybe Range)
-rowRanges rows = maybeConcat . join <$> (Both.unzip (fmap (fmap Prelude.snd . unLine) . unRow <$> rows))
+rowRanges rows = maybeConcat . join <$> Both.unzip (fmap (fmap Prelude.snd . unLine) . unRow <$> rows)
 
 -- | MaybeOpen test for (Range, a) pairs.
 openRangePair :: Source Char -> MaybeOpen (a, Range)
