@@ -43,16 +43,16 @@ adjoinRowsBy _ rows row = row : rows
 adjoinRowsByR :: Both (MaybeOpen a) -> Row a -> [Row a] -> [Row a]
 adjoinRowsByR _ row [] = [row]
 
-adjoinRowsByR f (Row bothLines) rows | Both (Just _, Just _) <- openLineBy <$> f <*> (pure <$> bothLines) = Both.zipWith makeRow $
+adjoinRowsByR f (Row bothLines) rows | runBothWith (&&) $ isOpenLineBy <$> f <*> bothLines = Both.zipWith makeRow $
   adjoinLinesByR <$> f <*> bothLines <*> Both.unzip (unRow <$> rows)
 
-adjoinRowsByR (Both (f, _)) (Row (Both (left', right'))) rows | Just _ <- openLineBy f [ left' ] = case right' of
+adjoinRowsByR (Both (f, _)) (Row (Both (left', right'))) rows | isOpenLineBy f left' = case right' of
   EmptyLine -> rest
   _ -> makeRow EmptyLine right' : rest
   where rest = Prelude.zipWith makeRow lefts rights
         (lefts, rights) = first (adjoinLinesByR f left') . runBoth $ Both.unzip (unRow <$> rows)
 
-adjoinRowsByR (Both (_, g)) (Row (Both (left', right'))) rows | Just _ <- openLineBy g [ right' ] = case left' of
+adjoinRowsByR (Both (_, g)) (Row (Both (left', right'))) rows | isOpenLineBy g right' = case left' of
   EmptyLine -> rest
   _ -> makeRow left' EmptyLine : rest
   where rest = Prelude.zipWith makeRow lefts rights
