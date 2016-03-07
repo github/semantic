@@ -26,7 +26,9 @@ instance PartialSemigroup a => Monoid (Adjoined a) where
   mempty = Adjoined empty
   mappend = mappendBy coalesce
 
-mappendBy :: (a -> a -> Maybe a) -> Adjoined a -> Adjoined a -> Adjoined a
+type Coalesce a = a -> a -> Maybe a
+
+mappendBy :: Coalesce a -> Adjoined a -> Adjoined a -> Adjoined a
 mappendBy coalesce (Adjoined a) (Adjoined b) = case (viewr a, viewl b) of
   (_, EmptyL) -> Adjoined a
   (EmptyR, _) -> Adjoined b
