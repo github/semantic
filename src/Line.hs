@@ -53,6 +53,12 @@ adjoinLinesBy f (EmptyLine : xs) line | Just _ <- openLineBy f xs = EmptyLine : 
 adjoinLinesBy f (prev:rest) line | Just _ <- openLineBy f [ prev ] = (prev <> line) : rest
 adjoinLinesBy _ lines line = line : lines
 
+adjoinLinesByR :: MaybeOpen a -> Line a -> [Line a] -> [Line a]
+adjoinLinesByR _ line [] = [line]
+adjoinLinesByR f line (EmptyLine : xs) | Just _ <- openLineBy f xs = EmptyLine : adjoinLinesByR f line xs
+adjoinLinesByR f line (next:rest) | Just _ <- openLineBy f [ next ] = (line <> next) : rest
+adjoinLinesByR _ line lines = line : lines
+
 -- | Create a list that contains all of the `a`s in `elements` separated by
 -- | `separator`.
 intersperse :: Foldable t => a -> t a -> [a]
