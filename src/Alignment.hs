@@ -65,9 +65,9 @@ splitAbstractedTerm makeTerm source (Info range categories) syntax = case syntax
                      ++ (pure . (,) Nothing <$> actualLineRanges (Range previous $ end range) source)
 
         childLines (lines, previous) child = let childRange = unionLineRangesFrom (rangeAt previous) (copoint child) in
-          (adjoin $  lines
-                  ++ (pure . (,) Nothing <$> actualLineRanges (Range previous (start childRange)) source)
-                  ++ (fmap (flip (,) childRange . Just . (<$ child)) <$> copoint child), end childRange)
+             (lines
+          ++ (pure . (,) Nothing <$> actualLineRanges (Range previous (start childRange)) source)
+          ++ (fmap (flip (,) childRange . Just . (<$ child)) <$> copoint child), end childRange)
 
 -- | Split an annotated diff into rows of split diffs.
 splitAnnotatedByLines :: Both (Source Char) -> Both Info -> Syntax leaf [Row (SplitDiff leaf Info, Range)] -> [Row (SplitDiff leaf Info, Range)]
