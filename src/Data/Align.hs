@@ -1,5 +1,7 @@
 module Data.Align where
 
+import Data.Bifunctor.These
+
 class Functor f => Align f where
   nil :: f a
   align :: f a -> f b -> f (These a b)
