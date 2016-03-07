@@ -59,7 +59,7 @@ splitAbstractedTerm makeTerm source (Info range categories) syntax = case syntax
   Keyed children -> adjoinChildLines (Keyed . fmap Prelude.fst . Map.fromList) (Map.toList children)
   where adjoinChildLines constructor children = let (lines, next) = foldr childLines ([], end range) children in
           fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) categories next)) . reverse . foldl' (adjoinLinesBy (openRangePair source)) []
-            $  (pure . (,) Nothing <$> actualLineRanges (Range (start range) next) source) ++ lines
+            $ (pure . (,) Nothing <$> actualLineRanges (Range (start range) next) source) ++ lines
 
         childLines child (lines, next) = let childRange = unionLineRangesFrom (rangeAt next) (copoint child) in
              ((fmap (flip (,) childRange . Just . (<$ child)) <$> copoint child)
