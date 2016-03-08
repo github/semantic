@@ -74,26 +74,26 @@ spec = parallel $ do
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $ forAll (arbitrary `suchThat` (not . isEmptyRow)) $
-      \ a -> adjoinRowsByR (pure openMaybe) a [] `shouldBe` [ a ]
+      \ a -> adjoinRowsBy (pure openMaybe) a [] `shouldBe` [ a ]
 
     prop "prunes empty rows" $
-      \ a -> adjoinRowsByR (pure openMaybe) (makeRow EmptyLine EmptyLine) [ a ] `shouldBe` [ a ]
+      \ a -> adjoinRowsBy (pure openMaybe) (makeRow EmptyLine EmptyLine) [ a ] `shouldBe` [ a ]
 
     prop "merges open rows" $
       forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> arbitrary) $
-        \ (a, b) -> adjoinRowsByR (pure openMaybe) a [ b ] `shouldBe` [ Row (mappend <$> unRow a <*> unRow b) ]
+        \ (a, b) -> adjoinRowsBy (pure openMaybe) a [ b ] `shouldBe` [ Row (mappend <$> unRow a <*> unRow b) ]
 
     prop "prepends closed rows" $
       forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> arbitrary) $
-        \ (a, b) -> adjoinRowsByR (pure openMaybe) a [ b ] `shouldBe` [ a, b ]
+        \ (a, b) -> adjoinRowsBy (pure openMaybe) a [ b ] `shouldBe` [ a, b ]
 
     prop "does not promote empty lines through closed rows" $
       forAll ((arbitrary `suchThat` (not . isOpenLineBy openMaybe)) >>= \ a -> (,) a <$> arbitrary) $
-        \ (a, b) -> adjoinRowsByR (pure openMaybe) (makeRow EmptyLine a) [ makeRow a a, b ] `shouldBe` [ makeRow a a, b ]
+        \ (a, b) -> adjoinRowsBy (pure openMaybe) (makeRow EmptyLine a) [ makeRow a a, b ] `shouldBe` [ makeRow a a, b ]
 
     prop "promotes empty lines through open rows" $
       forAll ((arbitrary `suchThat` (\ (a, b) -> isOpenLineBy openMaybe a && not (isOpenLineBy openMaybe b))) >>= \ (a, b) -> (,,) a b <$> arbitrary) $
-        \ (open, closed, rest) -> adjoinRowsByR (pure openMaybe) (makeRow EmptyLine open) [ makeRow open closed, rest ] `shouldBe` [ makeRow open closed, makeRow EmptyLine open, rest ]
+        \ (open, closed, rest) -> adjoinRowsBy (pure openMaybe) (makeRow EmptyLine open) [ makeRow open closed, rest ] `shouldBe` [ makeRow open closed, makeRow EmptyLine open, rest ]
 
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $

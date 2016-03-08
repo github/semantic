@@ -23,20 +23,20 @@ isOpenRowBy :: Both (MaybeOpen a) -> Row a -> Bool
 isOpenRowBy f = runBothWith (&&) . (isOpenLineBy <$> f <*>) . unRow
 
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
-adjoinRowsByR :: Both (MaybeOpen a) -> Row a -> [Row a] -> [Row a]
-adjoinRowsByR _ (Row (Both (EmptyLine, EmptyLine))) rows = rows
+adjoinRowsBy :: Both (MaybeOpen a) -> Row a -> [Row a] -> [Row a]
+adjoinRowsBy _ (Row (Both (EmptyLine, EmptyLine))) rows = rows
 
-adjoinRowsByR f row (nextRow : rows) | isOpenRowBy f row = Row ((<>) <$> unRow row <*> unRow nextRow) : rows
+adjoinRowsBy f row (nextRow : rows) | isOpenRowBy f row = Row ((<>) <$> unRow row <*> unRow nextRow) : rows
 
-adjoinRowsByR f (Row (Both (EmptyLine, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (fst f) nextLeft = makeRow nextLeft right : adjoinRowsByR f (makeRow mempty nextRight) rows
+adjoinRowsBy f (Row (Both (EmptyLine, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (fst f) nextLeft = makeRow nextLeft right : adjoinRowsBy f (makeRow mempty nextRight) rows
 
-adjoinRowsByR f (Row (Both (left, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (fst f) left = makeRow (left <> nextLeft) right : adjoinRowsByR f (makeRow mempty nextRight) rows
+adjoinRowsBy f (Row (Both (left, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (fst f) left = makeRow (left <> nextLeft) right : adjoinRowsBy f (makeRow mempty nextRight) rows
 
-adjoinRowsByR f (Row (Both (left, EmptyLine))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (snd f) nextRight = makeRow left nextRight : adjoinRowsByR f (makeRow nextLeft mempty) rows
+adjoinRowsBy f (Row (Both (left, EmptyLine))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (snd f) nextRight = makeRow left nextRight : adjoinRowsBy f (makeRow nextLeft mempty) rows
 
-adjoinRowsByR f (Row (Both (left, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (snd f) right = makeRow left (right <> nextRight) : adjoinRowsByR f (makeRow nextLeft mempty) rows
+adjoinRowsBy f (Row (Both (left, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (snd f) right = makeRow left (right <> nextRight) : adjoinRowsBy f (makeRow nextLeft mempty) rows
 
-adjoinRowsByR _ row rows = row : rows
+adjoinRowsBy _ row rows = row : rows
 
 instance Show a => Show (Row a) where
   show (Row (Both (left, right))) = "\n" ++ show left ++ " | " ++ show right
