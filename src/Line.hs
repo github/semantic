@@ -38,14 +38,6 @@ maybeLast vector = if Vector.null vector then Nothing else Just $ Vector.last ve
 -- | A function that takes an input and returns a Maybe of the same type.
 type MaybeOpen a = a -> Maybe a
 
--- | Returns the first non-empty line in the list, or Nothing if the last item
--- | in the line doesn't pass the given MaybeOpen or if there are no non-empty
--- | lines.
-openLineBy :: MaybeOpen a -> [Line a] -> Maybe (Line a)
-openLineBy _ [] = Nothing
-openLineBy f (EmptyLine : rest) = openLineBy f rest
-openLineBy f (line@(Line vector) : _) = const line <$> (f =<< maybeLast vector)
-
 isOpenLineBy :: MaybeOpen a -> Line a -> Bool
 isOpenLineBy f (Line vector) = isJust (maybeLast vector >>= f)
 isOpenLineBy _ _ = False
