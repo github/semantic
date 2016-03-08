@@ -38,7 +38,7 @@ maybeLast vector = if Vector.null vector then Nothing else Just $ Vector.last ve
 type MaybeOpen a = a -> Maybe a
 
 isOpenLineBy :: MaybeOpen a -> Line a -> Bool
-isOpenLineBy f (Line vector) = isJust (maybeLast vector >>= f)
+isOpenLineBy f (Line vector) | not (Vector.null vector) = isJust . f $ Vector.last vector
 isOpenLineBy _ _ = False
 
 -- | Merge open lines and prepend closed lines, pushing empty lines through open ones.
