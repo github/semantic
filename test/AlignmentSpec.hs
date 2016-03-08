@@ -90,8 +90,7 @@ spec = parallel $ do
       \ a -> adjoinRowsBy (pure openMaybe) (makeRow EmptyLine (pure Nothing)) [ makeRow (pure Nothing) (pure Nothing), a ] `shouldBe` [ makeRow EmptyLine (pure Nothing), makeRow (pure Nothing) (pure Nothing), a ]
 
     prop "promotes empty lines through open rows" $
-      forAll ((arbitrary `suchThat` (\ (a, b) -> isOpenLineBy openMaybe a && not (isOpenLineBy openMaybe b))) >>= \ (a, b) -> (,,) a b <$> arbitrary) $
-        \ (open, closed, rest) -> adjoinRowsBy (pure openMaybe) (makeRow EmptyLine open) [ makeRow open closed, rest ] `shouldBe` [ makeRow open closed, makeRow EmptyLine open, rest ]
+      \ a -> adjoinRowsBy (pure openMaybe) (makeRow EmptyLine (pure Nothing)) [ makeRow (pure (Just a)) (pure Nothing), makeRow (pure Nothing) (pure Nothing) ] `shouldBe` [ makeRow (pure (Just a)) (pure Nothing), makeRow EmptyLine (pure Nothing), makeRow (pure Nothing) (pure Nothing) ]
 
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
