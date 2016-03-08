@@ -47,8 +47,8 @@ openLineBy f (EmptyLine : rest) = openLineBy f rest
 openLineBy f (line@(Line vector) : _) = const line <$> (f =<< maybeLast vector)
 
 isOpenLineBy :: MaybeOpen a -> Line a -> Bool
-isOpenLineBy _ EmptyLine = True
 isOpenLineBy f (Line vector) = isJust (maybeLast vector >>= f)
+isOpenLineBy _ _ = False
 
 -- | Given a function that determines whether an item is open, add a line to a
 -- | first open, non-empty item in a list of lines, or add it as a new line.
