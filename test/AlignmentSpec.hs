@@ -87,8 +87,7 @@ spec = parallel $ do
       \ a -> adjoinRowsBy (pure openMaybe) (makeRow (pure Nothing) (pure Nothing)) [ makeRow (pure a) (pure a) ] `shouldBe` [ (makeRow (pure Nothing) (pure Nothing)), makeRow (pure a) (pure a) ]
 
     prop "does not promote empty lines through closed rows" $
-      forAll ((arbitrary `suchThat` (not . isOpenLineBy openMaybe)) >>= \ a -> (,) a <$> arbitrary) $
-        \ (a, b) -> adjoinRowsBy (pure openMaybe) (makeRow EmptyLine a) [ makeRow a a, b ] `shouldBe` [ makeRow a a, b ]
+      \ a -> adjoinRowsBy (pure openMaybe) (makeRow EmptyLine (pure Nothing)) [ makeRow (pure Nothing) (pure Nothing), a ] `shouldBe` [ makeRow EmptyLine (pure Nothing), makeRow (pure Nothing) (pure Nothing), a ]
 
     prop "promotes empty lines through open rows" $
       forAll ((arbitrary `suchThat` (\ (a, b) -> isOpenLineBy openMaybe a && not (isOpenLineBy openMaybe b))) >>= \ (a, b) -> (,,) a b <$> arbitrary) $
