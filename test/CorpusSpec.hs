@@ -79,7 +79,7 @@ testDiff :: Renderer T.Text String -> Both FilePath -> Maybe FilePath -> (String
 testDiff renderer paths diff matcher = do
   let parser = parserForFilepath (fst paths)
   sources <- sequence $ readAndTranscodeFile <$> paths
-  let sourceBlobs = Both (S.SourceBlob, S.SourceBlob) <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob
+  let sourceBlobs = Both (S.SourceBlob, S.SourceBlob) <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)
   actual <- diffFiles parser renderer sourceBlobs
   case diff of
     Nothing -> matcher actual actual
