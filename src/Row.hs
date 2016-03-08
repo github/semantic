@@ -41,6 +41,9 @@ adjoinRowsBy (Both (_, g)) rows (Row (Both (left', right'))) | Just _ <- openLin
 
 adjoinRowsBy _ rows row = row : rows
 
+isOpenRowBy :: Both (MaybeOpen a) -> Row a -> Bool
+isOpenRowBy f = runBothWith (&&) . (isOpenLineBy <$> f <*>) . unRow
+
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
 adjoinRowsByR :: Both (MaybeOpen a) -> Row a -> [Row a] -> [Row a]
 adjoinRowsByR f (Row lines) (Row nextLines : rest) | runBothWith (&&) (isOpenLineBy <$> f <*> lines) = Row ((<>) <$> lines <*> nextLines) : rest
