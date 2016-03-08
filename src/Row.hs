@@ -1,6 +1,5 @@
 module Row where
 
-import Control.Arrow
 import Data.Functor.Both as Both
 import Data.Monoid
 import Line
