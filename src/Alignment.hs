@@ -6,7 +6,6 @@ import Control.Comonad.Cofree
 import Control.Monad
 import Control.Monad.Free
 import Data.Copointed
-import Data.Foldable (foldl')
 import Data.Functor.Both as Both
 import Data.Functor.Identity
 import qualified Data.List as List
