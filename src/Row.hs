@@ -21,6 +21,9 @@ unRight = snd . unRow
 isOpenRowBy :: Both (MaybeOpen a) -> Row a -> Bool
 isOpenRowBy f = runBothWith (&&) . (isOpenLineBy <$> f <*>) . unRow
 
+isClosedRowBy :: Both (MaybeOpen a) -> Row a -> Bool
+isClosedRowBy f = not . runBothWith (||) . (isOpenLineBy <$> f <*>) . unRow
+
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
 adjoinRowsBy :: Both (MaybeOpen a) -> Row a -> [Row a] -> [Row a]
 adjoinRowsBy _ (Row (Both (EmptyLine, EmptyLine))) rows = rows
