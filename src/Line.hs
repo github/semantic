@@ -51,11 +51,11 @@ isOpenLineBy f (Line vector) = isJust (maybeLast vector >>= f)
 isOpenLineBy _ _ = False
 
 -- | Merge open lines and prepend closed lines, pushing empty lines through open ones.
-adjoinLinesByR :: MaybeOpen a -> Line a -> [Line a] -> [Line a]
-adjoinLinesByR _ line [] = [line]
-adjoinLinesByR f EmptyLine (next:rest) | isOpenLineBy f next = next : adjoinLinesByR f EmptyLine rest
-adjoinLinesByR f line (next:rest) | isOpenLineBy f line = (line <> next) : rest
-adjoinLinesByR _ line lines = line : lines
+adjoinLinesBy :: MaybeOpen a -> Line a -> [Line a] -> [Line a]
+adjoinLinesBy _ line [] = [line]
+adjoinLinesBy f EmptyLine (next:rest) | isOpenLineBy f next = next : adjoinLinesBy f EmptyLine rest
+adjoinLinesBy f line (next:rest) | isOpenLineBy f line = (line <> next) : rest
+adjoinLinesBy _ line lines = line : lines
 
 -- | Create a list that contains all of the `a`s in `elements` separated by
 -- | `separator`.
