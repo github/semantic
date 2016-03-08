@@ -30,10 +30,6 @@ wrapLineContents transform line = makeLine [ transform (unLine line) ]
 maybeFirst :: Foldable f => f a -> Maybe a
 maybeFirst = foldr (const . Just) Nothing
 
--- | Return the last item in the Vector, or Nothing if it's empty.
-maybeLast :: Vector.Vector a -> Maybe a
-maybeLast vector = if Vector.null vector then Nothing else Just $ Vector.last vector
-
 -- | A function that takes an input and returns a Maybe of the same type.
 type MaybeOpen a = a -> Maybe a
 
