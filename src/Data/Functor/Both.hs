@@ -1,6 +1,5 @@
 module Data.Functor.Both where
 
-import Data.Adjoined
 import Data.Bifunctor
 import Prelude hiding (zipWith, fst, snd)
 import qualified Prelude
@@ -53,13 +52,3 @@ instance Applicative Both where
 instance Monoid a => Monoid (Both a) where
   mempty = pure mempty
   mappend a b = mappend <$> a <*> b
-
-instance (PartialSemigroup a, Monoid a) => PartialSemigroup (Both a) where
-  coalesce = coalesceBy (pure coalesce)
-
-coalesceBy :: Monoid a => Both (Coalesce a) -> Both a -> Both a -> Maybe (Both a)
-coalesceBy coalesce a b = case coalesce <*> a <*> b of
-  Both (Just l, Just r) -> Just (both l r)
-  Both (Nothing, Just r) -> Just (both (fst a `mappend` fst b) r)
-  Both (Just l, Nothing) -> Just (both l (snd a `mappend` snd b))
-  Both (Nothing, Nothing) -> Nothing
