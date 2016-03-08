@@ -50,14 +50,6 @@ isOpenLineBy :: MaybeOpen a -> Line a -> Bool
 isOpenLineBy f (Line vector) = isJust (maybeLast vector >>= f)
 isOpenLineBy _ _ = False
 
--- | Given a function that determines whether an item is open, add a line to a
--- | first open, non-empty item in a list of lines, or add it as a new line.
-adjoinLinesBy :: MaybeOpen a -> [Line a] -> Line a -> [Line a]
-adjoinLinesBy _ [] line = [line]
-adjoinLinesBy f (EmptyLine : xs) line | Just _ <- openLineBy f xs = EmptyLine : adjoinLinesBy f xs line
-adjoinLinesBy f (prev:rest) line | Just _ <- openLineBy f [ prev ] = (prev <> line) : rest
-adjoinLinesBy _ lines line = line : lines
-
 adjoinLinesByR :: MaybeOpen a -> Line a -> [Line a] -> [Line a]
 adjoinLinesByR _ line [] = [line]
 adjoinLinesByR f EmptyLine (next:rest) | isOpenLineBy f next = next : adjoinLinesByR f EmptyLine rest
