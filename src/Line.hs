@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
 module Line where
 
 import Data.Maybe
