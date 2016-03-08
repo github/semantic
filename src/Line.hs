@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Line where
 
-import qualified Data.Foldable as Foldable
 import Data.Maybe
 import Data.Monoid
 import qualified Data.Vector as Vector
@@ -10,7 +9,7 @@ import qualified Data.Vector as Vector
 data Line a =
   Line (Vector.Vector a)
   | EmptyLine
-  deriving (Eq, Functor, Foldable)
+  deriving (Eq, Foldable, Functor, Show, Traversable)
 
 -- | Create a line from a list of items.
 makeLine :: [a] -> Line a
@@ -59,10 +58,6 @@ intersperse separator elements = drop 1 $ foldr (\ each rest -> separator : each
 -- | of `separator`.
 intercalate :: (Foldable t, Foldable u) => t a -> u (t a) -> [a]
 intercalate separator elements = concatMap Foldable.toList $ intersperse separator elements
-
-instance Show a => Show (Line a) where
-  show (Line elements) = "[" ++ intercalate ", " (show <$> elements) ++ "]"
-  show EmptyLine = "EmptyLine"
 
 instance Applicative Line where
   pure = makeLine . (:[])

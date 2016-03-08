@@ -7,7 +7,7 @@ import Prelude hiding (fst, snd)
 
 -- | A row in a split diff, composed of a before line and an after line.
 newtype Row a = Row { unRow :: Both (Line a) }
-  deriving (Eq, Functor)
+  deriving (Eq, Foldable, Functor, Show, Traversable)
 
 makeRow :: Line a -> Line a -> Row a
 makeRow a = Row . both a
@@ -39,9 +39,6 @@ adjoinRowsBy f (Row (Both (left, right))) (Row (Both (nextLeft, nextRight)) : ro
 adjoinRowsBy f (Row (Both (left, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (snd f) right = makeRow left (right <> nextRight) : adjoinRowsBy f (makeRow nextLeft mempty) rows
 
 adjoinRowsBy _ row rows = row : rows
-
-instance Show a => Show (Row a) where
-  show (Row (Both (left, right))) = "\n" ++ show left ++ " | " ++ show right
 
 instance Applicative Row where
   pure = Row . pure . pure
