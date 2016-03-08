@@ -106,9 +106,6 @@ spec = parallel $ do
         fmap start . maybeFirst . Maybe.catMaybes <$> Both.unzip (fmap maybeFirst . unRow . fmap Prelude.snd <$> splitPatchByLines ((Source.++) <$> sources <*> sources) (patchWithBoth patch (leafWithRangeInSource <$> sources <*> (Range <$> indices <*> ((2 *) <$> indices))))) `shouldBe` (<$) <$> indices <*> unPatch patch
 
     where
-      isClosedBy f (Row lines@(Both (Line _, Line _))) = and (Maybe.isNothing . openLineBy f . pure <$> lines)
-      isClosedBy _ _ = False
-
       isEmptyRow (Row (Both (EmptyLine, EmptyLine))) = True
       isEmptyRow _ = False
 
