@@ -48,17 +48,6 @@ adjoinLinesBy f EmptyLine (next:rest) | isOpenLineBy f next = next : adjoinLines
 adjoinLinesBy f line (next:rest) | isOpenLineBy f line = (line <> next) : rest
 adjoinLinesBy _ line lines = line : lines
 
--- | Create a list that contains all of the `a`s in `elements` separated by
--- | `separator`.
-intersperse :: Foldable t => a -> t a -> [a]
-intersperse separator elements = drop 1 $ foldr (\ each rest -> separator : each : rest) [] elements
-
--- | Create a list that contains all the items in the foldables in `elements`,
--- | where the contents of the different foldables are separated by the contents
--- | of `separator`.
-intercalate :: (Foldable t, Foldable u) => t a -> u (t a) -> [a]
-intercalate separator elements = concatMap Foldable.toList $ intersperse separator elements
-
 instance Applicative Line where
   pure = makeLine . (:[])
   a <*> b = makeLine $ unLine a <*> unLine b
