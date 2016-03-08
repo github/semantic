@@ -109,9 +109,6 @@ spec = parallel $ do
       isEmptyRow (Row (Both (EmptyLine, EmptyLine))) = True
       isEmptyRow _ = False
 
-      isEmptyLine EmptyLine = True
-      isEmptyLine _ = False
-
       isOnSingleLine (a, _, _) = filter (/= '\n') (toList a) == toList a
 
       getTotalRange (Source vector) = Range 0 $ length vector
