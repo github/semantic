@@ -118,7 +118,6 @@ spec = parallel $ do
       ] `shouldBe` Nothing
 
     where
-      isOpenBy f (Row lines) = and (Maybe.isJust . openLineBy f . pure <$> lines)
       isClosedBy f (Row lines@(Both (Line _, Line _))) = and (Maybe.isNothing . openLineBy f . pure <$> lines)
       isClosedBy _ _ = False
 
