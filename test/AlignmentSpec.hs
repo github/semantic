@@ -73,24 +73,27 @@ spec = parallel $ do
         length (splitDiffByLines sources (Free $ Annotated ((`Info` mempty) . getTotalRange <$> sources) (Indexed $ leafWithRangesInSources sources <$> Both.zip (actualLineRanges <$> (getTotalRange <$> sources) <*> sources)))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toList <$> sources)
 
   describe "adjoinRowsBy" $ do
-    prop "is identity on top of no rows" $
-      \ a -> adjoinRowsBy (pure openMaybe) [] a `shouldBe` [ a ]
+    prop "is identity on top of no rows" $ forAll (arbitrary `suchThat` (not . isEmptyRow)) $
+      \ a -> adjoinRowsByR (pure openMaybe) a [] `shouldBe` [ a ]
 
-    prop "appends onto open rows" $
-      forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
-        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ a ] b `shouldBe` [ Row (mappend <$> unRow a <*> unRow b) ]
+    prop "prunes empty rows" $
+      \ a -> adjoinRowsByR (pure openMaybe) (makeRow EmptyLine EmptyLine) [ a ] `shouldBe` [ a ]
 
-    prop "does not append onto closed rows" $
-      forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
-        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ a ] b `shouldBe` [ b, a ]
+    prop "merges open rows" $
+      forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> arbitrary) $
+        \ (a, b) -> adjoinRowsByR (pure openMaybe) a [ b ] `shouldBe` [ Row (mappend <$> unRow a <*> unRow b) ]
 
-    prop "does not promote elements through empty lines onto closed lines" $
-      forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
-        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ makeRow EmptyLine EmptyLine, a ] b `shouldBe` [ b, makeRow EmptyLine EmptyLine, a ]
+    prop "prepends closed rows" $
+      forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> arbitrary) $
+        \ (a, b) -> adjoinRowsByR (pure openMaybe) a [ b ] `shouldBe` [ a, b ]
 
-    prop "promotes elements through empty lines onto open lines" $
-      forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
-        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ makeRow EmptyLine EmptyLine, a ] b `shouldBe` makeRow EmptyLine EmptyLine : adjoinRowsBy (pure openMaybe) [ a ] b
+    prop "does not promote empty lines through closed rows" $
+      forAll ((arbitrary `suchThat` (not . isOpenLineBy openMaybe)) >>= \ a -> (,) a <$> arbitrary) $
+        \ (a, b) -> adjoinRowsByR (pure openMaybe) (makeRow EmptyLine a) [ makeRow a a, b ] `shouldBe` [ makeRow a a, b ]
+
+    prop "promotes empty lines through open rows" $
+      forAll ((arbitrary `suchThat` (\ (a, b) -> isOpenLineBy openMaybe a && not (isOpenLineBy openMaybe b))) >>= \ (a, b) -> (,,) a b <$> arbitrary) $
+        \ (open, closed, rest) -> adjoinRowsByR (pure openMaybe) (makeRow EmptyLine open) [ makeRow open closed, rest ] `shouldBe` [ makeRow open closed, makeRow EmptyLine open, rest ]
 
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
@@ -118,6 +121,12 @@ spec = parallel $ do
       isOpenBy f (Row lines) = and (Maybe.isJust . openLineBy f . pure <$> lines)
       isClosedBy f (Row lines@(Both (Line _, Line _))) = and (Maybe.isNothing . openLineBy f . pure <$> lines)
       isClosedBy _ _ = False
+
+      isEmptyRow (Row (Both (EmptyLine, EmptyLine))) = True
+      isEmptyRow _ = False
+
+      isEmptyLine EmptyLine = True
+      isEmptyLine _ = False
 
       isOnSingleLine (a, _, _) = filter (/= '\n') (toList a) == toList a
 
