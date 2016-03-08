@@ -43,7 +43,6 @@ isOpenLineBy _ _ = False
 
 -- | Merge open lines and prepend closed lines, pushing empty lines through open ones.
 adjoinLinesBy :: MaybeOpen a -> Line a -> [Line a] -> [Line a]
-adjoinLinesBy _ line [] = [line]
 adjoinLinesBy f EmptyLine (next:rest) | isOpenLineBy f next = next : adjoinLinesBy f EmptyLine rest
 adjoinLinesBy f line (next:rest) | isOpenLineBy f line = (line <> next) : rest
 adjoinLinesBy _ line lines = line : lines
