@@ -17,6 +17,10 @@ modeToDigits (SymlinkBlob mode) = showOct mode ""
 data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
   deriving (Show, Eq)
 
+-- | The default plain blob mode
+defaultPlainBlob :: SourceKind
+defaultPlainBlob = PlainBlob 0o100644
+
 -- | The contents of a source file, backed by a vector for efficient slicing.
 newtype Source a = Source { getVector :: Vector.Vector a  }
   deriving (Eq, Show, Functor, Traversable)
