@@ -46,19 +46,17 @@ isOpenRowBy f = runBothWith (&&) . (isOpenLineBy <$> f <*>) . unRow
 
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
 adjoinRowsByR :: Both (MaybeOpen a) -> Row a -> [Row a] -> [Row a]
-adjoinRowsByR f (Row lines) (Row nextLines : rest) | runBothWith (&&) (isOpenLineBy <$> f <*> lines) = Row ((<>) <$> lines <*> nextLines) : rest
+adjoinRowsByR _ (Row (Both (EmptyLine, EmptyLine))) rows = rows
 
-adjoinRowsByR (Both (f, _)) (Row (Both (left', right'))) rows | isOpenLineBy f left' = case right' of
-  EmptyLine -> rest
-  _ -> makeRow EmptyLine right' : rest
-  where rest = Prelude.zipWith makeRow lefts rights
-        (lefts, rights) = first (adjoinLinesByR f left') . runBoth $ Both.unzip (unRow <$> rows)
+adjoinRowsByR f row (nextRow : rows) | isOpenRowBy f row = Row ((<>) <$> unRow row <*> unRow nextRow) : rows
 
-adjoinRowsByR (Both (_, g)) (Row (Both (left', right'))) rows | isOpenLineBy g right' = case left' of
-  EmptyLine -> rest
-  _ -> makeRow left' EmptyLine : rest
-  where rest = Prelude.zipWith makeRow lefts rights
-        (lefts, rights) = second (adjoinLinesByR g right') . runBoth $ Both.unzip (unRow <$> rows)
+adjoinRowsByR f (Row (Both (EmptyLine, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (fst f) nextLeft = makeRow nextLeft right : adjoinRowsByR f (makeRow mempty nextRight) rows
+
+adjoinRowsByR f (Row (Both (left, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (fst f) left = makeRow (left <> nextLeft) right : adjoinRowsByR f (makeRow mempty nextRight) rows
+
+adjoinRowsByR f (Row (Both (left, EmptyLine))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (snd f) nextRight = makeRow left nextRight : adjoinRowsByR f (makeRow nextLeft mempty) rows
+
+adjoinRowsByR f (Row (Both (left, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (snd f) right = makeRow left (right <> nextRight) : adjoinRowsByR f (makeRow nextLeft mempty) rows
 
 adjoinRowsByR _ row rows = row : rows
 
