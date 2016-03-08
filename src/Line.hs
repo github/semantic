@@ -50,6 +50,7 @@ isOpenLineBy :: MaybeOpen a -> Line a -> Bool
 isOpenLineBy f (Line vector) = isJust (maybeLast vector >>= f)
 isOpenLineBy _ _ = False
 
+-- | Merge open lines and prepend closed lines, pushing empty lines through open ones.
 adjoinLinesByR :: MaybeOpen a -> Line a -> [Line a] -> [Line a]
 adjoinLinesByR _ line [] = [line]
 adjoinLinesByR f EmptyLine (next:rest) | isOpenLineBy f next = next : adjoinLinesByR f EmptyLine rest
