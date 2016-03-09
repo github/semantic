@@ -3,24 +3,17 @@ module Line where
 import Data.Monoid
 
 -- | A line of items or an empty line.
-data Line a =
-  Line [a]
-  | EmptyLine
+newtype Line a = Line { unLine :: [a] }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
 -- | Create a line from a list of items.
 makeLine :: [a] -> Line a
 makeLine = Line
 
--- | Return a list of items from a line.
-unLine :: Line a -> [a]
-unLine EmptyLine = []
-unLine (Line elements) = elements
-
 -- | Transform the line by applying a function to a list of all the items in the
 -- | line.
 wrapLineContents :: ([a] -> b) -> Line a -> Line b
-wrapLineContents _ EmptyLine = EmptyLine
+wrapLineContents _ (Line []) = mempty
 wrapLineContents transform line = makeLine [ transform (unLine line) ]
 
 -- | Return the first item in the Foldable, or Nothing if it's empty.
@@ -43,11 +36,9 @@ adjoinLinesBy f line (next:rest) = coalesceLinesBy f line next ++ rest
 adjoinLinesBy _ line [] = [ line ]
 
 instance Applicative Line where
-  pure = makeLine . (:[])
+  pure = makeLine . pure
   a <*> b = makeLine $ unLine a <*> unLine b
 
 instance Monoid (Line a) where
-  mempty = EmptyLine
-  mappend EmptyLine line = line
-  mappend line EmptyLine = line
+  mempty = Line []
   mappend (Line xs) (Line ys) = Line (xs <> ys)

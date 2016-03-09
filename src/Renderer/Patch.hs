@@ -47,7 +47,7 @@ rowLength = fmap lineLength . unRow
 
 -- | The length of the line, being either 0 or 1.
 lineLength :: Line a -> Sum Int
-lineLength EmptyLine = 0
+lineLength (Line []) = 0
 lineLength _ = 1
 
 -- | Given the before and after sources, render a hunk to a string.
@@ -68,7 +68,7 @@ showLines source prefix lines = fromMaybe "" . mconcat $ fmap prepend . showLine
 
 -- | Given a source, render a line to a string.
 showLine :: Source Char -> Line (SplitDiff leaf Info) -> Maybe String
-showLine _ EmptyLine = Nothing
+showLine _ (Line []) = Nothing
 showLine source line = Just . toString . (`slice` source) . unionRanges $ getRange <$> unLine line
 
 -- | Return the range from a split diff.

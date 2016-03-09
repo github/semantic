@@ -33,9 +33,7 @@ instance Arbitrary a => Arbitrary (Row a) where
   arbitrary = Row <$> arbitrary
 
 instance Arbitrary a => Arbitrary (Line a) where
-  arbitrary = oneof [
-    makeLine <$> arbitrary,
-    const EmptyLine <$> (arbitrary :: Gen ()) ]
+  arbitrary = makeLine <$> arbitrary
 
 instance Arbitrary a => Arbitrary (Patch a) where
   arbitrary = oneof [
@@ -78,7 +76,7 @@ spec = parallel $ do
       \ a -> adjoinRowsBy (pure Maybe.isJust) a [] `shouldBe` [ a :: Row (Maybe Bool) ]
 
     prop "prunes empty rows" $
-      \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow EmptyLine EmptyLine) [ a ] `shouldBe` [ a :: Row (Maybe Bool) ]
+      \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow mempty mempty) [ a ] `shouldBe` [ a :: Row (Maybe Bool) ]
 
     prop "merges open rows" $
       forAll ((arbitrary `suchThat` isOpenRowBy (pure Maybe.isJust)) >>= \ a -> (,) a <$> arbitrary) $
@@ -90,8 +88,8 @@ spec = parallel $ do
     it "aligns closed lines" $
       foldr (adjoinRowsBy (pure (/= '\n'))) [] (Prelude.zipWith (makeRow) (pure <$> "[ bar ]\nquux") (pure <$> "[\nbar\n]\nquux")) `shouldBe`
         [ makeRow (makeLine "[ bar ]\n") (makeLine "[\n")
-        , makeRow EmptyLine (makeLine "bar\n")
-        , makeRow EmptyLine (makeLine "]\n")
+        , makeRow mempty (makeLine "bar\n")
+        , makeRow mempty (makeLine "]\n")
         , makeRow (makeLine "quux") (makeLine "quux")
         ]
 
@@ -106,7 +104,7 @@ spec = parallel $ do
         fmap start . maybeFirst . Maybe.catMaybes <$> Both.unzip (fmap maybeFirst . unRow . fmap Prelude.snd <$> splitPatchByLines ((Source.++) <$> sources <*> sources) (patchWithBoth patch (leafWithRangeInSource <$> sources <*> (Range <$> indices <*> ((2 *) <$> indices))))) `shouldBe` (<$) <$> indices <*> unPatch patch
 
     where
-      isEmptyRow (Row (Both (EmptyLine, EmptyLine))) = True
+      isEmptyRow (Row (Both (Line [], Line []))) = True
       isEmptyRow _ = False
 
       isOnSingleLine (a, _, _) = filter (/= '\n') (toList a) == toList a

@@ -60,7 +60,7 @@ instance ToJSON (Term leaf Info) where
   toEncoding (info :< syntax) = pairs $ mconcat (termFields info syntax)
 
 lineFields :: KeyValue kv => Int -> Line (SplitDiff leaf Info, Range) -> [kv]
-lineFields _ EmptyLine = []
+lineFields _ (Line []) = []
 lineFields n line = [ "number" .= n, "terms" .= unLine (Prelude.fst <$> line), "range" .= unionRanges (Prelude.snd <$> line), "hasChanges" .= hasChanges (Prelude.fst <$> line) ]
 
 termFields :: (ToJSON recur, KeyValue kv) => Info -> Syntax leaf recur -> [kv]

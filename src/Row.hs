@@ -23,4 +23,4 @@ isOpenRowBy f = runBothWith (&&) . (isOpenLineBy <$> f <*>) . unRow
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
 adjoinRowsBy :: Both (a -> Bool) -> Row a -> [Row a] -> [Row a]
 adjoinRowsBy _ row [] = [ row ]
-adjoinRowsBy f row (nextRow : rows) = zipWithDefaults makeRow (pure EmptyLine) (coalesceLinesBy <$> f <*> unRow row <*> unRow nextRow) ++ rows
+adjoinRowsBy f row (nextRow : rows) = zipWithDefaults makeRow mempty (coalesceLinesBy <$> f <*> unRow row <*> unRow nextRow) ++ rows
