@@ -99,7 +99,7 @@ unionLineRangesFrom start lines = unionRangesFrom start (lines >>= (fmap Prelude
 
 -- | Returns the ranges of a list of Rows with the assistance of an unaligning function.
 rowRangesBy :: Functor f => ([f [Range]] -> f [[Range]]) -> [f (Line (a, Range))] -> f (Maybe Range)
-rowRangesBy unalign rows = maybeConcat . join <$> unalign (fmap (fmap Prelude.snd . unLine) <$> rows)
+rowRangesBy unalign = fmap (maybeConcat . join) . unalign . fmap (fmap (fmap Prelude.snd . unLine))
 
 -- | Openness predicate for (Range, a) pairs.
 openRangePair :: Source Char -> (a, Range) -> Bool
