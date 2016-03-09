@@ -74,17 +74,9 @@ splitAnnotatedByLines makeTerm sources infos syntax = case syntax of
   where ranges = characterRange <$> infos
         categories = Diff.categories <$> infos
 
-        adjoinChildRows constructor children = let (rows, next) = foldr childRows ([], end <$> ranges) children in
+        adjoinChildRows constructor children = let (rows, next) = foldr (childLines sources (zipDefaults (pure mempty))) ([], end <$> ranges) children in
           fmap (wrapLineContents <$> (makeBranchTerm (\ info -> makeTerm info . constructor) <$> categories <*> next) <*>) . foldr (adjoinRowsBy (openRangePair <$> sources)) [] $
             zipDefaults (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (start <$> ranges) <*> next) <*> sources)) ++ rows
-
-        childRows child (rows, next) =
-          -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
-          if or $ (>) . end <$> childRanges next child <*> next
-            then (rows, next)
-            else    ((fmap (fmap (first (Just . (<$ child)))) <$> copoint child)
-                 ++ zipDefaults (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (end <$> childRanges next child) <*> next) <*> sources))
-                 ++ rows, start <$> childRanges next child)
 
 childLines :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> (f [Line (Maybe (c a), Range)] -> [f (Line (Maybe (c a), Range))]) -> c [f (Line (a, Range))] -> ([f (Line (Maybe (c a), Range))], f Int) -> ([f (Line (Maybe (c a), Range))], f Int)
 -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
