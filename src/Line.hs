@@ -40,8 +40,8 @@ coalesceLinesBy _ line nextLine = [line, nextLine]
 
 -- | Merge open lines and prepend closed lines, pushing empty lines through open ones.
 adjoinLinesBy :: (a -> Bool) -> Line a -> [Line a] -> [Line a]
-adjoinLinesBy f line (next:rest) | isOpenLineBy f line = line <> next : rest
-adjoinLinesBy _ line lines = line : lines
+adjoinLinesBy f line (next:rest) = coalesceLinesBy f line next ++ rest
+adjoinLinesBy _ line [] = [ line ]
 
 instance Applicative Line where
   pure = makeLine . (:[])
