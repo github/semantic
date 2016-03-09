@@ -14,7 +14,7 @@ makeLine = Line
 -- | line.
 wrapLineContents :: ([a] -> b) -> Line a -> Line b
 wrapLineContents _ (Line []) = mempty
-wrapLineContents transform line = makeLine [ transform (unLine line) ]
+wrapLineContents transform line = Line [ transform (unLine line) ]
 
 -- | Return the first item in the Foldable, or Nothing if it's empty.
 maybeFirst :: Foldable f => f a -> Maybe a
@@ -36,8 +36,8 @@ adjoinLinesBy f line (next:rest) = coalesceLinesBy f line next ++ rest
 adjoinLinesBy _ line [] = [ line ]
 
 instance Applicative Line where
-  pure = makeLine . pure
-  a <*> b = makeLine $ unLine a <*> unLine b
+  pure = Line . pure
+  a <*> b = Line $ unLine a <*> unLine b
 
 instance Monoid (Line a) where
   mempty = Line []

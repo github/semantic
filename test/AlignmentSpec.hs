@@ -29,7 +29,7 @@ instance Arbitrary a => Arbitrary (Both a) where
   arbitrary = pure (curry Both) <*> arbitrary <*> arbitrary
 
 instance Arbitrary a => Arbitrary (Line a) where
-  arbitrary = makeLine <$> arbitrary
+  arbitrary = Line <$> arbitrary
 
 instance Arbitrary a => Arbitrary (Patch a) where
   arbitrary = oneof [
@@ -83,10 +83,10 @@ spec = parallel $ do
 
     it "aligns closed lines" $
       foldr (adjoinRowsBy (pure (/= '\n'))) [] (Prelude.zipWith (both) (pure <$> "[ bar ]\nquux") (pure <$> "[\nbar\n]\nquux")) `shouldBe`
-        [ both (makeLine "[ bar ]\n") (makeLine "[\n")
-        , both mempty (makeLine "bar\n")
-        , both mempty (makeLine "]\n")
-        , both (makeLine "quux") (makeLine "quux")
+        [ both (Line "[ bar ]\n") (Line "[\n")
+        , both mempty (Line "bar\n")
+        , both mempty (Line "]\n")
+        , both (Line "quux") (Line "quux")
         ]
 
   describe "splitAbstractedTerm" $ do
