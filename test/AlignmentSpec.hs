@@ -79,7 +79,7 @@ spec = parallel $ do
       \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow mempty mempty) [ a ] `shouldBe` [ a :: Row (Maybe Bool) ]
 
     prop "merges open rows" $
-      forAll ((arbitrary `suchThat` isOpenRowBy (pure Maybe.isJust)) >>= \ a -> (,) a <$> arbitrary) $
+      forAll ((arbitrary `suchThat` (and . fmap (isOpenLineBy Maybe.isJust) . unRow)) >>= \ a -> (,) a <$> arbitrary) $
         \ (a, b) -> adjoinRowsBy (pure Maybe.isJust) a [ b ] `shouldBe` [ Row (mappend <$> unRow a <*> unRow b) :: Row (Maybe Bool) ]
 
     prop "prepends closed rows" $
