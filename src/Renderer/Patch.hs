@@ -11,7 +11,6 @@ import Prelude hiding (fst, snd)
 import qualified Prelude
 import Range
 import Renderer
-import Row
 import Source hiding ((++), break)
 import SplitDiff
 import Control.Comonad.Cofree

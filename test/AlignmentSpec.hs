@@ -19,7 +19,6 @@ import Line
 import Patch
 import Prelude hiding (fst, snd)
 import qualified Prelude
-import Row
 import Range
 import Source hiding ((++))
 import qualified Source
