@@ -33,6 +33,10 @@ isOpenLineBy :: (a -> Bool) -> Line a -> Bool
 isOpenLineBy f (Line vector) = Vector.null vector || f (Vector.last vector)
 isOpenLineBy _ _ = True
 
+coalesceLinesBy :: (a -> Bool) -> Line a -> Line a -> [Line a]
+coalesceLinesBy f line nextLine | isOpenLineBy f line = [line <> nextLine]
+coalesceLinesBy _ line nextLine = [line, nextLine]
+
 -- | Merge open lines and prepend closed lines, pushing empty lines through open ones.
 adjoinLinesBy :: (a -> Bool) -> Line a -> [Line a] -> [Line a]
 adjoinLinesBy f line (next:rest) | isOpenLineBy f line = line <> next : rest

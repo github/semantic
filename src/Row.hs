@@ -21,10 +21,6 @@ unRight = snd . unRow
 isOpenRowBy :: Both (a -> Bool) -> Row a -> Bool
 isOpenRowBy f = runBothWith (&&) . (isOpenLineBy <$> f <*>) . unRow
 
-coalesceLinesBy :: (a -> Bool) -> Line a -> Line a -> [Line a]
-coalesceLinesBy f line nextLine | isOpenLineBy f line = [line <> nextLine]
-coalesceLinesBy _ line nextLine = [line, nextLine]
-
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
 adjoinRowsBy :: Both (a -> Bool) -> Row a -> [Row a] -> [Row a]
 adjoinRowsBy _ row [] = [ row ]
