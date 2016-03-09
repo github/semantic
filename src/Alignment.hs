@@ -108,4 +108,4 @@ openRangePair source pair = openRange source (Prelude.snd pair)
 
 -- | Does this Range in this Source end with a newline?
 openRange :: Source Char -> Range -> Bool
-openRange source range = (at source <$> maybeLastIndex range) == Just '\n'
+openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
