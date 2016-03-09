@@ -1,22 +1,21 @@
 module Line where
 
 import Data.Monoid
-import qualified Data.Vector as Vector
 
 -- | A line of items or an empty line.
 data Line a =
-  Line (Vector.Vector a)
+  Line [a]
   | EmptyLine
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
 -- | Create a line from a list of items.
 makeLine :: [a] -> Line a
-makeLine = Line . Vector.fromList
+makeLine = Line
 
 -- | Return a list of items from a line.
 unLine :: Line a -> [a]
 unLine EmptyLine = []
-unLine (Line elements) = Vector.toList elements
+unLine (Line elements) = elements
 
 -- | Transform the line by applying a function to a list of all the items in the
 -- | line.
@@ -30,7 +29,7 @@ maybeFirst = foldr (const . Just) Nothing
 
 -- | Is the final element of a line matched by the given predicate?
 isOpenLineBy :: (a -> Bool) -> Line a -> Bool
-isOpenLineBy f (Line vector) = Vector.null vector || f (Vector.last vector)
+isOpenLineBy f (Line elements) = null elements || f (last elements)
 isOpenLineBy _ _ = True
 
 -- | Coalesce a pair of lines if the first is matched by a predicate.
