@@ -31,10 +31,9 @@ zip = zipWith both
 transpose :: Both (a, b) -> (Both a, Both b)
 transpose = runBothWith (uncurry bimap . bimap both both)
 
--- | Zip two lists by applying a function, using the default values to extend
--- | the shorter list.
-zipWithDefaults :: (a -> a -> b) -> Both a -> Both [a] -> [b]
-zipWithDefaults f ds as = take (runBothWith max (length <$> as)) $ zipWith f ((++) <$> as <*> (repeat <$> ds))
+-- | Zip Both lists, using the default values to extend the shorter list.
+zipDefaults :: Both a -> Both [a] -> [Both a]
+zipDefaults ds as = take (runBothWith max (length <$> as)) $ zipWith both ((++) <$> as <*> (repeat <$> ds))
 
 zipWith :: (a -> a -> b) -> Both [a] -> [b]
 zipWith _ (Both ([], _)) = []
