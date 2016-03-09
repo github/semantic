@@ -1,7 +1,6 @@
 module Row where
 
 import Data.Functor.Both as Both
-import Data.Monoid
 import Line
 import Prelude hiding (fst, snd)
 
