@@ -69,15 +69,13 @@ splitAnnotatedByLines makeTerm sources infos syntax = case syntax of
 
 adjoinChildren :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> f Info -> (f [Line (Maybe (c a), Range)] -> [f (Line (Maybe (c a), Range))]) -> (Info -> Syntax leaf outTerm -> outTerm) -> ([c a] -> Syntax leaf outTerm) -> [c [f (Line (a, Range))]] -> [f (Line (outTerm, Range))]
 adjoinChildren sources infos align makeTerm constructor children =
-  fmap wrap . foldr adjoin [] $
+  fmap wrap . foldr (adjoinRowsBy (openRangePair <$> sources) align) [] $
     align leadingContext ++ lines
   where (lines, next) = foldr (childLines sources align) ([], end <$> ranges) children
         ranges = characterRange <$> infos
         categories = Diff.categories <$> infos
         leadingContext = fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
         wrap = (wrapLineContents <$> (makeBranchTerm (\ info -> makeTerm info . constructor) <$> categories <*> next) <*>)
-        adjoin row [] = [ row ]
-        adjoin row (nextRow : rows) = align (coalesceLinesBy <$> (openRangePair <$> sources) <*> row <*> nextRow) ++ rows
 
 childLines :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> (f [Line (Maybe (c a), Range)] -> [f (Line (Maybe (c a), Range))]) -> c [f (Line (a, Range))] -> ([f (Line (Maybe (c a), Range))], f Int) -> ([f (Line (Maybe (c a), Range))], f Int)
 -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
