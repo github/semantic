@@ -30,8 +30,8 @@ maybeFirst = foldr (const . Just) Nothing
 
 -- | Is the final element of a line matched by the given predicate?
 isOpenLineBy :: (a -> Bool) -> Line a -> Bool
-isOpenLineBy f (Line vector) | not (Vector.null vector) = f (Vector.last vector)
-isOpenLineBy _ _ = False
+isOpenLineBy f (Line vector) = Vector.null vector || f (Vector.last vector)
+isOpenLineBy _ _ = True
 
 -- | Merge open lines and prepend closed lines, pushing empty lines through open ones.
 adjoinLinesBy :: (a -> Bool) -> Line a -> [Line a] -> [Line a]
