@@ -22,10 +22,6 @@ rangeLength range = end range - start range
 totalRange :: Foldable f => f a -> Range
 totalRange t = Range 0 $ length t
 
--- | Return a range that has its start and end offset by the given amount.
-offsetRange :: Int -> Range -> Range
-offsetRange i (Range start end) = Range (i + start) (i + end)
-
 -- | Break a string down into words and sequences of punctuation. Return a list
 -- | strings with ranges, assuming that the first character in the string is
 -- | at the given index.
