@@ -62,16 +62,10 @@ splitAbstractedTerm makeTerm source (Info range categories) syntax = case syntax
 -- | Split an annotated diff into rows of split diffs.
 splitAnnotatedByLines :: (Info -> Syntax leaf outTerm -> outTerm) -> Both (Source Char) -> Both Info -> Syntax leaf [Row (outTerm, Range)] -> [Row (outTerm, Range)]
 splitAnnotatedByLines makeTerm sources infos syntax = case syntax of
-  Leaf a -> zipDefaults (pure mempty) $ fmap <$> ((\ categories range -> pure (makeTerm (Info range categories) (Leaf a), range)) <$> categories) <*> (actualLineRanges <$> ranges <*> sources)
-  Indexed children -> adjoinChildRows (Indexed . fmap copoint) (Identity <$> children)
-  Fixed children -> adjoinChildRows (Fixed . fmap copoint) (Identity <$> children)
-  Keyed children -> adjoinChildRows (Keyed . Map.fromList) (List.sortOn (rowRanges . Prelude.snd) $ Map.toList children)
-  where ranges = characterRange <$> infos
-        categories = Diff.categories <$> infos
-
-        adjoinChildRows constructor children = let (rows, next) = foldr (childLines sources (zipDefaults (pure mempty))) ([], end <$> ranges) children in
-          fmap (wrapLineContents <$> (makeBranchTerm (\ info -> makeTerm info . constructor) <$> categories <*> next) <*>) . foldr (adjoinRowsBy (openRangePair <$> sources)) [] $
-            zipDefaults (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (start <$> ranges) <*> next) <*> sources)) ++ rows
+  Leaf a -> zipDefaults (pure mempty) $ fmap <$> ((\ categories range -> pure (makeTerm (Info range categories) (Leaf a), range)) <$> (Diff.categories <$> infos)) <*> (actualLineRanges <$> (characterRange <$> infos) <*> sources)
+  Indexed children -> adjoinChildren sources infos (zipDefaults mempty) (adjoinRowsBy (openRangePair <$> sources)) makeTerm (Indexed . fmap copoint) (Identity <$> children)
+  Fixed children -> adjoinChildren sources infos (zipDefaults mempty) (adjoinRowsBy (openRangePair <$> sources)) makeTerm (Fixed . fmap copoint) (Identity <$> children)
+  Keyed children -> adjoinChildren sources infos (zipDefaults mempty) (adjoinRowsBy (openRangePair <$> sources)) makeTerm (Keyed . Map.fromList) (List.sortOn (rowRanges . Prelude.snd) $ Map.toList children)
 
 adjoinChildren :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> f Info -> (f [Line (Maybe (c a), Range)] -> [f (Line (Maybe (c a), Range))]) -> (f (Line (Maybe (c a), Range)) -> [f (Line (Maybe (c a), Range))] -> [f (Line (Maybe (c a), Range))]) -> (Info -> Syntax leaf outTerm -> outTerm) -> ([c a] -> Syntax leaf outTerm) -> [c [f (Line (a, Range))]] -> [f (Line (outTerm, Range))]
 adjoinChildren sources infos align adjoin makeTerm constructor children =
