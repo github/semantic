@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Range where
 
-import qualified Data.Text as T
 import Control.Applicative ((<|>))
 import qualified Data.Char as Char
 import Data.Maybe (fromMaybe)
@@ -18,10 +17,6 @@ rangeAt a = Range a a
 -- | Return the length of the range.
 rangeLength :: Range -> Int
 rangeLength range = end range - start range
-
--- | Return the portion of the text identified by the given range.
-substring :: Range -> T.Text -> T.Text
-substring range = T.take (rangeLength range) . T.drop (start range)
 
 -- | Return a range that covers the entire text.
 totalRange :: Foldable f => f a -> Range
