@@ -42,19 +42,19 @@ splitDiffByLines sources = iter (\ (Annotated info syntax) -> splitAnnotatedByLi
 
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> [Row (SplitDiff leaf Info, Range)]
-splitPatchByLines sources patch = zipDefaults (pure mempty) $ fmap (fmap (first (Pure . constructor patch))) <$> lines
-    where lines = maybe [] . cata . splitAbstractedTerm (:<) <$> sources <*> unPatch patch
+splitPatchByLines sources patch = zipDefaults mempty $ fmap (fmap (first (Pure . constructor patch)) . runIdentity) <$> lines
+    where lines = maybe [] . cata . splitAbstractedTerm (:<) <$> (Identity <$> sources) <*> (fmap (fmap Identity) <$> unPatch patch)
           constructor (Replace _ _) = SplitReplace
           constructor (Insert _) = SplitInsert
           constructor (Delete _) = SplitDelete
 
 -- | Split a term comprised of an Info & Syntax up into one `outTerm` (abstracted by a constructor) per line in `Source`.
-splitAbstractedTerm :: (Info -> Syntax leaf outTerm -> outTerm) -> Source Char -> Info -> Syntax leaf [Line (outTerm, Range)] -> [Line (outTerm, Range)]
-splitAbstractedTerm makeTerm source info@(Info range categories) syntax = case syntax of
-  Leaf a -> pure . ((`makeTerm` Leaf a) . (`Info` categories) &&& id) <$> actualLineRanges range source
-  Indexed children -> runIdentity <$> adjoinChildren (pure source) (pure info) sequenceA (constructor (Indexed . fmap runIdentity)) (Identity . fmap Identity <$> children)
-  Fixed children -> runIdentity <$> adjoinChildren (pure source) (pure info) sequenceA (constructor (Fixed . fmap runIdentity)) (Identity . fmap Identity <$> children)
-  Keyed children -> runIdentity <$> adjoinChildren (pure source) (pure info) sequenceA (constructor (Keyed . Map.fromList)) (Map.toList (fmap Identity <$> children))
+splitAbstractedTerm :: (Applicative f, Traversable f) => (Info -> Syntax leaf outTerm -> outTerm) -> f (Source Char) -> f Info -> Syntax leaf [f (Line (outTerm, Range))] -> [f (Line (outTerm, Range))]
+splitAbstractedTerm makeTerm sources infos syntax = case syntax of
+  Leaf a -> sequenceA $ fmap <$> ((\ categories range -> pure (makeTerm (Info range categories) (Leaf a), range)) <$> (Diff.categories <$> infos)) <*> (actualLineRanges <$> (characterRange <$> infos) <*> sources)
+  Indexed children -> adjoinChildren sources infos sequenceA (constructor (Indexed . fmap runIdentity)) (Identity <$> children)
+  Fixed children -> adjoinChildren sources infos sequenceA (constructor (Fixed . fmap runIdentity)) (Identity <$> children)
+  Keyed children -> adjoinChildren sources infos sequenceA (constructor (Keyed . Map.fromList)) (Map.toList children)
   where constructor with info = makeTerm info . with
 
 -- | Split an annotated diff into rows of split diffs.
