@@ -63,19 +63,19 @@ splitAbstractedTerm makeTerm source (Info range categories) syntax = case syntax
 splitAnnotatedByLines :: (Info -> Syntax leaf outTerm -> outTerm) -> Both (Source Char) -> Both Info -> Syntax leaf [Row (outTerm, Range)] -> [Row (outTerm, Range)]
 splitAnnotatedByLines makeTerm sources infos syntax = case syntax of
   Leaf a -> zipDefaults (pure mempty) $ fmap <$> ((\ categories range -> pure (makeTerm (Info range categories) (Leaf a), range)) <$> (Diff.categories <$> infos)) <*> (actualLineRanges <$> (characterRange <$> infos) <*> sources)
-  Indexed children -> adjoinChildren sources infos (zipDefaults mempty) makeTerm (Indexed . fmap copoint) (Identity <$> children)
-  Fixed children -> adjoinChildren sources infos (zipDefaults mempty) makeTerm (Fixed . fmap copoint) (Identity <$> children)
-  Keyed children -> adjoinChildren sources infos (zipDefaults mempty) makeTerm (Keyed . Map.fromList) (List.sortOn (rowRanges . Prelude.snd) $ Map.toList children)
+  Indexed children -> adjoinChildren sources infos (zipDefaults mempty) (\ info -> makeTerm info . (Indexed . fmap copoint)) (Identity <$> children)
+  Fixed children -> adjoinChildren sources infos (zipDefaults mempty) (\ info -> makeTerm info . (Fixed . fmap copoint)) (Identity <$> children)
+  Keyed children -> adjoinChildren sources infos (zipDefaults mempty) (\ info -> makeTerm info . (Keyed . Map.fromList)) (List.sortOn (rowRanges . Prelude.snd) $ Map.toList children)
 
-adjoinChildren :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> f Info -> (f [Line (Maybe (c a), Range)] -> [f (Line (Maybe (c a), Range))]) -> (Info -> Syntax leaf outTerm -> outTerm) -> ([c a] -> Syntax leaf outTerm) -> [c [f (Line (a, Range))]] -> [f (Line (outTerm, Range))]
-adjoinChildren sources infos align makeTerm constructor children =
+adjoinChildren :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> f Info -> (f [Line (Maybe (c a), Range)] -> [f (Line (Maybe (c a), Range))]) -> (Info -> [c a] -> outTerm) -> [c [f (Line (a, Range))]] -> [f (Line (outTerm, Range))]
+adjoinChildren sources infos align constructor children =
   fmap wrap . foldr (adjoinRowsBy (openRangePair <$> sources) align) [] $
     align leadingContext ++ lines
   where (lines, next) = foldr (childLines sources align) ([], end <$> ranges) children
         ranges = characterRange <$> infos
         categories = Diff.categories <$> infos
         leadingContext = fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
-        wrap = (wrapLineContents <$> (makeBranchTerm (\ info -> makeTerm info . constructor) <$> categories <*> next) <*>)
+        wrap = (wrapLineContents <$> (makeBranchTerm constructor <$> categories <*> next) <*>)
 
 childLines :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> (f [Line (Maybe (c a), Range)] -> [f (Line (Maybe (c a), Range))]) -> c [f (Line (a, Range))] -> ([f (Line (Maybe (c a), Range))], f Int) -> ([f (Line (Maybe (c a), Range))], f Int)
 -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
