@@ -55,17 +55,17 @@ spec = parallel $ do
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
-          \ source -> splitAnnotatedByLines makeTerm (pure source) (pure $ Info (getTotalRange source) mempty) (Indexed []) `shouldBe` [
-            both (pure (makeTerm (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
+          \ source -> splitAnnotatedByLines makeTerm (pure source) (pure $ Info (totalRange source) mempty) (Indexed []) `shouldBe` [
+            both (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
   describe "splitDiffByLines" $ do
     prop "preserves line counts in equal sources" $
       \ source ->
-        length (splitDiffByLines (pure source) (Free $ Annotated (pure $ Info (getTotalRange source) mempty) (Indexed . Prelude.fst $ foldl combineIntoLeaves ([], 0) source))) `shouldBe` length (filter (== '\n') $ toList source) + 1
+        length (splitDiffByLines (pure source) (Free $ Annotated (pure $ Info (totalRange source) mempty) (Indexed . Prelude.fst $ foldl combineIntoLeaves ([], 0) source))) `shouldBe` length (filter (== '\n') $ toList source) + 1
 
     prop "produces the maximum line count in inequal sources" $
       \ sources ->
-        length (splitDiffByLines sources (Free $ Annotated ((`Info` mempty) . getTotalRange <$> sources) (Indexed $ leafWithRangesInSources sources <$> Both.zip (actualLineRanges <$> (getTotalRange <$> sources) <*> sources)))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toList <$> sources)
+        length (splitDiffByLines sources (Free $ Annotated ((`Info` mempty) . totalRange <$> sources) (Indexed $ leafWithRangesInSources sources <$> Both.zip (actualLineRanges <$> (totalRange <$> sources) <*> sources)))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toList <$> sources)
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $ forAll (arbitrary `suchThat` (not . isEmptyRow)) $
@@ -91,7 +91,7 @@ spec = parallel $ do
 
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
-      \ source -> let range = getTotalRange source in
+      \ source -> let range = totalRange source in
         splitAbstractedTerm (:<) source (Info range mempty) (Leaf source) `shouldBe` (pure . ((:< Leaf source) . (`Info` mempty) &&& id) <$> actualLineRanges range source)
 
   describe "splitPatchByLines" $ do
@@ -104,8 +104,6 @@ spec = parallel $ do
       isEmptyRow _ = False
 
       isOnSingleLine (a, _, _) = filter (/= '\n') (toList a) == toList a
-
-      getTotalRange (Source vector) = Range 0 $ length vector
 
       combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info <$> pure (Range start $ start + 1) <*> mempty) (Leaf [ char ]) ], start + 1)
 
