@@ -43,7 +43,3 @@ adjoinRowsBy f (Row (Both (left, right))) (Row (Both (nextLeft, nextRight)) : ro
 adjoinRowsBy f (Row (Both (left, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (snd f) right = makeRow left (right <> nextRight) : adjoinRowsBy f (makeRow nextLeft EmptyLine) rows
 
 adjoinRowsBy _ row rows = row : rows
-
-instance Applicative Row where
-  pure = Row . pure . pure
-  Row (Both (f, g)) <*> Row (Both (a, b)) = Row $ both (f <*> a) (g <*> b)
