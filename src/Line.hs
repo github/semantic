@@ -19,7 +19,6 @@ maybeFirst = foldr (const . Just) Nothing
 -- | Is the final element of a line matched by the given predicate?
 isOpenLineBy :: (a -> Bool) -> Line a -> Bool
 isOpenLineBy f (Line elements) = null elements || f (last elements)
-isOpenLineBy _ _ = True
 
 -- | Coalesce a pair of lines if the first is matched by a predicate.
 coalesceLinesBy :: (a -> Bool) -> Line a -> Line a -> [Line a]
