@@ -98,7 +98,7 @@ unionLineRangesFrom :: Range -> [Line (a, Range)] -> Range
 unionLineRangesFrom start lines = unionRangesFrom start (lines >>= (fmap Prelude.snd . unLine))
 
 -- | Returns the ranges of a list of Rows.
-rowRanges :: [Row (a, Range)] -> Both (Maybe Range)
+rowRanges :: [Both (Line (a, Range))] -> Both (Maybe Range)
 rowRanges rows = maybeConcat . join <$> Both.unzip (fmap (fmap Prelude.snd . unLine) <$> rows)
 
 -- | Openness predicate for (Range, a) pairs.
