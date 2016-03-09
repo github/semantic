@@ -88,6 +88,7 @@ header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFile
             "old mode" ++ modeToDigits mode1,
             "new mode " ++ modeToDigits mode2 ++ " " ++ blobOidHeader
             ]
+          (Nothing, Nothing) -> ""
         blobOidHeader = "index " ++ oidA ++ ".." ++ oidB
         modeHeader :: String -> Maybe SourceKind -> String -> String
         modeHeader ty maybeMode path = case maybeMode of
