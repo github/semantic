@@ -21,9 +21,6 @@ unRight = snd . unRow
 isOpenRowBy :: Both (a -> Bool) -> Row a -> Bool
 isOpenRowBy f = runBothWith (&&) . (isOpenLineBy <$> f <*>) . unRow
 
-isClosedRowBy :: Both (a -> Bool) -> Row a -> Bool
-isClosedRowBy f = not . runBothWith (||) . (isOpenLineBy <$> f <*>) . unRow
-
 coalesceLinesBy :: (a -> Bool) -> Line a -> Line a -> [Line a]
 coalesceLinesBy f line nextLine | isOpenLineBy f line = [line <> nextLine]
 coalesceLinesBy _ line nextLine = [line, nextLine]
