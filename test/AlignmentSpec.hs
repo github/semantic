@@ -86,12 +86,6 @@ spec = parallel $ do
     prop "prepends closed rows" $
       \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow (pure Nothing) (pure Nothing)) [ makeRow (pure a) (pure a) ] `shouldBe` [ (makeRow (pure Nothing) (pure Nothing)), makeRow (pure a) (pure a) :: Row (Maybe Bool) ]
 
-    prop "does not promote empty lines through closed rows" $
-      \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow EmptyLine (pure Nothing)) [ makeRow (pure Nothing) (pure Nothing), a ] `shouldBe` [ makeRow EmptyLine (pure Nothing), makeRow (pure Nothing) (pure Nothing), a :: Row (Maybe Bool) ]
-
-    prop "promotes empty lines through open rows" $
-      \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow EmptyLine (pure Nothing)) [ makeRow (pure (Just a)) (pure Nothing), makeRow (pure Nothing) (pure Nothing) ] `shouldBe` [ makeRow (pure (Just a)) (pure Nothing), makeRow EmptyLine (pure Nothing), makeRow (pure Nothing) (pure Nothing) :: Row (Maybe Bool) ]
-
     it "aligns closed lines" $
       foldr (adjoinRowsBy (pure (/= '\n'))) [] (Prelude.zipWith (makeRow) (pure <$> "[ bar ]\nquux") (pure <$> "[\nbar\n]\nquux")) `shouldBe`
         [ makeRow (makeLine "[ bar ]\n") (makeLine "[\n")
