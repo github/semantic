@@ -92,6 +92,14 @@ spec = parallel $ do
     prop "promotes empty lines through open rows" $
       \ a -> adjoinRowsBy (pure openMaybe) (makeRow EmptyLine (pure Nothing)) [ makeRow (pure (Just a)) (pure Nothing), makeRow (pure Nothing) (pure Nothing) ] `shouldBe` [ makeRow (pure (Just a)) (pure Nothing), makeRow EmptyLine (pure Nothing), makeRow (pure Nothing) (pure Nothing) ]
 
+    it "aligns closed lines" $
+      foldr (adjoinRowsBy (pure $ \ c -> if c == '\n' then Nothing else Just c)) [] (Prelude.zipWith (makeRow) (pure <$> "[ bar ]\nquux") (pure <$> "[\nbar\n]\nquux")) `shouldBe`
+        [ makeRow (makeLine "[ bar ]\n") (makeLine "[\n")
+        , makeRow EmptyLine (makeLine "bar\n")
+        , makeRow EmptyLine (makeLine "]\n")
+        , makeRow (makeLine "quux") (makeLine "quux")
+        ]
+
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
       \ source -> let range = getTotalRange source in
