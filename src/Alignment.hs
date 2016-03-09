@@ -50,14 +50,12 @@ splitPatchByLines sources patch = zipDefaults (pure mempty) $ fmap (fmap (first 
 
 -- | Split a term comprised of an Info & Syntax up into one `outTerm` (abstracted by a constructor) per line in `Source`.
 splitAbstractedTerm :: (Info -> Syntax leaf outTerm -> outTerm) -> Source Char -> Info -> Syntax leaf [Line (outTerm, Range)] -> [Line (outTerm, Range)]
-splitAbstractedTerm makeTerm source (Info range categories) syntax = case syntax of
+splitAbstractedTerm makeTerm source info@(Info range categories) syntax = case syntax of
   Leaf a -> pure . ((`makeTerm` Leaf a) . (`Info` categories) &&& id) <$> actualLineRanges range source
-  Indexed children -> adjoinChildLines (Indexed . fmap copoint) (Identity . fmap Identity <$> children)
-  Fixed children -> adjoinChildLines (Fixed . fmap copoint) (Identity . fmap Identity <$> children)
-  Keyed children -> adjoinChildLines (Keyed . Map.fromList) (Map.toList (fmap Identity <$> children))
-  where adjoinChildLines constructor children = let (lines, next) = foldr (childLines (Identity source) sequenceA) ([], Identity (end range)) children in
-          fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) categories (runIdentity next))) . foldr (adjoinLinesBy (openRangePair source)) [] $
-            (pure . (,) Nothing <$> actualLineRanges (Range (start range) (runIdentity next)) source) ++ (runIdentity <$> lines)
+  Indexed children -> runIdentity <$> adjoinChildren (pure source) (pure info) sequenceA (constructor (Indexed . fmap runIdentity)) (Identity . fmap Identity <$> children)
+  Fixed children -> runIdentity <$> adjoinChildren (pure source) (pure info) sequenceA (constructor (Fixed . fmap runIdentity)) (Identity . fmap Identity <$> children)
+  Keyed children -> runIdentity <$> adjoinChildren (pure source) (pure info) sequenceA (constructor (Keyed . Map.fromList)) (Map.toList (fmap Identity <$> children))
+  where constructor with info = makeTerm info . with
 
 -- | Split an annotated diff into rows of split diffs.
 splitAnnotatedByLines :: (Info -> Syntax leaf outTerm -> outTerm) -> Both (Source Char) -> Both Info -> Syntax leaf [Row (outTerm, Range)] -> [Row (outTerm, Range)]
