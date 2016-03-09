@@ -77,8 +77,8 @@ splitAnnotatedByLines sources infos syntax = case syntax of
 
         adjoinChildRows :: (Copointed f, Functor f) => ([f (SplitDiff leaf Info)] -> Syntax leaf (SplitDiff leaf Info)) -> [f [Row (SplitDiff leaf Info, Range)]] -> [Row (SplitDiff leaf Info, Range)]
         adjoinChildRows constructor children = let (rows, next) = foldr childRows ([], end <$> ranges) children in
-          fmap (Row . (wrapLineContents <$> (makeBranchTerm (\ info -> Free . Annotated info . constructor) <$> categories <*> next) <*>) . unRow) . foldr (adjoinRowsBy (openRangePair <$> sources)) []
-            $ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (start <$> ranges) <*> next) <*> sources)) ++ rows
+          fmap (Row . (wrapLineContents <$> (makeBranchTerm (\ info -> Free . Annotated info . constructor) <$> categories <*> next) <*>) . unRow) . foldr (adjoinRowsBy (openRangePair <$> sources)) [] $
+            zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (start <$> ranges) <*> next) <*> sources)) ++ rows
 
         childRows :: (Copointed f, Functor f) => f [Row (SplitDiff leaf Info, Range)] -> ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int) -> ([Row (Maybe (f (SplitDiff leaf Info)), Range)], Both Int)
         childRows child (rows, next) = let childRanges = unionLineRangesFrom <$> (rangeAt <$> next) <*> sequenceA (unRow <$> copoint child) in
