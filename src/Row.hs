@@ -11,12 +11,6 @@ newtype Row a = Row { unRow :: Both (Line a) }
 makeRow :: Line a -> Line a -> Row a
 makeRow a = Row . both a
 
-unLeft :: Row a -> Line a
-unLeft = fst . unRow
-
-unRight :: Row a -> Line a
-unRight = snd . unRow
-
 isOpenRowBy :: Both (a -> Bool) -> Row a -> Bool
 isOpenRowBy f = runBothWith (&&) . (isOpenLineBy <$> f <*>) . unRow
 
