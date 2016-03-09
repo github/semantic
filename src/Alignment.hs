@@ -64,7 +64,7 @@ splitAnnotatedByLines makeTerm sources infos syntax = case syntax of
   Leaf a -> zipDefaults mempty $ fmap <$> ((\ categories range -> pure (makeTerm (Info range categories) (Leaf a), range)) <$> (Diff.categories <$> infos)) <*> (actualLineRanges <$> (characterRange <$> infos) <*> sources)
   Indexed children -> adjoinChildren sources infos (zipDefaults mempty) (constructor (Indexed . fmap copoint)) (Identity <$> children)
   Fixed children -> adjoinChildren sources infos (zipDefaults mempty) (constructor (Fixed . fmap copoint)) (Identity <$> children)
-  Keyed children -> adjoinChildren sources infos (zipDefaults mempty) (constructor (Keyed . Map.fromList)) (List.sortOn (rowRanges . Prelude.snd) $ Map.toList children)
+  Keyed children -> adjoinChildren sources infos (zipDefaults mempty) (constructor (Keyed . Map.fromList)) (List.sortOn (rowRangesBy Both.unzip . Prelude.snd) $ Map.toList children)
   where constructor with info = makeTerm info . with
 
 adjoinChildren :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> f Info -> (f [Line (Maybe (c a), Range)] -> [f (Line (Maybe (c a), Range))]) -> (Info -> [c a] -> outTerm) -> [c [f (Line (a, Range))]] -> [f (Line (outTerm, Range))]
@@ -97,9 +97,9 @@ makeBranchTerm constructor categories next children = (constructor (Info range c
 unionLineRangesFrom :: Range -> [Line (a, Range)] -> Range
 unionLineRangesFrom start lines = unionRangesFrom start (lines >>= (fmap Prelude.snd . unLine))
 
--- | Returns the ranges of a list of Rows.
-rowRanges :: [Both (Line (a, Range))] -> Both (Maybe Range)
-rowRanges rows = maybeConcat . join <$> Both.unzip (fmap (fmap Prelude.snd . unLine) <$> rows)
+-- | Returns the ranges of a list of Rows with the assistance of an unaligning function.
+rowRangesBy :: Functor f => ([f [Range]] -> f [[Range]]) -> [f (Line (a, Range))] -> f (Maybe Range)
+rowRangesBy unalign rows = maybeConcat . join <$> unalign (fmap (fmap Prelude.snd . unLine) <$> rows)
 
 -- | Openness predicate for (Range, a) pairs.
 openRangePair :: Source Char -> (a, Range) -> Bool
