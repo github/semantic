@@ -93,7 +93,7 @@ spec = parallel $ do
       \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow EmptyLine (pure Nothing)) [ makeRow (pure (Just a)) (pure Nothing), makeRow (pure Nothing) (pure Nothing) ] `shouldBe` [ makeRow (pure (Just a)) (pure Nothing), makeRow EmptyLine (pure Nothing), makeRow (pure Nothing) (pure Nothing) :: Row (Maybe Bool) ]
 
     it "aligns closed lines" $
-      foldr (adjoinRowsBy (pure (== '\n'))) [] (Prelude.zipWith (makeRow) (pure <$> "[ bar ]\nquux") (pure <$> "[\nbar\n]\nquux")) `shouldBe`
+      foldr (adjoinRowsBy (pure (/= '\n'))) [] (Prelude.zipWith (makeRow) (pure <$> "[ bar ]\nquux") (pure <$> "[\nbar\n]\nquux")) `shouldBe`
         [ makeRow (makeLine "[ bar ]\n") (makeLine "[\n")
         , makeRow EmptyLine (makeLine "bar\n")
         , makeRow EmptyLine (makeLine "]\n")
