@@ -87,10 +87,6 @@ makeBranchTerm constructor categories next children = (constructor (Info range c
 unionLineRangesFrom :: Range -> [Line (a, Range)] -> Range
 unionLineRangesFrom start lines = unionRangesFrom start (lines >>= (fmap Prelude.snd . unLine))
 
--- | Returns the ranges of a list of Rows with the assistance of an unaligning function.
-rowRangesBy :: Functor f => ([f [Range]] -> f [[Range]]) -> [f (Line (a, Range))] -> f (Maybe Range)
-rowRangesBy unalign = fmap (maybeConcat . join) . unalign . fmap (fmap (fmap Prelude.snd . unLine))
-
 -- | Openness predicate for (Range, a) pairs.
 openRangePair :: Source Char -> (a, Range) -> Bool
 openRangePair source pair = openRange source (Prelude.snd pair)
