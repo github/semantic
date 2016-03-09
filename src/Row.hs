@@ -30,8 +30,6 @@ coalesceLinesBy _ line nextLine = [line, nextLine]
 
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
 adjoinRowsBy :: Both (MaybeOpen a) -> Row a -> [Row a] -> [Row a]
-adjoinRowsBy _ (Row (Both (EmptyLine, EmptyLine))) rows = rows
-
 adjoinRowsBy f row (nextRow : rows) = zipWithDefaults makeRow (pure EmptyLine) (coalesceLinesBy <$> f <*> unRow row <*> unRow nextRow) ++ rows
 
 adjoinRowsBy _ row rows = row : rows
