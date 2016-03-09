@@ -28,8 +28,8 @@ sublist :: Range -> [a] -> [a]
 sublist range = take (rangeLength range) . drop (start range)
 
 -- | Return a range that covers the entire text.
-totalRange :: T.Text -> Range
-totalRange t = Range 0 $ T.length t
+totalRange :: Foldable f => f a -> Range
+totalRange t = Range 0 $ length t
 
 -- | Return a range that has its start and end offset by the given amount.
 offsetRange :: Int -> Range -> Range
