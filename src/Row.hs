@@ -18,17 +18,17 @@ unLeft = fst . unRow
 unRight :: Row a -> Line a
 unRight = snd . unRow
 
-isOpenRowBy :: Both (MaybeOpen a) -> Row a -> Bool
+isOpenRowBy :: Both (a -> Bool) -> Row a -> Bool
 isOpenRowBy f = runBothWith (&&) . (isOpenLineBy <$> f <*>) . unRow
 
-isClosedRowBy :: Both (MaybeOpen a) -> Row a -> Bool
+isClosedRowBy :: Both (a -> Bool) -> Row a -> Bool
 isClosedRowBy f = not . runBothWith (||) . (isOpenLineBy <$> f <*>) . unRow
 
-coalesceLinesBy :: MaybeOpen a -> Line a -> Line a -> [Line a]
+coalesceLinesBy :: (a -> Bool) -> Line a -> Line a -> [Line a]
 coalesceLinesBy f line nextLine | isOpenLineBy f line = [line <> nextLine]
 coalesceLinesBy _ line nextLine = [line, nextLine]
 
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
-adjoinRowsBy :: Both (MaybeOpen a) -> Row a -> [Row a] -> [Row a]
+adjoinRowsBy :: Both (a -> Bool) -> Row a -> [Row a] -> [Row a]
 adjoinRowsBy _ row [] = [ row ]
 adjoinRowsBy f row (nextRow : rows) = zipWithDefaults makeRow (pure EmptyLine) (coalesceLinesBy <$> f <*> unRow row <*> unRow nextRow) ++ rows

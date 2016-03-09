@@ -1,6 +1,5 @@
 module Line where
 
-import Data.Maybe
 import Data.Monoid
 import qualified Data.Vector as Vector
 
@@ -29,15 +28,13 @@ wrapLineContents transform line = makeLine [ transform (unLine line) ]
 maybeFirst :: Foldable f => f a -> Maybe a
 maybeFirst = foldr (const . Just) Nothing
 
--- | A function that takes an input and returns a Maybe of the same type.
-type MaybeOpen a = a -> Maybe a
-
-isOpenLineBy :: MaybeOpen a -> Line a -> Bool
-isOpenLineBy f (Line vector) | not (Vector.null vector) = isJust . f $ Vector.last vector
+-- | Is the final element of a line matched by the given predicate?
+isOpenLineBy :: (a -> Bool) -> Line a -> Bool
+isOpenLineBy f (Line vector) | not (Vector.null vector) = f (Vector.last vector)
 isOpenLineBy _ _ = False
 
 -- | Merge open lines and prepend closed lines, pushing empty lines through open ones.
-adjoinLinesBy :: MaybeOpen a -> Line a -> [Line a] -> [Line a]
+adjoinLinesBy :: (a -> Bool) -> Line a -> [Line a] -> [Line a]
 adjoinLinesBy f line (next:rest) | isOpenLineBy f line = line <> next : rest
 adjoinLinesBy _ line lines = line : lines
 

@@ -74,26 +74,26 @@ spec = parallel $ do
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $ forAll (arbitrary `suchThat` (not . isEmptyRow)) $
-      \ a -> adjoinRowsBy (pure openMaybe) a [] `shouldBe` [ a ]
+      \ a -> adjoinRowsBy (pure Maybe.isJust) a [] `shouldBe` [ a :: Row (Maybe Bool) ]
 
     prop "prunes empty rows" $
-      \ a -> adjoinRowsBy (pure openMaybe) (makeRow EmptyLine EmptyLine) [ a ] `shouldBe` [ a ]
+      \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow EmptyLine EmptyLine) [ a ] `shouldBe` [ a :: Row (Maybe Bool) ]
 
     prop "merges open rows" $
-      forAll ((arbitrary `suchThat` isOpenRowBy (pure openMaybe)) >>= \ a -> (,) a <$> arbitrary) $
-        \ (a, b) -> adjoinRowsBy (pure openMaybe) a [ b ] `shouldBe` [ Row (mappend <$> unRow a <*> unRow b) ]
+      forAll ((arbitrary `suchThat` isOpenRowBy (pure Maybe.isJust)) >>= \ a -> (,) a <$> arbitrary) $
+        \ (a, b) -> adjoinRowsBy (pure Maybe.isJust) a [ b ] `shouldBe` [ Row (mappend <$> unRow a <*> unRow b) :: Row (Maybe Bool) ]
 
     prop "prepends closed rows" $
-      \ a -> adjoinRowsBy (pure openMaybe) (makeRow (pure Nothing) (pure Nothing)) [ makeRow (pure a) (pure a) ] `shouldBe` [ (makeRow (pure Nothing) (pure Nothing)), makeRow (pure a) (pure a) ]
+      \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow (pure Nothing) (pure Nothing)) [ makeRow (pure a) (pure a) ] `shouldBe` [ (makeRow (pure Nothing) (pure Nothing)), makeRow (pure a) (pure a) :: Row (Maybe Bool) ]
 
     prop "does not promote empty lines through closed rows" $
-      \ a -> adjoinRowsBy (pure openMaybe) (makeRow EmptyLine (pure Nothing)) [ makeRow (pure Nothing) (pure Nothing), a ] `shouldBe` [ makeRow EmptyLine (pure Nothing), makeRow (pure Nothing) (pure Nothing), a ]
+      \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow EmptyLine (pure Nothing)) [ makeRow (pure Nothing) (pure Nothing), a ] `shouldBe` [ makeRow EmptyLine (pure Nothing), makeRow (pure Nothing) (pure Nothing), a :: Row (Maybe Bool) ]
 
     prop "promotes empty lines through open rows" $
-      \ a -> adjoinRowsBy (pure openMaybe) (makeRow EmptyLine (pure Nothing)) [ makeRow (pure (Just a)) (pure Nothing), makeRow (pure Nothing) (pure Nothing) ] `shouldBe` [ makeRow (pure (Just a)) (pure Nothing), makeRow EmptyLine (pure Nothing), makeRow (pure Nothing) (pure Nothing) ]
+      \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow EmptyLine (pure Nothing)) [ makeRow (pure (Just a)) (pure Nothing), makeRow (pure Nothing) (pure Nothing) ] `shouldBe` [ makeRow (pure (Just a)) (pure Nothing), makeRow EmptyLine (pure Nothing), makeRow (pure Nothing) (pure Nothing) :: Row (Maybe Bool) ]
 
     it "aligns closed lines" $
-      foldr (adjoinRowsBy (pure $ \ c -> if c == '\n' then Nothing else Just c)) [] (Prelude.zipWith (makeRow) (pure <$> "[ bar ]\nquux") (pure <$> "[\nbar\n]\nquux")) `shouldBe`
+      foldr (adjoinRowsBy (pure (== '\n'))) [] (Prelude.zipWith (makeRow) (pure <$> "[ bar ]\nquux") (pure <$> "[\nbar\n]\nquux")) `shouldBe`
         [ makeRow (makeLine "[ bar ]\n") (makeLine "[\n")
         , makeRow EmptyLine (makeLine "bar\n")
         , makeRow EmptyLine (makeLine "]\n")
@@ -127,7 +127,3 @@ spec = parallel $ do
       patchWithBoth (Insert ()) = Insert . snd
       patchWithBoth (Delete ()) = Delete . fst
       patchWithBoth (Replace () ()) = runBothWith Replace
-
-      openMaybe :: Maybe Bool -> Maybe (Maybe Bool)
-      openMaybe (Just a) = Just (Just a)
-      openMaybe Nothing = Nothing

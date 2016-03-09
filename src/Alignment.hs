@@ -102,13 +102,10 @@ unionLineRangesFrom start lines = unionRangesFrom start (lines >>= (fmap Prelude
 rowRanges :: [Row (a, Range)] -> Both (Maybe Range)
 rowRanges rows = maybeConcat . join <$> Both.unzip (fmap (fmap Prelude.snd . unLine) . unRow <$> rows)
 
--- | MaybeOpen test for (Range, a) pairs.
-openRangePair :: Source Char -> MaybeOpen (a, Range)
-openRangePair source pair = pair <$ openRange source (Prelude.snd pair)
+-- | Openness predicate for (Range, a) pairs.
+openRangePair :: Source Char -> (a, Range) -> Bool
+openRangePair source pair = openRange source (Prelude.snd pair)
 
--- | Given a source and a range, returns nothing if it ends with a `\n`;
--- | otherwise returns the range.
-openRange :: Source Char -> MaybeOpen Range
-openRange source range = case (source `at`) <$> maybeLastIndex range of
-  Just '\n' -> Nothing
-  _ -> Just range
+-- | Does this Range in this Source end with a newline?
+openRange :: Source Char -> Range -> Bool
+openRange source range = (at source <$> maybeLastIndex range) == Just '\n'
