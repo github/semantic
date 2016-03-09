@@ -28,7 +28,7 @@ import Term
 -- | Assign line numbers to the lines on each side of a list of rows.
 numberedRows :: [Row a] -> [Both (Int, Line a)]
 numberedRows = countUp (pure 1)
-  where countUp from (Row row : rows) = ((,) <$> from <*> row) : countUp ((+) <$> from <*> (valueOf <$> row)) rows
+  where countUp from (row : rows) = ((,) <$> from <*> row) : countUp ((+) <$> from <*> (valueOf <$> row)) rows
         countUp _ [] = []
         valueOf (Line []) = 0
         valueOf _ = 1
@@ -76,14 +76,14 @@ splitAnnotatedByLines makeTerm sources infos syntax = case syntax of
         categories = Diff.categories <$> infos
 
         adjoinChildRows constructor children = let (rows, next) = foldr childRows ([], end <$> ranges) children in
-          fmap (Row . (wrapLineContents <$> (makeBranchTerm (\ info -> makeTerm info . constructor) <$> categories <*> next) <*>) . unRow) . foldr (adjoinRowsBy (openRangePair <$> sources)) [] $
+          fmap (wrapLineContents <$> (makeBranchTerm (\ info -> makeTerm info . constructor) <$> categories <*> next) <*>) . foldr (adjoinRowsBy (openRangePair <$> sources)) [] $
             zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (start <$> ranges) <*> next) <*> sources)) ++ rows
 
-        childRows child (rows, next) = let childRanges = unionLineRangesFrom <$> (rangeAt <$> next) <*> sequenceA (unRow <$> copoint child) in
+        childRows child (rows, next) = let childRanges = unionLineRangesFrom <$> (rangeAt <$> next) <*> sequenceA (copoint child) in
           -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
           if or $ (>) . end <$> childRanges <*> next
             then (rows, next)
-            else    ((fmap (first (Just . (<$ child))) <$> copoint child)
+            else    ((fmap (fmap (first (Just . (<$ child)))) <$> copoint child)
                  ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (end <$> childRanges) <*> next) <*> sources))
                  ++ rows, start <$> childRanges)
 
@@ -98,7 +98,7 @@ unionLineRangesFrom start lines = unionRangesFrom start (lines >>= (fmap Prelude
 
 -- | Returns the ranges of a list of Rows.
 rowRanges :: [Row (a, Range)] -> Both (Maybe Range)
-rowRanges rows = maybeConcat . join <$> Both.unzip (fmap (fmap Prelude.snd . unLine) . unRow <$> rows)
+rowRanges rows = maybeConcat . join <$> Both.unzip (fmap (fmap Prelude.snd . unLine) <$> rows)
 
 -- | Openness predicate for (Range, a) pairs.
 openRangePair :: Source Char -> (a, Range) -> Bool

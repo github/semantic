@@ -43,7 +43,7 @@ changeLength change = mconcat $ (rowLength <$> context change) <> (rowLength <$>
 
 -- | The number of lines in the row, each being either 0 or 1.
 rowLength :: Row a -> Both (Sum Int)
-rowLength = fmap lineLength . unRow
+rowLength = fmap lineLength
 
 -- | The length of the line, being either 0 or 1.
 lineLength :: Line a -> Sum Int
@@ -52,13 +52,13 @@ lineLength _ = 1
 
 -- | Given the before and after sources, render a hunk to a string.
 showHunk :: Both SourceBlob -> Hunk (SplitDiff a Info) -> String
-showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (snd . unRow <$> trailingContext hunk)
+showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (snd <$> trailingContext hunk)
   where sources = source <$> blobs
 
 -- | Given the before and after sources, render a change to a string.
 showChange :: Both (Source Char) -> Change (SplitDiff a Info) -> String
-showChange sources change = showLines (snd sources) ' ' (snd . unRow <$> context change) ++ deleted ++ inserted
-  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> Both ('-', '+') <*> Both.unzip (unRow <$> contents change)
+showChange sources change = showLines (snd sources) ' ' (snd <$> context change) ++ deleted ++ inserted
+  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> Both ('-', '+') <*> Both.unzip (contents change)
 
 -- | Given a source, render a set of lines to a string with a prefix.
 showLines :: Source Char -> Char -> [Line (SplitDiff leaf Info)] -> String
@@ -109,7 +109,7 @@ header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFile
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
 hunks _ blobs | Both (True, True) <- Source.null . source <$> blobs = [Hunk { offset = mempty, changes = [], trailingContext = [] }]
-hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap Prelude.fst <$> splitDiffByLines (source <$> blobs) diff
+hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap (fmap Prelude.fst) <$> splitDiffByLines (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
@@ -150,7 +150,7 @@ changeIncludingContext leadingContext rows = case changes of
 
 -- | Whether a row has changes on either side.
 rowHasChanges :: Row (SplitDiff a Info) -> Bool
-rowHasChanges (Row lines) = or (lineHasChanges <$> lines)
+rowHasChanges lines = or (lineHasChanges <$> lines)
 
 -- | Whether a line has changes.
 lineHasChanges :: Line (SplitDiff a Info) -> Bool

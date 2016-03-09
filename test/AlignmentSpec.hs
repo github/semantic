@@ -29,9 +29,6 @@ import Syntax
 instance Arbitrary a => Arbitrary (Both a) where
   arbitrary = pure (curry Both) <*> arbitrary <*> arbitrary
 
-instance Arbitrary a => Arbitrary (Row a) where
-  arbitrary = Row <$> arbitrary
-
 instance Arbitrary a => Arbitrary (Line a) where
   arbitrary = makeLine <$> arbitrary
 
@@ -79,8 +76,8 @@ spec = parallel $ do
       \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow mempty mempty) [ a ] `shouldBe` [ a :: Row (Maybe Bool) ]
 
     prop "merges open rows" $
-      forAll ((arbitrary `suchThat` (and . fmap (isOpenLineBy Maybe.isJust) . unRow)) >>= \ a -> (,) a <$> arbitrary) $
-        \ (a, b) -> adjoinRowsBy (pure Maybe.isJust) a [ b ] `shouldBe` [ Row (mappend <$> unRow a <*> unRow b) :: Row (Maybe Bool) ]
+      forAll ((arbitrary `suchThat` (and . fmap (isOpenLineBy Maybe.isJust))) >>= \ a -> (,) a <$> arbitrary) $
+        \ (a, b) -> adjoinRowsBy (pure Maybe.isJust) a [ b ] `shouldBe` [ mappend <$> a <*> b :: Row (Maybe Bool) ]
 
     prop "prepends closed rows" $
       \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow (pure Nothing) (pure Nothing)) [ makeRow (pure a) (pure a) ] `shouldBe` [ (makeRow (pure Nothing) (pure Nothing)), makeRow (pure a) (pure a) :: Row (Maybe Bool) ]
@@ -101,10 +98,10 @@ spec = parallel $ do
   describe "splitPatchByLines" $ do
     prop "starts at initial indices" $
       \ patch sources -> let indices = length <$> sources in
-        fmap start . maybeFirst . Maybe.catMaybes <$> Both.unzip (fmap maybeFirst . unRow . fmap Prelude.snd <$> splitPatchByLines ((Source.++) <$> sources <*> sources) (patchWithBoth patch (leafWithRangeInSource <$> sources <*> (Range <$> indices <*> ((2 *) <$> indices))))) `shouldBe` (<$) <$> indices <*> unPatch patch
+        fmap start . maybeFirst . Maybe.catMaybes <$> Both.unzip (fmap maybeFirst . fmap (fmap Prelude.snd) <$> splitPatchByLines ((Source.++) <$> sources <*> sources) (patchWithBoth patch (leafWithRangeInSource <$> sources <*> (Range <$> indices <*> ((2 *) <$> indices))))) `shouldBe` (<$) <$> indices <*> unPatch patch
 
     where
-      isEmptyRow (Row (Both (Line [], Line []))) = True
+      isEmptyRow (Both (Line [], Line [])) = True
       isEmptyRow _ = False
 
       isOnSingleLine (a, _, _) = filter (/= '\n') (toList a) == toList a
