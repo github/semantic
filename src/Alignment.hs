@@ -52,17 +52,12 @@ splitPatchByLines sources patch = zipDefaults (pure mempty) $ fmap (fmap (first 
 splitAbstractedTerm :: (Info -> Syntax leaf outTerm -> outTerm) -> Source Char -> Info -> Syntax leaf [Line (outTerm, Range)] -> [Line (outTerm, Range)]
 splitAbstractedTerm makeTerm source (Info range categories) syntax = case syntax of
   Leaf a -> pure . ((`makeTerm` Leaf a) . (`Info` categories) &&& id) <$> actualLineRanges range source
-  Indexed children -> adjoinChildLines (Indexed . fmap copoint) (Identity <$> children)
-  Fixed children -> adjoinChildLines (Fixed . fmap copoint) (Identity <$> children)
-  Keyed children -> adjoinChildLines (Keyed . Map.fromList) (Map.toList children)
-  where adjoinChildLines constructor children = let (lines, next) = foldr childLines ([], end range) children in
-          fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) categories next)) . foldr (adjoinLinesBy (openRangePair source)) [] $
-            (pure . (,) Nothing <$> actualLineRanges (Range (start range) next) source) ++ lines
-
-        childLines child (lines, next) = let childRange = unionLineRangesFrom (rangeAt next) (copoint child) in
-             ((fmap (first (Just . (<$ child))) <$> copoint child)
-          ++ (pure . (,) Nothing <$> actualLineRanges (Range (end childRange) next) source)
-          ++ lines, start childRange)
+  Indexed children -> adjoinChildLines (Indexed . fmap copoint) (Identity . fmap Identity <$> children)
+  Fixed children -> adjoinChildLines (Fixed . fmap copoint) (Identity . fmap Identity <$> children)
+  Keyed children -> adjoinChildLines (Keyed . Map.fromList) (Map.toList (fmap Identity <$> children))
+  where adjoinChildLines constructor children = let (lines, next) = foldr (childLines (Identity source) sequenceA) ([], Identity (end range)) children in
+          fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) categories (runIdentity next))) . foldr (adjoinLinesBy (openRangePair source)) [] $
+            (pure . (,) Nothing <$> actualLineRanges (Range (start range) (runIdentity next)) source) ++ (runIdentity <$> lines)
 
 -- | Split an annotated diff into rows of split diffs.
 splitAnnotatedByLines :: (Info -> Syntax leaf outTerm -> outTerm) -> Both (Source Char) -> Both Info -> Syntax leaf [Row (outTerm, Range)] -> [Row (outTerm, Range)]
