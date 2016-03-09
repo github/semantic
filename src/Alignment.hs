@@ -10,7 +10,6 @@ import Data.Copointed
 import Data.Functor.Both as Both
 import Data.Functor.Identity
 import Data.Maybe
-import Data.Option
 import qualified Data.OrderedMap as Map
 import qualified Data.Set as Set
 import Diff
