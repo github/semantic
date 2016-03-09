@@ -53,15 +53,16 @@ arbitraryLeaf = toTuple <$> arbitrary
 spec :: Spec
 spec = parallel $ do
   describe "splitAnnotatedByLines" $ do
+    let makeTerm = ((Free .) . Annotated) :: Info -> Syntax (Source Char) (SplitDiff (Source Char) Info) -> SplitDiff (Source Char) Info
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
-        \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (pure source) (pure $ Info range categories) syntax `shouldBe` [
-          makeRow (pure (Free $ Annotated info $ Leaf source, Range 0 (length source))) (pure (Free $ Annotated info $ Leaf source, Range 0 (length source))) ]
+        \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines makeTerm (pure source) (pure $ Info range categories) syntax `shouldBe` [
+          makeRow (pure (makeTerm info $ Leaf source, Range 0 (length source))) (pure (makeTerm info $ Leaf source, Range 0 (length source))) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
-          \ source -> splitAnnotatedByLines (pure source) (pure $ Info (getTotalRange source) mempty) (Indexed [] :: Syntax String [Row (SplitDiff leaf Info, Range)]) `shouldBe` [
-            makeRow (pure (Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
+          \ source -> splitAnnotatedByLines makeTerm (pure source) (pure $ Info (getTotalRange source) mempty) (Indexed []) `shouldBe` [
+            makeRow (pure (makeTerm (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
   describe "splitDiffByLines" $ do
     prop "preserves line counts in equal sources" $
