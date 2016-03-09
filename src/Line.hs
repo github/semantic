@@ -33,6 +33,7 @@ isOpenLineBy :: (a -> Bool) -> Line a -> Bool
 isOpenLineBy f (Line vector) = Vector.null vector || f (Vector.last vector)
 isOpenLineBy _ _ = True
 
+-- | Coalesce a pair of lines if the first is matched by a predicate.
 coalesceLinesBy :: (a -> Bool) -> Line a -> Line a -> [Line a]
 coalesceLinesBy f line nextLine | isOpenLineBy f line = [line <> nextLine]
 coalesceLinesBy _ line nextLine = [line, nextLine]
