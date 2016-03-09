@@ -9,7 +9,6 @@ import Control.Monad.Free
 import Data.Copointed
 import Data.Functor.Both as Both
 import Data.Functor.Identity
-import qualified Data.List as List
 import Data.Maybe
 import Data.Option
 import qualified Data.OrderedMap as Map
