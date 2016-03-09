@@ -52,12 +52,12 @@ spec = parallel $ do
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
         \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines makeTerm (pure source) (pure $ Info range categories) syntax `shouldBe` [
-          makeRow (pure (makeTerm info $ Leaf source, Range 0 (length source))) (pure (makeTerm info $ Leaf source, Range 0 (length source))) ]
+          both (pure (makeTerm info $ Leaf source, Range 0 (length source))) (pure (makeTerm info $ Leaf source, Range 0 (length source))) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
           \ source -> splitAnnotatedByLines makeTerm (pure source) (pure $ Info (getTotalRange source) mempty) (Indexed []) `shouldBe` [
-            makeRow (pure (makeTerm (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
+            both (pure (makeTerm (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
   describe "splitDiffByLines" $ do
     prop "preserves line counts in equal sources" $
@@ -73,21 +73,21 @@ spec = parallel $ do
       \ a -> adjoinRowsBy (pure Maybe.isJust) a [] `shouldBe` [ a :: Row (Maybe Bool) ]
 
     prop "prunes empty rows" $
-      \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow mempty mempty) [ a ] `shouldBe` [ a :: Row (Maybe Bool) ]
+      \ a -> adjoinRowsBy (pure Maybe.isJust) (both mempty mempty) [ a ] `shouldBe` [ a :: Row (Maybe Bool) ]
 
     prop "merges open rows" $
       forAll ((arbitrary `suchThat` (and . fmap (isOpenLineBy Maybe.isJust))) >>= \ a -> (,) a <$> arbitrary) $
         \ (a, b) -> adjoinRowsBy (pure Maybe.isJust) a [ b ] `shouldBe` [ mappend <$> a <*> b :: Row (Maybe Bool) ]
 
     prop "prepends closed rows" $
-      \ a -> adjoinRowsBy (pure Maybe.isJust) (makeRow (pure Nothing) (pure Nothing)) [ makeRow (pure a) (pure a) ] `shouldBe` [ (makeRow (pure Nothing) (pure Nothing)), makeRow (pure a) (pure a) :: Row (Maybe Bool) ]
+      \ a -> adjoinRowsBy (pure Maybe.isJust) (both (pure Nothing) (pure Nothing)) [ both (pure a) (pure a) ] `shouldBe` [ (both (pure Nothing) (pure Nothing)), both (pure a) (pure a) :: Row (Maybe Bool) ]
 
     it "aligns closed lines" $
-      foldr (adjoinRowsBy (pure (/= '\n'))) [] (Prelude.zipWith (makeRow) (pure <$> "[ bar ]\nquux") (pure <$> "[\nbar\n]\nquux")) `shouldBe`
-        [ makeRow (makeLine "[ bar ]\n") (makeLine "[\n")
-        , makeRow mempty (makeLine "bar\n")
-        , makeRow mempty (makeLine "]\n")
-        , makeRow (makeLine "quux") (makeLine "quux")
+      foldr (adjoinRowsBy (pure (/= '\n'))) [] (Prelude.zipWith (both) (pure <$> "[ bar ]\nquux") (pure <$> "[\nbar\n]\nquux")) `shouldBe`
+        [ both (makeLine "[ bar ]\n") (makeLine "[\n")
+        , both mempty (makeLine "bar\n")
+        , both mempty (makeLine "]\n")
+        , both (makeLine "quux") (makeLine "quux")
         ]
 
   describe "splitAbstractedTerm" $ do

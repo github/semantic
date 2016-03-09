@@ -43,7 +43,7 @@ splitDiffByLines sources = iter (\ (Annotated info syntax) -> splitAnnotatedByLi
 
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> [Row (SplitDiff leaf Info, Range)]
-splitPatchByLines sources patch = zipWithDefaults makeRow (pure mempty) $ fmap (fmap (first (Pure . constructor patch))) <$> lines
+splitPatchByLines sources patch = zipWithDefaults both (pure mempty) $ fmap (fmap (first (Pure . constructor patch))) <$> lines
     where lines = maybe [] . cata . splitAbstractedTerm (:<) <$> sources <*> unPatch patch
           constructor (Replace _ _) = SplitReplace
           constructor (Insert _) = SplitInsert
@@ -68,7 +68,7 @@ splitAbstractedTerm makeTerm source (Info range categories) syntax = case syntax
 -- | Split an annotated diff into rows of split diffs.
 splitAnnotatedByLines :: (Info -> Syntax leaf outTerm -> outTerm) -> Both (Source Char) -> Both Info -> Syntax leaf [Row (outTerm, Range)] -> [Row (outTerm, Range)]
 splitAnnotatedByLines makeTerm sources infos syntax = case syntax of
-  Leaf a -> zipWithDefaults makeRow (pure mempty) $ fmap <$> ((\ categories range -> pure (makeTerm (Info range categories) (Leaf a), range)) <$> categories) <*> (actualLineRanges <$> ranges <*> sources)
+  Leaf a -> zipWithDefaults both (pure mempty) $ fmap <$> ((\ categories range -> pure (makeTerm (Info range categories) (Leaf a), range)) <$> categories) <*> (actualLineRanges <$> ranges <*> sources)
   Indexed children -> adjoinChildRows (Indexed . fmap copoint) (Identity <$> children)
   Fixed children -> adjoinChildRows (Fixed . fmap copoint) (Identity <$> children)
   Keyed children -> adjoinChildRows (Keyed . Map.fromList) (List.sortOn (rowRanges . Prelude.snd) $ Map.toList children)
@@ -77,14 +77,14 @@ splitAnnotatedByLines makeTerm sources infos syntax = case syntax of
 
         adjoinChildRows constructor children = let (rows, next) = foldr childRows ([], end <$> ranges) children in
           fmap (wrapLineContents <$> (makeBranchTerm (\ info -> makeTerm info . constructor) <$> categories <*> next) <*>) . foldr (adjoinRowsBy (openRangePair <$> sources)) [] $
-            zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (start <$> ranges) <*> next) <*> sources)) ++ rows
+            zipWithDefaults both (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (start <$> ranges) <*> next) <*> sources)) ++ rows
 
         childRows child (rows, next) = let childRanges = unionLineRangesFrom <$> (rangeAt <$> next) <*> sequenceA (copoint child) in
           -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
           if or $ (>) . end <$> childRanges <*> next
             then (rows, next)
             else    ((fmap (fmap (first (Just . (<$ child)))) <$> copoint child)
-                 ++ zipWithDefaults makeRow (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (end <$> childRanges) <*> next) <*> sources))
+                 ++ zipWithDefaults both (pure mempty) (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (end <$> childRanges) <*> next) <*> sources))
                  ++ rows, start <$> childRanges)
 
 -- | Wrap a list of child terms in a branch.
