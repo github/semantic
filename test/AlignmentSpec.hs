@@ -46,18 +46,6 @@ arbitraryLeaf = toTuple <$> arbitrary
 
 spec :: Spec
 spec = parallel $ do
-  describe "splitAnnotatedByLines" $ do
-    let makeTerm = ((Free .) . Annotated) :: Info -> Syntax (Source Char) (SplitDiff (Source Char) Info) -> SplitDiff (Source Char) Info
-    prop "outputs one row for single-line unchanged leaves" $
-      forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
-        \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines makeTerm (pure source) (pure $ Info range categories) syntax `shouldBe` [
-          both (pure (makeTerm info $ Leaf source, Range 0 (length source))) (pure (makeTerm info $ Leaf source, Range 0 (length source))) ]
-
-    prop "outputs one row for single-line empty unchanged indexed nodes" $
-      forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
-          \ source -> splitAnnotatedByLines makeTerm (pure source) (pure $ Info (totalRange source) mempty) (Indexed []) `shouldBe` [
-            both (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
-
   describe "splitDiffByLines" $ do
     prop "preserves line counts in equal sources" $
       \ source ->
@@ -93,6 +81,17 @@ spec = parallel $ do
     prop "preserves line count" $
       \ source -> let range = totalRange source in
         splitAbstractedTerm sequenceA (:<) (Identity source) (Identity (Info range mempty)) (Leaf source) `shouldBe` (Identity . pure . ((:< Leaf source) . (`Info` mempty) &&& id) <$> actualLineRanges range source)
+
+    let makeTerm = ((Free .) . Annotated) :: Info -> Syntax (Source Char) (SplitDiff (Source Char) Info) -> SplitDiff (Source Char) Info
+    prop "outputs one row for single-line unchanged leaves" $
+      forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
+        \ (source, info@(Info range categories), syntax) -> splitAbstractedTerm (zipDefaults mempty) makeTerm (pure source) (pure $ Info range categories) syntax `shouldBe` [
+          both (pure (makeTerm info $ Leaf source, Range 0 (length source))) (pure (makeTerm info $ Leaf source, Range 0 (length source))) ]
+
+    prop "outputs one row for single-line empty unchanged indexed nodes" $
+      forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
+          \ source -> splitAbstractedTerm (zipDefaults mempty) makeTerm (pure source) (pure $ Info (totalRange source) mempty) (Indexed []) `shouldBe` [
+            both (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
   describe "splitPatchByLines" $ do
     prop "starts at initial indices" $
