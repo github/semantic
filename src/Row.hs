@@ -11,9 +11,6 @@ newtype Row a = Row { unRow :: Both (Line a) }
 makeRow :: Line a -> Line a -> Row a
 makeRow a = Row . both a
 
-isOpenRowBy :: Both (a -> Bool) -> Row a -> Bool
-isOpenRowBy f = runBothWith (&&) . (isOpenLineBy <$> f <*>) . unRow
-
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
 adjoinRowsBy :: Both (a -> Bool) -> Row a -> [Row a] -> [Row a]
 adjoinRowsBy _ row [] = [ row ]
