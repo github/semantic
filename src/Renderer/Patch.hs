@@ -77,15 +77,32 @@ getRange (Pure patch) = let Info range _ :< _ = getSplitTerm patch in range
 
 -- | Returns the header given two source blobs and a hunk.
 header :: Both SourceBlob -> Hunk a -> String
-header blobs hunk = filepathHeader ++ blobOidHeader ++ maybeOffsetHeader
-   where filepathHeader = "diff --git a/" ++ pathA ++ " b/" ++ pathB ++ "\n"
-         blobOidHeader = "index " ++ oidA ++ ".." ++ oidB ++ "\n"
-         maybeOffsetHeader = if lengthA > 0 && lengthB > 0 then offsetHeader else mempty
-         offsetHeader = "@@ -" ++ show offsetA ++ "," ++ show lengthA ++ " +" ++ show offsetB ++ "," ++ show lengthB ++ " @@\n"
-         (lengthA, lengthB) = runBoth . fmap getSum $ hunkLength hunk
-         (offsetA, offsetB) = runBoth . fmap getSum $ offset hunk
-         (pathA, pathB) = runBoth $ path <$> blobs
-         (oidA, oidB) = runBoth $ oid <$> blobs
+header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFilepath, afterFilepath, maybeOffsetHeader]
+  where filepathHeader = "diff --git a/" ++ pathA ++ " b/" ++ pathB
+        fileModeHeader = case (modeA, modeB) of
+          (Nothing, Just mode) -> intercalate "\n" [ "new file mode " ++ modeToDigits mode, blobOidHeader ]
+          (Just mode, Nothing) -> intercalate "\n" [ "old file mode " ++ modeToDigits mode, blobOidHeader ]
+          (Just mode, Just other) | mode == other -> "index " ++ oidA ++ ".." ++ oidB ++ " " ++ modeToDigits mode
+          (Just mode1, Just mode2) -> intercalate "\n" [
+            "old mode" ++ modeToDigits mode1,
+            "new mode " ++ modeToDigits mode2 ++ " " ++ blobOidHeader
+            ]
+        blobOidHeader = "index " ++ oidA ++ ".." ++ oidB
+        modeHeader :: String -> Maybe SourceKind -> String -> String
+        modeHeader ty maybeMode path = case maybeMode of
+           Just mode -> ty ++ "/" ++ path
+           Nothing -> "/dev/null"
+        beforeFilepath = "--- " ++ modeHeader "a" modeA pathA
+        afterFilepath = "+++ " ++ modeHeader "b" modeB pathB
+        maybeOffsetHeader = if lengthA > 0 && lengthB > 0
+                            then offsetHeader
+                            else mempty
+        offsetHeader = "@@ -" ++ offsetA ++ "," ++ show lengthA ++ " +" ++ offsetB ++ "," ++ show lengthB ++ " @@" ++ "\n"
+        (lengthA, lengthB) = runBoth . fmap getSum $ hunkLength hunk
+        (offsetA, offsetB) = runBoth . fmap (show . getSum) $ offset hunk
+        (pathA, pathB) = runBoth $ path <$> blobs
+        (oidA, oidB) = runBoth $ oid <$> blobs
+        (modeA, modeB) = runBoth $ blobKind <$> blobs
 
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]

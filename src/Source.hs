@@ -3,9 +3,23 @@ module Source where
 import Range
 import qualified Data.Vector as Vector
 import qualified Data.Text as T
+import Data.Word
+import Numeric
 
-data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath }
+data SourceKind = PlainBlob Word32  | ExecutableBlob Word32 | SymlinkBlob Word32
   deriving (Show, Eq)
+
+modeToDigits :: SourceKind -> String
+modeToDigits (PlainBlob mode) = showOct mode ""
+modeToDigits (ExecutableBlob mode) = showOct mode ""
+modeToDigits (SymlinkBlob mode) = showOct mode ""
+
+data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
+  deriving (Show, Eq)
+
+-- | The default plain blob mode
+defaultPlainBlob :: SourceKind
+defaultPlainBlob = PlainBlob 0o100644
 
 -- | The contents of a source file, backed by a vector for efficient slicing.
 newtype Source a = Source { getVector :: Vector.Vector a  }
