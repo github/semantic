@@ -23,10 +23,6 @@ rangeLength range = end range - start range
 substring :: Range -> T.Text -> T.Text
 substring range = T.take (rangeLength range) . T.drop (start range)
 
--- | Return the portion of the list identified by the given range.
-sublist :: Range -> [a] -> [a]
-sublist range = take (rangeLength range) . drop (start range)
-
 -- | Return a range that covers the entire text.
 totalRange :: Foldable f => f a -> Range
 totalRange t = Range 0 $ length t
