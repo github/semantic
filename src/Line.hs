@@ -6,10 +6,6 @@ import Data.Monoid
 newtype Line a = Line { unLine :: [a] }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
--- | Create a line from a list of items.
-makeLine :: [a] -> Line a
-makeLine = Line
-
 -- | Transform the line by applying a function to a list of all the items in the
 -- | line.
 wrapLineContents :: ([a] -> b) -> Line a -> Line b
