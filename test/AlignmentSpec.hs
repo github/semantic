@@ -69,20 +69,20 @@ spec = parallel $ do
 
   describe "adjoinRowsBy" $ do
     prop "is identity on top of no rows" $ forAll (arbitrary `suchThat` (not . isEmptyRow)) $
-      \ a -> adjoinRowsBy (pure Maybe.isJust) a [] `shouldBe` [ a :: Row (Maybe Bool) ]
+      \ a -> adjoinRowsBy (pure Maybe.isJust) (zipDefaults mempty) a [] `shouldBe` [ a :: Row (Maybe Bool) ]
 
     prop "prunes empty rows" $
-      \ a -> adjoinRowsBy (pure Maybe.isJust) (both mempty mempty) [ a ] `shouldBe` [ a :: Row (Maybe Bool) ]
+      \ a -> adjoinRowsBy (pure Maybe.isJust) (zipDefaults mempty) (both mempty mempty) [ a ] `shouldBe` [ a :: Row (Maybe Bool) ]
 
     prop "merges open rows" $
       forAll ((arbitrary `suchThat` (and . fmap (isOpenLineBy Maybe.isJust))) >>= \ a -> (,) a <$> arbitrary) $
-        \ (a, b) -> adjoinRowsBy (pure Maybe.isJust) a [ b ] `shouldBe` [ mappend <$> a <*> b :: Row (Maybe Bool) ]
+        \ (a, b) -> adjoinRowsBy (pure Maybe.isJust) (zipDefaults mempty) a [ b ] `shouldBe` [ mappend <$> a <*> b :: Row (Maybe Bool) ]
 
     prop "prepends closed rows" $
-      \ a -> adjoinRowsBy (pure Maybe.isJust) (both (pure Nothing) (pure Nothing)) [ both (pure a) (pure a) ] `shouldBe` [ (both (pure Nothing) (pure Nothing)), both (pure a) (pure a) :: Row (Maybe Bool) ]
+      \ a -> adjoinRowsBy (pure Maybe.isJust) (zipDefaults mempty) (both (pure Nothing) (pure Nothing)) [ both (pure a) (pure a) ] `shouldBe` [ (both (pure Nothing) (pure Nothing)), both (pure a) (pure a) :: Row (Maybe Bool) ]
 
     it "aligns closed lines" $
-      foldr (adjoinRowsBy (pure (/= '\n'))) [] (Prelude.zipWith (both) (pure <$> "[ bar ]\nquux") (pure <$> "[\nbar\n]\nquux")) `shouldBe`
+      foldr (adjoinRowsBy (pure (/= '\n')) (zipDefaults mempty)) [] (Prelude.zipWith (both) (pure <$> "[ bar ]\nquux") (pure <$> "[\nbar\n]\nquux")) `shouldBe`
         [ both (Line "[ bar ]\n") (Line "[\n")
         , both mempty (Line "bar\n")
         , both mempty (Line "]\n")

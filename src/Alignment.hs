@@ -115,6 +115,6 @@ openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
 type Row a = Both (Line a)
 
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
-adjoinRowsBy :: Both (a -> Bool) -> Both (Line a) -> [Both (Line a)] -> [Both (Line a)]
-adjoinRowsBy _ row [] = [ row ]
-adjoinRowsBy f row (nextRow : rows) = zipDefaults mempty (coalesceLinesBy <$> f <*> row <*> nextRow) ++ rows
+adjoinRowsBy :: Applicative f => f (a -> Bool) -> (f [Line a] -> [f (Line a)]) -> f (Line a) -> [f (Line a)] -> [f (Line a)]
+adjoinRowsBy _ _ row [] = [ row ]
+adjoinRowsBy f align row (nextRow : rows) = align (coalesceLinesBy <$> f <*> row <*> nextRow) ++ rows
