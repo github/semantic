@@ -32,14 +32,6 @@ coalesceLinesBy _ line nextLine = [line, nextLine]
 adjoinRowsBy :: Both (MaybeOpen a) -> Row a -> [Row a] -> [Row a]
 adjoinRowsBy _ (Row (Both (EmptyLine, EmptyLine))) rows = rows
 
-adjoinRowsBy f row (nextRow : rows) | isOpenRowBy f row = Row ((<>) <$> unRow row <*> unRow nextRow) : rows
-
-adjoinRowsBy f (Row (Both (EmptyLine, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (fst f) nextLeft = makeRow nextLeft right : adjoinRowsBy f (makeRow mempty nextRight) rows
-
-adjoinRowsBy f (Row (Both (left, EmptyLine))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (snd f) nextRight = makeRow left nextRight : adjoinRowsBy f (makeRow nextLeft mempty) rows
-
-adjoinRowsBy f (Row (Both (left, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (fst f) left = makeRow (left <> nextLeft) right : adjoinRowsBy f (makeRow EmptyLine nextRight) rows
-
-adjoinRowsBy f (Row (Both (left, right))) (Row (Both (nextLeft, nextRight)) : rows) | isOpenLineBy (snd f) right = makeRow left (right <> nextRight) : adjoinRowsBy f (makeRow nextLeft EmptyLine) rows
+adjoinRowsBy f row (nextRow : rows) = zipWithDefaults makeRow (pure EmptyLine) (coalesceLinesBy <$> f <*> unRow row <*> unRow nextRow) ++ rows
 
 adjoinRowsBy _ row rows = row : rows
