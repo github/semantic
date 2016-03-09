@@ -17,6 +17,7 @@ import SplitDiff
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Functor.Both as Both
+import Data.List
 import Data.Maybe
 import Data.Monoid
 
