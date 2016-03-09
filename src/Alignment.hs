@@ -108,6 +108,9 @@ openRangePair source pair = openRange source (Prelude.snd pair)
 openRange :: Source Char -> Range -> Bool
 openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
 
+-- | A row in a split diff, composed of a before line and an after line.
+type Row a = Both (Line a)
+
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
 adjoinRowsBy :: Both (a -> Bool) -> Row a -> [Row a] -> [Row a]
 adjoinRowsBy _ row [] = [ row ]
