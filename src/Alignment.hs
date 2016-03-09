@@ -39,7 +39,7 @@ hasChanges = or . fmap (or . (True <$))
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs paired with the Range of characters spanned by that Row on each side of the diff.
 splitDiffByLines :: Both (Source Char) -> Diff leaf Info -> [Row (SplitDiff leaf Info, Range)]
-splitDiffByLines sources = iter (\ (Annotated info syntax) -> splitAnnotatedByLines ((Free .) . Annotated) sources info syntax) . fmap (splitPatchByLines sources)
+splitDiffByLines sources = iter (\ (Annotated infos syntax) -> splitAbstractedTerm (zipDefaults mempty) ((Free .) . Annotated) sources infos syntax) . fmap (splitPatchByLines sources)
 
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> [Row (SplitDiff leaf Info, Range)]
