@@ -63,9 +63,10 @@ splitAbstractedTerm makeTerm source (Info range categories) syntax = case syntax
 splitAnnotatedByLines :: (Info -> Syntax leaf outTerm -> outTerm) -> Both (Source Char) -> Both Info -> Syntax leaf [Row (outTerm, Range)] -> [Row (outTerm, Range)]
 splitAnnotatedByLines makeTerm sources infos syntax = case syntax of
   Leaf a -> zipDefaults (pure mempty) $ fmap <$> ((\ categories range -> pure (makeTerm (Info range categories) (Leaf a), range)) <$> (Diff.categories <$> infos)) <*> (actualLineRanges <$> (characterRange <$> infos) <*> sources)
-  Indexed children -> adjoinChildren sources infos (zipDefaults mempty) (\ info -> makeTerm info . (Indexed . fmap copoint)) (Identity <$> children)
-  Fixed children -> adjoinChildren sources infos (zipDefaults mempty) (\ info -> makeTerm info . (Fixed . fmap copoint)) (Identity <$> children)
-  Keyed children -> adjoinChildren sources infos (zipDefaults mempty) (\ info -> makeTerm info . (Keyed . Map.fromList)) (List.sortOn (rowRanges . Prelude.snd) $ Map.toList children)
+  Indexed children -> adjoinChildren sources infos (zipDefaults mempty) (constructor (Indexed . fmap copoint)) (Identity <$> children)
+  Fixed children -> adjoinChildren sources infos (zipDefaults mempty) (constructor (Fixed . fmap copoint)) (Identity <$> children)
+  Keyed children -> adjoinChildren sources infos (zipDefaults mempty) (constructor (Keyed . Map.fromList)) (List.sortOn (rowRanges . Prelude.snd) $ Map.toList children)
+  where constructor with info = makeTerm info . with
 
 adjoinChildren :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> f Info -> (f [Line (Maybe (c a), Range)] -> [f (Line (Maybe (c a), Range))]) -> (Info -> [c a] -> outTerm) -> [c [f (Line (a, Range))]] -> [f (Line (outTerm, Range))]
 adjoinChildren sources infos align constructor children =
