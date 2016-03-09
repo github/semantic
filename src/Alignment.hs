@@ -53,15 +53,15 @@ splitPatchByLines sources patch = zipWithDefaults makeRow (pure mempty) $ fmap (
 splitAbstractedTerm :: (Info -> Syntax leaf outTerm -> outTerm) -> Source Char -> Info -> Syntax leaf [Line (outTerm, Range)] -> [Line (outTerm, Range)]
 splitAbstractedTerm makeTerm source (Info range categories) syntax = case syntax of
   Leaf a -> pure . ((`makeTerm` Leaf a) . (`Info` categories) &&& id) <$> actualLineRanges range source
-  Indexed children -> adjoinChildLines (Indexed . fmap (Prelude.fst . copoint)) (Identity <$> children)
-  Fixed children -> adjoinChildLines (Fixed . fmap (Prelude.fst . copoint)) (Identity <$> children)
-  Keyed children -> adjoinChildLines (Keyed . fmap Prelude.fst . Map.fromList) (Map.toList children)
+  Indexed children -> adjoinChildLines (Indexed . fmap copoint) (Identity <$> children)
+  Fixed children -> adjoinChildLines (Fixed . fmap copoint) (Identity <$> children)
+  Keyed children -> adjoinChildLines (Keyed . Map.fromList) (Map.toList children)
   where adjoinChildLines constructor children = let (lines, next) = foldr childLines ([], end range) children in
           fmap (wrapLineContents (makeBranchTerm (\ info -> makeTerm info . constructor) categories next)) . foldr (adjoinLinesBy (openRangePair source)) [] $
             (pure . (,) Nothing <$> actualLineRanges (Range (start range) next) source) ++ lines
 
         childLines child (lines, next) = let childRange = unionLineRangesFrom (rangeAt next) (copoint child) in
-             ((fmap (flip (,) childRange . Just . (<$ child)) <$> copoint child)
+             ((fmap (first (Just . (<$ child))) <$> copoint child)
           ++ (pure . (,) Nothing <$> actualLineRanges (Range (end childRange) next) source)
           ++ lines, start childRange)
 
