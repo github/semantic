@@ -1,7 +1,5 @@
 module Line where
 
-import Data.Monoid
-
 -- | A line of items or an empty line.
 newtype Line a = Line { unLine :: [a] }
   deriving (Eq, Foldable, Functor, Show, Traversable)
@@ -22,7 +20,7 @@ isOpenLineBy f (Line elements) = null elements || f (last elements)
 
 -- | Coalesce a pair of lines if the first is matched by a predicate.
 coalesceLinesBy :: (a -> Bool) -> Line a -> Line a -> [Line a]
-coalesceLinesBy f line nextLine | isOpenLineBy f line = [line <> nextLine]
+coalesceLinesBy f line nextLine | isOpenLineBy f line = [line `mappend` nextLine]
 coalesceLinesBy _ line nextLine = [line, nextLine]
 
 -- | Merge open lines and prepend closed lines, pushing empty lines through open ones.
@@ -36,4 +34,4 @@ instance Applicative Line where
 
 instance Monoid (Line a) where
   mempty = Line []
-  mappend (Line xs) (Line ys) = Line (xs <> ys)
+  mappend (Line xs) (Line ys) = Line (xs `mappend` ys)
