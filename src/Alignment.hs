@@ -37,11 +37,11 @@ hasChanges = or . fmap (or . (True <$))
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs paired with the Range of characters spanned by that Row on each side of the diff.
 splitDiffByLines :: Both (Source Char) -> Diff leaf Info -> [Row (SplitDiff leaf Info, Range)]
-splitDiffByLines sources = iter (\ (Annotated infos syntax) -> splitAbstractedTerm (zipDefaults mempty) ((Free .) . Annotated) sources infos syntax) . fmap (splitPatchByLines sources)
+splitDiffByLines sources = iter (\ (Annotated infos syntax) -> splitAbstractedTerm alignRows ((Free .) . Annotated) sources infos syntax) . fmap (splitPatchByLines sources)
 
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> [Row (SplitDiff leaf Info, Range)]
-splitPatchByLines sources patch = zipDefaults mempty $ fmap (fmap (first (Pure . constructor patch)) . runIdentity) <$> lines
+splitPatchByLines sources patch = alignRows $ fmap (fmap (first (Pure . constructor patch)) . runIdentity) <$> lines
     where lines = maybe [] . cata . splitAbstractedTerm sequenceA (:<) <$> (Identity <$> sources) <*> (fmap (fmap Identity) <$> unPatch patch)
           constructor (Replace _ _) = SplitReplace
           constructor (Insert _) = SplitInsert
