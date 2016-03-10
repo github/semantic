@@ -32,11 +32,6 @@ wrapLineContents transform line | isEmpty line = mempty
 maybeFirst :: Foldable f => f a -> Maybe a
 maybeFirst = foldr (const . Just) Nothing
 
--- | Is the final element of a line matched by the given predicate?
-isOpenLineBy :: (a -> Bool) -> Line a -> Bool
-isOpenLineBy _ (Closed _) = False
-isOpenLineBy f (Line elements) = null elements || f (last elements)
-
 -- | Merge or prepend lines based on whether the left line is open or closed.
 coalesceLines :: Line a -> Line a -> [Line a]
 coalesceLines line nextLine | Line _ <- line = [line `mappend` nextLine]
