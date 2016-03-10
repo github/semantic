@@ -44,11 +44,6 @@ changeLength change = mconcat $ (rowLength <$> context change) <> (rowLength <$>
 rowLength :: Row a -> Both (Sum Int)
 rowLength = fmap lineIncrement
 
--- | The increment the given line implies for line numbering.
-lineIncrement :: Num n => Line a -> n
-lineIncrement line | isEmpty line = 0
-                   | otherwise = 1
-
 -- | Given the before and after sources, render a hunk to a string.
 showHunk :: Both SourceBlob -> Hunk (SplitDiff a Info) -> String
 showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (snd <$> trailingContext hunk)

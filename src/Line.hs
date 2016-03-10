@@ -11,6 +11,11 @@ unLine (Closed as) = as
 isEmpty :: Line a -> Bool
 isEmpty = null . unLine
 
+-- | The increment the given line implies for line numbering.
+lineIncrement :: Num n => Line a -> n
+lineIncrement line | isEmpty line = 0
+                   | otherwise = 1
+
 -- | Transform the line by applying a function to a list of all the items in the
 -- | line.
 wrapLineContents :: ([a] -> b) -> Line a -> Line b
