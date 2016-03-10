@@ -10,9 +10,6 @@ newtype Adjoined a = Adjoined { unAdjoined :: Seq a }
 fromList :: [a] -> Adjoined a
 fromList = Adjoined . Seq.fromList
 
-empty :: Adjoined a
-empty = Adjoined Seq.empty
-
 instance Applicative Adjoined where
   pure = return
   (<*>) = ap
