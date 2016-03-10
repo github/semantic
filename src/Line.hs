@@ -17,6 +17,11 @@ unLine (Closed as) = as
 isEmpty :: Line a -> Bool
 isEmpty = null . unLine
 
+-- | Is the given line open?
+isOpen :: Line a -> Bool
+isOpen (Line _) = True
+isOpen _ = False
+
 -- | The increment the given line implies for line numbering.
 lineIncrement :: Num n => Line a -> n
 lineIncrement line | isEmpty line = 0
