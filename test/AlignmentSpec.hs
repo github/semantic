@@ -57,16 +57,16 @@ spec = parallel $ do
 
   describe "adjoinRows" $ do
     prop "is identity on top of no rows" $ forAll (arbitrary `suchThat` (not . isEmptyRow)) $
-      \ a -> adjoinRows alignRows a [] `shouldBe` [ a :: Row (Maybe Bool) ]
+      \ a -> adjoinRows alignRows a [] `shouldBe` [ a :: Row String ]
 
     prop "prunes empty rows" $
-      \ a -> adjoinRows alignRows (both mempty mempty) [ a ] `shouldBe` [ a :: Row (Maybe Bool) ]
+      \ a -> adjoinRows alignRows mempty [ a ] `shouldBe` [ a :: Row String ]
 
     prop "merges open rows" $
       \ a b -> adjoinRows alignRows (pure (Line [a])) [ b ] `shouldBe` [ pure (Line [a]) `mappend` b :: Row String ]
 
     prop "prepends closed rows" $
-      \ a b -> adjoinRows alignRows (pure (Closed [a])) [ b ] `shouldBe` [ pure (Closed [a]), b :: Row (Maybe Bool) ]
+      \ a b -> adjoinRows alignRows (pure (Closed [a])) [ b ] `shouldBe` [ pure (Closed [a]), b :: Row String ]
 
     it "aligns closed lines" $
       foldr (adjoinRows (zipDefaults mempty)) [] (Prelude.zipWith (both) (pureBy (/= '\n') <$> "[ bar ]\nquux") (pureBy (/= '\n') <$> "[\nbar\n]\nquux")) `shouldBe`
