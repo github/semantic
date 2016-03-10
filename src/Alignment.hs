@@ -56,7 +56,7 @@ splitAbstractedTerm align makeTerm sources infos syntax = case syntax of
 
 adjoinChildren :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> f Info -> (f [Line (Maybe (c a), Range)] -> [f (Line (Maybe (c a), Range))]) -> (Info -> [c a] -> outTerm) -> [c [f (Line (a, Range))]] -> [f (Line (outTerm, Range))]
 adjoinChildren sources infos align constructor children =
-  fmap wrap . foldr (adjoinRowsBy (openRangePair <$> sources) align) [] $
+  fmap wrap . foldr (adjoinRows align) [] $
     align leadingContext ++ lines
   where (lines, next) = foldr (childLines sources align) ([], end <$> ranges) children
         ranges = characterRange <$> infos
@@ -100,6 +100,6 @@ openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
 type Row a = Both (Line a)
 
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
-adjoinRowsBy :: Applicative f => f (a -> Bool) -> (f [Line a] -> [f (Line a)]) -> f (Line a) -> [f (Line a)] -> [f (Line a)]
-adjoinRowsBy _ _ row [] = [ row ]
-adjoinRowsBy f align row (nextRow : rows) = align (coalesceLinesBy <$> f <*> row <*> nextRow) ++ rows
+adjoinRows :: Applicative f => (f [Line a] -> [f (Line a)]) -> f (Line a) -> [f (Line a)] -> [f (Line a)]
+adjoinRows _ row [] = [ row ]
+adjoinRows align row (nextRow : rows) = align (coalesceLines <$> row <*> nextRow) ++ rows

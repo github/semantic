@@ -37,10 +37,10 @@ isOpenLineBy :: (a -> Bool) -> Line a -> Bool
 isOpenLineBy _ (Closed _) = False
 isOpenLineBy f (Line elements) = null elements || f (last elements)
 
--- | Coalesce a pair of lines if the first is matched by a predicate.
-coalesceLinesBy :: (a -> Bool) -> Line a -> Line a -> [Line a]
-coalesceLinesBy f line nextLine | isOpenLineBy f line = [line `mappend` nextLine]
-                                | otherwise = [Closed (unLine line), nextLine]
+-- | Merge or prepend lines based on whether the left line is open or closed.
+coalesceLines :: Line a -> Line a -> [Line a]
+coalesceLines line nextLine | Line _ <- line = [line `mappend` nextLine]
+                            | otherwise = [Closed (unLine line), nextLine]
 
 instance Applicative Line where
   pure = Line . pure
