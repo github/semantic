@@ -50,7 +50,8 @@ coalesceLines line nextLine | isOpen line = [line `mappend` nextLine]
 
 instance Applicative Line where
   pure = Line . pure
-  a <*> b = Line (unLine a <*> unLine b)
+  as <*> bs | isOpen as && isOpen bs = Line (unLine as <*> unLine bs)
+            | otherwise = Closed (unLine as <*> unLine bs)
 
 instance Monoid (Line a) where
   mempty = Line []
