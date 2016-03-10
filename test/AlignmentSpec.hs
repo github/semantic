@@ -71,8 +71,8 @@ spec = parallel $ do
     it "aligns closed lines" $
       foldr (adjoinRows alignRows) [] (Prelude.zipWith both (pureBy (/= '\n') <$> "[ bar ]\nquux") (pureBy (/= '\n') <$> "[\nbar\n]\nquux")) `shouldBe`
         [ both (Closed "[ bar ]\n") (Closed "[\n")
-        , both (Closed []) (Closed "bar\n")
-        , both (Closed []) (Closed "]\n")
+        , both (Closed "") (Closed "bar\n")
+        , both (Closed "") (Closed "]\n")
         , both (Line "quux") (Line "quux")
         ]
 
