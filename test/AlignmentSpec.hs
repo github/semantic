@@ -55,7 +55,7 @@ spec = parallel $ do
       \ sources ->
         length (splitDiffByLines sources (Free $ Annotated ((`Info` mempty) . totalRange <$> sources) (Indexed $ leafWithRangesInSources sources <$> Both.zip (actualLineRanges <$> (totalRange <$> sources) <*> sources)))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toList <$> sources)
 
-  describe "adjoinRowsBy" $ do
+  describe "adjoinRows" $ do
     prop "is identity on top of no rows" $ forAll (arbitrary `suchThat` (not . isEmptyRow)) $
       \ a -> adjoinRows (zipDefaults mempty) a [] `shouldBe` [ a :: Row (Maybe Bool) ]
 
