@@ -44,7 +44,7 @@ changeLength change = mconcat $ (rowLength <$> context change) <> (rowLength <$>
 rowLength :: Row a -> Both (Sum Int)
 rowLength = fmap lineIncrement
 
--- | The length of the line, being either 0 or 1.
+-- | The increment the given line implies for line numbering.
 lineIncrement :: Num n => Line a -> n
 lineIncrement line | isEmpty line = 0
                    | otherwise = 1
