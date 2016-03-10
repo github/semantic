@@ -29,7 +29,7 @@ isOpenLineBy f (Line elements) = null elements || f (last elements)
 -- | Coalesce a pair of lines if the first is matched by a predicate.
 coalesceLinesBy :: (a -> Bool) -> Line a -> Line a -> [Line a]
 coalesceLinesBy f line nextLine | isOpenLineBy f line = [line `mappend` nextLine]
-coalesceLinesBy _ line nextLine = [line, nextLine]
+                                | otherwise = [Closed (unLine line), nextLine]
 
 instance Applicative Line where
   pure = Line . pure
