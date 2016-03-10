@@ -75,6 +75,7 @@ childLines sources align child (lines, next) =
 childRanges :: (Copointed c, Applicative f) => f Int -> c [f (Line (a, Range))] -> f Range
 childRanges next child = unionLineRangesFrom <$> (rangeAt <$> next) <*> sequenceA (copoint child)
 
+-- | Produce open/closed lines for the portion of the source spanned by a range.
 linesInRangeOfSource :: Range -> Source Char -> [Line Range]
 linesInRangeOfSource range source = (if openRange source range then Line else Closed) . pure <$> actualLineRanges range source
 
