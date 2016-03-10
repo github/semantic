@@ -29,7 +29,7 @@ instance Arbitrary a => Arbitrary (Both a) where
   arbitrary = pure (curry Both) <*> arbitrary <*> arbitrary
 
 instance Arbitrary a => Arbitrary (Line a) where
-  arbitrary = Line <$> arbitrary
+  arbitrary = oneof [ Line <$> arbitrary, Closed <$> arbitrary ]
 
 instance Arbitrary a => Arbitrary (Patch a) where
   arbitrary = oneof [
