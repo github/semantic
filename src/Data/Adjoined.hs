@@ -16,10 +16,10 @@ instance Monad Adjoined where
     EmptyL -> Adjoined empty
     (a :< as) -> Adjoined $ unAdjoined (f a) >< unAdjoined (Adjoined as >>= f)
 
-type Coalesce a = a -> a -> Maybe a
+type Coalesce a = a -> a -> [a]
 
 mappendBy :: Coalesce a -> Adjoined a -> Adjoined a -> Adjoined a
 mappendBy coalesce (Adjoined a) (Adjoined b) = case (viewr a, viewl b) of
   (_, EmptyL) -> Adjoined a
   (EmptyR, _) -> Adjoined b
-  (as :> a', b' :< bs) -> Adjoined $ maybe (a >< b) ((as ><) . (<| bs)) (coalesce a' b')
+  (as :> a', b' :< bs) -> Adjoined $ as >< fromList (coalesce a' b') >< bs
