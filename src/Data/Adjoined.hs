@@ -9,6 +9,9 @@ newtype Adjoined a = Adjoined { unAdjoined :: Seq a }
 fromList :: [a] -> Adjoined a
 fromList = Adjoined . Seq.fromList
 
+empty :: Adjoined a
+empty = Adjoined Seq.empty
+
 instance Applicative Adjoined where
   pure = return
   (<*>) = ap
@@ -16,7 +19,7 @@ instance Applicative Adjoined where
 instance Monad Adjoined where
   return = Adjoined . return
   Adjoined a >>= f = case viewl a of
-    EmptyL -> Adjoined empty
+    EmptyL -> Adjoined Seq.empty
     (a :< as) -> Adjoined $ unAdjoined (f a) >< unAdjoined (Adjoined as >>= f)
 
 type Coalesce a = a -> a -> [a]
