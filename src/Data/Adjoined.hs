@@ -26,8 +26,3 @@ instance Coalescent a => Monoid (Adjoined a) where
   mempty = Adjoined mempty
   Adjoined a `mappend` Adjoined b | as :> a' <- viewr a, b' :< bs <- viewl b, Just coalesced <- coalesce a' b' = Adjoined (as >< (coalesced <| bs))
                                   | otherwise = Adjoined (a >< b)
-
-mappendBy :: Coalesce a -> Adjoined a -> Adjoined a -> Adjoined a
-mappendBy coalesce (Adjoined a) (Adjoined b) = case (viewr a, viewl b) of
-  (as :> a', b' :< bs) -> Adjoined $ as >< Seq.fromList (coalesce a' b') >< bs
-  _ -> Adjoined (a >< b)
