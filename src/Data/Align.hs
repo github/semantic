@@ -16,6 +16,13 @@ instance Align [] where
   alignWith f [] bs = f . That <$> bs
   alignWith f (a : as) (b : bs) = f (These a b) : alignWith f as bs
 
+instance Align Maybe where
+  nil = Nothing
+  a `align` b | Just a <- a, Just b <- b = Just (These a b)
+              | Just a <- a = Just (This a)
+              | Just b <- b = Just (That b)
+              | otherwise = Nothing
+
 
 class Functor t => Crosswalk t where
   crosswalk :: Align f => (a -> f b) -> t a -> f (t b)
