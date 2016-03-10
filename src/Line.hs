@@ -4,6 +4,9 @@ module Line where
 newtype Line a = Line { unLine :: [a] }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
+isEmpty :: Line a -> Bool
+isEmpty = null . unLine
+
 -- | Transform the line by applying a function to a list of all the items in the
 -- | line.
 wrapLineContents :: ([a] -> b) -> Line a -> Line b
