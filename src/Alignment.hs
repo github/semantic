@@ -48,7 +48,7 @@ splitPatchByLines sources patch = zipDefaults mempty $ fmap (fmap (first (Pure .
 -- | Split a term comprised of an Info & Syntax up into one `outTerm` (abstracted by an alignment function & constructor) per line in `Source`.
 splitAbstractedTerm :: (Applicative f, Foldable f) => (forall b. Monoid b => f [b] -> [f b]) -> (Info -> Syntax leaf outTerm -> outTerm) -> f (Source Char) -> f Info -> Syntax leaf [f (Line (outTerm, Range))] -> [f (Line (outTerm, Range))]
 splitAbstractedTerm align makeTerm sources infos syntax = case syntax of
-  Leaf a -> align $ fmap <$> ((\ categories range -> pure (makeTerm (Info range categories) (Leaf a), range)) <$> (Diff.categories <$> infos)) <*> (actualLineRanges <$> (characterRange <$> infos) <*> sources)
+  Leaf a -> align $ fmap <$> ((\ categories -> fmap (\ range -> (makeTerm (Info range categories) (Leaf a), range))) <$> (Diff.categories <$> infos)) <*> (linesInRangeOfSource <$> (characterRange <$> infos) <*> sources)
   Indexed children -> adjoinChildren sources infos align (constructor (Indexed . fmap runIdentity)) (Identity <$> children)
   Fixed children -> adjoinChildren sources infos align (constructor (Fixed . fmap runIdentity)) (Identity <$> children)
   Keyed children -> adjoinChildren sources infos align (constructor (Keyed . Map.fromList)) (Map.toList children)
