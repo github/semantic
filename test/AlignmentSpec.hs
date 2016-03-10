@@ -69,7 +69,7 @@ spec = parallel $ do
       \ a b -> adjoinRows alignRows (pure (Closed [a])) [ b ] `shouldBe` [ pure (Closed [a]), b :: Row Char ]
 
     it "aligns closed lines" $
-      foldr (adjoinRows (zipDefaults mempty)) [] (Prelude.zipWith (both) (pureBy (/= '\n') <$> "[ bar ]\nquux") (pureBy (/= '\n') <$> "[\nbar\n]\nquux")) `shouldBe`
+      foldr (adjoinRows alignRows) [] (Prelude.zipWith both (pureBy (/= '\n') <$> "[ bar ]\nquux") (pureBy (/= '\n') <$> "[\nbar\n]\nquux")) `shouldBe`
         [ both (Closed "[ bar ]\n") (Closed "[\n")
         , both mempty (Closed "bar\n")
         , both mempty (Closed "]\n")
