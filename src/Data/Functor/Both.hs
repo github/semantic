@@ -1,6 +1,5 @@
 module Data.Functor.Both where
 
-import Data.Bifunctor
 import Prelude hiding (zipWith, fst, snd)
 import qualified Prelude
 
