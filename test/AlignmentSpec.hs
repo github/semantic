@@ -79,7 +79,7 @@ spec = parallel $ do
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
       \ source -> let range = totalRange source in
-        splitAbstractedTerm sequenceA (:<) (Identity source) (Identity (Info range mempty)) (Leaf source) `shouldBe` (Identity . pure . ((:< Leaf source) . (`Info` mempty) &&& id) <$> actualLineRanges range source)
+        splitAbstractedTerm sequenceA (:<) (Identity source) (Identity (Info range mempty)) (Leaf source) `shouldBe` (Identity . lineMap (fmap (((:< Leaf source) . (`Info` mempty) &&& id))) <$> linesInRangeOfSource range source)
 
     let makeTerm = ((Free .) . Annotated) :: Info -> Syntax (Source Char) (SplitDiff (Source Char) Info) -> SplitDiff (Source Char) Info
     prop "outputs one row for single-line unchanged leaves" $
