@@ -40,7 +40,7 @@ hunkLength hunk = mconcat $ (changeLength <$> changes hunk) <> (rowIncrement <$>
 changeLength :: Change a -> Both (Sum Int)
 changeLength change = mconcat $ (rowIncrement <$> context change) <> (rowIncrement <$> contents change)
 
--- | The number of lines in the row, each being either 0 or 1.
+-- | The increment the given row implies for line numbering.
 rowIncrement :: Row a -> Both (Sum Int)
 rowIncrement = fmap lineIncrement
 
