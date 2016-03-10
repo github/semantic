@@ -17,7 +17,9 @@ instance Align [] where
 
 
 class Crosswalk t where
+  crosswalk :: Align f => (a -> f b) -> t a -> f (t b)
   sequenceL :: Align f => t (f a) -> f (t a)
 
 instance Crosswalk Identity where
   sequenceL = fmap Identity . runIdentity
+  crosswalk f = fmap Identity . f . runIdentity
