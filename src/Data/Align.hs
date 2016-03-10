@@ -16,7 +16,7 @@ instance Align [] where
   alignWith f (a : as) (b : bs) = f (These a b) : alignWith f as bs
 
 
-class Crosswalk t where
+class Functor t => Crosswalk t where
   crosswalk :: Align f => (a -> f b) -> t a -> f (t b)
   sequenceL :: Align f => t (f a) -> f (t a)
   sequenceL = crosswalk id
