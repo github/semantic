@@ -1,8 +1,12 @@
 module Line where
 
 -- | A line of items or an empty line.
-newtype Line a = Line { unLine :: [a] }
+data Line a = Line [a] | Closed [a]
   deriving (Eq, Foldable, Functor, Show, Traversable)
+
+unLine :: Line a -> [a]
+unLine (Line as) = as
+unLine (Closed as) = as
 
 isEmpty :: Line a -> Bool
 isEmpty = null . unLine
