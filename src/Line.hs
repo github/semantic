@@ -32,8 +32,7 @@ lineIncrement line | isEmpty line = 0
 -- | Transform the line by applying a function to a list of all the items in the
 -- | line.
 wrapLineContents :: ([a] -> b) -> Line a -> Line b
-wrapLineContents transform line | isEmpty line = mempty
-                                | otherwise = pureBy (const (isOpen line)) (transform (unLine line))
+wrapLineContents transform line = lineMap (if isEmpty line then const [] else pure . transform) line
 
 -- | Map the elements of a line, preserving closed lines.
 lineMap :: ([a] -> [b]) -> Line a -> Line b
