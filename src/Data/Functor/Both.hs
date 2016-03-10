@@ -12,9 +12,9 @@ newtype Both a = Both { runBoth :: (a, a) }
 both :: a -> a -> Both a
 both = curry Both
 
--- | Construct Both with These values & a default.
-bothOfThese :: a -> These a a -> Both a
-bothOfThese a = these (flip both a) (both a) both
+-- | Construct Both with These values & defaults.
+bothOfThese :: Both a -> These a a -> Both a
+bothOfThese a = these (`both` snd a) (both (fst a)) both
 
 -- | Apply a function to `Both` sides of a computation.
 runBothWith :: (a -> a -> b) -> Both a -> b
