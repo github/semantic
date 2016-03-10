@@ -39,7 +39,7 @@ maybeFirst = foldr (const . Just) Nothing
 
 -- | Merge or prepend lines based on whether the left line is open or closed.
 coalesceLines :: Line a -> Line a -> [Line a]
-coalesceLines line nextLine | Line _ <- line = [line `mappend` nextLine]
+coalesceLines line nextLine | isOpen line = [line `mappend` nextLine]
                             | otherwise = [Closed (unLine line), nextLine]
 
 instance Applicative Line where
