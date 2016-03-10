@@ -37,4 +37,5 @@ instance Applicative Line where
 
 instance Monoid (Line a) where
   mempty = Line []
+  mappend xs (Closed ys) = Closed (unLine xs `mappend` ys)
   mappend xs ys = Line (unLine xs `mappend` unLine ys)
