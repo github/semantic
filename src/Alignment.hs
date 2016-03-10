@@ -6,6 +6,8 @@ import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad
 import Control.Monad.Free
+import Data.Align
+import Data.Bifunctor.These
 import Data.Copointed
 import Data.Functor.Both as Both
 import Data.Functor.Identity
@@ -99,3 +101,7 @@ type Row a = Both (Line a)
 adjoinRows :: Applicative f => (f [Line a] -> [f (Line a)]) -> f (Line a) -> [f (Line a)] -> [f (Line a)]
 adjoinRows _ row [] = [ row ]
 adjoinRows align row (nextRow : rows) = align (coalesceLines <$> row <*> nextRow) ++ rows
+
+alignRows :: Align f => Both (f (Line a)) -> f (Both (Line a))
+alignRows = runBothWith (alignWith combine)
+  where combine = these (Both . (id &&& lineMap (const []))) (Both . (lineMap (const []) &&& id)) both
