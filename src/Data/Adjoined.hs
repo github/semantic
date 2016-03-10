@@ -6,6 +6,9 @@ import Data.Sequence as Seq
 newtype Adjoined a = Adjoined { unAdjoined :: Seq a }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
+fromList :: [a] -> Adjoined a
+fromList = Adjoined . Seq.fromList
+
 instance Applicative Adjoined where
   pure = return
   (<*>) = ap
