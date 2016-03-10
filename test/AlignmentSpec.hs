@@ -63,8 +63,7 @@ spec = parallel $ do
       \ a -> adjoinRows (zipDefaults mempty) (both mempty mempty) [ a ] `shouldBe` [ a :: Row (Maybe Bool) ]
 
     prop "merges open rows" $
-      forAll ((arbitrary `suchThat` (and . fmap (isOpenLineBy Maybe.isJust))) >>= \ a -> (,) a <$> arbitrary) $
-        \ (a, b) -> adjoinRows (zipDefaults mempty) a [ b ] `shouldBe` [ mappend <$> a <*> b :: Row (Maybe Bool) ]
+      \ a b -> adjoinRows (zipDefaults mempty) (pure a) [ b ] `shouldBe` [ mappend <$> pure a <*> b :: Row (Maybe Bool) ]
 
     prop "prepends closed rows" $
       \ a -> adjoinRows (zipDefaults mempty) (both (pure Nothing) (pure Nothing)) [ both (pure a) (pure a) ] `shouldBe` [ (both (Closed [Nothing]) (Closed [Nothing])), both (pure a) (pure a) :: Row (Maybe Bool) ]
