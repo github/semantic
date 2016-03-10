@@ -1,5 +1,6 @@
 module Data.Functor.Both where
 
+import Data.Bifunctor.These
 import Prelude hiding (zipWith, fst, snd)
 import qualified Prelude
 
@@ -10,6 +11,9 @@ newtype Both a = Both { runBoth :: (a, a) }
 -- | Given two operands returns a functor operating on `Both`. This is a curried synonym for Both.
 both :: a -> a -> Both a
 both = curry Both
+
+bothOfThese :: a -> These a a -> Both a
+bothOfThese a = these (flip both a) (both a) both
 
 -- | Apply a function to `Both` sides of a computation.
 runBothWith :: (a -> a -> b) -> Both a -> b
