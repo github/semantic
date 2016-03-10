@@ -22,5 +22,4 @@ class Crosswalk t where
   sequenceL = crosswalk id
 
 instance Crosswalk Identity where
-  sequenceL = fmap Identity . runIdentity
   crosswalk f = fmap Identity . f . runIdentity
