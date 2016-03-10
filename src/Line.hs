@@ -29,4 +29,4 @@ instance Applicative Line where
 
 instance Monoid (Line a) where
   mempty = Line []
-  mappend (Line xs) (Line ys) = Line (xs `mappend` ys)
+  mappend xs ys = Line (unLine xs `mappend` unLine ys)
