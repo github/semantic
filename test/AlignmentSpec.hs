@@ -67,7 +67,7 @@ spec = parallel $ do
         \ (a, b) -> adjoinRowsBy (pure Maybe.isJust) (zipDefaults mempty) a [ b ] `shouldBe` [ mappend <$> a <*> b :: Row (Maybe Bool) ]
 
     prop "prepends closed rows" $
-      \ a -> adjoinRowsBy (pure Maybe.isJust) (zipDefaults mempty) (both (pure Nothing) (pure Nothing)) [ both (pure a) (pure a) ] `shouldBe` [ (both (pure Nothing) (pure Nothing)), both (pure a) (pure a) :: Row (Maybe Bool) ]
+      \ a -> adjoinRowsBy (pure Maybe.isJust) (zipDefaults mempty) (both (pure Nothing) (pure Nothing)) [ both (pure a) (pure a) ] `shouldBe` [ (both (Closed [Nothing]) (Closed [Nothing])), both (pure a) (pure a) :: Row (Maybe Bool) ]
 
     it "aligns closed lines" $
       foldr (adjoinRowsBy (pure (/= '\n')) (zipDefaults mempty)) [] (Prelude.zipWith (both) (pure <$> "[ bar ]\nquux") (pure <$> "[\nbar\n]\nquux")) `shouldBe`
