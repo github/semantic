@@ -1,7 +1,7 @@
 module Data.Adjoined where
 
 import Control.Monad
-import Data.Sequence
+import Data.Sequence as Seq
 
 newtype Adjoined a = Adjoined { unAdjoined :: Seq a }
   deriving (Eq, Foldable, Functor, Show, Traversable)
@@ -20,5 +20,5 @@ type Coalesce a = a -> a -> [a]
 
 mappendBy :: Coalesce a -> Adjoined a -> Adjoined a -> Adjoined a
 mappendBy coalesce (Adjoined a) (Adjoined b) = case (viewr a, viewl b) of
-  (as :> a', b' :< bs) -> Adjoined $ as >< fromList (coalesce a' b') >< bs
+  (as :> a', b' :< bs) -> Adjoined $ as >< Seq.fromList (coalesce a' b') >< bs
   _ -> Adjoined (a >< b)
