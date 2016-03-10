@@ -75,6 +75,9 @@ childLines sources align child (lines, next) =
 childRanges :: (Copointed c, Applicative f) => f Int -> c [f (Line (a, Range))] -> f Range
 childRanges next child = unionLineRangesFrom <$> (rangeAt <$> next) <*> sequenceA (copoint child)
 
+linesInRangeOfSource :: Range -> Source Char -> [Line Range]
+linesInRangeOfSource range source = pure <$> actualLineRanges range source
+
 -- | Wrap a list of child terms in a branch.
 makeBranchTerm :: (Info -> [inTerm] -> outTerm) -> Set.Set Category -> Int -> [(Maybe inTerm, Range)] -> (outTerm, Range)
 makeBranchTerm constructor categories next children = (constructor (Info range categories) . catMaybes $ Prelude.fst <$> children, range)
