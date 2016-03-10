@@ -13,3 +13,7 @@ instance Align [] where
   alignWith f as [] = f . This <$> as
   alignWith f [] bs = f . That <$> bs
   alignWith f (a : as) (b : bs) = f (These a b) : alignWith f as bs
+
+
+class Crosswalk t where
+  sequenceL :: Align f => t (f a) -> f (t a)
