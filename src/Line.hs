@@ -31,7 +31,7 @@ lineIncrement line | isEmpty line = 0
 -- | line.
 wrapLineContents :: ([a] -> b) -> Line a -> Line b
 wrapLineContents transform line | isEmpty line = mempty
-                                | otherwise = Line [ transform (unLine line) ]
+                                | otherwise = pureBy (const (isOpen line)) (transform (unLine line))
 
 -- | Return the first item in the Foldable, or Nothing if it's empty.
 maybeFirst :: Foldable f => f a -> Maybe a
