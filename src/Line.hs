@@ -8,6 +8,7 @@ unLine :: Line a -> [a]
 unLine (Line as) = as
 unLine (Closed as) = as
 
+-- | Is the given line empty?
 isEmpty :: Line a -> Bool
 isEmpty = null . unLine
 
