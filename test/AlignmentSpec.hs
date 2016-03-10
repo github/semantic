@@ -63,7 +63,7 @@ spec = parallel $ do
       \ a -> adjoinRows alignRows (both mempty mempty) [ a ] `shouldBe` [ a :: Row (Maybe Bool) ]
 
     prop "merges open rows" $
-      \ a b -> adjoinRows alignRows (pure a) [ b ] `shouldBe` [ pure a `mappend` b :: Row (Maybe Bool) ]
+      \ a b -> adjoinRows alignRows (pure (Line [a])) [ b ] `shouldBe` [ pure (Line [a]) `mappend` b :: Row String ]
 
     prop "prepends closed rows" $
       \ a b -> adjoinRows alignRows (pure (Closed [a])) [ b ] `shouldBe` [ pure (Closed [a]), b :: Row (Maybe Bool) ]
