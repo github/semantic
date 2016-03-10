@@ -25,7 +25,7 @@ coalesceLinesBy _ line nextLine = [line, nextLine]
 
 instance Applicative Line where
   pure = Line . pure
-  a <*> b = Line $ unLine a <*> unLine b
+  a <*> b = Line (unLine a <*> unLine b)
 
 instance Monoid (Line a) where
   mempty = Line []
