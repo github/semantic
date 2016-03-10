@@ -102,6 +102,7 @@ adjoinRows :: Applicative f => (f [Line a] -> [f (Line a)]) -> f (Line a) -> [f 
 adjoinRows _ row [] = [ row ]
 adjoinRows align row (nextRow : rows) = align (coalesceLines <$> row <*> nextRow) ++ rows
 
+-- | Align Both containers of lines into a container of Both lines, filling any gaps with empty rows which are either open or closed to match the opposite side.
 alignRows :: Align f => Both (f (Line a)) -> f (Both (Line a))
 alignRows = runBothWith (alignWith combine)
   where combine = these (Both . (id &&& lineMap (const []))) (Both . (lineMap (const []) &&& id)) both
