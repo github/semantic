@@ -4,7 +4,7 @@ module Line where
 data Line a = Line [a] | Closed [a]
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
--- | Construct a Line with a predicate to determine whether the line is open or closed.
+-- | Construct a single-element Line with a predicate determining whether the line is open.
 pureBy :: (a -> Bool) -> a -> Line a
 pureBy predicate a | predicate a = Line [ a ]
                    | otherwise = Closed [ a ]
