@@ -99,8 +99,7 @@ spec = parallel $ do
         fmap start . maybeFirst . Maybe.catMaybes <$> Both.unzip (fmap maybeFirst . fmap (fmap Prelude.snd) <$> splitPatchByLines ((Source.++) <$> sources <*> sources) (patchWithBoth patch (leafWithRangeInSource <$> sources <*> (Range <$> indices <*> ((2 *) <$> indices))))) `shouldBe` (<$) <$> indices <*> unPatch patch
 
     where
-      isEmptyRow (Both (Line [], Line [])) = True
-      isEmptyRow _ = False
+      isEmptyRow = and . fmap isEmpty
 
       isOnSingleLine (a, _, _) = filter (/= '\n') (toList a) == toList a
 

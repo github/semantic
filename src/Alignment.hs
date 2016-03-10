@@ -28,7 +28,7 @@ numberedRows :: [Row a] -> [Both (Int, Line a)]
 numberedRows = countUp (pure 1)
   where countUp from (row : rows) = ((,) <$> from <*> row) : countUp ((+) <$> from <*> (valueOf <$> row)) rows
         countUp _ [] = []
-        valueOf (Line []) = 0
+        valueOf line | isEmpty line = 0
         valueOf _ = 1
 
 -- | Determine whether a line contains any patches.

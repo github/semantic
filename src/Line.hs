@@ -10,8 +10,8 @@ isEmpty = null . unLine
 -- | Transform the line by applying a function to a list of all the items in the
 -- | line.
 wrapLineContents :: ([a] -> b) -> Line a -> Line b
-wrapLineContents _ (Line []) = mempty
-wrapLineContents transform line = Line [ transform (unLine line) ]
+wrapLineContents transform line | isEmpty line = mempty
+                                | otherwise = Line [ transform (unLine line) ]
 
 -- | Return the first item in the Foldable, or Nothing if it's empty.
 maybeFirst :: Foldable f => f a -> Maybe a
