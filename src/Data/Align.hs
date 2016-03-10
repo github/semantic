@@ -33,3 +33,6 @@ class Functor t => Crosswalk t where
 
 instance Crosswalk Identity where
   crosswalk f = fmap Identity . f . runIdentity
+
+instance Crosswalk Maybe where
+  crosswalk f = maybe nil (fmap Just) . fmap f
