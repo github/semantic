@@ -54,8 +54,7 @@ instance Applicative Line where
 
 instance Monoid (Line a) where
   mempty = Line []
-  mappend xs (Closed ys) = Closed (unLine xs `mappend` ys)
-  mappend xs ys = Line (unLine xs `mappend` unLine ys)
+  mappend xs ys = lineMap (mappend (unLine xs)) ys
 
 instance Coalescent (Line a) where
   coalesce a b | isOpen a = Just (a `mappend` b)
