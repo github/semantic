@@ -76,6 +76,22 @@ spec = parallel $ do
         , both (Line "quux") (Line "quux")
         ]
 
+    it "preserves children’s alignment" $
+      let rows = concat
+            [ [ both (Closed "[ bar ]\n") (Closed "[\n")
+              , both (Closed "") (Closed "bar\n")
+              , both (Line "") (Line "]")
+              ]
+            , [ both (Closed "") (Closed "\n") ]
+            , [ both (Line "quux") (Line "quux") ]
+            ] :: [Row Char] in
+              foldr (adjoinRows alignRows) [] rows `shouldBe`
+              [ both (Closed "[ bar ]\n") (Closed "[\n")
+              , both (Closed "") (Closed "bar\n")
+              , both (Closed "") (Closed "]\n")
+              , both (Line "quux") (Line "quux")
+              ]
+
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
       \ source -> let range = totalRange source in
