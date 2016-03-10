@@ -45,7 +45,7 @@ rowLength :: Row a -> Both (Sum Int)
 rowLength = fmap lineLength
 
 -- | The length of the line, being either 0 or 1.
-lineLength :: Line a -> Sum Int
+lineLength :: Num n => Line a -> n
 lineLength line | isEmpty line = 0
                 | otherwise = 1
 
