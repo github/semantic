@@ -42,12 +42,12 @@ changeLength change = mconcat $ (rowLength <$> context change) <> (rowLength <$>
 
 -- | The number of lines in the row, each being either 0 or 1.
 rowLength :: Row a -> Both (Sum Int)
-rowLength = fmap lineLength
+rowLength = fmap lineIncrement
 
 -- | The length of the line, being either 0 or 1.
-lineLength :: Num n => Line a -> n
-lineLength line | isEmpty line = 0
-                | otherwise = 1
+lineIncrement :: Num n => Line a -> n
+lineIncrement line | isEmpty line = 0
+                   | otherwise = 1
 
 -- | Given the before and after sources, render a hunk to a string.
 showHunk :: Both SourceBlob -> Hunk (SplitDiff a Info) -> String
