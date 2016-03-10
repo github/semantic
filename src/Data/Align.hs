@@ -1,6 +1,7 @@
 module Data.Align where
 
 import Data.Bifunctor.These
+import Data.Functor.Identity
 
 class Functor f => Align f where
   nil :: f a
@@ -17,3 +18,6 @@ instance Align [] where
 
 class Crosswalk t where
   sequenceL :: Align f => t (f a) -> f (t a)
+
+instance Crosswalk Identity where
+  sequenceL = fmap Identity . runIdentity
