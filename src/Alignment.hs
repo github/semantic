@@ -61,7 +61,7 @@ adjoinChildren sources infos align constructor children =
   where (lines, next) = foldr (childLines sources align) ([], end <$> ranges) children
         ranges = characterRange <$> infos
         categories = Diff.categories <$> infos
-        leadingContext = fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
+        leadingContext = fmap (fmap ((,) Nothing)) <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
         wrap = (wrapLineContents <$> (makeBranchTerm constructor <$> categories <*> next) <*>)
 
 childLines :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> (f [Line (Maybe (c a), Range)] -> [f (Line (Maybe (c a), Range))]) -> c [f (Line (a, Range))] -> ([f (Line (Maybe (c a), Range))], f Int) -> ([f (Line (Maybe (c a), Range))], f Int)
@@ -69,7 +69,7 @@ childLines :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source C
 childLines _ _ child (lines, next) | or $ (>) . end <$> childRanges next child <*> next = (lines, next)
 childLines sources align child (lines, next) =
   ((fmap (fmap (first (Just . (<$ child)))) <$> copoint child)
-  ++ align (fmap (pure . (,) Nothing) <$> (actualLineRanges <$> (Range <$> (end <$> childRanges next child) <*> next) <*> sources))
+  ++ align (fmap (fmap ((,) Nothing)) <$> (linesInRangeOfSource <$> (Range <$> (end <$> childRanges next child) <*> next) <*> sources))
   ++ lines, start <$> childRanges next child)
 
 childRanges :: (Copointed c, Applicative f) => f Int -> c [f (Line (a, Range))] -> f Range
