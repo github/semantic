@@ -27,10 +27,6 @@ snd = Prelude.snd . runBoth
 zip :: Both [a] -> [Both a]
 zip = zipWith both
 
--- | Split a `Both` of pairs into a pair of `Both`s.
-transpose :: Both (a, b) -> (Both a, Both b)
-transpose = runBothWith (uncurry bimap . bimap both both)
-
 -- | Zip Both lists, using the default values to extend the shorter list.
 zipDefaults :: Both a -> Both [a] -> [Both a]
 zipDefaults ds as = take (runBothWith max (length <$> as)) $ zipWith both ((++) <$> as <*> (repeat <$> ds))
