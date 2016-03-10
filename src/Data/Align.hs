@@ -18,6 +18,8 @@ instance Align [] where
 
 class Functor t => Crosswalk t where
   crosswalk :: Align f => (a -> f b) -> t a -> f (t b)
+  crosswalk f = sequenceL . fmap f
+
   sequenceL :: Align f => t (f a) -> f (t a)
   sequenceL = crosswalk id
 
