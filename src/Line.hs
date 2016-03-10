@@ -35,6 +35,11 @@ wrapLineContents :: ([a] -> b) -> Line a -> Line b
 wrapLineContents transform line | isEmpty line = mempty
                                 | otherwise = pureBy (const (isOpen line)) (transform (unLine line))
 
+-- | Map the elements of a line, preserving closed lines.
+lineMap :: ([a] -> [b]) -> Line a -> Line b
+lineMap f (Line ls) = Line (f ls)
+lineMap f (Closed cs) = Closed (f cs)
+
 -- | Return the first item in the Foldable, or Nothing if it's empty.
 maybeFirst :: Foldable f => f a -> Maybe a
 maybeFirst = foldr (const . Just) Nothing
