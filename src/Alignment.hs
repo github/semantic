@@ -26,10 +26,8 @@ import Term
 -- | Assign line numbers to the lines on each side of a list of rows.
 numberedRows :: [Row a] -> [Both (Int, Line a)]
 numberedRows = countUp (pure 1)
-  where countUp from (row : rows) = ((,) <$> from <*> row) : countUp ((+) <$> from <*> (valueOf <$> row)) rows
+  where countUp from (row : rows) = ((,) <$> from <*> row) : countUp ((+) <$> from <*> (lineIncrement <$> row)) rows
         countUp _ [] = []
-        valueOf line | isEmpty line = 0
-        valueOf _ = 1
 
 -- | Determine whether a line contains any patches.
 hasChanges :: Line (SplitDiff leaf Info) -> Bool
