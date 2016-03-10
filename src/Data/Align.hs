@@ -8,6 +8,7 @@ class Functor f => Align f where
   align :: f a -> f b -> f (These a b)
   align = alignWith id
   alignWith :: (These a b -> c) -> f a -> f b -> f c
+  alignWith f a b = f <$> align a b
 
 instance Align [] where
   nil = []
