@@ -1,5 +1,7 @@
 module Line where
 
+import Data.Coalescent
+
 -- | A line of items or an empty line.
 data Line a = Line [a] | Closed [a]
   deriving (Eq, Foldable, Functor, Show, Traversable)
@@ -50,3 +52,7 @@ instance Monoid (Line a) where
   mempty = Line []
   mappend xs (Closed ys) = Closed (unLine xs `mappend` ys)
   mappend xs ys = Line (unLine xs `mappend` unLine ys)
+
+instance Coalescent (Line a) where
+  coalesce a b | isOpen a = Just (a `mappend` b)
+               | otherwise = Nothing
