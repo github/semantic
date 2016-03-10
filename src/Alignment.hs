@@ -88,10 +88,6 @@ makeBranchTerm constructor categories next children = (constructor (Info range c
 unionLineRangesFrom :: Range -> [Line (a, Range)] -> Range
 unionLineRangesFrom start lines = unionRangesFrom start (lines >>= (fmap Prelude.snd . unLine))
 
--- | Openness predicate for (Range, a) pairs.
-openRangePair :: Source Char -> (a, Range) -> Bool
-openRangePair source pair = openRange source (Prelude.snd pair)
-
 -- | Does this Range in this Source end with a newline?
 openRange :: Source Char -> Range -> Bool
 openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
