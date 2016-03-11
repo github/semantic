@@ -9,3 +9,6 @@ instance Arbitrary a => Arbitrary (Adjoined a) where
 
 newtype Separated a = Separated { unSeparated :: a }
   deriving (Eq, Functor, Show)
+
+instance Arbitrary a => Arbitrary (Separated a) where
+  arbitrary = Separated <$> arbitrary
