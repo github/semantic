@@ -48,7 +48,7 @@ splitPatchByLines sources patch = alignRows $ fmap (fmap (first (Pure . construc
           constructor (Delete _) = SplitDelete
 
 -- | Split a term comprised of an Info & Syntax up into one `outTerm` (abstracted by an alignment function & constructor) per line in `Source`.
-splitAbstractedTerm :: (Applicative f, Foldable f) => (forall b. f [Line b] -> [f (Line b)]) -> (Info -> Syntax leaf outTerm -> outTerm) -> f (Source Char) -> f Info -> Syntax leaf [f (Line (outTerm, Range))] -> [f (Line (outTerm, Range))]
+splitAbstractedTerm :: (Applicative f, Foldable f) => AlignFunction f -> (Info -> Syntax leaf outTerm -> outTerm) -> f (Source Char) -> f Info -> Syntax leaf [f (Line (outTerm, Range))] -> [f (Line (outTerm, Range))]
 splitAbstractedTerm align makeTerm sources infos syntax = case syntax of
   Leaf a -> align $ fmap <$> ((\ categories -> fmap (\ range -> (makeTerm (Info range categories) (Leaf a), range))) <$> (Diff.categories <$> infos)) <*> (linesInRangeOfSource <$> (characterRange <$> infos) <*> sources)
   Indexed children -> adjoinChildren sources infos align (constructor (Indexed . fmap runIdentity)) (Identity <$> children)
@@ -100,6 +100,8 @@ openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
 
 -- | A row in a split diff, composed of a before line and an after line.
 type Row a = Both (Line a)
+
+type AlignFunction f = (forall b. f [Line b] -> [f (Line b)])
 
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
 adjoinRows :: Applicative f => (f [Line a] -> [f (Line a)]) -> f (Line a) -> [f (Line a)] -> [f (Line a)]
