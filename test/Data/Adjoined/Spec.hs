@@ -56,15 +56,15 @@ instance Monoid a => Coalescent (Coalesced a) where
 
 
 -- | A wrapper which only coalesces some values.
-newtype Semicoalesced a = Semicoalesced { runSemicoalesced :: Maybe a }
+newtype Semicoalesced a = Semicoalesced { runSemicoalesced :: (Bool, a) }
   deriving (Eq, Show)
 
 instance Arbitrary a => Arbitrary (Semicoalesced a) where
   arbitrary = Semicoalesced <$> arbitrary
 
 instance Monoid a => Coalescent (Semicoalesced a) where
-  Semicoalesced (Just a) `coalesce` Semicoalesced b = Just (Semicoalesced (Just a `mappend` b))
-  Semicoalesced Nothing `coalesce` _ = Nothing
+  Semicoalesced (True, a) `coalesce` Semicoalesced (flag, b) = Just (Semicoalesced (flag, a `mappend` b))
+  Semicoalesced (False, _) `coalesce` _ = Nothing
 
 
 -- | Returns a string with the name of a type.
