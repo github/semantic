@@ -6,3 +6,6 @@ import Test.QuickCheck
 
 instance Arbitrary a => Arbitrary (Adjoined a) where
   arbitrary = fromList <$> arbitrary
+
+newtype Separated a = Separated { unSeparated :: a }
+  deriving (Eq, Functor, Show)
