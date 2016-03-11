@@ -24,14 +24,6 @@ fst = Prelude.fst . runBoth
 snd :: Both a -> a
 snd = Prelude.snd . runBoth
 
-zip :: Both [a] -> [Both a]
-zip = zipWith both
-
-zipWith :: (a -> a -> b) -> Both [a] -> [b]
-zipWith _ (Both ([], _)) = []
-zipWith _ (Both (_, [])) = []
-zipWith f (Both (a : as, b : bs)) = f a b : zipWith f (both as bs)
-
 unzip :: [Both a] -> Both [a]
 unzip = foldr pair (pure [])
   where pair (Both (a, b)) (Both (as, bs)) = Both (a : as, b : bs)
