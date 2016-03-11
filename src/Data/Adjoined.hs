@@ -16,6 +16,10 @@ uncons :: Adjoined a -> Maybe (a, Adjoined a)
 uncons (Adjoined v) | a :< as <- viewl v = Just (a, Adjoined as)
                     | otherwise = Nothing
 
+unsnoc :: Adjoined a -> Maybe (Adjoined a, a)
+unsnoc (Adjoined v) | as :> a <- viewr v = Just (Adjoined as, a)
+                    | otherwise = Nothing
+
 instance Applicative Adjoined where
   pure = return
   (<*>) = ap
