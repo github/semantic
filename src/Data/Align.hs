@@ -15,8 +15,8 @@ class Functor f => Align f where
 
 instance Align [] where
   nil = []
-  align as bs | la < lb = (That <$> take (lb - la) bs) ++ zipWith These as (drop (lb - la) bs)
-              | la > lb = (This <$> take (la - lb) as) ++ zipWith These (drop (la - lb) as) bs
+  align as bs | la < lb, (prefix, overlap) <- splitAt (lb - la) bs = (That <$> prefix) ++ zipWith These as overlap
+              | la > lb, (prefix, overlap) <- splitAt (la - lb) as = (This <$> prefix) ++ zipWith These overlap bs
               | otherwise = zipWith These as bs
               where (la, lb) = (length as, length bs)
 
