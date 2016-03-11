@@ -114,7 +114,7 @@ type Row a = Both (Line a)
 type AlignFunction f = forall b list. (Align list, Applicative list) => f (list (Line b)) -> list (f (Line b))
 
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
-adjoinRows :: Applicative f => (f [Line a] -> [f (Line a)]) -> f (Line a) -> [f (Line a)] -> [f (Line a)]
+adjoinRows :: Applicative f => AlignFunction f -> f (Line a) -> [f (Line a)] -> [f (Line a)]
 adjoinRows _ row [] = [ row ]
 adjoinRows align row (nextRow : rows) = align (coalesceLines <$> row <*> nextRow) ++ rows
 
