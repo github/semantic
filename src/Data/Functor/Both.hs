@@ -53,6 +53,7 @@ instance Monoid a => Monoid (Both a) where
 newtype MaybeBoth a = MaybeBoth { runMaybeBoth :: Both (Maybe a) }
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
+-- | Lift Both values into MaybeBoth via Just.
 justBoth :: Both a -> MaybeBoth a
 justBoth = MaybeBoth . fmap Just
 
