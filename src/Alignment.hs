@@ -67,6 +67,7 @@ adjoinChildren sources infos align constructor children =
         leadingContext = fmap (fmap ((,) Nothing)) <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
         wrap = (wrapLineContents <$> (makeBranchTerm constructor <$> categories <*> next) <*>)
 
+-- | Accumulate the lines of and between a branch term’s children.
 childLines :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> (f [Line (Maybe (c a), Range)] -> [f (Line (Maybe (c a), Range))]) -> c [f (Line (a, Range))] -> ([f (Line (Maybe (c a), Range))], f Int) -> ([f (Line (Maybe (c a), Range))], f Int)
 -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
 childLines _ _ child (followingLines, next) | or $ (>) . end <$> childRanges next child <*> next = (followingLines, next)
