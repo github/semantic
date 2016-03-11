@@ -2,6 +2,7 @@ module Data.Adjoined.Spec where
 
 import Data.Adjoined
 import Data.Coalescent
+import Data.Typeable
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
@@ -51,3 +52,14 @@ instance Arbitrary a => Arbitrary (Coalesced a) where
 
 instance Monoid a => Coalescent (Coalesced a) where
   coalesce a b = Just (Coalesced (runCoalesced a `mappend` runCoalesced b))
+
+
+-- | Returns a string with the name of a type.
+-- |
+-- | Use with `asTypeOf` or `asGeneratedTypeOf` to show type names for parameters without fighting type variable scoping:
+-- |
+-- |   showTypeOf (`asTypeOf` someTypeParametricValue)
+showTypeOf :: Typeable a => (a -> a) -> String
+showTypeOf f = show (typeRep (proxyOf f))
+  where proxyOf :: (a -> a) -> Proxy a
+        proxyOf _ = Proxy
