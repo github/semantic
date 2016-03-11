@@ -112,7 +112,11 @@ instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
 
 
 instance ToMarkup a => ToMarkup (Renderable (Bool, Int, Line a)) where
-  toMarkup (Renderable (_, _, line)) | isEmpty line = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell") <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell") <> string "\n"
-  toMarkup (Renderable (hasChanges, num, line))
-    = td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
-    <> td (mconcat $ toMarkup <$> unLine line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code") <> string "\n"
+  toMarkup (Renderable (_, _, line)) | isEmpty line =
+    td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
+    <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
+    <> string "\n"
+  toMarkup (Renderable (hasChanges, num, line)) =
+    td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
+    <> td (mconcat $ toMarkup <$> unLine line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
+    <> string "\n"
