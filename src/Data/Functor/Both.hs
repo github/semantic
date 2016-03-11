@@ -53,6 +53,9 @@ instance Monoid a => Monoid (Both a) where
 newtype MaybeBoth a = MaybeBoth { runMaybeBoth :: Both (Maybe a) }
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
+justBoth :: Both a -> MaybeBoth a
+justBoth = MaybeBoth . fmap Just
+
 instance Applicative MaybeBoth where
   pure = MaybeBoth . pure . Just
   MaybeBoth (Both (f, g)) <*> MaybeBoth (Both (a, b)) = MaybeBoth (both (f <*> a) (g <*> b))
