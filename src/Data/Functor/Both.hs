@@ -2,6 +2,7 @@
 module Data.Functor.Both where
 
 import Data.Align
+import Data.Coalescent
 import Data.Bifunctor
 import Data.Bifunctor.These
 import Prelude hiding (zipWith, fst, snd)
@@ -57,3 +58,6 @@ instance Applicative MaybeBoth where
 
 instance Crosswalk MaybeBoth where
   crosswalk f (MaybeBoth ab) = runBothWith (alignWith (MaybeBoth . maybeBothOfThese)) (maybe nil f <$> ab)
+
+instance Coalescent a => Coalescent (MaybeBoth a) where
+  coalesce as bs = sequenceL (coalesce <$> as <*> bs)
