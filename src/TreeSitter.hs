@@ -16,7 +16,7 @@ treeSitterParser :: Language -> Ptr TS.Language -> Parser
 treeSitterParser language grammar contents = do
   document <- ts_document_make
   ts_document_set_language document grammar
-  withCString (toList contents) (\source -> do
+  withCString (toString contents) (\source -> do
     ts_document_set_input_string document source
     ts_document_parse document
     term <- documentToTerm (termConstructor $ categoriesForLanguage language) document contents

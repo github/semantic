@@ -20,7 +20,7 @@ import Diff
 import Line
 import Range
 import Renderer
-import Source hiding (fromList, toList)
+import Source hiding (fromList)
 import SplitDiff
 import Syntax
 import Term

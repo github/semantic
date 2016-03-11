@@ -102,7 +102,7 @@ header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFile
 
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
-hunks _ blobs | Both (True, True) <- Source.null . source <$> blobs = [Hunk { offset = mempty, changes = [], trailingContext = [] }]
+hunks _ blobs | Both (True, True) <- null . source <$> blobs = [Hunk { offset = mempty, changes = [], trailingContext = [] }]
 hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap (fmap Prelude.fst) <$> splitDiffByLines (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a

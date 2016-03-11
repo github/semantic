@@ -42,10 +42,10 @@ termConstructor :: (String -> Set.Set Category) -> Constructor
 termConstructor mapping source range name = (Info range categories :<) . construct
   where
     categories = mapping name
-    construct [] = Leaf . pack . toList $ slice range source
+    construct [] = Leaf . pack . toString $ slice range source
     construct children | isFixed categories = Fixed children
     construct children | isKeyed categories = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed children
     assignKey node@(Info _ categories :< Fixed (key : _)) | Set.member Pair categories = (getSubstring key, node)
     assignKey node = (getSubstring node, node)
-    getSubstring (Info range _ :< _) = pack . toList $ slice range source
+    getSubstring (Info range _ :< _) = pack . toString $ slice range source
