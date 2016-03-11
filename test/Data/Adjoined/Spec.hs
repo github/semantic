@@ -1,6 +1,7 @@
 module Data.Adjoined.Spec where
 
 import Data.Adjoined
+import Data.Coalescent
 import Test.QuickCheck
 
 
@@ -12,3 +13,6 @@ newtype Separated a = Separated { unSeparated :: a }
 
 instance Arbitrary a => Arbitrary (Separated a) where
   arbitrary = Separated <$> arbitrary
+
+instance Coalescent (Separated a) where
+  coalesce _ _ = Nothing
