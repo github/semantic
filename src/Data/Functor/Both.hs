@@ -27,10 +27,6 @@ snd = Prelude.snd . runBoth
 zip :: Both [a] -> [Both a]
 zip = zipWith both
 
--- | Zip Both lists, using the default values to extend the shorter list.
-zipDefaults :: Both a -> Both [a] -> [Both a]
-zipDefaults ds as = take (runBothWith max (length <$> as)) $ zipWith both ((++) <$> as <*> (repeat <$> ds))
-
 zipWith :: (a -> a -> b) -> Both [a] -> [b]
 zipWith _ (Both ([], _)) = []
 zipWith _ (Both (_, [])) = []
