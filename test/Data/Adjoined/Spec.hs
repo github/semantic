@@ -63,3 +63,7 @@ showTypeOf :: Typeable a => (a -> a) -> String
 showTypeOf f = show (typeRep (proxyOf f))
   where proxyOf :: (a -> a) -> Proxy a
         proxyOf _ = Proxy
+
+-- | Type-restricted `const`, usually written infix or as an operator section with `showTypeOf`.
+asGeneratedTypeOf :: a -> Gen a -> a
+asGeneratedTypeOf = const
