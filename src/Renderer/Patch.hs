@@ -47,7 +47,7 @@ rowIncrement = fmap lineIncrement
 -- | Given the before and after sources, render a hunk to a string.
 showHunk :: Both SourceBlob -> Hunk (SplitDiff a Info) -> String
 showHunk blobs hunk = if last sourceHunk /= '\n'
-                      then sourceHunk ++ "\n\\ No newline at end of file\n"
+                      then sourceHunk ++ "\n\\\\ No newline at end of file\n"
                       else sourceHunk
   where sources = source <$> blobs
         sourceHunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (snd <$> trailingContext hunk)
