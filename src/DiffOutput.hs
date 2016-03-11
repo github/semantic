@@ -30,5 +30,5 @@ printDiff parser arguments sources = case format arguments of
                          then path </> (takeFileName outputPath -<.> ".html")
                          else path
         IO.withFile outputPath IO.WriteMode (`TextIO.hPutStr` rendered)
-  Patch -> putStrLn =<< diffFiles parser P.patch sources
+  Patch -> putStr =<< diffFiles parser P.patch sources
   JSON -> B.putStr =<< diffFiles parser J.json sources
