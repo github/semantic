@@ -15,8 +15,11 @@ class Functor f => Align f where
 
 instance Align [] where
   nil = []
+           -- | The second list is longer, so map its prefix into `That` and zip the rest.
   align as bs | la < lb, (prefix, overlap) <- splitAt (lb - la) bs = (That <$> prefix) ++ zipWith These as overlap
+           -- | The first list is longer, so map its prefix into `This` and zip the rest.
               | la > lb, (prefix, overlap) <- splitAt (la - lb) as = (This <$> prefix) ++ zipWith These overlap bs
+           -- | They’re of equal length, so zip into `These`.
               | otherwise = zipWith These as bs
               where (la, lb) = (length as, length bs)
 
