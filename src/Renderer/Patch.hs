@@ -11,12 +11,12 @@ import Prelude hiding (fst, snd)
 import qualified Prelude
 import Range
 import Renderer
-import Row
 import Source hiding ((++), break)
 import SplitDiff
 import Control.Comonad.Cofree
 import Control.Monad.Free
-import Data.Functor.Both
+import Data.Functor.Both as Both
+import Data.List
 import Data.Maybe
 import Data.Monoid
 
@@ -34,30 +34,25 @@ data Change a = Change { context :: [Row a], contents :: [Row a] }
 
 -- | The number of lines in the hunk before and after.
 hunkLength :: Hunk a -> Both (Sum Int)
-hunkLength hunk = mconcat $ (changeLength <$> changes hunk) <> (rowLength <$> trailingContext hunk)
+hunkLength hunk = mconcat $ (changeLength <$> changes hunk) <> (rowIncrement <$> trailingContext hunk)
 
 -- | The number of lines in change before and after.
 changeLength :: Change a -> Both (Sum Int)
-changeLength change = mconcat $ (rowLength <$> context change) <> (rowLength <$> contents change)
+changeLength change = mconcat $ (rowIncrement <$> context change) <> (rowIncrement <$> contents change)
 
--- | The number of lines in the row, each being either 0 or 1.
-rowLength :: Row a -> Both (Sum Int)
-rowLength = fmap lineLength . unRow
-
--- | The length of the line, being either 0 or 1.
-lineLength :: Line a -> Sum Int
-lineLength EmptyLine = 0
-lineLength _ = 1
+-- | The increment the given row implies for line numbering.
+rowIncrement :: Row a -> Both (Sum Int)
+rowIncrement = fmap lineIncrement
 
 -- | Given the before and after sources, render a hunk to a string.
 showHunk :: Both SourceBlob -> Hunk (SplitDiff a Info) -> String
-showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (unRight <$> trailingContext hunk)
+showHunk blobs hunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (snd <$> trailingContext hunk)
   where sources = source <$> blobs
 
 -- | Given the before and after sources, render a change to a string.
 showChange :: Both (Source Char) -> Change (SplitDiff a Info) -> String
-showChange sources change = showLines (snd sources) ' ' (unRight <$> context change) ++ deleted ++ inserted
-  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> Both ('-', '+') <*> (pure fmap <*> Both (unLeft, unRight) <*> pure (contents change))
+showChange sources change = showLines (snd sources) ' ' (snd <$> context change) ++ deleted ++ inserted
+  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> Both ('-', '+') <*> Both.unzip (contents change)
 
 -- | Given a source, render a set of lines to a string with a prefix.
 showLines :: Source Char -> Char -> [Line (SplitDiff leaf Info)] -> String
@@ -67,8 +62,8 @@ showLines source prefix lines = fromMaybe "" . mconcat $ fmap prepend . showLine
 
 -- | Given a source, render a line to a string.
 showLine :: Source Char -> Line (SplitDiff leaf Info) -> Maybe String
-showLine _ EmptyLine = Nothing
-showLine source line = Just . toString . (`slice` source) . unionRanges $ getRange <$> unLine line
+showLine source line | isEmpty line = Nothing
+                     | otherwise = Just . toString . (`slice` source) . unionRanges $ getRange <$> unLine line
 
 -- | Return the range from a split diff.
 getRange :: SplitDiff leaf Info -> Range
@@ -108,7 +103,7 @@ header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFile
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
 hunks _ blobs | Both (True, True) <- Source.null . source <$> blobs = [Hunk { offset = mempty, changes = [], trailingContext = [] }]
-hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap Prelude.fst <$> splitDiffByLines (source <$> blobs) diff
+hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap (fmap Prelude.fst) <$> splitDiffByLines (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
@@ -134,7 +129,7 @@ nextHunk start rows = case nextChange start rows of
 nextChange :: Both (Sum Int) -> [Row (SplitDiff a Info)] -> Maybe (Both (Sum Int), Change (SplitDiff a Info), [Row (SplitDiff a Info)])
 nextChange start rows = case changeIncludingContext leadingContext afterLeadingContext of
   Nothing -> Nothing
-  Just (change, afterChanges) -> Just (start <> mconcat (rowLength <$> skippedContext), change, afterChanges)
+  Just (change, afterChanges) -> Just (start <> mconcat (rowIncrement <$> skippedContext), change, afterChanges)
   where (leadingRows, afterLeadingContext) = break rowHasChanges rows
         (skippedContext, leadingContext) = splitAt (max (length leadingRows - 3) 0) leadingRows
 
@@ -149,7 +144,7 @@ changeIncludingContext leadingContext rows = case changes of
 
 -- | Whether a row has changes on either side.
 rowHasChanges :: Row (SplitDiff a Info) -> Bool
-rowHasChanges (Row lines) = or (lineHasChanges <$> lines)
+rowHasChanges lines = or (lineHasChanges <$> lines)
 
 -- | Whether a line has changes.
 lineHasChanges :: Line (SplitDiff a Info) -> Bool

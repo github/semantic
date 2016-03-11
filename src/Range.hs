@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Range where
 
-import qualified Data.Text as T
 import Control.Applicative ((<|>))
 import qualified Data.Char as Char
 import Data.Maybe (fromMaybe)
@@ -19,21 +18,9 @@ rangeAt a = Range a a
 rangeLength :: Range -> Int
 rangeLength range = end range - start range
 
--- | Return the portion of the text identified by the given range.
-substring :: Range -> T.Text -> T.Text
-substring range = T.take (rangeLength range) . T.drop (start range)
-
--- | Return the portion of the list identified by the given range.
-sublist :: Range -> [a] -> [a]
-sublist range = take (rangeLength range) . drop (start range)
-
 -- | Return a range that covers the entire text.
-totalRange :: T.Text -> Range
-totalRange t = Range 0 $ T.length t
-
--- | Return a range that has its start and end offset by the given amount.
-offsetRange :: Int -> Range -> Range
-offsetRange i (Range start end) = Range (i + start) (i + end)
+totalRange :: Foldable f => f a -> Range
+totalRange t = Range 0 $ length t
 
 -- | Break a string down into words and sequences of punctuation. Return a list
 -- | strings with ranges, assuming that the first character in the string is

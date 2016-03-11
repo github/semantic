@@ -19,7 +19,6 @@ import Line
 import Patch
 import Prelude hiding (fst, snd)
 import qualified Prelude
-import Row
 import Range
 import Source hiding ((++))
 import qualified Source
@@ -29,13 +28,8 @@ import Syntax
 instance Arbitrary a => Arbitrary (Both a) where
   arbitrary = pure (curry Both) <*> arbitrary <*> arbitrary
 
-instance Arbitrary a => Arbitrary (Row a) where
-  arbitrary = Row <$> arbitrary
-
 instance Arbitrary a => Arbitrary (Line a) where
-  arbitrary = oneof [
-    makeLine <$> arbitrary,
-    const EmptyLine <$> (arbitrary :: Gen ()) ]
+  arbitrary = oneof [ Line <$> arbitrary, Closed <$> arbitrary ]
 
 instance Arbitrary a => Arbitrary (Patch a) where
   arbitrary = oneof [
@@ -52,87 +46,79 @@ arbitraryLeaf = toTuple <$> arbitrary
 
 spec :: Spec
 spec = parallel $ do
-  describe "splitAnnotatedByLines" $ do
-    prop "outputs one row for single-line unchanged leaves" $
-      forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
-        \ (source, info@(Info range categories), syntax) -> splitAnnotatedByLines (pure source) (pure $ Info range categories) syntax `shouldBe` [
-          makeRow (pure (Free $ Annotated info $ Leaf source, Range 0 (length source))) (pure (Free $ Annotated info $ Leaf source, Range 0 (length source))) ]
-
-    prop "outputs one row for single-line empty unchanged indexed nodes" $
-      forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
-          \ source -> splitAnnotatedByLines (pure source) (pure $ Info (getTotalRange source) mempty) (Indexed [] :: Syntax String [Row (SplitDiff leaf Info, Range)]) `shouldBe` [
-            makeRow (pure (Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (Free $ Annotated (Info (getTotalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
-
   describe "splitDiffByLines" $ do
     prop "preserves line counts in equal sources" $
       \ source ->
-        length (splitDiffByLines (pure source) (Free $ Annotated (pure $ Info (getTotalRange source) mempty) (Indexed . Prelude.fst $ foldl combineIntoLeaves ([], 0) source))) `shouldBe` length (filter (== '\n') $ toList source) + 1
+        length (splitDiffByLines (pure source) (Free $ Annotated (pure $ Info (totalRange source) mempty) (Indexed . Prelude.fst $ foldl combineIntoLeaves ([], 0) source))) `shouldBe` length (filter (== '\n') $ toList source) + 1
 
     prop "produces the maximum line count in inequal sources" $
       \ sources ->
-        length (splitDiffByLines sources (Free $ Annotated ((`Info` mempty) . getTotalRange <$> sources) (Indexed $ leafWithRangesInSources sources <$> Both.zip (actualLineRanges <$> (getTotalRange <$> sources) <*> sources)))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toList <$> sources)
+        length (splitDiffByLines sources (Free $ Annotated ((`Info` mempty) . totalRange <$> sources) (Indexed $ leafWithRangesInSources sources <$> Both.zip (actualLineRanges <$> (totalRange <$> sources) <*> sources)))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toList <$> sources)
 
-  describe "adjoinRowsBy" $ do
-    prop "is identity on top of no rows" $
-      \ a -> adjoinRowsBy (pure openMaybe) [] a == [ a ]
+  describe "adjoinRows" $ do
+    prop "is identity on top of no rows" $ forAll (arbitrary `suchThat` (not . isEmptyRow)) $
+      \ a -> adjoinRows alignRows a [] `shouldBe` [ a :: Row Char ]
 
-    prop "appends onto open rows" $
-      forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
-        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ a ] b `shouldBe` [ Row (mappend <$> unRow a <*> unRow b) ]
+    prop "prunes empty rows" $
+      \ a -> adjoinRows alignRows mempty [ a ] `shouldBe` [ a :: Row Char ]
 
-    prop "does not append onto closed rows" $
-      forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
-        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ a ] b `shouldBe` [ b, a ]
+    prop "merges open rows" $
+      \ a b -> adjoinRows alignRows (pure (Line [a])) [ b ] `shouldBe` [ pure (Line [a]) `mappend` b :: Row Char ]
 
-    prop "does not promote elements through empty lines onto closed lines" $
-      forAll ((arbitrary `suchThat` isClosedBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isClosedBy openMaybe)) $
-        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ makeRow EmptyLine EmptyLine, a ] b `shouldBe` [ b, makeRow EmptyLine EmptyLine, a ]
+    prop "prepends closed rows" $
+      \ a b -> adjoinRows alignRows (pure (Closed [a])) [ b ] `shouldBe` [ pure (Closed [a]), b :: Row Char ]
 
-    prop "promotes elements through empty lines onto open lines" $
-      forAll ((arbitrary `suchThat` isOpenBy openMaybe) >>= \ a -> (,) a <$> (arbitrary `suchThat` isOpenBy openMaybe)) $
-        \ (a, b) -> adjoinRowsBy (pure openMaybe) [ makeRow EmptyLine EmptyLine, a ] b `shouldBe` makeRow EmptyLine EmptyLine : adjoinRowsBy (pure openMaybe) [ a ] b
+    -- it "aligns closed lines" $
+    --   foldr (adjoinRows alignRows) [] (Prelude.zipWith both (pureBy (/= '\n') <$> "[ bar ]\nquux") (pureBy (/= '\n') <$> "[\nbar\n]\nquux")) `shouldBe`
+    --     [ both (Closed "[ bar ]\n") (Closed "[\n")
+    --     , both (Closed "") (Closed "bar\n")
+    --     , both (Closed "") (Closed "]\n")
+    --     , both (Line "quux") (Line "quux")
+    --     ]
+
+    it "preserves children’s alignment" $
+      let rows = concat
+            [ [ both (Closed "[ bar ]\n") (Closed "[\n")
+              , both (Closed "") (Closed "bar\n")
+              , both (Line "") (Line "]")
+              ]
+            , [ both (Closed "") (Closed "\n") ]
+            , [ both (Line "quux") (Line "quux") ]
+            ] :: [Row Char] in
+              foldr (adjoinRows alignRows) [] rows `shouldBe`
+              [ both (Closed "[ bar ]\n") (Closed "[\n")
+              , both (Closed "") (Closed "bar\n")
+              , both (Closed "") (Closed "]\n")
+              , both (Line "quux") (Line "quux")
+              ]
 
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
-      \ source -> let range = getTotalRange source in
-        splitAbstractedTerm (:<) source (Info range mempty) (Leaf source) `shouldBe` (pure . ((:< Leaf source) . (`Info` mempty) &&& id) <$> actualLineRanges range source)
+      \ source -> let range = totalRange source in
+        splitAbstractedTerm sequenceA (:<) (Identity source) (Identity (Info range mempty)) (Leaf source) `shouldBe` (Identity . lineMap (fmap (((:< Leaf source) . (`Info` mempty) &&& id))) <$> linesInRangeOfSource range source)
 
-  describe "splitPatchByLines" $ do
-    prop "starts at initial indices" $
-      \ patch sources -> let indices = length <$> sources in
-        fmap start . maybeFirst . Maybe.catMaybes <$> Both.unzip (fmap maybeFirst . unRow . fmap Prelude.snd <$> (splitPatchByLines ((Source.++) <$> sources <*> sources) (patchWithBoth patch (leafWithRangeInSource <$> sources <*> (Range <$> indices <*> ((2 *) <$> indices)))))) `shouldBe` (<$) <$> indices <*> unPatch patch
+    let makeTerm = ((Free .) . Annotated) :: Info -> Syntax (Source Char) (SplitDiff (Source Char) Info) -> SplitDiff (Source Char) Info
+    prop "outputs one row for single-line unchanged leaves" $
+      forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
+        \ (source, info@(Info range categories), syntax) -> splitAbstractedTerm alignRows makeTerm (pure source) (pure $ Info range categories) syntax `shouldBe` [
+          both (pure (makeTerm info $ Leaf source, Range 0 (length source))) (pure (makeTerm info $ Leaf source, Range 0 (length source))) ]
 
-  describe "openLineBy" $ do
-    it "produces the earliest non-empty line in a list, if open" $
-      openLineBy openMaybe [
-        pure (Just True),
-        pure (Just False)
-      ] `shouldBe` (Just $ pure $ Just True)
-
-    it "returns Nothing if the earliest non-empty line is closed" $
-      openLineBy openMaybe [
-        pure Nothing, pure (Just True)
-      ] `shouldBe` Nothing
+    prop "outputs one row for single-line empty unchanged indexed nodes" $
+      forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
+          \ source -> splitAbstractedTerm alignRows makeTerm (pure source) (pure $ Info (totalRange source) mempty) (Indexed []) `shouldBe` [
+            both (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
     where
-      isOpenBy f (Row lines) = and (Maybe.isJust . openLineBy f . pure <$> lines)
-      isClosedBy f (Row lines@(Both (Line _, Line _))) = and (Maybe.isNothing . openLineBy f . pure <$> lines)
-      isClosedBy _ _ = False
+      isEmptyRow = and . fmap isEmpty
 
       isOnSingleLine (a, _, _) = filter (/= '\n') (toList a) == toList a
 
-      getTotalRange (Source vector) = Range 0 $ length vector
-
-      combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info <$> (pure (Range start $ start + 1)) <*> mempty) (Leaf [ char ]) ], start + 1)
+      combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info <$> pure (Range start $ start + 1) <*> mempty) (Leaf [ char ]) ], start + 1)
 
       leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty) (Leaf $ runBothWith (++) (toList <$> sources))
 
-      leafWithRangeInSource source range = (Info range mempty :< Leaf source)
+      leafWithRangeInSource source range = Info range mempty :< Leaf source
 
       patchWithBoth (Insert ()) = Insert . snd
       patchWithBoth (Delete ()) = Delete . fst
       patchWithBoth (Replace () ()) = runBothWith Replace
-
-      openMaybe :: Maybe Bool -> Maybe (Maybe Bool)
-      openMaybe (Just a) = Just (Just a)
-      openMaybe Nothing = Nothing
