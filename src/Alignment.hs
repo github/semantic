@@ -56,6 +56,7 @@ splitAbstractedTerm align makeTerm sources infos syntax = case syntax of
   Keyed children -> adjoinChildren sources infos align (constructor (Keyed . Map.fromList)) (Map.toList children)
   where constructor with info = makeTerm info . with
 
+-- | Adjoin a branch term’s lines, wrapping children & context in branch nodes using a constructor.
 adjoinChildren :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> f Info -> (f [Line (Maybe (c a), Range)] -> [f (Line (Maybe (c a), Range))]) -> (Info -> [c a] -> outTerm) -> [c [f (Line (a, Range))]] -> [f (Line (outTerm, Range))]
 adjoinChildren sources infos align constructor children =
   fmap wrap . foldr (adjoinRows align) [] $
