@@ -25,8 +25,10 @@ monoid gen =
     prop "mappend is associative" $ forAll gen $
       \ a b c -> (a `mappend` b) `mappend` c `shouldBe` a `mappend` (b `mappend` c)
 
+
 instance Arbitrary a => Arbitrary (Adjoined a) where
   arbitrary = fromList <$> arbitrary
+
 
 -- | A wrapper which never coalesces values.
 newtype Uncoalesced a = Uncoalesced { runUncoalesced :: a }
