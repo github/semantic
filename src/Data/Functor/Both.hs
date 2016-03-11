@@ -40,3 +40,8 @@ instance Applicative Both where
 instance Monoid a => Monoid (Both a) where
   mempty = pure mempty
   mappend a b = mappend <$> a <*> b
+
+
+-- | A wrapper around `Both (Maybe a)` to allow total handling of partial operations.
+newtype MaybeBoth a = MaybeBoth { runMaybeBoth :: Both (Maybe a) }
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
