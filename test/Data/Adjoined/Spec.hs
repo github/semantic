@@ -16,6 +16,9 @@ spec = do
     prop "mempty is the left identity" $
       \ a -> memptySep `mappend` a `shouldBe` a
 
+    prop "mempty is the right identity" $
+      \ a -> a `mappend` memptySep `shouldBe` a
+
 instance Arbitrary a => Arbitrary (Adjoined a) where
   arbitrary = fromList <$> arbitrary
 
