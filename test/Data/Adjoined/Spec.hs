@@ -11,7 +11,7 @@ spec = do
   prop "equality is reflexive" $
     \ a -> a `shouldBe` (a :: Adjoined (Uncoalesced Char))
 
-  monoid (arbitrary :: Gen (Adjoined (Uncoalesced String)))
+  describe "Monoid (Uncoalesced)" $ monoid (arbitrary :: Gen (Adjoined (Uncoalesced String)))
 
 monoid :: (Arbitrary a, Coalescent a, Eq a, Show a) => Gen (Adjoined a) -> Spec
 monoid gen =
