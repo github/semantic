@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Functor.Both where
 
+import Data.Bifunctor
 import Data.Bifunctor.These
 import Prelude hiding (zipWith, fst, snd)
 import qualified Prelude
@@ -16,6 +17,9 @@ both = curry Both
 -- | Construct Both with These values & defaults.
 bothOfThese :: Both a -> These a a -> Both a
 bothOfThese a = these (`both` snd a) (both (fst a)) both
+
+maybeBothOfThese :: These a a -> Both (Maybe a)
+maybeBothOfThese = bothOfThese (pure Nothing) . bimap Just Just
 
 -- | Apply a function to `Both` sides of a computation.
 runBothWith :: (a -> a -> b) -> Both a -> b
