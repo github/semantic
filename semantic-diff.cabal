@@ -70,6 +70,7 @@ test-suite semantic-diff-test
   other-modules:       AlignmentSpec
                      , ArbitraryTerm
                      , CorpusSpec
+                     , Data.Adjoined.Spec
                      , InterpreterSpec
                      , OrderedMapSpec
                      , PatchOutputSpec
