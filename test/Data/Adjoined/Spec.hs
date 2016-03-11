@@ -1,4 +1,4 @@
-module Data.Adjoined.Spec where
+module Data.Adjoined.Spec (spec) where
 
 import Data.Adjoined
 import Data.Coalescent
