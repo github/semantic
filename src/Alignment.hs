@@ -68,18 +68,16 @@ adjoinChildren sources infos align constructor children =
 
 childLines :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> AlignFunction f -> c [f (Line (a, Range))] -> ([f (Line (Maybe (c a), Range))], f Int) -> ([f (Line (Maybe (c a), Range))], f Int)
 -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
-childLines _ _ child (followingLines, next) | or $ (>) . end <$> childRanges next child <*> next = (followingLines, next)
-childLines sources align child (followingLines, next) =
+childLines sources align child (followingLines, next) | or $ (>) . end <$> childRanges <*> next = (followingLines, next)
+                                                      | otherwise =
   ((placeChildAndRangeInContainer <$> copoint child)
   ++ align (pairWithNothing <$> trailingContextLines)
-  ++ followingLines, start <$> childRanges next child)
+  ++ followingLines, start <$> childRanges)
   where pairWithNothing = fmap (fmap ((,) Nothing))
         placeChildAndRangeInContainer = fmap (fmap (first (Just . (<$ child))))
         trailingContextLines = linesInRangeOfSource <$> rangeOfContextToNext <*> sources
-        rangeOfContextToNext = (Range <$> (end <$> childRanges next child) <*> next)
-
-childRanges :: (Copointed c, Applicative f) => f Int -> c [f (Line (a, Range))] -> f Range
-childRanges next child = unionLineRangesFrom <$> (rangeAt <$> next) <*> sequenceA (copoint child)
+        rangeOfContextToNext = (Range <$> (end <$> childRanges) <*> next)
+        childRanges = unionLineRangesFrom <$> (rangeAt <$> next) <*> sequenceA (copoint child)
 
 -- | Produce open/closed lines for the portion of the source spanned by a range.
 linesInRangeOfSource :: Range -> Source Char -> [Line Range]
