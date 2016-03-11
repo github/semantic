@@ -24,5 +24,7 @@ instance Monad Adjoined where
 
 instance Coalescent a => Monoid (Adjoined a) where
   mempty = Adjoined mempty
-  Adjoined a `mappend` Adjoined b | as :> a' <- viewr a, b' :< bs <- viewl b, Just coalesced <- coalesce a' b' = Adjoined (as >< (coalesced <| bs))
+  Adjoined a `mappend` Adjoined b | as :> a' <- viewr a,
+                                    b' :< bs <- viewl b,
+                                    Just coalesced <- coalesce a' b' = Adjoined (as >< (coalesced <| bs))
                                   | otherwise = Adjoined (a >< b)
