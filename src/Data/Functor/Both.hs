@@ -20,6 +20,7 @@ both = curry Both
 bothOfThese :: Both a -> These a a -> Both a
 bothOfThese a = these (`both` snd a) (both (fst a)) both
 
+-- | Construct Both (Maybe) with These values, defaulting to Nothing.
 maybeBothOfThese :: These a a -> Both (Maybe a)
 maybeBothOfThese = bothOfThese (pure Nothing) . bimap Just Just
 
