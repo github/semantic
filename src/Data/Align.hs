@@ -9,8 +9,14 @@ import Data.Functor.Identity
 class Functor f => Align f where
   -- | The empty value. The identity value for `align` (modulo the `This` or `That` constructor wrapping the results).
   nil :: f a
+  -- | Combine two structures into a structure of `These` holding pairs of values in `These` where they overlap, and individual values in `This` and `That` elsewhere.
+  -- |
+  -- | Analogous with `zip`.
   align :: f a -> f b -> f (These a b)
   align = alignWith id
+  -- | Combine two structures into a structure by applying a function to pairs of values in `These` where they overlap, and individual values in `This` and `That` elsewhere.
+  -- |
+  -- | Analogous with `zipWith`.
   alignWith :: (These a b -> c) -> f a -> f b -> f c
   alignWith f a b = f <$> align a b
 
