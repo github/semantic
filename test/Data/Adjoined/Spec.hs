@@ -9,9 +9,9 @@ import Test.QuickCheck
 spec :: Spec
 spec = do
   prop "equality is reflexive" $
-    \ a -> a `shouldBe` (a :: Adjoined (Separated Char))
+    \ a -> a `shouldBe` (a :: Adjoined (Uncoalesced Char))
 
-  monoid (arbitrary :: Gen (Adjoined (Separated Char)))
+  monoid (arbitrary :: Gen (Adjoined (Uncoalesced Char)))
 
 monoid :: (Arbitrary a, Coalescent a, Eq a, Show a) => Gen (Adjoined a) -> Spec
 monoid gen =
@@ -29,11 +29,11 @@ instance Arbitrary a => Arbitrary (Adjoined a) where
   arbitrary = fromList <$> arbitrary
 
 -- | A wrapper which never coalesces values.
-newtype Separated a = Separated { unSeparated :: a }
+newtype Uncoalesced a = Uncoalesced { runUncoalesced :: a }
   deriving (Eq, Functor, Show)
 
-instance Arbitrary a => Arbitrary (Separated a) where
-  arbitrary = Separated <$> arbitrary
+instance Arbitrary a => Arbitrary (Uncoalesced a) where
+  arbitrary = Uncoalesced <$> arbitrary
 
-instance Coalescent (Separated a) where
+instance Coalescent (Uncoalesced a) where
   coalesce _ _ = Nothing
