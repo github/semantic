@@ -3,6 +3,9 @@ module Data.Align where
 import Data.Bifunctor.These
 import Data.Functor.Identity
 
+-- | A functor which can be aligned, essentially the union of (potentially) asymmetrical values.
+-- |
+-- | For example, this allows a zip over lists which pads out the shorter side with a default value.
 class Functor f => Align f where
   nil :: f a
   align :: f a -> f b -> f (These a b)
