@@ -101,6 +101,7 @@ openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
 -- | A row in a split diff, composed of a before line and an after line.
 type Row a = Both (Line a)
 
+-- | A function to align a context of lists into a list of contexts, possibly padding out the shorter list with default values.
 type AlignFunction f = forall b list. (Align list, Applicative list) => f (list (Line b)) -> list (f (Line b))
 
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
