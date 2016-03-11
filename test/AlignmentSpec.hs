@@ -49,11 +49,11 @@ spec = parallel $ do
   describe "splitDiffByLines" $ do
     prop "preserves line counts in equal sources" $
       \ source ->
-        length (splitDiffByLines (pure source) (Free $ Annotated (pure $ Info (totalRange source) mempty) (Indexed . Prelude.fst $ foldl combineIntoLeaves ([], 0) source))) `shouldBe` length (filter (== '\n') $ toList source) + 1
+        length (splitDiffByLines (pure source) (Free $ Annotated (pure $ Info (totalRange source) mempty) (Indexed . Prelude.fst $ foldl combineIntoLeaves ([], 0) source))) `shouldBe` length (filter (== '\n') $ toString source) + 1
 
     prop "produces the maximum line count in inequal sources" $
       \ sources ->
-        length (splitDiffByLines sources (Free $ Annotated ((`Info` mempty) . totalRange <$> sources) (Indexed $ leafWithRangesInSources sources <$> runBothWith (zipWith both) (actualLineRanges <$> (totalRange <$> sources) <*> sources)))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toList <$> sources)
+        length (splitDiffByLines sources (Free $ Annotated ((`Info` mempty) . totalRange <$> sources) (Indexed $ leafWithRangesInSources sources <$> runBothWith (zipWith both) (actualLineRanges <$> (totalRange <$> sources) <*> sources)))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toString <$> sources)
 
   describe "adjoinRows" $ do
     prop "is identity on top of no rows" $ forAll (arbitrary `suchThat` (not . isEmptyRow)) $
@@ -104,18 +104,18 @@ spec = parallel $ do
           both (pure (makeTerm info $ Leaf source, Range 0 (length source))) (pure (makeTerm info $ Leaf source, Range 0 (length source))) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
-      forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
+      forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toString a) == toString a)) $
           \ source -> splitAbstractedTerm alignRows makeTerm (pure source) (pure $ Info (totalRange source) mempty) (Indexed []) `shouldBe` [
             both (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
     where
       isEmptyRow = and . fmap isEmpty
 
-      isOnSingleLine (a, _, _) = filter (/= '\n') (toList a) == toList a
+      isOnSingleLine (a, _, _) = filter (/= '\n') (toString a) == toString a
 
       combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info <$> pure (Range start $ start + 1) <*> mempty) (Leaf [ char ]) ], start + 1)
 
-      leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty) (Leaf $ runBothWith (++) (toList <$> sources))
+      leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty) (Leaf $ runBothWith (++) (toString <$> sources))
 
       leafWithRangeInSource source range = Info range mempty :< Leaf source
 
