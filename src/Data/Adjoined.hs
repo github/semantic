@@ -3,6 +3,7 @@ module Data.Adjoined where
 
 import Control.Monad
 import Data.Coalescent
+import Data.Monoid
 import Data.Sequence as Seq
 
 -- | A collection of elements which can be adjoined onto other such collections associatively.
@@ -32,7 +33,7 @@ instance Monad Adjoined where
 
 instance Coalescent a => Monoid (Adjoined a) where
   mempty = Adjoined mempty
-  Adjoined a `mappend` Adjoined b | as :> a' <- viewr a,
-                                    b' :< bs <- viewl b,
-                                    Just coalesced <- coalesce a' b' = Adjoined (as >< (coalesced <| bs))
-                                  | otherwise = Adjoined (a >< b)
+  a `mappend` b | Just (as, a') <- unsnoc a,
+                  Just (b', bs) <- uncons b,
+                  Just coalesced <- coalesce a' b' = as <> pure coalesced <> bs
+                | otherwise = Adjoined (unAdjoined a >< unAdjoined b)
