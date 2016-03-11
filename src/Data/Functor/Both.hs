@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Functor.Both where
 
+import Data.Bifunctor.These
 import Prelude hiding (zipWith, fst, snd)
 import qualified Prelude
 
