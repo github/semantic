@@ -5,6 +5,7 @@ import Control.Monad
 import Data.Coalescent
 import Data.Sequence as Seq
 
+-- | A collection of elements which can be adjoined onto other such collections associatively.
 newtype Adjoined a = Adjoined { unAdjoined :: Seq a }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
