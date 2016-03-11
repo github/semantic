@@ -22,6 +22,9 @@ monoid gen =
     prop "mempty is the right identity" $ forAll gen $
       \ a -> a `mappend` mempty `shouldBe` a
 
+    prop "mappend is associative" $ forAll gen $
+      \ a b c -> (a `mappend` b) `mappend` c `shouldBe` a `mappend` (b `mappend` c)
+
 instance Arbitrary a => Arbitrary (Adjoined a) where
   arbitrary = fromList <$> arbitrary
 
