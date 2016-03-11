@@ -57,7 +57,9 @@ instance Monoid a => Coalescent (Coalesced a) where
   coalesce a b = Just (Coalesced (runCoalesced a `mappend` runCoalesced b))
 
 
--- | A wrapper which only coalesces some values.
+-- | A wrapper which coalesces asymmetrically.
+-- |
+-- | Specifically, it coalesces only when the value at the left has `True` set.
 newtype Semicoalesced a = Semicoalesced { runSemicoalesced :: (Bool, a) }
   deriving (Eq, Show)
 
