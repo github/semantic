@@ -49,3 +49,7 @@ instance Monoid a => Monoid (Both a) where
 -- | A wrapper around `Both (Maybe a)` to allow total handling of partial operations.
 newtype MaybeBoth a = MaybeBoth { runMaybeBoth :: Both (Maybe a) }
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
+
+instance Applicative MaybeBoth where
+  pure = MaybeBoth . pure . Just
+  MaybeBoth (Both (f, g)) <*> MaybeBoth (Both (a, b)) = MaybeBoth (both (f <*> a) (g <*> b))
