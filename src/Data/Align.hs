@@ -38,6 +38,9 @@ instance Align Maybe where
               | otherwise = Nothing
 
 
+-- | A functor which can be traversed through an `Align`able functor, inverting the nesting of one in the other.
+-- |
+-- | Analogous with `zip`, in that it can e.g. turn a tuple of lists into a list of tuples.
 class Functor t => Crosswalk t where
   crosswalk :: Align f => (a -> f b) -> t a -> f (t b)
   crosswalk f = sequenceL . fmap f
