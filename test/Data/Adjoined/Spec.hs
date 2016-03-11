@@ -35,7 +35,7 @@ instance Arbitrary a => Arbitrary (Adjoined a) where
 
 -- | A wrapper which never coalesces values.
 newtype Uncoalesced a = Uncoalesced { runUncoalesced :: a }
-  deriving (Eq, Functor, Show)
+  deriving (Eq, Show)
 
 instance Arbitrary a => Arbitrary (Uncoalesced a) where
   arbitrary = Uncoalesced <$> arbitrary
@@ -46,7 +46,7 @@ instance Coalescent (Uncoalesced a) where
 
 -- | A wrapper which always coalesces values.
 newtype Coalesced a = Coalesced { runCoalesced :: a }
-  deriving (Eq, Functor, Show)
+  deriving (Eq, Show)
 
 instance Arbitrary a => Arbitrary (Coalesced a) where
   arbitrary = Coalesced <$> arbitrary
@@ -57,7 +57,7 @@ instance Monoid a => Coalescent (Coalesced a) where
 
 -- | A wrapper which only coalesces some values.
 newtype Semicoalesced a = Semicoalesced { runSemicoalesced :: Maybe a }
-  deriving (Eq, Functor, Show)
+  deriving (Eq, Show)
 
 instance Arbitrary a => Arbitrary (Semicoalesced a) where
   arbitrary = Semicoalesced <$> arbitrary
