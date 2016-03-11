@@ -7,6 +7,7 @@ import Data.Functor.Identity
 -- |
 -- | For example, this allows a zip over lists which pads out the shorter side with a default value.
 class Functor f => Align f where
+  -- | The empty value. The identity value for `align` (modulo the `This` or `That` constructor wrapping the results).
   nil :: f a
   align :: f a -> f b -> f (These a b)
   align = alignWith id
