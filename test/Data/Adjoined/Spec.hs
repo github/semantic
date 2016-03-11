@@ -8,6 +8,7 @@ import Test.QuickCheck
 instance Arbitrary a => Arbitrary (Adjoined a) where
   arbitrary = fromList <$> arbitrary
 
+-- | A wrapper which never coalesces values.
 newtype Separated a = Separated { unSeparated :: a }
   deriving (Eq, Functor, Show)
 
