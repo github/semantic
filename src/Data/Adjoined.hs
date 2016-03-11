@@ -12,6 +12,10 @@ newtype Adjoined a = Adjoined { unAdjoined :: Seq a }
 fromList :: [a] -> Adjoined a
 fromList = Adjoined . Seq.fromList
 
+uncons :: Adjoined a -> Maybe (a, Adjoined a)
+uncons (Adjoined v) | a :< as <- viewl v = Just (a, Adjoined as)
+                    | otherwise = Nothing
+
 instance Applicative Adjoined where
   pure = return
   (<*>) = ap
