@@ -11,13 +11,16 @@ spec = do
   prop "equality is reflexive" $
     \ a -> a `shouldBe` (a :: Adjoined (Separated Char))
 
-  describe "Monoid" $ do
-    let memptySep = mempty :: Adjoined (Separated Char)
-    prop "mempty is the left identity" $
-      \ a -> memptySep `mappend` a `shouldBe` a
+  monoid (arbitrary :: Gen (Adjoined (Separated Char)))
 
-    prop "mempty is the right identity" $
-      \ a -> a `mappend` memptySep `shouldBe` a
+monoid :: (Arbitrary a, Coalescent a, Eq a, Show a) => Gen (Adjoined a) -> Spec
+monoid gen =
+  describe "Monoid" $ do
+    prop "mempty is the left identity" $ forAll gen $
+      \ a -> mempty `mappend` a `shouldBe` a
+
+    prop "mempty is the right identity" $ forAll gen $
+      \ a -> a `mappend` mempty `shouldBe` a
 
 instance Arbitrary a => Arbitrary (Adjoined a) where
   arbitrary = fromList <$> arbitrary
