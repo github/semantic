@@ -110,8 +110,9 @@ spec = parallel $ do
 
   describe "splitPatchByLines" $ do
     prop "starts at initial indices" $
-      \ patch sources -> let indices = length <$> sources in
-        fmap start . maybeFirst . Maybe.catMaybes <$> Both.unzip (fmap maybeFirst . fmap (fmap Prelude.snd) <$> splitPatchByLines ((Source.++) <$> sources <*> sources) (patchWithBoth patch (leafWithRangeInSource <$> sources <*> (Range <$> indices <*> ((2 *) <$> indices))))) `shouldBe` (<$) <$> indices <*> unPatch patch
+      \ patch sources -> let indices = length <$> sources
+                             ranges = (Range <$> indices <*> ((2 *) <$> indices)) in
+        fmap start . maybeFirst . Maybe.catMaybes <$> Both.unzip (fmap maybeFirst . fmap (fmap Prelude.snd) <$> splitPatchByLines ((Source.++) <$> sources <*> sources) (patchWithBoth patch (leafWithRangeInSource <$> sources <*> ranges))) `shouldBe` (<$) <$> indices <*> unPatch patch
 
     where
       isEmptyRow = and . fmap isEmpty
