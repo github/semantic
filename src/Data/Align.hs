@@ -12,9 +12,10 @@ class Functor f => Align f where
 
 instance Align [] where
   nil = []
-  alignWith f as [] = f . This <$> as
-  alignWith f [] bs = f . That <$> bs
-  alignWith f (a : as) (b : bs) = f (These a b) : alignWith f as bs
+  align as bs | la < lb = (That <$> take (lb - la) bs) ++ align as (drop (lb - la) bs)
+              | la > lb = (This <$> take (la - lb) as) ++ align (drop (la - lb) as) bs
+              | otherwise = zipWith These as bs
+              where (la, lb) = (length as, length bs)
 
 instance Align Maybe where
   nil = Nothing
