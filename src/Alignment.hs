@@ -1,5 +1,14 @@
 {-# LANGUAGE RankNTypes #-}
-module Alignment where
+module Alignment
+( adjoinRows
+, alignRows
+, hasChanges
+, linesInRangeOfSource
+, numberedRows
+, splitAbstractedTerm
+, splitDiffByLines
+, Row
+) where
 
 import Category
 import Control.Arrow
@@ -56,6 +65,7 @@ splitAbstractedTerm align makeTerm sources infos syntax = case syntax of
   Keyed children -> adjoinChildren sources infos align (constructor (Keyed . Map.fromList)) (Map.toList children)
   where constructor with info = makeTerm info . with
 
+-- | Adjoin a branch term’s lines, wrapping children & context in branch nodes using a constructor.
 adjoinChildren :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> f Info -> AlignFunction f -> (Info -> [c a] -> outTerm) -> [c [f (Line (a, Range))]] -> [f (Line (outTerm, Range))]
 adjoinChildren sources infos align constructor children =
   fmap wrap . foldr (adjoinRows align) [] $
@@ -66,6 +76,7 @@ adjoinChildren sources infos align constructor children =
         leadingContext = fmap (fmap ((,) Nothing)) <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
         wrap = (wrapLineContents <$> (makeBranchTerm constructor <$> categories <*> next) <*>)
 
+-- | Accumulate the lines of and between a branch term’s children.
 childLines :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> AlignFunction f -> c [f (Line (a, Range))] -> ([f (Line (Maybe (c a), Range))], f Int) -> ([f (Line (Maybe (c a), Range))], f Int)
 -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
 childLines sources align child (followingLines, next) | or $ (>) . end <$> childRanges <*> next = (followingLines, next)

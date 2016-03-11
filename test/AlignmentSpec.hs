@@ -108,11 +108,6 @@ spec = parallel $ do
           \ source -> splitAbstractedTerm alignRows makeTerm (pure source) (pure $ Info (totalRange source) mempty) (Indexed []) `shouldBe` [
             both (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
-  describe "splitPatchByLines" $ do
-    prop "starts at initial indices" $
-      \ patch sources -> let indices = length <$> sources in
-        fmap start . maybeFirst . Maybe.catMaybes <$> Both.unzip (fmap maybeFirst . fmap (fmap Prelude.snd) <$> splitPatchByLines ((Source.++) <$> sources <*> sources) (patchWithBoth patch (leafWithRangeInSource <$> sources <*> (Range <$> indices <*> ((2 *) <$> indices))))) `shouldBe` (<$) <$> indices <*> unPatch patch
-
     where
       isEmptyRow = and . fmap isEmpty
 
