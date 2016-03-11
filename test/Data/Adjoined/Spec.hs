@@ -11,6 +11,11 @@ spec = do
   prop "equality is reflexive" $
     \ a -> a `shouldBe` (a :: Adjoined (Separated Char))
 
+  describe "Monoid" $ do
+    let memptySep = mempty :: Adjoined (Separated Char)
+    prop "mempty is the left identity" $
+      \ a -> memptySep `mappend` a `shouldBe` a
+
 instance Arbitrary a => Arbitrary (Adjoined a) where
   arbitrary = fromList <$> arbitrary
 
