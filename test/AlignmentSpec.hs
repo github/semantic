@@ -100,12 +100,12 @@ spec = parallel $ do
     let makeTerm = ((Free .) . Annotated) :: Info -> Syntax (Source Char) (SplitDiff (Source Char) Info) -> SplitDiff (Source Char) Info
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
-        \ (source, info@(Info range categories), syntax) -> splitAbstractedTerm (zipDefaults mempty) makeTerm (pure source) (pure $ Info range categories) syntax `shouldBe` [
+        \ (source, info@(Info range categories), syntax) -> splitAbstractedTerm alignRows makeTerm (pure source) (pure $ Info range categories) syntax `shouldBe` [
           both (pure (makeTerm info $ Leaf source, Range 0 (length source))) (pure (makeTerm info $ Leaf source, Range 0 (length source))) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toList a) == toList a)) $
-          \ source -> splitAbstractedTerm (zipDefaults mempty) makeTerm (pure source) (pure $ Info (totalRange source) mempty) (Indexed []) `shouldBe` [
+          \ source -> splitAbstractedTerm alignRows makeTerm (pure source) (pure $ Info (totalRange source) mempty) (Indexed []) `shouldBe` [
             both (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
   describe "splitPatchByLines" $ do
