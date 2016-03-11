@@ -37,3 +37,14 @@ instance Arbitrary a => Arbitrary (Uncoalesced a) where
 
 instance Coalescent (Uncoalesced a) where
   coalesce _ _ = Nothing
+
+
+-- | A wrapper which always coalesces values.
+newtype Coalesced a = Coalesced { runCoalesced :: a }
+  deriving (Eq, Functor, Show)
+
+instance Arbitrary a => Arbitrary (Coalesced a) where
+  arbitrary = Coalesced <$> arbitrary
+
+instance Monoid a => Coalescent (Coalesced a) where
+  coalesce a b = Just (Coalesced (runCoalesced a `mappend` runCoalesced b))
