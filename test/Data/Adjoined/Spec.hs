@@ -15,9 +15,9 @@ spec = do
   describe "Monoid (Coalesced)" $ monoid (arbitrary :: Gen (Adjoined (Coalesced String)))
   describe "Monoid (Uncoalesced)" $ monoid (arbitrary :: Gen (Adjoined (Uncoalesced String)))
 
-monoid :: (Arbitrary a, Coalescent a, Eq a, Show a) => Gen (Adjoined a) -> Spec
+monoid :: (Arbitrary a, Coalescent a, Eq a, Show a, Typeable a) => Gen (Adjoined a) -> Spec
 monoid gen =
-  describe "Monoid" $ do
+  describe ("Monoid (" ++ showTypeOf (`asGeneratedTypeOf` gen) ++ ")") $ do
     prop "mempty is the left identity" $ forAll gen $
       \ a -> mempty `mappend` a `shouldBe` a
 
