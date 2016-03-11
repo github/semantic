@@ -21,6 +21,7 @@ import Data.Copointed
 import Data.Functor.Both as Both
 import Data.Functor.Identity
 import Data.Maybe
+import Data.Monoid
 import qualified Data.OrderedMap as Map
 import qualified Data.Set as Set
 import Diff
@@ -29,7 +30,7 @@ import Patch
 import Prelude hiding (fst, snd)
 import qualified Prelude
 import Range
-import Source hiding ((++))
+import Source
 import SplitDiff
 import Syntax
 import Term
@@ -69,7 +70,7 @@ splitAbstractedTerm align makeTerm sources infos syntax = case syntax of
 adjoinChildren :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> f Info -> AlignFunction f -> (Info -> [c a] -> outTerm) -> [c [f (Line (a, Range))]] -> [f (Line (outTerm, Range))]
 adjoinChildren sources infos align constructor children =
   fmap wrap . foldr (adjoinRows align) [] $
-    align leadingContext ++ lines
+    align leadingContext <> lines
   where (lines, next) = foldr (childLines sources align) ([], end <$> ranges) children
         ranges = characterRange <$> infos
         categories = Diff.categories <$> infos
@@ -82,8 +83,8 @@ childLines :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source C
 childLines sources align child (followingLines, next) | or $ (>) . end <$> childRanges <*> next = (followingLines, next)
                                                       | otherwise =
   ((placeChildAndRangeInContainer <$> copoint child)
-  ++ align (pairWithNothing <$> trailingContextLines)
-  ++ followingLines, start <$> childRanges)
+  <> align (pairWithNothing <$> trailingContextLines)
+  <> followingLines, start <$> childRanges)
   where pairWithNothing = fmap (fmap ((,) Nothing))
         placeChildAndRangeInContainer = fmap (fmap (first (Just . (<$ child))))
         trailingContextLines = linesInRangeOfSource <$> rangeOfContextToNext <*> sources
@@ -116,7 +117,7 @@ type AlignFunction f = forall b list. (Align list, Applicative list) => f (list 
 -- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
 adjoinRows :: Applicative f => AlignFunction f -> f (Line a) -> [f (Line a)] -> [f (Line a)]
 adjoinRows _ row [] = [ row ]
-adjoinRows align row (nextRow : rows) = align (coalesceLines <$> row <*> nextRow) ++ rows
+adjoinRows align row (nextRow : rows) = align (coalesceLines <$> row <*> nextRow) <> rows
 
 -- | Align Both containers of lines into a container of Both lines, filling any gaps with empty rows which are either open or closed to match the opposite side.
 alignRows :: Align f => Both (f (Line a)) -> f (Both (Line a))
