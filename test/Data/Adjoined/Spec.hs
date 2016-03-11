@@ -54,6 +54,18 @@ instance Monoid a => Coalescent (Coalesced a) where
   coalesce a b = Just (Coalesced (runCoalesced a `mappend` runCoalesced b))
 
 
+-- | A wrapper which only coalesces some values.
+newtype Semicoalesced a = Semicoalesced { runSemicoalesced :: Maybe a }
+  deriving (Eq, Functor, Show)
+
+instance Arbitrary a => Arbitrary (Semicoalesced a) where
+  arbitrary = Semicoalesced <$> arbitrary
+
+instance Monoid a => Coalescent (Semicoalesced a) where
+  Semicoalesced (Just a) `coalesce` Semicoalesced b = Just (Semicoalesced (Just a `mappend` b))
+  Semicoalesced Nothing `coalesce` _ = Nothing
+
+
 -- | Returns a string with the name of a type.
 -- |
 -- | Use with `asTypeOf` or `asGeneratedTypeOf` to show type names for parameters without fighting type variable scoping:
