@@ -1,5 +1,14 @@
 {-# LANGUAGE RankNTypes #-}
-module Alignment where
+module Alignment
+( adjoinRows
+, alignRows
+, hasChanges
+, linesInRangeOfSource
+, numberedRows
+, splitAbstractedTerm
+, splitDiffByLines
+, Row
+) where
 
 import Category
 import Control.Arrow
