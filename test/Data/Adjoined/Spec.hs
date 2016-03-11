@@ -19,14 +19,16 @@ spec = do
 monoid :: (Arbitrary a, Coalescent a, Eq a, Show a, Typeable a) => Gen (Adjoined a) -> Spec
 monoid gen =
   describe ("Monoid (" ++ showTypeOf (`asGeneratedTypeOf` gen) ++ ")") $ do
-    prop "mempty is the left identity" $ forAll gen $
-      \ a -> mempty `mappend` a `shouldBe` a
+    describe "mempty" $ do
+      prop "left identity" $ forAll gen $
+        \ a -> mempty `mappend` a `shouldBe` a
 
-    prop "mempty is the right identity" $ forAll gen $
-      \ a -> a `mappend` mempty `shouldBe` a
+      prop "right identity" $ forAll gen $
+        \ a -> a `mappend` mempty `shouldBe` a
 
-    prop "mappend is associative" $ forAll gen $
-      \ a b c -> (a `mappend` b) `mappend` c `shouldBe` a `mappend` (b `mappend` c)
+    describe "mappend" $ do
+      prop "associativity" $ forAll gen $
+        \ a b c -> (a `mappend` b) `mappend` c `shouldBe` a `mappend` (b `mappend` c)
 
 
 instance Arbitrary a => Arbitrary (Adjoined a) where
