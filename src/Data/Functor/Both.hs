@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Functor.Both where
 
+import Data.Align
 import Data.Bifunctor
 import Data.Bifunctor.These
 import Prelude hiding (zipWith, fst, snd)
@@ -53,3 +54,6 @@ newtype MaybeBoth a = MaybeBoth { runMaybeBoth :: Both (Maybe a) }
 instance Applicative MaybeBoth where
   pure = MaybeBoth . pure . Just
   MaybeBoth (Both (f, g)) <*> MaybeBoth (Both (a, b)) = MaybeBoth (both (f <*> a) (g <*> b))
+
+instance Crosswalk MaybeBoth where
+  crosswalk f (MaybeBoth ab) = runBothWith (alignWith (MaybeBoth . maybeBothOfThese)) (maybe nil f <$> ab)
