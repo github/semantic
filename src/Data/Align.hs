@@ -15,8 +15,8 @@ class Functor f => Align f where
 
 instance Align [] where
   nil = []
-  align as bs | la < lb = (That <$> take (lb - la) bs) ++ align as (drop (lb - la) bs)
-              | la > lb = (This <$> take (la - lb) as) ++ align (drop (la - lb) as) bs
+  align as bs | la < lb = (That <$> take (lb - la) bs) ++ zipWith These as (drop (lb - la) bs)
+              | la > lb = (This <$> take (la - lb) as) ++ zipWith These (drop (la - lb) as) bs
               | otherwise = zipWith These as bs
               where (la, lb) = (length as, length bs)
 
