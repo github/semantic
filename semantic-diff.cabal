@@ -20,6 +20,7 @@ library
                      , Control.Monad.Free
                      , Data.Adjoined
                      , Data.Align
+                     , Data.Bifunctor.Join
                      , Data.Bifunctor.These
                      , Data.Coalescent
                      , Data.Copointed
