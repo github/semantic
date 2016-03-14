@@ -86,7 +86,7 @@ adjoinChildren sources infos constructor children = fmap wrap $ leadingContext <
 childLines :: (Copointed c, Functor c, Applicative f, Coalescent (f (Line (Maybe (c a), Range))), Crosswalk f, Foldable f) => f (Source Char) -> c (Adjoined (f (Line (a, Range)))) -> (Adjoined (f (Line (Maybe (c a), Range))), f Int) -> (Adjoined (f (Line (Maybe (c a), Range))), f Int)
 -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
 childLines sources child (followingLines, next) | or $ (>) . end <$> childRanges <*> next = (followingLines, next)
-                                                      | otherwise =
+                                                | otherwise =
   ((placeChildAndRangeInContainer <$> copoint child)
   <> sequenceL (fromList . pairWithNothing <$> trailingContextLines)
   <> followingLines, start <$> childRanges)
