@@ -52,8 +52,8 @@ instance Monad Adjoined where
 instance Coalescent a => Monoid (Adjoined a) where
   mempty = Adjoined mempty
   a `mappend` b | Just (as, a) <- unsnoc a,
-                  Just (b, bs) <- uncons b,
-                  Just coalesced <- coalesce a b = as <> pure coalesced <> bs
+                  Just (b, bs) <- uncons b
+                = as <|> coalesce a b <|> bs
                 | otherwise = Adjoined (unAdjoined a >< unAdjoined b)
 
 instance Align Adjoined where

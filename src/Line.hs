@@ -1,5 +1,6 @@
 module Line where
 
+import Control.Applicative
 import Data.Coalescent
 
 -- | A line of items or an empty line.
@@ -58,5 +59,5 @@ instance Monoid (Line a) where
   mappend xs ys = lineMap (mappend (unLine xs)) ys
 
 instance Coalescent (Line a) where
-  coalesce a b | isOpen a = Just (a `mappend` b)
-               | otherwise = Nothing
+  coalesce a b | isOpen a = pure (a `mappend` b)
+               | otherwise = pure a <|> pure b

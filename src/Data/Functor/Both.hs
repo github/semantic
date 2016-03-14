@@ -70,4 +70,4 @@ instance Crosswalk BothMaybe where
   crosswalk f (BothMaybe ab) = runBothWith (alignWith (BothMaybe . maybeBothOfThese)) (maybe nil f <$> ab)
 
 instance Coalescent a => Coalescent (BothMaybe a) where
-  coalesce as bs = sequenceL (coalesce <$> as <*> bs)
+  coalesce as bs = sequenceA (coalesce <$> as <*> bs)
