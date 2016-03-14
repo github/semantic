@@ -98,8 +98,8 @@ linesInRangeOfSource :: Range -> Source Char -> [Line Range]
 linesInRangeOfSource range source = pureBy (openRange source) <$> actualLineRanges range source
 
 -- | Wrap a list of child terms in a branch.
-makeBranchTerm :: (Info -> [inTerm] -> outTerm) -> Set.Set Category -> Int -> [(Maybe inTerm, Range)] -> (outTerm, Range)
-makeBranchTerm constructor categories next children = (constructor (Info range categories) . catMaybes $ Prelude.fst <$> children, range)
+makeBranchTerm :: (Foldable t, Functor t) => (Info -> [inTerm] -> outTerm) -> Set.Set Category -> Int -> t (Maybe inTerm, Range) -> (outTerm, Range)
+makeBranchTerm constructor categories next children = (constructor (Info range categories) . catMaybes . toList $ Prelude.fst <$> children, range)
   where range = unionRangesFrom (rangeAt next) $ Prelude.snd <$> children
 
 -- | Compute the union of the ranges in a list of ranged lines.
