@@ -110,3 +110,7 @@ openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
 
 -- | A row in a split diff, composed of a before line and an after line.
 type Row a = Both (Line a)
+
+
+alignRows :: Align f => Both (f (Line a)) -> f (Both (Line a))
+alignRows = runBothWith (alignWith (bothOfThese (pure $ Line [])))
