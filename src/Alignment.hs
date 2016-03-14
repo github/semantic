@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleInstances, RankNTypes #-}
 module Alignment
-( adjoinRows
-, alignRows
+( alignRows
 , hasChanges
 , linesInRangeOfSource
 , numberedRows
@@ -120,11 +119,6 @@ type Row a = Both (Line a)
 
 -- | A function to align a context of lists into a list of contexts, possibly padding out the shorter list with default values.
 type AlignFunction f = forall b list. (Align list, Applicative list) => f (list (Line b)) -> list (f (Line b))
-
--- | Merge open lines and prepend closed lines (as determined by a pair of functions) onto a list of rows.
-adjoinRows :: Applicative f => AlignFunction f -> f (Line a) -> [f (Line a)] -> [f (Line a)]
-adjoinRows _ row [] = [ row ]
-adjoinRows align row (nextRow : rows) = align (coalesceLines <$> row <*> nextRow) <> rows
 
 -- | Align Both containers of lines into a container of Both lines, filling any gaps with empty rows which are either open or closed to match the opposite side.
 alignRows :: Align f => Both (f (Line a)) -> f (Both (Line a))
