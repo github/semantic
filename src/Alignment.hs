@@ -49,13 +49,13 @@ hasChanges = or . fmap (or . (True <$))
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs paired with the Range of characters spanned by that Row on each side of the diff.
 splitDiffByLines :: Both (Source Char) -> Diff leaf Info -> [Row (SplitDiff leaf Info, Range)]
-splitDiffByLines sources = fmap (bothWithDefault (Line [])) . toList . iter (\ (Annotated infos syntax) -> splitAbstractedTerm sequenceL ((Free .) . Annotated) (justBoth sources) (justBoth infos) syntax) . fmap (splitPatchByLines sources)
+splitDiffByLines sources = fmap (bothWithDefault (Line [])) . toList . iter (\ (Annotated infos syntax) -> splitAbstractedTerm ((Free .) . Annotated) (justBoth sources) (justBoth infos) syntax) . fmap (splitPatchByLines sources)
 
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> Adjoined (BothMaybe (Line (SplitDiff leaf Info, Range)))
 splitPatchByLines sources patch = wrapTermInPatch <$> lines
     where lines = sequenceL $ justBoth (splitAndFoldTerm <$> sources <*> unPatch patch)
-          splitAndFoldTerm source (Just term) = (runIdentity <$> cata (splitAbstractedTerm sequenceL (:<) (Identity source)) (Identity <$> term))
+          splitAndFoldTerm source (Just term) = (runIdentity <$> cata (splitAbstractedTerm (:<) (Identity source)) (Identity <$> term))
           splitAndFoldTerm _ _ = nil
           wrapTermInPatch = fmap (fmap (first (Pure . constructor patch)))
           constructor (Replace _ _) = SplitReplace
@@ -63,12 +63,12 @@ splitPatchByLines sources patch = wrapTermInPatch <$> lines
           constructor (Delete _) = SplitDelete
 
 -- | Split a term comprised of an Info & Syntax up into one `outTerm` (abstracted by an alignment function & constructor) per line in `Source`.
-splitAbstractedTerm :: (Applicative f, Coalescent (f (Line (Maybe (Identity outTerm), Range))), Coalescent (f (Line (Maybe (T.Text, outTerm), Range))), Foldable f) => AlignFunction f -> (Info -> Syntax leaf outTerm -> outTerm) -> f (Source Char) -> f Info -> Syntax leaf (Adjoined (f (Line (outTerm, Range)))) -> Adjoined (f (Line (outTerm, Range)))
-splitAbstractedTerm align makeTerm sources infos syntax = case syntax of
-  Leaf a -> align $ fmap <$> ((\ categories -> fmap (\ range -> (makeTerm (Info range categories) (Leaf a), range))) <$> (Diff.categories <$> infos)) <*> (fmap fromList $ linesInRangeOfSource <$> (characterRange <$> infos) <*> sources)
-  Indexed children -> adjoinChildren sources infos align (constructor (Indexed . fmap runIdentity)) (Identity <$> children)
-  Fixed children -> adjoinChildren sources infos align (constructor (Fixed . fmap runIdentity)) (Identity <$> children)
-  Keyed children -> adjoinChildren sources infos align (constructor (Keyed . Map.fromList)) (Map.toList children)
+splitAbstractedTerm :: (Applicative f, Coalescent (f (Line (Maybe (Identity outTerm), Range))), Coalescent (f (Line (Maybe (T.Text, outTerm), Range))), Crosswalk f, Foldable f) => (Info -> Syntax leaf outTerm -> outTerm) -> f (Source Char) -> f Info -> Syntax leaf (Adjoined (f (Line (outTerm, Range)))) -> Adjoined (f (Line (outTerm, Range)))
+splitAbstractedTerm makeTerm sources infos syntax = case syntax of
+  Leaf a -> sequenceL $ fmap <$> ((\ categories -> fmap (\ range -> (makeTerm (Info range categories) (Leaf a), range))) <$> (Diff.categories <$> infos)) <*> (fmap fromList $ linesInRangeOfSource <$> (characterRange <$> infos) <*> sources)
+  Indexed children -> adjoinChildren sources infos sequenceL (constructor (Indexed . fmap runIdentity)) (Identity <$> children)
+  Fixed children -> adjoinChildren sources infos sequenceL (constructor (Fixed . fmap runIdentity)) (Identity <$> children)
+  Keyed children -> adjoinChildren sources infos sequenceL (constructor (Keyed . Map.fromList)) (Map.toList children)
   where constructor with info = makeTerm info . with
 
 -- | Adjoin a branch term’s lines, wrapping children & context in branch nodes using a constructor.
