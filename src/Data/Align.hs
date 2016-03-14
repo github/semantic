@@ -62,3 +62,6 @@ class Functor t => TotalCrosswalk t where
 
   tsequenceL :: Align f => t a -> t (f a) -> f (t a)
   tsequenceL d = tcrosswalk d id
+
+instance TotalCrosswalk Identity where
+  tcrosswalk _ = crosswalk
