@@ -111,6 +111,6 @@ openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
 -- | A row in a split diff, composed of a before line and an after line.
 type Row a = Both (Line a)
 
-
+-- | Align Both containers of lines into a container of Both lines, filling any gaps with empty rows which are either open or closed to match the opposite side.
 alignRows :: Align f => Both (f (Line a)) -> f (Both (Line a))
 alignRows = runBothWith (alignWith (bothOfThese (pure $ Line [])))
