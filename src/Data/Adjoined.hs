@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Adjoined where
 
+import Control.Applicative
 import Control.Monad
 import Data.Align
 import Data.Bifunctor.These
@@ -37,6 +38,10 @@ unsnoc (Adjoined v) | as :> a <- viewr v = Just (Adjoined as, a)
 instance Applicative Adjoined where
   pure = return
   (<*>) = ap
+
+instance Alternative Adjoined where
+  empty = Adjoined mempty
+  Adjoined a <|> Adjoined b = Adjoined (a >< b)
 
 instance Monad Adjoined where
   return = Adjoined . return
