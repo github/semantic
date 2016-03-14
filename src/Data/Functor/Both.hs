@@ -71,3 +71,6 @@ instance Crosswalk BothMaybe where
 
 instance Coalescent a => Coalescent (BothMaybe a) where
   coalesce as bs = sequenceA (coalesce <$> as <*> bs)
+
+instance Coalescent a => Coalescent (Both a) where
+  coalesce as bs = sequenceA (coalesce <$> as <*> bs)
