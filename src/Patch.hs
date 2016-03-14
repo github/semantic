@@ -1,6 +1,6 @@
 module Patch where
 
-import Data.Functor.Both as Both
+import Data.Bifunctor.These
 
 -- | An operation to replace, insert, or delete an item.
 data Patch a =
@@ -11,17 +11,17 @@ data Patch a =
 
 -- | Return the item from the after side of the patch.
 after :: Patch a -> Maybe a
-after = Both.snd . unPatch
+after = maybeFirst . unPatch
 
 -- | Return the item from the before side of the patch.
 before :: Patch a -> Maybe a
-before = Both.fst . unPatch
+before = maybeSecond . unPatch
 
 -- | Return both sides of a patch.
-unPatch :: Patch a -> Both (Maybe a)
-unPatch (Replace a b) = both (Just a) (Just b)
-unPatch (Insert b) = both Nothing (Just b)
-unPatch (Delete a) = both (Just a) Nothing
+unPatch :: Patch a -> These a a
+unPatch (Replace a b) = These a b
+unPatch (Insert b) = That b
+unPatch (Delete a) = This a
 
 -- | Calculate the cost of the patch given a function to compute the cost of a item.
 patchSum :: (a -> Integer) -> Patch a -> Integer
