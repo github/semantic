@@ -5,6 +5,7 @@ import Data.Align
 import Data.Coalescent
 import Data.Bifunctor
 import Data.Bifunctor.These
+import Data.Maybe
 import Prelude hiding (zipWith, fst, snd)
 import qualified Prelude
 
@@ -56,6 +57,9 @@ newtype MaybeBoth a = MaybeBoth { runMaybeBoth :: Both (Maybe a) }
 -- | Lift Both values into MaybeBoth via Just.
 justBoth :: Both a -> MaybeBoth a
 justBoth = MaybeBoth . fmap Just
+
+bothWithDefault :: a -> MaybeBoth a -> Both a
+bothWithDefault a = fmap (fromMaybe a) . runMaybeBoth
 
 instance Applicative MaybeBoth where
   pure = MaybeBoth . pure . Just
