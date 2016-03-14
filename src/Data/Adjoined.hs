@@ -14,10 +14,12 @@ newtype Adjoined a = Adjoined { unAdjoined :: Seq a }
 fromList :: [a] -> Adjoined a
 fromList = Adjoined . Seq.fromList
 
+-- | Destructure a non-empty Adjoined into Just the leftmost element and the rightward remainder of the Adjoined, or Nothing otherwise.
 uncons :: Adjoined a -> Maybe (a, Adjoined a)
 uncons (Adjoined v) | a :< as <- viewl v = Just (a, Adjoined as)
                     | otherwise = Nothing
 
+-- | Destructure a non-empty Adjoined into Just the rightmost element and the leftward remainder of the Adjoined, or Nothing otherwise.
 unsnoc :: Adjoined a -> Maybe (Adjoined a, a)
 unsnoc (Adjoined v) | as :> a <- viewr v = Just (Adjoined as, a)
                     | otherwise = Nothing
