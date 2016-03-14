@@ -55,3 +55,10 @@ instance Crosswalk Identity where
 
 instance Crosswalk Maybe where
   crosswalk f = maybe nil (fmap Just) . fmap f
+
+class Functor t => TotalCrosswalk t where
+  tcrosswalk :: Align f => t b -> (a -> f b) -> t a -> f (t b)
+  tcrosswalk d f = tsequenceL d . fmap f
+
+  tsequenceL :: Align f => t a -> t (f a) -> f (t a)
+  tsequenceL d = tcrosswalk d id
