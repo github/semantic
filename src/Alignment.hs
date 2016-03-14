@@ -79,6 +79,8 @@ adjoinChildren sources infos align constructor children = fmap wrap $ mconcat (l
         categories = Diff.categories <$> infos
         leadingContext = align $ fromList . fmap (fmap ((,) Nothing)) <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
         wrap = (wrapLineContents <$> (makeBranchTerm constructor <$> categories <*> next) <*>)
+        makeBranchTerm constructor categories next children = (constructor (Info range categories) . catMaybes . toList $ Prelude.fst <$> children, range)
+          where range = unionRangesFrom (rangeAt next) $ Prelude.snd <$> children
 
 -- | Accumulate the lines of and between a branch term’s children.
 childLines :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> AlignFunction f -> c (Adjoined (f (Line (a, Range)))) -> ([Adjoined (f (Line (Maybe (c a), Range)))], f Int) -> ([Adjoined (f (Line (Maybe (c a), Range)))], f Int)
@@ -97,11 +99,6 @@ childLines sources align child (followingLines, next) | or $ (>) . end <$> child
 -- | Produce open/closed lines for the portion of the source spanned by a range.
 linesInRangeOfSource :: Range -> Source Char -> [Line Range]
 linesInRangeOfSource range source = pureBy (openRange source) <$> actualLineRanges range source
-
--- | Wrap a list of child terms in a branch.
-makeBranchTerm :: (Foldable t, Functor t) => (Info -> [inTerm] -> outTerm) -> Set.Set Category -> Int -> t (Maybe inTerm, Range) -> (outTerm, Range)
-makeBranchTerm constructor categories next children = (constructor (Info range categories) . catMaybes . toList $ Prelude.fst <$> children, range)
-  where range = unionRangesFrom (rangeAt next) $ Prelude.snd <$> children
 
 -- | Compute the union of the ranges in a list of ranged lines.
 unionLineRangesFrom :: (Foldable t, Monad t) => Range -> t (Line (a, Range)) -> Range
