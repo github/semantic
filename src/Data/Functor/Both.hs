@@ -53,28 +53,6 @@ instance Monoid a => Monoid (Both a) where
   mappend a b = mappend <$> a <*> b
 
 
--- | A wrapper around `Both (Maybe a)` to allow total handling of partial operations.
-newtype BothMaybe a = BothMaybe { runBothMaybe :: Both (Maybe a) }
-  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
-
--- | Lift Both values into BothMaybe via Just.
-justBoth :: Both a -> BothMaybe a
-justBoth = BothMaybe . fmap Just
-
--- | Recover Both from BothMaybe given a default value.
-bothWithDefault :: a -> BothMaybe a -> Both a
-bothWithDefault a = fmap (fromMaybe a) . runBothMaybe
-
-instance Applicative BothMaybe where
-  pure = BothMaybe . pure . Just
-  BothMaybe (Both (f, g)) <*> BothMaybe (Both (a, b)) = BothMaybe (both (f <*> a) (g <*> b))
-
-instance Crosswalk BothMaybe where
-  crosswalk f (BothMaybe ab) = runBothWith (alignWith (BothMaybe . maybeBothOfThese)) (maybe nil f <$> ab)
-
-instance Coalescent a => Coalescent (BothMaybe a) where
-  coalesce as bs = sequenceA (coalesce <$> as <*> bs)
-
 instance Coalescent a => Coalescent (Both a) where
   coalesce as bs = sequenceA (coalesce <$> as <*> bs)
 
