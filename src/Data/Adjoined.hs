@@ -14,6 +14,7 @@ newtype Adjoined a = Adjoined { unAdjoined :: Seq a }
 fromList :: [a] -> Adjoined a
 fromList = Adjoined . Seq.fromList
 
+-- | Construct Adjoined by adding an element at the left.
 cons :: a -> Adjoined a -> Adjoined a
 cons a (Adjoined as) = Adjoined (a <| as)
 
