@@ -66,18 +66,18 @@ splitPatchByLines sources patch = wrapTermInPatch <$> lines
 splitAbstractedTerm :: (Applicative f, Coalescent (f (Line (Maybe (Identity outTerm), Range))), Coalescent (f (Line (Maybe (T.Text, outTerm), Range))), Crosswalk f, Foldable f) => (Info -> Syntax leaf outTerm -> outTerm) -> f (Source Char) -> f Info -> Syntax leaf (Adjoined (f (Line (outTerm, Range)))) -> Adjoined (f (Line (outTerm, Range)))
 splitAbstractedTerm makeTerm sources infos syntax = case syntax of
   Leaf a -> sequenceL $ fmap <$> ((\ categories -> fmap (\ range -> (makeTerm (Info range categories) (Leaf a), range))) <$> (Diff.categories <$> infos)) <*> (fmap fromList $ linesInRangeOfSource <$> (characterRange <$> infos) <*> sources)
-  Indexed children -> adjoinChildren sources infos sequenceL (constructor (Indexed . fmap runIdentity)) (Identity <$> children)
-  Fixed children -> adjoinChildren sources infos sequenceL (constructor (Fixed . fmap runIdentity)) (Identity <$> children)
-  Keyed children -> adjoinChildren sources infos sequenceL (constructor (Keyed . Map.fromList)) (Map.toList children)
+  Indexed children -> adjoinChildren sources infos (constructor (Indexed . fmap runIdentity)) (Identity <$> children)
+  Fixed children -> adjoinChildren sources infos (constructor (Fixed . fmap runIdentity)) (Identity <$> children)
+  Keyed children -> adjoinChildren sources infos (constructor (Keyed . Map.fromList)) (Map.toList children)
   where constructor with info = makeTerm info . with
 
 -- | Adjoin a branch term’s lines, wrapping children & context in branch nodes using a constructor.
-adjoinChildren :: (Copointed c, Functor c, Applicative f, Coalescent (f (Line (Maybe (c a), Range))), Foldable f) => f (Source Char) -> f Info -> AlignFunction f -> (Info -> [c a] -> outTerm) -> [c (Adjoined (f (Line (a, Range))))] -> Adjoined (f (Line (outTerm, Range)))
-adjoinChildren sources infos align constructor children = fmap wrap $ mconcat (leadingContext : lines)
-  where (lines, next) = foldr (childLines sources align) ([], end <$> ranges) children
+adjoinChildren :: (Copointed c, Functor c, Applicative f, Coalescent (f (Line (Maybe (c a), Range))), Crosswalk f, Foldable f) => f (Source Char) -> f Info -> (Info -> [c a] -> outTerm) -> [c (Adjoined (f (Line (a, Range))))] -> Adjoined (f (Line (outTerm, Range)))
+adjoinChildren sources infos constructor children = fmap wrap $ mconcat (leadingContext : lines)
+  where (lines, next) = foldr (childLines sources sequenceL) ([], end <$> ranges) children
         ranges = characterRange <$> infos
         categories = Diff.categories <$> infos
-        leadingContext = align $ fromList . fmap (fmap ((,) Nothing)) <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
+        leadingContext = sequenceL $ fromList . fmap (fmap ((,) Nothing)) <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
         wrap = (wrapLineContents <$> (makeBranchTerm constructor <$> categories <*> next) <*>)
         makeBranchTerm constructor categories next children = let range = unionRangesFrom (rangeAt next) $ Prelude.snd <$> children in
           (constructor (Info range categories) . catMaybes . toList $ Prelude.fst <$> children, range)
