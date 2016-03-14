@@ -23,6 +23,7 @@ uncons :: Adjoined a -> Maybe (a, Adjoined a)
 uncons (Adjoined v) | a :< as <- viewl v = Just (a, Adjoined as)
                     | otherwise = Nothing
 
+-- | Construct Adjoined by adding an element at the right.
 snoc :: Adjoined a -> a -> Adjoined a
 snoc (Adjoined as) a = Adjoined (as |> a)
 
