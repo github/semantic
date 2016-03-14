@@ -47,10 +47,6 @@ toString = toList
 at :: Source a -> Int -> a
 at = (Vector.!) . getVector
 
--- | Prepend an item.
-cons :: a -> Source a -> Source a
-cons a = Source . Vector.cons a . getVector
-
 -- | Remove the first item and return it with the rest of the source.
 uncons :: Source a -> Maybe (a, Source a)
 uncons (Source vector) = if null vector then Nothing else Just (Vector.head vector, Source $ Vector.tail vector)
