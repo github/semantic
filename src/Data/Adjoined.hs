@@ -14,6 +14,9 @@ newtype Adjoined a = Adjoined { unAdjoined :: Seq a }
 fromList :: [a] -> Adjoined a
 fromList = Adjoined . Seq.fromList
 
+cons :: a -> Adjoined a -> Adjoined a
+cons a (Adjoined as) = Adjoined (a <| as)
+
 -- | Destructure a non-empty Adjoined into Just the leftmost element and the rightward remainder of the Adjoined, or Nothing otherwise.
 uncons :: Adjoined a -> Maybe (a, Adjoined a)
 uncons (Adjoined v) | a :< as <- viewl v = Just (a, Adjoined as)
