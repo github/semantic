@@ -79,8 +79,8 @@ adjoinChildren sources infos align constructor children = fmap wrap $ mconcat (l
         categories = Diff.categories <$> infos
         leadingContext = align $ fromList . fmap (fmap ((,) Nothing)) <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
         wrap = (wrapLineContents <$> (makeBranchTerm constructor <$> categories <*> next) <*>)
-        makeBranchTerm constructor categories next children = (constructor (Info range categories) . catMaybes . toList $ Prelude.fst <$> children, range)
-          where range = unionRangesFrom (rangeAt next) $ Prelude.snd <$> children
+        makeBranchTerm constructor categories next children = let range = unionRangesFrom (rangeAt next) $ Prelude.snd <$> children in
+          (constructor (Info range categories) . catMaybes . toList $ Prelude.fst <$> children, range)
 
 -- | Accumulate the lines of and between a branch term’s children.
 childLines :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> AlignFunction f -> c (Adjoined (f (Line (a, Range)))) -> ([Adjoined (f (Line (Maybe (c a), Range)))], f Int) -> ([Adjoined (f (Line (Maybe (c a), Range)))], f Int)
