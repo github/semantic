@@ -10,6 +10,7 @@ import Data.Sequence as Seq
 newtype Adjoined a = Adjoined { unAdjoined :: Seq a }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
+-- | Construct an Adjoined from a list.
 fromList :: [a] -> Adjoined a
 fromList = Adjoined . Seq.fromList
 
