@@ -8,4 +8,4 @@ class Coalescent a where
   coalesce :: a -> a -> Maybe a
 
 instance Coalescent a => Coalescent (Identity a) where
-  a `coalesce` b = Identity <$> runIdentity a `coalesce` runIdentity b
+  a `coalesce` b = sequenceA (coalesce <$> a <*> b)
