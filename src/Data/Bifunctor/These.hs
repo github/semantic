@@ -15,6 +15,10 @@ these _ _ f (These this that) = f this that
 maybeFirst :: These a b -> Maybe a
 maybeFirst = these Just (const Nothing) ((Just .) . const)
 
+-- | Return Just the value in That, or the second value in These, if any.
+maybeSecond :: These a b -> Maybe b
+maybeSecond = these (const Nothing) Just ((Just .) . flip const)
+
 
 -- Instances
 
