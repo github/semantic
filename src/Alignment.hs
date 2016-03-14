@@ -1,7 +1,6 @@
-{-# LANGUAGE FlexibleInstances, RankNTypes #-}
+{-# LANGUAGE RankNTypes #-}
 module Alignment
-( alignRows
-, hasChanges
+( hasChanges
 , linesInRangeOfSource
 , numberedRows
 , splitAbstractedTerm
@@ -50,17 +49,15 @@ hasChanges = or . fmap (or . (True <$))
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs paired with the Range of characters spanned by that Row on each side of the diff.
 splitDiffByLines :: Both (Source Char) -> Diff leaf Info -> [Row (SplitDiff leaf Info, Range)]
-splitDiffByLines sources = toList . iter (\ (Annotated infos syntax) -> splitAbstractedTerm alignRows ((Free .) . Annotated) sources infos syntax) . fmap (splitPatchByLines sources)
-
-instance Coalescent (Both (Line a)) where
-  coalesce as bs = case coalesce <$> as <*> bs of
-    Both (Nothing, Nothing) -> Nothing
-    b -> Just $ fromMaybe (Line []) <$> b
+splitDiffByLines sources = fmap (bothWithDefault (Line [])) . toList . iter (\ (Annotated infos syntax) -> splitAbstractedTerm sequenceL ((Free .) . Annotated) (justBoth sources) (justBoth infos) syntax) . fmap (splitPatchByLines sources)
 
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
-splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> Adjoined (Row (SplitDiff leaf Info, Range))
-splitPatchByLines sources patch = alignRows $ fmap (fmap (first (Pure . constructor patch)) . runIdentity) <$> lines
-    where lines = maybe nil . cata . splitAbstractedTerm sequenceA (:<) <$> (Identity <$> sources) <*> (fmap (fmap Identity) <$> unPatch patch)
+splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> Adjoined (MaybeBoth (Line (SplitDiff leaf Info, Range)))
+splitPatchByLines sources patch = wrapTermInPatch <$> lines
+    where lines = sequenceL $ justBoth (splitAndFoldTerm <$> sources <*> unPatch patch)
+          splitAndFoldTerm source (Just term) = (runIdentity <$> cata (splitAbstractedTerm sequenceL (:<) (Identity source)) (Identity <$> term))
+          splitAndFoldTerm _ _ = nil
+          wrapTermInPatch = fmap (fmap (first (Pure . constructor patch)))
           constructor (Replace _ _) = SplitReplace
           constructor (Insert _) = SplitInsert
           constructor (Delete _) = SplitDelete
@@ -119,8 +116,3 @@ type Row a = Both (Line a)
 
 -- | A function to align a context of lists into a list of contexts, possibly padding out the shorter list with default values.
 type AlignFunction f = forall b list. (Align list, Applicative list) => f (list (Line b)) -> list (f (Line b))
-
--- | Align Both containers of lines into a container of Both lines, filling any gaps with empty rows which are either open or closed to match the opposite side.
-alignRows :: Align f => Both (f (Line a)) -> f (Both (Line a))
-alignRows = runBothWith (alignWith combine)
-  where combine = these (Both . (flip (,) (Line []))) (Both . ((,) (Line []))) both
