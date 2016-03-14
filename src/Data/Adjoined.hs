@@ -2,9 +2,11 @@
 module Data.Adjoined where
 
 import Control.Monad
+import Data.Align
+import Data.Bifunctor.These
 import Data.Coalescent
 import Data.Monoid
-import Data.Sequence as Seq
+import Data.Sequence as Seq hiding (null)
 
 -- | A collection of elements which can be adjoined onto other such collections associatively.
 newtype Adjoined a = Adjoined { unAdjoined :: Seq a }
@@ -48,3 +50,11 @@ instance Coalescent a => Monoid (Adjoined a) where
                   Just (b', bs) <- uncons b,
                   Just coalesced <- coalesce a' b' = as <> pure coalesced <> bs
                 | otherwise = Adjoined (unAdjoined a >< unAdjoined b)
+
+instance Align Adjoined where
+  nil = Adjoined mempty
+  align as bs | Just (as, a) <- unsnoc as,
+                Just (bs, b) <- unsnoc bs = align as bs `snoc` These a b
+              | null bs = This <$> as
+              | null as = That <$> bs
+              | otherwise = nil
