@@ -77,3 +77,6 @@ instance Coalescent a => Coalescent (BothMaybe a) where
 
 instance Coalescent a => Coalescent (Both a) where
   coalesce as bs = sequenceA (coalesce <$> as <*> bs)
+
+instance TotalCrosswalk Both where
+  tsequenceL d = runBothWith (alignWith (\ these -> fromMaybe <$> d <*> maybeBothOfThese these))
