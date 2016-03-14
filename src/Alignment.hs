@@ -73,7 +73,7 @@ splitAbstractedTerm makeTerm sources infos syntax = case syntax of
 
 -- | Adjoin a branch term’s lines, wrapping children & context in branch nodes using a constructor.
 adjoinChildren :: (Copointed c, Functor c, Applicative f, Coalescent (f (Line (Maybe (c a), Range))), Crosswalk f, Foldable f) => f (Source Char) -> f Info -> (Info -> [c a] -> outTerm) -> [c (Adjoined (f (Line (a, Range))))] -> Adjoined (f (Line (outTerm, Range)))
-adjoinChildren sources infos constructor children = fmap wrap $ leadingContext <> lines
+adjoinChildren sources infos constructor children = wrap <$> leadingContext <> lines
   where (lines, next) = foldr (childLines sources) (mempty, end <$> ranges) children
         ranges = characterRange <$> infos
         categories = Diff.categories <$> infos
