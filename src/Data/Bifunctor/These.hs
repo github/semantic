@@ -11,6 +11,10 @@ these f _ _ (This this) = f this
 these _ f _ (That that) = f that
 these _ _ f (These this that) = f this that
 
+-- | Return Just the value in This, or the first value in These, if any.
+maybeFirst :: These a b -> Maybe a
+maybeFirst = these Just (const Nothing) ((Just .) . const)
+
 
 -- Instances
 
