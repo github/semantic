@@ -58,6 +58,7 @@ newtype BothMaybe a = BothMaybe { runBothMaybe :: Both (Maybe a) }
 justBoth :: Both a -> BothMaybe a
 justBoth = BothMaybe . fmap Just
 
+-- | Recover Both from BothMaybe given a default value.
 bothWithDefault :: a -> BothMaybe a -> Both a
 bothWithDefault a = fmap (fromMaybe a) . runBothMaybe
 
