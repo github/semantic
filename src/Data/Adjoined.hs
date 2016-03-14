@@ -6,7 +6,6 @@ import Control.Monad
 import Data.Align
 import Data.Bifunctor.These
 import Data.Coalescent
-import Data.Monoid
 import Data.Sequence as Seq hiding (null)
 
 -- | A collection of elements which can be adjoined onto other such collections associatively.
