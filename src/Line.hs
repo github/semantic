@@ -44,11 +44,6 @@ lineMap f (Closed cs) = Closed (f cs)
 maybeFirst :: Foldable f => f a -> Maybe a
 maybeFirst = foldr (const . Just) Nothing
 
--- | Merge or prepend lines based on whether the left line is open or closed.
-coalesceLines :: Line a -> Line a -> [Line a]
-coalesceLines line nextLine | isOpen line = [line `mappend` nextLine]
-                            | otherwise = [line, nextLine]
-
 instance Applicative Line where
   pure = Line . pure
   as <*> bs | isOpen as && isOpen bs = Line (unLine as <*> unLine bs)
