@@ -92,8 +92,8 @@ childLines sources child (followingLines, next) | or $ (>) . end <$> childRanges
   <> followingLines, start <$> childRanges)
   where pairWithNothing = fmap (fmap ((,) Nothing))
         placeChildAndRangeInContainer = fmap (fmap (first (Just . (<$ child))))
-        trailingContextLines = linesInRangeOfSource <$> rangeOfContextToNext <*> sources
-        rangeOfContextToNext = (Range <$> (end <$> childRanges) <*> next)
+        trailingContextLines = linesInRangeOfSource <$> rangeUntilNext <*> sources
+        rangeUntilNext = (Range <$> (end <$> childRanges) <*> next)
         childRanges = unionLineRangesFrom <$> (rangeAt <$> next) <*> sequenceA (copoint child)
 
 -- | Produce open/closed lines for the portion of the source spanned by a range.
