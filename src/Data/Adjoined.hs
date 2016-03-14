@@ -22,6 +22,9 @@ uncons :: Adjoined a -> Maybe (a, Adjoined a)
 uncons (Adjoined v) | a :< as <- viewl v = Just (a, Adjoined as)
                     | otherwise = Nothing
 
+snoc :: Adjoined a -> a -> Adjoined a
+snoc (Adjoined as) a = Adjoined (as |> a)
+
 -- | Destructure a non-empty Adjoined into Just the rightmost element and the leftward remainder of the Adjoined, or Nothing otherwise.
 unsnoc :: Adjoined a -> Maybe (Adjoined a, a)
 unsnoc (Adjoined v) | as :> a <- viewr v = Just (Adjoined as, a)
