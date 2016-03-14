@@ -74,7 +74,7 @@ splitAbstractedTerm makeTerm sources infos syntax = case syntax of
 -- | Adjoin a branch term’s lines, wrapping children & context in branch nodes using a constructor.
 adjoinChildren :: (Copointed c, Functor c, Applicative f, Coalescent (f (Line (Maybe (c a), Range))), Crosswalk f, Foldable f) => f (Source Char) -> f Info -> (Info -> [c a] -> outTerm) -> [c (Adjoined (f (Line (a, Range))))] -> Adjoined (f (Line (outTerm, Range)))
 adjoinChildren sources infos constructor children = fmap wrap $ mconcat (leadingContext : lines)
-  where (lines, next) = foldr (childLines sources sequenceL) ([], end <$> ranges) children
+  where (lines, next) = foldr (childLines sources) ([], end <$> ranges) children
         ranges = characterRange <$> infos
         categories = Diff.categories <$> infos
         leadingContext = sequenceL $ fromList . fmap (fmap ((,) Nothing)) <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
@@ -83,12 +83,12 @@ adjoinChildren sources infos constructor children = fmap wrap $ mconcat (leading
           (constructor (Info range categories) . catMaybes . toList $ Prelude.fst <$> children, range)
 
 -- | Accumulate the lines of and between a branch term’s children.
-childLines :: (Copointed c, Functor c, Applicative f, Foldable f) => f (Source Char) -> AlignFunction f -> c (Adjoined (f (Line (a, Range)))) -> ([Adjoined (f (Line (Maybe (c a), Range)))], f Int) -> ([Adjoined (f (Line (Maybe (c a), Range)))], f Int)
+childLines :: (Copointed c, Functor c, Applicative f, Crosswalk f, Foldable f) => f (Source Char) -> c (Adjoined (f (Line (a, Range)))) -> ([Adjoined (f (Line (Maybe (c a), Range)))], f Int) -> ([Adjoined (f (Line (Maybe (c a), Range)))], f Int)
 -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
-childLines sources align child (followingLines, next) | or $ (>) . end <$> childRanges <*> next = (followingLines, next)
+childLines sources child (followingLines, next) | or $ (>) . end <$> childRanges <*> next = (followingLines, next)
                                                       | otherwise =
   (pure (placeChildAndRangeInContainer <$> copoint child)
-  <> pure (align (fromList . pairWithNothing <$> trailingContextLines))
+  <> pure (sequenceL (fromList . pairWithNothing <$> trailingContextLines))
   <> followingLines, start <$> childRanges)
   where pairWithNothing = fmap (fmap ((,) Nothing))
         placeChildAndRangeInContainer = fmap (fmap (first (Just . (<$ child))))
