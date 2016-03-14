@@ -52,7 +52,7 @@ splitDiffByLines :: Both (Source Char) -> Diff leaf Info -> [Row (SplitDiff leaf
 splitDiffByLines sources = fmap (bothWithDefault (Line [])) . toList . iter (\ (Annotated infos syntax) -> splitAbstractedTerm sequenceL ((Free .) . Annotated) (justBoth sources) (justBoth infos) syntax) . fmap (splitPatchByLines sources)
 
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
-splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> Adjoined (MaybeBoth (Line (SplitDiff leaf Info, Range)))
+splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> Adjoined (BothMaybe (Line (SplitDiff leaf Info, Range)))
 splitPatchByLines sources patch = wrapTermInPatch <$> lines
     where lines = sequenceL $ justBoth (splitAndFoldTerm <$> sources <*> unPatch patch)
           splitAndFoldTerm source (Just term) = (runIdentity <$> cata (splitAbstractedTerm sequenceL (:<) (Identity source)) (Identity <$> term))

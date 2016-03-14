@@ -51,22 +51,22 @@ instance Monoid a => Monoid (Both a) where
 
 
 -- | A wrapper around `Both (Maybe a)` to allow total handling of partial operations.
-newtype MaybeBoth a = MaybeBoth { runMaybeBoth :: Both (Maybe a) }
+newtype BothMaybe a = BothMaybe { runBothMaybe :: Both (Maybe a) }
   deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
--- | Lift Both values into MaybeBoth via Just.
-justBoth :: Both a -> MaybeBoth a
-justBoth = MaybeBoth . fmap Just
+-- | Lift Both values into BothMaybe via Just.
+justBoth :: Both a -> BothMaybe a
+justBoth = BothMaybe . fmap Just
 
-bothWithDefault :: a -> MaybeBoth a -> Both a
-bothWithDefault a = fmap (fromMaybe a) . runMaybeBoth
+bothWithDefault :: a -> BothMaybe a -> Both a
+bothWithDefault a = fmap (fromMaybe a) . runBothMaybe
 
-instance Applicative MaybeBoth where
-  pure = MaybeBoth . pure . Just
-  MaybeBoth (Both (f, g)) <*> MaybeBoth (Both (a, b)) = MaybeBoth (both (f <*> a) (g <*> b))
+instance Applicative BothMaybe where
+  pure = BothMaybe . pure . Just
+  BothMaybe (Both (f, g)) <*> BothMaybe (Both (a, b)) = BothMaybe (both (f <*> a) (g <*> b))
 
-instance Crosswalk MaybeBoth where
-  crosswalk f (MaybeBoth ab) = runBothWith (alignWith (MaybeBoth . maybeBothOfThese)) (maybe nil f <$> ab)
+instance Crosswalk BothMaybe where
+  crosswalk f (BothMaybe ab) = runBothWith (alignWith (BothMaybe . maybeBothOfThese)) (maybe nil f <$> ab)
 
-instance Coalescent a => Coalescent (MaybeBoth a) where
+instance Coalescent a => Coalescent (BothMaybe a) where
   coalesce as bs = sequenceL (coalesce <$> as <*> bs)
