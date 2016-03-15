@@ -30,13 +30,6 @@ instance Align [] where
               | otherwise = zipWith These as bs
               where (la, lb) = (length as, length bs)
 
-instance Align Maybe where
-  nil = Nothing
-  a `align` b | Just a <- a, Just b <- b = Just (These a b)
-              | Just a <- a = Just (This a)
-              | Just b <- b = Just (That b)
-              | otherwise = Nothing
-
 
 -- | A functor which can be traversed through an `Align`able functor, inverting the nesting of one in the other, given some default value.
 -- |
