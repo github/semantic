@@ -63,7 +63,7 @@ splitPatchByLines sources patch = wrapTermInPatch <$> splitAndFoldTerm (unPatch 
 -- | Split a term comprised of an Info & Syntax up into one `outTerm` (abstracted by an alignment function & constructor) per line in `Source`.
 splitAbstractedTerm :: (Applicative f, Coalescent (f (Line (Maybe (Identity outTerm), Range))), Coalescent (f (Line (Maybe (T.Text, outTerm), Range))), Foldable f, TotalCrosswalk f) => (Info -> Syntax leaf outTerm -> outTerm) -> f (Source Char) -> f Info -> Syntax leaf (Adjoined (f (Line (outTerm, Range)))) -> Adjoined (f (Line (outTerm, Range)))
 splitAbstractedTerm makeTerm sources infos syntax = case syntax of
-  Leaf a -> tsequenceL (pure mempty) $ fmap <$> ((\ categories -> fmap (\ range -> (makeTerm (Info range categories) (Leaf a), range))) <$> (Diff.categories <$> infos)) <*> (fmap fromList $ linesInRangeOfSource <$> (characterRange <$> infos) <*> sources)
+  Leaf a -> tsequenceL (pure mempty) $ fmap <$> ((\ categories -> fmap (\ range -> (makeTerm (Info range categories) (Leaf a), range))) <$> (Diff.categories <$> infos)) <*> (linesInRangeOfSource <$> (characterRange <$> infos) <*> sources)
   Indexed children -> adjoinChildren sources infos (constructor (Indexed . fmap runIdentity)) (Identity <$> children)
   Fixed children -> adjoinChildren sources infos (constructor (Fixed . fmap runIdentity)) (Identity <$> children)
   Keyed children -> adjoinChildren sources infos (constructor (Keyed . Map.fromList)) (Map.toList children)
@@ -75,7 +75,7 @@ adjoinChildren sources infos constructor children = wrap <$> leadingContext <> l
   where (lines, next) = foldr (childLines sources) (mempty, end <$> ranges) children
         ranges = characterRange <$> infos
         categories = Diff.categories <$> infos
-        leadingContext = tsequenceL (pure mempty) $ fromList . makeContextLines <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
+        leadingContext = tsequenceL (pure mempty) $ makeContextLines <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
         wrap = (wrapLineContents <$> (makeBranchTerm constructor <$> categories <*> next) <*>)
         makeBranchTerm constructor categories next children = let range = unionRangesFrom (rangeAt next) $ Prelude.snd <$> children in
           (constructor (Info range categories) . catMaybes . toList $ Prelude.fst <$> children, range)
@@ -85,18 +85,18 @@ childLines :: (Copointed c, Functor c, Applicative f, Coalescent (f (Line (Maybe
 -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
 childLines sources child (nextLines, next) | or ((>) . end <$> childRanges <*> next) = (nextLines, next)
                                            | otherwise = ((makeChildLines <$> copoint child)
-                                                         <> tsequenceL (pure mempty) (fromList . makeContextLines <$> trailingContextLines)
+                                                         <> tsequenceL (pure mempty) (makeContextLines <$> trailingContextLines)
                                                          <> nextLines, start <$> childRanges)
   where makeChildLines = fmap (fmap (first (Just . (<$ child))))
         trailingContextLines = linesInRangeOfSource <$> (Range <$> (end <$> childRanges) <*> next) <*> sources
         childRanges = unionRangesFrom <$> (rangeAt <$> next) <*> (concat . fmap (fmap Prelude.snd . unLine) <$> sequenceA (copoint child))
 
-makeContextLines :: [Line Range] -> [Line (Maybe a, Range)]
+makeContextLines :: Adjoined (Line Range) -> Adjoined (Line (Maybe a, Range))
 makeContextLines = fmap (fmap ((,) Nothing))
 
 -- | Produce open/closed lines for the portion of the source spanned by a range.
-linesInRangeOfSource :: Range -> Source Char -> [Line Range]
-linesInRangeOfSource range source = pureBy (openRange source) <$> actualLineRanges range source
+linesInRangeOfSource :: Range -> Source Char -> Adjoined (Line Range)
+linesInRangeOfSource range source = fromList $ pureBy (openRange source) <$> actualLineRanges range source
 
 -- | Does this Range in this Source end with a newline?
 openRange :: Source Char -> Range -> Bool
