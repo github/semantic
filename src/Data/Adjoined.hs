@@ -8,7 +8,12 @@ import Data.Bifunctor.These
 import Data.Coalescent
 import Data.Sequence as Seq hiding (null)
 
--- | A collection of elements which can be adjoined onto other such collections associatively.
+-- | A collection of elements which can be adjoined onto other such collections associatively. There are two big wins with Data.Adjoined:
+-- |
+-- | 1. Efficient adjoining of lines and concatenation, thanks to its use of Data.Sequence’s `Seq` type.
+-- | 2. The Monoid instance guarantees that adjoining cannot touch any lines other than the outermost.
+-- |
+-- | Since aligning diffs proceeds through the diff tree depth-first, adjoining child nodes and context from right to left, the former is crucial for efficiency, and the latter is crucial for correctness. Prior to using Data.Adjoined, repeatedly adjoining the last line in a node into its parent, and then its grandparent, and so forth, would sometimes cause blank lines to “travel” downwards, ultimately shifting blank lines at the end of nodes down proportionately to the depth in the tree at which they were introduced.
 newtype Adjoined a = Adjoined { unAdjoined :: Seq a }
   deriving (Eq, Foldable, Functor, Show, Traversable)
 
