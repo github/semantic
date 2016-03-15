@@ -75,7 +75,7 @@ adjoinChildren sources infos constructor children = wrap <$> leadingContext <> l
   where (lines, next) = foldr (childLines sources) (mempty, end <$> ranges) children
         ranges = characterRange <$> infos
         categories = Diff.categories <$> infos
-        leadingContext = tsequenceL (pure mempty) $ fromList . fmap (fmap ((,) Nothing)) <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
+        leadingContext = tsequenceL (pure mempty) $ fromList . makeContextLines <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
         wrap = (wrapLineContents <$> (makeBranchTerm constructor <$> categories <*> next) <*>)
         makeBranchTerm constructor categories next children = let range = unionRangesFrom (rangeAt next) $ Prelude.snd <$> children in
           (constructor (Info range categories) . catMaybes . toList $ Prelude.fst <$> children, range)
