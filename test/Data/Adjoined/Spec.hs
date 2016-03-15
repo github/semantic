@@ -1,5 +1,6 @@
 module Data.Adjoined.Spec (spec) where
 
+import Control.Applicative
 import Data.Adjoined
 import Data.Coalescent
 import Data.Typeable
@@ -43,7 +44,7 @@ instance Arbitrary a => Arbitrary (Uncoalesced a) where
   arbitrary = Uncoalesced <$> arbitrary
 
 instance Coalescent (Uncoalesced a) where
-  coalesce _ _ = Nothing
+  coalesce a b = pure a <|> pure b
 
 
 -- | A wrapper which always coalesces values.
@@ -54,7 +55,7 @@ instance Arbitrary a => Arbitrary (Coalesced a) where
   arbitrary = Coalesced <$> arbitrary
 
 instance Monoid a => Coalescent (Coalesced a) where
-  coalesce a b = Just (Coalesced (runCoalesced a `mappend` runCoalesced b))
+  coalesce a b = pure (Coalesced (runCoalesced a `mappend` runCoalesced b))
 
 
 -- | A wrapper which coalesces asymmetrically.
@@ -67,8 +68,8 @@ instance Arbitrary a => Arbitrary (Semicoalesced a) where
   arbitrary = Semicoalesced <$> arbitrary
 
 instance Monoid a => Coalescent (Semicoalesced a) where
-  Semicoalesced (True, a) `coalesce` Semicoalesced (flag, b) = Just (Semicoalesced (flag, a `mappend` b))
-  Semicoalesced (False, _) `coalesce` _ = Nothing
+  Semicoalesced (True, a) `coalesce` Semicoalesced (flag, b) = pure (Semicoalesced (flag, a `mappend` b))
+  a `coalesce` b = pure a <|> pure b
 
 
 -- | Returns a string with the name of a type.
