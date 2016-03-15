@@ -6,7 +6,7 @@ import Test.QuickCheck hiding (Fixed)
 import Data.Text.Arbitrary ()
 
 import Alignment
-import ArbitraryTerm ()
+import ArbitraryTerm (arbitraryLeaf)
 import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
@@ -25,25 +25,6 @@ import Source hiding ((++), fromList)
 import qualified Source
 import SplitDiff
 import Syntax
-
-instance Arbitrary a => Arbitrary (Both a) where
-  arbitrary = pure (curry Both) <*> arbitrary <*> arbitrary
-
-instance Arbitrary a => Arbitrary (Line a) where
-  arbitrary = oneof [ Line <$> arbitrary, Closed <$> arbitrary ]
-
-instance Arbitrary a => Arbitrary (Patch a) where
-  arbitrary = oneof [
-    Insert <$> arbitrary,
-    Delete <$> arbitrary,
-    Replace <$> arbitrary <*> arbitrary ]
-
-instance Arbitrary a => Arbitrary (Source a) where
-  arbitrary = Source.fromList <$> arbitrary
-
-arbitraryLeaf :: Gen (Source Char, Info, Syntax (Source Char) f)
-arbitraryLeaf = toTuple <$> arbitrary
-  where toTuple string = (string, Info (Range 0 $ length string) mempty, Leaf string)
 
 spec :: Spec
 spec = parallel $ do
