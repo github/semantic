@@ -44,7 +44,7 @@ instance Applicative Adjoined where
   (<*>) = ap
 
 instance Alternative Adjoined where
-  empty = Adjoined mempty
+  empty = Adjoined Seq.empty
   Adjoined a <|> Adjoined b = Adjoined (a >< b)
 
 instance Monad Adjoined where
@@ -54,14 +54,14 @@ instance Monad Adjoined where
     (a :< as) -> Adjoined $ unAdjoined (f a) >< unAdjoined (Adjoined as >>= f)
 
 instance Coalescent a => Monoid (Adjoined a) where
-  mempty = Adjoined mempty
+  mempty = Adjoined Seq.empty
   a `mappend` b | Just (as, a) <- unsnoc a,
                   Just (b, bs) <- uncons b
                 = as <|> coalesce a b <|> bs
                 | otherwise = Adjoined (unAdjoined a >< unAdjoined b)
 
 instance Align Adjoined where
-  nil = Adjoined mempty
+  nil = Adjoined Seq.empty
   align as bs | Just (as, a) <- unsnoc as,
                 Just (bs, b) <- unsnoc bs = align as bs `snoc` These a b
               | null bs = This <$> as
