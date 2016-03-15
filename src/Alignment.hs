@@ -86,13 +86,15 @@ childLines :: (Copointed c, Functor c, Applicative f, Coalescent (f (Line (Maybe
 childLines sources child (followingLines, next) | or $ (>) . end <$> childRanges <*> next = (followingLines, next)
                                                 | otherwise =
   ((placeChildAndRangeInContainer <$> copoint child)
-  <> tsequenceL (pure mempty) (fromList . pairWithNothing <$> trailingContextLines)
+  <> tsequenceL (pure mempty) (fromList . makeContextLines <$> trailingContextLines)
   <> followingLines, start <$> childRanges)
-  where pairWithNothing = fmap (fmap ((,) Nothing))
-        placeChildAndRangeInContainer = fmap (fmap (first (Just . (<$ child))))
+  where placeChildAndRangeInContainer = fmap (fmap (first (Just . (<$ child))))
         trailingContextLines = linesInRangeOfSource <$> rangeUntilNext <*> sources
         rangeUntilNext = (Range <$> (end <$> childRanges) <*> next)
         childRanges = unionLineRangesFrom <$> (rangeAt <$> next) <*> sequenceA (copoint child)
+
+makeContextLines :: [Line Range] -> [Line (Maybe a, Range)]
+makeContextLines = fmap (fmap ((,) Nothing))
 
 -- | Produce open/closed lines for the portion of the source spanned by a range.
 linesInRangeOfSource :: Range -> Source Char -> [Line Range]
