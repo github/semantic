@@ -71,6 +71,7 @@ test-suite semantic-diff-test
                      , ArbitraryTerm
                      , CorpusSpec
                      , Data.Adjoined.Spec
+                     , Data.Functor.Both.Spec
                      , InterpreterSpec
                      , OrderedMapSpec
                      , PatchOutputSpec
