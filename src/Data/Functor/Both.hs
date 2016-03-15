@@ -17,9 +17,6 @@ newtype Both a = Both { runBoth :: (a, a) }
 both :: a -> a -> Both a
 both = curry Both
 
-modifyBoth :: ((a, a) -> (b, b)) -> Both a -> Both b
-modifyBoth f = Both . f . runBoth
-
 -- | Construct Both with These values & defaults.
 bothOfThese :: Both a -> These a a -> Both a
 bothOfThese a = these (`both` snd a) (both (fst a)) both
