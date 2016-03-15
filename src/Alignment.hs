@@ -88,8 +88,7 @@ childLines sources child (nextLines, next) | or ((>) . end <$> childRanges <*> n
                                                          <> tsequenceL (pure mempty) (fromList . makeContextLines <$> trailingContextLines)
                                                          <> nextLines, start <$> childRanges)
   where makeChildLines = fmap (fmap (first (Just . (<$ child))))
-        trailingContextLines = linesInRangeOfSource <$> rangeUntilNext <*> sources
-        rangeUntilNext = (Range <$> (end <$> childRanges) <*> next)
+        trailingContextLines = linesInRangeOfSource <$> (Range <$> (end <$> childRanges) <*> next) <*> sources
         childRanges = unionRangesFrom <$> (rangeAt <$> next) <*> (concat . fmap (fmap Prelude.snd . unLine) <$> sequenceA (copoint child))
 
 makeContextLines :: [Line Range] -> [Line (Maybe a, Range)]
