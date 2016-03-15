@@ -20,3 +20,6 @@ instance Applicative (Join These) where
 
 instance Foldable (Join These) where
   foldMap f = these id id mappend . bimap f f . runJoin
+
+instance Traversable (Join These) where
+  sequenceA = these (fmap (Join . This)) (fmap (Join . That)) (\ a b -> (Join .) . These <$> a <*> b) . runJoin
