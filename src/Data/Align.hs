@@ -38,24 +38,6 @@ instance Align Maybe where
               | otherwise = Nothing
 
 
--- | A functor which can be traversed through an `Align`able functor, inverting the nesting of one in the other.
--- |
--- | Analogous with `zip`, in that it can e.g. turn a tuple of lists into a list of tuples.
-class Functor t => Crosswalk t where
-  -- | Embed a structure into an `Align`able functor by mapping its elements into that functor and convoluting (inverting the embedding).
-  crosswalk :: Align f => (a -> f b) -> t a -> f (t b)
-  crosswalk f = sequenceL . fmap f
-
-  -- | Convolute (invert the embedding of) a structure over an `Align`able functor.
-  sequenceL :: Align f => t (f a) -> f (t a)
-  sequenceL = crosswalk id
-
-instance Crosswalk Identity where
-  crosswalk f = fmap Identity . f . runIdentity
-
-instance Crosswalk Maybe where
-  crosswalk f = maybe nil (fmap Just) . fmap f
-
 -- | A functor which can be traversed through an `Align`able functor, inverting the nesting of one in the other, given some default value.
 -- |
 -- | Analogous with `zip`, in that it can e.g. turn a tuple of lists into a list of tuples.
@@ -69,4 +51,4 @@ class Functor t => TotalCrosswalk t where
   tsequenceL d = tcrosswalk d id
 
 instance TotalCrosswalk Identity where
-  tcrosswalk _ = crosswalk
+  tcrosswalk _ f = fmap Identity . f . runIdentity
