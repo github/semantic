@@ -9,4 +9,4 @@ spec :: Spec
 spec = do
   describe "Coalescent" $ do
     it "should coalesce when both sides coalesce" $
-      (both (Line [True]) (Line [True]) `coalesce` both (Line [True]) (Line [True]) :: [Both (Line Bool)]) `shouldBe` [both (Line [True, True]) (Line [True, True])]
+      (pure (Line [True]) `coalesce` pure (Line [True]) :: [Both (Line Bool)]) `shouldBe` [pure (Line [True, True])]
