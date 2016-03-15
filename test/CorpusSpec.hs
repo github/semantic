@@ -66,7 +66,7 @@ examples directory = do
   where
     globFor :: String -> IO [FilePath]
     globFor p = globDir1 (compile p) directory
-    toDict list = Map.fromList ((normalizeName <$> list) `Prelude.zip` list)
+    toDict list = Map.fromList ((normalizeName <$> list) `zip` list)
 
 -- | Given a test name like "foo.A.js", return "foo.js".
 normalizeName :: FilePath -> FilePath

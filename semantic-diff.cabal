@@ -70,6 +70,8 @@ test-suite semantic-diff-test
   other-modules:       AlignmentSpec
                      , ArbitraryTerm
                      , CorpusSpec
+                     , Data.Adjoined.Spec
+                     , Data.Functor.Both.Spec
                      , InterpreterSpec
                      , OrderedMapSpec
                      , PatchOutputSpec
@@ -90,7 +92,7 @@ test-suite semantic-diff-test
   else
     ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -pgml=script/g++
   default-language:    Haskell2010
-  default-extensions:  DeriveGeneric, OverloadedStrings
+  default-extensions:  DeriveFunctor, DeriveGeneric, OverloadedStrings
   if os(darwin)
     extra-libraries:   stdc++ icuuc icudata icui18n
   if os(darwin)

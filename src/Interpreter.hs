@@ -55,8 +55,8 @@ run :: (Eq a, Eq annotation) => Comparable a annotation -> Algorithm a annotatio
 run _ (Pure diff) = Just diff
 
 run comparable (Free (Recursive (annotation1 :< a) (annotation2 :< b) f)) = run comparable . f $ recur a b where
-  recur (Indexed a') (Indexed b') | length a' == length b' = annotate . Indexed $ Prelude.zipWith (interpret comparable) a' b'
-  recur (Fixed a') (Fixed b') | length a' == length b' = annotate . Fixed $ Prelude.zipWith (interpret comparable) a' b'
+  recur (Indexed a') (Indexed b') | length a' == length b' = annotate . Indexed $ zipWith (interpret comparable) a' b'
+  recur (Fixed a') (Fixed b') | length a' == length b' = annotate . Fixed $ zipWith (interpret comparable) a' b'
   recur (Keyed a') (Keyed b') | Map.keys a' == bKeys = annotate . Keyed . Map.fromList . fmap repack $ bKeys
     where
       bKeys = Map.keys b'

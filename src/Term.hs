@@ -16,8 +16,8 @@ zipTerms (annotation1 :< a) (annotation2 :< b) = annotate $ zipUnwrap a b
   where
     annotate = fmap (Both (annotation1, annotation2) :<)
     zipUnwrap (Leaf _) (Leaf b') = Just $ Leaf b'
-    zipUnwrap (Indexed a') (Indexed b') = Just . Indexed . catMaybes $ Prelude.zipWith zipTerms a' b'
-    zipUnwrap (Fixed a') (Fixed b') = Just . Fixed . catMaybes $ Prelude.zipWith zipTerms a' b'
+    zipUnwrap (Indexed a') (Indexed b') = Just . Indexed . catMaybes $ zipWith zipTerms a' b'
+    zipUnwrap (Fixed a') (Fixed b') = Just . Fixed . catMaybes $ zipWith zipTerms a' b'
     zipUnwrap (Keyed a') (Keyed b') | keys a' == keys b' = Just . Keyed . fromList . catMaybes $ zipUnwrapMaps a' b' <$> keys a'
     zipUnwrap _ _ = Nothing
     zipUnwrapMaps a' b' key = (,) key <$> zipTerms (a' ! key) (b' ! key)

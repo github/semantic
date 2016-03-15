@@ -1,5 +1,10 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Functor.Both where
 
+import Data.Align
+import Data.Bifunctor
+import Data.Bifunctor.These
+import Data.Maybe
 import Prelude hiding (zipWith, fst, snd)
 import qualified Prelude
 
@@ -10,6 +15,14 @@ newtype Both a = Both { runBoth :: (a, a) }
 -- | Given two operands returns a functor operating on `Both`. This is a curried synonym for Both.
 both :: a -> a -> Both a
 both = curry Both
+
+-- | Construct Both with These values & defaults.
+bothOfThese :: Both a -> These a a -> Both a
+bothOfThese a = these (`both` snd a) (both (fst a)) both
+
+-- | Construct Both (Maybe) with These values, defaulting to Nothing.
+maybeBothOfThese :: These a a -> Both (Maybe a)
+maybeBothOfThese = bothOfThese (pure Nothing) . bimap Just Just
 
 -- | Apply a function to `Both` sides of a computation.
 runBothWith :: (a -> a -> b) -> Both a -> b
@@ -23,14 +36,6 @@ fst = Prelude.fst . runBoth
 snd :: Both a -> a
 snd = Prelude.snd . runBoth
 
-zip :: Both [a] -> [Both a]
-zip = zipWith both
-
-zipWith :: (a -> a -> b) -> Both [a] -> [b]
-zipWith _ (Both ([], _)) = []
-zipWith _ (Both (_, [])) = []
-zipWith f (Both (a : as, b : bs)) = f a b : zipWith f (both as bs)
-
 unzip :: [Both a] -> Both [a]
 unzip = foldr pair (pure [])
   where pair (Both (a, b)) (Both (as, bs)) = Both (a : as, b : bs)
@@ -42,3 +47,7 @@ instance Applicative Both where
 instance Monoid a => Monoid (Both a) where
   mempty = pure mempty
   mappend a b = mappend <$> a <*> b
+
+
+instance TotalCrosswalk Both where
+  tsequenceL d = runBothWith (alignWith (\ these -> fromMaybe <$> d <*> maybeBothOfThese these))

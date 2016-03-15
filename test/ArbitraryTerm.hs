@@ -1,16 +1,23 @@
 module ArbitraryTerm where
 
 import Category
-import Syntax
-import Term
 import Control.Comonad.Cofree
 import Control.Monad
+import Data.Functor.Both
 import qualified Data.OrderedMap as Map
 import qualified Data.List as List
 import qualified Data.Set as Set
-import GHC.Generics
-import Test.QuickCheck hiding (Fixed)
 import Data.Text.Arbitrary ()
+import Diff
+import Line
+import Patch
+import Prelude hiding (fst, snd)
+import Range
+import Source hiding ((++))
+import Syntax
+import GHC.Generics
+import Term
+import Test.QuickCheck hiding (Fixed)
 
 newtype ArbitraryTerm a annotation = ArbitraryTerm (annotation, Syntax a (ArbitraryTerm a annotation))
   deriving (Show, Eq, Generic)
@@ -46,3 +53,24 @@ instance Categorizable CategorySet where
 
 instance Arbitrary CategorySet where
   arbitrary = elements [ A, B, C, D ]
+
+instance Arbitrary a => Arbitrary (Both a) where
+  arbitrary = pure (curry Both) <*> arbitrary <*> arbitrary
+  shrink b = both <$> (shrink (fst b)) <*> (shrink (snd b))
+
+instance Arbitrary a => Arbitrary (Line a) where
+  arbitrary = oneof [ Line <$> arbitrary, Closed <$> arbitrary ]
+  shrink line = (`lineMap` line) . const <$> shrinkList shrink (unLine line)
+
+instance Arbitrary a => Arbitrary (Patch a) where
+  arbitrary = oneof [
+    Insert <$> arbitrary,
+    Delete <$> arbitrary,
+    Replace <$> arbitrary <*> arbitrary ]
+
+instance Arbitrary a => Arbitrary (Source a) where
+  arbitrary = Source.fromList <$> arbitrary
+
+arbitraryLeaf :: Gen (Source Char, Info, Syntax (Source Char) f)
+arbitraryLeaf = toTuple <$> arbitrary
+  where toTuple string = (string, Info (Range 0 $ length string) mempty, Leaf string)

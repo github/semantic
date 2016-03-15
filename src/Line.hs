@@ -1,6 +1,10 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Line where
 
+import Control.Applicative
+import Data.Align
 import Data.Coalescent
+import Data.Functor.Both
 
 -- | A line of items or an empty line.
 data Line a = Line [a] | Closed [a]
@@ -43,11 +47,6 @@ lineMap f (Closed cs) = Closed (f cs)
 maybeFirst :: Foldable f => f a -> Maybe a
 maybeFirst = foldr (const . Just) Nothing
 
--- | Merge or prepend lines based on whether the left line is open or closed.
-coalesceLines :: Line a -> Line a -> [Line a]
-coalesceLines line nextLine | isOpen line = [line `mappend` nextLine]
-                            | otherwise = [line, nextLine]
-
 instance Applicative Line where
   pure = Line . pure
   as <*> bs | isOpen as && isOpen bs = Line (unLine as <*> unLine bs)
@@ -58,5 +57,8 @@ instance Monoid (Line a) where
   mappend xs ys = lineMap (mappend (unLine xs)) ys
 
 instance Coalescent (Line a) where
-  coalesce a b | isOpen a = Just (a `mappend` b)
-               | otherwise = Nothing
+  coalesce a b | isOpen a = pure (a `mappend` b)
+               | otherwise = pure a <|> pure b
+
+instance Coalescent (Both (Line a)) where
+ coalesce as bs = tsequenceL (pure (Line [])) (coalesce <$> as <*> bs)

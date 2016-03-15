@@ -52,7 +52,7 @@ breakDownLeavesByWord source = cata replaceIn
   where
     replaceIn info@(Info range categories) (Leaf _) | ranges <- rangesAndWordsInSource range, length ranges > 1 = info :< Indexed (makeLeaf categories <$> ranges)
     replaceIn info syntax = info :< syntax
-    rangesAndWordsInSource range = rangesAndWordsFrom (start range) (Source.toList $ slice range source)
+    rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
     makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
 
 -- | Transcode a file to a unicode source.
