@@ -2,7 +2,6 @@
 module Data.Functor.Both where
 
 import Data.Align
-import Data.Coalescent
 import Data.Bifunctor
 import Data.Bifunctor.These
 import Data.Maybe
@@ -49,9 +48,6 @@ instance Monoid a => Monoid (Both a) where
   mempty = pure mempty
   mappend a b = mappend <$> a <*> b
 
-
-instance Coalescent a => Coalescent (Both a) where
-  coalesce as bs = sequenceA (coalesce <$> as <*> bs)
 
 instance TotalCrosswalk Both where
   tsequenceL d = runBothWith (alignWith (\ these -> fromMaybe <$> d <*> maybeBothOfThese these))

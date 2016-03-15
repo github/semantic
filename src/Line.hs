@@ -1,7 +1,9 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Line where
 
 import Control.Applicative
 import Data.Coalescent
+import Data.Functor.Both
 
 -- | A line of items or an empty line.
 data Line a = Line [a] | Closed [a]
@@ -56,3 +58,6 @@ instance Monoid (Line a) where
 instance Coalescent (Line a) where
   coalesce a b | isOpen a = pure (a `mappend` b)
                | otherwise = pure a <|> pure b
+
+instance Coalescent (Both (Line a)) where
+ coalesce as bs = sequenceA (coalesce <$> as <*> bs)
