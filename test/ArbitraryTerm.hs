@@ -58,6 +58,7 @@ instance Arbitrary a => Arbitrary (Both a) where
 
 instance Arbitrary a => Arbitrary (Line a) where
   arbitrary = oneof [ Line <$> arbitrary, Closed <$> arbitrary ]
+  shrink line = (`lineMap` line) . const <$> shrinkList shrink (unLine line)
 
 instance Arbitrary a => Arbitrary (Patch a) where
   arbitrary = oneof [
