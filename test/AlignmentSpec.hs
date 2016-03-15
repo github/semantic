@@ -10,6 +10,7 @@ import ArbitraryTerm ()
 import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad.Free hiding (unfold)
+import Data.Adjoined
 import Data.Copointed
 import Data.Functor.Both as Both
 import Diff
@@ -20,7 +21,7 @@ import Patch
 import Prelude hiding (fst, snd)
 import qualified Prelude
 import Range
-import Source hiding ((++))
+import Source hiding ((++), fromList)
 import qualified Source
 import SplitDiff
 import Syntax
@@ -38,7 +39,7 @@ instance Arbitrary a => Arbitrary (Patch a) where
     Replace <$> arbitrary <*> arbitrary ]
 
 instance Arbitrary a => Arbitrary (Source a) where
-  arbitrary = fromList <$> arbitrary
+  arbitrary = Source.fromList <$> arbitrary
 
 arbitraryLeaf :: Gen (Source Char, Info, Syntax (Source Char) f)
 arbitraryLeaf = toTuple <$> arbitrary
@@ -58,17 +59,17 @@ spec = parallel $ do
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
       \ source -> let range = totalRange source in
-        splitAbstractedTerm sequenceA (:<) (Identity source) (Identity (Info range mempty)) (Leaf source) `shouldBe` (Identity . lineMap (fmap (((:< Leaf source) . (`Info` mempty) &&& id))) <$> linesInRangeOfSource range source)
+        splitAbstractedTerm (:<) (Identity source) (Identity (Info range mempty)) (Leaf source) `shouldBe` (fromList (Identity . lineMap (fmap (((:< Leaf source) . (`Info` mempty) &&& id))) <$> linesInRangeOfSource range source))
 
     let makeTerm = ((Free .) . Annotated) :: Info -> Syntax (Source Char) (SplitDiff (Source Char) Info) -> SplitDiff (Source Char) Info
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
-        \ (source, info@(Info range categories), syntax) -> splitAbstractedTerm makeTerm (pure source) (pure $ Info range categories) syntax `shouldBe` [
+        \ (source, info@(Info range categories), syntax) -> splitAbstractedTerm makeTerm (pure source) (pure $ Info range categories) syntax `shouldBe` fromList [
           both (pure (makeTerm info $ Leaf source, Range 0 (length source))) (pure (makeTerm info $ Leaf source, Range 0 (length source))) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toString a) == toString a)) $
-          \ source -> splitAbstractedTerm makeTerm (pure source) (pure $ Info (totalRange source) mempty) (Indexed []) `shouldBe` [
+          \ source -> splitAbstractedTerm makeTerm (pure source) (pure $ Info (totalRange source) mempty) (Indexed []) `shouldBe` fromList [
             both (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
     where
