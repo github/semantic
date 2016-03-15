@@ -20,6 +20,7 @@ spec = do
   monoid (arbitrary :: Gen (Adjoined (Uncoalesced String)))
   monoid (arbitrary :: Gen (Adjoined (Semicoalesced String)))
   monoid (arbitrary :: Gen (Adjoined (Line Char)))
+  monoid (arbitrary :: Gen (Adjoined (Both (Line Char))))
 
 monoid :: (Arbitrary a, Coalescent a, Eq a, Show a, Typeable a) => Gen (Adjoined a) -> Spec
 monoid gen =
