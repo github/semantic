@@ -11,6 +11,7 @@ import Data.Text.Arbitrary ()
 import Diff
 import Line
 import Patch
+import Prelude hiding (fst, snd)
 import Range
 import Source hiding ((++))
 import Syntax
@@ -55,6 +56,7 @@ instance Arbitrary CategorySet where
 
 instance Arbitrary a => Arbitrary (Both a) where
   arbitrary = pure (curry Both) <*> arbitrary <*> arbitrary
+  shrink b = both <$> (shrink (fst b)) <*> (shrink (snd b))
 
 instance Arbitrary a => Arbitrary (Line a) where
   arbitrary = oneof [ Line <$> arbitrary, Closed <$> arbitrary ]
