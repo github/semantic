@@ -19,8 +19,6 @@ maybeFirst = these Just (const Nothing) ((Just .) . const)
 maybeSecond :: These a b -> Maybe b
 maybeSecond = these (const Nothing) Just ((Just .) . flip const)
 
-swap :: These a b -> These b a
-swap = these That This (flip These)
 
 -- Instances
 
