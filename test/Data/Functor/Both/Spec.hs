@@ -16,3 +16,6 @@ spec = do
 
     it "should coalesce asymmetrically at left" $
       (both (Line [True]) (Closed [True]) `coalesce` pure (Line [True]) :: [Both (Line Bool)]) `shouldBe` [both (Line [True, True]) (Closed [True]), both (Line []) (Line [True])]
+
+    it "should coalesce asymmetrically at right" $
+      (both (Closed [True]) (Line [True]) `coalesce` pure (Line [True]) :: [Both (Line Bool)]) `shouldBe` [both (Closed [True]) (Line [True, True]), both (Line [True]) (Line [])]
