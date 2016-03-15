@@ -64,6 +64,7 @@ class Functor t => TotalCrosswalk t where
   tcrosswalk :: Align f => t b -> (a -> f b) -> t a -> f (t b)
   tcrosswalk d f = tsequenceL d . fmap f
 
+  -- | Given some default value, convolute (invert the embedding of) a structure over an `Align`able functor.
   tsequenceL :: Align f => t a -> t (f a) -> f (t a)
   tsequenceL d = tcrosswalk d id
 
