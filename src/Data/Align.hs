@@ -1,5 +1,7 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Data.Align where
 
+import Data.Bifunctor.Join
 import Data.Bifunctor.These
 import Data.Functor.Identity
 
@@ -65,3 +67,6 @@ class Functor t => TotalCrosswalk t where
 
 instance TotalCrosswalk Identity where
   tcrosswalk _ = crosswalk
+
+instance Crosswalk (Join These) where
+  sequenceL = these (fmap (Join . This)) (fmap (Join . That)) (alignWith Join) . runJoin
