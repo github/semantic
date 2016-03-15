@@ -55,43 +55,6 @@ spec = parallel $ do
       \ sources ->
         length (splitDiffByLines sources (Free $ Annotated ((`Info` mempty) . totalRange <$> sources) (Indexed $ leafWithRangesInSources sources <$> runBothWith (zipWith both) (actualLineRanges <$> (totalRange <$> sources) <*> sources)))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toString <$> sources)
 
-  describe "adjoinRows" $ do
-    prop "is identity on top of no rows" $ forAll (arbitrary `suchThat` (not . isEmptyRow)) $
-      \ a -> adjoinRows alignRows a [] `shouldBe` [ a :: Row Char ]
-
-    prop "prunes empty rows" $
-      \ a -> adjoinRows alignRows mempty [ a ] `shouldBe` [ a :: Row Char ]
-
-    prop "merges open rows" $
-      \ a b -> adjoinRows alignRows (pure (Line [a])) [ b ] `shouldBe` [ pure (Line [a]) `mappend` b :: Row Char ]
-
-    prop "prepends closed rows" $
-      \ a b -> adjoinRows alignRows (pure (Closed [a])) [ b ] `shouldBe` [ pure (Closed [a]), b :: Row Char ]
-
-    -- it "aligns closed lines" $
-    --   foldr (adjoinRows alignRows) [] (zipWith both (pureBy (/= '\n') <$> "[ bar ]\nquux") (pureBy (/= '\n') <$> "[\nbar\n]\nquux")) `shouldBe`
-    --     [ both (Closed "[ bar ]\n") (Closed "[\n")
-    --     , both (Closed "") (Closed "bar\n")
-    --     , both (Closed "") (Closed "]\n")
-    --     , both (Line "quux") (Line "quux")
-    --     ]
-
-    it "preserves children’s alignment" $
-      let rows = concat
-            [ [ both (Closed "[ bar ]\n") (Closed "[\n")
-              , both (Closed "") (Closed "bar\n")
-              , both (Line "") (Line "]")
-              ]
-            , [ both (Closed "") (Closed "\n") ]
-            , [ both (Line "quux") (Line "quux") ]
-            ] :: [Row Char] in
-              foldr (adjoinRows alignRows) [] rows `shouldBe`
-              [ both (Closed "[ bar ]\n") (Closed "[\n")
-              , both (Closed "") (Closed "bar\n")
-              , both (Closed "") (Closed "]\n")
-              , both (Line "quux") (Line "quux")
-              ]
-
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
       \ source -> let range = totalRange source in
