@@ -1,9 +1,12 @@
 module Data.Adjoined.Spec (spec) where
 
+import ArbitraryTerm ()
 import Control.Applicative
 import Data.Adjoined
 import Data.Coalescent
+import Data.Functor.Both
 import Data.Typeable
+import Line
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
@@ -16,6 +19,7 @@ spec = do
   monoid (arbitrary :: Gen (Adjoined (Coalesced String)))
   monoid (arbitrary :: Gen (Adjoined (Uncoalesced String)))
   monoid (arbitrary :: Gen (Adjoined (Semicoalesced String)))
+  monoid (arbitrary :: Gen (Adjoined (Line Char)))
 
 monoid :: (Arbitrary a, Coalescent a, Eq a, Show a, Typeable a) => Gen (Adjoined a) -> Spec
 monoid gen =
