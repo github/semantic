@@ -90,7 +90,7 @@ childLines sources child (nextLines, next) | or ((>) . end <$> childRanges <*> n
   where placeChildAndRangeInContainer = fmap (fmap (first (Just . (<$ child))))
         trailingContextLines = linesInRangeOfSource <$> rangeUntilNext <*> sources
         rangeUntilNext = (Range <$> (end <$> childRanges) <*> next)
-        childRanges = unionLineRangesFrom <$> (rangeAt <$> next) <*> sequenceA (copoint child)
+        childRanges = unionRangesFrom <$> (rangeAt <$> next) <*> (concat . fmap (fmap Prelude.snd . unLine) <$> sequenceA (copoint child))
 
 makeContextLines :: [Line Range] -> [Line (Maybe a, Range)]
 makeContextLines = fmap (fmap ((,) Nothing))
@@ -98,10 +98,6 @@ makeContextLines = fmap (fmap ((,) Nothing))
 -- | Produce open/closed lines for the portion of the source spanned by a range.
 linesInRangeOfSource :: Range -> Source Char -> [Line Range]
 linesInRangeOfSource range source = pureBy (openRange source) <$> actualLineRanges range source
-
--- | Compute the union of the ranges in a list of ranged lines.
-unionLineRangesFrom :: (Foldable t, Monad t) => Range -> t (Line (a, Range)) -> Range
-unionLineRangesFrom start lines = unionRangesFrom start (concat (fmap Prelude.snd . unLine <$> lines))
 
 -- | Does this Range in this Source end with a newline?
 openRange :: Source Char -> Range -> Bool
