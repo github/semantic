@@ -4,6 +4,7 @@ import ArbitraryTerm ()
 import Control.Applicative
 import Data.Adjoined
 import Data.Coalescent
+import Data.Foldable
 import Data.Functor.Both
 import Data.Typeable
 import Line
@@ -39,6 +40,7 @@ monoid gen =
 
 instance Arbitrary a => Arbitrary (Adjoined a) where
   arbitrary = fromList <$> arbitrary
+  shrink arbitrary = fromList <$> shrinkList shrink (toList arbitrary)
 
 
 -- | A wrapper which never coalesces values.
