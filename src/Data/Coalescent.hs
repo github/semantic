@@ -1,6 +1,10 @@
+{-# LANGUAGE FlexibleInstances #-}
 module Data.Coalescent where
 
 import Control.Applicative
+import Data.Align
+import Data.Bifunctor.Join
+import Data.Bifunctor.These
 import Data.Functor.Identity
 
 -- | The class of types which can optionally be coalesced together.
@@ -12,4 +16,7 @@ instance Coalescent a => Coalescent (Identity a) where
   a `coalesce` b = sequenceA (coalesce <$> a <*> b)
 
 instance Coalescent a => Coalescent (Maybe a) where
+  a `coalesce` b = sequenceA (coalesce <$> a <*> b)
+
+instance Coalescent a => Coalescent (Join These a) where
   a `coalesce` b = sequenceA (coalesce <$> a <*> b)
