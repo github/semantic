@@ -49,9 +49,8 @@ instance Alternative Adjoined where
 
 instance Monad Adjoined where
   return = Adjoined . return
-  Adjoined a >>= f = case viewl a of
-    EmptyL -> Adjoined Seq.empty
-    (a :< as) -> Adjoined $ unAdjoined (f a) >< unAdjoined (Adjoined as >>= f)
+  a >>= f | Just (a, as) <- uncons a = f a <|> (as >>= f)
+          | otherwise = Adjoined Seq.empty
 
 instance Coalescent a => Monoid (Adjoined a) where
   mempty = Adjoined Seq.empty
