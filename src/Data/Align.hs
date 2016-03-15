@@ -60,6 +60,7 @@ instance Crosswalk Maybe where
 -- |
 -- | Analogous with `zip`, in that it can e.g. turn a tuple of lists into a list of tuples.
 class Functor t => TotalCrosswalk t where
+  -- | Given some default value, embed a structure into an `Align`able functor by mapping its elements into that functor and convoluting (inverting the embedding).
   tcrosswalk :: Align f => t b -> (a -> f b) -> t a -> f (t b)
   tcrosswalk d f = tsequenceL d . fmap f
 
