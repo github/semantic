@@ -16,7 +16,7 @@ spec = do
       (pure (Closed [True]) `coalesce` pure (Line [True]) :: Adjoined (Both (Line Bool))) `shouldBe` fromList [pure (Closed [True]), pure (Line [True])]
 
     it "should coalesce asymmetrically at left" $
-      (both (Line [True]) (Closed [True]) `coalesce` pure (Line [True]) :: Adjoined (Both (Line Bool))) `shouldBe` fromList [both (Line [True, True]) (Closed [True]), both (Line []) (Line [True])]
+      (both (Line [True]) (Closed [True]) `coalesce` pure (Line [True]) :: Adjoined (Both (Line Bool))) `shouldBe` fromList [both (Line []) (Closed [True]), both (Line [True, True]) (Line [True])]
 
     it "should coalesce asymmetrically at right" $
-      (both (Closed [True]) (Line [True]) `coalesce` pure (Line [True]) :: Adjoined (Both (Line Bool))) `shouldBe` fromList [both (Closed [True]) (Line [True, True]), both (Line [True]) (Line [])]
+      (both (Closed [True]) (Line [True]) `coalesce` pure (Line [True]) :: Adjoined (Both (Line Bool))) `shouldBe` fromList [both (Closed [True]) (Line []), both (Line [True]) (Line [True, True])]
