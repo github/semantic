@@ -83,11 +83,10 @@ adjoinChildren sources infos constructor children = wrap <$> leadingContext <> l
 -- | Accumulate the lines of and between a branch term’s children.
 childLines :: (Copointed c, Functor c, Applicative f, Coalescent (f (Line (Maybe (c a), Range))), Foldable f, TotalCrosswalk f) => f (Source Char) -> c (Adjoined (f (Line (a, Range)))) -> (Adjoined (f (Line (Maybe (c a), Range))), f Int) -> (Adjoined (f (Line (Maybe (c a), Range))), f Int)
 -- We depend on source ranges increasing monotonically. If a child invalidates that, e.g. if it’s a move in a Keyed node, we don’t output rows for it in this iteration. (It will still show up in the diff as context rows.) This works around https://github.com/github/semantic-diff/issues/488.
-childLines sources child (followingLines, next) | or $ (>) . end <$> childRanges <*> next = (followingLines, next)
-                                                | otherwise =
-  ((placeChildAndRangeInContainer <$> copoint child)
-  <> tsequenceL (pure mempty) (fromList . makeContextLines <$> trailingContextLines)
-  <> followingLines, start <$> childRanges)
+childLines sources child (nextLines, next) | or ((>) . end <$> childRanges <*> next) = (nextLines, next)
+                                           | otherwise = ((placeChildAndRangeInContainer <$> copoint child)
+                                                         <> tsequenceL (pure mempty) (fromList . makeContextLines <$> trailingContextLines)
+                                                         <> nextLines, start <$> childRanges)
   where placeChildAndRangeInContainer = fmap (fmap (first (Just . (<$ child))))
         trailingContextLines = linesInRangeOfSource <$> rangeUntilNext <*> sources
         rangeUntilNext = (Range <$> (end <$> childRanges) <*> next)
