@@ -56,6 +56,9 @@ instance Crosswalk Identity where
 instance Crosswalk Maybe where
   crosswalk f = maybe nil (fmap Just) . fmap f
 
+-- | A functor which can be traversed through an `Align`able functor, inverting the nesting of one in the other, given some default value.
+-- |
+-- | Analogous with `zip`, in that it can e.g. turn a tuple of lists into a list of tuples.
 class Functor t => TotalCrosswalk t where
   tcrosswalk :: Align f => t b -> (a -> f b) -> t a -> f (t b)
   tcrosswalk d f = tsequenceL d . fmap f
