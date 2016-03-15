@@ -72,8 +72,6 @@ spec = parallel $ do
             both (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
     where
-      isEmptyRow = and . fmap isEmpty
-
       isOnSingleLine (a, _, _) = filter (/= '\n') (toString a) == toString a
 
       combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info <$> pure (Range start $ start + 1) <*> mempty) (Leaf [ char ]) ], start + 1)
