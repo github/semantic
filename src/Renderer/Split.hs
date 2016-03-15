@@ -58,10 +58,10 @@ split diff blobs = renderHtml
     . body
       . (table ! A.class_ (stringValue "diff")) $
         ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
-        . mconcat $ numberedLinesToMarkup <$> reverse numbered
+        . mconcat $ numberedLinesToMarkup <$> numbered
   where
     sources = Source.source <$> blobs
-    numbered = numberedRows (fmap Prelude.fst <$> splitDiffByLines sources diff)
+    numbered = numberedRows (fmap (fmap Prelude.fst) <$> splitDiffByLines sources diff)
     maxNumber = case numbered of
       [] -> 0
       (row : _) -> runBothWith max $ Prelude.fst <$> row
@@ -75,7 +75,7 @@ split diff blobs = renderHtml
 
     -- | Render a line with numbers as an HTML row.
     numberedLinesToMarkup :: Both (Int, Line (SplitDiff a Info)) -> Markup
-    numberedLinesToMarkup numberedLines = tr $ (runBothWith (<>) (renderLine <$> numberedLines <*> sources)) <> string "\n"
+    numberedLinesToMarkup numberedLines = tr $ runBothWith (<>) (renderLine <$> numberedLines <*> sources) <> string "\n"
 
     renderLine :: (Int, Line (SplitDiff leaf Info)) -> Source Char -> Markup
     renderLine (number, line) source = toMarkup $ Renderable (hasChanges line, number, Renderable . (,) source <$> line)
@@ -112,7 +112,11 @@ instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
 
 
 instance ToMarkup a => ToMarkup (Renderable (Bool, Int, Line a)) where
-  toMarkup (Renderable (_, _, EmptyLine)) = td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell") <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell") <> string "\n"
-  toMarkup (Renderable (hasChanges, num, line))
-    = td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
-    <> td (mconcat $ toMarkup <$> unLine line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code") <> string "\n"
+  toMarkup (Renderable (_, _, line)) | isEmpty line =
+    td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
+    <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
+    <> string "\n"
+  toMarkup (Renderable (hasChanges, num, line)) =
+    td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
+    <> td (mconcat $ toMarkup <$> unLine line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
+    <> string "\n"

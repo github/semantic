@@ -31,7 +31,7 @@ json diff sources = toLazyByteString . fromEncoding . pairs $
      "rows" .= annotateRows (splitDiffByLines (source <$> sources) diff)
   <> "oids" .= (oid <$> sources)
   <> "paths" .= (path <$> sources)
-  where annotateRows = fmap (fmap NumberedLine) . Prelude.reverse . numberedRows
+  where annotateRows = fmap (fmap NumberedLine) . numberedRows
 
 newtype NumberedLine a = NumberedLine (Int, Line a)
 
@@ -46,7 +46,7 @@ instance ToJSON Range where
   toEncoding (Range start end) = foldable [ start,  end ]
 instance ToJSON a => ToJSON (Both a) where
   toJSON (Both (a, b)) = Array . fromList $ toJSON <$> [ a, b ]
-  toEncoding both = foldable both
+  toEncoding = foldable
 instance ToJSON (SplitDiff leaf Info) where
   toJSON (Free (Annotated info syntax)) = object (termFields info syntax)
   toJSON (Pure patch) = object (patchFields patch)
@@ -60,8 +60,12 @@ instance ToJSON (Term leaf Info) where
   toEncoding (info :< syntax) = pairs $ mconcat (termFields info syntax)
 
 lineFields :: KeyValue kv => Int -> Line (SplitDiff leaf Info, Range) -> [kv]
-lineFields _ EmptyLine = []
-lineFields n line = [ "number" .= n, "terms" .= unLine (Prelude.fst <$> line), "range" .= unionRanges (Prelude.snd <$> line), "hasChanges" .= hasChanges (Prelude.fst <$> line) ]
+lineFields n line | isEmpty line = []
+                  | otherwise = [ "number" .= n
+                                , "terms" .= unLine (Prelude.fst <$> line)
+                                , "range" .= unionRanges (Prelude.snd <$> line)
+                                , "hasChanges" .= hasChanges (Prelude.fst <$> line)
+                                ]
 
 termFields :: (ToJSON recur, KeyValue kv) => Info -> Syntax leaf recur -> [kv]
 termFields (Info range categories) syntax = "range" .= range : "categories" .= categories : case syntax of
