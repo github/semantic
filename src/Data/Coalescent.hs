@@ -10,6 +10,3 @@ class Coalescent a where
 
 instance Coalescent a => Coalescent (Identity a) where
   a `coalesce` b = sequenceA (coalesce <$> a <*> b)
-
-instance Coalescent a => Coalescent (Maybe a) where
-  a `coalesce` b = sequenceA (coalesce <$> a <*> b)
