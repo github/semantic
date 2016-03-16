@@ -23,8 +23,8 @@ import Data.Monoid
 -- | Render a diff in the traditional patch format.
 patch :: Renderer a String
 patch diff sources = case getLast $ foldMap (Last . Just) string of
-                      Just c | c /= '\n' -> string ++ "\n\\\\ No newline at end of file\n"
-                      _ -> string
+  Just c | c /= '\n' -> string ++ "\n\\\\ No newline at end of file\n"
+  _ -> string
   where string = mconcat $ showHunk sources <$> hunks diff sources
 
 -- | A hunk in a patch, including the offset, changes, and context.
