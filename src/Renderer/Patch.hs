@@ -22,7 +22,10 @@ import Data.Monoid
 
 -- | Render a diff in the traditional patch format.
 patch :: Renderer a String
-patch diff sources = mconcat $ showHunk sources <$> hunks diff sources
+patch diff sources = case getLast $ foldMap (Last . Just) string of
+  Just c | c /= '\n' -> string ++ "\n\\ No newline at end of file\n"
+  _ -> string
+  where string = mconcat $ showHunk sources <$> hunks diff sources
 
 -- | A hunk in a patch, including the offset, changes, and context.
 data Hunk a = Hunk { offset :: Both (Sum Int), changes :: [Change a], trailingContext :: [Row a] }
@@ -46,11 +49,10 @@ rowIncrement = fmap lineIncrement
 
 -- | Given the before and after sources, render a hunk to a string.
 showHunk :: Both SourceBlob -> Hunk (SplitDiff a Info) -> String
-showHunk blobs hunk = if last sourceHunk /= '\n'
-                      then sourceHunk ++ "\n\\\\ No newline at end of file\n"
-                      else sourceHunk
+showHunk blobs hunk = header blobs hunk ++
+  concat (showChange sources <$> changes hunk) ++
+  showLines (snd sources) ' ' (snd <$> trailingContext hunk)
   where sources = source <$> blobs
-        sourceHunk = header blobs hunk ++ concat (showChange sources <$> changes hunk) ++ showLines (snd sources) ' ' (snd <$> trailingContext hunk)
 
 -- | Given the before and after sources, render a change to a string.
 showChange :: Both (Source Char) -> Change (SplitDiff a Info) -> String
