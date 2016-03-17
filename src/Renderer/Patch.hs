@@ -110,7 +110,7 @@ header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFile
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
 hunks _ blobs | sources <- source <$> blobs
               , sourcesEqual <- runBothWith (==) sources
-              , sourcesNull <- runBothWith (==) sources
+              , sourcesNull <- runBothWith (&&) (null <$> sources)
               , sourcesEqual || sourcesNull
   = [Hunk { offset = mempty, changes = [], trailingContext = [] }]
 hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap (fmap Prelude.fst) <$> splitDiffByLines (source <$> blobs) diff
