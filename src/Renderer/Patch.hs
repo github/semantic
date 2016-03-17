@@ -84,7 +84,7 @@ header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFile
           (Just mode, Nothing) -> intercalate "\n" [ "old file mode " ++ modeToDigits mode, blobOidHeader ]
           (Just mode, Just other) | mode == other -> "index " ++ oidA ++ ".." ++ oidB ++ " " ++ modeToDigits mode
           (Just mode1, Just mode2) -> intercalate "\n" [
-            "old mode" ++ modeToDigits mode1,
+            "old mode " ++ modeToDigits mode1,
             "new mode " ++ modeToDigits mode2 ++ " " ++ blobOidHeader
             ]
           (Nothing, Nothing) -> ""
