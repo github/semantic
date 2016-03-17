@@ -81,7 +81,7 @@ header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFile
   where filepathHeader = "diff --git a/" ++ pathA ++ " b/" ++ pathB
         fileModeHeader = case (modeA, modeB) of
           (Nothing, Just mode) -> intercalate "\n" [ "new file mode " ++ modeToDigits mode, blobOidHeader ]
-          (Just mode, Nothing) -> intercalate "\n" [ "old file mode " ++ modeToDigits mode, blobOidHeader ]
+          (Just mode, Nothing) -> intercalate "\n" [ "deleted file mode " ++ modeToDigits mode, blobOidHeader ]
           (Just mode, Just other) | mode == other -> "index " ++ oidA ++ ".." ++ oidB ++ " " ++ modeToDigits mode
           (Just mode1, Just mode2) -> intercalate "\n" [
             "old mode " ++ modeToDigits mode1,
