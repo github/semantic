@@ -84,8 +84,9 @@ header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFile
           (Just mode, Nothing) -> intercalate "\n" [ "deleted file mode " ++ modeToDigits mode, blobOidHeader ]
           (Just mode, Just other) | mode == other -> "index " ++ oidA ++ ".." ++ oidB ++ " " ++ modeToDigits mode
           (Just mode1, Just mode2) -> intercalate "\n" [
-            "old mode" ++ modeToDigits mode1,
-            "new mode " ++ modeToDigits mode2 ++ " " ++ blobOidHeader
+            "old mode " ++ modeToDigits mode1,
+            "new mode " ++ modeToDigits mode2,
+            blobOidHeader
             ]
           (Nothing, Nothing) -> ""
         blobOidHeader = "index " ++ oidA ++ ".." ++ oidB
@@ -107,7 +108,11 @@ header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFile
 
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
-hunks _ blobs | Both (True, True) <- null . source <$> blobs = [Hunk { offset = mempty, changes = [], trailingContext = [] }]
+hunks _ blobs | sources <- source <$> blobs
+              , sourcesEqual <- runBothWith (==) sources
+              , sourcesNull <- runBothWith (&&) (null <$> sources)
+              , sourcesEqual || sourcesNull
+  = [Hunk { offset = mempty, changes = [], trailingContext = [] }]
 hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap (fmap Prelude.fst) <$> splitDiffByLines (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
