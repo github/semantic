@@ -2,3 +2,6 @@ cmd: "stack build semantic-diff"
 name: "semantic-diff"
 env:
   PATH: "~/.local/bin:~/Developer/Tools:~/Library/Haskell/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+targets:
+  test:
+    cmd: "stack build :semantic-diff-test"
