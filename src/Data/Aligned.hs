@@ -2,7 +2,7 @@
 module Data.Aligned
 ( Aligned (..)
 , pattern AlignThis
-, alignThat
+, pattern AlignThat
 , alignThese
 ) where
 
@@ -16,8 +16,7 @@ newtype Aligned f recur = Aligned { unAligned :: Join These [f recur] }
 pattern AlignThis a = Aligned (Join (This a))
 
 -- | Construct a functor aligning a list of children at right with nothing at left.
-alignThat :: [f recur] -> Aligned f recur
-alignThat = Aligned . Join . That
+pattern AlignThat b = Aligned (Join (That b))
 
 -- | Construct a functor aligning two lists of children.
 alignThese :: [f recur] -> [f recur] -> Aligned f recur
