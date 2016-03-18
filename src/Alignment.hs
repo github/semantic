@@ -8,13 +8,13 @@ module Alignment
 , Row
 ) where
 
-import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad
 import Control.Monad.Free
 import Data.Adjoined
 import Data.Align
 import Data.Aligned
+import Data.Bifunctor
 import Data.Bifunctor.Join
 import Data.Bifunctor.These
 import Data.Coalescent
