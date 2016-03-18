@@ -11,3 +11,5 @@ targets:
     cmd: stack build :semantic-difftool
   semantic-git-diff:
     cmd: stack build :semantic-git-diff
+errorMatch:
+- \n(?<file>/[^:]+):(?<line>\d+):((?<col>\d+):)?
