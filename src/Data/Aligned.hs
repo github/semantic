@@ -1,6 +1,7 @@
+{-# LANGUAGE PatternSynonyms #-}
 module Data.Aligned
 ( Aligned (..)
-, alignThis
+, pattern AlignThis
 , alignThat
 , alignThese
 ) where
@@ -12,8 +13,7 @@ import Data.Bifunctor.These
 newtype Aligned f recur = Aligned { unAligned :: Join These [f recur] }
 
 -- | Construct a functor aligning a list of children at left with nothing at right.
-alignThis :: [f recur] -> Aligned f recur
-alignThis = Aligned . Join . This
+pattern AlignThis a = Aligned (Join (This a))
 
 -- | Construct a functor aligning a list of children at right with nothing at left.
 alignThat :: [f recur] -> Aligned f recur
