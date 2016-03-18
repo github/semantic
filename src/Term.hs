@@ -1,6 +1,7 @@
 module Term where
 
 import Control.Comonad.Cofree
+import Data.Bifunctor
 import Data.Functor.Both
 import Data.Maybe
 import Data.OrderedMap hiding (size)
@@ -25,6 +26,10 @@ zipTerms (annotation1 :< a) (annotation2 :< b) = annotate $ zipUnwrap a b
 -- | Fold a term into some other value, starting with the leaves.
 cata :: (annotation -> Syntax a b -> b) -> Term a annotation -> b
 cata f (annotation :< syntax) = f annotation $ cata f <$> syntax
+
+-- | Unfold a term and its annotation starting from a seed value.
+ana :: Functor f => (a -> (annotation, f a)) -> a -> Cofree f annotation
+ana f = uncurry (:<) . second (fmap (ana f)) . f
 
 -- | A hylomorphism. Given an `a`, unfold and then refold into a `b`.
 hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b

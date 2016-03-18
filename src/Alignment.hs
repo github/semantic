@@ -122,10 +122,10 @@ alignTerm :: Term leaf Info -> Syntax leaf (Term leaf Info)
 alignTerm = unwrap
 
 hylo :: Functor f => (f b -> b) -> (a -> f a) -> a -> b
-hylo phi psi = Alignment.cata phi . ana psi
+hylo phi psi = Alignment.cata phi . Alignment.ana psi
 
 cata :: Functor f => (f a -> a) -> Fix f -> a
 cata f = f . fmap (Alignment.cata f) . unFix
 
 ana :: Functor f => (a -> f a) -> a -> Fix f
-ana f = Fix . fmap (ana f) . f
+ana f = Fix . fmap (Alignment.ana f) . f
