@@ -3,7 +3,7 @@ module Data.Aligned
 ( Aligned (..)
 , pattern AlignThis
 , pattern AlignThat
-, alignThese
+, pattern AlignThese
 ) where
 
 import Data.Bifunctor.Join
@@ -19,5 +19,4 @@ pattern AlignThis a = Aligned (Join (This a))
 pattern AlignThat b = Aligned (Join (That b))
 
 -- | Construct a functor aligning two lists of children.
-alignThese :: [f recur] -> [f recur] -> Aligned f recur
-alignThese = ((Aligned . Join) .) . These
+pattern AlignThese a b = Aligned (Join (These a b))
