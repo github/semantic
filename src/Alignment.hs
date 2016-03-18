@@ -107,3 +107,6 @@ type Row a = Both (Line a)
 
 -- | A fixpoint over a functor.
 newtype Fix f = Fix { unFix :: f (Fix f) }
+
+ana :: Functor f => (a -> f a) -> a -> Fix f
+ana f = Fix . fmap (ana f) . f
