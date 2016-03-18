@@ -24,6 +24,7 @@ import Data.Functor.Identity
 import Data.Maybe
 import Data.Monoid
 import qualified Data.OrderedMap as Map
+import qualified Data.Set as Set
 import qualified Data.Text as T
 import Diff
 import Line
@@ -109,14 +110,14 @@ type Row a = Both (Line a)
 -- | A fixpoint over a functor.
 newtype Fix f = Fix { unFix :: f (Fix f) }
 
-type AlignedDiff leaf = Cofree (Aligned (Syntax leaf)) ()
+type AlignedDiff leaf = Cofree (Aligned (Syntax leaf)) Info
 
 alignPatch :: Patch (Term leaf Info) -> AlignedDiff leaf
-alignPatch (Insert term) = hylo (alignTermBy AlignThis) unCofree (() <$ term)
-alignPatch (Delete term) = hylo (alignTermBy AlignThat) unCofree (() <$ term)
-alignPatch (Replace term1 term2) = let _ :< AlignThis a = hylo (alignTermBy AlignThis) unCofree (() <$ term1)
-                                       _ :< AlignThat b = hylo (alignTermBy AlignThat) unCofree (() <$ term2) in
-                                       () :< AlignThese a b
+alignPatch (Insert term) = hylo (alignTermBy AlignThis) unCofree term
+alignPatch (Delete term) = hylo (alignTermBy AlignThat) unCofree term
+alignPatch (Replace term1 term2) = let Info r1 c1 :< AlignThis a = hylo (alignTermBy AlignThis) unCofree term1
+                                       Info r2 c2 :< AlignThat b = hylo (alignTermBy AlignThat) unCofree term2 in
+                                       Info (r1 `unionRange` r2) (Set.union c1 c2) :< AlignThese a b
 
-alignTermBy :: (forall r. [Syntax leaf r] -> Aligned (Syntax leaf) r) -> () -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
-alignTermBy constructor _ syntax = () :< constructor [syntax]
+alignTermBy :: (forall r. [Syntax leaf r] -> Aligned (Syntax leaf) r) -> Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
+alignTermBy constructor info syntax = info :< constructor [syntax]
