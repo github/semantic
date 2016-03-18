@@ -1,0 +1,1 @@
+cmd: "stack build semantic-diff"
