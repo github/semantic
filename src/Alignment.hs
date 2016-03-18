@@ -122,3 +122,7 @@ alignPatch sources (Replace term1 term2) = let Join (This info1) :< AlignThis a 
 
 alignTermBy :: Both (Source Char) -> (forall r. [Syntax leaf r] -> Aligned (Syntax leaf) r) -> Join These Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
 alignTermBy sources constructor infos syntax = infos :< constructor [syntax]
+
+alignSyntax :: Both (Source Char) -> Join These Range -> Syntax leaf (AlignedDiff leaf) -> Join These [Syntax leaf (AlignedDiff leaf)]
+alignSyntax sources ranges (Leaf s) = (Leaf s <$) <$> lineRanges
+  where lineRanges = uncurry actualLineRanges <$> Join (runBothWith bimap (flip (,) <$> sources) (runJoin ranges))
