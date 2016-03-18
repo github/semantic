@@ -120,4 +120,4 @@ alignPatch (Replace term1 term2) = let info1 :< AlignThis a = hylo (alignTermBy 
                                        both (fst info1) (snd info2) :< AlignThese a b
 
 alignTermBy :: (forall r. [Syntax leaf r] -> Aligned (Syntax leaf) r) -> Both Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
-alignTermBy constructor info syntax = info :< constructor [syntax]
+alignTermBy constructor infos syntax = infos :< constructor [syntax]
