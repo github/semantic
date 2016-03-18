@@ -110,14 +110,14 @@ type Row a = Both (Line a)
 -- | A fixpoint over a functor.
 newtype Fix f = Fix { unFix :: f (Fix f) }
 
-type AlignedDiff leaf = Cofree (Aligned (Syntax leaf)) (Both Info)
+type AlignedDiff leaf = Cofree (Aligned (Syntax leaf)) (These Info Info)
 
 alignPatch :: Patch (Term leaf Info) -> AlignedDiff leaf
-alignPatch (Insert term) = hylo (alignTermBy AlignThis) unCofree (pure <$> term)
-alignPatch (Delete term) = hylo (alignTermBy AlignThat) unCofree (pure <$> term)
-alignPatch (Replace term1 term2) = let info1 :< AlignThis a = hylo (alignTermBy AlignThis) unCofree (pure <$> term1)
-                                       info2 :< AlignThat b = hylo (alignTermBy AlignThat) unCofree (pure <$> term2) in
-                                       both (fst info1) (snd info2) :< AlignThese a b
+alignPatch (Insert term) = hylo (alignTermBy AlignThis) unCofree (This <$> term)
+alignPatch (Delete term) = hylo (alignTermBy AlignThat) unCofree (That <$> term)
+alignPatch (Replace term1 term2) = let This info1 :< AlignThis a = hylo (alignTermBy AlignThis) unCofree (This <$> term1)
+                                       That info2 :< AlignThat b = hylo (alignTermBy AlignThat) unCofree (That <$> term2) in
+                                       These info1 info2 :< AlignThese a b
 
-alignTermBy :: (forall r. [Syntax leaf r] -> Aligned (Syntax leaf) r) -> Both Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
+alignTermBy :: (forall r. [Syntax leaf r] -> Aligned (Syntax leaf) r) -> These Info Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
 alignTermBy constructor infos syntax = infos :< constructor [syntax]
