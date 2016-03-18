@@ -109,6 +109,8 @@ type Row a = Both (Line a)
 -- | A fixpoint over a functor.
 newtype Fix f = Fix { unFix :: f (Fix f) }
 
+type AlignedDiff leaf = Cofree (Aligned (Syntax leaf)) Info
+
 alignPatch :: Patch (Term leaf Info) -> Fix (Aligned (Syntax leaf))
 alignPatch (Insert term) = hylo (Fix . AlignThis . pure) unwrap term
 alignPatch (Delete term) = hylo (Fix . AlignThat . pure) unwrap term
