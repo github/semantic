@@ -112,11 +112,14 @@ newtype Fix f = Fix { unFix :: f (Fix f) }
 type AlignedDiff leaf = Cofree (Aligned (Syntax leaf)) Info
 
 alignPatch :: Patch (Term leaf Info) -> Fix (Aligned (Syntax leaf))
-alignPatch (Insert term) = hylo (Fix . AlignThis . pure) unwrap term
-alignPatch (Delete term) = hylo (Fix . AlignThat . pure) unwrap term
+alignPatch (Insert term) = hylo (Fix . AlignThis . pure) alignTerm term
+alignPatch (Delete term) = hylo (Fix . AlignThat . pure) alignTerm term
 alignPatch (Replace term1 term2) = let Fix (AlignThis a) = alignPatch $ Delete term1
                                        Fix (AlignThat b) = alignPatch $ Insert term2 in
                                        Fix (AlignThese a b)
+
+alignTerm :: Term leaf Info -> Syntax leaf (Term leaf Info)
+alignTerm = unwrap
 
 hylo :: Functor f => (f b -> b) -> (a -> f a) -> a -> b
 hylo phi psi = Alignment.cata phi . ana psi
