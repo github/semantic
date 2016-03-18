@@ -7,3 +7,5 @@ targets:
     cmd: "stack build :semantic-diff-test"
   semantic-difftool:
     cmd: "stack build :semantic-difftool"
+  semantic-git-diff:
+    cmd: "stack build :semantic-git-diff"
