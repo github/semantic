@@ -33,8 +33,7 @@ ana f = uncurry (:<) . second (fmap (ana f)) . f
 
 -- | A hylomorphism. Given an `a`, unfold and then refold into a `b`.
 hylo :: Functor f => (annotation -> f b -> b) -> (a -> (annotation, f a)) -> a -> b
-hylo down up a = down annotation $ hylo down up <$> syntax where
-  (annotation, syntax) = up a
+hylo phi psi = cata phi . ana psi
 
 -- | Return the number of leaves in the node.
 termSize :: Term a annotation -> Integer
