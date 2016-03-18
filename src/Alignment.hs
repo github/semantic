@@ -109,23 +109,14 @@ type Row a = Both (Line a)
 -- | A fixpoint over a functor.
 newtype Fix f = Fix { unFix :: f (Fix f) }
 
-type AlignedDiff leaf = Cofree (Aligned (Syntax leaf)) Info
+type AlignedDiff leaf = Cofree (Aligned (Syntax leaf)) ()
 
-alignPatch :: Patch (Term leaf Info) -> Fix (Aligned (Syntax leaf))
-alignPatch (Insert term) = Alignment.hylo (Fix . AlignThis . pure) alignTerm term
-alignPatch (Delete term) = Alignment.hylo (Fix . AlignThat . pure) alignTerm term
-alignPatch (Replace term1 term2) = let Fix (AlignThis a) = alignPatch $ Delete term1
-                                       Fix (AlignThat b) = alignPatch $ Insert term2 in
-                                       Fix (AlignThese a b)
+alignPatch :: Patch (Term leaf Info) -> AlignedDiff leaf
+alignPatch (Insert term) = hylo (alignTermBy AlignThis) unCofree (() <$ term)
+alignPatch (Delete term) = hylo (alignTermBy AlignThat) unCofree (() <$ term)
+alignPatch (Replace term1 term2) = let _ :< AlignThis a = hylo (alignTermBy AlignThis) unCofree (() <$ term1)
+                                       _ :< AlignThat b = hylo (alignTermBy AlignThat) unCofree (() <$ term2) in
+                                       () :< AlignThese a b
 
-alignTerm :: Term leaf Info -> Syntax leaf (Term leaf Info)
-alignTerm = unwrap
-
-hylo :: Functor f => (f b -> b) -> (a -> f a) -> a -> b
-hylo phi psi = Alignment.cata phi . Alignment.ana psi
-
-cata :: Functor f => (f a -> a) -> Fix f -> a
-cata f = f . fmap (Alignment.cata f) . unFix
-
-ana :: Functor f => (a -> f a) -> a -> Fix f
-ana f = Fix . fmap (Alignment.ana f) . f
+alignTermBy :: (forall r. [Syntax leaf r] -> Aligned (Syntax leaf) r) -> () -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
+alignTermBy constructor _ syntax = () :< constructor [syntax]
