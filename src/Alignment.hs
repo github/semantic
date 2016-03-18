@@ -113,11 +113,11 @@ newtype Fix f = Fix { unFix :: f (Fix f) }
 type AlignedDiff leaf = Cofree (Aligned (Syntax leaf)) (These Info Info)
 
 alignPatch :: Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
-alignPatch sources (Insert term) = hylo (alignTermBy AlignThis) unCofree (This <$> term)
-alignPatch sources (Delete term) = hylo (alignTermBy AlignThat) unCofree (That <$> term)
-alignPatch sources (Replace term1 term2) = let This info1 :< AlignThis a = hylo (alignTermBy AlignThis) unCofree (This <$> term1)
-                                               That info2 :< AlignThat b = hylo (alignTermBy AlignThat) unCofree (That <$> term2) in
+alignPatch sources (Insert term) = hylo (alignTermBy sources AlignThis) unCofree (This <$> term)
+alignPatch sources (Delete term) = hylo (alignTermBy sources AlignThat) unCofree (That <$> term)
+alignPatch sources (Replace term1 term2) = let This info1 :< AlignThis a = hylo (alignTermBy sources AlignThis) unCofree (This <$> term1)
+                                               That info2 :< AlignThat b = hylo (alignTermBy sources AlignThat) unCofree (That <$> term2) in
                                                These info1 info2 :< AlignThese a b
 
-alignTermBy :: (forall r. [Syntax leaf r] -> Aligned (Syntax leaf) r) -> These Info Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
-alignTermBy constructor infos syntax = infos :< constructor [syntax]
+alignTermBy :: Both (Source Char) -> (forall r. [Syntax leaf r] -> Aligned (Syntax leaf) r) -> These Info Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
+alignTermBy sources constructor infos syntax = infos :< constructor [syntax]
