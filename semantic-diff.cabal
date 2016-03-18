@@ -48,6 +48,7 @@ library
                      , TreeSitter
   build-depends:       aeson
                      , base >= 4.8 && < 5
+                     , bifunctors
                      , blaze-html
                      , blaze-markup
                      , bytestring
