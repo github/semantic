@@ -5,3 +5,5 @@ env:
 targets:
   test:
     cmd: "stack build :semantic-diff-test"
+  semantic-difftool:
+    cmd: "stack build :semantic-difftool"
