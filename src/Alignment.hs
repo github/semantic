@@ -108,6 +108,9 @@ type Row a = Both (Line a)
 -- | A fixpoint over a functor.
 newtype Fix f = Fix { unFix :: f (Fix f) }
 
+hylo :: Functor f => (f b -> b) -> (a -> f a) -> a -> b
+hylo phi psi = Alignment.cata phi . ana psi
+
 cata :: Functor f => (f a -> a) -> Fix f -> a
 cata f = f . fmap (Alignment.cata f) . unFix
 
