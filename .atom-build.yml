@@ -1,1 +1,2 @@
 cmd: "stack build semantic-diff"
+name: "semantic-diff"
