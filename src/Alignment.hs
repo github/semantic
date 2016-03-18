@@ -14,6 +14,7 @@ import Control.Monad
 import Control.Monad.Free
 import Data.Adjoined
 import Data.Align
+import Data.Aligned
 import Data.Bifunctor.These
 import Data.Coalescent
 import Data.Copointed
@@ -107,6 +108,13 @@ type Row a = Both (Line a)
 
 -- | A fixpoint over a functor.
 newtype Fix f = Fix { unFix :: f (Fix f) }
+
+alignPatch :: Patch (Term leaf Info) -> Fix (Aligned (Syntax leaf))
+alignPatch (Insert term) = hylo (Fix . AlignThis . pure) unwrap term
+alignPatch (Delete term) = hylo (Fix . AlignThat . pure) unwrap term
+alignPatch (Replace term1 term2) = let Fix (AlignThis a) = alignPatch $ Delete term1
+                                       Fix (AlignThat b) = alignPatch $ Insert term2 in
+                                       Fix (AlignThese a b)
 
 hylo :: Functor f => (f b -> b) -> (a -> f a) -> a -> b
 hylo phi psi = Alignment.cata phi . ana psi
