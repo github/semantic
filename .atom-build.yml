@@ -1,3 +1,4 @@
+# Build configuration for https://atom.io/packages/build
 cmd: "stack build semantic-diff"
 name: "semantic-diff"
 env:
