@@ -5,6 +5,7 @@ env:
 targets:
   test:
     cmd: "stack build :semantic-diff-test"
+    keymap: "cmd-u"
   semantic-difftool:
     cmd: "stack build :semantic-difftool"
   semantic-git-diff:
