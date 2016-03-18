@@ -108,9 +108,6 @@ openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
 -- | A row in a split diff, composed of a before line and an after line.
 type Row a = Both (Line a)
 
--- | A fixpoint over a functor.
-newtype Fix f = Fix { unFix :: f (Fix f) }
-
 type AlignedDiff leaf = Cofree (Aligned (Syntax leaf)) (Join These Info)
 
 alignPatch :: Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
