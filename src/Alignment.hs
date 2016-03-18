@@ -125,5 +125,5 @@ alignTerm sources infos syntax = infos :< alignSyntax sources (characterRange <$
 
 alignSyntax :: Both (Source Char) -> Join These Range -> Syntax leaf (AlignedDiff leaf) -> Aligned (Syntax leaf) (AlignedDiff leaf)
 alignSyntax sources ranges syntax = Aligned $ case syntax of
-  Leaf s -> (Leaf s <$) <$> lineRanges
+  Leaf _ -> (syntax <$) <$> lineRanges
   where lineRanges = uncurry actualLineRanges <$> Join (runBothWith bimap (flip (,) <$> sources) (runJoin ranges))
