@@ -15,6 +15,7 @@ import Control.Monad.Free
 import Data.Adjoined
 import Data.Align
 import Data.Aligned
+import Data.Bifunctor.Join
 import Data.Bifunctor.These
 import Data.Coalescent
 import Data.Copointed
@@ -110,14 +111,14 @@ type Row a = Both (Line a)
 -- | A fixpoint over a functor.
 newtype Fix f = Fix { unFix :: f (Fix f) }
 
-type AlignedDiff leaf = Cofree (Aligned (Syntax leaf)) (These Info Info)
+type AlignedDiff leaf = Cofree (Aligned (Syntax leaf)) (Join These Info)
 
 alignPatch :: Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
-alignPatch sources (Insert term) = hylo (alignTermBy sources AlignThis) unCofree (This <$> term)
-alignPatch sources (Delete term) = hylo (alignTermBy sources AlignThat) unCofree (That <$> term)
-alignPatch sources (Replace term1 term2) = let This info1 :< AlignThis a = hylo (alignTermBy sources AlignThis) unCofree (This <$> term1)
-                                               That info2 :< AlignThat b = hylo (alignTermBy sources AlignThat) unCofree (That <$> term2) in
-                                               These info1 info2 :< AlignThese a b
+alignPatch sources (Insert term) = hylo (alignTermBy sources AlignThis) unCofree (Join . This <$> term)
+alignPatch sources (Delete term) = hylo (alignTermBy sources AlignThat) unCofree (Join . That <$> term)
+alignPatch sources (Replace term1 term2) = let Join (This info1) :< AlignThis a = hylo (alignTermBy sources AlignThis) unCofree (Join . This <$> term1)
+                                               Join (That info2) :< AlignThat b = hylo (alignTermBy sources AlignThat) unCofree (Join . That <$> term2) in
+                                               Join (These info1 info2) :< AlignThese a b
 
-alignTermBy :: Both (Source Char) -> (forall r. [Syntax leaf r] -> Aligned (Syntax leaf) r) -> These Info Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
+alignTermBy :: Both (Source Char) -> (forall r. [Syntax leaf r] -> Aligned (Syntax leaf) r) -> Join These Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
 alignTermBy sources constructor infos syntax = infos :< constructor [syntax]
