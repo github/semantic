@@ -32,7 +32,7 @@ ana :: Functor f => (a -> (annotation, f a)) -> a -> Cofree f annotation
 ana f = uncurry (:<) . second (fmap (ana f)) . f
 
 -- | A hylomorphism. Given an `a`, unfold and then refold into a `b`.
-hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
+hylo :: Functor f => (annotation -> f b -> b) -> (a -> (annotation, f a)) -> a -> b
 hylo down up a = down annotation $ hylo down up <$> syntax where
   (annotation, syntax) = up a
 
