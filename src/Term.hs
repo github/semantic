@@ -24,7 +24,7 @@ zipTerms (annotation1 :< a) (annotation2 :< b) = annotate $ zipUnwrap a b
     zipUnwrapMaps a' b' key = (,) key <$> zipTerms (a' ! key) (b' ! key)
 
 -- | Fold a term into some other value, starting with the leaves.
-cata :: (annotation -> Syntax a b -> b) -> Term a annotation -> b
+cata :: Functor f => (annotation -> f b -> b) -> Cofree f annotation -> b
 cata f (annotation :< syntax) = f annotation $ cata f <$> syntax
 
 -- | Unfold a term and its annotation starting from a seed value.
