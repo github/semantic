@@ -31,11 +31,6 @@ diffTerms = interpret comparable
 interpret :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
 interpret comparable a b = fromMaybe (Pure $ Replace a b) $ constructAndRun comparable a b
 
--- | A hylomorphism. Given an `a`, unfold and then refold into a `b`.
-hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
-hylo down up a = down annotation $ hylo down up <$> syntax where
-  (annotation, syntax) = up a
-
 -- | Constructs an algorithm and runs it
 constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
 constructAndRun _ a b | a == b = hylo (curry $ Free . uncurry Annotated) (copoint &&& unwrap) <$> zipTerms a b where

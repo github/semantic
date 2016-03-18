@@ -26,6 +26,11 @@ zipTerms (annotation1 :< a) (annotation2 :< b) = annotate $ zipUnwrap a b
 cata :: (annotation -> Syntax a b -> b) -> Term a annotation -> b
 cata f (annotation :< syntax) = f annotation $ cata f <$> syntax
 
+-- | A hylomorphism. Given an `a`, unfold and then refold into a `b`.
+hylo :: Functor f => (t -> f b -> b) -> (a -> (t, f a)) -> a -> b
+hylo down up a = down annotation $ hylo down up <$> syntax where
+  (annotation, syntax) = up a
+
 -- | Return the number of leaves in the node.
 termSize :: Term a annotation -> Integer
 termSize = cata size where
