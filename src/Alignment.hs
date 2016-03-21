@@ -25,7 +25,6 @@ import Data.Functor.Identity
 import Data.Maybe
 import Data.Monoid
 import qualified Data.OrderedMap as Map
-import qualified Data.Set as Set
 import qualified Data.Text as T
 import Diff
 import Line
