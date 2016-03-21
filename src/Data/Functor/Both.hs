@@ -24,6 +24,9 @@ bothOfThese a = these (`both` snd a) (both (fst a)) both
 maybeBothOfThese :: These a a -> Both (Maybe a)
 maybeBothOfThese = bothOfThese (pure Nothing) . bimap Just Just
 
+pairWithThese :: Both a -> These b c -> These (a, b) (a, c)
+pairWithThese = uncurry bimap . bimap (,) (,) . runBoth
+
 -- | Apply a function to `Both` sides of a computation.
 runBothWith :: (a -> a -> b) -> Both a -> b
 runBothWith f = uncurry f . runBoth
