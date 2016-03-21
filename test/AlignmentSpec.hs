@@ -66,6 +66,9 @@ spec = parallel $ do
       patchWithBoth (Delete ()) = Delete . fst
       patchWithBoth (Replace () ()) = runBothWith Replace
 
+      branch :: annotation -> [Free (Annotated String annotation) patch] -> Free (Annotated String annotation) patch
+      branch annotation = Free . Annotated annotation . Indexed
+
       leaf :: annotation -> String -> Free (Annotated String annotation) patch
       leaf info = Free . Annotated info . Leaf
 
