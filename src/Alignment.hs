@@ -13,7 +13,6 @@ import Control.Monad
 import Control.Monad.Free
 import Data.Adjoined
 import Data.Align
-import Data.Aligned
 import Data.Bifunctor
 import Data.Bifunctor.Join
 import Data.Bifunctor.These
@@ -107,20 +106,24 @@ openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
 -- | A row in a split diff, composed of a before line and an after line.
 type Row a = Both (Line a)
 
-type AlignedDiff leaf = Cofree (Aligned (Syntax leaf)) (Join These Info)
+type AlignedDiff leaf = Join These [Cofree (Syntax leaf) Info]
 
 alignPatch :: Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
 alignPatch sources (Insert term) = hylo (alignTerm sources) unCofree (Join . This <$> term)
 alignPatch sources (Delete term) = hylo (alignTerm sources) unCofree (Join . That <$> term)
-alignPatch sources (Replace term1 term2) = let Join (This info1) :< AlignThis a = hylo (alignTerm sources) unCofree (Join . This <$> term1)
-                                               Join (That info2) :< AlignThat b = hylo (alignTerm sources) unCofree (Join . That <$> term2) in
-                                               Join (These info1 info2) :< AlignThese a b
+alignPatch sources (Replace term1 term2) = let Join (This a) = hylo (alignTerm sources) unCofree (Join . This <$> term1)
+                                               Join (That b) = hylo (alignTerm sources) unCofree (Join . That <$> term2) in
+                                               Join (These a b)
 
 alignTerm :: Both (Source Char) -> Join These Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
-alignTerm sources infos syntax = infos :< alignSyntax sources (characterRange <$> infos) syntax
+alignTerm sources infos syntax = runBothWith ((Join .) . theseBoth) $ (\ info source -> (\ info -> (info :<) <$> alignSyntax source (characterRange info) syntax) <$> info) <$> maybeBothOfThese (runJoin infos) <*> sources
+  where theseBoth (Just a) (Just b) = These a b
+        theseBoth (Just a) _ = This a
+        theseBoth _ (Just b) = That b
+        theseBoth _ _ = error "one of these was supposed to exist, that was the deal"
 
-alignSyntax :: Both (Source Char) -> Join These Range -> Syntax leaf (AlignedDiff leaf) -> Aligned (Syntax leaf) (AlignedDiff leaf)
-alignSyntax sources ranges syntax = Aligned $ case syntax of
-  Leaf _ -> (syntax <$) <$> lineRanges
-  _ -> [] <$ ranges
-  where lineRanges = uncurry actualLineRanges <$> Join (runBothWith bimap (flip (,) <$> sources) (runJoin ranges))
+alignSyntax :: Source Char -> Range -> Syntax leaf (AlignedDiff leaf) -> [Syntax leaf (Cofree (Syntax leaf) Info)]
+alignSyntax source range syntax = case syntax of
+  Leaf s -> Leaf s <$ lineRanges
+  _ -> []
+  where lineRanges = actualLineRanges range source
