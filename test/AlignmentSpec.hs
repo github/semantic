@@ -95,8 +95,5 @@ spec = parallel $ do
       leaf :: annotation -> String -> Free (Annotated String annotation) patch
       leaf info = Free . Annotated info . Leaf
 
-      source :: String -> Source Char
-      source = Source.fromList
-
       info :: Int -> Int -> Info
       info = ((`Info` mempty) .) . Range
