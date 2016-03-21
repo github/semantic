@@ -18,6 +18,9 @@ data Annotated a annotation f = Annotated { annotation :: !annotation, syntax ::
 data Info = Info { characterRange :: !Range, categories :: !(Set Category) }
   deriving (Eq, Show)
 
+setCharacterRange :: Info -> Range -> Info
+setCharacterRange info range = Info range (Diff.categories info)
+
 instance Categorizable Info where
   categories = Diff.categories
 
