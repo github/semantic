@@ -118,6 +118,14 @@ alignPatch sources (Replace term1 term2) = let Join (This a) = hylo (alignTerm s
 alignTerm :: Both (Source Char) -> Join These Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
 alignTerm sources infos syntax = (\ (source, info) -> Free . Annotated info <$> alignSyntax source (characterRange info) syntax) <$> Join (pairWithThese sources (runJoin infos))
 
+alignDiff :: Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
+alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
+  where alignSyntax :: Annotated leaf (Both Info) (AlignedDiff leaf) -> AlignedDiff leaf
+        alignSyntax (Annotated infos syntax) = case syntax of
+          Leaf s -> runBothWith ((Join .) . These) $ (\ info -> (Free (Annotated info (Leaf s)) <$)) <$> infos <*> lineRanges
+          _ -> Join (These [] [])
+          where lineRanges = actualLineRanges <$> (characterRange <$> infos) <*> sources
+
 alignSyntax :: Source Char -> Range -> Syntax leaf (AlignedDiff leaf) -> [Syntax leaf (SplitDiff leaf Info)]
 alignSyntax source range syntax = case syntax of
   Leaf s -> Leaf s <$ lineRanges
