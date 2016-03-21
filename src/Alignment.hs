@@ -116,11 +116,7 @@ alignPatch sources (Replace term1 term2) = let Join (This a) = hylo (alignTerm s
                                                Join (These a b)
 
 alignTerm :: Both (Source Char) -> Join These Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
-alignTerm sources infos syntax = runBothWith ((Join .) . theseBoth) $ (\ info source -> (\ info -> (info :<) <$> alignSyntax source (characterRange info) syntax) <$> info) <$> maybeBothOfThese (runJoin infos) <*> sources
-  where theseBoth (Just a) (Just b) = These a b
-        theseBoth (Just a) _ = This a
-        theseBoth _ (Just b) = That b
-        theseBoth _ _ = error "one of these was supposed to exist, that was the deal"
+alignTerm sources infos syntax = (\ (source, info) -> (info :<) <$> alignSyntax source (characterRange info) syntax) <$> Join (pairWithThese sources (runJoin infos))
 
 alignSyntax :: Source Char -> Range -> Syntax leaf (AlignedDiff leaf) -> [Syntax leaf (Cofree (Syntax leaf) Info)]
 alignSyntax source range syntax = case syntax of
