@@ -66,5 +66,8 @@ spec = parallel $ do
       patchWithBoth (Delete ()) = Delete . fst
       patchWithBoth (Replace () ()) = runBothWith Replace
 
+      source :: String -> Source Char
+      source = Source.fromList
+
       info :: Int -> Int -> Info
       info = ((`Info` mempty) .) . Range
