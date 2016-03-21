@@ -18,6 +18,7 @@ data Annotated a annotation f = Annotated { annotation :: !annotation, syntax ::
 data Info = Info { characterRange :: !Range, categories :: !(Set Category) }
   deriving (Eq, Show)
 
+-- | Return a new Info by replacing its characterRange.
 setCharacterRange :: Info -> Range -> Info
 setCharacterRange info range = Info range (Diff.categories info)
 
