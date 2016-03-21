@@ -106,7 +106,7 @@ openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
 -- | A row in a split diff, composed of a before line and an after line.
 type Row a = Both (Line a)
 
-type AlignedDiff leaf = Join These [Cofree (Syntax leaf) Info]
+type AlignedDiff leaf = Join These [SplitDiff leaf Info]
 
 alignPatch :: Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
 alignPatch sources (Insert term) = hylo (alignTerm sources) unCofree (Join . This <$> term)
@@ -116,9 +116,9 @@ alignPatch sources (Replace term1 term2) = let Join (This a) = hylo (alignTerm s
                                                Join (These a b)
 
 alignTerm :: Both (Source Char) -> Join These Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
-alignTerm sources infos syntax = (\ (source, info) -> (info :<) <$> alignSyntax source (characterRange info) syntax) <$> Join (pairWithThese sources (runJoin infos))
+alignTerm sources infos syntax = (\ (source, info) -> Free . Annotated info <$> alignSyntax source (characterRange info) syntax) <$> Join (pairWithThese sources (runJoin infos))
 
-alignSyntax :: Source Char -> Range -> Syntax leaf (AlignedDiff leaf) -> [Syntax leaf (Cofree (Syntax leaf) Info)]
+alignSyntax :: Source Char -> Range -> Syntax leaf (AlignedDiff leaf) -> [Syntax leaf (SplitDiff leaf Info)]
 alignSyntax source range syntax = case syntax of
   Leaf s -> Leaf s <$ lineRanges
   _ -> []
