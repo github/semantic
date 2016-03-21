@@ -126,8 +126,8 @@ alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
           _ -> both [] []
           where lineRanges = actualLineRanges <$> (characterRange <$> infos) <*> sources
 
-groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> Join These [[SplitDiff leaf Info]]
-groupChildrenByLine (Join lineRanges) children = Join $ bimap (f children) (g children) lineRanges
+groupChildrenByLine :: These [Range] [Range] -> [AlignedDiff leaf] -> Join These [[SplitDiff leaf Info]]
+groupChildrenByLine lineRanges children = Join $ bimap (f children) (g children) lineRanges
   where f children ranges = (\ range -> children >>= intersectionsFst range) <$> ranges
         g children ranges = (\ range -> children >>= intersectionsSnd range) <$> ranges
         intersectionsFst range = filter (intersectsRange range) . these id (const []) (curry Prelude.fst) . runJoin
