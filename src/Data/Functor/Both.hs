@@ -25,6 +25,8 @@ maybeBothOfThese :: These a a -> Both (Maybe a)
 maybeBothOfThese = bothOfThese (pure Nothing) . bimap Just Just
 
 -- | Pairs either or both elements of These with the corresponding elements of Both.
+-- |
+-- | This is a total operation which makes it easier to cope with the lack of an Applicative or Biapplicative instance for These.
 pairWithThese :: Both a -> These b c -> These (a, b) (a, c)
 pairWithThese = uncurry bimap . bimap (,) (,) . runBoth
 
