@@ -35,3 +35,12 @@ class Functor t => TotalCrosswalk t where
 
 instance TotalCrosswalk Identity where
   tcrosswalk _ f = fmap Identity . f . runIdentity
+
+class Functor t => Crosswalk t where
+  -- | Embed a structure into an `Align`able functor by mapping its elements into that functor and convoluting (inverting the embedding).
+  crosswalk :: Align f => (a -> f b) -> t a -> f (t b)
+  crosswalk f = sequenceL . fmap f
+
+  -- | Convolute (invert the embedding of) a structure over an `Align`able functor.
+  sequenceL :: Align f => t (f a) -> f (t a)
+  sequenceL = crosswalk id
