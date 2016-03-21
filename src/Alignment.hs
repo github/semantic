@@ -121,9 +121,10 @@ alignTerm sources infos syntax = (\ (source, info) -> Free . Annotated info <$> 
 alignDiff :: Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
 alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
   where alignSyntax :: Annotated leaf (Both Info) (AlignedDiff leaf) -> AlignedDiff leaf
-        alignSyntax (Annotated infos syntax) = runBothWith ((Join .) . These) $ case syntax of
-          Leaf s -> (\ info -> fmap (Free . (`Annotated` Leaf s) . setCharacterRange info)) <$> infos <*> lineRanges
-          _ -> both [] []
+        alignSyntax (Annotated infos syntax) = case syntax of
+          Leaf s -> runBothWith ((Join .) . These) $ (\ info -> fmap (Free . (`Annotated` Leaf s) . setCharacterRange info)) <$> infos <*> lineRanges
+          Indexed children -> fmap (\ (range, children) -> Free (Annotated (Info range mempty) (Indexed children))) <$> groupChildrenByLine (runBothWith These lineRanges) children
+          _ -> Join (These [] [])
           where lineRanges = actualLineRanges <$> (characterRange <$> infos) <*> sources
 
 groupChildrenByLine :: These [Range] [Range] -> [AlignedDiff leaf] -> Join These [(Range, [SplitDiff leaf Info])]
