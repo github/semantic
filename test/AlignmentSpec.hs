@@ -66,6 +66,9 @@ spec = parallel $ do
       patchWithBoth (Delete ()) = Delete . fst
       patchWithBoth (Replace () ()) = runBothWith Replace
 
+      leaf :: annotation -> String -> Free (Annotated String annotation) patch
+      leaf info = Free . Annotated info . Leaf
+
       source :: String -> Source Char
       source = Source.fromList
 
