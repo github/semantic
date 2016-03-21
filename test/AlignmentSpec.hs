@@ -65,3 +65,6 @@ spec = parallel $ do
       patchWithBoth (Insert ()) = Insert . snd
       patchWithBoth (Delete ()) = Delete . fst
       patchWithBoth (Replace () ()) = runBothWith Replace
+
+      info :: Int -> Int -> Info
+      info = ((`Info` mempty) .) . Range
