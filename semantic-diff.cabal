@@ -78,6 +78,7 @@ test-suite semantic-diff-test
                      , PatchOutputSpec
                      , TermSpec
   build-depends:       base
+                     , bifunctors
                      , bytestring
                      , containers
                      , deepseq
