@@ -65,3 +65,9 @@ class Align f => Unalign f where
   unalign x = (left <$> x, right <$> x)
     where left = these Just (const Nothing) (curry (Just . fst))
           right = these (const Nothing) Just (curry (Just . snd))
+
+instance Unalign [] where
+  unalign = foldr (these this that them) ([], [])
+    where this l ~(ls,rs) = (Just l : ls, Nothing : rs)
+          that r ~(ls,rs) = (Nothing : ls, Just r : rs)
+          them l r ~(ls,rs) = (Just l : ls, Just r : rs)
