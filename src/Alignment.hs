@@ -131,12 +131,11 @@ alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
           where lineRanges = runBothWith ((Join .) . These) (actualLineRanges <$> (characterRange <$> infos) <*> sources)
 
 groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
-groupChildrenByLine lineRanges children = groupChildren <$> sequenceL lineRanges
+groupChildrenByLine lineRanges children = Join . bimap f g . runJoin <$> sequenceL lineRanges
   where f range = (range, children >>= filter (intersects range . getRange) . catMaybes . fmap (maybeFst . runJoin))
         g range = (range, children >>= filter (intersects range . getRange) . catMaybes . fmap (maybeSnd . runJoin))
         getRange (Free (Annotated (Info range _) _)) = range
         getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
-        groupChildren = Join . bimap f g . runJoin
 
 intersects :: Range -> Range -> Bool
 intersects a b = max (start a) (start b) < min (end a) (end b)
