@@ -58,22 +58,22 @@ spec = parallel $ do
   describe "alignDiff" $ do
     it "aligns smaller diffs" $
       alignDiff (both (Source.fromList "[ foo ]") (Source.fromList "[\nfoo\n]")) (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe`
-        [ Join (These [ info 0 7 `branch` [ info 2 5 `leaf` "foo" ] ]
-                      [ info 0 2 `branch` [] ])
-        , Join (That  [ info 2 6 `branch` [ info 2 5 `leaf` "foo" ] ])
-        , Join (That  [ info 6 7 `branch` [] ])
+        [ Join (These (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])
+                      (info 0 2 `branch` []))
+        , Join (That  (info 2 6 `branch` [ info 2 5 `leaf` "foo" ]))
+        , Join (That  (info 6 7 `branch` []))
         ]
 
     it "aligns bigger diffs" $
       alignDiff (both (Source.fromList "[ foo ]\nbar\n") (Source.fromList "[\nfoo\n]\nbar\n")) (pure (info 0 12) `branch` [ pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ], pure (info 8 11) `leaf` "bar" ]) `shouldBe`
-        [ Join (These [ info 0 8 `branch` [ info 0 7 `branch` [ info 2 5 `leaf` "foo" ] ] ]
-                      [ info 0 2 `branch` [ info 0 2 `branch` [] ] ])
-        , Join (That  [ info 2 6 `branch` [ info 2 6 `branch` [ info 2 5 `leaf` "foo" ] ] ])
-        , Join (That  [ info 6 8 `branch` [ info 6 7 `branch` [] ] ])
-        , Join (These [ info 8 12 `branch` [ info 8 11 `leaf` "bar" ] ]
-                      [ info 8 12 `branch` [ info 8 11 `leaf` "bar" ] ])
-        , Join (These [ info 12 12 `branch` [] ]
-                      [ info 12 12 `branch` [] ])
+        [ Join (These (info 0 8 `branch` [ info 0 7 `branch` [ info 2 5 `leaf` "foo" ] ])
+                      (info 0 2 `branch` [ info 0 2 `branch` [] ]))
+        , Join (That  (info 2 6 `branch` [ info 2 6 `branch` [ info 2 5 `leaf` "foo" ] ]))
+        , Join (That  (info 6 8 `branch` [ info 6 7 `branch` [] ]))
+        , Join (These (info 8 12 `branch` [ info 8 11 `leaf` "bar" ])
+                      (info 8 12 `branch` [ info 8 11 `leaf` "bar" ]))
+        , Join (These (info 12 12 `branch` [])
+                      (info 12 12 `branch` []))
         ]
 
     where
