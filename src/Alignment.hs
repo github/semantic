@@ -6,6 +6,8 @@ module Alignment
 , splitAbstractedTerm
 , splitDiffByLines
 , Row
+, AlignedDiff
+, alignDiff
 ) where
 
 import Control.Comonad.Cofree
@@ -106,37 +108,41 @@ openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
 -- | A row in a split diff, composed of a before line and an after line.
 type Row a = Both (Line a)
 
-type AlignedDiff leaf = Join These [SplitDiff leaf Info]
+type AlignedDiff leaf = [Join These (SplitDiff leaf Info)]
 
 alignPatch :: Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
-alignPatch sources (Insert term) = hylo (alignTerm sources) unCofree (Join . This <$> term)
-alignPatch sources (Delete term) = hylo (alignTerm sources) unCofree (Join . That <$> term)
-alignPatch sources (Replace term1 term2) = let Join (This a) = hylo (alignTerm sources) unCofree (Join . This <$> term1)
-                                               Join (That b) = hylo (alignTerm sources) unCofree (Join . That <$> term2) in
-                                               Join (These a b)
-
-alignTerm :: Both (Source Char) -> Join These Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
-alignTerm sources infos syntax = (\ (source, info) -> Free . Annotated info <$> alignSyntax source (characterRange info) syntax) <$> Join (pairWithThese sources (runJoin infos))
+alignPatch _ _ = []
+-- alignPatch sources patch = crosswalk (hylo (alignTerm sources) unCofree) (unPatch patch)
+-- alignPatch sources (Insert term) = hylo (alignTerm sources) unCofree term
+-- alignPatch sources (Delete term) = hylo (alignTerm sources) unCofree term
+-- alignPatch sources (Replace term1 term2) = alignWith Join (hylo (alignTerm sources) unCofree term1)
+--                                                           (hylo (alignTerm sources) unCofree term2)
+--
+-- alignTerm :: Both (Source Char) -> Join These Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
+-- alignTerm sources infos syntax = (\ (source, info) -> Free . Annotated info <$> alignSyntax source (characterRange info) syntax) <$> Join (pairWithThese sources (runJoin infos))
 
 alignDiff :: Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
 alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
   where alignSyntax :: Annotated leaf (Both Info) (AlignedDiff leaf) -> AlignedDiff leaf
         alignSyntax (Annotated infos syntax) = case syntax of
-          Leaf s -> runBothWith ((Join .) . These) $ (\ info -> fmap (Free . (`Annotated` Leaf s) . setCharacterRange info)) <$> infos <*> lineRanges
-          Indexed children -> fmap (\ (range, children) -> Free (Annotated (Info range mempty) (Indexed children))) <$> groupChildrenByLine (runBothWith These lineRanges) children
-          _ -> Join (These [] [])
-          where lineRanges = actualLineRanges <$> (characterRange <$> infos) <*> sources
+          -- Leaf s -> runBothWith ((Join .) . These) $ (\ info -> fmap (Free . (`Annotated` Leaf s) . setCharacterRange info)) <$> infos <*> lineRanges
+          Indexed children -> fmap (\ (range, children) -> Free (Annotated (Info range mempty) (Indexed children))) <$> groupChildrenByLine lineRanges children
+          _ -> []
+          where lineRanges = runBothWith ((Join .) . These) (actualLineRanges <$> (characterRange <$> infos) <*> sources)
 
-groupChildrenByLine :: These [Range] [Range] -> [AlignedDiff leaf] -> Join These [(Range, [SplitDiff leaf Info])]
-groupChildrenByLine lineRanges children = Join $ bimap (f children) (g children) lineRanges
-  where f children ranges = (\ range -> (range, children >>= intersectionsFst range)) <$> ranges
-        g children ranges = (\ range -> (range, children >>= intersectionsSnd range)) <$> ranges
-        intersectionsFst range = filter (intersectsRange range) . these id (const []) (curry Prelude.fst) . runJoin
-        intersectionsSnd range = filter (intersectsRange range) . these (const []) id (curry Prelude.snd) . runJoin
-        intersectsRange range (Free (Annotated (Info nodeRange _) _)) = max (start nodeRange) (start range) < min (end nodeRange) (end range)
+groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
+groupChildrenByLine lineRanges children = groupChildren <$> sequenceL lineRanges
+  where f range = (range, children >>= filter (intersects range . getRange) . catMaybes . fmap (maybeFst . runJoin))
+        g range = (range, children >>= filter (intersects range . getRange) . catMaybes . fmap (maybeSnd . runJoin))
+        getRange (Free (Annotated (Info range _) _)) = range
+        getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
+        groupChildren = Join . bimap f g . runJoin
 
-alignSyntax :: Source Char -> Range -> Syntax leaf (AlignedDiff leaf) -> [Syntax leaf (SplitDiff leaf Info)]
-alignSyntax source range syntax = case syntax of
-  Leaf s -> Leaf s <$ lineRanges
-  _ -> []
-  where lineRanges = actualLineRanges range source
+intersects :: Range -> Range -> Bool
+intersects a b = max (start a) (start b) < min (end a) (end b)
+
+-- alignSyntax :: Source Char -> Range -> Syntax leaf (AlignedDiff leaf) -> [Syntax leaf (SplitDiff leaf Info)]
+-- alignSyntax source range syntax = case syntax of
+--   Leaf s -> Leaf s <$ lineRanges
+--   _ -> []
+--   where lineRanges = actualLineRanges range source
