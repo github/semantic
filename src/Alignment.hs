@@ -125,7 +125,7 @@ alignDiff :: Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
 alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
   where alignSyntax :: Annotated leaf (Both Info) (AlignedDiff leaf) -> AlignedDiff leaf
         alignSyntax (Annotated infos syntax) = case syntax of
-          -- Leaf s -> runBothWith ((Join .) . These) $ (\ info -> fmap (Free . (`Annotated` Leaf s) . setCharacterRange info)) <$> infos <*> lineRanges
+          Leaf s -> (Join . bimap (Free . (`Annotated` Leaf s) . setCharacterRange (fst infos)) (Free . (`Annotated` Leaf s) . setCharacterRange (snd infos)) . runJoin) <$> sequenceL lineRanges
           Indexed children -> fmap (\ (range, children) -> Free (Annotated (Info range mempty) (Indexed children))) <$> groupChildrenByLine lineRanges children
           _ -> []
           where lineRanges = runBothWith ((Join .) . These) (actualLineRanges <$> (characterRange <$> infos) <*> sources)
