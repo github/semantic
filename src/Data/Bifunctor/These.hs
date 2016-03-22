@@ -12,12 +12,12 @@ these _ f _ (That that) = f that
 these _ _ f (These this that) = f this that
 
 -- | Return Just the value in This, or the first value in These, if any.
-maybeFirst :: These a b -> Maybe a
-maybeFirst = these Just (const Nothing) ((Just .) . const)
+maybeFst :: These a b -> Maybe a
+maybeFst = these Just (const Nothing) ((Just .) . const)
 
 -- | Return Just the value in That, or the second value in These, if any.
-maybeSecond :: These a b -> Maybe b
-maybeSecond = these (const Nothing) Just ((Just .) . flip const)
+maybeSnd :: These a b -> Maybe b
+maybeSnd = these (const Nothing) Just ((Just .) . flip const)
 
 
 -- Instances

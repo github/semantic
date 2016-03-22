@@ -11,11 +11,11 @@ data Patch a =
 
 -- | Return the item from the after side of the patch.
 after :: Patch a -> Maybe a
-after = maybeFirst . unPatch
+after = maybeFst . unPatch
 
 -- | Return the item from the before side of the patch.
 before :: Patch a -> Maybe a
-before = maybeSecond . unPatch
+before = maybeSnd . unPatch
 
 -- | Return both sides of a patch.
 unPatch :: Patch a -> These a a
