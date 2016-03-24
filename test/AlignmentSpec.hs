@@ -56,7 +56,7 @@ spec = parallel $ do
             both (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
   describe "groupChildrenByLine" $ do
-    it "produces context lines without children" $
+    it "produces symmetrical context" $
       groupChildrenByLine (Join (These [Range 0 2, Range 2 4] [Range 0 2, Range 2 4])) [] `shouldBe`
         [ Join (These (Range 0 2, [] :: [SplitDiff String Info])
                       (Range 0 2, []))
