@@ -144,7 +144,7 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) chil
         getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
 
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
-modifyJoin = (Join .) . runJoinWith
+modifyJoin f = Join . f . runJoin
 
 bimapJoin :: Bifunctor p => (a -> b) -> (a -> b) -> Join p a -> Join p b
 bimapJoin f g = modifyJoin $ bimap f g
