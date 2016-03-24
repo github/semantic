@@ -55,6 +55,15 @@ spec = parallel $ do
           \ source -> splitAbstractedTerm makeTerm (pure source) (pure $ Info (totalRange source) mempty) (Indexed []) `shouldBe` fromList [
             both (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
+  describe "groupChildrenByLine" $ do
+    it "produces context lines without children" $
+      groupChildrenByLine (Join (These [Range 0 2, Range 2 4] [Range 0 2, Range 2 4])) [] `shouldBe`
+        [ Join (These (Range 0 2, [] :: [SplitDiff String Info])
+                      (Range 0 2, []))
+        , Join (These (Range 2 4, [])
+                      (Range 2 4, []))
+        ]
+
   describe "alignDiff" $ do
     it "aligns identical branches on a single line" $
       alignDiff (both (Source.fromList "[ foo ]") (Source.fromList "[ foo ]")) (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe`
