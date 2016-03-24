@@ -135,7 +135,7 @@ groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (
 groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) children
   where go ranges children | (l:ls, r:rs) <- ranges
                            , ((firstLine:restOfLines):rest) <- children
-                           = case fromThese False False . runJoin $ bimapJoin (intersects l . getRange) (intersects r . getRange) firstLine of
+                           = case fromThese False False $ bimap (intersects l . getRange) (intersects r . getRange) $ runJoin firstLine of
                               (True, True) -> bimapJoin ((,) l . pure) ((,) r . pure) firstLine : go ranges (restOfLines:rest)
                               (_, _) -> Join (These (l, []) (r, [])) : go (ls, rs) children
                            | ([]:rest) <- children = go ranges rest
