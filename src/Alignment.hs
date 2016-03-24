@@ -131,9 +131,8 @@ alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
           where lineRanges = runBothWith ((Join .) . These) (actualLineRanges <$> (characterRange <$> infos) <*> sources)
 
 groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
-groupChildrenByLine ranges children = go rangeLists children
-  where rangeLists = these (flip (,) []) ((,) []) (,) (runJoin ranges)
-        go ranges children | (l:ls, r:rs) <- ranges
+groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) children
+  where go ranges children | (l:ls, r:rs) <- ranges
                            , (child:rest) <- children
                            = go ranges rest
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
