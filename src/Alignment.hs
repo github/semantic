@@ -8,6 +8,7 @@ module Alignment
 , Row
 , AlignedDiff
 , alignDiff
+, groupChildrenByLine
 ) where
 
 import Control.Comonad.Cofree
