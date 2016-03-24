@@ -139,7 +139,6 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) chil
                                else Join (These (l, []) (r, [])) : go (ls, rs) children
                            | ([]:rest) <- children = go ranges rest
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
-        firstRangesForChild child = getRange <$> head child
         getRange (Free (Annotated (Info range _) _)) = range
         getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
 
