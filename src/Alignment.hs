@@ -146,6 +146,9 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) chil
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
 
+bimapJoin :: Bifunctor p => (a -> b) -> (a -> b) -> Join p a -> Join p b
+bimapJoin f g = modifyJoin $ bimap f g
+
 intersects :: Range -> Range -> Bool
 intersects a b = max (start a) (start b) < min (end a) (end b)
 
