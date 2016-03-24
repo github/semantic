@@ -136,6 +136,8 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) chil
                            , (child:rest) <- children
                            = go ranges rest
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
+        getRange (Free (Annotated (Info range _) _)) = range
+        getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
 
 intersects :: Range -> Range -> Bool
 intersects a b = max (start a) (start b) < min (end a) (end b)
