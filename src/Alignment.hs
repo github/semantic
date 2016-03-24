@@ -149,9 +149,6 @@ modifyJoin f = Join . f . runJoin
 bimapJoin :: Bifunctor p => (a -> b) -> (a -> b) -> Join p a -> Join p b
 bimapJoin f g = modifyJoin $ bimap f g
 
-runJoinWith :: (p a a -> b) -> Join p a -> b
-runJoinWith f = f . runJoin
-
 intersects :: Range -> Range -> Bool
 intersects a b = max (start a) (start b) < min (end a) (end b)
 
