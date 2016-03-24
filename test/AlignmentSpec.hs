@@ -61,6 +61,16 @@ spec = parallel $ do
         [ Join (These (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])
                       (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])) ]
 
+    it "aligns identical nodes spanning multiple lines" $
+      alignDiff (both (Source.fromList "[\nfoo\n]") (Source.fromList "[\nfoo\n]")) (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe`
+        [ Join (These (info 0 2 `branch` [])
+                      (info 0 2 `branch` []))
+        , Join (These (info 2 6 `branch` [ info 2 5 `leaf` "foo" ])
+                      (info 2 6 `branch` [ info 2 5 `leaf` "foo" ]))
+        , Join (These (info 6 7 `branch` [])
+                      (info 6 7 `branch` []))
+        ]
+
     it "aligns reformatted nodes" $
       alignDiff (both (Source.fromList "[ foo ]") (Source.fromList "[\nfoo\n]")) (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe`
         [ Join (These (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])
