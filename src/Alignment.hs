@@ -132,13 +132,12 @@ alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
           where lineRanges = runBothWith ((Join .) . These) (actualLineRanges <$> (characterRange <$> infos) <*> sources)
 
 groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
-groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) children
+groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) (join children)
   where go ranges children | (l:ls, r:rs) <- ranges
-                           , ((firstLine:restOfLines):rest) <- children
-                           = case fromThese False False $ bimap (intersects l . getRange) (intersects r . getRange) $ runJoin firstLine of
-                              (True, True) -> bimapJoin ((,) l . pure) ((,) r . pure) firstLine : go ranges (restOfLines:rest)
+                           , (first:rest) <- children
+                           = case fromThese False False $ bimap ((< end l) . end . getRange) ((< end r) . end . getRange) $ runJoin first of
+                              (True, True) -> bimapJoin ((,) l . pure) ((,) r . pure) first : go ranges rest
                               (_, _) -> Join (These (l, []) (r, [])) : go (ls, rs) children
-                           | ([]:rest) <- children = go ranges rest
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
         getRange (Free (Annotated (Info range _) _)) = range
         getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
