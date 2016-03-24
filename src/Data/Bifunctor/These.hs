@@ -11,6 +11,7 @@ these f _ _ (This this) = f this
 these _ f _ (That that) = f that
 these _ _ f (These this that) = f this that
 
+-- | Return a pair of values given These and defaults for either side.
 fromThese :: a -> b -> These a b -> (a, b)
 fromThese a b = these (flip (,) b) ((,) a) (,)
 
