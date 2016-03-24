@@ -136,7 +136,7 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) chil
   where go ranges children | (l:ls, r:rs) <- ranges
                            , ((firstLine:restOfLines):rest) <- children
                            = if and $ Join $ bimap (intersects l . getRange) (intersects r . getRange) (runJoin firstLine)
-                               then Join (bimap ((,) l . pure) ((,) r . pure) (runJoin firstLine)) : go ranges (restOfLines:rest)
+                               then modifyJoin (bimap ((,) l . pure) ((,) r . pure)) firstLine : go ranges (restOfLines:rest)
                                else Join (These (l, []) (r, [])) : go (ls, rs) children
                            | ([]:rest) <- children = go ranges rest
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
