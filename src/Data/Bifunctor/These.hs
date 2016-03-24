@@ -28,9 +28,7 @@ maybeSnd = these (const Nothing) Just ((Just .) . flip const)
 -- Instances
 
 instance Bifunctor These where
-  bimap f _ (This a) = This (f a)
-  bimap _ g (That b) = That (g b)
-  bimap f g (These a b) = These (f a) (g b)
+  bimap f g = these (This . f) (That . g) ((. g) . These . f)
 
 instance Bifoldable These where
   bifoldMap f g = these f g ((. g) . mappend . f)
