@@ -134,7 +134,8 @@ groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (
 groupChildrenByLine ranges children = go rangeLists children
   where rangeLists = these (flip (,) []) ((,) []) (,) (runJoin ranges)
         go ranges children | (l:ls, r:rs) <- ranges
-                           , (child:rest) <- children = go ranges rest
+                           , (child:rest) <- children
+                           = go ranges rest
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
 
 intersects :: Range -> Range -> Bool
