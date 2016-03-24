@@ -56,6 +56,11 @@ spec = parallel $ do
             both (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty) $ Indexed [], Range 0 (length source))) ]
 
   describe "alignDiff" $ do
+    it "aligns identical nodes on a single line" $
+      alignDiff (both (Source.fromList "[ foo ]") (Source.fromList "[ foo ]")) (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe`
+        [ Join (These (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])
+                      (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])) ]
+
     it "aligns reformatted nodes" $
       alignDiff (both (Source.fromList "[ foo ]") (Source.fromList "[\nfoo\n]")) (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe`
         [ Join (These (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])
