@@ -64,6 +64,13 @@ spec = parallel $ do
                       (Range 2 4, []))
         ]
 
+    it "produces asymmetrical context" $ do
+      groupChildrenByLine (Join (These [Range 0 2, Range 2 4] [Range 0 1])) [] `shouldBe`
+        [ Join (These (Range 0 2, [] :: [SplitDiff String Info])
+                      (Range 0 1, []))
+        , Join (This  (Range 2 4, []))
+        ]
+
   describe "alignDiff" $ do
     it "aligns identical branches on a single line" $
       alignDiff (both (Source.fromList "[ foo ]") (Source.fromList "[ foo ]")) (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe`
