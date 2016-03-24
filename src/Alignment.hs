@@ -133,8 +133,8 @@ alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
 groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
 groupChildrenByLine ranges children = go rangeLists children
   where rangeLists = these (flip (,) []) ((,) []) (,) (runJoin ranges)
-        go ranges children | (l:ls, r:rs) <- ranges,
-                             ((firstLine:restOfLines):rest) <- children = go ranges (restOfLines:rest)
+        go ranges children | (l:ls, r:rs) <- ranges
+                           , ((firstLine:restOfLines):rest) <- children = go ranges (restOfLines:rest)
                            | ([]:rest) <- children = go ranges rest
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
 
