@@ -157,7 +157,7 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) (joi
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
         getRange (Free (Annotated (Info range _) _)) = range
         getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
-        intersecting l r = and . bimapJoin ((< end l) . end . getRange) ((< end r) . end . getRange)
+        intersecting l r = and . bimapJoin ((<= end l) . end . getRange) ((<= end r) . end . getRange)
 
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
