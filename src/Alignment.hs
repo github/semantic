@@ -147,9 +147,6 @@ modifyJoin f = Join . f . runJoin
 bimapJoin :: Bifunctor p => (a -> b) -> (a -> b) -> Join p a -> Join p b
 bimapJoin f g = modifyJoin $ bimap f g
 
-intersects :: Range -> Range -> Bool
-intersects a b = max (start a) (start b) < min (end a) (end b)
-
 -- alignSyntax :: Source Char -> Range -> Syntax leaf (AlignedDiff leaf) -> [Syntax leaf (SplitDiff leaf Info)]
 -- alignSyntax source range syntax = case syntax of
 --   Leaf s -> Leaf s <$ lineRanges
