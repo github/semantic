@@ -155,7 +155,7 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) chil
                                                           (right ++ merge, left ++ nope)
                                        _ -> ([], children)
                                    | otherwise = ([], [])
-        split :: Join These (SplitDiff leaf Info) -> ([Join These (SplitDiff leaf Info)], [Join These (SplitDiff leaf Info)])
+        split :: Join These a -> ([Join These a], [Join These a])
         split these = fromThese [] [] $ bimap (pure . Join . This) (pure . Join . That) (runJoin these)
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
