@@ -140,11 +140,11 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) (joi
                            | (l:ls, rs) <- ranges
                            , (lines, rest) <- span (and . bimapJoin ((<= end l) . end . getRange) (const True)) children
                            , null lines
-                           = Join (This $ (l, catMaybes (Prelude.fst . unalign $ runJoin <$> lines))) : go (ls, rs) rest
+                           = Join (This (l, catMaybes (Prelude.fst . unalign $ runJoin <$> lines))) : go (ls, rs) rest
                            | (ls, r:rs) <- ranges
                            , (lines, rest) <- span (and . bimapJoin (const True) ((<= end r) . end . getRange)) children
                            , null lines
-                           = Join (That $ (r, catMaybes (Prelude.snd . unalign $ runJoin <$> lines))) : go (ls, rs) rest
+                           = Join (That (r, catMaybes (Prelude.snd . unalign $ runJoin <$> lines))) : go (ls, rs) rest
                            | (l:ls, r:rs) <- ranges
                            , null children
                            = Join (These (l, []) (r, [])) : go (ls, rs) children
