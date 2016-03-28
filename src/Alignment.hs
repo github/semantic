@@ -149,10 +149,10 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) chil
                                    , ~(merge, nope) <- spanMergeable l r rest
                                    = case fromThese False False . runJoin $ intersects l r child of
                                        (True, True) -> (child:merge, nope)
-                                       (True, False) -> let (left, right) = unzip $ split <$> child in
-                                                          (left ++ merge, right ++ nope)
-                                       (False, True) -> let (left, right) = unzip $ split <$> child in
-                                                          (right ++ merge, left ++ nope)
+                                       (True, False) -> let (this, that) = unzip $ split <$> child in
+                                                          (this ++ merge, that ++ nope)
+                                       (False, True) -> let (this, that) = unzip $ split <$> child in
+                                                          (that ++ merge, this ++ nope)
                                        _ -> ([], children)
                                    | otherwise = ([], [])
         split :: Join These a -> ([Join These a], [Join These a])
