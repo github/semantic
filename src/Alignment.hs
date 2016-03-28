@@ -22,7 +22,7 @@ import Data.Bifunctor.These
 import Data.Coalescent
 import Data.Copointed
 import Data.Foldable
-import Data.Functor.Both as Both
+import Data.Functor.Both as Both hiding (unzip)
 import Data.Functor.Identity
 import Data.Maybe
 import Data.Monoid
@@ -34,7 +34,7 @@ import Patch
 import Prelude hiding (fst, snd)
 import qualified Prelude
 import Range
-import Source hiding (fromList, uncons)
+import Source hiding (fromList, uncons, (++))
 import SplitDiff
 import Syntax
 import Term
@@ -144,6 +144,17 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) chil
                                   | otherwise = Join (These False False)
         intersectsChild range child = end (getRange child) <= end range
 
+        spanMergeable :: Range -> Range -> [AlignedDiff leaf] -> ([AlignedDiff leaf], [AlignedDiff leaf])
+        spanMergeable l r children | (child:rest) <- children
+                                   , ~(merge, nope) <- spanMergeable l r rest
+                                   = case fromThese False False . runJoin $ intersects l r child of
+                                       (True, True) -> (child:merge, nope)
+                                       (True, False) -> let (left, right) = unzip $ split <$> child in
+                                                          (left ++ merge, right ++ nope)
+                                       (False, True) -> let (left, right) = unzip $ split <$> child in
+                                                          (right ++ merge, left ++ nope)
+                                       _ -> ([], children)
+                                   | otherwise = ([], [])
         split :: Join These (SplitDiff leaf Info) -> ([Join These (SplitDiff leaf Info)], [Join These (SplitDiff leaf Info)])
         split these = fromThese [] [] $ bimap (pure . Join . This) (pure . Join . That) (runJoin these)
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
