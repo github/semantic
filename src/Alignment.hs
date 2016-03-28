@@ -139,6 +139,14 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) chil
                            = Join (uncurry These $ bimap ((,) l . catMaybes) ((,) r . catMaybes) (unalign $ runJoin <$> join intersectingChildren)) : go (ls, rs) rest
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
 
+unconsThese :: Join These [a] -> Maybe (Join These a, Join These [a])
+unconsThese (Join (This (a:as))) = Just (Join (This a), Join (This as))
+unconsThese (Join (That (b:bs))) = Just (Join (That b), Join (That bs))
+unconsThese (Join (These (a:as) (b:bs))) = Just (Join (These a b), Join (These as bs))
+unconsThese (Join (These (a:as) _)) = Just (Join (This a), Join (This as))
+unconsThese (Join (These _ (b:bs))) = Just (Join (That b), Join (That bs))
+unconsThese _ = Nothing
+
 getRange :: SplitDiff leaf Info -> Range
 getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
