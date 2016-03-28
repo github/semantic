@@ -143,9 +143,9 @@ getRange :: SplitDiff leaf Info -> Range
 getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
 
-intersects :: Range -> Range -> AlignedDiff leaf -> Join These Bool
-intersects l r childLines | (line:_) <- childLines = (bimapJoin (intersectsChild l) (intersectsChild r) line)
-                          | otherwise = Join (These False False)
+intersects :: Join These Range -> AlignedDiff leaf -> Join These Bool
+intersects ranges childLines | (line:_) <- childLines = fromMaybe (False <$ line) $ intersectsChild <$> ranges `applyThese` line
+                             | otherwise = Join (These False False)
 
 intersectsChild :: Range -> SplitDiff leaf Info -> Bool
 intersectsChild range child = end (getRange child) <= end range
@@ -154,7 +154,7 @@ spanMergeable :: Range -> Range -> [AlignedDiff leaf] -> ([AlignedDiff leaf], [A
 spanMergeable l r children | (child:rest) <- children
                            , ~(merge, nope) <- spanMergeable l r rest
                            , ~(this, that) <- unzip $ split <$> child
-                           = case fromThese False False . runJoin $ intersects l r child of
+                           = case fromThese False False . runJoin $ intersects (Join (These l r)) child of
                                (True, True) -> (child:merge, nope)
                                (True, False) -> (this ++ merge, that ++ nope)
                                (False, True) -> (that ++ merge, this ++ nope)
