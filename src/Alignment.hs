@@ -93,7 +93,7 @@ childLines sources child (nextLines, next) | or ((>) . end <$> childRanges <*> n
                                                          <> nextLines, start <$> childRanges)
   where makeChildLines = fmap (fmap (first (Just . (<$ child))))
         trailingContextLines = linesInRangeOfSource <$> (Range <$> (end <$> childRanges) <*> next) <*> sources
-        childRanges = unionRangesFrom <$> (rangeAt <$> next) <*> (concat . fmap (fmap Prelude.snd . unLine) <$> sequenceA (copoint child))
+        childRanges = unionRangesFrom <$> (rangeAt <$> next) <*> (concatMap (fmap Prelude.snd . unLine) <$> sequenceA (copoint child))
 
 makeContextLines :: Adjoined (Line Range) -> Adjoined (Line (Maybe a, Range))
 makeContextLines = fmap (fmap ((,) Nothing))
