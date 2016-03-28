@@ -135,24 +135,24 @@ groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (
 groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) (join children)
   where go ranges children | (l:ls, r:rs) <- ranges
                            , (lines, rest) <- span (and . bimapJoin ((<= end l) . end . getRange) ((<= end r) . end . getRange)) children
-                           , null lines
+                           , not $ null lines
                            = Join (uncurry These $ bimap ((,) l . catMaybes) ((,) r . catMaybes) (unalign $ runJoin <$> lines)) : go (ls, rs) rest
                            | (l:ls, rs) <- ranges
                            , (lines, rest) <- span (and . bimapJoin ((<= end l) . end . getRange) (const True)) children
-                           , null lines
+                           , not $ null lines
                            = Join (This (l, catMaybes (Prelude.fst . unalign $ runJoin <$> lines))) : go (ls, rs) rest
                            | (ls, r:rs) <- ranges
                            , (lines, rest) <- span (and . bimapJoin (const True) ((<= end r) . end . getRange)) children
-                           , null lines
+                           , not $ null lines
                            = Join (That (r, catMaybes (Prelude.snd . unalign $ runJoin <$> lines))) : go (ls, rs) rest
                            | (l:ls, r:rs) <- ranges
-                           , null children
+                           , not $ null children
                            = Join (These (l, []) (r, [])) : go (ls, rs) children
                            | (l:ls, rs) <- ranges
-                           , null children
+                           , not $ null children
                            = Join (This (l, [])) : go (ls, rs) children
                            | (ls, r:rs) <- ranges
-                           , null children
+                           , not $ null children
                            = Join (That (r, [])) : go (ls, rs) children
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
         getRange (Free (Annotated (Info range _) _)) = range
