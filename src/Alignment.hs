@@ -135,7 +135,7 @@ groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (
 groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) children
   where go :: ([Range], [Range]) -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
         go ranges children | (l:ls, r:rs) <- ranges
-                           , (intersectingChildren, rest) <- spanMergeable l r children
+                           , (intersectingChildren, rest) <- spanMergeable (Join (These l r)) children
                            = Join (uncurry These $ bimap ((,) l . catMaybes) ((,) r . catMaybes) (unalign $ runJoin <$> join intersectingChildren)) : go (ls, rs) rest
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
 
@@ -150,16 +150,16 @@ intersects ranges childLines | (line:_) <- childLines = fromMaybe (False <$ line
 intersectsChild :: Range -> SplitDiff leaf Info -> Bool
 intersectsChild range child = end (getRange child) <= end range
 
-spanMergeable :: Range -> Range -> [AlignedDiff leaf] -> ([AlignedDiff leaf], [AlignedDiff leaf])
-spanMergeable l r children | (child:rest) <- children
-                           , ~(merge, nope) <- spanMergeable l r rest
-                           , ~(this, that) <- unzip $ split <$> child
-                           = case fromThese False False . runJoin $ intersects (Join (These l r)) child of
-                               (True, True) -> (child:merge, nope)
-                               (True, False) -> (this ++ merge, that ++ nope)
-                               (False, True) -> (that ++ merge, this ++ nope)
-                               _ -> ([], children)
-                           | otherwise = ([], [])
+spanMergeable :: Join These Range -> [AlignedDiff leaf] -> ([AlignedDiff leaf], [AlignedDiff leaf])
+spanMergeable ranges children | (child:rest) <- children
+                              , ~(merge, nope) <- spanMergeable ranges rest
+                              , ~(this, that) <- unzip $ split <$> child
+                              = case fromThese False False . runJoin $ intersects ranges child of
+                                  (True, True) -> (child:merge, nope)
+                                  (True, False) -> (this ++ merge, that ++ nope)
+                                  (False, True) -> (that ++ merge, this ++ nope)
+                                  _ -> ([], children)
+                              | otherwise = ([], [])
 
 split :: Join These a -> ([Join These a], [Join These a])
 split these = fromThese [] [] $ bimap (pure . Join . This) (pure . Join . That) (runJoin these)
