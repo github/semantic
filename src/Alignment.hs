@@ -135,7 +135,6 @@ groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (
 groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) (join children)
   where go ranges children | (l:ls, r:rs) <- ranges
                            , (lines, rest) <- span (or . bimapJoin ((<= end l) . end . getRange) ((<= end r) . end . getRange)) children
-                           , not $ null lines
                            = Join (uncurry These $ bimap ((,) l . catMaybes) ((,) r . catMaybes) (unalign $ runJoin <$> lines)) : go (ls, rs) rest
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
         getRange (Free (Annotated (Info range _) _)) = range
