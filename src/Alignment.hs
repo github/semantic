@@ -139,7 +139,7 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) (joi
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
         getRange (Free (Annotated (Info range _) _)) = range
         getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
-        intersects range = (<= end range) . end . getRange
+        intersects range child = end (getRange child) <= end range
 
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
