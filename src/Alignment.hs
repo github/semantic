@@ -137,15 +137,6 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) (joi
                            , (lines, rest) <- span (and . bimapJoin ((<= end l) . end . getRange) ((<= end r) . end . getRange)) children
                            , not $ null lines
                            = Join (uncurry These $ bimap ((,) l . catMaybes) ((,) r . catMaybes) (unalign $ runJoin <$> lines)) : go (ls, rs) rest
-                           | (l:ls, r:rs) <- ranges
-                           , not $ null children
-                           = Join (These (l, []) (r, [])) : go (ls, rs) children
-                           | (l:ls, rs) <- ranges
-                           , not $ null children
-                           = Join (This (l, [])) : go (ls, rs) children
-                           | (ls, r:rs) <- ranges
-                           , not $ null children
-                           = Join (That (r, [])) : go (ls, rs) children
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
         getRange (Free (Annotated (Info range _) _)) = range
         getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
