@@ -144,6 +144,8 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) chil
                                   | otherwise = Join (These False False)
         intersectsChild range child = end (getRange child) <= end range
 
+        split :: Join These (SplitDiff leaf Info) -> ([Join These (SplitDiff leaf Info)], [Join These (SplitDiff leaf Info)])
+        split these = fromThese [] [] $ bimap (pure . Join . This) (pure . Join . That) (runJoin these)
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
 
