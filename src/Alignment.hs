@@ -147,12 +147,11 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) chil
         spanMergeable :: Range -> Range -> [AlignedDiff leaf] -> ([AlignedDiff leaf], [AlignedDiff leaf])
         spanMergeable l r children | (child:rest) <- children
                                    , ~(merge, nope) <- spanMergeable l r rest
+                                   , ~(this, that) <- unzip $ split <$> child
                                    = case fromThese False False . runJoin $ intersects l r child of
                                        (True, True) -> (child:merge, nope)
-                                       (True, False) -> let (this, that) = unzip $ split <$> child in
-                                                          (this ++ merge, that ++ nope)
-                                       (False, True) -> let (this, that) = unzip $ split <$> child in
-                                                          (that ++ merge, this ++ nope)
+                                       (True, False) -> (this ++ merge, that ++ nope)
+                                       (False, True) -> (that ++ merge, this ++ nope)
                                        _ -> ([], children)
                                    | otherwise = ([], [])
         split :: Join These a -> ([Join These a], [Join These a])
