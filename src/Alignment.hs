@@ -132,14 +132,17 @@ alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
           where lineRanges = runBothWith ((Join .) . These) (actualLineRanges <$> (characterRange <$> infos) <*> sources)
 
 groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
-groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) (join children)
-  where go ranges children | (l:ls, r:rs) <- ranges
-                           , (lines, rest) <- span (or . bimapJoin (intersects l) (intersects r)) children
-                           = Join (uncurry These $ bimap ((,) l . catMaybes) ((,) r . catMaybes) (unalign $ runJoin <$> lines)) : go (ls, rs) rest
+groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) children
+  where go :: ([Range], [Range]) -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
+        go ranges children | (l:ls, r:rs) <- ranges
+                           , (intersectingChildren, rest) <- span (intersects l r) children
+                           = Join (uncurry These $ bimap ((,) l . catMaybes) ((,) r . catMaybes) (unalign $ runJoin <$> join intersectingChildren)) : go (ls, rs) rest
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
         getRange (Free (Annotated (Info range _) _)) = range
         getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
-        intersects range child = end (getRange child) <= end range
+        intersects l r childLines | (line:_) <- childLines = or (bimapJoin (intersectsChild l) (intersectsChild r) line)
+                                  | otherwise = False
+        intersectsChild range child = end (getRange child) <= end range
 
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
