@@ -138,24 +138,31 @@ groupChildrenByLine ranges children = go (fromThese [] [] $ runJoin ranges) chil
                            , (intersectingChildren, rest) <- spanMergeable l r children
                            = Join (uncurry These $ bimap ((,) l . catMaybes) ((,) r . catMaybes) (unalign $ runJoin <$> join intersectingChildren)) : go (ls, rs) rest
                            | otherwise = uncurry (alignWith (fmap (flip (,) []) . Join)) ranges
-        getRange (Free (Annotated (Info range _) _)) = range
-        getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
-        intersects l r childLines | (line:_) <- childLines = (bimapJoin (intersectsChild l) (intersectsChild r) line)
-                                  | otherwise = Join (These False False)
-        intersectsChild range child = end (getRange child) <= end range
 
-        spanMergeable :: Range -> Range -> [AlignedDiff leaf] -> ([AlignedDiff leaf], [AlignedDiff leaf])
-        spanMergeable l r children | (child:rest) <- children
-                                   , ~(merge, nope) <- spanMergeable l r rest
-                                   , ~(this, that) <- unzip $ split <$> child
-                                   = case fromThese False False . runJoin $ intersects l r child of
-                                       (True, True) -> (child:merge, nope)
-                                       (True, False) -> (this ++ merge, that ++ nope)
-                                       (False, True) -> (that ++ merge, this ++ nope)
-                                       _ -> ([], children)
-                                   | otherwise = ([], [])
-        split :: Join These a -> ([Join These a], [Join These a])
-        split these = fromThese [] [] $ bimap (pure . Join . This) (pure . Join . That) (runJoin these)
+getRange :: SplitDiff leaf Info -> Range
+getRange (Free (Annotated (Info range _) _)) = range
+getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
+
+intersects :: Range -> Range -> AlignedDiff leaf -> Join These Bool
+intersects l r childLines | (line:_) <- childLines = (bimapJoin (intersectsChild l) (intersectsChild r) line)
+                          | otherwise = Join (These False False)
+
+intersectsChild :: Range -> SplitDiff leaf Info -> Bool
+intersectsChild range child = end (getRange child) <= end range
+
+spanMergeable :: Range -> Range -> [AlignedDiff leaf] -> ([AlignedDiff leaf], [AlignedDiff leaf])
+spanMergeable l r children | (child:rest) <- children
+                           , ~(merge, nope) <- spanMergeable l r rest
+                           , ~(this, that) <- unzip $ split <$> child
+                           = case fromThese False False . runJoin $ intersects l r child of
+                               (True, True) -> (child:merge, nope)
+                               (True, False) -> (this ++ merge, that ++ nope)
+                               (False, True) -> (that ++ merge, this ++ nope)
+                               _ -> ([], children)
+                           | otherwise = ([], [])
+
+split :: Join These a -> ([Join These a], [Join These a])
+split these = fromThese [] [] $ bimap (pure . Join . This) (pure . Join . That) (runJoin these)
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
 
