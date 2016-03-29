@@ -162,7 +162,7 @@ intersectsChild range child = end (getRange child) <= end range
 
 spanMergeable :: Join These Range -> [AlignedDiff leaf] -> ([AlignedDiff leaf], [AlignedDiff leaf])
 spanMergeable ranges children | ((firstChildLine:restChildLines):rest) <- children
-                              , ~(merge, nope) <- spanMergeable ranges (if null restChildLines then rest else restChildLines : rest)
+                              , ~(merge, nope) <- if null restChildLines then spanMergeable ranges rest else ([], restChildLines : rest)
                               , ~(this, that) <- split firstChildLine
                               = case fromThese False False . runJoin $ intersects ranges firstChildLine of
                                   (True, True) -> ([firstChildLine] : merge, nope)
