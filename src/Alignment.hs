@@ -191,9 +191,6 @@ applyThese _ _ = Nothing
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
 
-bimapJoin :: Bifunctor p => (a -> b) -> (a -> b) -> Join p a -> Join p b
-bimapJoin f g = modifyJoin $ bimap f g
-
 -- alignSyntax :: Source Char -> Range -> Syntax leaf (AlignedDiff leaf) -> [Syntax leaf (SplitDiff leaf Info)]
 -- alignSyntax source range syntax = case syntax of
 --   Leaf s -> Leaf s <$ lineRanges
