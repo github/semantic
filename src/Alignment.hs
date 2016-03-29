@@ -188,6 +188,7 @@ applyThese (Join (These _ g)) (Join (That b)) = Just (Join (That (g b)))
 applyThese (Join (This f)) (Join (These a _)) = Just (Join (This (f a)))
 applyThese (Join (That g)) (Join (These _ b)) = Just (Join (That (g b)))
 applyThese _ _ = Nothing
+
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
 
