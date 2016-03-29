@@ -56,9 +56,9 @@ splitDiffByLines sources = toList . iter (\ (Annotated infos syntax) -> splitAbs
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> Adjoined (Both (Line (SplitDiff leaf Info, Range)))
 splitPatchByLines sources patch = wrapTermInPatch <$> splitAndFoldTerm (unPatch patch)
-    where splitAndFoldTerm (This deleted) = tsequenceL mempty $ both (runIdentity <$> Term.cata (splitAbstractedTerm (:<) (Identity $ fst sources)) (Identity <$> deleted)) nil
-          splitAndFoldTerm (That inserted) = tsequenceL mempty $ both nil (runIdentity <$> Term.cata (splitAbstractedTerm (:<) (Identity $ snd sources)) (Identity <$> inserted))
-          splitAndFoldTerm (These deleted inserted) = tsequenceL mempty $ both (runIdentity <$> Term.cata (splitAbstractedTerm (:<) (Identity $ fst sources)) (Identity <$> deleted)) (runIdentity <$> Term.cata (splitAbstractedTerm (:<) (Identity $ snd sources)) (Identity <$> inserted))
+    where splitAndFoldTerm (This deleted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm (:<) (Identity $ fst sources)) (Identity <$> deleted)) nil
+          splitAndFoldTerm (That inserted) = tsequenceL mempty $ both nil (runIdentity <$> cata (splitAbstractedTerm (:<) (Identity $ snd sources)) (Identity <$> inserted))
+          splitAndFoldTerm (These deleted inserted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm (:<) (Identity $ fst sources)) (Identity <$> deleted)) (runIdentity <$> cata (splitAbstractedTerm (:<) (Identity $ snd sources)) (Identity <$> inserted))
           wrapTermInPatch = fmap (fmap (first (Pure . constructor patch)))
           constructor (Replace _ _) = SplitReplace
           constructor (Insert _) = SplitInsert
