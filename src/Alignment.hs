@@ -156,7 +156,7 @@ getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
 
 intersects :: Join These Range -> AlignedDiff leaf -> Join These Bool
 intersects ranges childLines | (line:_) <- childLines = fromMaybe (False <$ line) $ intersectsChild <$> ranges `applyThese` line
-                             | otherwise = Join (These False False)
+                             | otherwise = False <$ ranges
 
 intersectsChild :: Range -> SplitDiff leaf Info -> Bool
 intersectsChild range child = end (getRange child) <= end range
