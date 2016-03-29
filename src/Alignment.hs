@@ -132,17 +132,15 @@ alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
           where lineRanges = runBothWith ((Join .) . These) (actualLineRanges <$> (characterRange <$> infos) <*> sources)
 
 groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
-groupChildrenByLine ranges children = go ranges children
-  where go :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
-        go ranges children | Just (heads, tails) <- unconsThese ranges
-                           , (intersectingChildren, rest) <- spanMergeable heads children
-                           , ~(intersectingChildrenL, intersectingChildrenR) <- bimap catMaybes catMaybes (unalign $ runJoin <$> join intersectingChildren)
-                           = (case runJoin heads of
-                               This l -> Join $ This (l, intersectingChildrenL)
-                               That r -> Join $ That (r, intersectingChildrenR)
-                               These l r -> Join $ These (l, intersectingChildrenL) (r, intersectingChildrenR))
-                                : go tails rest
-                           | otherwise = []
+groupChildrenByLine ranges children | Just (heads, tails) <- unconsThese ranges
+                                    , (intersectingChildren, rest) <- spanMergeable heads children
+                                    , ~(intersectingChildrenL, intersectingChildrenR) <- bimap catMaybes catMaybes (unalign $ runJoin <$> join intersectingChildren)
+                                    = (case runJoin heads of
+                                        This l -> Join $ This (l, intersectingChildrenL)
+                                        That r -> Join $ That (r, intersectingChildrenR)
+                                        These l r -> Join $ These (l, intersectingChildrenL) (r, intersectingChildrenR))
+                                          : groupChildrenByLine tails rest
+                                    | otherwise = []
 
 unconsThese :: Join These [a] -> Maybe (Join These a, Join These [a])
 unconsThese (Join (This (a:as))) = Just (Join (This a), Join (This as))
