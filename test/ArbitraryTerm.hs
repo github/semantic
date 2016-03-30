@@ -9,6 +9,7 @@ import qualified Data.List as List
 import qualified Data.Set as Set
 import Data.Text.Arbitrary ()
 import Diff
+import Info
 import Line
 import Patch
 import Prelude hiding (fst, snd)
