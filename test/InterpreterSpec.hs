@@ -6,7 +6,7 @@ import Syntax
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Patch
-import Diff
+import Info
 import Category
 import Test.Hspec
 

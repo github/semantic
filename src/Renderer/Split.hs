@@ -10,6 +10,7 @@ import Data.Functor.Both
 import Data.Monoid
 import qualified Data.Text.Lazy as TL
 import Diff
+import Info
 import Line
 import Prelude hiding (div, head, span, fst, snd)
 import qualified Prelude
