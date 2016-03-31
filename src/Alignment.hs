@@ -241,17 +241,6 @@ intersects ranges childLines | (line:_) <- childLines = fromMaybe (False <$ line
 intersectsChild :: Range -> SplitDiff leaf Info -> Bool
 intersectsChild range child = end (getRange child) <= end range
 
-spanMergeable :: Join These Range -> [AlignedDiff leaf] -> ([AlignedDiff leaf], [AlignedDiff leaf])
-spanMergeable ranges children | (child:rest) <- children
-                              , ~(merge, nope) <- spanMergeable ranges rest
-                              , ~(this, that) <- unzip $ split <$> child
-                              = case fromThese False False . runJoin $ intersects ranges child of
-                                  (True, True) -> (child:merge, nope)
-                                  (True, False) -> (this ++ merge, that ++ nope)
-                                  (False, True) -> (that ++ merge, this ++ nope)
-                                  _ -> ([], children)
-                              | otherwise = ([], [])
-
 split :: Join These a -> ([Join These a], [Join These a])
 split these = fromThese [] [] $ bimap (pure . Join . This) (pure . Join . That) (runJoin these)
 
