@@ -147,7 +147,7 @@ group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                            (True, True) -> let (moreRanges, moreChildren, remainingLines) = group2 tailRanges (rest:restOfChildren) in
                                              (moreRanges, moreChildren, pairRangeWithLine headRanges first : remainingLines)
                            (True, False) -> let (moreRanges, moreChildren, remainingLines) = group2 (atLeft ranges) (r:rest:restOfChildren) in
-                                                (moreRanges, moreChildren, pairRangeWithLine headRanges (head l) : remainingLines)
+                                              (moreRanges, moreChildren, pairRangeWithLine headRanges (head l) : remainingLines)
                            (False, True) -> let (moreRanges, moreChildren, remainingLines) = group2 (atRight ranges) (l:rest:restOfChildren) in
                                               (moreRanges, moreChildren, pairRangeWithLine headRanges (head r) : remainingLines)
                            _ -> (tailRanges, children, [ flip (,) [] <$> headRanges ])
