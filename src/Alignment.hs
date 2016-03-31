@@ -142,6 +142,7 @@ group2 :: Join These [Range] -> [AlignedDiff leaf] -> (Join These [Range], [Alig
 group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                        , (child:restOfChildren) <- children
                        , (first:rest) <- child
+                       , ~(l, r) <- split first
                        = case fromThese False False . runJoin $ intersects headRanges child of
                            (True, True) -> let (moreRanges, moreChildren, remainingLines) = group2 tailRanges (rest:restOfChildren) in
                                              (moreRanges, moreChildren, pairRangeWithLine headRanges first : remainingLines)
