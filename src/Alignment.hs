@@ -216,12 +216,6 @@ bar       foo
 
 -}
 
-maybeThese :: (Maybe a, Maybe b) -> Maybe (These a b)
-maybeThese (Just a, Just b) = Just (These a b)
-maybeThese (Just a, _) = Just (This a)
-maybeThese (_, Just b) = Just (That b)
-maybeThese _ = Nothing
-
 unconsThese :: Join These [a] -> Maybe (Join These a, Join These [a])
 unconsThese (Join (This (a:as))) = Just (Join (This a), Join (This as))
 unconsThese (Join (That (b:bs))) = Just (Join (That b), Join (That bs))
