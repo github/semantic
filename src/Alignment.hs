@@ -143,17 +143,17 @@ groupChildrenByLine ranges children | Just (headRanges, tailRanges) <- unconsThe
                                           : groupChildrenByLine tailRanges rest
                                     | otherwise = []
 
-group2 :: Join These [Range] -> AlignedDiff leaf -> (Join These [Range], [Join These (SplitDiff leaf Info)])
+group2 :: Join These [Range] -> AlignedDiff leaf -> (Join These [Range], [Join These [SplitDiff leaf Info]])
 group2 ranges child | Just (headRanges, tailRanges) <- unconsThese ranges
                     , Just rrrraaaangggeessss <- sequenceL $ uncons <$> ranges
                     , (first:rest) <- child
                     = case fromThese False False . runJoin $ intersects headRanges child of
                         (True, True) -> let (moreRanges, restOfChild) = group2 tailRanges rest in
-                                          (moreRanges, first : restOfChild)
+                                          (moreRanges, (pure <$> first) : restOfChild)
                         (True, False) -> let (moreRanges, restOfChild) = group2 (atLeft ranges) rest in
-                                           (moreRanges, first : restOfChild)
+                                           (moreRanges, (pure <$> first) : restOfChild)
                         (False, True) -> let (moreRanges, restOfChild) = group2 (atRight ranges) rest in
-                                           (moreRanges, first : restOfChild)
+                                           (moreRanges, (pure <$> first) : restOfChild)
                         _ -> (tailRanges, [])
                     | otherwise = (ranges, [])
                     where uncons :: [a] -> Maybe (a, [a])
