@@ -150,10 +150,7 @@ group2 ranges child | Just (headRanges, tailRanges) <- unconsThese ranges
                                            (moreRanges, (x headRanges first) : restOfChild)
                         _ -> (tailRanges, [])
                     | otherwise = (ranges, [])
-                    where uncons :: [a] -> Maybe (a, [a])
-                          uncons (a:as) = Just (a, as)
-                          uncons _ = Nothing
-                          atLeft (Join (These (a:as) bs)) = Join (These as bs)
+                    where atLeft (Join (These (a:as) bs)) = Join (These as bs)
                           atLeft (Join (This (a:as))) = Join (This as)
                           atLeft other = other
                           atRight (Join (These as (b:bs))) = Join (These as bs)
