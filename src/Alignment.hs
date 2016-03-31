@@ -156,7 +156,6 @@ group2 ranges child | Just (headRanges, tailRanges) <- unconsThese ranges
                           atRight (Join (These as (_:bs))) = Join (These as bs)
                           atRight (Join (That (_:bs))) = Join (That bs)
                           atRight other = other
-                          x :: Join These Range -> Join These (SplitDiff leaf Info) -> Join These (Range, [SplitDiff leaf Info])
                           x headRanges childLine = case (,) <$> headRanges `applyThese` (pure <$> childLine) of
                             Just v -> v
                             Nothing -> error "oh god no"
