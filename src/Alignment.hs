@@ -143,11 +143,11 @@ group2 ranges child | Just (headRanges, tailRanges) <- unconsThese ranges
                     , (first:rest) <- child
                     = case fromThese False False . runJoin $ intersects headRanges child of
                         (True, True) -> let (moreRanges, restOfChild) = group2 tailRanges rest in
-                                          (moreRanges, (x headRanges first) : restOfChild)
+                                          (moreRanges, (pairRangeWithLine headRanges first) : restOfChild)
                         (True, False) -> let (moreRanges, restOfChild) = group2 (atLeft ranges) rest in
-                                           (moreRanges, (x headRanges first) : restOfChild)
+                                           (moreRanges, (pairRangeWithLine headRanges first) : restOfChild)
                         (False, True) -> let (moreRanges, restOfChild) = group2 (atRight ranges) rest in
-                                           (moreRanges, (x headRanges first) : restOfChild)
+                                           (moreRanges, (pairRangeWithLine headRanges first) : restOfChild)
                         _ -> (tailRanges, [ flip (,) [] <$> headRanges ])
                     | otherwise = (ranges, [])
                     where atLeft (Join (These (_:as) bs)) = Join (These as bs)
@@ -156,7 +156,7 @@ group2 ranges child | Just (headRanges, tailRanges) <- unconsThese ranges
                           atRight (Join (These as (_:bs))) = Join (These as bs)
                           atRight (Join (That (_:bs))) = Join (That bs)
                           atRight other = other
-                          x headRanges childLine = case (,) <$> headRanges `applyThese` (pure <$> childLine) of
+                          pairRangeWithLine headRanges childLine = case (,) <$> headRanges `applyThese` (pure <$> childLine) of
                             Just v -> v
                             Nothing -> error "oh god no"
 
