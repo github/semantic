@@ -150,11 +150,11 @@ group2 ranges child | Just (headRanges, tailRanges) <- unconsThese ranges
                                            (moreRanges, (x headRanges first) : restOfChild)
                         _ -> (tailRanges, [])
                     | otherwise = (ranges, [])
-                    where atLeft (Join (These (a:as) bs)) = Join (These as bs)
-                          atLeft (Join (This (a:as))) = Join (This as)
+                    where atLeft (Join (These (_:as) bs)) = Join (These as bs)
+                          atLeft (Join (This (_:as))) = Join (This as)
                           atLeft other = other
-                          atRight (Join (These as (b:bs))) = Join (These as bs)
-                          atRight (Join (That (b:bs))) = Join (That bs)
+                          atRight (Join (These as (_:bs))) = Join (These as bs)
+                          atRight (Join (That (_:bs))) = Join (That bs)
                           atRight other = other
                           x :: Join These Range -> Join These (SplitDiff leaf Info) -> Join These (Range, [SplitDiff leaf Info])
                           x headRanges childLine = case (,) <$> headRanges `applyThese` (pure <$> childLine) of
