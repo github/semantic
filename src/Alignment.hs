@@ -142,12 +142,12 @@ group2 :: Join These [Range] -> AlignedDiff leaf -> (Join These [Range], [Join T
 group2 ranges child | Just (headRanges, tailRanges) <- unconsThese ranges
                     , (first:rest) <- child
                     = case fromThese False False . runJoin $ intersects headRanges child of
-                        (True, True) -> let (moreRanges, restOfChild) = group2 tailRanges rest in
-                                          (moreRanges, pairRangeWithLine headRanges first : restOfChild)
-                        (True, False) -> let (moreRanges, restOfChild) = group2 (atLeft ranges) rest in
-                                           (moreRanges, pairRangeWithLine headRanges first : restOfChild)
-                        (False, True) -> let (moreRanges, restOfChild) = group2 (atRight ranges) rest in
-                                           (moreRanges, pairRangeWithLine headRanges first : restOfChild)
+                        (True, True) -> let (moreRanges, remainingLines) = group2 tailRanges rest in
+                                          (moreRanges, pairRangeWithLine headRanges first : remainingLines)
+                        (True, False) -> let (moreRanges, remainingLines) = group2 (atLeft ranges) rest in
+                                           (moreRanges, pairRangeWithLine headRanges first : remainingLines)
+                        (False, True) -> let (moreRanges, remainingLines) = group2 (atRight ranges) rest in
+                                           (moreRanges, pairRangeWithLine headRanges first : remainingLines)
                         _ -> (tailRanges, [ flip (,) [] <$> headRanges ])
                     | otherwise = (ranges, [])
                     where atLeft (Join (These (_:as) bs)) = Join (These as bs)
