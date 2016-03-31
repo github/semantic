@@ -28,6 +28,11 @@ instance Align [] where
   alignWith f [] bs = f . That <$> bs
   alignWith f (a:as) (b:bs) = f (These a b) : alignWith f as bs
 
+instance Align Maybe where
+  nil = Nothing
+  align (Just a) (Just b) = Just (These a b)
+  align Nothing (Just b) = Just (That b)
+  align (Just a) Nothing = Just (This a)
 
 -- | A functor which can be traversed through an `Align`able functor, inverting the nesting of one in the other, given some default value.
 -- |
