@@ -133,32 +133,34 @@ alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
           where lineRanges = runBothWith ((Join .) . These) (actualLineRanges <$> (characterRange <$> infos) <*> sources)
 
 groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
-groupChildrenByLine ranges children | (child:rest) <- children
-                                    , (nextRanges, lines) <- group2 ranges child
-                                    = lines ++ groupChildrenByLine nextRanges rest
+groupChildrenByLine ranges children | (nextRanges, nextChildren, lines) <- group2 ranges children
+                                    , not (null lines)
+                                    = lines ++ groupChildrenByLine nextRanges nextChildren
                                     | otherwise = fmap (flip (,) []) <$> sequenceL ranges
 
-group2 :: Join These [Range] -> AlignedDiff leaf -> (Join These [Range], [Join These (Range, [SplitDiff leaf Info])])
-group2 ranges child | Just (headRanges, tailRanges) <- unconsThese ranges
-                    , (first:rest) <- child
-                    = case fromThese False False . runJoin $ intersects headRanges child of
-                        (True, True) -> let (moreRanges, remainingLines) = group2 tailRanges rest in
-                                          (moreRanges, pairRangeWithLine headRanges first : remainingLines)
-                        (True, False) -> let (moreRanges, remainingLines) = group2 (atLeft ranges) rest in
-                                           (moreRanges, pairRangeWithLine headRanges first : remainingLines)
-                        (False, True) -> let (moreRanges, remainingLines) = group2 (atRight ranges) rest in
-                                           (moreRanges, pairRangeWithLine headRanges first : remainingLines)
-                        _ -> (tailRanges, [ flip (,) [] <$> headRanges ])
-                    | otherwise = (ranges, [])
-                    where atLeft (Join (These (_:as) bs)) = Join (These as bs)
-                          atLeft (Join (This (_:as))) = Join (This as)
-                          atLeft other = other
-                          atRight (Join (These as (_:bs))) = Join (These as bs)
-                          atRight (Join (That (_:bs))) = Join (That bs)
-                          atRight other = other
-                          pairRangeWithLine headRanges childLine = case (,) <$> headRanges `applyThese` (pure <$> childLine) of
-                            Just v -> v
-                            Nothing -> error "oh god no"
+group2 :: Join These [Range] -> [AlignedDiff leaf] -> (Join These [Range], [AlignedDiff leaf], [Join These (Range, [SplitDiff leaf Info])])
+group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
+                       , (child:restOfChildren) <- children
+                       = if null child then group2 ranges restOfChildren
+                         else let (first:rest) = child in
+                         case fromThese False False . runJoin $ intersects headRanges child of
+                           (True, True) -> let (moreRanges, moreChildren, remainingLines) = group2 tailRanges (rest:restOfChildren) in
+                                             (moreRanges, moreChildren, pairRangeWithLine headRanges first : remainingLines)
+                           (True, False) -> let (moreRanges, moreChildren, remainingLines) = group2 (atLeft ranges) (rest:restOfChildren) in
+                                              (moreRanges, moreChildren, pairRangeWithLine headRanges first : remainingLines)
+                           (False, True) -> let (moreRanges, moreChildren, remainingLines) = group2 (atRight ranges) (rest:restOfChildren) in
+                                              (moreRanges, moreChildren, pairRangeWithLine headRanges first : remainingLines)
+                           _ -> (tailRanges, children, [ flip (,) [] <$> headRanges ])
+                       | otherwise = (ranges, children, [])
+                       where atLeft (Join (These (_:as) bs)) = Join (These as bs)
+                             atLeft (Join (This (_:as))) = Join (This as)
+                             atLeft other = other
+                             atRight (Join (These as (_:bs))) = Join (These as bs)
+                             atRight (Join (That (_:bs))) = Join (That bs)
+                             atRight other = other
+                             pairRangeWithLine headRanges childLine = case (,) <$> headRanges `applyThese` (pure <$> childLine) of
+                               Just v -> v
+                               Nothing -> error "oh god no"
 
 {-
 
