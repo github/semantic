@@ -133,14 +133,9 @@ alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
           where lineRanges = runBothWith ((Join .) . These) (actualLineRanges <$> (characterRange <$> infos) <*> sources)
 
 groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
-groupChildrenByLine ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
-                                    , (intersectingChildren, rest) <- spanMergeable headRanges children
-                                    , ~(intersectingChildrenL, intersectingChildrenR) <- bimap catMaybes catMaybes (unalign $ runJoin <$> join intersectingChildren)
-                                    = (case runJoin headRanges of
-                                        This l -> Join $ This (l, intersectingChildrenL)
-                                        That r -> Join $ That (r, intersectingChildrenR)
-                                        These l r -> Join $ These (l, intersectingChildrenL) (r, intersectingChildrenR))
-                                          : groupChildrenByLine tailRanges rest
+groupChildrenByLine ranges children | (child:rest) <- children
+                                    , (nextRanges, lines) <- group2 ranges child
+                                    = lines ++ groupChildrenByLine nextRanges rest
                                     | otherwise = []
 
 group2 :: Join These [Range] -> AlignedDiff leaf -> (Join These [Range], [Join These (Range, [SplitDiff leaf Info])])
