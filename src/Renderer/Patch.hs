@@ -56,7 +56,7 @@ showHunk blobs hunk = maybeOffsetHeader ++
         maybeOffsetHeader = if lengthA > 0 && lengthB > 0
                             then offsetHeader
                             else mempty
-        offsetHeader = "@@ -" ++ offsetA ++ "," ++ show lengthA ++ " +" ++ offsetB ++ "," ++ show lengthB ++ " @@"
+        offsetHeader = "@@ -" ++ offsetA ++ "," ++ show lengthA ++ " +" ++ offsetB ++ "," ++ show lengthB ++ " @@" ++ "\n"
         (lengthA, lengthB) = runBoth . fmap getSum $ hunkLength hunk
         (offsetA, offsetB) = runBoth . fmap (show . getSum) $ offset hunk
 
