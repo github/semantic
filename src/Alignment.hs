@@ -136,7 +136,7 @@ groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (
 groupChildrenByLine ranges children | (child:rest) <- children
                                     , (nextRanges, lines) <- group2 ranges child
                                     = lines ++ groupChildrenByLine nextRanges rest
-                                    | otherwise = []
+                                    | otherwise = fmap (flip (,) []) <$> sequenceL ranges
 
 group2 :: Join These [Range] -> AlignedDiff leaf -> (Join These [Range], [Join These (Range, [SplitDiff leaf Info])])
 group2 ranges child | Just (headRanges, tailRanges) <- unconsThese ranges
