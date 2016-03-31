@@ -155,20 +155,21 @@ getRange :: SplitDiff leaf Info -> Range
 getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
 
-intersects :: Join These Range -> Join These (SplitDiff leaf Info) -> Join These Bool
-intersects ranges child = fromMaybe (False <$ child) $ intersectsChild <$> ranges `applyThese` child
+intersects :: Join These Range -> AlignedDiff leaf -> Join These Bool
+intersects ranges childLines | (line:_) <- childLines = fromMaybe (False <$ line) $ intersectsChild <$> ranges `applyThese` line
+                             | otherwise = False <$ ranges
 
 intersectsChild :: Range -> SplitDiff leaf Info -> Bool
 intersectsChild range child = end (getRange child) <= end range
 
 spanMergeable :: Join These Range -> [AlignedDiff leaf] -> ([AlignedDiff leaf], [AlignedDiff leaf])
-spanMergeable ranges children | ((firstChildLine:restChildLines):rest) <- children
-                              , ~(merge, nope) <- spanMergeable ranges (if null restChildLines then rest else restChildLines : rest)
-                              , ~(this, that) <- split firstChildLine
-                              = case fromThese False False . runJoin $ intersects ranges firstChildLine of
-                                  (True, True) -> ([firstChildLine] : merge, nope)
-                                  (True, False) -> (this : merge, that : nope)
-                                  (False, True) -> (that : merge, this : nope)
+spanMergeable ranges children | (child:rest) <- children
+                              , ~(merge, nope) <- spanMergeable ranges rest
+                              , ~(this, that) <- unzip $ split <$> child
+                              = case fromThese False False . runJoin $ intersects ranges child of
+                                  (True, True) -> (child:merge, nope)
+                                  (True, False) -> (this ++ merge, that ++ nope)
+                                  (False, True) -> (that ++ merge, this ++ nope)
                                   _ -> ([], children)
                               | otherwise = ([], [])
 
