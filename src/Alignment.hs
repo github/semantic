@@ -146,19 +146,19 @@ group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                        = case fromThese False False . runJoin $ intersects headRanges child of
                            (True, True) -> let (moreRanges, moreChildren, remainingLines) = group2 tailRanges (rest:restOfChildren) in
                                              (moreRanges, moreChildren, pairRangesWithLine headRanges first : remainingLines)
-                           (True, False) -> let (moreRanges, moreChildren, remainingLines) = group2 (atLeft ranges) (r:rest:restOfChildren) in
+                           (True, False) -> let (moreRanges, moreChildren, remainingLines) = group2 (advanceLeft ranges) (r:rest:restOfChildren) in
                                               (moreRanges, moreChildren, pairRangesWithLine headRanges (head l) : remainingLines)
-                           (False, True) -> let (moreRanges, moreChildren, remainingLines) = group2 (atRight ranges) (l:rest:restOfChildren) in
+                           (False, True) -> let (moreRanges, moreChildren, remainingLines) = group2 (advanceRight ranges) (l:rest:restOfChildren) in
                                               (moreRanges, moreChildren, pairRangesWithLine headRanges (head r) : remainingLines)
                            _ -> (tailRanges, children, [ flip (,) [] <$> headRanges ])
                        | ([]:rest) <- children = group2 ranges rest
                        | otherwise = (ranges, children, [])
-                       where atLeft (Join (These (_:as) bs)) = Join (These as bs)
-                             atLeft (Join (This (_:as))) = Join (This as)
-                             atLeft other = other
-                             atRight (Join (These as (_:bs))) = Join (These as bs)
-                             atRight (Join (That (_:bs))) = Join (That bs)
-                             atRight other = other
+                       where advanceLeft (Join (These (_:as) bs)) = Join (These as bs)
+                             advanceLeft (Join (This (_:as))) = Join (This as)
+                             advanceLeft other = other
+                             advanceRight (Join (These as (_:bs))) = Join (These as bs)
+                             advanceRight (Join (That (_:bs))) = Join (That bs)
+                             advanceRight other = other
                              pairRangesWithLine headRanges childLine = case (,) <$> headRanges `applyThese` (pure <$> childLine) of
                                Just v -> v
                                Nothing -> error "oh god no"
