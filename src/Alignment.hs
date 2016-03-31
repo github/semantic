@@ -148,7 +148,7 @@ group2 ranges child | Just (headRanges, tailRanges) <- unconsThese ranges
                                            (moreRanges, (x headRanges first) : restOfChild)
                         (False, True) -> let (moreRanges, restOfChild) = group2 (atRight ranges) rest in
                                            (moreRanges, (x headRanges first) : restOfChild)
-                        _ -> (tailRanges, [])
+                        _ -> (tailRanges, [ flip (,) [] <$> headRanges ])
                     | otherwise = (ranges, [])
                     where atLeft (Join (These (_:as) bs)) = Join (These as bs)
                           atLeft (Join (This (_:as))) = Join (This as)
