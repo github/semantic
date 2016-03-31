@@ -165,6 +165,60 @@ group2 ranges child | Just (headRanges, tailRanges) <- unconsThese ranges
                           atRight (Join (These as (b:bs))) = Join (These as bs)
                           atRight (Join (That (b:bs))) = Join (That bs)
                           atRight other = other
+
+{-
+
+find all of the lines which intersect with this child, not all the children intersecting with this line?
+
+[ foo ]   [
+          foo
+          ]
+
+
+[ Join These "[ foo ]" "[\n"]
+[ Join That            "foo\n"]
+[ Join That            "]"]
+
+[ Range 2 5 ] [ Range 2 5 ]
+[ Range 0 7 ] [ Range 0 2, Range 2 6, Range 6 7 ]
+
+
+
+[ foo ]
+bar
+
+[
+foo
+]
+bar
+
+[ foo ]   [
+          foo
+          ]
+bar       bar
+
+
+[ Range 0 8, Range 8 12 ]  [ Range 0 2, Range 2 6, Range 6 8, Range 8 12 ]
+
+[ foo ]   [
+bar       foo
+          ]
+          bar
+
+1. we need to consume lines until the child’s lines have been exhausted
+
+
+2. (AND all the children intersecting the line have been consumed)
+
+
+-[ foo ]
++[
++foo
++]
+ bar
+
+-}
+
 maybeThese :: (Maybe a, Maybe b) -> Maybe (These a b)
 maybeThese (Just a, Just b) = Just (These a b)
 maybeThese (Just a, _) = Just (This a)
