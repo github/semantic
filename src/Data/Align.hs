@@ -33,6 +33,7 @@ instance Align Maybe where
   align (Just a) (Just b) = Just (These a b)
   align Nothing (Just b) = Just (That b)
   align (Just a) Nothing = Just (This a)
+  align _ _ = Nothing
 
 -- | A functor which can be traversed through an `Align`able functor, inverting the nesting of one in the other, given some default value.
 -- |
