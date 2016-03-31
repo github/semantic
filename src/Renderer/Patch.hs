@@ -22,10 +22,10 @@ import Data.Monoid
 
 -- | Render a diff in the traditional patch format.
 patch :: Renderer a String
-patch diff sources = case getLast $ foldMap (Last . Just) string of
+patch diff blobs = case getLast $ foldMap (Last . Just) string of
   Just c | c /= '\n' -> string ++ "\n\\ No newline at end of file\n"
   _ -> string
-  where string = mconcat $ showHunk sources <$> hunks diff sources
+  where string = header blobs ++ mconcat (showHunk blobs <$> hunks diff blobs)
 
 -- | A hunk in a patch, including the offset, changes, and context.
 data Hunk a = Hunk { offset :: Both (Sum Int), changes :: [Change a], trailingContext :: [Row a] }
@@ -49,10 +49,16 @@ rowIncrement = fmap lineIncrement
 
 -- | Given the before and after sources, render a hunk to a string.
 showHunk :: Both SourceBlob -> Hunk (SplitDiff a Info) -> String
-showHunk blobs hunk = header blobs hunk ++
+showHunk blobs hunk = maybeOffsetHeader ++
   concat (showChange sources <$> changes hunk) ++
   showLines (snd sources) ' ' (snd <$> trailingContext hunk)
   where sources = source <$> blobs
+        maybeOffsetHeader = if lengthA > 0 && lengthB > 0
+                            then offsetHeader
+                            else mempty
+        offsetHeader = "@@ -" ++ offsetA ++ "," ++ show lengthA ++ " +" ++ offsetB ++ "," ++ show lengthB ++ " @@" ++ "\n"
+        (lengthA, lengthB) = runBoth . fmap getSum $ hunkLength hunk
+        (offsetA, offsetB) = runBoth . fmap (show . getSum) $ offset hunk
 
 -- | Given the before and after sources, render a change to a string.
 showChange :: Both (Source Char) -> Change (SplitDiff a Info) -> String
@@ -76,8 +82,8 @@ getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure patch) = let Info range _ :< _ = getSplitTerm patch in range
 
 -- | Returns the header given two source blobs and a hunk.
-header :: Both SourceBlob -> Hunk a -> String
-header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFilepath, afterFilepath, maybeOffsetHeader]
+header :: Both SourceBlob -> String
+header blobs = intercalate "\n" [filepathHeader, fileModeHeader, beforeFilepath, afterFilepath] ++ "\n"
   where filepathHeader = "diff --git a/" ++ pathA ++ " b/" ++ pathB
         fileModeHeader = case (modeA, modeB) of
           (Nothing, Just mode) -> intercalate "\n" [ "new file mode " ++ modeToDigits mode, blobOidHeader ]
@@ -96,12 +102,6 @@ header blobs hunk = intercalate "\n" [filepathHeader, fileModeHeader, beforeFile
            Nothing -> "/dev/null"
         beforeFilepath = "--- " ++ modeHeader "a" modeA pathA
         afterFilepath = "+++ " ++ modeHeader "b" modeB pathB
-        maybeOffsetHeader = if lengthA > 0 && lengthB > 0
-                            then offsetHeader
-                            else mempty
-        offsetHeader = "@@ -" ++ offsetA ++ "," ++ show lengthA ++ " +" ++ offsetB ++ "," ++ show lengthB ++ " @@" ++ "\n"
-        (lengthA, lengthB) = runBoth . fmap getSum $ hunkLength hunk
-        (offsetA, offsetB) = runBoth . fmap (show . getSum) $ offset hunk
         (pathA, pathB) = runBoth $ path <$> blobs
         (oidA, oidB) = runBoth $ oid <$> blobs
         (modeA, modeB) = runBoth $ blobKind <$> blobs
