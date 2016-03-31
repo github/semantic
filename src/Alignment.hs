@@ -145,11 +145,11 @@ group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                        , ~(l, r) <- split first
                        = case fromThese False False . runJoin $ intersects headRanges child of
                            (True, True) -> let (moreRanges, moreChildren, remainingLines) = group2 tailRanges (rest:restOfChildren) in
-                                             (moreRanges, moreChildren, pairRangesWithLine headRanges first : remainingLines)
+                                             (moreRanges, moreChildren, pairRangesWithLine headRanges (pure <$> first) : remainingLines)
                            (True, False) -> let (moreRanges, moreChildren, remainingLines) = group2 (advanceLeft ranges) (r:rest:restOfChildren) in
-                                              (moreRanges, moreChildren, pairRangesWithLine headRanges (head l) : remainingLines)
+                                              (moreRanges, moreChildren, pairRangesWithLine headRanges (pure <$> head l) : remainingLines)
                            (False, True) -> let (moreRanges, moreChildren, remainingLines) = group2 (advanceRight ranges) (l:rest:restOfChildren) in
-                                              (moreRanges, moreChildren, pairRangesWithLine headRanges (head r) : remainingLines)
+                                              (moreRanges, moreChildren, pairRangesWithLine headRanges (pure <$> head r) : remainingLines)
                            _ -> (tailRanges, children, [ flip (,) [] <$> headRanges ])
                        | ([]:rest) <- children = group2 ranges rest
                        | otherwise = (ranges, children, [])
@@ -159,7 +159,7 @@ group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                              advanceRight (Join (These as (_:bs))) = Join (These as bs)
                              advanceRight (Join (That (_:bs))) = Join (That bs)
                              advanceRight other = other
-                             pairRangesWithLine headRanges childLine = case (,) <$> headRanges `applyThese` (pure <$> childLine) of
+                             pairRangesWithLine headRanges childLine = case (,) <$> headRanges `applyThese` childLine of
                                Just v -> v
                                Nothing -> error "oh god no"
 
