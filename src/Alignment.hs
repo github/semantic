@@ -143,6 +143,28 @@ groupChildrenByLine ranges children | Just (headRanges, tailRanges) <- unconsThe
                                           : groupChildrenByLine tailRanges rest
                                     | otherwise = []
 
+group2 :: Join These [Range] -> AlignedDiff leaf -> (Join These [Range], [Join These (SplitDiff leaf Info)])
+group2 ranges child | Just (headRanges, tailRanges) <- unconsThese ranges
+                    , Just rrrraaaangggeessss <- sequenceL $ uncons <$> ranges
+                    , (first:rest) <- child
+                    = case fromThese False False . runJoin $ intersects headRanges child of
+                        (True, True) -> let (moreRanges, restOfChild) = group2 tailRanges rest in
+                                          (moreRanges, first : restOfChild)
+                        (True, False) -> let (moreRanges, restOfChild) = group2 (atLeft ranges) rest in
+                                           (moreRanges, first : restOfChild)
+                        (False, True) -> let (moreRanges, restOfChild) = group2 (atRight ranges) rest in
+                                           (moreRanges, first : restOfChild)
+                        _ -> (tailRanges, [])
+                    | otherwise = (ranges, [])
+                    where uncons :: [a] -> Maybe (a, [a])
+                          uncons (a:as) = Just (a, as)
+                          uncons _ = Nothing
+                          atLeft (Join (These (a:as) bs)) = Join (These as bs)
+                          atLeft (Join (This (a:as))) = Join (This as)
+                          atLeft other = other
+                          atRight (Join (These as (b:bs))) = Join (These as bs)
+                          atRight (Join (That (b:bs))) = Join (That bs)
+                          atRight other = other
 unconsThese :: Join These [a] -> Maybe (Join These a, Join These [a])
 unconsThese (Join (This (a:as))) = Just (Join (This a), Join (This as))
 unconsThese (Join (That (b:bs))) = Just (Join (That b), Join (That bs))
