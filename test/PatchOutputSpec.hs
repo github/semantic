@@ -1,12 +1,13 @@
 module PatchOutputSpec where
 
+import Control.Monad.Free
 import Data.Functor.Both
 import Diff
-import Renderer.Patch
+import Info
 import Range
+import Renderer.Patch
 import Source
 import Syntax
-import Control.Monad.Free
 import Test.Hspec
 
 spec :: Spec

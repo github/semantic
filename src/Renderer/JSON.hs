@@ -17,6 +17,7 @@ import Data.OrderedMap hiding (fromList)
 import qualified Data.Text as T
 import Data.Vector hiding (toList)
 import Diff
+import Info
 import Line
 import Range
 import Renderer

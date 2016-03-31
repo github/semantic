@@ -1,7 +1,7 @@
 module Parser where
 
 import Category
-import Diff
+import Info
 import Range
 import Syntax
 import Term

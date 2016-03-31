@@ -14,6 +14,7 @@ import Data.Adjoined
 import Data.Copointed
 import Data.Functor.Both as Both
 import Diff
+import Info
 import qualified Data.Maybe as Maybe
 import Data.Functor.Identity
 import Line

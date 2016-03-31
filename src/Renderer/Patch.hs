@@ -6,6 +6,7 @@ module Renderer.Patch (
 
 import Alignment
 import Diff
+import Info
 import Line
 import Prelude hiding (fst, snd)
 import qualified Prelude

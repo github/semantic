@@ -1,6 +1,6 @@
 module Diffing where
 
-import Diff
+import Info
 import Interpreter
 import Language
 import Parser
