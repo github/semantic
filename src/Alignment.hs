@@ -140,7 +140,6 @@ groupChildrenByLine ranges children | (child:rest) <- children
 
 group2 :: Join These [Range] -> AlignedDiff leaf -> (Join These [Range], [Join These (Range, [SplitDiff leaf Info])])
 group2 ranges child | Just (headRanges, tailRanges) <- unconsThese ranges
-                    , Just rrrraaaangggeessss <- sequenceL $ uncons <$> ranges
                     , (first:rest) <- child
                     = case fromThese False False . runJoin $ intersects headRanges child of
                         (True, True) -> let (moreRanges, restOfChild) = group2 tailRanges rest in
