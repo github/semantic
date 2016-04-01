@@ -44,11 +44,13 @@ spec = parallel $ do
     correctTests paths@(_, Nothing, Nothing, Nothing) = testsForPaths paths
     correctTests paths = List.filter (\(_, _, _, output) -> isJust output) $ testsForPaths paths
     testsForPaths :: (Both FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, Both FilePath, Maybe FilePath)]
-    testsForPaths (paths, json, patch, split) = [ ("json", testJSON, paths, json), ("patch", P.patch, paths, patch), ("split", testSplit, paths, split) ]
+    testsForPaths (paths, json, patch, split) = [ ("json", testJSON, paths, json), ("patch", testPatch, paths, patch), ("split", testSplit, paths, split) ]
+    testPatch :: Renderer a String
+    testPatch diff sources = T.unpack $ P.patch diff sources
     testSplit :: Renderer a String
-    testSplit diff sources = TL.unpack $ Split.split diff sources
+    testSplit diff sources = T.unpack $ Split.split diff sources
     testJSON :: Renderer a String
-    testJSON diff sources = B.unpack $ J.json diff sources
+    testJSON diff sources = T.unpack $ J.json diff sources
 
 
 -- | Return all the examples from the given directory. Examples are expected to
