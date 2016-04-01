@@ -153,15 +153,19 @@ group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                            _ -> (tailRanges, children, [ flip (,) [] <$> headRanges ])
                        | ([]:rest) <- children = group2 ranges rest
                        | otherwise = (ranges, children, [])
-                       where advanceLeft (Join (These (_:as) bs)) = Join (These as bs)
-                             advanceLeft (Join (This (_:as))) = Join (This as)
-                             advanceLeft other = other
-                             advanceRight (Join (These as (_:bs))) = Join (These as bs)
-                             advanceRight (Join (That (_:bs))) = Join (That bs)
-                             advanceRight other = other
-                             pairRangesWithLine headRanges childLine = case (,) <$> headRanges `applyThese` childLine of
+                       where pairRangesWithLine headRanges childLine = case (,) <$> headRanges `applyThese` childLine of
                                Just v -> v
                                Nothing -> error "oh god no"
+
+advanceLeft :: Join These [a] -> Join These [a]
+advanceLeft (Join (These (_:as) bs)) = Join (These as bs)
+advanceLeft (Join (This (_:as))) = Join (This as)
+advanceLeft other = other
+
+advanceRight :: Join These [a] -> Join These [a]
+advanceRight (Join (These as (_:bs))) = Join (These as bs)
+advanceRight (Join (That (_:bs))) = Join (That bs)
+advanceRight other = other
 
 {-
 
