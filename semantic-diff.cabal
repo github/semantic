@@ -29,6 +29,7 @@ library
                      , Diff
                      , Diffing
                      , DiffOutput
+                     , Info
                      , Interpreter
                      , Language
                      , Line
