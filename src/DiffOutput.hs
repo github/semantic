@@ -6,6 +6,7 @@ import Diffing
 import Parser
 import qualified Renderer.JSON as J
 import qualified Renderer.Patch as P
+import Renderer
 import Renderer.Split
 import Source
 import System.Directory
@@ -13,11 +14,6 @@ import System.FilePath
 import qualified System.IO as IO
 import Data.String
 import Data.Text hiding (split)
-
--- | The available types of diff rendering.
-data Format = Split | Patch | JSON
-
-data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath, outputPath :: FilePath }
 
 -- | Return a renderer from the command-line arguments that will print the diff.
 printDiff :: Parser -> DiffArguments -> Both SourceBlob -> IO Text
