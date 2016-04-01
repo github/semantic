@@ -22,6 +22,12 @@ printDiff parser arguments sources = case format arguments of
   Patch -> diffFiles parser P.patch sources
   JSON -> diffFiles parser J.json sources
 
+truncatedDiff :: DiffArguments -> Both SourceBlob -> IO Text
+truncatedDiff arguments sources = case format arguments of
+  Split -> return ""
+  Patch -> return $ P.truncatePatch arguments sources
+  JSON -> return "{}"
+
 printDiff' :: Parser -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff' parser arguments sources = case format arguments of
   Split -> put (output arguments) =<< diffFiles parser split sources
