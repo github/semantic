@@ -9,7 +9,7 @@ import Alignment
 import ArbitraryTerm (arbitraryLeaf)
 import Control.Arrow
 import Control.Comonad.Cofree
-import Control.Monad.Free hiding (unfold)
+import Control.Monad.Free
 import Data.Adjoined
 import Data.Bifunctor.Join
 import Data.Bifunctor.These
