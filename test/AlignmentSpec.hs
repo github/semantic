@@ -112,8 +112,6 @@ spec = parallel $ do
 
       leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty) (Leaf $ runBothWith (++) (toString <$> sources))
 
-      leafWithRangeInSource source range = Info range mempty :< Leaf source
-
       patchWithBoth (Insert ()) = Insert . snd
       patchWithBoth (Delete ()) = Delete . fst
       patchWithBoth (Replace () ()) = runBothWith Replace
