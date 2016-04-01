@@ -75,4 +75,4 @@ diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sources
   let replaceLeaves = breakDownLeavesByWord <$> sources
-  return $ renderer (runBothWith diffTerms $ replaceLeaves <*> terms) sourceBlobs
+  return $! renderer (runBothWith diffTerms $ replaceLeaves <*> terms) sourceBlobs
