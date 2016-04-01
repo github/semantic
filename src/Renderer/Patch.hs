@@ -113,13 +113,16 @@ header blobs = intercalate "\n" [filepathHeader, fileModeHeader, beforeFilepath,
         (oidA, oidB) = runBoth $ oid <$> blobs
         (modeA, modeB) = runBoth $ blobKind <$> blobs
 
+emptyHunk :: Hunk (SplitDiff a Info)
+emptyHunk = Hunk { offset = mempty, changes = [], trailingContext = [] }
+
 -- | Render a diff as a series of hunks.
 hunks :: Renderer a [Hunk (SplitDiff a Info)]
 hunks _ blobs | sources <- source <$> blobs
               , sourcesEqual <- runBothWith (==) sources
               , sourcesNull <- runBothWith (&&) (null <$> sources)
               , sourcesEqual || sourcesNull
-  = [Hunk { offset = mempty, changes = [], trailingContext = [] }]
+  = [emptyHunk]
 hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap (fmap Prelude.fst) <$> splitDiffByLines (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
