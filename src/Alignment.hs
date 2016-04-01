@@ -164,10 +164,8 @@ advanceRight (Join (These as (_:bs))) = Join (These as bs)
 advanceRight (Join (That (_:bs))) = Join (That bs)
 advanceRight other = other
 
-pairRangesWithLine :: Join These a -> Join These b -> Join These (a, b)
-pairRangesWithLine headRanges childLine = case (,) <$> headRanges `applyThese` childLine of
-  Just v -> v
-  Nothing -> error "oh god no"
+pairRangesWithLine :: Monoid b => Join These a -> Join These b -> Join These (a, b)
+pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRanges) $ (,) <$> headRanges `applyThese` childLine
 
 {-
 
