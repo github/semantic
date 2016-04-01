@@ -13,14 +13,11 @@ import Control.Monad.Free hiding (unfold)
 import Data.Adjoined
 import Data.Bifunctor.Join
 import Data.Bifunctor.These
-import Data.Copointed
 import Data.Functor.Both as Both
 import Diff
 import Info
-import qualified Data.Maybe as Maybe
 import Data.Functor.Identity
 import Line
-import Patch
 import Prelude hiding (fst, snd)
 import qualified Prelude
 import Range
