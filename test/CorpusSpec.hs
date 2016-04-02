@@ -79,12 +79,16 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | is true, but the diff will still be calculated.
 testDiff :: Renderer T.Text String -> Both FilePath -> Maybe FilePath -> (String -> String -> Expectation) -> Expectation
 testDiff renderer paths diff matcher = do
-  let parser = parserForFilepath (fst paths)
   sources <- sequence $ readAndTranscodeFile <$> paths
-  let sourceBlobs = Both (S.SourceBlob, S.SourceBlob) <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)
   actual <- diffFiles parser renderer sourceBlobs
   case diff of
     Nothing -> matcher actual actual
     Just file -> do
       expected <- readFile file
       matcher actual expected
+  where parser = parserForFilepath (fst paths)
+        sourceBlobs = Both (S.SourceBlob, S.SourceBlob) <*>
+          sources <*>
+          pure mempty <*>
+          paths <*>
+          pure (Just S.defaultPlainBlob)
