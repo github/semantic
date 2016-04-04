@@ -8,6 +8,7 @@ import Control.Monad.Free
 import Data.Foldable
 import Data.Functor.Both
 import Data.Monoid
+import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import Diff
 import Info
@@ -52,8 +53,8 @@ splitPatchToClassName patch = stringValue $ "patch " ++ case patch of
   SplitReplace _ -> "replace"
 
 -- | Render a diff as an HTML split diff.
-split :: Renderer leaf TL.Text
-split diff blobs = renderHtml
+split :: Renderer leaf
+split diff blobs = TL.toStrict . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body

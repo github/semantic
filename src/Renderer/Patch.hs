@@ -1,7 +1,8 @@
 module Renderer.Patch (
   patch,
   hunks,
-  Hunk(..)
+  Hunk(..),
+  truncatePatch
 ) where
 
 import Alignment
@@ -20,10 +21,15 @@ import Data.Functor.Both as Both
 import Data.List
 import Data.Maybe
 import Data.Monoid
+import Data.Text (pack, Text)
+
+-- | Render a timed out file as a truncated diff.
+truncatePatch :: DiffArguments -> Both SourceBlob -> Text
+truncatePatch arguments blobs = pack $ header blobs ++ "#timed_out\nTruncating diff: timeout reached.\n"
 
 -- | Render a diff in the traditional patch format.
-patch :: Renderer a String
-patch diff blobs = case getLast $ foldMap (Last . Just) string of
+patch :: Renderer a
+patch diff blobs = pack $ case getLast (foldMap (Last . Just) string) of
   Just c | c /= '\n' -> string ++ "\n\\ No newline at end of file\n"
   _ -> string
   where string = header blobs ++ mconcat (showHunk blobs <$> hunks diff blobs)
@@ -107,13 +113,17 @@ header blobs = intercalate "\n" [filepathHeader, fileModeHeader, beforeFilepath,
         (oidA, oidB) = runBoth $ oid <$> blobs
         (modeA, modeB) = runBoth $ blobKind <$> blobs
 
+-- | A hunk representing no changes.
+emptyHunk :: Hunk (SplitDiff a Info)
+emptyHunk = Hunk { offset = mempty, changes = [], trailingContext = [] }
+
 -- | Render a diff as a series of hunks.
-hunks :: Renderer a [Hunk (SplitDiff a Info)]
+hunks :: Diff a Info -> Both SourceBlob -> [Hunk (SplitDiff a Info)]
 hunks _ blobs | sources <- source <$> blobs
               , sourcesEqual <- runBothWith (==) sources
               , sourcesNull <- runBothWith (&&) (null <$> sources)
               , sourcesEqual || sourcesNull
-  = [Hunk { offset = mempty, changes = [], trailingContext = [] }]
+  = [emptyHunk]
 hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap (fmap Prelude.fst) <$> splitDiffByLines (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
