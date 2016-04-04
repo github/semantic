@@ -28,7 +28,7 @@ truncatePatch :: DiffArguments -> Both SourceBlob -> Text
 truncatePatch arguments blobs = pack $ header blobs ++ "#timed_out\nTruncating diff: timeout reached.\n"
 
 -- | Render a diff in the traditional patch format.
-patch :: Renderer a Text
+patch :: Renderer a
 patch diff blobs = pack $ case getLast (foldMap (Last . Just) string) of
   Just c | c /= '\n' -> string ++ "\n\\ No newline at end of file\n"
   _ -> string
@@ -118,7 +118,7 @@ emptyHunk :: Hunk (SplitDiff a Info)
 emptyHunk = Hunk { offset = mempty, changes = [], trailingContext = [] }
 
 -- | Render a diff as a series of hunks.
-hunks :: Renderer a [Hunk (SplitDiff a Info)]
+hunks :: Diff a Info -> Both SourceBlob -> [Hunk (SplitDiff a Info)]
 hunks _ blobs | sources <- source <$> blobs
               , sourcesEqual <- runBothWith (==) sources
               , sourcesNull <- runBothWith (&&) (null <$> sources)

@@ -34,23 +34,23 @@ spec = parallel $ do
     examples "test/diffs/" `shouldNotReturn` []
 
   where
-    runTestsIn :: String -> (String -> String -> Expectation) -> SpecWith ()
+    runTestsIn :: String -> (T.Text -> T.Text -> Expectation) -> SpecWith ()
     runTestsIn directory matcher = do
       paths <- runIO $ examples directory
       let tests = correctTests =<< paths
       mapM_ (\ (formatName, renderer, paths, output) -> it (normalizeName (fst paths) ++ " (" ++ formatName ++ ")") $ testDiff renderer paths output matcher) tests
 
-    correctTests :: (Both FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, Both FilePath, Maybe FilePath)]
+    correctTests :: (Both FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a, Both FilePath, Maybe FilePath)]
     correctTests paths@(_, Nothing, Nothing, Nothing) = testsForPaths paths
     correctTests paths = List.filter (\(_, _, _, output) -> isJust output) $ testsForPaths paths
-    testsForPaths :: (Both FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a String, Both FilePath, Maybe FilePath)]
+    testsForPaths :: (Both FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a, Both FilePath, Maybe FilePath)]
     testsForPaths (paths, json, patch, split) = [ ("json", testJSON, paths, json), ("patch", testPatch, paths, patch), ("split", testSplit, paths, split) ]
-    testPatch :: Renderer a String
-    testPatch diff sources = T.unpack $ P.patch diff sources
-    testSplit :: Renderer a String
-    testSplit diff sources = T.unpack $ Split.split diff sources
-    testJSON :: Renderer a String
-    testJSON diff sources = T.unpack $ J.json diff sources
+    testPatch :: Renderer a
+    testPatch diff sources = P.patch diff sources
+    testSplit :: Renderer a
+    testSplit diff sources = Split.split diff sources
+    testJSON :: Renderer a
+    testJSON diff sources = J.json diff sources
 
 
 -- | Return all the examples from the given directory. Examples are expected to
@@ -77,18 +77,14 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | Given file paths for A, B, and, optionally, a diff, return whether diffing
 -- | the files will produce the diff. If no diff is provided, then the result
 -- | is true, but the diff will still be calculated.
-testDiff :: Renderer T.Text String -> Both FilePath -> Maybe FilePath -> (String -> String -> Expectation) -> Expectation
+testDiff :: Renderer T.Text -> Both FilePath -> Maybe FilePath -> (T.Text -> T.Text -> Expectation) -> Expectation
 testDiff renderer paths diff matcher = do
   sources <- sequence $ readAndTranscodeFile <$> paths
-  actual <- diffFiles parser renderer sourceBlobs
+  actual <- diffFiles parser renderer (sourceBlobs sources)
   case diff of
     Nothing -> matcher actual actual
     Just file -> do
-      expected <- readFile file
+      expected <- T.pack <$> readFile file
       matcher actual expected
   where parser = parserForFilepath (fst paths)
-        sourceBlobs = Both (S.SourceBlob, S.SourceBlob) <*>
-          sources <*>
-          pure mempty <*>
-          paths <*>
-          pure (Just S.defaultPlainBlob)
+        sourceBlobs sources = Both (S.SourceBlob, S.SourceBlob) <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)
