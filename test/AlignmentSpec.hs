@@ -62,7 +62,7 @@ spec = parallel $ do
                       (Range 2 4, []))
         ]
 
-    it "produces asymmetrical context" $ do
+    it "produces asymmetrical context" $
       groupChildrenByLine (Join (These [Range 0 2, Range 2 4] [Range 0 1])) [] `shouldBe`
         [ Join (These (Range 0 2, [] :: [SplitDiff String Info])
                       (Range 0 1, []))
