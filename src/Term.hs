@@ -15,7 +15,7 @@ type Term a annotation = Cofree (Syntax a) annotation
 zipTerms :: Term a annotation -> Term a annotation -> Maybe (Term a (Both annotation))
 zipTerms (annotation1 :< a) (annotation2 :< b) = annotate $ zipUnwrap a b
   where
-    annotate = fmap (Both (annotation1, annotation2) :<)
+    annotate = fmap (both annotation1 annotation2 :<)
     zipUnwrap (Leaf _) (Leaf b') = Just $ Leaf b'
     zipUnwrap (Indexed a') (Indexed b') = Just . Indexed . catMaybes $ zipWith zipTerms a' b'
     zipUnwrap (Fixed a') (Fixed b') = Just . Fixed . catMaybes $ zipWith zipTerms a' b'

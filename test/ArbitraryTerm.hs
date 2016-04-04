@@ -56,7 +56,7 @@ instance Arbitrary CategorySet where
   arbitrary = elements [ A, B, C, D ]
 
 instance Arbitrary a => Arbitrary (Both a) where
-  arbitrary = pure (curry Both) <*> arbitrary <*> arbitrary
+  arbitrary = both <$> arbitrary <*> arbitrary
   shrink b = both <$> (shrink (fst b)) <*> (shrink (snd b))
 
 instance Arbitrary a => Arbitrary (Line a) where

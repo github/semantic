@@ -43,7 +43,7 @@ constructAndRun comparable (annotation1 :< a) (annotation2 :< b) =
     algorithm (Keyed a') (Keyed b') = Free $ ByKey a' b' (annotate . Keyed)
     algorithm (Leaf a') (Leaf b') | a' == b' = annotate $ Leaf b'
     algorithm a' b' = Free $ Recursive (annotation1 :< a') (annotation2 :< b') Pure
-    annotate = Pure . Free . Annotated (Both (annotation1, annotation2))
+    annotate = Pure . Free . Annotated (both annotation1 annotation2)
 
 -- | Runs the diff algorithm
 run :: (Eq a, Eq annotation) => Comparable a annotation -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
@@ -59,7 +59,7 @@ run comparable (Free (Recursive (annotation1 :< a) (annotation2 :< b) f)) = run 
       interpretInBoth key x y = interpret comparable (x ! key) (y ! key)
   recur _ _ = Pure $ Replace (annotation1 :< a) (annotation2 :< b)
 
-  annotate = Free . Annotated (Both (annotation1, annotation2))
+  annotate = Free . Annotated (both annotation1 annotation2)
 
 run comparable (Free (ByKey a b f)) = run comparable $ f byKey where
   byKey = Map.fromList $ toKeyValue <$> List.union aKeys bKeys

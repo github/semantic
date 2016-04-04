@@ -62,7 +62,7 @@ examples directory = do
   patches <- toDict <$> globFor "*.patch.*"
   splits <- toDict <$> globFor "*.split.*"
   let keys = Set.unions $ keysSet <$> [as, bs]
-  return $ (\name -> (Both (as ! name, bs ! name), Map.lookup name jsons, Map.lookup name patches, Map.lookup name splits)) <$> sort (Set.toList keys)
+  return $ (\name -> (both (as ! name) (bs ! name), Map.lookup name jsons, Map.lookup name patches, Map.lookup name splits)) <$> sort (Set.toList keys)
   where
     globFor :: String -> IO [FilePath]
     globFor p = globDir1 (compile p) directory
@@ -79,7 +79,7 @@ testDiff :: Renderer T.Text String -> Both FilePath -> Maybe FilePath -> (String
 testDiff renderer paths diff matcher = do
   let parser = parserForFilepath (fst paths)
   sources <- sequence $ readAndTranscodeFile <$> paths
-  let sourceBlobs = Both (S.SourceBlob, S.SourceBlob) <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)
+  let sourceBlobs = both S.SourceBlob S.SourceBlob <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)
   actual <- diffFiles parser renderer sourceBlobs
   case diff of
     Nothing -> matcher actual actual
