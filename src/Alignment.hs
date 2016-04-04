@@ -128,9 +128,10 @@ alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
   where alignSyntax :: Annotated leaf (Both Info) (AlignedDiff leaf) -> AlignedDiff leaf
         alignSyntax (Annotated infos syntax) = case syntax of
           Leaf s -> modifyJoin (runBothWith bimap (((Free . (`Annotated` Leaf s)) .) . setCharacterRange <$> infos)) <$> sequenceL lineRanges
-          Indexed children -> modifyJoin (runBothWith bimap ((\ info (range, children) -> Free (Annotated (setCharacterRange info range) (Indexed children))) <$> infos)) <$> groupChildrenByLine lineRanges children
+          Indexed children -> wrapInBranch Indexed <$> groupChildrenByLine lineRanges children
           _ -> []
           where lineRanges = runBothWith ((Join .) . These) (actualLineRanges <$> (characterRange <$> infos) <*> sources)
+                wrapInBranch constructor = modifyJoin (runBothWith bimap ((\ info (range, children) -> Free (Annotated (setCharacterRange info range) (constructor children))) <$> infos))
 
 groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
 groupChildrenByLine ranges children | (nextRanges, nextChildren, lines) <- group2 ranges children
