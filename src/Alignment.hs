@@ -141,15 +141,15 @@ groupChildrenByLine ranges children | (nextRanges, nextChildren, lines) <- group
 group2 :: Join These [Range] -> [AlignedDiff leaf] -> (Join These [Range], [AlignedDiff leaf], [Join These (Range, [SplitDiff leaf Info])])
 group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                        , (child:restOfChildren) <- children
-                       , (first:rest) <- child
-                       , ~(l, r) <- split first
+                       , (firstLine:rest) <- child
+                       , ~(l, r) <- split firstLine
                        = case fromThese False False . runJoin $ intersects headRanges child of
                            (True, True) -> let (moreRanges, moreChildren, remainingLines) = group2 tailRanges (rest:restOfChildren) in
-                                             (moreRanges, moreChildren, pairRangesWithLine headRanges (pure <$> first) : remainingLines)
+                                             (moreRanges, moreChildren, pairRangesWithLine headRanges (pure <$> firstLine) : remainingLines)
                            (True, False) -> let (moreRanges, moreChildren, remainingLines) = group2 (advanceLeft ranges) ((r ++ rest):restOfChildren) in
-                                              (moreRanges, moreChildren, pairRangesWithLine headRanges (mask first $ modifyJoin (uncurry These . fromThese [] []) $ pure <$> head l) : remainingLines)
+                                              (moreRanges, moreChildren, pairRangesWithLine headRanges (mask firstLine $ modifyJoin (uncurry These . fromThese [] []) $ pure <$> head l) : remainingLines)
                            (False, True) -> let (moreRanges, moreChildren, remainingLines) = group2 (advanceRight ranges) ((l ++ rest):restOfChildren) in
-                                              (moreRanges, moreChildren, pairRangesWithLine headRanges (mask first $ modifyJoin (uncurry These . fromThese [] []) $ pure <$> head r) : remainingLines)
+                                              (moreRanges, moreChildren, pairRangesWithLine headRanges (mask firstLine $ modifyJoin (uncurry These . fromThese [] []) $ pure <$> head r) : remainingLines)
                            _ -> (tailRanges, children, [ flip (,) [] <$> headRanges ])
                        | ([]:rest) <- children = group2 ranges rest
                        | otherwise = (ranges, children, [])
