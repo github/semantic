@@ -44,14 +44,7 @@ spec = parallel $ do
     correctTests paths@(_, Nothing, Nothing, Nothing) = testsForPaths paths
     correctTests paths = List.filter (\(_, _, _, output) -> isJust output) $ testsForPaths paths
     testsForPaths :: (Both FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a, Both FilePath, Maybe FilePath)]
-    testsForPaths (paths, json, patch, split) = [ ("json", testJSON, paths, json), ("patch", testPatch, paths, patch), ("split", testSplit, paths, split) ]
-    testPatch :: Renderer a
-    testPatch diff sources = P.patch diff sources
-    testSplit :: Renderer a
-    testSplit diff sources = Split.split diff sources
-    testJSON :: Renderer a
-    testJSON diff sources = J.json diff sources
-
+    testsForPaths (paths, json, patch, split) = [ ("json", J.json, paths, json), ("patch", P.patch, paths, patch), ("split", Split.split, paths, split) ]
 
 -- | Return all the examples from the given directory. Examples are expected to
 -- | have the form "foo.A.js", "foo.B.js", "foo.patch.js". Diffs are not
