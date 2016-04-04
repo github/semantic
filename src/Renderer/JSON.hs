@@ -13,7 +13,6 @@ import Data.Aeson.Encode
 import Data.Bifunctor.Join
 import Data.Functor.Both
 import Data.OrderedMap hiding (fromList)
-import Data.Text
 import Data.Text.Lazy (toStrict)
 import Data.Text.Lazy.Builder (toLazyText)
 import qualified Data.Text as T

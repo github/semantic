@@ -8,7 +8,6 @@ import Control.Monad.Free
 import Data.Foldable
 import Data.Functor.Both
 import Data.Monoid
-import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
 import Diff
 import Info
