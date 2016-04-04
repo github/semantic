@@ -119,7 +119,6 @@ alignPatch sources (Insert term) = hylo (alignSyntax (Join . That . runIdentity)
 alignPatch _ _ = []
 -- alignPatch sources (Replace term1 term2) = alignWith Join (hylo (alignTerm sources) unCofree term1)
 --                                                           (hylo (alignTerm sources) unCofree term2)
---
 
 alignDiff :: Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
 alignDiff sources diff = iter (uncurry (alignSyntax (runBothWith ((Join .) . These)) sources) . (annotation &&& syntax)) (alignPatch sources <$> diff)
