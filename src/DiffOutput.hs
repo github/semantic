@@ -16,8 +16,8 @@ import Data.String
 import Data.Text hiding (split)
 
 -- | Return a renderer from the command-line arguments that will print the diff.
-printDiff :: Parser -> DiffArguments -> Both SourceBlob -> IO Text
-printDiff parser arguments sources = case format arguments of
+textDiff :: Parser -> DiffArguments -> Both SourceBlob -> IO Text
+textDiff parser arguments sources = case format arguments of
   Split -> diffFiles parser split sources
   Patch -> diffFiles parser P.patch sources
   JSON -> diffFiles parser J.json sources
@@ -28,8 +28,8 @@ truncatedDiff arguments sources = case format arguments of
   Patch -> return $ P.truncatePatch arguments sources
   JSON -> return "{}"
 
-printDiff' :: Parser -> DiffArguments -> Both SourceBlob -> IO ()
-printDiff' parser arguments sources = case format arguments of
+printDiff :: Parser -> DiffArguments -> Both SourceBlob -> IO ()
+printDiff parser arguments sources = case format arguments of
   Split -> put (output arguments) =<< diffFiles parser split sources
     where
       put Nothing rendered = TextIO.putStr rendered
