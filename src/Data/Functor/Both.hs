@@ -22,7 +22,7 @@ bothOfThese (Join a) = Join . uncurry fromThese a
 
 -- | Construct Both (Maybe) with These values, defaulting to Nothing.
 maybeBothOfThese :: These a a -> Both (Maybe a)
-maybeBothOfThese = bothOfThese (pure Nothing) . bimap Just Just
+maybeBothOfThese = Join . fromThese Nothing Nothing . bimap Just Just
 
 -- | Pairs either or both elements of These with the corresponding elements of Both.
 -- |
