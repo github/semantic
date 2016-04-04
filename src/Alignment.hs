@@ -167,59 +167,6 @@ mask (Join (These _ _)) (Join (That b2)) = Join $ That b2
 mask (Join (These _ _)) (Join (These b1 b2)) = Join $ These b1 b2
 mask _ b = b
 
-{-
-
-find all of the lines which intersect with this child, not all the children intersecting with this line?
-
-[ foo ]   [
-          foo
-          ]
-
-
-[ Join These "[ foo ]" "[\n"]
-[ Join That            "foo\n"]
-[ Join That            "]"]
-
-[ Range 2 5 ] [ Range 2 5 ]
-[ Range 0 7 ] [ Range 0 2, Range 2 6, Range 6 7 ]
-
-
-
-[ foo ]
-bar
-
-[
-foo
-]
-bar
-
-[ foo ]   [
-          foo
-          ]
-bar       bar
-
-
-[ Range 0 8, Range 8 12 ]  [ Range 0 2, Range 2 6, Range 6 8, Range 8 12 ]
-
-[ foo ]   [
-bar       foo
-          ]
-          bar
-
-1. we need to consume lines until the child’s lines have been exhausted
-
-
-2. (AND all the children intersecting the line have been consumed)
-
-
--[ foo ]
-+[
-+foo
-+]
- bar
-
--}
-
 unconsThese :: Join These [a] -> Maybe (Join These a, Join These [a])
 unconsThese (Join (This (a:as))) = Just (Join (This a), Join (This as))
 unconsThese (Join (That (b:bs))) = Just (Join (That b), Join (That bs))
