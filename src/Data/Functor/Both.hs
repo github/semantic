@@ -18,7 +18,7 @@ both = curry Join
 
 -- | Construct Both with These values & defaults.
 bothOfThese :: Both a -> These a a -> Both a
-bothOfThese a = these (`both` snd a) (both (fst a)) both
+bothOfThese (Join a) = Join . uncurry fromThese a
 
 -- | Construct Both (Maybe) with These values, defaulting to Nothing.
 maybeBothOfThese :: These a a -> Both (Maybe a)
