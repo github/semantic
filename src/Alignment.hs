@@ -133,10 +133,10 @@ alignSyntax toJoinThese sources infos syntax = case syntax of
         wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> Free (Annotated (setCharacterRange info range) (constructor children))) <$> infos)
 
 groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
-groupChildrenByLine ranges children | (nextRanges, nextChildren, lines) <- group2 ranges children
-                                    , not (null lines)
+groupChildrenByLine ranges children | not (and $ null <$> ranges)
+                                    , (nextRanges, nextChildren, lines) <- group2 ranges children
                                     = lines ++ groupChildrenByLine nextRanges nextChildren
-                                    | otherwise = fmap (flip (,) []) <$> sequenceL ranges
+                                    | otherwise = []
 
 group2 :: Join These [Range] -> [AlignedDiff leaf] -> (Join These [Range], [AlignedDiff leaf], [Join These (Range, [SplitDiff leaf Info])])
 group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
@@ -152,7 +152,7 @@ group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                                               (moreRanges, moreChildren, pairRangesWithLine headRanges (mask firstLine $ modifyJoin (uncurry These . fromThese [] []) $ pure <$> head r) : remainingLines)
                            _ -> (tailRanges, children, [ flip (,) [] <$> headRanges ])
                        | ([]:rest) <- children = group2 ranges rest
-                       | otherwise = (ranges, children, [])
+                       | otherwise = ([] <$ ranges, children, fmap (flip (,) []) <$> sequenceL ranges)
 
 pairRangesWithLine :: Monoid b => Join These a -> Join These b -> Join These (a, b)
 pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRanges) $ (,) <$> headRanges `applyThese` childLine
