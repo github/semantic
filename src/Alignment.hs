@@ -11,6 +11,7 @@ module Alignment
 , groupChildrenByLine
 ) where
 
+import Control.Arrow ((&&&))
 import Control.Comonad.Cofree
 import Control.Monad
 import Control.Monad.Free
@@ -124,10 +125,10 @@ alignPatch _ _ = []
 -- alignTerm sources infos syntax = (\ (source, info) -> Free . Annotated info <$> alignSyntax source (characterRange info) syntax) <$> Join (pairWithThese sources (runJoin infos))
 
 alignDiff :: Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
-alignDiff sources diff = iter (alignSyntax sources) (alignPatch sources <$> diff)
+alignDiff sources diff = iter (uncurry (alignSyntax sources) . (annotation &&& syntax)) (alignPatch sources <$> diff)
 
-alignSyntax :: Both (Source Char) -> Annotated leaf (Both Info) (AlignedDiff leaf) -> AlignedDiff leaf
-alignSyntax sources (Annotated infos syntax) = case syntax of
+alignSyntax :: Both (Source Char) -> Both Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
+alignSyntax sources infos syntax = case syntax of
   Leaf s -> modifyJoin (runBothWith bimap (((Free . (`Annotated` Leaf s)) .) . setCharacterRange <$> infos)) <$> sequenceL lineRanges
   Indexed children -> wrapInBranch Indexed <$> groupChildrenByLine lineRanges children
   Fixed children -> wrapInBranch Fixed <$> groupChildrenByLine lineRanges children
