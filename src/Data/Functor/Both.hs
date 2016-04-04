@@ -42,10 +42,6 @@ fst = Prelude.fst . runBoth
 snd :: Both a -> a
 snd = Prelude.snd . runBoth
 
-unzip :: [Both a] -> Both [a]
-unzip = foldr pair (pure [])
-  where pair head tail = (:) <$> head <*> tail
-
 instance Monoid a => Monoid (Join (,) a) where
   mempty = pure mempty
   mappend a b = mappend <$> a <*> b

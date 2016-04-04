@@ -65,7 +65,7 @@ showHunk blobs hunk = maybeOffsetHeader ++
 -- | Given the before and after sources, render a change to a string.
 showChange :: Both (Source Char) -> Change (SplitDiff a Info) -> String
 showChange sources change = showLines (snd sources) ' ' (snd <$> context change) ++ deleted ++ inserted
-  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> both '-' '+' <*> Both.unzip (contents change)
+  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> both '-' '+' <*> Join (unzip (runJoin <$> contents change))
 
 -- | Given a source, render a set of lines to a string with a prefix.
 showLines :: Source Char -> Char -> [Line (SplitDiff leaf Info)] -> String

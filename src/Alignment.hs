@@ -23,7 +23,7 @@ import Data.Bifunctor.These
 import Data.Coalescent
 import Data.Copointed
 import Data.Foldable
-import Data.Functor.Both as Both hiding (unzip)
+import Data.Functor.Both as Both
 import Data.Functor.Identity
 import Data.Maybe
 import Data.Monoid
