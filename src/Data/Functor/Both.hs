@@ -44,7 +44,7 @@ snd = Prelude.snd . runBoth
 
 unzip :: [Both a] -> Both [a]
 unzip = foldr pair (pure [])
-  where pair (Join (a, b)) (Join (as, bs)) = Join (a : as, b : bs)
+  where pair head tail = (:) <$> head <*> tail
 
 instance Monoid a => Monoid (Join (,) a) where
   mempty = pure mempty
