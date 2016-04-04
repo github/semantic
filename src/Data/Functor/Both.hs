@@ -16,10 +16,6 @@ type Both a = Join (,) a
 both :: a -> a -> Both a
 both = curry Join
 
--- | Construct Both with These values & defaults.
-bothOfThese :: Both a -> These a a -> Both a
-bothOfThese (Join a) = Join . uncurry fromThese a
-
 -- | Construct Both (Maybe) with These values, defaulting to Nothing.
 maybeBothOfThese :: These a a -> Both (Maybe a)
 maybeBothOfThese = Join . fromThese Nothing Nothing . bimap Just Just
