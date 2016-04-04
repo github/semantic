@@ -154,12 +154,6 @@ group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                        | ([]:rest) <- children = group2 ranges rest
                        | otherwise = (ranges, children, [])
 
-advanceLeft :: Join These [a] -> Join These [a]
-advanceLeft = modifyJoin $ first (drop 1)
-
-advanceRight :: Join These [a] -> Join These [a]
-advanceRight = modifyJoin $ second (drop 1)
-
 pairRangesWithLine :: Monoid b => Join These a -> Join These b -> Join These (a, b)
 pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRanges) $ (,) <$> headRanges `applyThese` childLine
 
