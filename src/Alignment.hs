@@ -129,6 +129,7 @@ alignDiff sources diff = iter alignSyntax (alignPatch sources <$> diff)
         alignSyntax (Annotated infos syntax) = case syntax of
           Leaf s -> modifyJoin (runBothWith bimap (((Free . (`Annotated` Leaf s)) .) . setCharacterRange <$> infos)) <$> sequenceL lineRanges
           Indexed children -> wrapInBranch Indexed <$> groupChildrenByLine lineRanges children
+          Fixed children -> wrapInBranch Fixed <$> groupChildrenByLine lineRanges children
           _ -> []
           where lineRanges = runBothWith ((Join .) . These) (actualLineRanges <$> (characterRange <$> infos) <*> sources)
                 wrapInBranch constructor = modifyJoin (runBothWith bimap ((\ info (range, children) -> Free (Annotated (setCharacterRange info range) (constructor children))) <$> infos))
