@@ -123,16 +123,16 @@ alignPatch _ _ = []
 --
 
 alignDiff :: Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
-alignDiff sources diff = iter (uncurry (alignSyntax sources) . (annotation &&& syntax)) (alignPatch sources <$> diff)
+alignDiff sources diff = iter (uncurry (alignSyntax (runBothWith ((Join .) . These)) sources) . (annotation &&& syntax)) (alignPatch sources <$> diff)
 
-alignSyntax :: Both (Source Char) -> Both Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
-alignSyntax sources infos syntax = case syntax of
-  Leaf s -> modifyJoin (runBothWith bimap (((Free . (`Annotated` Leaf s)) .) . setCharacterRange <$> infos)) <$> sequenceL lineRanges
-  Indexed children -> wrapInBranch Indexed <$> groupChildrenByLine lineRanges children
-  Fixed children -> wrapInBranch Fixed <$> groupChildrenByLine lineRanges children
+alignSyntax :: Applicative f => (forall a. f a -> Join These a) -> f (Source Char) -> f Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
+alignSyntax toJoinThese sources infos syntax = case syntax of
+  Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> sequenceL lineRanges
+  Indexed children -> catMaybes $ wrapInBranch Indexed <$> groupChildrenByLine lineRanges children
+  Fixed children -> catMaybes $ wrapInBranch Fixed <$> groupChildrenByLine lineRanges children
   _ -> []
-  where lineRanges = runBothWith ((Join .) . These) (actualLineRanges <$> (characterRange <$> infos) <*> sources)
-        wrapInBranch constructor = modifyJoin (runBothWith bimap ((\ info (range, children) -> Free (Annotated (setCharacterRange info range) (constructor children))) <$> infos))
+  where lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
+        wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> Free (Annotated (setCharacterRange info range) (constructor children))) <$> infos)
 
 groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
 groupChildrenByLine ranges children | (nextRanges, nextChildren, lines) <- group2 ranges children
