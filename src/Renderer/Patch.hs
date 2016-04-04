@@ -113,6 +113,7 @@ header blobs = intercalate "\n" [filepathHeader, fileModeHeader, beforeFilepath,
         (oidA, oidB) = runBoth $ oid <$> blobs
         (modeA, modeB) = runBoth $ blobKind <$> blobs
 
+-- | A hunk representing no changes.
 emptyHunk :: Hunk (SplitDiff a Info)
 emptyHunk = Hunk { offset = mempty, changes = [], trailingContext = [] }
 

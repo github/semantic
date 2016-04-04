@@ -15,19 +15,21 @@ import qualified System.IO as IO
 import Data.String
 import Data.Text hiding (split)
 
--- | Return a renderer from the command-line arguments that will print the diff.
+-- | Returns a rendered diff given a parser, diff arguments and two source blobs.
 textDiff :: Parser -> DiffArguments -> Both SourceBlob -> IO Text
 textDiff parser arguments sources = case format arguments of
   Split -> diffFiles parser split sources
   Patch -> diffFiles parser P.patch sources
   JSON -> diffFiles parser J.json sources
 
+-- | Returns a truncated diff given diff arguments and two source blobs.
 truncatedDiff :: DiffArguments -> Both SourceBlob -> IO Text
 truncatedDiff arguments sources = case format arguments of
   Split -> return ""
   Patch -> return $ P.truncatePatch arguments sources
   JSON -> return "{}"
 
+-- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
 printDiff :: Parser -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = case format arguments of
   Split -> put (output arguments) =<< diffFiles parser split sources
