@@ -167,6 +167,16 @@ advanceRight other = other
 pairRangesWithLine :: Monoid b => Join These a -> Join These b -> Join These (a, b)
 pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRanges) $ (,) <$> headRanges `applyThese` childLine
 
+mask :: Join These a -> Join These b -> Join These b
+mask (Join (This _)) (Join (This b1)) = Join $ This b1
+mask (Join (This _)) (Join (These b1 _)) = Join $ This b1
+mask (Join (That _)) (Join (That b2)) = Join $ That b2
+mask (Join (That _)) (Join (These _ b2)) = Join $ That b2
+mask (Join (These _ _)) (Join (This b1)) = Join $ This b1
+mask (Join (These _ _)) (Join (That b2)) = Join $ That b2
+mask (Join (These _ _)) (Join (These b1 b2)) = Join $ These b1 b2
+mask _ b = b
+
 {-
 
 find all of the lines which intersect with this child, not all the children intersecting with this line?
