@@ -9,12 +9,13 @@ import Category
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Aeson hiding (json)
+import Data.Aeson.Encode
 import Data.Bifunctor.Join
-import Data.ByteString.Builder
-import Data.ByteString.Lazy
 import Data.Functor.Both
-import Data.Monoid
 import Data.OrderedMap hiding (fromList)
+import Data.Text
+import Data.Text.Lazy (toStrict)
+import Data.Text.Lazy.Builder (toLazyText)
 import qualified Data.Text as T
 import Data.Vector hiding (toList)
 import Diff
@@ -28,11 +29,8 @@ import Syntax
 import Term
 
 -- | Render a diff to a string representing its JSON.
-json :: Renderer a ByteString
-json diff sources = toLazyByteString . fromEncoding . pairs $
-     "rows" .= annotateRows (splitDiffByLines (source <$> sources) diff)
-  <> "oids" .= (oid <$> sources)
-  <> "paths" .= (path <$> sources)
+json :: Renderer a
+json diff sources = toStrict . toLazyText . encodeToTextBuilder $ object ["rows" .= annotateRows (splitDiffByLines (source <$> sources) diff), "oids" .= (oid <$> sources), "paths" .= (path <$> sources)]
   where annotateRows = fmap (fmap NumberedLine) . numberedRows
 
 newtype NumberedLine a = NumberedLine (Int, Line a)
