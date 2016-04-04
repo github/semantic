@@ -205,9 +205,3 @@ applyThese _ _ = Nothing
 
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
-
--- alignSyntax :: Source Char -> Range -> Syntax leaf (AlignedDiff leaf) -> [Syntax leaf (SplitDiff leaf Info)]
--- alignSyntax source range syntax = case syntax of
---   Leaf s -> Leaf s <$ lineRanges
---   _ -> []
---   where lineRanges = actualLineRanges range source
