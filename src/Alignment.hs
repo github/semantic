@@ -121,8 +121,6 @@ alignPatch _ _ = []
 -- alignPatch sources (Replace term1 term2) = alignWith Join (hylo (alignTerm sources) unCofree term1)
 --                                                           (hylo (alignTerm sources) unCofree term2)
 --
--- alignTerm :: Both (Source Char) -> Join These Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
--- alignTerm sources infos syntax = (\ (source, info) -> Free . Annotated info <$> alignSyntax source (characterRange info) syntax) <$> Join (pairWithThese sources (runJoin infos))
 
 alignDiff :: Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
 alignDiff sources diff = iter (uncurry (alignSyntax sources) . (annotation &&& syntax)) (alignPatch sources <$> diff)
