@@ -9,6 +9,7 @@ import Category
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Aeson hiding (json)
+import Data.Bifunctor.Join
 import Data.ByteString.Builder
 import Data.ByteString.Lazy
 import Data.Functor.Both
@@ -46,7 +47,7 @@ instance ToJSON Range where
   toJSON (Range start end) = Array . fromList $ toJSON <$> [ start, end ]
   toEncoding (Range start end) = foldable [ start,  end ]
 instance ToJSON a => ToJSON (Both a) where
-  toJSON (Both (a, b)) = Array . fromList $ toJSON <$> [ a, b ]
+  toJSON (Join (a, b)) = Array . fromList $ toJSON <$> [ a, b ]
   toEncoding = foldable
 instance ToJSON (SplitDiff leaf Info) where
   toJSON (Free (Annotated info syntax)) = object (termFields info syntax)

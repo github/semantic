@@ -1,8 +1,10 @@
+{-# LANGUAGE FlexibleInstances #-}
 module ArbitraryTerm where
 
 import Category
 import Control.Comonad.Cofree
 import Control.Monad
+import Data.Bifunctor.Join
 import Data.Functor.Both
 import qualified Data.OrderedMap as Map
 import qualified Data.List as List
@@ -55,7 +57,7 @@ instance Categorizable CategorySet where
 instance Arbitrary CategorySet where
   arbitrary = elements [ A, B, C, D ]
 
-instance Arbitrary a => Arbitrary (Both a) where
+instance Arbitrary a => Arbitrary (Join (,) a) where
   arbitrary = both <$> arbitrary <*> arbitrary
   shrink b = both <$> (shrink (fst b)) <*> (shrink (snd b))
 

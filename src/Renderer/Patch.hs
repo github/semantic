@@ -16,6 +16,7 @@ import Source hiding ((++), break)
 import SplitDiff
 import Control.Comonad.Cofree
 import Control.Monad.Free
+import Data.Bifunctor.Join
 import Data.Functor.Both as Both
 import Data.List
 import Data.Maybe
@@ -114,7 +115,7 @@ hunks _ blobs | sources <- source <$> blobs
               , sourcesNull <- runBothWith (&&) (null <$> sources)
               , sourcesEqual || sourcesNull
   = [Hunk { offset = mempty, changes = [], trailingContext = [] }]
-hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap (fmap Prelude.fst) <$> splitDiffByLines (source <$> blobs) diff
+hunks diff blobs = hunksInRows (Join (1, 1)) $ fmap (fmap Prelude.fst) <$> splitDiffByLines (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
