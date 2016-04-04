@@ -143,7 +143,7 @@ group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                        , (child:restOfChildren) <- children
                        , (firstLine:rest) <- child
                        , ~(l, r) <- split firstLine
-                       = case fromThese False False . runJoin $ intersects headRanges child of
+                       = case fromThese False False . runJoin $ intersects headRanges firstLine of
                            (True, True) -> let (moreRanges, moreChildren, remainingLines) = group2 tailRanges (rest:restOfChildren) in
                                              (moreRanges, moreChildren, pairRangesWithLine headRanges (pure <$> firstLine) : remainingLines)
                            (True, False) -> let (moreRanges, moreChildren, remainingLines) = group2 (modifyJoin (bimap (drop 1) (if null r then id else drop 1)) ranges) ((r ++ rest):restOfChildren) in
@@ -179,9 +179,8 @@ getRange :: SplitDiff leaf Info -> Range
 getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
 
-intersects :: Join These Range -> AlignedDiff leaf -> Join These Bool
-intersects ranges childLines | (line:_) <- childLines = fromMaybe (False <$ line) $ intersectsChild <$> ranges `applyThese` line
-                             | otherwise = False <$ ranges
+intersects :: Join These Range -> Join These (SplitDiff leaf Info) -> Join These Bool
+intersects ranges line = fromMaybe (False <$ line) $ intersectsChild <$> ranges `applyThese` line
 
 intersectsChild :: Range -> SplitDiff leaf Info -> Bool
 intersectsChild range child = end (getRange child) <= end range
