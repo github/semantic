@@ -114,10 +114,9 @@ type Row a = Both (Line a)
 type AlignedDiff leaf = [Join These (SplitDiff leaf Info)]
 
 alignPatch :: Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
+alignPatch sources (Delete term) = hylo (alignSyntax (Join . This . runIdentity) (Identity $ fst sources)) unCofree (Identity <$> term)
+alignPatch sources (Insert term) = hylo (alignSyntax (Join . That . runIdentity) (Identity $ snd sources)) unCofree (Identity <$> term)
 alignPatch _ _ = []
--- alignPatch sources patch = crosswalk (hylo (alignTerm sources) unCofree) (unPatch patch)
--- alignPatch sources (Insert term) = hylo (alignTerm sources) unCofree term
--- alignPatch sources (Delete term) = hylo (alignTerm sources) unCofree term
 -- alignPatch sources (Replace term1 term2) = alignWith Join (hylo (alignTerm sources) unCofree term1)
 --                                                           (hylo (alignTerm sources) unCofree term2)
 --
