@@ -70,6 +70,8 @@ readAndTranscodeFile path = do
 
 -- | Given a parser and renderer, diff two sources and return the rendered
 -- | result.
+-- | Returns the rendered result strictly, so it's always fully evaluated
+-- | with respect to other IO actions.
 diffFiles :: Parser -> Renderer T.Text b -> Both SourceBlob -> IO b
 diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
