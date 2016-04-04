@@ -146,9 +146,9 @@ group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                        = case fromThese False False . runJoin $ intersects headRanges child of
                            (True, True) -> let (moreRanges, moreChildren, remainingLines) = group2 tailRanges (rest:restOfChildren) in
                                              (moreRanges, moreChildren, pairRangesWithLine headRanges (pure <$> firstLine) : remainingLines)
-                           (True, False) -> let (moreRanges, moreChildren, remainingLines) = group2 (fromMaybe tailRanges $ drop 1 <$ firstLine `applyThese` ranges) ((r ++ rest):restOfChildren) in
+                           (True, False) -> let (moreRanges, moreChildren, remainingLines) = group2 (modifyJoin (bimap (drop 1) (if null r then id else drop 1)) ranges) ((r ++ rest):restOfChildren) in
                                               (moreRanges, moreChildren, pairRangesWithLine headRanges (mask firstLine $ modifyJoin (uncurry These . fromThese [] []) $ pure <$> head l) : remainingLines)
-                           (False, True) -> let (moreRanges, moreChildren, remainingLines) = group2 (fromMaybe tailRanges $ drop 1 <$ firstLine `applyThese` ranges) ((l ++ rest):restOfChildren) in
+                           (False, True) -> let (moreRanges, moreChildren, remainingLines) = group2 (modifyJoin (bimap (if null l then id else drop 1) (drop 1)) ranges) ((l ++ rest):restOfChildren) in
                                               (moreRanges, moreChildren, pairRangesWithLine headRanges (mask firstLine $ modifyJoin (uncurry These . fromThese [] []) $ pure <$> head r) : remainingLines)
                            _ -> (tailRanges, children, [ flip (,) [] <$> headRanges ])
                        | ([]:rest) <- children = group2 ranges rest
