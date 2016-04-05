@@ -106,8 +106,8 @@ spec = parallel $ do
         ]
 
     it "aligns identical branches with multiple children on the same line" $
-      alignDiff (pure (Source.fromList "[ foo, bar, baz ]")) (pure (info 0 17) `branch` [ pure (info 2 5) `leaf` "foo", pure (info 7 10) `leaf` "bar", pure (info 12 15) `leaf` "baz" ]) `shouldBe`
-        [ Join (runBothWith These (pure (info 0 17 `branch` [ info 2 5 `leaf` "foo", info 7 10 `leaf` "bar", info 12 15 `leaf` "baz" ])) ) ]
+      alignDiff (pure (Source.fromList "[ foo, bar ]")) (pure (info 0 12) `branch` [ pure (info 2 5) `leaf` "foo", pure (info 7 10) `leaf` "bar" ]) `shouldBe`
+        [ Join (runBothWith These (pure (info 0 12 `branch` [ info 2 5 `leaf` "foo", info 7 10 `leaf` "bar" ])) ) ]
 
     where
       isOnSingleLine (a, _, _) = filter (/= '\n') (toString a) == toString a
