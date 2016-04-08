@@ -141,7 +141,7 @@ groupChildrenByLine ranges children | not (and $ null <$> ranges)
 group2 :: Join These [Range] -> [AlignedDiff leaf] -> (Join These [Range], [AlignedDiff leaf], [Join These (Range, [SplitDiff leaf Info])])
 group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                        , ~(group, l, r, rest) <- spanThese (intersects headRanges) children
-                       , Just merged <- (,) <$> headRanges `applyThese` fmap catMaybes (Join (uncurry These (unalign (runJoin <$> join group))))
+                       , merged <- pairRangesWithLine headRanges $ fmap catMaybes (Join (uncurry These (unalign (runJoin <$> join group))))
                        , ~(moreRanges, moreChildren, remainingLines) <- group2 (modifyJoin (bimap (if null l then id else drop 1) (if null r then id else drop 1)) ranges) (l ++ r ++ rest)
                        = (moreRanges, moreChildren, merged : remainingLines)
                        | ([]:rest) <- children = group2 ranges rest
