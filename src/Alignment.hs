@@ -153,22 +153,23 @@ group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                        | ([]:rest) <- children = group2 ranges rest
                        | otherwise = ([] <$ ranges, children, fmap (flip (,) []) <$> sequenceL ranges)
 
--- | Partitions and splits a list of children into a triple consisting of:
+-- | Partitions and splits a list of children into a tuple consisting of:
 -- | - elements which matched; if an element matches only partially this field will contain only the matching side
--- | - the opposite sides of elements which matched only on the other side
+-- | - the left sides of elements which matched only on the right side
+-- | - the right sides of elements which matched only on the left side
 -- | - elements which do not intersect.
-spanThese :: (Join These a -> Join These Bool) -> [[Join These a]] -> ([[Join These a]], [[Join These a]], [[Join These a]])
+spanThese :: (Join These a -> Join These Bool) -> [[Join These a]] -> ([[Join These a]], [[Join These a]], [[Join These a]], [[Join These a]])
 spanThese pred children | (child:rest) <- children
                         , not (null child)
-                        , ~(moreChildren, morePunted, moreLines) <- spanThese pred rest
+                        , ~(moreChildren, moreL, moreR, moreLines) <- spanThese pred rest
                         , ~(l, r) <- split (head child)
                         = case fromThese False False (runJoin (pred (head child))) of
-                          (True, True) -> (child : moreChildren, morePunted, moreLines)
-                          (True, False) -> (l : moreChildren, r : morePunted, moreLines)
-                          (False, True) -> (r : moreChildren, l : morePunted, moreLines)
-                          _ -> ([], [], children)
+                          (True, True) -> (child : moreChildren, moreL, moreR, moreLines)
+                          (True, False) -> (l : moreChildren, moreL, r : moreR, moreLines)
+                          (False, True) -> (r : moreChildren, l : moreL, moreR, moreLines)
+                          _ -> ([], [], [], children)
                         | ([]:rest) <- children = spanThese pred rest
-                        | otherwise = ([], [], children)
+                        | otherwise = ([], [], [], children)
 
 pairRangesWithLine :: Monoid b => Join These a -> Join These b -> Join These (a, b)
 pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRanges) $ (,) <$> headRanges `applyThese` childLine
