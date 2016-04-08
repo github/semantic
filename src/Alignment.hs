@@ -142,7 +142,7 @@ group2 :: Join These [Range] -> [AlignedDiff leaf] -> (Join These [Range], [Alig
 group2 ranges children | Just (headRanges, _) <- unconsThese ranges
                        , ~(group, l, r, rest) <- spanThese (intersects headRanges) children
                        , merged <- pairRangesWithLine headRanges $ fmap catMaybes (Join (uncurry These (unalign (runJoin <$> join group))))
-                       , ~(moreRanges, moreChildren, remainingLines) <- group2 (modifyJoin (bimap (if null l then id else drop 1) (if null r then id else drop 1)) ranges) (l ++ r ++ rest)
+                       , ~(moreRanges, moreChildren, remainingLines) <- group2 (modifyJoin (bimap (if null l && not (null r) then id else drop 1) (if null r && not (null l) then id else drop 1)) ranges) (l ++ r ++ rest)
                        = (moreRanges, moreChildren, merged : remainingLines)
                        | ([]:rest) <- children = group2 ranges rest
                        | otherwise = ([] <$ ranges, children, fmap (flip (,) []) <$> sequenceL ranges)
