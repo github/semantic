@@ -153,6 +153,19 @@ group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                        | ([]:rest) <- children = group2 ranges rest
                        | otherwise = ([] <$ ranges, children, fmap (flip (,) []) <$> sequenceL ranges)
 
+spanThese :: (Join These a -> Join These Bool) -> [[Join These a]] -> ([[Join These a]], [[Join These a]], [[Join These a]])
+spanThese pred children | (child:rest) <- children
+                        , not (null child)
+                        , ~(moreChildren, morePunted, moreLines) <- spanThese pred rest
+                        , ~(l, r) <- split (head child)
+                        = case fromThese False False (runJoin (pred (head child))) of
+                          (True, True) -> (child : moreChildren, morePunted, moreLines)
+                          (True, False) -> (l : moreChildren, r : morePunted, moreLines)
+                          (False, True) -> (r : moreChildren, l : morePunted, moreLines)
+                          _ -> ([], [], children)
+                        | ([]:rest) <- children = spanThese pred rest
+                        | otherwise = ([], [], children)
+
 pairRangesWithLine :: Monoid b => Join These a -> Join These b -> Join These (a, b)
 pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRanges) $ (,) <$> headRanges `applyThese` childLine
 
