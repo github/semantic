@@ -40,7 +40,7 @@ isFixed = not . Set.null . Set.intersection fixedCategories
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
 termConstructor :: (String -> Set.Set Category) -> Constructor
-termConstructor mapping source range name children = Info range categories (sum (getSize . copoint <$> children)) :< construct children
+termConstructor mapping source range name children = Info range categories (sum (size . copoint <$> children)) :< construct children
   where
     categories = mapping name
     construct [] = Leaf . pack . toString $ slice range source
