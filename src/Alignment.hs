@@ -140,10 +140,16 @@ groupChildrenByLine ranges children | not (and $ null <$> ranges)
 
 group2 :: Join These [Range] -> [AlignedDiff leaf] -> (Join These [Range], [AlignedDiff leaf], [Join These (Range, [SplitDiff leaf Info])])
 group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
-                       , ~(group, l, r, rest) <- spanThese (intersects headRanges) children
-                       , merged <- pairRangesWithLine headRanges $ fmap catMaybes (Join (uncurry These (unalign (runJoin <$> join group))))
-                       , ~(moreRanges, moreChildren, remainingLines) <- group2 (modifyJoin (bimap (if null l && not (null r) then id else drop 1) (if null r && not (null l) then id else drop 1)) ranges) (l ++ r ++ rest)
-                       = (moreRanges, moreChildren, merged : remainingLines)
+                       , ((firstLine:rest):restOfChildren) <- children
+                       , ~(l, r) <- split firstLine
+                       = case fromThese False False . runJoin $ intersects headRanges firstLine of
+                           (True, True) -> let (moreRanges, moreChildren, remainingLines) = group2 tailRanges (rest:restOfChildren) in
+                                             (moreRanges, moreChildren, pairRangesWithLine headRanges (pure <$> firstLine) : remainingLines)
+                           (True, False) -> let (moreRanges, moreChildren, remainingLines) = group2 (modifyJoin (bimap (drop 1) (if null r then id else drop 1)) ranges) ((r ++ rest):restOfChildren) in
+                                              (moreRanges, moreChildren, pairRangesWithLine headRanges (mask firstLine $ modifyJoin (uncurry These . fromThese [] []) $ pure <$> head l) : remainingLines)
+                           (False, True) -> let (moreRanges, moreChildren, remainingLines) = group2 (modifyJoin (bimap (if null l then id else drop 1) (drop 1)) ranges) ((l ++ rest):restOfChildren) in
+                                              (moreRanges, moreChildren, pairRangesWithLine headRanges (mask firstLine $ modifyJoin (uncurry These . fromThese [] []) $ pure <$> head r) : remainingLines)
+                           _ -> (tailRanges, children, [ flip (,) [] <$> headRanges ])
                        | ([]:rest) <- children = group2 ranges rest
                        | otherwise = ([] <$ ranges, children, fmap (flip (,) []) <$> sequenceL ranges)
 
