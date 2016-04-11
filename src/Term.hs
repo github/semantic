@@ -26,7 +26,7 @@ zipTerms (annotation1 :< a) (annotation2 :< b) = annotate $ zipUnwrap a b
 cata :: (annotation -> Syntax a b -> b) -> Term a annotation -> b
 cata f (annotation :< syntax) = f annotation $ cata f <$> syntax
 
--- | Return the number of leaves in the node.
+-- | Return the node count of a term.
 termSize :: Term a annotation -> Integer
 termSize = cata size where
   size _ syntax = 1 + sum syntax
