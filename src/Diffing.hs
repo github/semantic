@@ -19,6 +19,7 @@ import Data.Copointed
 import Data.Functor.Both
 import qualified Data.ByteString.Char8 as B1
 import Data.Foldable
+import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
@@ -84,4 +85,4 @@ diffFiles parser renderer sourceBlobs = do
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermSizes :: Diff a Info -> Integer
-diffCostWithCachedTermSizes = diffSum (patchSum (size . copoint))
+diffCostWithCachedTermSizes = diffSum (getSum . foldMap (Sum . size . copoint))
