@@ -29,7 +29,4 @@ cata f (annotation :< syntax) = f annotation $ cata f <$> syntax
 -- | Return the number of leaves in the node.
 termSize :: Term a annotation -> Integer
 termSize = cata size where
-  size _ (Leaf _) = 1
-  size _ (Indexed i) = sum i
-  size _ (Fixed f) = sum f
-  size _ (Keyed k) = sum k
+  size _ syntax = 1 + sum syntax
