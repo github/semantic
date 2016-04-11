@@ -85,8 +85,8 @@ showLine source line | isEmpty line = Nothing
 
 -- | Return the range from a split diff.
 getRange :: SplitDiff leaf Info -> Range
-getRange (Free (Annotated (Info range _) _)) = range
-getRange (Pure patch) = let Info range _ :< _ = getSplitTerm patch in range
+getRange (Free (Annotated (Info range _ _) _)) = range
+getRange (Pure patch) = let Info range _ _ :< _ = getSplitTerm patch in range
 
 -- | Returns the header given two source blobs and a hunk.
 header :: Both SourceBlob -> String

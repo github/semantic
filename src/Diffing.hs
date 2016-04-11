@@ -32,12 +32,12 @@ parserForType mediaType = case languageForType mediaType of
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser
-lineByLineParser input = return . root . Indexed $ case foldl' annotateLeaves ([], 0) lines of
+lineByLineParser input = return . root $ case foldl' annotateLeaves ([], 0) lines of
   (leaves, _) -> leaves
   where
     lines = actualLines input
-    root syntax = Info (Range 0 $ length input) mempty :< syntax
-    leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) mempty :< Leaf line
+    root children = Info (Range 0 $ length input) mempty (1 + fromIntegral (length children)) :< Indexed children
+    leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) mempty 1 :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum ++ [ leaf charIndex (toText line) ]
       , charIndex + length line)
@@ -51,10 +51,10 @@ parserForFilepath = parserForType . T.pack . takeExtension
 breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
 breakDownLeavesByWord source = cata replaceIn
   where
-    replaceIn info@(Info range categories) (Leaf _) | ranges <- rangesAndWordsInSource range, length ranges > 1 = info :< Indexed (makeLeaf categories <$> ranges)
+    replaceIn (Info range categories _) (Leaf _) | ranges <- rangesAndWordsInSource range, length ranges > 1 = Info range categories (1 + fromIntegral (length ranges)) :< Indexed (makeLeaf categories <$> ranges)
     replaceIn info syntax = info :< syntax
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
-    makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
+    makeLeaf categories (range, substring) = Info range categories 1 :< Leaf (T.pack substring)
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
