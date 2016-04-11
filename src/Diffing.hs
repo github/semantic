@@ -5,6 +5,7 @@ import Info
 import Interpreter
 import Language
 import Parser
+import Patch
 import Range
 import Renderer
 import Source hiding ((++))
@@ -14,6 +15,7 @@ import TreeSitter
 import Text.Parser.TreeSitter.Language
 
 import Control.Comonad.Cofree
+import Data.Copointed
 import Data.Functor.Both
 import qualified Data.ByteString.Char8 as B1
 import Data.Foldable
@@ -79,3 +81,7 @@ diffFiles parser renderer sourceBlobs = do
   terms <- sequence $ parser <$> sources
   let replaceLeaves = breakDownLeavesByWord <$> sources
   return $! renderer (runBothWith (diffTerms diffCost) $ replaceLeaves <*> terms) sourceBlobs
+
+-- | The sum of the node count of the diff’s patches.
+diffCostWithCachedTermSizes :: Diff a Info -> Integer
+diffCostWithCachedTermSizes = diffSum (patchSum (size . copoint))
