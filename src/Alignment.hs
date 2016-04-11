@@ -139,7 +139,7 @@ groupChildrenByLine ranges children | not (and $ null <$> ranges)
                                     | otherwise = []
 
 group2 :: Join These [Range] -> [AlignedDiff leaf] -> (Join These [Range], [AlignedDiff leaf], [Join These (Range, [SplitDiff leaf Info])])
-group2 ranges children | Just (headRanges, _) <- unconsThese ranges
+group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                        , ~(group, l, r, rest) <- spanThese (intersects headRanges) children
                        , merged <- pairRangesWithLine headRanges $ fmap catMaybes (Join (uncurry These (unalign (runJoin <$> join group))))
                        , ~(moreRanges, moreChildren, remainingLines) <- group2 (modifyJoin (bimap (if null l && not (null r) then id else drop 1) (if null r && not (null l) then id else drop 1)) ranges) (l ++ r ++ rest)
