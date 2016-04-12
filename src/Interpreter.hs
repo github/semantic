@@ -23,7 +23,7 @@ import Term
 -- | Returns whether two terms are comparable
 type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
 
--- | Diff two terms, given the default Categorizable.comparable function.
+-- | Diff two terms, given the default Categorizable.comparable function and a function computing the cost of a given diff.
 diffTerms :: (Eq a, Eq annotation, Categorizable annotation) => Cost a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
 diffTerms cost = interpret comparable cost
 
