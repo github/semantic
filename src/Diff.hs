@@ -17,7 +17,6 @@ type Diff a annotation = Free (Annotated a (Both annotation)) (Patch (Term a ann
 diffSum :: (Patch (Term a annotation) -> Integer) -> Diff a annotation -> Integer
 diffSum patchCost diff = sum $ fmap patchCost diff
 
--- | The total cost of the diff.
--- | This is the number of all leaves in all terms in all patches of the diff.
+-- | The sum of the node count of the diff’s patches.
 diffCost :: Diff a annotation -> Integer
 diffCost = diffSum $ patchSum termSize

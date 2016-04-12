@@ -12,7 +12,6 @@ import Source
 import System.Directory
 import System.FilePath
 import qualified System.IO as IO
-import Data.String
 import Data.Text hiding (split)
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
