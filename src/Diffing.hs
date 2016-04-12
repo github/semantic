@@ -54,10 +54,12 @@ parserForFilepath = parserForType . T.pack . takeExtension
 breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
 breakDownLeavesByWord source = cata replaceIn
   where
-    replaceIn (Info range categories _) (Leaf _) | ranges <- rangesAndWordsInSource range
-                                                 , length ranges > 1
-                                                 = Info range categories (1 + fromIntegral (length ranges)) :< Indexed (makeLeaf categories <$> ranges)
-    replaceIn info@(Info range categories _) syntax = Info range categories (1 + sum (size . copoint <$> syntax)) :< syntax
+    replaceIn (Info range categories _) (Leaf _)
+      | ranges <- rangesAndWordsInSource range
+      , length ranges > 1
+      = Info range categories (1 + fromIntegral (length ranges)) :< Indexed (makeLeaf categories <$> ranges)
+    replaceIn info@(Info range categories _) syntax
+      = Info range categories (1 + sum (size . copoint <$> syntax)) :< syntax
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
     makeLeaf categories (range, substring) = Info range categories 1 :< Leaf (T.pack substring)
 
