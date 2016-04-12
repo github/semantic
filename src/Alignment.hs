@@ -76,10 +76,11 @@ adjoinChildren sources infos constructor children = wrap <$> leadingContext <> l
   where (lines, next) = foldr (childLines sources) (mempty, end <$> ranges) children
         ranges = characterRange <$> infos
         categories = Info.categories <$> infos
+        sizes = size <$> infos
         leadingContext = tsequenceL (pure mempty) $ makeContextLines <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
-        wrap = (wrapLineContents <$> (makeBranchTerm constructor <$> categories <*> next) <*>)
-        makeBranchTerm constructor categories next children = let range = unionRangesFrom (rangeAt next) $ Prelude.snd <$> children in
-          (constructor (Info range categories 0) . catMaybes . toList $ Prelude.fst <$> children, range)
+        wrap = (wrapLineContents <$> (makeBranchTerm constructor <$> categories <*> sizes <*> next) <*>)
+        makeBranchTerm constructor categories size next children = let range = unionRangesFrom (rangeAt next) $ Prelude.snd <$> children in
+          (constructor (Info range categories size) . catMaybes . toList $ Prelude.fst <$> children, range)
 
 -- | Accumulate the lines of and between a branch term’s children.
 childLines :: (Copointed c, Functor c, Applicative f, Coalescent (f (Line (Maybe (c a), Range))), Foldable f, TotalCrosswalk f) => f (Source Char) -> c (Adjoined (f (Line (a, Range)))) -> (Adjoined (f (Line (Maybe (c a), Range))), f Int) -> (Adjoined (f (Line (Maybe (c a), Range))), f Int)
