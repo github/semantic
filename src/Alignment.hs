@@ -64,7 +64,7 @@ splitPatchByLines sources patch = wrapTermInPatch <$> splitAndFoldTerm (unPatch 
 -- | Split a term comprised of an Info & Syntax up into one `outTerm` (abstracted by an alignment function & constructor) per line in `Source`.
 splitAbstractedTerm :: (Applicative f, Coalescent (f (Line (Maybe (Identity outTerm), Range))), Coalescent (f (Line (Maybe (T.Text, outTerm), Range))), Foldable f, TotalCrosswalk f) => (Info -> Syntax leaf outTerm -> outTerm) -> f (Source Char) -> f Info -> Syntax leaf (Adjoined (f (Line (outTerm, Range)))) -> Adjoined (f (Line (outTerm, Range)))
 splitAbstractedTerm makeTerm sources infos syntax = case syntax of
-  Leaf a -> tsequenceL (pure mempty) $ fmap <$> ((\ categories -> fmap (\ range -> (makeTerm (Info range categories 0) (Leaf a), range))) <$> (Info.categories <$> infos)) <*> (linesInRangeOfSource <$> (characterRange <$> infos) <*> sources)
+  Leaf a -> tsequenceL (pure mempty) $ fmap <$> ((\ categories size -> fmap (\ range -> (makeTerm (Info range categories size) (Leaf a), range))) <$> (Info.categories <$> infos) <*> (size <$> infos)) <*> (linesInRangeOfSource <$> (characterRange <$> infos) <*> sources)
   Indexed children -> adjoinChildren sources infos (constructor (Indexed . fmap runIdentity)) (Identity <$> children)
   Fixed children -> adjoinChildren sources infos (constructor (Fixed . fmap runIdentity)) (Identity <$> children)
   Keyed children -> adjoinChildren sources infos (constructor (Keyed . Map.fromList)) (Map.toList children)
