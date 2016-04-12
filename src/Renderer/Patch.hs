@@ -25,7 +25,7 @@ import Data.Text (pack, Text)
 
 -- | Render a timed out file as a truncated diff.
 truncatePatch :: DiffArguments -> Both SourceBlob -> Text
-truncatePatch arguments blobs = pack $ header blobs ++ "#timed_out\nTruncating diff: timeout reached.\n"
+truncatePatch _ blobs = pack $ header blobs ++ "#timed_out\nTruncating diff: timeout reached.\n"
 
 -- | Render a diff in the traditional patch format.
 patch :: Renderer a

@@ -5,7 +5,6 @@ import Info
 import Interpreter
 import Language
 import Parser
-import Patch
 import Range
 import Renderer
 import Source hiding ((++))
