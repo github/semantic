@@ -89,7 +89,7 @@ diffFiles parser renderer sourceBlobs = do
 diffCostWithCachedTermSizes :: Diff a Info -> Integer
 diffCostWithCachedTermSizes = diffSum (getSum . foldMap (Sum . size . copoint))
 
--- | The sum of the node count of the diff.
-diffCostWithCachedDiffSizes :: Diff a Info -> Integer
-diffCostWithCachedDiffSizes (Free (Annotated (Both (before, after)) _)) = size before + size after
-diffCostWithCachedDiffSizes (Pure patch) = sum $ size . copoint <$> patch
+-- | The absolute difference between the node counts of a diff.
+diffCostWithAbsoluteDifferenceOfCachedDiffSizes :: Diff a Info -> Integer
+diffCostWithAbsoluteDifferenceOfCachedDiffSizes (Free (Annotated (Both (before, after)) _)) = abs $ size before - size after
+diffCostWithAbsoluteDifferenceOfCachedDiffSizes (Pure patch) = sum $ size . copoint <$> patch
