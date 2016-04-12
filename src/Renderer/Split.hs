@@ -85,7 +85,7 @@ split diff blobs = TL.toStrict . renderHtml
 newtype Renderable a = Renderable a
 
 instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Range))) where
-  toMarkup (Renderable (source, Info range categories _, syntax)) = classifyMarkup categories $ case syntax of
+  toMarkup (Renderable (source, Info range categories size, syntax)) = (! A.data_ (stringValue (show size))) . classifyMarkup categories $ case syntax of
     Leaf _ -> span . string . toString $ slice range source
     Indexed children -> ul . mconcat $ wrapIn li <$> contentElements children
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements children
