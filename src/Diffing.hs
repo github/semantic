@@ -13,6 +13,7 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 
+import Control.Monad.Free
 import Control.Comonad.Cofree
 import Data.Copointed
 import Data.Functor.Both
@@ -87,3 +88,8 @@ diffFiles parser renderer sourceBlobs = do
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermSizes :: Diff a Info -> Integer
 diffCostWithCachedTermSizes = diffSum (getSum . foldMap (Sum . size . copoint))
+
+-- | The sum of the node count of the diff.
+diffCostWithCachedDiffSizes :: Diff a Info -> Integer
+diffCostWithCachedDiffSizes (Free (Annotated (Both (before, after)) _)) = size before + size after
+diffCostWithCachedDiffSizes (Pure patch) = sum $ size . copoint <$> patch
