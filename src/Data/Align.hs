@@ -3,6 +3,7 @@ module Data.Align where
 
 import Data.Bifunctor.Join
 import Data.Bifunctor.These
+import Data.Function
 import Data.Functor.Identity
 
 -- | A functor which can be aligned, essentially the union of (potentially) asymmetrical values.
@@ -63,7 +64,7 @@ instance Crosswalk Identity where
   crosswalk f = fmap Identity . f . runIdentity
 
 instance Crosswalk (Join These) where
-  crosswalk f = these (fmap (Join . This) . f) (fmap (Join . That) . f) (\ a b -> alignWith Join (f a) (f b)) . runJoin
+  crosswalk f = these (fmap (Join . This) . f) (fmap (Join . That) . f) (alignWith Join `on` f) . runJoin
 
 
 class Align f => Unalign f where
