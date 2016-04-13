@@ -12,7 +12,6 @@ import Data.Aeson hiding (json)
 import Data.Aeson.Encode
 import Data.Functor.Both
 import Data.OrderedMap hiding (fromList)
-import Data.Text
 import Data.Text.Lazy (toStrict)
 import Data.Text.Lazy.Builder (toLazyText)
 import qualified Data.Text as T
@@ -67,7 +66,7 @@ lineFields n line | isEmpty line = []
                                 ]
 
 termFields :: (ToJSON recur, KeyValue kv) => Info -> Syntax leaf recur -> [kv]
-termFields (Info range categories) syntax = "range" .= range : "categories" .= categories : case syntax of
+termFields (Info range categories _) syntax = "range" .= range : "categories" .= categories : case syntax of
   Leaf _ -> []
   Indexed c -> childrenFields c
   Fixed c -> childrenFields c

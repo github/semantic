@@ -1,5 +1,6 @@
 module Diffing where
 
+import Diff
 import Info
 import Interpreter
 import Language
@@ -12,10 +13,13 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 
+import Control.Monad.Free
 import Control.Comonad.Cofree
+import Data.Copointed
 import Data.Functor.Both
 import qualified Data.ByteString.Char8 as B1
 import Data.Foldable
+import Data.Monoid
 import qualified Data.Text as T
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
@@ -31,12 +35,12 @@ parserForType mediaType = case languageForType mediaType of
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser
-lineByLineParser input = return . root . Indexed $ case foldl' annotateLeaves ([], 0) lines of
+lineByLineParser input = return . root $ case foldl' annotateLeaves ([], 0) lines of
   (leaves, _) -> leaves
   where
     lines = actualLines input
-    root syntax = Info (Range 0 $ length input) mempty :< syntax
-    leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) mempty :< Leaf line
+    root children = Info (Range 0 $ length input) mempty (1 + fromIntegral (length children)) :< Indexed children
+    leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) mempty 1 :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum ++ [ leaf charIndex (toText line) ]
       , charIndex + length line)
@@ -50,10 +54,14 @@ parserForFilepath = parserForType . T.pack . takeExtension
 breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
 breakDownLeavesByWord source = cata replaceIn
   where
-    replaceIn info@(Info range categories) (Leaf _) | ranges <- rangesAndWordsInSource range, length ranges > 1 = info :< Indexed (makeLeaf categories <$> ranges)
-    replaceIn info syntax = info :< syntax
+    replaceIn (Info range categories _) (Leaf _)
+      | ranges <- rangesAndWordsInSource range
+      , length ranges > 1
+      = Info range categories (1 + fromIntegral (length ranges)) :< Indexed (makeLeaf categories <$> ranges)
+    replaceIn info@(Info range categories _) syntax
+      = Info range categories (1 + sum (size . copoint <$> syntax)) :< syntax
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
-    makeLeaf categories (range, substring) = Info range categories :< Leaf (T.pack substring)
+    makeLeaf categories (range, substring) = Info range categories 1 :< Leaf (T.pack substring)
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
@@ -77,4 +85,13 @@ diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sources
   let replaceLeaves = breakDownLeavesByWord <$> sources
-  return $! renderer (runBothWith diffTerms $ replaceLeaves <*> terms) sourceBlobs
+  return $! renderer (runBothWith (diffTerms diffCostWithAbsoluteDifferenceOfCachedDiffSizes) $ replaceLeaves <*> terms) sourceBlobs
+
+-- | The sum of the node count of the diff’s patches.
+diffCostWithCachedTermSizes :: Diff a Info -> Integer
+diffCostWithCachedTermSizes = diffSum (getSum . foldMap (Sum . size . copoint))
+
+-- | The absolute difference between the node counts of a diff.
+diffCostWithAbsoluteDifferenceOfCachedDiffSizes :: Diff a Info -> Integer
+diffCostWithAbsoluteDifferenceOfCachedDiffSizes (Free (Annotated (Both (before, after)) _)) = abs $ size before - size after
+diffCostWithAbsoluteDifferenceOfCachedDiffSizes (Pure patch) = sum $ size . copoint <$> patch
