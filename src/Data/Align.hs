@@ -66,6 +66,10 @@ instance Crosswalk Identity where
 instance Crosswalk (Join These) where
   crosswalk f = these (fmap (Join . This) . f) (fmap (Join . That) . f) (alignWith Join `on` f) . runJoin
 
+instance Crosswalk [] where
+  crosswalk f l | (a : as) <- l = alignWith (these pure id (:)) (f a) (crosswalk f as)
+                | otherwise = nil
+
 
 class Align f => Unalign f where
   unalign :: f (These a b) -> (f (Maybe a), f (Maybe b))
