@@ -2,6 +2,7 @@ module Data.Bifunctor.These where
 
 import Data.Bifunctor
 import Data.Bifoldable
+import Data.Bitraversable
 
 data These a b = This a | That b | These a b
   deriving (Eq, Show)
@@ -32,3 +33,8 @@ instance Bifunctor These where
 
 instance Bifoldable These where
   bifoldMap f g = these f g ((. g) . mappend . f)
+
+instance Bitraversable These where
+  bitraverse f _ (This a) = This <$> f a
+  bitraverse _ g (That b) = That <$> g b
+  bitraverse f g (These a b) = These <$> f a <*> g b
