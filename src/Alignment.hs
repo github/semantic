@@ -153,6 +153,14 @@ group2 ranges children | Just (headRanges, tailRanges) <- unconsThese ranges
                        | ([]:rest) <- children = group2 ranges rest
                        | otherwise = ([] <$ ranges, children, fmap (flip (,) []) <$> sequenceL ranges)
 
+spanAndSplitFirstLines :: (Join These a -> Join These Bool) -> [[Join These a]] -> ([Join These a], [[Join These a]])
+spanAndSplitFirstLines pred = foldr go ([], [])
+  where go (first:rest) (fs, rs) = let ~(l, r) = split first in case fromThese False False . runJoin $ pred first of
+          (True, True) -> (first : fs, rest : rs)
+          (True, False) -> (head l : fs, (r ++ rest) : rs)
+          (False, True) -> (head r : fs, (l ++ rest) : rs)
+          _ -> (fs, (first:rest):rs)
+
 -- | Partitions and splits a list of children into a tuple consisting of:
 -- | - elements which matched; if an element matches only partially this field will contain only the matching side
 -- | - the left sides of elements which matched only on the right side
