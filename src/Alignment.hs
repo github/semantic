@@ -162,6 +162,7 @@ spanAndSplitFirstLines pred = foldr go ([], [])
               (True, False) -> ((head l, r ++ rest) : intersecting, nonintersecting)
               (False, True) -> ((head r, l ++ rest) : intersecting, nonintersecting)
               _ -> (intersecting, (first : rest) : nonintersecting)
+          | otherwise = (intersecting, nonintersecting)
 
 -- | Partitions and splits a list of children into a tuple consisting of:
 -- | - elements which matched; if an element matches only partially this field will contain only the matching side
