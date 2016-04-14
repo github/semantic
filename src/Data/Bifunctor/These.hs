@@ -33,6 +33,7 @@ maybeFst = these Just (const Nothing) ((Just .) . const)
 maybeSnd :: These a b -> Maybe b
 maybeSnd = these (const Nothing) Just ((Just .) . flip const)
 
+-- | Like `<*>`, but it returns its result in `Maybe` since the result is the intersection of the shapes of the inputs.
 apThese :: These (a -> b) (c -> d) -> These a c -> Maybe (These b d)
 apThese fg ab = uncurry maybeThese $ uncurry (***) (bimap (<*>) (<*>) (unpack fg)) (unpack ab)
   where unpack = fromThese Nothing Nothing . bimap Just Just
