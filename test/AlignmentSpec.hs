@@ -14,9 +14,9 @@ import Data.Adjoined
 import Data.Bifunctor.Join
 import Data.Bifunctor.These
 import Data.Functor.Both as Both
+import Data.Functor.Identity
 import Diff
 import Info
-import Data.Functor.Identity
 import Line
 import Prelude hiding (fst, snd)
 import qualified Prelude
