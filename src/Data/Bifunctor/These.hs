@@ -39,6 +39,10 @@ apThese fg ab = uncurry maybeThese $ uncurry (***) (bimap (<*>) (<*>) (unpack fg
   where unpack = fromThese Nothing Nothing . bimap Just Just
 
 
+newtype Union a b = Union { getUnion :: Maybe (These a b) }
+  deriving (Eq, Show)
+
+
 -- Instances
 
 instance Bifunctor These where
