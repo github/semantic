@@ -166,7 +166,6 @@ spanAndSplitFirstLines pred = foldr go ([], [])
 catThese :: [Join These a] -> Join These [a]
 catThese as = maybe (Join (These [] [])) Join $ getUnion $ mconcat $ Union . Just . runJoin . fmap pure <$> as
 
-
 pairRangesWithLine :: Monoid b => Join These a -> Join These b -> Join These (a, b)
 pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRanges) $ (,) <$> headRanges `applyThese` childLine
 
