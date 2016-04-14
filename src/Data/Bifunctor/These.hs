@@ -3,6 +3,7 @@ module Data.Bifunctor.These where
 import Data.Bifunctor
 import Data.Bifoldable
 import Data.Bitraversable
+import Control.Arrow
 
 data These a b = This a | That b | These a b
   deriving (Eq, Show)
@@ -31,6 +32,10 @@ maybeFst = these Just (const Nothing) ((Just .) . const)
 -- | Return Just the value in That, or the second value in These, if any.
 maybeSnd :: These a b -> Maybe b
 maybeSnd = these (const Nothing) Just ((Just .) . flip const)
+
+apThese :: These (a -> b) (c -> d) -> These a c -> Maybe (These b d)
+apThese fg ab = uncurry maybeThese $ uncurry (***) (bimap (<*>) (<*>) (unpack fg)) (unpack ab)
+  where unpack = fromThese Nothing Nothing . bimap Just Just
 
 
 -- Instances
