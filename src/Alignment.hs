@@ -160,10 +160,10 @@ spanAndSplitFirstLines pred = foldr go ([], [])
               _ -> (intersecting, (first : rest) : nonintersecting)
           | otherwise = (intersecting, nonintersecting)
 
-mergeThese :: [Join These a] -> Join These [a]
-mergeThese [ a ] = pure <$> a
-mergeThese (a:as) = fromMaybe (Join (These [] [])) $ (:) <$> a `applyThese` mergeThese as
-mergeThese [] = Join (These [] [])
+catThese :: [Join These a] -> Join These [a]
+catThese [ a ] = pure <$> a
+catThese (a:as) = fromMaybe (Join (These [] [])) $ (:) <$> a `applyThese` catThese as
+catThese [] = Join (These [] [])
 
 -- | Partitions and splits a list of children into a tuple consisting of:
 -- | - elements which matched; if an element matches only partially this field will contain only the matching side
