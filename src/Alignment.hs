@@ -142,15 +142,16 @@ groupChildrenByLine ranges children | not (and $ null <$> ranges)
                                     | otherwise = []
 
 alignChildrenInRanges :: Join These [Range] -> [AlignedDiff leaf] -> (Join These [Range], [AlignedDiff leaf], [Join These (Range, [SplitDiff leaf Info])])
-alignChildrenInRanges ranges children | Just headRanges <- sequenceL $ listToMaybe <$> ranges
-                       , (intersecting, nonintersecting) <- spanAndSplitFirstLines (intersects headRanges) children
-                       , (thisLine, nextLines) <- foldr (\ (this, next) (these, nexts) -> (this : these, next ++ nexts)) ([], []) intersecting
-                       , merged <- pairRangesWithLine headRanges $ catThese thisLine
-                       , advance <- fromMaybe (drop 1, drop 1) $ fromThese id id . runJoin . (drop 1 <$) <$> listToMaybe nextLines
-                       , (nextRanges, nextChildren, nextLines) <- alignChildrenInRanges (modifyJoin (uncurry bimap advance) ranges) (nextLines : nonintersecting)
-                       = (nextRanges, nextChildren, merged : nextLines)
-                       | ([]:rest) <- children = alignChildrenInRanges ranges rest
-                       | otherwise = ([] <$ ranges, children, fmap (flip (,) []) <$> sequenceL ranges)
+alignChildrenInRanges ranges children
+  | Just headRanges <- sequenceL $ listToMaybe <$> ranges
+  , (intersecting, nonintersecting) <- spanAndSplitFirstLines (intersects headRanges) children
+  , (thisLine, nextLines) <- foldr (\ (this, next) (these, nexts) -> (this : these, next ++ nexts)) ([], []) intersecting
+  , merged <- pairRangesWithLine headRanges $ catThese thisLine
+  , advance <- fromMaybe (drop 1, drop 1) $ fromThese id id . runJoin . (drop 1 <$) <$> listToMaybe nextLines
+  , (nextRanges, nextChildren, nextLines) <- alignChildrenInRanges (modifyJoin (uncurry bimap advance) ranges) (nextLines : nonintersecting)
+  = (nextRanges, nextChildren, merged : nextLines)
+  | ([]:rest) <- children = alignChildrenInRanges ranges rest
+  | otherwise = ([] <$ ranges, children, fmap (flip (,) []) <$> sequenceL ranges)
 
 spanAndSplitFirstLines :: (Join These a -> Join These Bool) -> [[Join These a]] -> ([(Join These a, [Join These a])], [[Join These a]])
 spanAndSplitFirstLines pred = foldr go ([], [])
