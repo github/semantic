@@ -194,14 +194,6 @@ mask (Join (These _ _)) (Join (That b2)) = Join $ That b2
 mask (Join (These _ _)) (Join (These b1 b2)) = Join $ These b1 b2
 mask _ b = b
 
-unconsThese :: Join These [a] -> Maybe (Join These a, Join These [a])
-unconsThese (Join (This (a:as))) = Just (Join (This a), Join (This as))
-unconsThese (Join (That (b:bs))) = Just (Join (That b), Join (That bs))
-unconsThese (Join (These (a:as) (b:bs))) = Just (Join (These a b), Join (These as bs))
-unconsThese (Join (These (a:as) _)) = Just (Join (This a), Join (This as))
-unconsThese (Join (These _ (b:bs))) = Just (Join (That b), Join (That bs))
-unconsThese _ = Nothing
-
 getRange :: SplitDiff leaf Info -> Range
 getRange (Free (Annotated (Info range _) _)) = range
 getRange (Pure patch) | Info range _ :< _ <- getSplitTerm patch = range
