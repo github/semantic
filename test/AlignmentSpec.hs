@@ -18,6 +18,7 @@ import Data.Functor.Identity
 import Diff
 import Info
 import Line
+import Patch
 import Prelude hiding (fst, snd)
 import qualified Prelude
 import Range
@@ -83,6 +84,13 @@ spec = parallel $ do
     it "aligns identical branches with multiple children on the same line" $
       alignDiff (pure (Source.fromList "[ foo, bar ]")) (pure (info 0 12) `branch` [ pure (info 2 5) `leaf` "foo", pure (info 7 10) `leaf` "bar" ]) `shouldBe`
         [ Join (runBothWith These (pure (info 0 12 `branch` [ info 2 5 `leaf` "foo", info 7 10 `leaf` "bar" ])) ) ]
+
+    it "aligns insertions" $
+      alignDiff (both (Source.fromList "a") (Source.fromList "a\nb")) (both (info 0 1) (info 0 3) `branch` [ pure (info 0 1) `leaf` "a", Pure (Insert (info 2 3 :< Leaf "b")) ]) `shouldBe`
+        [ Join (These (info 0 1 `branch` [ info 0 1 `leaf` "a" ])
+                      (info 0 2 `branch` [ info 0 1 `leaf` "a" ]))
+        , Join (That (Pure (SplitInsert (info 2 3 :< Leaf "b"))))
+        ]
 
     where
       isOnSingleLine (a, _, _) = filter (/= '\n') (toString a) == toString a
