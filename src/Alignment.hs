@@ -218,14 +218,7 @@ split these = fromThese [] [] $ bimap (pure . Join . This) (pure . Join . That) 
 infixl 4 `applyThese`
 
 applyThese :: Join These (a -> b) -> Join These a -> Maybe (Join These b)
-applyThese (Join (This f)) (Join (This a)) = Just (Join (This (f a)))
-applyThese (Join (That g)) (Join (That b)) = Just (Join (That (g b)))
-applyThese (Join (These f g)) (Join (These a b)) = Just (Join (These (f a) (g b)))
-applyThese (Join (These f _)) (Join (This a)) = Just (Join (This (f a)))
-applyThese (Join (These _ g)) (Join (That b)) = Just (Join (That (g b)))
-applyThese (Join (This f)) (Join (These a _)) = Just (Join (This (f a)))
-applyThese (Join (That g)) (Join (These _ b)) = Just (Join (That (g b)))
-applyThese _ _ = Nothing
+applyThese fg ab = Join <$> runJoin fg `apThese` runJoin ab
 
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
