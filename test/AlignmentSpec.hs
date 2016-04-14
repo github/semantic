@@ -37,22 +37,6 @@ spec = parallel $ do
       \ sources -> let ranges = actualLineRanges <$> (totalRange <$> sources) <*> sources in
         length (splitDiffByLines sources (Free $ Annotated ((\ s -> Info (totalRange s) mempty 0) <$> sources) (Indexed $ leafWithRangesInSources sources <$> runBothWith (zipWith both) ranges))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toString <$> sources)
 
-  describe "splitAbstractedTerm" $ do
-    prop "preserves line count" $
-      \ source -> let range = totalRange source in
-        splitAbstractedTerm (:<) (Identity source) (Identity (Info range mempty 0)) (Leaf source) `shouldBe` (Identity . lineMap (fmap ((:< Leaf source) . (\ r -> Info r mempty 0) &&& id)) <$> linesInRangeOfSource range source)
-
-    let makeTerm = ((Free .) . Annotated) :: Info -> Syntax (Source Char) (SplitDiff (Source Char) Info) -> SplitDiff (Source Char) Info
-    prop "outputs one row for single-line unchanged leaves" $
-      forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
-        \ (source, Info range categories _, syntax) -> splitAbstractedTerm makeTerm (pure source) (pure $ Info range categories 0) syntax `shouldBe` fromList [
-          both (pure (makeTerm (Info range categories 0) $ Leaf source, Range 0 (length source))) (pure (makeTerm (Info range categories 0) $ Leaf source, Range 0 (length source))) ]
-
-    prop "outputs one row for single-line empty unchanged indexed nodes" $
-      forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toString a) == toString a)) $
-          \ source -> splitAbstractedTerm makeTerm (pure source) (pure $ Info (totalRange source) mempty 0) (Indexed []) `shouldBe` fromList [
-            both (pure (makeTerm (Info (totalRange source) mempty 0) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty 0) $ Indexed [], Range 0 (length source))) ]
-
   describe "groupChildrenByLine" $ do
     it "produces symmetrical context" $
       groupChildrenByLine (Join (These [Range 0 2, Range 2 4] [Range 0 2, Range 2 4])) [] `shouldBe`
