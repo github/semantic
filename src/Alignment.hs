@@ -142,7 +142,7 @@ group2 :: Join These [Range] -> [AlignedDiff leaf] -> (Join These [Range], [Alig
 group2 ranges children | Just headRanges <- sequenceL $ listToMaybe <$> ranges
                        , (intersecting, nonintersecting) <- spanAndSplitFirstLines (intersects headRanges) children
                        , (thisLine, nextLines) <- foldr (\ (this, next) (these, nexts) -> (this : these, next ++ nexts)) ([], []) intersecting
-                       , merged <- pairRangesWithLine headRanges . mask headRanges . fmap join . Join . uncurry These . unzip $ fromThese [] [] . runJoin . fmap pure <$> thisLine
+                       , merged <- pairRangesWithLine headRanges $ catThese thisLine
                        , fs <- fromThese id id . runJoin . fmap (const (drop 1)) <$> listToMaybe nextLines
                        , (nextRanges, nextChildren, nextLines) <- group2 (modifyJoin (uncurry bimap $ fromMaybe (drop 1, drop 1) fs) ranges) (nextLines : nonintersecting)
                        = (nextRanges, nextChildren, merged : nextLines)
