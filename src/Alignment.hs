@@ -133,7 +133,7 @@ alignSyntax toJoinThese sources infos syntax = case syntax of
   Fixed children -> catMaybes $ wrapInBranch Fixed <$> groupChildrenByLine lineRanges children
   _ -> []
   where lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
-        wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> Free (Annotated (setCharacterRange info range) (constructor children))) <$> infos)
+        wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> Free (Annotated (info { characterRange = range }) (constructor children))) <$> infos)
 
 groupChildrenByLine :: Join These [Range] -> [AlignedDiff leaf] -> [Join These (Range, [SplitDiff leaf Info])]
 groupChildrenByLine ranges children | not (and $ null <$> ranges)
