@@ -28,15 +28,6 @@ import Syntax
 
 spec :: Spec
 spec = parallel $ do
-  describe "splitDiffByLines" $ do
-    prop "preserves line counts in equal sources" $
-      \ source ->
-        length (splitDiffByLines (pure source) (Free $ Annotated (pure $ Info (totalRange source) mempty 1) (Indexed . Prelude.fst $ foldl combineIntoLeaves ([], 0) source))) `shouldBe` length (filter (== '\n') $ toString source) + 1
-
-    prop "produces the maximum line count in inequal sources" $
-      \ sources -> let ranges = actualLineRanges <$> (totalRange <$> sources) <*> sources in
-        length (splitDiffByLines sources (Free $ Annotated ((\ s -> Info (totalRange s) mempty 0) <$> sources) (Indexed $ leafWithRangesInSources sources <$> runBothWith (zipWith both) ranges))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toString <$> sources)
-
   describe "groupChildrenByLine" $ do
     it "produces symmetrical context" $
       groupChildrenByLine (Join (These [Range 0 2, Range 2 4] [Range 0 2, Range 2 4])) [] `shouldBe`
