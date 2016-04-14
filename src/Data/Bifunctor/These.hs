@@ -55,3 +55,11 @@ instance Bitraversable These where
   bitraverse f _ (This a) = This <$> f a
   bitraverse _ g (That b) = That <$> g b
   bitraverse f g (These a b) = These <$> f a <*> g b
+
+instance (Monoid a, Monoid b) => Monoid (Union a b) where
+  mempty = Union Nothing
+  Union (Just a) `mappend` Union (Just b) = Union $ uncurry maybeThese $ uncurry (***) (bimap mappend mappend (unpack a)) (unpack b)
+    where unpack = fromThese Nothing Nothing . bimap Just Just
+  Union (Just a) `mappend` _ = Union $ Just a
+  Union _ `mappend` Union (Just b) = Union $ Just b
+  _ `mappend` _ = Union Nothing
