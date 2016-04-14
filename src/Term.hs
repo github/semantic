@@ -35,10 +35,7 @@ ana f = uncurry (:<) . second (fmap (ana f)) . f
 hylo :: Functor f => (annotation -> f b -> b) -> (a -> (annotation, f a)) -> a -> b
 hylo phi psi = cata phi . ana psi
 
--- | Return the number of leaves in the node.
+-- | Return the node count of a term.
 termSize :: Term a annotation -> Integer
 termSize = cata size where
-  size _ (Leaf _) = 1
-  size _ (Indexed i) = sum i
-  size _ (Fixed f) = sum f
-  size _ (Keyed k) = sum k
+  size _ syntax = 1 + sum syntax

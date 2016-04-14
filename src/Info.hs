@@ -6,12 +6,12 @@ import Range
 
 -- | An annotation for a source file, including the source range and semantic
 -- | categories.
-data Info = Info { characterRange :: !Range, categories :: !(Set Category) }
+data Info = Info { characterRange :: !Range, categories :: !(Set Category), size :: !Integer }
   deriving (Eq, Show)
 
 -- | Return a new Info by replacing its characterRange.
 setCharacterRange :: Info -> Range -> Info
-setCharacterRange info range = Info range (Info.categories info)
+setCharacterRange info range = Info range (Info.categories info) (Info.size info)
 
 instance Categorizable Info where
   categories = Info.categories

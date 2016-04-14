@@ -76,4 +76,4 @@ instance Arbitrary a => Arbitrary (Source a) where
 
 arbitraryLeaf :: Gen (Source Char, Info, Syntax (Source Char) f)
 arbitraryLeaf = toTuple <$> arbitrary
-  where toTuple string = (string, Info (Range 0 $ length string) mempty, Leaf string)
+  where toTuple string = (string, Info (Range 0 $ length string) mempty 1, Leaf string)

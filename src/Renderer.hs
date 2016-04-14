@@ -10,6 +10,8 @@ import Data.Text
 type Renderer a = Diff a Info -> Both SourceBlob -> Text
 
 data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath, outputPath :: FilePath }
+ deriving (Show)
 
 -- | The available types of diff rendering.
 data Format = Split | Patch | JSON
+  deriving (Show)

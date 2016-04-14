@@ -6,6 +6,7 @@ import Range
 import Syntax
 import Term
 import Control.Comonad.Cofree
+import Data.Copointed
 import qualified Data.OrderedMap as Map
 import qualified Data.Set as Set
 import Source
@@ -39,13 +40,13 @@ isFixed = not . Set.null . Set.intersection fixedCategories
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
 termConstructor :: (String -> Set.Set Category) -> Constructor
-termConstructor mapping source range name = (Info range categories :<) . construct
+termConstructor mapping source range name children = Info range categories (1 + sum (size . copoint <$> children)) :< construct children
   where
     categories = mapping name
     construct [] = Leaf . pack . toString $ slice range source
     construct children | isFixed categories = Fixed children
     construct children | isKeyed categories = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed children
-    assignKey node@(Info _ categories :< Fixed (key : _)) | Set.member Pair categories = (getSubstring key, node)
+    assignKey node@(Info _ categories _ :< Fixed (key : _)) | Set.member Pair categories = (getSubstring key, node)
     assignKey node = (getSubstring node, node)
-    getSubstring (Info range _ :< _) = pack . toString $ slice range source
+    getSubstring (Info range _ _ :< _) = pack . toString $ slice range source
