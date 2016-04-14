@@ -171,10 +171,6 @@ catThese as = maybe (Join (These [] [])) Join $ getUnion $ mconcat $ Union . Jus
 pairRangesWithLine :: Monoid b => Join These a -> Join These b -> Join These (a, b)
 pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRanges) $ (,) <$> headRanges `applyThese` childLine
 
-getRange :: SplitDiff leaf Info -> Range
-getRange (Free (Annotated (Info range _ _) _)) = range
-getRange (Pure patch) | Info range _ _ :< _ <- getSplitTerm patch = range
-
 intersects :: Join These Range -> Join These (SplitDiff leaf Info) -> Join These Bool
 intersects ranges line = fromMaybe (False <$ line) $ intersectsChild <$> ranges `applyThese` line
 
