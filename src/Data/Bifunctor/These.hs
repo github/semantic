@@ -17,6 +17,13 @@ these _ _ f (These this that) = f this that
 fromThese :: a -> b -> These a b -> (a, b)
 fromThese a b = these (flip (,) b) ((,) a) (,)
 
+-- | Given a pair of Maybes, produce a These containing Just their values, or Nothing if they haven’t any.
+maybeThese :: Maybe a -> Maybe b -> Maybe (These a b)
+maybeThese (Just a) (Just b) = Just (These a b)
+maybeThese (Just a) _ = Just (This a)
+maybeThese _ (Just b) = Just (That b)
+maybeThese _ _ = Nothing
+
 -- | Return Just the value in This, or the first value in These, if any.
 maybeFst :: These a b -> Maybe a
 maybeFst = these Just (const Nothing) ((Just .) . const)
