@@ -66,7 +66,3 @@ instance (Monoid a, Monoid b) => Monoid (Union a b) where
   Union (Just a) `mappend` _ = Union $ Just a
   Union _ `mappend` Union (Just b) = Union $ Just b
   _ `mappend` _ = Union Nothing
-
-instance (Monoid a, Monoid b) => Monoid (Intersection a b) where
-  mempty = Intersection Nothing
-  Intersection a `mappend` Intersection b = Intersection $ maybe a (maybe Just (apThese . bimap mappend mappend) a) b
