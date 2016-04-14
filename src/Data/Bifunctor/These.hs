@@ -42,6 +42,9 @@ apThese fg ab = uncurry maybeThese $ uncurry (***) (bimap (<*>) (<*>) (unpack fg
 newtype Union a b = Union { getUnion :: Maybe (These a b) }
   deriving (Eq, Show)
 
+newtype Intersection a b = Intersection { getIntersection :: Maybe (These a b) }
+  deriving (Eq, Show)
+
 
 -- Instances
 
