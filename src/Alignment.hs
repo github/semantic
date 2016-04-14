@@ -17,7 +17,7 @@ import Control.Monad
 import Control.Monad.Free
 import Data.Adjoined
 import Data.Align
-import Data.Bifunctor
+import Data.Biapplicative
 import Data.Bifunctor.Join
 import Data.Bifunctor.These
 import Data.Coalescent
@@ -146,7 +146,8 @@ alignChildrenInRanges ranges children
   | Just headRanges <- sequenceL $ listToMaybe <$> ranges
   , (intersecting, nonintersecting) <- spanAndSplitFirstLines (intersects headRanges) children
   , (thisLine, nextLines) <- foldr (\ (this, next) (these, nexts) -> (this : these, next ++ nexts)) ([], []) intersecting
-  , merged <- pairRangesWithLine headRanges (catThese thisLine)
+  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` catThese (thisLine ++ nextLines)
+  , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (catThese thisLine))
   , advance <- fromMaybe (drop 1, drop 1) $ fromThese id id . runJoin . (drop 1 <$) <$> listToMaybe nextLines
   , (nextRanges, nextChildren, nextLines) <- alignChildrenInRanges (modifyJoin (uncurry bimap advance) ranges) (nextLines : nonintersecting)
   = (nextRanges, nextChildren, merged : nextLines)
