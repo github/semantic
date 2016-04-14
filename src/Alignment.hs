@@ -139,7 +139,7 @@ groupChildrenByLine ranges children | not (and $ null <$> ranges)
                                     | otherwise = []
 
 group2 :: Join These [Range] -> [AlignedDiff leaf] -> (Join These [Range], [AlignedDiff leaf], [Join These (Range, [SplitDiff leaf Info])])
-group2 ranges children | Just headRanges <- fmap Join . uncurry maybeThese . fromThese Nothing Nothing . runJoin $ listToMaybe <$> ranges
+group2 ranges children | Just headRanges <- sequenceL $ listToMaybe <$> ranges
                        , (intersecting, nonintersecting) <- spanAndSplitFirstLines (intersects headRanges) children
                        , (thisLine, nextLines) <- foldr (\ (this, next) (these, nexts) -> (this : these, next ++ nexts)) ([], []) intersecting
                        , merged <- pairRangesWithLine headRanges . mask headRanges . fmap join . Join . uncurry These . unzip $ fromThese [] [] . runJoin . fmap pure <$> thisLine
