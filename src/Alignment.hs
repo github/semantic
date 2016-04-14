@@ -116,15 +116,15 @@ type Row a = Both (Line a)
 
 type AlignedDiff leaf = [Join These (SplitDiff leaf Info)]
 
+alignDiff :: Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
+alignDiff sources diff = iter (uncurry (alignSyntax (runBothWith ((Join .) . These)) sources) . (annotation &&& syntax)) (alignPatch sources <$> diff)
+
 alignPatch :: Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
 alignPatch sources (Delete term) = hylo (alignSyntax (Join . This . runIdentity) (Identity (fst sources))) unCofree (Identity <$> term)
 alignPatch sources (Insert term) = hylo (alignSyntax (Join . That . runIdentity) (Identity (snd sources))) unCofree (Identity <$> term)
 alignPatch sources (Replace term1 term2) = alignWith (fmap (these id id const . runJoin) . Join)
                                             (hylo (alignSyntax (Join . This . runIdentity) (Identity (fst sources))) unCofree (Identity <$> term1))
                                             (hylo (alignSyntax (Join . That . runIdentity) (Identity (snd sources))) unCofree (Identity <$> term2))
-
-alignDiff :: Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
-alignDiff sources diff = iter (uncurry (alignSyntax (runBothWith ((Join .) . These)) sources) . (annotation &&& syntax)) (alignPatch sources <$> diff)
 
 alignSyntax :: Applicative f => (forall a. f a -> Join These a) -> f (Source Char) -> f Info -> Syntax leaf (AlignedDiff leaf) -> AlignedDiff leaf
 alignSyntax toJoinThese sources infos syntax = case syntax of
