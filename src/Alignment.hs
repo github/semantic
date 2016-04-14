@@ -161,9 +161,7 @@ spanAndSplitFirstLines pred = foldr go ([], [])
           | otherwise = (intersecting, nonintersecting)
 
 catThese :: [Join These a] -> Join These [a]
-catThese [ a ] = pure <$> a
-catThese (a:as) = fromMaybe (Join (These [] [])) $ (:) <$> a `applyThese` catThese as
-catThese [] = Join (These [] [])
+catThese as = maybe (Join (These [] [])) Join $ getUnion $ mconcat $ Union . Just . runJoin . fmap pure <$> as
 
 -- | Partitions and splits a list of children into a tuple consisting of:
 -- | - elements which matched; if an element matches only partially this field will contain only the matching side
