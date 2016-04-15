@@ -10,14 +10,12 @@ import ArbitraryTerm (arbitraryLeaf)
 import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad.Free
-import Data.Adjoined
 import Data.Bifunctor.Join
 import Data.Bifunctor.These
 import Data.Functor.Both as Both
 import Data.Functor.Identity
 import Diff
 import Info
-import Line
 import Patch
 import Prelude hiding (fst, snd)
 import qualified Prelude
