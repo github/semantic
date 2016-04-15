@@ -91,8 +91,8 @@ spanAndSplitFirstLines pred = foldr go ([], [])
           | (first : rest) <- child = let ~(l, r) = splitThese first in
             case fromThese False False . runJoin $ pred first of
               (True, True) -> ((first, rest) : intersecting, nonintersecting)
-              (True, False) -> ((head l, r ++ rest) : intersecting, nonintersecting)
-              (False, True) -> ((head r, l ++ rest) : intersecting, nonintersecting)
+              (True, False) -> ((fromJust l, maybeToList r ++ rest) : intersecting, nonintersecting)
+              (False, True) -> ((fromJust r, maybeToList l ++ rest) : intersecting, nonintersecting)
               _ -> (intersecting, (first : rest) : nonintersecting)
           | otherwise = (intersecting, nonintersecting)
 
@@ -109,8 +109,8 @@ intersectsRange :: Range -> Range -> Bool
 intersectsRange range1 range2 = end range2 <= end range1
 
 -- | Split a These value up into independent These values representing the left and right sides, if any.
-splitThese :: Join These a -> ([Join These a], [Join These a])
-splitThese these = fromThese [] [] $ bimap (pure . Join . This) (pure . Join . That) (runJoin these)
+splitThese :: Join These a -> (Maybe (Join These a), Maybe (Join These a))
+splitThese these = fromThese Nothing Nothing $ bimap (Just . Join . This) (Just . Join . That) (runJoin these)
 
 infixl 4 `applyThese`
 
