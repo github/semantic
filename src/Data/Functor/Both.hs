@@ -1,7 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Data.Functor.Both where
 
-import Data.Align
 import Data.Bifunctor
 import Data.Bifunctor.Join
 import Data.Bifunctor.These
@@ -45,7 +44,3 @@ snd = Prelude.snd . runBoth
 instance Monoid a => Monoid (Join (,) a) where
   mempty = pure mempty
   mappend a b = mappend <$> a <*> b
-
-
-instance TotalCrosswalk (Join (,)) where
-  tsequenceL d = runBothWith (alignWith (\ these -> fromMaybe <$> d <*> maybeBothOfThese these))
