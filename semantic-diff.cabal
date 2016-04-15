@@ -32,7 +32,6 @@ library
                      , Info
                      , Interpreter
                      , Language
-                     , Line
                      , Operation
                      , Parser
                      , Patch
