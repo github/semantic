@@ -48,8 +48,8 @@ alignDiff sources diff = iter (uncurry (alignSyntax (runBothWith ((Join .) . The
 
 alignPatch :: Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
 alignPatch sources patch = case patch of
-  Delete term -> fmap (Pure . SplitDelete) <$> hylo (alignSyntax (Join . This . runIdentity) (:<) getRange (Identity (fst sources))) unCofree (Identity <$> term)
-  Insert term -> fmap (Pure . SplitInsert) <$> hylo (alignSyntax (Join . That . runIdentity) (:<) getRange (Identity (snd sources))) unCofree (Identity <$> term)
+  Delete term -> fmap (Pure . SplitDelete) <$> hylo (alignSyntax this (:<) getRange (Identity (fst sources))) unCofree (Identity <$> term)
+  Insert term -> fmap (Pure . SplitInsert) <$> hylo (alignSyntax that (:<) getRange (Identity (snd sources))) unCofree (Identity <$> term)
   Replace term1 term2 -> fmap (Pure . SplitReplace) <$> alignWith (fmap (these id id const . runJoin) . Join)
     (hylo (alignSyntax this (:<) getRange (Identity (fst sources))) unCofree (Identity <$> term1))
     (hylo (alignSyntax that (:<) getRange (Identity (snd sources))) unCofree (Identity <$> term2))
