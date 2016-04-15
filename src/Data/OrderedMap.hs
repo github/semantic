@@ -16,7 +16,7 @@ module Data.OrderedMap (
 import qualified Data.Maybe as Maybe
 
 -- | An ordered map of keys and values.
-data OrderedMap key value = OrderedMap { toList :: [(key, value)] }
+newtype OrderedMap key value = OrderedMap { toList :: [(key, value)] }
   deriving (Show, Eq, Functor, Foldable, Traversable)
 
 instance Eq key => Monoid (OrderedMap key value) where
