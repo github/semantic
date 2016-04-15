@@ -26,3 +26,11 @@ unPatch (Delete a) = This a
 -- | Calculate the cost of the patch given a function to compute the cost of a item.
 patchSum :: (a -> Integer) -> Patch a -> Integer
 patchSum termCost patch = maybe 0 termCost (before patch) + maybe 0 termCost (after patch)
+
+-- | Return Just the value in This, or the first value in These, if any.
+maybeFst :: These a b -> Maybe a
+maybeFst = these Just (const Nothing) ((Just .) . const)
+
+-- | Return Just the value in That, or the second value in These, if any.
+maybeSnd :: These a b -> Maybe b
+maybeSnd = these (const Nothing) Just ((Just .) . flip const)

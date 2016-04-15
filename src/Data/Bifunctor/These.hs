@@ -25,13 +25,6 @@ maybeThese (Just a) _ = Just (This a)
 maybeThese _ (Just b) = Just (That b)
 maybeThese _ _ = Nothing
 
--- | Return Just the value in This, or the first value in These, if any.
-maybeFst :: These a b -> Maybe a
-maybeFst = these Just (const Nothing) ((Just .) . const)
-
--- | Return Just the value in That, or the second value in These, if any.
-maybeSnd :: These a b -> Maybe b
-maybeSnd = these (const Nothing) Just ((Just .) . flip const)
 
 mergeThese :: (a -> a -> a) -> These a a -> a
 mergeThese = these id id
