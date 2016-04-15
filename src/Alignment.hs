@@ -105,9 +105,6 @@ pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRan
 intersects :: (term -> Range) -> Join These Range -> Join These term -> Join These Bool
 intersects getRange ranges line = fromMaybe (False <$ line) $ intersectsRange <$> ranges `applyThese` (getRange <$> line)
 
-intersectsRange :: Range -> Range -> Bool
-intersectsRange range1 range2 = end range2 <= end range1
-
 -- | Split a These value up into independent These values representing the left and right sides, if any.
 splitThese :: Join These a -> (Maybe (Join These a), Maybe (Join These a))
 splitThese these = fromThese Nothing Nothing $ bimap (Just . Join . This) (Just . Join . That) (runJoin these)
