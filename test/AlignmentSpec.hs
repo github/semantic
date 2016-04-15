@@ -11,9 +11,9 @@ import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Bifunctor.Join
-import Data.Bifunctor.These
 import Data.Functor.Both as Both
 import Data.Functor.Identity
+import Data.These
 import Diff
 import Info
 import Patch

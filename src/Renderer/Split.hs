@@ -6,12 +6,12 @@ import Category
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Bifunctor.Join
-import Data.Bifunctor.These
 import Data.Foldable
 import Data.Functor.Both
 import Data.Maybe
 import Data.Monoid
 import qualified Data.Text.Lazy as TL
+import Data.These
 import Diff
 import Info
 import Prelude hiding (div, head, span, fst, snd)

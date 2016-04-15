@@ -14,12 +14,12 @@ import Renderer
 import Source hiding ((++), break)
 import SplitDiff
 import Data.Bifunctor.Join
-import Data.Bifunctor.These
 import Data.Functor.Both as Both
 import Data.List
 import Data.Maybe
 import Data.Monoid
 import Data.Text (pack, Text)
+import Data.These
 
 -- | Render a timed out file as a truncated diff.
 truncatePatch :: DiffArguments -> Both SourceBlob -> Text

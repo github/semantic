@@ -1,6 +1,6 @@
 module Patch where
 
-import Data.Bifunctor.These
+import Data.These
 
 -- | An operation to replace, insert, or delete an item.
 data Patch a =

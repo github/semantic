@@ -11,11 +11,11 @@ import Control.Monad.Free
 import Data.Aeson hiding (json)
 import Data.Aeson.Encode
 import Data.Bifunctor.Join
-import Data.Bifunctor.These
 import Data.OrderedMap hiding (fromList)
 import Data.Text.Lazy (toStrict)
 import Data.Text.Lazy.Builder (toLazyText)
 import qualified Data.Text as T
+import Data.These
 import Data.Vector hiding (toList)
 import Diff
 import Info

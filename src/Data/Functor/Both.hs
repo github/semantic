@@ -3,7 +3,7 @@ module Data.Functor.Both where
 
 import Data.Bifunctor
 import Data.Bifunctor.Join
-import Data.Bifunctor.These
+import Data.These
 import Data.Maybe
 import Prelude hiding (zipWith, fst, snd)
 import qualified Prelude

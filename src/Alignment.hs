@@ -15,13 +15,13 @@ import Control.Monad.Free
 import Data.Align
 import Data.Biapplicative
 import Data.Bifunctor.Join
-import Data.Bifunctor.These
 import Data.Copointed
 import Data.Foldable
 import Data.Functor.Both as Both
 import Data.Functor.Identity
 import Data.Maybe
 import Data.Monoid
+import Data.These
 import Diff
 import Info
 import Patch
@@ -81,8 +81,8 @@ alignChildrenInRanges getRange ranges children
   | Just headRanges <- sequenceL $ listToMaybe <$> ranges
   , (intersecting, nonintersecting) <- spanAndSplitFirstLines (intersects getRange headRanges) children
   , (thisLine, nextLines) <- foldr (\ (this, next) (these, nexts) -> (this : these, next ++ nexts)) ([], []) intersecting
-  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` catThese (thisLine ++ nextLines)
-  , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (catThese thisLine))
+  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` Alignment.catThese (thisLine ++ nextLines)
+  , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (Alignment.catThese thisLine))
   , advance <- fromMaybe (drop 1, drop 1) $ fromThese id id . runJoin . (drop 1 <$) <$> listToMaybe nextLines
   , (nextRanges, nextChildren, nextLines) <- alignChildrenInRanges getRange (modifyJoin (uncurry bimap advance) ranges) (nextLines : nonintersecting)
   = (nextRanges, nextChildren, merged : nextLines)
@@ -122,6 +122,9 @@ applyThese fg ab = Join <$> runJoin fg `apThese` runJoin ab
 
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
+
+instance Bicrosswalk t => Crosswalk (Join t) where
+  crosswalk f = fmap Join . bicrosswalk f f . runJoin
 
 -- | Given a pair of Maybes, produce a These containing Just their values, or Nothing if they haven’t any.
 maybeThese :: Maybe a -> Maybe b -> Maybe (These a b)
