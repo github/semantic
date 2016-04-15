@@ -59,7 +59,7 @@ instance Arbitrary CategorySet where
 
 instance Arbitrary a => Arbitrary (Join (,) a) where
   arbitrary = both <$> arbitrary <*> arbitrary
-  shrink b = both <$> (shrink (fst b)) <*> (shrink (snd b))
+  shrink b = both <$> shrink (fst b) <*> shrink (snd b)
 
 instance Arbitrary a => Arbitrary (Line a) where
   arbitrary = oneof [ Line <$> arbitrary, Closed <$> arbitrary ]
