@@ -19,7 +19,7 @@ import Data.Foldable
 import Data.Functor.Both as Both
 import Data.Functor.Identity
 import Data.Maybe
-import Data.Monoid hiding (Alt)
+import Data.Monoid
 import Data.These
 import Diff
 import Info
