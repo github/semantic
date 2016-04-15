@@ -14,6 +14,7 @@ module Data.OrderedMap (
   ) where
 
 import qualified Data.Maybe as Maybe
+import Data.Functor.Plus
 
 -- | An ordered map of keys and values.
 data OrderedMap key value = OrderedMap { toList :: [(key, value)] }
@@ -66,3 +67,12 @@ intersectionWith combine (OrderedMap a) (OrderedMap b) = OrderedMap $ a >>= (\ (
 difference :: Eq key => OrderedMap key a -> OrderedMap key b -> OrderedMap key a
 difference (OrderedMap a) (OrderedMap b) = OrderedMap $ filter ((`notElem` extant) . fst) a
   where extant = fst <$> b
+
+
+-- | Instances
+
+instance Eq key => Alt (OrderedMap key) where
+  (<!>) = union
+
+instance Eq key => Plus (OrderedMap key) where
+  zero = fromList []

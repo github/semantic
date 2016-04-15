@@ -52,6 +52,7 @@ library
                      , filepath
                      , mtl
                      , pointed
+                     , semigroupoids
                      , text >= 1.2.1.3
                      , text-icu
                      , these
