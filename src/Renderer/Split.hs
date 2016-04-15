@@ -26,6 +26,10 @@ import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 import qualified Text.Blaze.Internal as Blaze
 
+-- | Return the first item in the Foldable, or Nothing if it's empty.
+maybeFirst :: Foldable f => f a -> Maybe a
+maybeFirst = foldr (const . Just) Nothing
+
 -- | Add the first category from a Foldable of categories as a class name as a
 -- | class name on the markup, prefixed by `category-`.
 classifyMarkup :: Foldable f => f Category -> Markup -> Markup

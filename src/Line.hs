@@ -43,10 +43,6 @@ lineMap :: ([a] -> [b]) -> Line a -> Line b
 lineMap f (Line ls) = Line (f ls)
 lineMap f (Closed cs) = Closed (f cs)
 
--- | Return the first item in the Foldable, or Nothing if it's empty.
-maybeFirst :: Foldable f => f a -> Maybe a
-maybeFirst = foldr (const . Just) Nothing
-
 instance Applicative Line where
   pure = Line . pure
   as <*> bs | isOpen as && isOpen bs = Line (unLine as <*> unLine bs)
