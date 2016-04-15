@@ -119,9 +119,6 @@ applyThese fg ab = Join <$> runJoin fg `apThese` runJoin ab
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
 
-instance Bicrosswalk t => Crosswalk (Join t) where
-  crosswalk f = fmap Join . bicrosswalk f f . runJoin
-
 -- | Given a pair of Maybes, produce a These containing Just their values, or Nothing if they haven’t any.
 maybeThese :: Maybe a -> Maybe b -> Maybe (These a b)
 maybeThese (Just a) (Just b) = Just (These a b)
@@ -138,6 +135,8 @@ newtype Union a b = Union { getUnion :: Maybe (These a b) }
   deriving (Eq, Show)
 
 
+-- | Instances
+
 instance (Monoid a, Monoid b) => Monoid (Union a b) where
   mempty = Union Nothing
   Union (Just a) `mappend` Union (Just b) = Union $ uncurry maybeThese $ uncurry (***) (bimap mappend mappend (unpack a)) (unpack b)
@@ -145,3 +144,6 @@ instance (Monoid a, Monoid b) => Monoid (Union a b) where
   Union (Just a) `mappend` _ = Union $ Just a
   Union _ `mappend` Union (Just b) = Union $ Just b
   _ `mappend` _ = Union Nothing
+
+instance Bicrosswalk t => Crosswalk (Join t) where
+  crosswalk f = fmap Join . bicrosswalk f f . runJoin
