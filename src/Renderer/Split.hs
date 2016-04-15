@@ -5,13 +5,15 @@ import Alignment
 import Category
 import Control.Comonad.Cofree
 import Control.Monad.Free
+import Data.Bifunctor.Join
+import Data.Bifunctor.These
 import Data.Foldable
 import Data.Functor.Both
+import Data.Maybe
 import Data.Monoid
 import qualified Data.Text.Lazy as TL
 import Diff
 import Info
-import Line
 import Prelude hiding (div, head, span, fst, snd)
 import qualified Prelude
 import Range
@@ -66,10 +68,10 @@ split diff blobs = TL.toStrict . renderHtml
         . mconcat $ numberedLinesToMarkup <$> numbered
   where
     sources = Source.source <$> blobs
-    numbered = numberedRows (fmap (fmap Prelude.fst) <$> splitDiffByLines sources diff)
+    numbered = numberedRows (alignDiff sources diff)
     maxNumber = case numbered of
       [] -> 0
-      (row : _) -> runBothWith max $ Prelude.fst <$> row
+      (row : _) -> mergeThese max . runJoin $ Prelude.fst <$> row
 
     -- | The number of digits in a number (e.g. 342 has 3 digits).
     digits :: Int -> Int
@@ -79,11 +81,15 @@ split diff blobs = TL.toStrict . renderHtml
     columnWidth = max (20 + digits maxNumber * 8) 40
 
     -- | Render a line with numbers as an HTML row.
-    numberedLinesToMarkup :: Both (Int, Line (SplitDiff a Info)) -> Markup
-    numberedLinesToMarkup numberedLines = tr $ runBothWith (<>) (renderLine <$> numberedLines <*> sources) <> string "\n"
+    numberedLinesToMarkup :: Join These (Int, SplitDiff a Info) -> Markup
+    numberedLinesToMarkup numberedLines = tr $ runBothWith (<>) (renderLine <$> Join (fromThese Nothing Nothing (runJoin (Just <$> numberedLines))) <*> sources) <> string "\n"
 
-    renderLine :: (Int, Line (SplitDiff leaf Info)) -> Source Char -> Markup
-    renderLine (number, line) source = toMarkup $ Renderable (hasChanges line, number, Renderable . (,) source <$> line)
+    renderLine :: Maybe (Int, SplitDiff leaf Info) -> Source Char -> Markup
+    renderLine (Just (number, line)) source = toMarkup $ Renderable (hasChanges line, number, Renderable (source, line))
+    renderLine _ _ =
+      td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
+      <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
+      <> string "\n"
 
 -- | Something that can be rendered as markup.
 newtype Renderable a = Renderable a
@@ -116,12 +122,8 @@ instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
             ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue . show $ termSize term)) . toMarkup $ Renderable (source, term), range)
 
 
-instance ToMarkup a => ToMarkup (Renderable (Bool, Int, Line a)) where
-  toMarkup (Renderable (_, _, line)) | isEmpty line =
-    td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
-    <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
-    <> string "\n"
+instance ToMarkup a => ToMarkup (Renderable (Bool, Int, a)) where
   toMarkup (Renderable (hasChanges, num, line)) =
     td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
-    <> td (mconcat $ toMarkup <$> unLine line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
+    <> td (toMarkup line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
     <> string "\n"

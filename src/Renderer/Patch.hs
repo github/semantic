@@ -8,16 +8,12 @@ module Renderer.Patch (
 import Alignment
 import Diff
 import Info
-import Line
-import Prelude hiding (fst, snd)
-import qualified Prelude
-import Range
+import Prelude hiding (snd)
 import Renderer
 import Source hiding ((++), break)
 import SplitDiff
-import Control.Comonad.Cofree
-import Control.Monad.Free
 import Data.Bifunctor.Join
+import Data.Bifunctor.These
 import Data.Functor.Both as Both
 import Data.List
 import Data.Maybe
@@ -53,13 +49,13 @@ changeLength change = mconcat $ (rowIncrement <$> context change) <> (rowIncreme
 
 -- | The increment the given row implies for line numbering.
 rowIncrement :: Row a -> Both (Sum Int)
-rowIncrement = fmap lineIncrement
+rowIncrement = Join . fromThese (Sum 0) (Sum 0) . runJoin . (Sum 1 <$)
 
 -- | Given the before and after sources, render a hunk to a string.
 showHunk :: Both SourceBlob -> Hunk (SplitDiff a Info) -> String
 showHunk blobs hunk = maybeOffsetHeader ++
   concat (showChange sources <$> changes hunk) ++
-  showLines (snd sources) ' ' (snd <$> trailingContext hunk)
+  showLines (snd sources) ' ' (maybeSnd . runJoin <$> trailingContext hunk)
   where sources = source <$> blobs
         maybeOffsetHeader = if lengthA > 0 && lengthB > 0
                             then offsetHeader
@@ -70,24 +66,19 @@ showHunk blobs hunk = maybeOffsetHeader ++
 
 -- | Given the before and after sources, render a change to a string.
 showChange :: Both (Source Char) -> Change (SplitDiff a Info) -> String
-showChange sources change = showLines (snd sources) ' ' (snd <$> context change) ++ deleted ++ inserted
-  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> both '-' '+' <*> Join (unzip (runJoin <$> contents change))
+showChange sources change = showLines (snd sources) ' ' (maybeSnd . runJoin <$> context change) ++ deleted ++ inserted
+  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> both '-' '+' <*> Join (unzip (fromThese Nothing Nothing . runJoin . fmap Just <$> contents change))
 
 -- | Given a source, render a set of lines to a string with a prefix.
-showLines :: Source Char -> Char -> [Line (SplitDiff leaf Info)] -> String
+showLines :: Source Char -> Char -> [Maybe (SplitDiff leaf Info)] -> String
 showLines source prefix lines = fromMaybe "" . mconcat $ fmap prepend . showLine source <$> lines
   where prepend "" = ""
         prepend source = prefix : source
 
 -- | Given a source, render a line to a string.
-showLine :: Source Char -> Line (SplitDiff leaf Info) -> Maybe String
-showLine source line | isEmpty line = Nothing
-                     | otherwise = Just . toString . (`slice` source) . unionRanges $ getRange <$> unLine line
-
--- | Return the range from a split diff.
-getRange :: SplitDiff leaf Info -> Range
-getRange (Free (Annotated (Info range _ _) _)) = range
-getRange (Pure patch) = let Info range _ _ :< _ = getSplitTerm patch in range
+showLine :: Source Char -> Maybe (SplitDiff leaf Info) -> Maybe String
+showLine source line | Just line <- line = Just . toString . (`slice` source) $ getRange line
+                     | otherwise = Nothing
 
 -- | Returns the header given two source blobs and a hunk.
 header :: Both SourceBlob -> String
@@ -125,7 +116,7 @@ hunks _ blobs | sources <- source <$> blobs
               , sourcesNull <- runBothWith (&&) (null <$> sources)
               , sourcesEqual || sourcesNull
   = [emptyHunk]
-hunks diff blobs = hunksInRows (Join (1, 1)) $ fmap (fmap Prelude.fst) <$> splitDiffByLines (source <$> blobs) diff
+hunks diff blobs = hunksInRows (Join (1, 1)) $ alignDiff (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
@@ -166,12 +157,4 @@ changeIncludingContext leadingContext rows = case changes of
 
 -- | Whether a row has changes on either side.
 rowHasChanges :: Row (SplitDiff a Info) -> Bool
-rowHasChanges lines = or (lineHasChanges <$> lines)
-
--- | Whether a line has changes.
-lineHasChanges :: Line (SplitDiff a Info) -> Bool
-lineHasChanges = or . fmap diffHasChanges
-
--- | Whether a split diff has changes.
-diffHasChanges :: SplitDiff a Info -> Bool
-diffHasChanges = or . fmap (const True)
+rowHasChanges row = or (hasChanges <$> row)

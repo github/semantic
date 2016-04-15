@@ -42,14 +42,12 @@ import Syntax
 import Term
 
 -- | Assign line numbers to the lines on each side of a list of rows.
-numberedRows :: [Row a] -> [Both (Int, Line a)]
-numberedRows = countUp (pure 1)
-  where countUp from (row : rows) = ((,) <$> from <*> row) : countUp ((+) <$> from <*> (lineIncrement <$> row)) rows
+numberedRows :: [Join These a] -> [Join These (Int, a)]
+numberedRows = countUp (Join $ These 1 1)
+  where countUp from (row : rows) = fromJust ((,) <$> from `applyThese` row) : countUp (succ <$> from) rows
         countUp _ [] = []
 
 -- | Determine whether a line contains any patches.
-hasChanges :: Line (SplitDiff leaf Info) -> Bool
-hasChanges = or . fmap (or . (True <$))
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs paired with the Range of characters spanned by that Row on each side of the diff.
 splitDiffByLines :: Both (Source Char) -> Diff leaf Info -> [Row (SplitDiff leaf Info, Range)]
@@ -110,9 +108,11 @@ linesInRangeOfSource range source = fromList $ pureBy (openRange source) <$> act
 -- | Does this Range in this Source end with a newline?
 openRange :: Source Char -> Range -> Bool
 openRange source range = (at source <$> maybeLastIndex range) /= Just '\n'
+hasChanges :: SplitDiff leaf Info -> Bool
+hasChanges = or . (True <$)
 
 -- | A row in a split diff, composed of a before line and an after line.
-type Row a = Both (Line a)
+type Row a = Join These a
 
 type AlignedDiff leaf = [Join These (SplitDiff leaf Info)]
 
