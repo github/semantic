@@ -66,13 +66,13 @@ alignSyntax toJoinThese toNode getRange sources infos syntax = case syntax of
   where lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
         wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (info { characterRange = range }) (constructor children)) <$> infos)
 
-groupChildrenByLine :: (term -> Range) -> Join These [Range] -> [[Join These term]] -> [Join These (Range, [term])]
+groupChildrenByLine :: Foldable f => (term -> Range) -> Join These [Range] -> f [Join These term] -> [Join These (Range, [term])]
 groupChildrenByLine getRange ranges children | not (and $ null <$> ranges)
                                              , (nextRanges, nextChildren, lines) <- alignChildrenInRanges getRange ranges children
                                              = lines ++ groupChildrenByLine getRange nextRanges nextChildren
                                              | otherwise = []
 
-alignChildrenInRanges :: (term -> Range) -> Join These [Range] -> [[Join These term]] -> (Join These [Range], [[Join These term]], [Join These (Range, [term])])
+alignChildrenInRanges :: Foldable f => (term -> Range) -> Join These [Range] -> f [Join These term] -> (Join These [Range], [[Join These term]], [Join These (Range, [term])])
 alignChildrenInRanges getRange ranges children
   | Just headRanges <- sequenceL $ listToMaybe <$> ranges
   , (intersecting, nonintersecting) <- spanAndSplitFirstLines (intersects getRange headRanges) children
@@ -82,9 +82,9 @@ alignChildrenInRanges getRange ranges children
   , advance <- fromThese id id . runJoin . (drop 1 <$) $ Alignment.catThese nextLines
   , (nextRanges, nextChildren, nextLines) <- alignChildrenInRanges getRange (modifyJoin (uncurry bimap advance) ranges) (nextLines : nonintersecting)
   = (nextRanges, nextChildren, merged : nextLines)
-  | otherwise = ([] <$ ranges, children, fmap (flip (,) []) <$> sequenceL ranges)
+  | otherwise = ([] <$ ranges, toList children, fmap (flip (,) []) <$> sequenceL ranges)
 
-spanAndSplitFirstLines :: (Join These a -> Join These Bool) -> [[Join These a]] -> ([(Join These a, [Join These a])], [[Join These a]])
+spanAndSplitFirstLines :: Foldable f => (Join These a -> Join These Bool) -> f [Join These a] -> ([(Join These a, [Join These a])], [[Join These a]])
 spanAndSplitFirstLines pred = foldr go ([], [])
   where go child (intersecting, nonintersecting)
           | (first : rest) <- child = let ~(l, r) = splitThese first in
