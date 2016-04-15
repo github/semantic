@@ -19,7 +19,6 @@ library
                      , Control.Comonad.Cofree
                      , Control.Monad.Free
                      , Data.Functor.Both
-                     , Data.Option
                      , Data.OrderedMap
                      , Diff
                      , Diffing
@@ -52,6 +51,7 @@ library
                      , filepath
                      , mtl
                      , pointed
+                     , semigroups
                      , text >= 1.2.1.3
                      , text-icu
                      , these

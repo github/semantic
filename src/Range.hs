@@ -4,7 +4,7 @@ module Range where
 import Control.Applicative ((<|>))
 import qualified Data.Char as Char
 import Data.Maybe (fromMaybe)
-import Data.Option
+import Data.Semigroup
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: !Int, end :: !Int }
@@ -59,16 +59,16 @@ unionRange (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (
 unionRanges :: Foldable f => f Range -> Range
 unionRanges = unionRangesFrom (Range 0 0)
 
+-- | Return Just the concatenation of any elements in a Foldable, or Nothing if it is empty.
+maybeConcat :: (Foldable f, Semigroup a) => f a -> Maybe a
+maybeConcat = getOption . foldMap (Option . Just)
+
 -- | Return a range that contains all the ranges in a Foldable, or the passed Range if the Foldable is empty.
 unionRangesFrom :: Foldable f => Range -> f Range -> Range
 unionRangesFrom range = fromMaybe range . maybeConcat
 
-instance Monoid (Option Range) where
-  mempty = Option Nothing
-  mappend (Option (Just a)) (Option (Just b)) = Option (Just (unionRange a b))
-  mappend a@(Option (Just _)) _ = a
-  mappend _ b@(Option (Just _)) = b
-  mappend _ _ = mempty
+instance Semigroup Range where
+  a <> b = unionRange a b
 
 instance Ord Range where
   a <= b = start a <= start b
