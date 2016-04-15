@@ -7,6 +7,7 @@ module Alignment
 , groupChildrenByLine
 ) where
 
+import Control.Applicative
 import Control.Arrow ((&&&), (***))
 import Control.Comonad.Cofree
 import Control.Monad
@@ -95,8 +96,8 @@ spanAndSplitFirstLines pred = foldr go ([], [])
               _ -> (intersecting, (first : rest) : nonintersecting)
           | otherwise = (intersecting, nonintersecting)
 
-catThese :: [Join These a] -> Join These [a]
-catThese as = fromMaybe (Join (These [] [])) . getUnion . mconcat $ Union . Just . fmap pure <$> as
+catThese :: (Alternative f, Foldable f, Monoid (f a)) => f (Join These a) -> Join These (f a)
+catThese as = fromMaybe (Join (These empty empty)) . getUnion . fold $ Union . Just . fmap pure <$> as
 
 pairRangesWithLine :: Monoid b => Join These a -> Join These b -> Join These (a, b)
 pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRanges) $ (,) <$> headRanges `applyThese` childLine
