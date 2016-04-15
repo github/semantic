@@ -138,6 +138,10 @@ apThese :: These (a -> b) (c -> d) -> These a c -> Maybe (These b d)
 apThese fg ab = uncurry maybeThese $ uncurry (***) (bimap (<*>) (<*>) (unpack fg)) (unpack ab)
   where unpack = fromThese Nothing Nothing . bimap Just Just
 
+newtype Union a b = Union { getUnion :: Maybe (These a b) }
+  deriving (Eq, Show)
+
+
 instance (Monoid a, Monoid b) => Monoid (Union a b) where
   mempty = Union Nothing
   Union (Just a) `mappend` Union (Just b) = Union $ uncurry maybeThese $ uncurry (***) (bimap mappend mappend (unpack a)) (unpack b)
@@ -145,7 +149,3 @@ instance (Monoid a, Monoid b) => Monoid (Union a b) where
   Union (Just a) `mappend` _ = Union $ Just a
   Union _ `mappend` Union (Just b) = Union $ Just b
   _ `mappend` _ = Union Nothing
-
-
-newtype Union a b = Union { getUnion :: Maybe (These a b) }
-  deriving (Eq, Show)
