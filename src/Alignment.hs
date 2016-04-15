@@ -78,9 +78,9 @@ alignChildrenInRanges getRange ranges children
   | Just headRanges <- sequenceL $ listToMaybe <$> ranges
   , (intersecting, nonintersecting) <- spanAndSplitFirstLines (intersects getRange headRanges) children
   , (thisLine, nextLines) <- foldr (\ (this, next) (these, nexts) -> (this : these, next ++ nexts)) ([], []) intersecting
-  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` Alignment.catThese (thisLine ++ nextLines)
-  , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (Alignment.catThese thisLine))
-  , advance <- fromThese id id . runJoin . (drop 1 <$) $ Alignment.catThese nextLines
+  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` unionThese (thisLine ++ nextLines)
+  , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (unionThese thisLine))
+  , advance <- fromThese id id . runJoin . (drop 1 <$) $ unionThese nextLines
   , (nextRanges, nextChildren, nextLines) <- alignChildrenInRanges getRange (modifyJoin (uncurry bimap advance) ranges) (nextLines : nonintersecting)
   = (nextRanges, nextChildren, merged : nextLines)
   | otherwise = ([] <$ ranges, toList children, fmap (flip (,) []) <$> sequenceL ranges)
@@ -96,8 +96,8 @@ spanAndSplitFirstLines pred = foldr go ([], [])
               _ -> (intersecting, (first : rest) : nonintersecting)
           | otherwise = (intersecting, nonintersecting)
 
-catThese :: (Alternative f, Foldable f, Monoid (f a)) => f (Join These a) -> Join These (f a)
-catThese as = fromMaybe (Join (These empty empty)) . getUnion . fold $ Union . Just . fmap pure <$> as
+unionThese :: (Alternative f, Foldable f, Monoid (f a)) => f (Join These a) -> Join These (f a)
+unionThese as = fromMaybe (Join (These empty empty)) . getUnion . fold $ Union . Just . fmap pure <$> as
 
 pairRangesWithLine :: Monoid b => Join These a -> Join These b -> Join These (a, b)
 pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRanges) $ (,) <$> headRanges `applyThese` childLine
