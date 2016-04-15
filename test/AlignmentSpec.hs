@@ -90,6 +90,16 @@ spec = parallel $ do
         , Join (That (info 2 3 `branch` [ Pure (SplitInsert (info 2 3 :< Leaf "b")) ]))
         ]
 
+    it "aligns context following insertions" $
+      alignDiff (both (Source.fromList "a\nc") (Source.fromList "a\nb\nc")) (both (info 0 3) (info 0 5) `branch` [ pure (info 0 1) `leaf` "a", Pure (Insert (info 2 3 :< Leaf "b")), both (info 2 3) (info 4 5) `leaf` "c" ])
+        `shouldBe`
+        [ Join (These (info 0 2 `branch` [ info 0 1 `leaf` "a" ])
+                      (info 0 2 `branch` [ info 0 1 `leaf` "a" ]))
+        , Join (That (info 2 4 `branch` [ Pure (SplitInsert (info 2 3 :< Leaf "b")) ]))
+        , Join (These (info 2 3 `branch` [ info 2 3 `leaf` "c" ])
+                      (info 4 5 `branch` [ info 4 5 `leaf` "c" ]))
+        ]
+
     where
       isOnSingleLine (a, _, _) = filter (/= '\n') (toString a) == toString a
 
