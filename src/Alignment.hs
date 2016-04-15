@@ -113,8 +113,10 @@ split these = fromThese [] [] $ bimap (pure . Join . This) (pure . Join . That) 
 
 infixl 4 `applyThese`
 
+-- | Like `<*>`, but it returns its result in `Maybe` since the result is the intersection of the shapes of the inputs.
 applyThese :: Join These (a -> b) -> Join These a -> Maybe (Join These b)
-applyThese fg ab = Join <$> runJoin fg `apThese` runJoin ab
+applyThese (Join fg) (Join ab) = fmap Join . uncurry maybeThese $ uncurry (***) (bimap (<*>) (<*>) (unpack fg)) (unpack ab)
+  where unpack = fromThese Nothing Nothing . bimap Just Just
 
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
@@ -125,11 +127,6 @@ maybeThese (Just a) (Just b) = Just (These a b)
 maybeThese (Just a) _ = Just (This a)
 maybeThese _ (Just b) = Just (That b)
 maybeThese _ _ = Nothing
-
--- | Like `<*>`, but it returns its result in `Maybe` since the result is the intersection of the shapes of the inputs.
-apThese :: These (a -> b) (c -> d) -> These a c -> Maybe (These b d)
-apThese fg ab = uncurry maybeThese $ uncurry (***) (bimap (<*>) (<*>) (unpack fg)) (unpack ab)
-  where unpack = fromThese Nothing Nothing . bimap Just Just
 
 -- | A Monoid wrapping These, for which mappend is the smallest shape covering both arguments.
 newtype Union a b = Union { getUnion :: Maybe (These a b) }
