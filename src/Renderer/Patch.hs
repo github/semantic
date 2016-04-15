@@ -33,11 +33,11 @@ patch diff blobs = pack $ case getLast (foldMap (Last . Just) string) of
   where string = header blobs ++ mconcat (showHunk blobs <$> hunks diff blobs)
 
 -- | A hunk in a patch, including the offset, changes, and context.
-data Hunk a = Hunk { offset :: Both (Sum Int), changes :: [Change a], trailingContext :: [Row a] }
+data Hunk a = Hunk { offset :: Both (Sum Int), changes :: [Change a], trailingContext :: [Join These a] }
   deriving (Eq, Show)
 
 -- | A change in a patch hunk, along with its preceding context.
-data Change a = Change { context :: [Row a], contents :: [Row a] }
+data Change a = Change { context :: [Join These a], contents :: [Join These a] }
   deriving (Eq, Show)
 
 -- | The number of lines in the hunk before and after.
@@ -49,7 +49,7 @@ changeLength :: Change a -> Both (Sum Int)
 changeLength change = mconcat $ (rowIncrement <$> context change) <> (rowIncrement <$> contents change)
 
 -- | The increment the given row implies for line numbering.
-rowIncrement :: Row a -> Both (Sum Int)
+rowIncrement :: Join These a -> Both (Sum Int)
 rowIncrement = Join . fromThese (Sum 0) (Sum 0) . runJoin . (Sum 1 <$)
 
 -- | Given the before and after sources, render a hunk to a string.
@@ -121,14 +121,14 @@ hunks diff blobs = hunksInRows (Join (1, 1)) $ alignDiff (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
-hunksInRows :: Both (Sum Int) -> [Row (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]
+hunksInRows :: Both (Sum Int) -> [Join These (SplitDiff a Info)] -> [Hunk (SplitDiff a Info)]
 hunksInRows start rows = case nextHunk start rows of
   Nothing -> []
   Just (hunk, rest) -> hunk : hunksInRows (offset hunk <> hunkLength hunk) rest
 
 -- | Given beginning line numbers, return the next hunk and the remaining rows
 -- | of the split diff.
-nextHunk :: Both (Sum Int) -> [Row (SplitDiff a Info)] -> Maybe (Hunk (SplitDiff a Info), [Row (SplitDiff a Info)])
+nextHunk :: Both (Sum Int) -> [Join These (SplitDiff a Info)] -> Maybe (Hunk (SplitDiff a Info), [Join These (SplitDiff a Info)])
 nextHunk start rows = case nextChange start rows of
   Nothing -> Nothing
   Just (offset, change, rest) -> let (changes, rest') = contiguousChanges rest in Just (Hunk offset (change : changes) $ take 3 rest', drop 3 rest')
@@ -140,7 +140,7 @@ nextHunk start rows = case nextChange start rows of
 
 -- | Given beginning line numbers, return the number of lines to the next
 -- | the next change, and the remaining rows of the split diff.
-nextChange :: Both (Sum Int) -> [Row (SplitDiff a Info)] -> Maybe (Both (Sum Int), Change (SplitDiff a Info), [Row (SplitDiff a Info)])
+nextChange :: Both (Sum Int) -> [Join These (SplitDiff a Info)] -> Maybe (Both (Sum Int), Change (SplitDiff a Info), [Join These (SplitDiff a Info)])
 nextChange start rows = case changeIncludingContext leadingContext afterLeadingContext of
   Nothing -> Nothing
   Just (change, afterChanges) -> Just (start <> mconcat (rowIncrement <$> skippedContext), change, afterChanges)
@@ -150,12 +150,12 @@ nextChange start rows = case changeIncludingContext leadingContext afterLeadingC
 -- | Return a Change with the given context and the rows from the begginning of
 -- | the given rows that have changes, or Nothing if the first row has no
 -- | changes.
-changeIncludingContext :: [Row (SplitDiff a Info)] -> [Row (SplitDiff a Info)] -> Maybe (Change (SplitDiff a Info), [Row (SplitDiff a Info)])
+changeIncludingContext :: [Join These (SplitDiff a Info)] -> [Join These (SplitDiff a Info)] -> Maybe (Change (SplitDiff a Info), [Join These (SplitDiff a Info)])
 changeIncludingContext leadingContext rows = case changes of
   [] -> Nothing
   _ -> Just (Change leadingContext changes, afterChanges)
   where (changes, afterChanges) = span rowHasChanges rows
 
 -- | Whether a row has changes on either side.
-rowHasChanges :: Row (SplitDiff a Info) -> Bool
+rowHasChanges :: Join These (SplitDiff a Info) -> Bool
 rowHasChanges row = or (hasChanges <$> row)
