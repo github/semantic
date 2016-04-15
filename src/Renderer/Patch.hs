@@ -8,6 +8,7 @@ module Renderer.Patch (
 import Alignment
 import Diff
 import Info
+import Patch
 import Prelude hiding (snd)
 import Renderer
 import Source hiding ((++), break)
