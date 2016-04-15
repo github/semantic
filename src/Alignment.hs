@@ -83,7 +83,7 @@ alignChildrenInRanges getRange ranges children
   , (thisLine, nextLines) <- foldr (\ (this, next) (these, nexts) -> (this : these, next ++ nexts)) ([], []) intersecting
   , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` Alignment.catThese (thisLine ++ nextLines)
   , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (Alignment.catThese thisLine))
-  , advance <- fromMaybe (drop 1, drop 1) $ fromThese id id . runJoin . (drop 1 <$) <$> listToMaybe nextLines
+  , advance <- fromThese id id . runJoin . (drop 1 <$) $ Alignment.catThese nextLines
   , (nextRanges, nextChildren, nextLines) <- alignChildrenInRanges getRange (modifyJoin (uncurry bimap advance) ranges) (nextLines : nonintersecting)
   = (nextRanges, nextChildren, merged : nextLines)
   | ([]:rest) <- children = alignChildrenInRanges getRange ranges rest
