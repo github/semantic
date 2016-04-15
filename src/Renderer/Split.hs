@@ -100,8 +100,8 @@ instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Ran
     Indexed children -> ul . mconcat $ wrapIn li <$> contentElements children
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements children
     Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements children
-    where markupForSeparatorAndChild :: ToMarkup f => (f, Range) -> ([Markup], Int) -> ([Markup], Int)
-          markupForSeparatorAndChild (child, range) (rows, next) = (string (toString $ slice (Range (start range) next) source) : toMarkup child : rows, end range)
+    where markupForContextAndChild :: ToMarkup f => (f, Range) -> ([Markup], Int) -> ([Markup], Int)
+          markupForContextAndChild (child, range) (rows, next) = (toMarkup child : string (toString (slice (Range (end range) next) source)) : rows, start range)
 
           wrapIn _ l@Blaze.Leaf{} = l
           wrapIn _ l@Blaze.CustomLeaf{} = l
@@ -109,8 +109,8 @@ instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Ran
           wrapIn _ l@Blaze.Comment{} = l
           wrapIn f p = f p
 
-          contentElements children = let (elements, previous) = foldr' markupForSeparatorAndChild ([], end range) children in
-            elements ++ [ string . toString $ slice (Range previous $ end range) source ]
+          contentElements children = let (elements, next) = foldr' markupForContextAndChild ([], end range) children in
+            string (toString (slice (Range (start range) (max next (start range))) source)) : elements
 
 instance ToMarkup (Renderable (Source Char, Term a Info)) where
   toMarkup (Renderable (source, term)) = Prelude.fst $ cata (\ info@(Info range _ _) syntax -> (toMarkup $ Renderable (source, info, syntax), range)) term
