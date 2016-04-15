@@ -96,7 +96,7 @@ spanAndSplitFirstLines pred = foldr go ([], [])
           | otherwise = (intersecting, nonintersecting)
 
 catThese :: [Join These a] -> Join These [a]
-catThese as = Join . fromMaybe (These [] []) . getUnion . mconcat $ Union . Just . runJoin . fmap pure <$> as
+catThese as = fromMaybe (Join (These [] [])) . getUnion . mconcat $ Union . Just . fmap pure <$> as
 
 pairRangesWithLine :: Monoid b => Join These a -> Join These b -> Join These (a, b)
 pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRanges) $ (,) <$> headRanges `applyThese` childLine
