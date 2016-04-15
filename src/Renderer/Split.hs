@@ -118,8 +118,8 @@ instance ToMarkup (Renderable (Source Char, Term a Info)) where
 instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
   toMarkup (Renderable (source, diff)) = Prelude.fst $ iter (\ (Annotated info@(Info range _ _) syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) $ toMarkupAndRange <$> diff
     where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
-          toMarkupAndRange patch = let term@(Info range _ _ :< _) = getSplitTerm patch in
-            ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue . show $ termSize term)) . toMarkup $ Renderable (source, term), range)
+          toMarkupAndRange patch = let term@(Info range _ size :< _) = getSplitTerm patch in
+            ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue (show size))) . toMarkup $ Renderable (source, term), range)
 
 
 instance ToMarkup a => ToMarkup (Renderable (Bool, Int, a)) where
