@@ -3,7 +3,6 @@ module Data.Bifunctor.These where
 import Data.Bifunctor
 import Data.Bifoldable
 import Data.Bitraversable
-import Control.Arrow
 
 data These a b = This a | That b | These a b
   deriving (Eq, Show)
@@ -18,25 +17,9 @@ these _ _ f (These this that) = f this that
 fromThese :: a -> b -> These a b -> (a, b)
 fromThese a b = these (flip (,) b) ((,) a) (,)
 
--- | Given a pair of Maybes, produce a These containing Just their values, or Nothing if they haven’t any.
-maybeThese :: Maybe a -> Maybe b -> Maybe (These a b)
-maybeThese (Just a) (Just b) = Just (These a b)
-maybeThese (Just a) _ = Just (This a)
-maybeThese _ (Just b) = Just (That b)
-maybeThese _ _ = Nothing
-
 
 mergeThese :: (a -> a -> a) -> These a a -> a
 mergeThese = these id id
-
--- | Like `<*>`, but it returns its result in `Maybe` since the result is the intersection of the shapes of the inputs.
-apThese :: These (a -> b) (c -> d) -> These a c -> Maybe (These b d)
-apThese fg ab = uncurry maybeThese $ uncurry (***) (bimap (<*>) (<*>) (unpack fg)) (unpack ab)
-  where unpack = fromThese Nothing Nothing . bimap Just Just
-
-
-newtype Union a b = Union { getUnion :: Maybe (These a b) }
-  deriving (Eq, Show)
 
 
 -- Instances
@@ -51,11 +34,3 @@ instance Bitraversable These where
   bitraverse f _ (This a) = This <$> f a
   bitraverse _ g (That b) = That <$> g b
   bitraverse f g (These a b) = These <$> f a <*> g b
-
-instance (Monoid a, Monoid b) => Monoid (Union a b) where
-  mempty = Union Nothing
-  Union (Just a) `mappend` Union (Just b) = Union $ uncurry maybeThese $ uncurry (***) (bimap mappend mappend (unpack a)) (unpack b)
-    where unpack = fromThese Nothing Nothing . bimap Just Just
-  Union (Just a) `mappend` _ = Union $ Just a
-  Union _ `mappend` Union (Just b) = Union $ Just b
-  _ `mappend` _ = Union Nothing

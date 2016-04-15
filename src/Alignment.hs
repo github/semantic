@@ -8,7 +8,7 @@ module Alignment
 , groupChildrenByLine
 ) where
 
-import Control.Arrow ((&&&))
+import Control.Arrow ((&&&), (***))
 import Control.Comonad.Cofree
 import Control.Monad
 import Control.Monad.Free
@@ -122,3 +122,27 @@ applyThese fg ab = Join <$> runJoin fg `apThese` runJoin ab
 
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
+
+-- | Given a pair of Maybes, produce a These containing Just their values, or Nothing if they haven’t any.
+maybeThese :: Maybe a -> Maybe b -> Maybe (These a b)
+maybeThese (Just a) (Just b) = Just (These a b)
+maybeThese (Just a) _ = Just (This a)
+maybeThese _ (Just b) = Just (That b)
+maybeThese _ _ = Nothing
+
+-- | Like `<*>`, but it returns its result in `Maybe` since the result is the intersection of the shapes of the inputs.
+apThese :: These (a -> b) (c -> d) -> These a c -> Maybe (These b d)
+apThese fg ab = uncurry maybeThese $ uncurry (***) (bimap (<*>) (<*>) (unpack fg)) (unpack ab)
+  where unpack = fromThese Nothing Nothing . bimap Just Just
+
+instance (Monoid a, Monoid b) => Monoid (Union a b) where
+  mempty = Union Nothing
+  Union (Just a) `mappend` Union (Just b) = Union $ uncurry maybeThese $ uncurry (***) (bimap mappend mappend (unpack a)) (unpack b)
+    where unpack = fromThese Nothing Nothing . bimap Just Just
+  Union (Just a) `mappend` _ = Union $ Just a
+  Union _ `mappend` Union (Just b) = Union $ Just b
+  _ `mappend` _ = Union Nothing
+
+
+newtype Union a b = Union { getUnion :: Maybe (These a b) }
+  deriving (Eq, Show)
