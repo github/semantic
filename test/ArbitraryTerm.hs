@@ -12,7 +12,6 @@ import qualified Data.Set as Set
 import Data.Text.Arbitrary ()
 import Diff
 import Info
-import Line
 import Patch
 import Prelude hiding (fst, snd)
 import Range
@@ -60,10 +59,6 @@ instance Arbitrary CategorySet where
 instance Arbitrary a => Arbitrary (Join (,) a) where
   arbitrary = both <$> arbitrary <*> arbitrary
   shrink b = both <$> shrink (fst b) <*> shrink (snd b)
-
-instance Arbitrary a => Arbitrary (Line a) where
-  arbitrary = oneof [ Line <$> arbitrary, Closed <$> arbitrary ]
-  shrink line = (`lineMap` line) . const <$> shrinkList shrink (unLine line)
 
 instance Arbitrary a => Arbitrary (Patch a) where
   arbitrary = oneof [
