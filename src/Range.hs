@@ -47,6 +47,7 @@ maybeLastIndex :: Range -> Maybe Int
 maybeLastIndex (Range start end) | start == end = Nothing
 maybeLastIndex (Range _ end) = Just $ end - 1
 
+-- | Test two ranges for intersection.
 intersectsRange :: Range -> Range -> Bool
 intersectsRange range1 range2 = end range2 <= end range1
 
