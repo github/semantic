@@ -102,6 +102,7 @@ catThese as = maybe (Join (These [] [])) Join $ getUnion $ mconcat $ Union . Jus
 pairRangesWithLine :: Monoid b => Join These a -> Join These b -> Join These (a, b)
 pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRanges) $ (,) <$> headRanges `applyThese` childLine
 
+-- | Test ranges and terms for intersection on either or both sides.
 intersects :: (term -> Range) -> Join These Range -> Join These term -> Join These Bool
 intersects getRange ranges line = fromMaybe (False <$ line) $ intersectsRange <$> ranges `applyThese` (getRange <$> line)
 
