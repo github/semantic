@@ -88,7 +88,7 @@ alignChildrenInRanges getRange ranges children
 spanAndSplitFirstLines :: (Join These a -> Join These Bool) -> [[Join These a]] -> ([(Join These a, [Join These a])], [[Join These a]])
 spanAndSplitFirstLines pred = foldr go ([], [])
   where go child (intersecting, nonintersecting)
-          | (first : rest) <- child = let ~(l, r) = split first in
+          | (first : rest) <- child = let ~(l, r) = splitThese first in
             case fromThese False False . runJoin $ pred first of
               (True, True) -> ((first, rest) : intersecting, nonintersecting)
               (True, False) -> ((head l, r ++ rest) : intersecting, nonintersecting)
@@ -109,8 +109,8 @@ intersectsRange :: Range -> Range -> Bool
 intersectsRange range1 range2 = end range2 <= end range1
 
 -- | Split a These value up into independent These values representing the left and right sides, if any.
-split :: Join These a -> ([Join These a], [Join These a])
-split these = fromThese [] [] $ bimap (pure . Join . This) (pure . Join . That) (runJoin these)
+splitThese :: Join These a -> ([Join These a], [Join These a])
+splitThese these = fromThese [] [] $ bimap (pure . Join . This) (pure . Join . That) (runJoin these)
 
 infixl 4 `applyThese`
 
