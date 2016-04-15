@@ -108,6 +108,7 @@ intersects getRange ranges line = fromMaybe (False <$ line) $ intersectsRange <$
 intersectsRange :: Range -> Range -> Bool
 intersectsRange range1 range2 = end range2 <= end range1
 
+-- | Split a These value up into independent These values representing the left and right sides, if any.
 split :: Join These a -> ([Join These a], [Join These a])
 split these = fromThese [] [] $ bimap (pure . Join . This) (pure . Join . That) (runJoin these)
 
