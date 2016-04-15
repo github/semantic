@@ -131,6 +131,7 @@ apThese :: These (a -> b) (c -> d) -> These a c -> Maybe (These b d)
 apThese fg ab = uncurry maybeThese $ uncurry (***) (bimap (<*>) (<*>) (unpack fg)) (unpack ab)
   where unpack = fromThese Nothing Nothing . bimap Just Just
 
+-- | A Monoid wrapping These, for which mappend is the smallest shape covering both arguments.
 newtype Union a b = Union { getUnion :: Maybe (These a b) }
   deriving (Eq, Show)
 
