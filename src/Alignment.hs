@@ -82,7 +82,6 @@ alignChildrenInRanges getRange ranges children
   , advance <- fromThese id id . runJoin . (drop 1 <$) $ Alignment.catThese nextLines
   , (nextRanges, nextChildren, nextLines) <- alignChildrenInRanges getRange (modifyJoin (uncurry bimap advance) ranges) (nextLines : nonintersecting)
   = (nextRanges, nextChildren, merged : nextLines)
-  | ([]:rest) <- children = alignChildrenInRanges getRange ranges rest
   | otherwise = ([] <$ ranges, children, fmap (flip (,) []) <$> sequenceL ranges)
 
 spanAndSplitFirstLines :: (Join These a -> Join These Bool) -> [[Join These a]] -> ([(Join These a, [Join These a])], [[Join These a]])
