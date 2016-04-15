@@ -2,7 +2,6 @@
 module Alignment
 ( hasChanges
 , numberedRows
-, Row
 , AlignedDiff
 , alignDiff
 , groupChildrenByLine
@@ -41,9 +40,6 @@ numberedRows = countUp (Join $ These 1 1)
 -- | Determine whether a line contains any patches.
 hasChanges :: SplitDiff leaf Info -> Bool
 hasChanges = or . (True <$)
-
--- | A row in a split diff, composed of a before line and an after line.
-type Row a = Join These a
 
 type AlignedDiff leaf = [Join These (SplitDiff leaf Info)]
 
