@@ -118,6 +118,7 @@ applyThese :: Join These (a -> b) -> Join These a -> Maybe (Join These b)
 applyThese (Join fg) (Join ab) = fmap Join . uncurry maybeThese $ uncurry (***) (bimap (<*>) (<*>) (unpack fg)) (unpack ab)
   where unpack = fromThese Nothing Nothing . bimap Just Just
 
+-- Map over the bifunctor inside a Join, producing another Join.
 modifyJoin :: (p a a -> q b b) -> Join p a -> Join q b
 modifyJoin f = Join . f . runJoin
 
