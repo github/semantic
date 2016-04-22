@@ -15,7 +15,6 @@ module Data.OrderedMap (
   ) where
 
 import Data.Functor.Alt
-import Data.Functor.Plus
 import qualified Data.Maybe as Maybe
 
 -- | An ordered map of keys and values.
@@ -75,6 +74,3 @@ instance Eq key => Monoid (OrderedMap key value) where
 
 instance Eq key => Alt (OrderedMap key) where
   (<!>) = union
-
-instance Eq key => Plus (OrderedMap key) where
-  zero = fromList []
