@@ -100,14 +100,6 @@ spec = parallel $ do
                       (info 4 5 `branch` [ info 4 5 `leaf` "c" ]))
         ]
 
-    where
-      isOnSingleLine (a, _, _) = filter (/= '\n') (toString a) == toString a
-
-      combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info <$> pure (Range start $ start + 1) <*> mempty <*> pure 1) (Leaf [ char ]) ], start + 1)
-
-      leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty <*> pure 1) (Leaf $ runBothWith (++) (toString <$> sources))
-      leafWithRangeInSource source range = Info range mempty 1 :< Leaf source
-
 branch :: annotation -> [Free (Annotated String annotation) patch] -> Free (Annotated String annotation) patch
 branch annotation = Free . Annotated annotation . Indexed
 
