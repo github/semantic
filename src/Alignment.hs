@@ -76,26 +76,25 @@ groupChildrenByLine getRange ranges children | not (and $ null <$> ranges)
 alignChildrenInRanges :: Foldable f => (term -> Range) -> Join These [Range] -> f [Join These term] -> (Join These [Range], [[Join These term]], [Join These (Range, [term])])
 alignChildrenInRanges getRange ranges children
   | Just headRanges <- sequenceL $ listToMaybe <$> ranges
-  , (intersecting, nonintersecting) <- spanAndSplitFirstLines (intersects getRange headRanges) children
-  , (thisLine, nextLines) <- foldr (\ (this, next) (these, nexts) -> (this : these, next ++ nexts)) ([], []) intersecting
-  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` unionThese (thisLine ++ nextLines)
+  , (thisLine, nextLines, nonintersecting) <- spanAndSplitFirstLines (intersects getRange headRanges) children
+  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` unionThese (join (thisLine : nextLines))
   , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (unionThese thisLine))
-  , advance <- fromThese id id . runJoin . (drop 1 <$) $ unionThese nextLines
-  , (nextRanges, nextChildren, nextLines) <- alignChildrenInRanges getRange (modifyJoin (uncurry bimap advance) ranges) (nextLines : nonintersecting)
+  , advance <- fromThese id id . runJoin . (drop 1 <$) $ unionThese (join nextLines)
+  , (nextRanges, nextChildren, nextLines) <- alignChildrenInRanges getRange (modifyJoin (uncurry bimap advance) ranges) (nextLines ++ nonintersecting)
   = (nextRanges, nextChildren, merged : nextLines)
   | otherwise = ([] <$ ranges, toList children, fmap (flip (,) []) <$> sequenceL ranges)
 
-spanAndSplitFirstLines :: Foldable f => (Join These a -> Join These Bool) -> f [Join These a] -> ([(Join These a, [Join These a])], [[Join These a]])
-spanAndSplitFirstLines pred = foldr go ([], [])
-  where go child (intersecting, nonintersecting)
+spanAndSplitFirstLines :: Foldable f => (Join These a -> Join These Bool) -> f [Join These a] -> ([Join These a], [[Join These a]], [[Join These a]])
+spanAndSplitFirstLines pred = foldr go ([], [], [])
+  where go child (this, next, nonintersecting)
           | (first : rest) <- child
           , ~(l, r) <- splitThese first
           = case fromThese False False . runJoin $ pred first of
-              (True, True) -> ((first, rest) : intersecting, nonintersecting)
-              (True, False) -> ((fromJust l, maybeToList r ++ rest) : intersecting, nonintersecting)
-              (False, True) -> ((fromJust r, maybeToList l ++ rest) : intersecting, nonintersecting)
-              _ -> (intersecting, child : nonintersecting)
-          | otherwise = (intersecting, nonintersecting)
+              (True, True) -> (first : this, rest : next, nonintersecting)
+              (True, False) -> (fromJust l : this, (maybeToList r ++ rest) : next, nonintersecting)
+              (False, True) -> (fromJust r : this, (maybeToList l ++ rest) : next, nonintersecting)
+              _ -> (this, next, child : nonintersecting)
+          | otherwise = (this, next, nonintersecting)
 
 unionThese :: (Alternative f, Foldable f, Monoid (f a)) => f (Join These a) -> Join These (f a)
 unionThese as = fromMaybe (Join (These empty empty)) . getUnion . fold $ Union . Just . fmap pure <$> as
