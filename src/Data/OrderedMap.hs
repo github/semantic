@@ -20,10 +20,6 @@ import qualified Data.Maybe as Maybe
 newtype OrderedMap key value = OrderedMap { toList :: [(key, value)] }
   deriving (Show, Eq, Functor, Foldable, Traversable)
 
-instance Eq key => Monoid (OrderedMap key value) where
-  mempty = fromList []
-  mappend = union
-
 -- | Construct an ordered map from a list of pairs of keys and values.
 fromList :: [(key, value)] -> OrderedMap key value
 fromList = OrderedMap
@@ -67,3 +63,10 @@ intersectionWith combine (OrderedMap a) (OrderedMap b) = OrderedMap $ a >>= (\ (
 difference :: Eq key => OrderedMap key a -> OrderedMap key b -> OrderedMap key a
 difference (OrderedMap a) (OrderedMap b) = OrderedMap $ filter ((`notElem` extant) . fst) a
   where extant = fst <$> b
+
+
+-- Instances
+
+instance Eq key => Monoid (OrderedMap key value) where
+  mempty = fromList []
+  mappend = union
