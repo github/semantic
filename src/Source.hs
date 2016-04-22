@@ -7,6 +7,7 @@ import qualified Data.Vector as Vector
 import Data.Word
 import Numeric
 import Range
+import Data.Maybe
 
 data SourceKind = PlainBlob Word32  | ExecutableBlob Word32 | SymlinkBlob Word32
   deriving (Show, Eq)
@@ -26,6 +27,16 @@ defaultPlainBlob = PlainBlob 0o100644
 -- | The contents of a source file, backed by a vector for efficient slicing.
 newtype Source a = Source { getVector :: Vector.Vector a  }
   deriving (Eq, Show, Foldable, Functor, Traversable)
+
+
+-- | Map blobs with Nothing blobKind to empty blobs.
+idOrEmptySourceBlob :: SourceBlob -> SourceBlob
+idOrEmptySourceBlob blob = if isNothing (Source.blobKind blob)
+                           then (blob { Source.oid = nullOid, Source.blobKind = Nothing })
+                           else blob
+
+nullOid :: String
+nullOid = "0000000000000000000000000000000000000000"
 
 -- | Return a Source from a list of items.
 fromList :: [a] -> Source a
