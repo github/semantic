@@ -94,7 +94,7 @@ spanAndSplitFirstLines pred = foldr go ([], [])
               (True, True) -> ((first, rest) : intersecting, nonintersecting)
               (True, False) -> ((fromJust l, maybeToList r ++ rest) : intersecting, nonintersecting)
               (False, True) -> ((fromJust r, maybeToList l ++ rest) : intersecting, nonintersecting)
-              _ -> (intersecting, (first : rest) : nonintersecting)
+              _ -> (intersecting, child : nonintersecting)
           | otherwise = (intersecting, nonintersecting)
 
 unionThese :: (Alternative f, Foldable f, Monoid (f a)) => f (Join These a) -> Join These (f a)
