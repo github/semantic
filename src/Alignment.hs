@@ -131,7 +131,7 @@ maybeThese _ _ = Nothing
 
 -- | A Monoid wrapping Join These, for which mappend is the smallest shape covering both arguments.
 newtype Union a = Union { getUnion :: Maybe (Join These a) }
-  deriving (Eq, Show)
+  deriving (Eq, Functor, Show)
 
 
 -- | Instances
