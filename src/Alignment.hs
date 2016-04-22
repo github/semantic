@@ -88,8 +88,9 @@ alignChildrenInRanges getRange ranges children
 spanAndSplitFirstLines :: Foldable f => (Join These a -> Join These Bool) -> f [Join These a] -> ([(Join These a, [Join These a])], [[Join These a]])
 spanAndSplitFirstLines pred = foldr go ([], [])
   where go child (intersecting, nonintersecting)
-          | (first : rest) <- child = let ~(l, r) = splitThese first in
-            case fromThese False False . runJoin $ pred first of
+          | (first : rest) <- child
+          , ~(l, r) <- splitThese first
+          = case fromThese False False . runJoin $ pred first of
               (True, True) -> ((first, rest) : intersecting, nonintersecting)
               (True, False) -> ((fromJust l, maybeToList r ++ rest) : intersecting, nonintersecting)
               (False, True) -> ((fromJust r, maybeToList l ++ rest) : intersecting, nonintersecting)
