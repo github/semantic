@@ -14,6 +14,7 @@ module Data.OrderedMap (
   , difference
   ) where
 
+import Data.Functor.Alt
 import qualified Data.Maybe as Maybe
 
 -- | An ordered map of keys and values.
@@ -70,3 +71,6 @@ difference (OrderedMap a) (OrderedMap b) = OrderedMap $ filter ((`notElem` extan
 instance Eq key => Monoid (OrderedMap key value) where
   mempty = fromList []
   mappend = union
+
+instance Eq key => Alt (OrderedMap key) where
+  (<!>) = union
