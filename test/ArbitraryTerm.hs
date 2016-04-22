@@ -10,7 +10,6 @@ import qualified Data.OrderedMap as Map
 import qualified Data.List as List
 import qualified Data.Set as Set
 import Data.Text.Arbitrary ()
-import Diff
 import Info
 import Patch
 import Prelude hiding (fst, snd)
