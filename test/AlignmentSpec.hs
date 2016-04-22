@@ -1,13 +1,9 @@
 module AlignmentSpec where
 
 import Test.Hspec
-import Test.Hspec.QuickCheck
-import Test.QuickCheck hiding (Fixed)
 import Data.Text.Arbitrary ()
 
 import Alignment
-import ArbitraryTerm (arbitraryLeaf)
-import Control.Arrow
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Bifunctor.Join
@@ -18,9 +14,7 @@ import Diff
 import Info
 import Patch
 import Prelude hiding (fst, snd)
-import qualified Prelude
 import Range
-import Source hiding ((++), fromList)
 import qualified Source
 import SplitDiff
 import Syntax
