@@ -91,8 +91,8 @@ spanAndSplitFirstLines pred = foldr go ([], [], [])
           , ~(l, r) <- splitThese first
           = case fromThese False False . runJoin $ pred first of
               (True, True) -> (first : this, rest : next, nonintersecting)
-              (True, False) -> (fromJust l : this, (maybeToList r ++ rest) : next, nonintersecting)
-              (False, True) -> (fromJust r : this, (maybeToList l ++ rest) : next, nonintersecting)
+              (True, False) -> (fromJust l : this, maybe rest (: rest) r : next, nonintersecting)
+              (False, True) -> (fromJust r : this, maybe rest (: rest) l : next, nonintersecting)
               _ -> (this, next, child : nonintersecting)
           | otherwise = (this, next, nonintersecting)
 
