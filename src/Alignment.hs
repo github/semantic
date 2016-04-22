@@ -21,6 +21,7 @@ import Data.Functor.Both as Both
 import Data.Functor.Identity
 import Data.Maybe
 import Data.Monoid
+import qualified Data.OrderedMap as Map
 import Data.These
 import Diff
 import Info
@@ -61,38 +62,38 @@ alignPatch sources patch = case patch of
 alignSyntax :: Applicative f => (forall a. f a -> Join These a) -> (Info -> Syntax leaf term -> term) -> (term -> Range) -> f (Source Char) -> f Info -> Syntax leaf [Join These term] -> [Join These term]
 alignSyntax toJoinThese toNode getRange sources infos syntax = case syntax of
   Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> sequenceL lineRanges
-  Indexed children -> catMaybes $ wrapInBranch Indexed <$> groupChildrenByLine getRange lineRanges children
-  Fixed children -> catMaybes $ wrapInBranch Fixed <$> groupChildrenByLine getRange lineRanges children
-  Keyed children -> catMaybes $ wrapInBranch Fixed <$> groupChildrenByLine getRange lineRanges children
+  Indexed children -> catMaybes $ wrapInBranch Indexed <$> groupChildrenByLine getRange lineRanges (Identity <$> children)
+  Fixed children -> catMaybes $ wrapInBranch Fixed <$> groupChildrenByLine getRange lineRanges (Identity <$> children)
+  Keyed children -> catMaybes $ wrapInBranch Fixed <$> groupChildrenByLine getRange lineRanges (Map.toList children)
   where lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
         wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (info { characterRange = range }) (constructor children)) <$> infos)
 
-groupChildrenByLine :: Foldable f => (term -> Range) -> Join These [Range] -> f [Join These term] -> [Join These (Range, [term])]
+groupChildrenByLine :: (Copointed c, Functor c, Foldable f) => (term -> Range) -> Join These [Range] -> f (c [Join These term]) -> [Join These (Range, [term])]
 groupChildrenByLine getRange ranges children | not (and $ null <$> ranges)
                                              , (nextRanges, nextChildren, lines) <- alignChildrenInRanges getRange ranges children
                                              = lines ++ groupChildrenByLine getRange nextRanges nextChildren
                                              | otherwise = []
 
-alignChildrenInRanges :: Foldable f => (term -> Range) -> Join These [Range] -> f [Join These term] -> (Join These [Range], [[Join These term]], [Join These (Range, [term])])
+alignChildrenInRanges :: (Copointed c, Functor c, Foldable f) => (term -> Range) -> Join These [Range] -> f (c [Join These term]) -> (Join These [Range], [c [Join These term]], [Join These (Range, [term])])
 alignChildrenInRanges getRange ranges children
   | Just headRanges <- sequenceL $ listToMaybe <$> ranges
   , (thisLine, nextLines, nonintersecting) <- spanAndSplitFirstLines (intersects getRange headRanges) children
-  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` unionThese (join (thisLine : nextLines))
-  , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (unionThese thisLine))
-  , advance <- fromThese id id . runJoin . (drop 1 <$) $ unionThese (join nextLines)
+  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` unionThese ((copoint <$> thisLine) ++ (nextLines >>= copoint))
+  , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (unionThese (copoint <$> thisLine)))
+  , advance <- fromThese id id . runJoin . (drop 1 <$) $ unionThese (nextLines >>= copoint)
   , (nextRanges, nextChildren, nextLines) <- alignChildrenInRanges getRange (modifyJoin (uncurry bimap advance) ranges) (nextLines ++ nonintersecting)
   = (nextRanges, nextChildren, merged : nextLines)
   | otherwise = ([] <$ ranges, toList children, fmap (flip (,) []) <$> sequenceL ranges)
 
-spanAndSplitFirstLines :: Foldable f => (Join These a -> Join These Bool) -> f [Join These a] -> ([Join These a], [[Join These a]], [[Join These a]])
-spanAndSplitFirstLines pred = foldr go ([], [], [])
-  where go child (this, next, nonintersecting)
-          | (first : rest) <- child
+spanAndSplitFirstLines :: (Copointed c, Functor c, Foldable f) => (Join These a -> Join These Bool) -> f (c [Join These a]) -> ([c (Join These a)], [c [Join These a]], [c [Join These a]])
+spanAndSplitFirstLines pred = foldr (go pred) ([], [], [])
+  where go pred child (this, next, nonintersecting)
+          | (first : rest) <- copoint child
           , ~(l, r) <- splitThese first
           = case fromThese False False . runJoin $ pred first of
-              (True, True) -> (first : this, rest : next, nonintersecting)
-              (True, False) -> (fromJust l : this, maybe rest (: rest) r : next, nonintersecting)
-              (False, True) -> (fromJust r : this, maybe rest (: rest) l : next, nonintersecting)
+              (True, True) -> ((first <$ child) : this, (rest <$ child) : next, nonintersecting)
+              (True, False) -> ((fromJust l <$ child) : this, (maybe rest (: rest) r <$ child) : next, nonintersecting)
+              (False, True) -> ((fromJust r <$ child) : this, (maybe rest (: rest) l <$ child) : next, nonintersecting)
               _ -> (this, next, child : nonintersecting)
           | otherwise = (this, next, nonintersecting)
 

@@ -29,16 +29,16 @@ spec :: Spec
 spec = parallel $ do
   describe "groupChildrenByLine" $ do
     it "produces symmetrical context" $
-      groupChildrenByLine getRange (Join (These [Range 0 2, Range 2 4] [Range 0 2, Range 2 4])) [] `shouldBe`
-        [ Join (These (Range 0 2, [] :: [SplitDiff String Info])
+      groupChildrenByLine getRange (Join (These [Range 0 2, Range 2 4] [Range 0 2, Range 2 4])) ([] :: [Identity [Join These (SplitDiff String Info)]]) `shouldBe`
+        [ Join (These (Range 0 2, [])
                       (Range 0 2, []))
         , Join (These (Range 2 4, [])
                       (Range 2 4, []))
         ]
 
     it "produces asymmetrical context" $
-      groupChildrenByLine getRange (Join (These [Range 0 2, Range 2 4] [Range 0 1])) [] `shouldBe`
-        [ Join (These (Range 0 2, [] :: [SplitDiff String Info])
+      groupChildrenByLine getRange (Join (These [Range 0 2, Range 2 4] [Range 0 1])) ([] :: [Identity [Join These (SplitDiff String Info)]]) `shouldBe`
+        [ Join (These (Range 0 2, [])
                       (Range 0 1, []))
         , Join (This  (Range 2 4, []))
         ]
