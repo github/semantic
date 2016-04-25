@@ -17,6 +17,7 @@ import Data.Biapplicative
 import Data.Bifunctor.Join
 import Data.Copointed
 import Data.Foldable
+import Data.Function
 import Data.Functor.Both as Both
 import Data.Functor.Identity
 import Data.Maybe
@@ -62,24 +63,24 @@ alignPatch sources patch = case patch of
 alignSyntax :: Applicative f => (forall a. f a -> Join These a) -> (Info -> Syntax leaf term -> term) -> (term -> Range) -> f (Source Char) -> f Info -> Syntax leaf [Join These term] -> [Join These term]
 alignSyntax toJoinThese toNode getRange sources infos syntax = case syntax of
   Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> sequenceL lineRanges
-  Indexed children -> catMaybes $ wrapInBranch Indexed <$> groupChildrenByLine getRange lineRanges (Identity <$> children)
-  Fixed children -> catMaybes $ wrapInBranch Fixed <$> groupChildrenByLine getRange lineRanges (Identity <$> children)
-  Keyed children -> catMaybes $ wrapInBranch Fixed <$> groupChildrenByLine getRange lineRanges (Map.toList children)
+  Indexed children -> catMaybes $ wrapInBranch (Indexed . fmap runIdentity) <$> groupChildrenByLine getRange lineRanges (Identity <$> children)
+  Fixed children -> catMaybes $ wrapInBranch (Fixed . fmap runIdentity) <$> groupChildrenByLine getRange lineRanges (Identity <$> children)
+  Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> groupChildrenByLine getRange lineRanges (Map.toList children)
   where lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
         wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (info { characterRange = range }) (constructor children)) <$> infos)
 
-groupChildrenByLine :: (Copointed c, Functor c, Foldable f) => (term -> Range) -> Join These [Range] -> f (c [Join These term]) -> [Join These (Range, [term])]
+groupChildrenByLine :: (Copointed c, Functor c, Foldable f) => (term -> Range) -> Join These [Range] -> f (c [Join These term]) -> [Join These (Range, [c term])]
 groupChildrenByLine getRange ranges children | not (and $ null <$> ranges)
                                              , (nextRanges, nextChildren, lines) <- alignChildrenInRanges getRange ranges children
                                              = lines ++ groupChildrenByLine getRange nextRanges nextChildren
                                              | otherwise = []
 
-alignChildrenInRanges :: (Copointed c, Functor c, Foldable f) => (term -> Range) -> Join These [Range] -> f (c [Join These term]) -> (Join These [Range], [c [Join These term]], [Join These (Range, [term])])
+alignChildrenInRanges :: (Copointed c, Functor c, Foldable f) => (term -> Range) -> Join These [Range] -> f (c [Join These term]) -> (Join These [Range], [c [Join These term]], [Join These (Range, [c term])])
 alignChildrenInRanges getRange ranges children
   | Just headRanges <- sequenceL $ listToMaybe <$> ranges
   , (thisLine, nextLines, nonintersecting) <- spanAndSplitFirstLines (intersects getRange headRanges) children
-  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` unionThese ((copoint <$> thisLine) ++ (nextLines >>= copoint))
-  , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (unionThese (copoint <$> thisLine)))
+  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` unionThese (invertEmbedding <$> thisLine) -- handle nextLines again
+  , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (unionThese (invertEmbedding <$> thisLine)))
   , advance <- fromThese id id . runJoin . (drop 1 <$) $ unionThese (nextLines >>= copoint)
   , (nextRanges, nextChildren, nextLines) <- alignChildrenInRanges getRange (modifyJoin (uncurry bimap advance) ranges) (nextLines ++ nonintersecting)
   = (nextRanges, nextChildren, merged : nextLines)
