@@ -113,8 +113,7 @@ data PrettyDiff = PrettyDiff { unPrettySources :: Both (Source.Source Char), unP
 instance Show PrettyDiff where
   show (PrettyDiff sources lines) = showLine (fromMaybe 0 (maximum (fmap length <$> shownLines))) <$> catMaybes shownLines >>= ('\n':)
     where shownLines = toBoth <$> lines
-          showLine n line = let (before, after) = fromThese (replicate n ' ') (replicate n ' ') (runJoin (pad n <$> line)) in
-            before ++ " | " ++ after
+          showLine n line = uncurry ((++) . (++ " | ")) (fromThese (replicate n ' ') (replicate n ' ') (runJoin (pad n <$> line)))
           showDiff diff = filter (/= '\n') . toList . Source.slice (getRange diff)
           pad n string = showString (take n string) (replicate (max 0 (n - length string)) ' ')
           toBoth them = showDiff <$> them `applyThese` modifyJoin (uncurry These) sources
