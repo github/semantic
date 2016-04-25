@@ -116,9 +116,9 @@ instance Eq PrettyDiff where
 instance Show PrettyDiff where
   show (PrettyDiff sources lines) = intercalate "\n" (showLine 40 <$> lines)
     where showLine n line = case runJoin line of
-            This before -> pad n (showDiff (fst sources) before) " | "
-            That after -> showString (replicate n ' ') (showString " | " (showDiff (snd sources) after))
-            These before after -> pad n (showDiff (fst sources) before) (showString " | " (showDiff (snd sources) after))
-          showDiff source diff = toList (stripNewlines (Source.slice (getRange diff) source))
+            This before -> pad n (showDiff before (fst sources)) " | "
+            That after -> showString (replicate n ' ') (showString " | " (showDiff after (snd sources)))
+            These before after -> pad n (showDiff before (fst sources)) (showString " | " (showDiff after (snd sources)))
+          showDiff diff = toList . stripNewlines . Source.slice (getRange diff)
           stripNewlines = fmap (\ c -> if c == '\n' then ' ' else c)
           pad n string = showString string . showString (replicate (max 0 (n - length string)) ' ')
