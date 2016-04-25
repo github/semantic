@@ -5,6 +5,8 @@ module Alignment
 , AlignedDiff
 , alignDiff
 , groupChildrenByLine
+, applyThese
+, modifyJoin
 ) where
 
 import Control.Applicative
