@@ -110,7 +110,7 @@ data PrettyDiff = PrettyDiff (Source.Source Char) [Join These (SplitDiff String 
 instance Show PrettyDiff where
   show (PrettyDiff source lines) = intercalate "\n" (showLine <$> lines)
     where showLine line = case runJoin line of
-            This before -> showDiff before
-            That after -> showString (replicate 40 ' ') (showString " | " (showDiff after))
-            These before after -> showDiff before ++ showString " | " (showDiff after)
-          showDiff diff = toList (Source.slice (getRange diff) source)
+            This before -> showDiff before source
+            That after -> showString (replicate 40 ' ') (showString " | " (showDiff after source))
+            These before after -> showDiff before source ++ showString " | " (showDiff after source)
+          showDiff diff = toList . Source.slice (getRange diff)
