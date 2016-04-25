@@ -4,7 +4,6 @@ module Data.Functor.Both where
 import Data.Bifunctor
 import Data.Bifunctor.Join
 import Data.These
-import Data.Maybe
 import Prelude hiding (zipWith, fst, snd)
 import qualified Prelude
 
@@ -14,10 +13,6 @@ type Both a = Join (,) a
 -- | Given two operands returns a functor operating on `Both`. This is a curried synonym for Both.
 both :: a -> a -> Both a
 both = curry Join
-
--- | Construct Both (Maybe) with These values, defaulting to Nothing.
-maybeBothOfThese :: These a a -> Both (Maybe a)
-maybeBothOfThese = Join . fromThese Nothing Nothing . bimap Just Just
 
 -- | Pairs either or both elements of These with the corresponding elements of Both.
 -- |
