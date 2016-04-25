@@ -129,6 +129,10 @@ maybeThese (Just a) _ = Just (This a)
 maybeThese _ (Just b) = Just (That b)
 maybeThese _ _ = Nothing
 
+invertEmbedding :: (Copointed c, Functor c) => c (Join These a) -> Join These (c a)
+invertEmbedding c = modifyJoin (these (This . put) (That . put) (These `on` put)) (copoint c)
+  where put = (<$ c)
+
 -- | A Monoid wrapping Join These, for which mappend is the smallest shape covering both arguments.
 newtype Union a = Union { getUnion :: Maybe (Join These a) }
   deriving (Eq, Functor, Show)
