@@ -122,3 +122,4 @@ instance Show PrettyDiff where
           showDiff diff = toList . stripNewlines . Source.slice (getRange diff)
           stripNewlines = fmap (\ c -> if c == '\n' then ' ' else c)
           pad n string = showString (take n string) . showString (replicate (max 0 (n - length string)) ' ')
+          toBoth them = (uncurry both . fromThese (const (repeat ' ')) (const (repeat ' ')) . runJoin $ showDiff <$> them) <*> sources
