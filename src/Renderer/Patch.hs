@@ -62,13 +62,13 @@ showHunk blobs hunk = maybeOffsetHeader ++
                             then offsetHeader
                             else mempty
         offsetHeader = "@@ -" ++ offsetA ++ "," ++ show lengthA ++ " +" ++ offsetB ++ "," ++ show lengthB ++ " @@" ++ "\n"
-        (lengthA, lengthB) = runBoth . fmap getSum $ hunkLength hunk
-        (offsetA, offsetB) = runBoth . fmap (show . getSum) $ offset hunk
+        (lengthA, lengthB) = runJoin . fmap getSum $ hunkLength hunk
+        (offsetA, offsetB) = runJoin . fmap (show . getSum) $ offset hunk
 
 -- | Given the before and after sources, render a change to a string.
 showChange :: Both (Source Char) -> Change (SplitDiff a Info) -> String
 showChange sources change = showLines (snd sources) ' ' (maybeSnd . runJoin <$> context change) ++ deleted ++ inserted
-  where (deleted, inserted) = runBoth $ pure showLines <*> sources <*> both '-' '+' <*> Join (unzip (fromThese Nothing Nothing . runJoin . fmap Just <$> contents change))
+  where (deleted, inserted) = runJoin $ pure showLines <*> sources <*> both '-' '+' <*> Join (unzip (fromThese Nothing Nothing . runJoin . fmap Just <$> contents change))
 
 -- | Given a source, render a set of lines to a string with a prefix.
 showLines :: Source Char -> Char -> [Maybe (SplitDiff leaf Info)] -> String
@@ -102,9 +102,9 @@ header blobs = intercalate "\n" [filepathHeader, fileModeHeader, beforeFilepath,
            Nothing -> "/dev/null"
         beforeFilepath = "--- " ++ modeHeader "a" modeA pathA
         afterFilepath = "+++ " ++ modeHeader "b" modeB pathB
-        (pathA, pathB) = runBoth $ path <$> blobs
-        (oidA, oidB) = runBoth $ oid <$> blobs
-        (modeA, modeB) = runBoth $ blobKind <$> blobs
+        (pathA, pathB) = runJoin $ path <$> blobs
+        (oidA, oidB) = runJoin $ oid <$> blobs
+        (modeA, modeB) = runJoin $ blobKind <$> blobs
 
 -- | A hunk representing no changes.
 emptyHunk :: Hunk (SplitDiff a Info)
