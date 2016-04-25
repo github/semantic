@@ -134,8 +134,7 @@ maybeThese _ _ = Nothing
 --
 -- This allows us to preserve any associated state while embedding the contents of the other functor into it.
 distribute :: (Copointed c, Functor c, Functor f) => c (f a) -> f (c a)
-distribute c = put <$> copoint c
-  where put = (<$ c)
+distribute c = (<$ c) <$> copoint c
 
 -- | A Monoid wrapping Join These, for which mappend is the smallest shape covering both arguments.
 newtype Union a = Union { getUnion :: Maybe (Join These a) }
