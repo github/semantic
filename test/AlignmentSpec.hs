@@ -118,7 +118,7 @@ instance Show PrettyDiff where
     where showLine n line = case runJoin line of
             This before -> pad n (showDiff before (fst sources)) " | "
             That after -> showString (replicate n ' ') (showString " | " (showDiff after (snd sources)))
-            These before after -> showDiff before (fst sources) ++ showString " | " (showDiff after (snd sources))
+            These before after -> pad n (showDiff before (fst sources)) (showString " | " (showDiff after (snd sources)))
           showDiff diff = toList . stripNewlines . Source.slice (getRange diff)
           stripNewlines = fmap (\ c -> if c == '\n' then ' ' else c)
           pad n string = showString string . showString (replicate (max 0 (n - length string)) ' ')
