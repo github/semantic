@@ -79,8 +79,8 @@ alignChildrenInRanges :: (Copointed c, Functor c, Foldable f) => (term -> Range)
 alignChildrenInRanges getRange ranges children
   | Just headRanges <- sequenceL $ listToMaybe <$> ranges
   , (thisLine, nextLines, nonintersecting) <- spanAndSplitFirstLines (intersects getRange headRanges) children
-  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` unionThese (invertEmbedding <$> thisLine) -- handle nextLines again
-  , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (unionThese (invertEmbedding <$> thisLine)))
+  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` unionThese (distribute <$> thisLine) -- handle nextLines again
+  , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (unionThese (distribute <$> thisLine)))
   , advance <- fromThese id id . runJoin . (drop 1 <$) $ unionThese (nextLines >>= copoint)
   , (nextRanges, nextChildren, nextLines) <- alignChildrenInRanges getRange (modifyJoin (uncurry bimap advance) ranges) (nextLines ++ nonintersecting)
   = (nextRanges, nextChildren, merged : nextLines)
@@ -130,8 +130,8 @@ maybeThese (Just a) _ = Just (This a)
 maybeThese _ (Just b) = Just (That b)
 maybeThese _ _ = Nothing
 
-invertEmbedding :: (Copointed c, Functor c) => c (Join These a) -> Join These (c a)
-invertEmbedding c = modifyJoin (these (This . put) (That . put) (These `on` put)) (copoint c)
+distribute :: (Copointed c, Functor c) => c (Join These a) -> Join These (c a)
+distribute c = modifyJoin (these (This . put) (That . put) (These `on` put)) (copoint c)
   where put = (<$ c)
 
 -- | A Monoid wrapping Join These, for which mappend is the smallest shape covering both arguments.
