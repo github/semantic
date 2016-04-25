@@ -8,10 +8,8 @@ import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Bifunctor.Join
 import Data.Foldable (toList)
-import Data.Function (on)
 import Data.Functor.Both as Both
 import Data.Functor.Identity
-import Data.List (intercalate)
 import Data.Maybe (catMaybes, fromMaybe)
 import Data.These
 import Diff
@@ -110,9 +108,7 @@ info :: Int -> Int -> Info
 info = ((\ r -> Info r mempty 0) .) . Range
 
 data PrettyDiff = PrettyDiff { unPrettySources :: Both (Source.Source Char), unPrettyLines :: [Join These (SplitDiff String Info)] }
-
-instance Eq PrettyDiff where
-  (==) = (==) `on` unPrettyLines
+  deriving Eq
 
 instance Show PrettyDiff where
   show (PrettyDiff sources lines) = ('\n':) =<< (showLine (fromMaybe 0 (maximum (fmap length <$> shownLines))) <$> catMaybes shownLines)
