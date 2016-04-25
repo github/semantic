@@ -102,3 +102,5 @@ leaf info = Free . Annotated info . Leaf
 
 info :: Int -> Int -> Info
 info = ((\ r -> Info r mempty 0) .) . Range
+
+newtype PrettyDiff = PrettyDiff { unPrettyDiff :: Join These [SplitDiff String Info] }
