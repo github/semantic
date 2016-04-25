@@ -121,7 +121,7 @@ instance Show PrettyDiff where
             This before -> pad n before " | "
             That after -> showString (replicate n ' ') (showString " | " after)
             These before after -> pad n before (showString " | " after)
-          showDiff diff = toList . stripNewlines . Source.slice (getRange diff)
-          stripNewlines = fmap (\ c -> if c == '\n' then ' ' else c)
+          showDiff diff = stripNewlines . toList . Source.slice (getRange diff)
+          stripNewlines = filter (/= '\n')
           pad n string = showString (take n string) . showString (replicate (max 0 (n - length string)) ' ')
           toBoth them = showDiff <$> them `applyThese` modifyJoin (uncurry These) sources
