@@ -105,12 +105,12 @@ leaf info = Free . Annotated info . Leaf
 info :: Int -> Int -> Info
 info = ((\ r -> Info r mempty 0) .) . Range
 
-data PrettyDiff = PrettyDiff (Source.Source Char) [Join These (SplitDiff String Info)]
+data PrettyDiff = PrettyDiff (Both (Source.Source Char)) [Join These (SplitDiff String Info)]
 
 instance Show PrettyDiff where
-  show (PrettyDiff source lines) = intercalate "\n" (showLine <$> lines)
+  show (PrettyDiff sources lines) = intercalate "\n" (showLine <$> lines)
     where showLine line = case runJoin line of
-            This before -> showDiff before source
-            That after -> showString (replicate 40 ' ') (showString " | " (showDiff after source))
-            These before after -> showDiff before source ++ showString " | " (showDiff after source)
+            This before -> showDiff before (fst sources)
+            That after -> showString (replicate 40 ' ') (showString " | " (showDiff after (snd sources)))
+            These before after -> showDiff before (fst sources) ++ showString " | " (showDiff after (snd sources))
           showDiff diff = toList . Source.slice (getRange diff)
