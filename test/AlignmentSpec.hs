@@ -115,7 +115,6 @@ instance Show PrettyDiff where
     where shownLines = toBoth <$> lines
           showLine n line = let (before, after) = fromThese (replicate n ' ') (replicate n ' ') (runJoin (pad n <$> line)) in
             before ++ " | " ++ after
-          showDiff diff = stripNewlines . toList . Source.slice (getRange diff)
-          stripNewlines = filter (/= '\n')
+          showDiff diff = filter (/= '\n') . toList . Source.slice (getRange diff)
           pad n string = showString (take n string) (showString (replicate (max 0 (n - length string)) ' ') "")
           toBoth them = showDiff <$> them `applyThese` modifyJoin (uncurry These) sources
