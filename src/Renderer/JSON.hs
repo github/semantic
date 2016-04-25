@@ -62,7 +62,7 @@ instance ToJSON (Term leaf Info) where
 
 lineFields :: KeyValue kv => Int -> SplitDiff leaf Info -> Range -> [kv]
 lineFields n term range = [ "number" .= n
-                          , "terms" .= term
+                          , "terms" .= [ term ]
                           , "range" .= range
                           , "hasChanges" .= hasChanges term
                           ]
