@@ -12,7 +12,7 @@ import Data.Function (on)
 import Data.Functor.Both as Both
 import Data.Functor.Identity
 import Data.List (intercalate)
-import Data.Maybe (catMaybes)
+import Data.Maybe (catMaybes, fromMaybe)
 import Data.These
 import Diff
 import Info
@@ -115,7 +115,7 @@ instance Eq PrettyDiff where
   (==) = (==) `on` unPrettyLines
 
 instance Show PrettyDiff where
-  show (PrettyDiff sources lines) = intercalate "\n" (showLine 40 <$> catMaybes shownLines)
+  show (PrettyDiff sources lines) = intercalate "\n" (showLine (fromMaybe 0 (maximum (fmap length <$> shownLines))) <$> catMaybes shownLines)
     where shownLines = toBoth <$> lines
           showLine n line = case runJoin line of
             This before -> pad n before " | "
