@@ -130,10 +130,10 @@ maybeThese (Just a) _ = Just (This a)
 maybeThese _ (Just b) = Just (That b)
 maybeThese _ _ = Nothing
 
--- Distributes a copointed functor through `Join These`.
+-- Distributes a copointed functor through another functor.
 --
--- This allows us to preserve any associated state while embedding the contents of the `Join These` into it.
-distribute :: (Copointed c, Functor c) => c (Join These a) -> Join These (c a)
+-- This allows us to preserve any associated state while embedding the contents of the other functor into it.
+distribute :: (Copointed c, Functor c, Functor f) => c (f a) -> f (c a)
 distribute c = put <$> copoint c
   where put = (<$ c)
 
