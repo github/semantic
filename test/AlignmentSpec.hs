@@ -106,7 +106,7 @@ leaf info = Free . Annotated info . Leaf
 info :: Int -> Int -> Info
 info = ((\ r -> Info r mempty 0) .) . Range
 
-data PrettyDiff = PrettyDiff (Both (Source.Source Char)) [Join These (SplitDiff String Info)]
+data PrettyDiff = PrettyDiff { unPrettySources :: Both (Source.Source Char), unPrettyLines :: [Join These (SplitDiff String Info)] }
 
 instance Show PrettyDiff where
   show (PrettyDiff sources lines) = intercalate "\n" (showLine <$> lines)
