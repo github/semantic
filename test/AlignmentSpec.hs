@@ -114,9 +114,9 @@ instance Eq PrettyDiff where
   (==) = (==) `on` unPrettyLines
 
 instance Show PrettyDiff where
-  show (PrettyDiff sources lines) = intercalate "\n" (showLine <$> lines)
-    where showLine line = case runJoin line of
+  show (PrettyDiff sources lines) = intercalate "\n" (showLine 40 <$> lines)
+    where showLine n line = case runJoin line of
             This before -> showDiff before (fst sources)
-            That after -> showString (replicate 40 ' ') (showString " | " (showDiff after (snd sources)))
+            That after -> showString (replicate n ' ') (showString " | " (showDiff after (snd sources)))
             These before after -> showDiff before (fst sources) ++ showString " | " (showDiff after (snd sources))
           showDiff diff = toList . Source.slice (getRange diff)
