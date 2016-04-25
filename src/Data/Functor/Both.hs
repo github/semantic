@@ -14,12 +14,6 @@ type Both a = Join (,) a
 both :: a -> a -> Both a
 both = curry Join
 
--- | Pairs either or both elements of These with the corresponding elements of Both.
--- |
--- | This is a total operation which makes it easier to cope with the lack of an Applicative or Biapplicative instance for These.
-pairWithThese :: Both a -> These b c -> These (a, b) (a, c)
-pairWithThese = uncurry bimap . bimap (,) (,) . runBoth
-
 -- | Extract `Both` sides of a computation.
 runBoth :: Both a -> (a, a)
 runBoth = runJoin
