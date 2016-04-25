@@ -120,3 +120,4 @@ instance Show PrettyDiff where
             That after -> showString (replicate n ' ') (showString " | " (showDiff after (snd sources)))
             These before after -> showDiff before (fst sources) ++ showString " | " (showDiff after (snd sources))
           showDiff diff = toList . Source.slice (getRange diff)
+          stripNewlines = fmap (\ c -> if c == '\n' then ' ' else c)
