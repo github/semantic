@@ -116,7 +116,7 @@ instance Eq PrettyDiff where
 instance Show PrettyDiff where
   show (PrettyDiff sources lines) = intercalate "\n" (showLine 40 <$> lines)
     where showLine n line = case runJoin line of
-            This before -> let beforeString = showDiff before (fst sources) in beforeString ++ showString (replicate (max 0 (n - length beforeString)) ' ') " | "
+            This before -> pad n (showDiff before (fst sources)) " | "
             That after -> showString (replicate n ' ') (showString " | " (showDiff after (snd sources)))
             These before after -> showDiff before (fst sources) ++ showString " | " (showDiff after (snd sources))
           showDiff diff = toList . stripNewlines . Source.slice (getRange diff)
