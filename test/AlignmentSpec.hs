@@ -117,11 +117,9 @@ instance Eq PrettyDiff where
 instance Show PrettyDiff where
   show (PrettyDiff sources lines) = ('\n':) =<< (showLine (fromMaybe 0 (maximum (fmap length <$> shownLines))) <$> catMaybes shownLines)
     where shownLines = toBoth <$> lines
-          showLine n line = case runJoin line of
-            This before -> pad n before " | "
-            That after -> showString (replicate n ' ') (showString " | " after)
-            These before after -> pad n before (showString " | " after)
+          showLine n line = let (before, after) = fromThese (replicate n ' ') (replicate n ' ') (runJoin (pad n <$> line)) in
+            before ++ " | " ++ after
           showDiff diff = stripNewlines . toList . Source.slice (getRange diff)
           stripNewlines = filter (/= '\n')
-          pad n string = showString (take n string) . showString (replicate (max 0 (n - length string)) ' ')
+          pad n string = showString (take n string) (showString (replicate (max 0 (n - length string)) ' ') "")
           toBoth them = showDiff <$> them `applyThese` modifyJoin (uncurry These) sources
