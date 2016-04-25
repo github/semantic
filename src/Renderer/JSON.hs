@@ -34,8 +34,8 @@ json diff sources = toStrict . toLazyText . encodeToTextBuilder $ object ["rows"
 newtype NumberedLine a = NumberedLine (Int, a)
 
 instance ToJSON (NumberedLine (SplitDiff leaf Info)) where
-  toJSON (NumberedLine (n, a)) = object (lineFields n (a, getRange a))
-  toEncoding (NumberedLine (n, a)) = pairs $ mconcat (lineFields n (a, getRange a))
+  toJSON (NumberedLine (n, a)) = object (lineFields n a (getRange a))
+  toEncoding (NumberedLine (n, a)) = pairs $ mconcat (lineFields n a (getRange a))
 instance ToJSON Category where
   toJSON (Other s) = String $ T.pack s
   toJSON s = String . T.pack $ show s
@@ -60,12 +60,12 @@ instance ToJSON (Term leaf Info) where
   toJSON (info :< syntax) = object (termFields info syntax)
   toEncoding (info :< syntax) = pairs $ mconcat (termFields info syntax)
 
-lineFields :: KeyValue kv => Int -> (SplitDiff leaf Info, Range) -> [kv]
-lineFields n (term, range) = [ "number" .= n
-                             , "terms" .= term
-                             , "range" .= range
-                             , "hasChanges" .= hasChanges term
-                             ]
+lineFields :: KeyValue kv => Int -> SplitDiff leaf Info -> Range -> [kv]
+lineFields n term range = [ "number" .= n
+                          , "terms" .= term
+                          , "range" .= range
+                          , "hasChanges" .= hasChanges term
+                          ]
 
 termFields :: (ToJSON recur, KeyValue kv) => Info -> Syntax leaf recur -> [kv]
 termFields (Info range categories _) syntax = "range" .= range : "categories" .= categories : case syntax of
