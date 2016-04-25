@@ -115,8 +115,9 @@ instance Eq PrettyDiff where
   (==) = (==) `on` unPrettyLines
 
 instance Show PrettyDiff where
-  show (PrettyDiff sources lines) = let shownLines = toBoth <$> lines in intercalate "\n" (showLine 40 <$> catMaybes shownLines)
-    where showLine n line = case runJoin line of
+  show (PrettyDiff sources lines) = intercalate "\n" (showLine 40 <$> catMaybes shownLines)
+    where shownLines = toBoth <$> lines
+          showLine n line = case runJoin line of
             This before -> pad n before " | "
             That after -> showString (replicate n ' ') (showString " | " after)
             These before after -> pad n before (showString " | " after)
