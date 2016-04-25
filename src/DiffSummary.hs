@@ -26,8 +26,6 @@ patchSummary termSummary patch = maybe emptyDiffSummary termSummary beforeTerm <
 
 diffSummary :: Diff (Patch a) Info -> DiffSummary
 diffSummary = foldMap (patchSummary termSummary)
--- $ fmap (patchSummary termSummary) diff-- diffSum $ patchSummary diff
--- (a -> b -> b) -> b -> t a -> b
 
 termSummary :: Term (Patch a) Info -> DiffSummary
 termSummary = cata summary where
