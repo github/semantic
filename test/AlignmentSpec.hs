@@ -115,7 +115,7 @@ instance Eq PrettyDiff where
   (==) = (==) `on` unPrettyLines
 
 instance Show PrettyDiff where
-  show (PrettyDiff sources lines) = intercalate "\n" (showLine (fromMaybe 0 (maximum (fmap length <$> shownLines))) <$> catMaybes shownLines)
+  show (PrettyDiff sources lines) = ('\n':) =<< (showLine (fromMaybe 0 (maximum (fmap length <$> shownLines))) <$> catMaybes shownLines)
     where shownLines = toBoth <$> lines
           showLine n line = case runJoin line of
             This before -> pad n before " | "
