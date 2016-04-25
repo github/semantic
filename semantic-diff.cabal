@@ -47,6 +47,7 @@ library
                      , Syntax
                      , Term
                      , TreeSitter
+                     , DiffSummary
   build-depends:       aeson
                      , base >= 4.8 && < 5
                      , blaze-html
