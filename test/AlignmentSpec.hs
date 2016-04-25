@@ -7,8 +7,10 @@ import Alignment
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Bifunctor.Join
+import Data.Foldable (toList)
 import Data.Functor.Both as Both
 import Data.Functor.Identity
+import Data.List (intercalate)
 import Data.These
 import Diff
 import Info
@@ -104,3 +106,11 @@ info :: Int -> Int -> Info
 info = ((\ r -> Info r mempty 0) .) . Range
 
 data PrettyDiff = PrettyDiff (Source.Source Char) [Join These (SplitDiff String Info)]
+
+instance Show PrettyDiff where
+  show (PrettyDiff source lines) = intercalate "\n" (showLine <$> lines)
+    where showLine line = case runJoin line of
+            This before -> showDiff before
+            That after -> showString (replicate 40 ' ') (showString " | " (showDiff after))
+            These before after -> showDiff before ++ showString " | " (showDiff after)
+          showDiff diff = toList (Source.slice (getRange diff) source)
