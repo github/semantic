@@ -119,5 +119,5 @@ instance Show PrettyDiff where
             This before -> let beforeString = showDiff before (fst sources) in beforeString ++ showString (replicate (max 0 (min n (n - length beforeString))) ' ') " | "
             That after -> showString (replicate n ' ') (showString " | " (showDiff after (snd sources)))
             These before after -> showDiff before (fst sources) ++ showString " | " (showDiff after (snd sources))
-          showDiff diff = toList . Source.slice (getRange diff)
+          showDiff diff = toList . stripNewlines . Source.slice (getRange diff)
           stripNewlines = fmap (\ c -> if c == '\n' then ' ' else c)
