@@ -1,6 +1,7 @@
 module AlignmentSpec where
 
 import Alignment
+import ArbitraryTerm ()
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Align
@@ -22,6 +23,7 @@ import qualified Source
 import SplitDiff
 import Syntax
 import Test.Hspec
+import Test.Hspec.QuickCheck
 
 spec :: Spec
 spec = parallel $ do
@@ -99,6 +101,10 @@ spec = parallel $ do
         , Join (These (info 2 3 `branch` [ info 2 3 `leaf` "c" ])
                       (info 4 5 `branch` [ info 4 5 `leaf` "c" ]))
         ]
+
+  describe "numberedRows" $
+    prop "counts only non-empty values" $
+      \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
 
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
