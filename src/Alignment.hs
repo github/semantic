@@ -38,13 +38,9 @@ import Term
 
 -- | Assign line numbers to the lines on each side of a list of rows.
 numberedRows :: [Join These a] -> [Join These (Int, a)]
-numberedRows = countUp (Join (These 1 1))
-  where countUp from (row : rows) = fromJust ((,) <$> from `applyThese` row) : countUp (increment from row) rows
+numberedRows = countUp (both 1 1)
+  where countUp from (row : rows) = fromJust ((,) <$> modifyJoin (uncurry These) from `applyThese` row) : countUp (modifyJoin (fromThese id id) (succ <$ row) <*> from) rows
         countUp _ [] = []
-        increment :: Enum number => Join These number -> Join These b -> Join These number
-        increment from (Join (These _ _)) = succ <$> from
-        increment from (Join (This _)) = modifyJoin (first succ) from
-        increment from (Join (That _)) = modifyJoin (second succ) from
 
 -- | Determine whether a line contains any patches.
 hasChanges :: SplitDiff leaf Info -> Bool
