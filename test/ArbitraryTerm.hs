@@ -67,6 +67,10 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (These a b) where
                     , These <$> arbitrary <*> arbitrary ]
   shrink = these (fmap This . shrink) (fmap That . shrink) (\ a b -> (This <$> shrink a) ++ (That <$> shrink b) ++ (These <$> shrink a <*> shrink b))
 
+instance Arbitrary a => Arbitrary (Join These a) where
+  arbitrary = Join <$> arbitrary
+  shrink (Join a) = Join <$> shrink a
+
 instance Arbitrary a => Arbitrary (Patch a) where
   arbitrary = oneof [
     Insert <$> arbitrary,
