@@ -38,7 +38,7 @@ import Term
 
 -- | Assign line numbers to the lines on each side of a list of rows.
 numberedRows :: [Join These a] -> [Join These (Int, a)]
-numberedRows = countUp (Join $ These 1 1)
+numberedRows = countUp (Join (These 1 1))
   where countUp from (row : rows) = fromJust ((,) <$> from `applyThese` row) : countUp (increment from row) rows
         countUp _ [] = []
         increment :: Enum number => Join These number -> Join These b -> Join These number
