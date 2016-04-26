@@ -41,6 +41,10 @@ numberedRows :: [Join These a] -> [Join These (Int, a)]
 numberedRows = countUp (Join $ These 1 1)
   where countUp from (row : rows) = fromJust ((,) <$> from `applyThese` row) : countUp (succ <$> from) rows
         countUp _ [] = []
+        increment :: Enum number => Join These number -> Join These b -> Join These number
+        increment from (Join (These _ _)) = succ <$> from
+        increment from (Join (This _)) = modifyJoin (first succ) from
+        increment from (Join (That _)) = modifyJoin (second succ) from
 
 -- | Determine whether a line contains any patches.
 hasChanges :: SplitDiff leaf Info -> Bool
