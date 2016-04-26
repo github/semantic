@@ -11,6 +11,7 @@ import qualified Data.OrderedMap as Map
 import qualified Data.List as List
 import qualified Data.Set as Set
 import Data.Text.Arbitrary ()
+import Data.These
 import Info
 import Patch
 import Prelude hiding (fst, snd)
@@ -59,6 +60,11 @@ instance Arbitrary CategorySet where
 instance Arbitrary a => Arbitrary (Join (,) a) where
   arbitrary = both <$> arbitrary <*> arbitrary
   shrink b = both <$> shrink (fst b) <*> shrink (snd b)
+
+instance (Arbitrary a, Arbitrary b) => Arbitrary (These a b) where
+  arbitrary = oneof [ This <$> arbitrary
+                    , That <$> arbitrary
+                    , These <$> arbitrary <*> arbitrary ]
 
 instance Arbitrary a => Arbitrary (Patch a) where
   arbitrary = oneof [
