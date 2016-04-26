@@ -3,17 +3,20 @@ module AlignmentSpec where
 import Alignment
 import Control.Comonad.Cofree
 import Control.Monad.Free
+import Data.Align
 import Data.Bifunctor.Join
 import Data.Foldable (toList)
 import Data.Functor.Both as Both
 import Data.Functor.Identity
 import Data.Maybe (catMaybes, fromMaybe)
+import Data.Monoid
 import Data.Text.Arbitrary ()
 import Data.These
 import Diff
 import Info
 import Patch
 import Prelude hiding (fst, snd)
+import qualified Prelude
 import Range
 import qualified Source
 import SplitDiff
@@ -96,6 +99,9 @@ spec = parallel $ do
         , Join (These (info 2 3 `branch` [ info 2 3 `leaf` "c" ])
                       (info 4 5 `branch` [ info 4 5 `leaf` "c" ]))
         ]
+
+counts :: [Join These (Int, a)] -> Both Int
+counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
 
 branch :: annotation -> [Free (Annotated String annotation) patch] -> Free (Annotated String annotation) patch
 branch annotation = Free . Annotated annotation . Indexed
