@@ -1,8 +1,5 @@
 module AlignmentSpec where
 
-import Test.Hspec
-import Data.Text.Arbitrary ()
-
 import Alignment
 import Control.Comonad.Cofree
 import Control.Monad.Free
@@ -11,6 +8,7 @@ import Data.Foldable (toList)
 import Data.Functor.Both as Both
 import Data.Functor.Identity
 import Data.Maybe (catMaybes, fromMaybe)
+import Data.Text.Arbitrary ()
 import Data.These
 import Diff
 import Info
@@ -20,6 +18,7 @@ import Range
 import qualified Source
 import SplitDiff
 import Syntax
+import Test.Hspec
 
 spec :: Spec
 spec = parallel $ do
