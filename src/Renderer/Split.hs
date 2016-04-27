@@ -106,7 +106,7 @@ instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Ran
           contentElements children = let (elements, next) = foldr' markupForContextAndChild ([], end range) children in
             string (toString (slice (Range (start range) (max next (start range))) source)) : elements
 
-wrapIn :: (Blaze.MarkupM () -> Blaze.MarkupM ()) -> Blaze.MarkupM () -> Blaze.MarkupM ()
+wrapIn :: (Markup -> Markup) -> Markup -> Markup
 wrapIn _ l@Blaze.Leaf{} = l
 wrapIn _ l@Blaze.CustomLeaf{} = l
 wrapIn _ l@Blaze.Content{} = l
