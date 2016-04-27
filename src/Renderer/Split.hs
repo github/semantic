@@ -97,12 +97,13 @@ newtype Renderable a = Renderable a
 instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Range))) where
   toMarkup (Renderable (source, Info range categories size, syntax)) = (! A.data_ (stringValue (show size))) . classifyMarkup categories $ case syntax of
     Leaf _ -> span . string . toString $ slice range source
-    Indexed children -> ul . mconcat $ wrapIn li <$> contentElements children
-    Fixed children -> ul . mconcat $ wrapIn li <$> contentElements children
-    Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements children
-    where contentElements :: (Foldable t, ToMarkup f) => t (f, Range) -> [Markup]
-          contentElements children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
-            string (toString (slice (Range (start range) (max next (start range))) source)) : elements
+    Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source range children
+    Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source range children
+    Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements source range children
+
+contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
+contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
+  string (toString (slice (Range (start range) (max next (start range))) source)) : elements
 
 markupForContextAndChild :: ToMarkup f => Source Char -> (f, Range) -> ([Markup], Int) -> ([Markup], Int)
 markupForContextAndChild source (child, range) (rows, next) = (toMarkup child : string (toString (slice (Range (end range) next) source)) : rows, start range)
