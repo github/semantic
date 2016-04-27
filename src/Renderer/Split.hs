@@ -100,12 +100,12 @@ instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Ran
     Indexed children -> ul . mconcat $ wrapIn li <$> contentElements children
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements children
     Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements children
-    where markupForContextAndChild :: ToMarkup f => (f, Range) -> ([Markup], Int) -> ([Markup], Int)
-          markupForContextAndChild (child, range) (rows, next) = (toMarkup child : string (toString (slice (Range (end range) next) source)) : rows, start range)
-
-          contentElements :: (Foldable t, ToMarkup f) => t (f, Range) -> [Markup]
-          contentElements children = let (elements, next) = foldr' markupForContextAndChild ([], end range) children in
+    where contentElements :: (Foldable t, ToMarkup f) => t (f, Range) -> [Markup]
+          contentElements children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
             string (toString (slice (Range (start range) (max next (start range))) source)) : elements
+
+markupForContextAndChild :: ToMarkup f => Source Char -> (f, Range) -> ([Markup], Int) -> ([Markup], Int)
+markupForContextAndChild source (child, range) (rows, next) = (toMarkup child : string (toString (slice (Range (end range) next) source)) : rows, start range)
 
 wrapIn :: (Markup -> Markup) -> Markup -> Markup
 wrapIn _ l@Blaze.Leaf{} = l
