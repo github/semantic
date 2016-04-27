@@ -59,8 +59,8 @@ breakDownLeavesByWord source = cata replaceIn
       | ranges <- rangesAndWordsInSource range
       , length ranges > 1
       = Info range categories (1 + fromIntegral (length ranges)) :< Indexed (makeLeaf categories <$> ranges)
-    replaceIn info@(Info range categories _) syntax
-      = Info range categories (1 + sum (size . copoint <$> syntax)) :< syntax
+    replaceIn info syntax
+      = info { size = 1 + sum (size . copoint <$> syntax) } :< syntax
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
     makeLeaf categories (range, substring) = Info range categories 1 :< Leaf (T.pack substring)
 
