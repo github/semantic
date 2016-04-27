@@ -103,6 +103,7 @@ instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Ran
     where markupForContextAndChild :: ToMarkup f => (f, Range) -> ([Markup], Int) -> ([Markup], Int)
           markupForContextAndChild (child, range) (rows, next) = (toMarkup child : string (toString (slice (Range (end range) next) source)) : rows, start range)
 
+          contentElements :: (Foldable t, ToMarkup f) => t (f, Range) -> [Markup]
           contentElements children = let (elements, next) = foldr' markupForContextAndChild ([], end range) children in
             string (toString (slice (Range (start range) (max next (start range))) source)) : elements
 
