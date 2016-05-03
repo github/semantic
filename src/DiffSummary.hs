@@ -13,6 +13,8 @@ import Data.Maybe (listToMaybe)
 import Data.Set (toList)
 import Control.Arrow
 import Control.Monad
+import Control.Comonad.Trans.Cofree
+import Data.Functor.Foldable as Foldable
 
 
 newtype DiffSummary = DiffSummary { diffChanges :: [Patch DiffEntry] }
@@ -29,19 +31,25 @@ patchSummary termSummary patch = memptyOrDiff (before patch) <> memptyOrDiff (af
     memptyOrDiff = maybe emptyDiffSummary termSummary
 
 diffSummary :: Diff (Patch a) Info -> DiffSummary
-diffSummary = foldMap (patchSummary termSummary)
+diffSummary = histo diffSummary' where
+  diffSummary' :: TermF (Diff (Patch a) Info) (Cofree (TermF a Info) DiffSummary) f -> DiffSummary
+  diffSummary' (info :< Leaf replace) = _
+  -- (patchSummary termSummary)
 
 -- Syntax Text DiffSummary -> DiffSummary Text
+-- If termSummary returns a DiffEntry that just contains the term name, we need to
+-- Instead of foldMap we need a histomorphism
 
 termSummary :: Term T.Text Info -> T.Text
-termSummary = cata summary where
-  summary :: Info -> Syntax T.Text f -> T.Text
-  summary info (Leaf replace) = replace
-  summary info (Indexed children) = toCategory info
-  summary info (Fixed children) = toCategory info
-  summary info (Keyed _) = toCategory info
+termSummary = Foldable.cata summary where
+  summary :: TermF T.Text Info f -> T.Text
+  summary (info :< Leaf replace) = replace
+  summary (info :< Indexed children) = toCategory info
+  summary (info :< Fixed children) = toCategory info
+  summary (info :< Keyed _) = toCategory info
 
   toCategory :: Info -> T.Text
-  toCategory term = T.pack $ case listToMaybe . toList $ Category.categories term of
+  toCategory term = T.pack $ case maybeFirstCategory term of
     Just category -> show category
     Nothing -> "Unknown"
+  maybeFirstCategory term = listToMaybe . toList $ Category.categories term

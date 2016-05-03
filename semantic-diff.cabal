@@ -16,7 +16,7 @@ library
   exposed-modules:     Algorithm
                      , Alignment
                      , Category
-                     , Control.Comonad.Cofree
+                     , Control.Comonad.CofreeExtras
                      , Control.Monad.Free
                      , Data.Adjoined
                      , Data.Align

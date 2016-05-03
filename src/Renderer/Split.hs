@@ -3,10 +3,11 @@ module Renderer.Split where
 
 import Alignment
 import Category
-import Control.Comonad.Cofree
+import Control.Comonad.Trans.Cofree
 import Control.Monad.Free
 import Data.Foldable
 import Data.Functor.Both
+import Data.Functor.Foldable
 import Data.Monoid
 import qualified Data.Text.Lazy as TL
 import Diff

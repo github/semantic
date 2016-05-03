@@ -14,9 +14,10 @@ import TreeSitter
 import Text.Parser.TreeSitter.Language
 
 import Control.Monad.Free
-import Control.Comonad.Cofree
+import Control.Comonad.Trans.Cofree
 import Data.Copointed
 import Data.Functor.Both
+import Data.Functor.Foldable
 import qualified Data.ByteString.Char8 as B1
 import Data.Foldable
 import Data.Monoid

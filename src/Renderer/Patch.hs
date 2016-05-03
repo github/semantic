@@ -15,7 +15,7 @@ import Range
 import Renderer
 import Source hiding ((++), break)
 import SplitDiff
-import Control.Comonad.Cofree
+import Control.Comonad.Trans.Cofree
 import Control.Monad.Free
 import Data.Functor.Both as Both
 import Data.List

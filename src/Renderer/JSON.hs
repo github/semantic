@@ -6,7 +6,7 @@ module Renderer.JSON (
 
 import Alignment
 import Category
-import Control.Comonad.Cofree
+import Control.Comonad.Trans.Cofree
 import Control.Monad.Free
 import Data.Aeson hiding (json)
 import Data.Aeson.Encode

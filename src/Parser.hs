@@ -5,8 +5,8 @@ import Info
 import Range
 import Syntax
 import Term
-import Control.Comonad.Cofree
-import Data.Copointed
+import Control.Comonad.Trans.Cofree
+import Data.Functor.Foldable
 import qualified Data.OrderedMap as Map
 import qualified Data.Set as Set
 import Source
@@ -40,13 +40,14 @@ isFixed = not . Set.null . Set.intersection fixedCategories
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
 termConstructor :: (String -> Set.Set Category) -> Constructor
-termConstructor mapping source range name children = Info range categories (1 + sum (size . copoint <$> children)) :< construct children
+termConstructor mapping source range name children = Fix (Info range categories (1 + sum (size . headF . unfix <$> children)) :< construct children)
   where
     categories = mapping name
+    construct :: [Term Text Info] -> Syntax Text (Term Text Info)
     construct [] = Leaf . pack . toString $ slice range source
     construct children | isFixed categories = Fixed children
     construct children | isKeyed categories = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed children
-    assignKey node@(Info _ categories _ :< Fixed (key : _)) | Set.member Pair categories = (getSubstring key, node)
+    assignKey node@(Fix (Info _ categories _ :< Fixed (key : _))) | Set.member Pair categories = (getSubstring key, node)
     assignKey node = (getSubstring node, node)
-    getSubstring (Info range _ _ :< _) = pack . toString $ slice range source
+    getSubstring (Fix (Info range _ _ :< _)) = pack . toString $ slice range source

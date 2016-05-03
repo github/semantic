@@ -2,7 +2,8 @@
 module Category where
 
 import Term
-import Control.Comonad.Cofree
+import Control.Comonad.Trans.Cofree
+import Data.Functor.Foldable
 import Data.Set
 
 -- | A standardized category of AST node. Used to determine the semantics for
@@ -33,7 +34,7 @@ class Categorizable a where
   categories :: a -> Set Category
 
 instance Categorizable annotation => Categorizable (Term a annotation) where
-  categories (annotation :< _) = categories annotation
+  categories (Fix (annotation :< _)) = categories annotation
 
 -- | Test whether the categories from the categorizables intersect.
 comparable :: Categorizable a => a -> a -> Bool
