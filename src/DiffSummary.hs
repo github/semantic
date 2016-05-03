@@ -30,10 +30,11 @@ patchSummary termSummary patch = memptyOrDiff (before patch) <> memptyOrDiff (af
   where
     memptyOrDiff = maybe emptyDiffSummary termSummary
 
-diffSummary :: Diff (Patch a) Info -> DiffSummary
+diffSummary :: Diff a Info -> DiffSummary
 diffSummary = histo diffSummary' where
-  diffSummary' :: TermF (Diff (Patch a) Info) (Cofree (TermF a Info) DiffSummary) f -> DiffSummary
-  diffSummary' (info :< Leaf replace) = _
+  diffSummary' :: DiffF a (Cofree (DiffF a Info) DiffSummary) f -> DiffSummary
+  diffSummary' (coDiffSummary :< Leaf _) = diffSummary
+    where (diffSummary :< _) = runCofree coDiffSummary
   -- (patchSummary termSummary)
 
 -- Syntax Text DiffSummary -> DiffSummary Text
