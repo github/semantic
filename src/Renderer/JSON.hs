@@ -7,6 +7,7 @@ module Renderer.JSON (
 import Alignment
 import Category
 import Control.Comonad.Trans.Cofree
+import Data.Functor.Foldable
 import Control.Monad.Free
 import Data.Aeson hiding (json)
 import Data.Aeson.Encode
@@ -54,8 +55,8 @@ instance ToJSON value => ToJSON (OrderedMap T.Text value) where
   toJSON map = object $ uncurry (.=) <$> toList map
   toEncoding map = pairs . mconcat $ uncurry (.=) <$> toList map
 instance ToJSON (Term leaf Info) where
-  toJSON (info :< syntax) = object (termFields info syntax)
-  toEncoding (info :< syntax) = pairs $ mconcat (termFields info syntax)
+  toJSON (Fix (info :< syntax)) = object (termFields info syntax)
+  toEncoding (Fix (info :< syntax)) = pairs $ mconcat (termFields info syntax)
 
 lineFields :: KeyValue kv => Int -> Line (SplitDiff leaf Info, Range) -> [kv]
 lineFields n line | isEmpty line = []
@@ -73,9 +74,9 @@ termFields (Info range categories _) syntax = "range" .= range : "categories" .=
   Keyed c -> childrenFields c
   where childrenFields c = [ "children" .= c ]
 
-patchFields :: KeyValue kv => SplitPatch (Cofree (Syntax leaf) Info) -> [kv]
+patchFields :: KeyValue kv => SplitPatch (Term leaf Info) -> [kv]
 patchFields patch = case patch of
   SplitInsert term -> fields "insert" term
   SplitDelete term -> fields "delete" term
   SplitReplace term -> fields "replace" term
-  where fields kind (info :< syntax) = "patch" .= T.pack kind : termFields info syntax
+  where fields kind (Fix (info :< syntax)) = "patch" .= T.pack kind : termFields info syntax
