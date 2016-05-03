@@ -1,7 +1,8 @@
 module SplitDiff where
 
-import Diff (Annotated)
+import Syntax
 import Control.Monad.Free (Free)
+import Control.Comonad.Trans.Cofree
 import Term (Term)
 
 -- | A patch to only one side of a diff.
@@ -15,4 +16,4 @@ getSplitTerm (SplitDelete a) = a
 getSplitTerm (SplitReplace a) = a
 
 -- | A diff with only one side’s annotations.
-type SplitDiff leaf annotation = Free (Annotated leaf annotation) (SplitPatch (Term leaf annotation))
+type SplitDiff leaf annotation = Free (CofreeF (Syntax leaf) annotation) (SplitPatch (Term leaf annotation))

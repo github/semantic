@@ -16,6 +16,9 @@ annotation = headF
 syntax :: Annotated a annotation f -> Syntax a f
 syntax = tailF
 
+annotate :: annotation -> Syntax a f -> CofreeF (Syntax a) annotation f
+annotate = (:<)
+
 -- | An annotated series of patches of terms.
 type Diff a annotation = Free (CofreeF (Syntax a) (Both annotation)) (Patch (Term a annotation))
 

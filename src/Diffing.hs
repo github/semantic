@@ -94,5 +94,5 @@ diffCostWithCachedTermSizes = diffSum (getSum . foldMap (Sum . size . headF . un
 
 -- | The absolute difference between the node counts of a diff.
 diffCostWithAbsoluteDifferenceOfCachedDiffSizes :: Diff a Info -> Integer
-diffCostWithAbsoluteDifferenceOfCachedDiffSizes (Free (Annotated (Both (before, after)) _)) = abs $ size before - size after
+diffCostWithAbsoluteDifferenceOfCachedDiffSizes (Free (Both (before, after) :< _)) = abs $ size before - size after
 diffCostWithAbsoluteDifferenceOfCachedDiffSizes (Pure patch) = sum $ size . headF . unfix <$> patch

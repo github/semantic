@@ -2,11 +2,9 @@ module Interpreter (interpret, Comparable, diffTerms) where
 
 import Algorithm
 import Category
-import Control.Arrow
 import Control.Comonad.Trans.Cofree
 import Data.Functor.Foldable
 import Control.Monad.Free
-import Data.Copointed
 import Data.Functor.Both
 import qualified Data.OrderedMap as Map
 import qualified Data.List as List
@@ -34,7 +32,7 @@ interpret comparable cost a b = fromMaybe (Pure $ Replace a b) $ constructAndRun
 
 -- | Constructs an algorithm and runs it
 constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Cost a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
-constructAndRun _ _ a b | a == b = hylo (\termF -> Free $ Annotated (headF termF) (tailF termF)) unfix <$> zipTerms a b
+constructAndRun _ _ a b | a == b = hylo (\termF -> Free $ headF termF :< tailF termF) unfix <$> zipTerms a b
 
 constructAndRun comparable _ a b | not $ comparable a b = Nothing
 
@@ -44,7 +42,7 @@ constructAndRun comparable cost (Fix (annotation1 :< a)) (Fix (annotation2 :< b)
     algorithm (Keyed a') (Keyed b') = Free $ ByKey a' b' (annotate . Keyed)
     algorithm (Leaf a') (Leaf b') | a' == b' = annotate $ Leaf b'
     algorithm a' b' = Free $ Recursive (Fix (annotation1 :< a')) (Fix (annotation2 :< b')) Pure
-    annotate = Pure . Free . Annotated (Both (annotation1, annotation2))
+    annotate = Pure . Free . (Both (annotation1, annotation2) :<)
 
 -- | Runs the diff algorithm
 run :: (Eq a, Eq annotation) => Comparable a annotation -> Cost a annotation -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
@@ -60,7 +58,7 @@ run comparable cost (Free (Recursive (Fix (annotation1 :< a)) (Fix (annotation2 
       interpretInBoth key x y = interpret comparable cost (x ! key) (y ! key)
   recur _ _ = Pure $ Replace (Fix (annotation1 :< a)) (Fix (annotation2 :< b))
 
-  annotate = Free . Annotated (Both (annotation1, annotation2))
+  annotate = Free . (Both (annotation1, annotation2) :<)
 
 run comparable cost (Free (ByKey a b f)) = run comparable cost $ f byKey where
   byKey = Map.fromList $ toKeyValue <$> List.union aKeys bKeys

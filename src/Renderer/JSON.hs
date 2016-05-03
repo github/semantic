@@ -47,9 +47,9 @@ instance ToJSON a => ToJSON (Both a) where
   toJSON (Both (a, b)) = Array . fromList $ toJSON <$> [ a, b ]
   toEncoding = foldable
 instance ToJSON (SplitDiff leaf Info) where
-  toJSON (Free (Annotated info syntax)) = object (termFields info syntax)
+  toJSON (Free (info :< syntax)) = object (termFields info syntax)
   toJSON (Pure patch) = object (patchFields patch)
-  toEncoding (Free (Annotated info syntax)) = pairs $ mconcat (termFields info syntax)
+  toEncoding (Free (info :< syntax)) = pairs $ mconcat (termFields info syntax)
   toEncoding (Pure patch) = pairs $ mconcat (patchFields patch)
 instance ToJSON value => ToJSON (OrderedMap T.Text value) where
   toJSON map = object $ uncurry (.=) <$> toList map

@@ -10,7 +10,6 @@ import Data.Functor.Both
 import Data.Functor.Foldable
 import Data.Monoid
 import qualified Data.Text.Lazy as TL
-import Diff
 import Info
 import Line
 import Prelude hiding (div, head, span, fst, snd)
@@ -107,7 +106,7 @@ instance ToMarkup (Renderable (Source Char, Term a Info)) where
   toMarkup (Renderable (source, term)) = Prelude.fst $ cata (\ (info@(Info range _ _) :< syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) term
 
 instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
-  toMarkup (Renderable (source, diff)) = Prelude.fst $ iter (\ (Annotated info@(Info range _ _) syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) $ toMarkupAndRange <$> diff
+  toMarkup (Renderable (source, diff)) = Prelude.fst $ iter (\ (info@(Info range _ _) :< syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) $ toMarkupAndRange <$> diff
     where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
           toMarkupAndRange patch = let term@(Fix (Info range _ _ :< _)) = getSplitTerm patch in
             ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue . show $ termSize term)) . toMarkup $ Renderable (source, term), range)
