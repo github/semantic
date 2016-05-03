@@ -1,7 +1,9 @@
+{-# LANGUAGE TypeFamilies, TypeSynonymInstances, FlexibleInstances #-}
 module Diff where
 
 import Control.Comonad.Trans.Cofree
-import Control.Monad.Free
+import Control.Monad.Trans.Free
+import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Patch
 import Syntax
@@ -20,9 +22,13 @@ annotate :: annotation -> Syntax a f -> CofreeF (Syntax a) annotation f
 annotate = (:<)
 
 -- | An annotated series of patches of terms.
+type DiffF a annotation = FreeF (CofreeF (Syntax a) (Both annotation)) (Patch (Term a annotation))
 type Diff a annotation = Free (CofreeF (Syntax a) (Both annotation)) (Patch (Term a annotation))
+type instance Base (Diff a annotation) = DiffF a annotation
+type instance Base (Free f a) = FreeF f a
 
--- | Sum the result of a transform applied to all the patches in the diff.
+instance (Functor f) => Foldable.Foldable (Free f a) where project = runFree
+
 diffSum :: (Patch (Term a annotation) -> Integer) -> Diff a annotation -> Integer
 diffSum patchCost diff = sum $ fmap patchCost diff
 

@@ -8,12 +8,16 @@ import Term
 import Syntax
 import qualified Data.Text as T
 import qualified Category
+import Data.Functor.Both
 import Data.Monoid
 import Data.Maybe (listToMaybe)
 import Data.Set (toList)
 import Control.Arrow
 import Control.Monad
+import Control.Comonad
 import Control.Comonad.Trans.Cofree
+import Control.Monad.Trans.Free
+import qualified Control.Comonad.Cofree as Cofree
 import Data.Functor.Foldable as Foldable
 
 
@@ -30,11 +34,19 @@ patchSummary termSummary patch = memptyOrDiff (before patch) <> memptyOrDiff (af
   where
     memptyOrDiff = maybe emptyDiffSummary termSummary
 
-diffSummary :: Diff a Info -> DiffSummary
-diffSummary = histo diffSummary' where
-  diffSummary' :: DiffF a (Cofree (DiffF a Info) DiffSummary) f -> DiffSummary
-  diffSummary' (coDiffSummary :< Leaf _) = diffSummary
-    where (diffSummary :< _) = runCofree coDiffSummary
+type DiffSummaryF leaf annotation = FreeF (CofreeF (Syntax leaf) (Both annotation))
+diffSummary :: Diff leaf Info -> DiffSummary
+-- histo :: Foldable t => (Base t (Cofree (Base t) a) -> a) -> t -> a
+diffSummary = histo diffSummary' . fmap (patchSummary undefined) where
+  --diffSummary' :: DiffF leaf (Cofree.Cofree (DiffF leaf Info) DiffSummary) f -> DiffSummary
+  -- Skip any child that doesn't have any changes (that will always include leaves)
+  -- Skip any child that doesn't have any changes (that will always include leaves)
+  diffSummary' :: DiffSummaryF leaf annotation DiffSummary (Cofree.Cofree (DiffSummaryF leaf annotation DiffSummary) DiffSummary) -> DiffSummary
+  diffSummary' (Free (_ :< Leaf _)) = undefined
+  diffSummary' (Free (_ :< Indexed children)) = DiffSummary { diffChanges = children >>= diffChanges . extract }
+  diffSummary' (Free (_ :< Fixed children)) = undefined
+  diffSummary' (Free (_ :< Keyed children)) = undefined
+  diffSummary' (Pure diffSummary) = diffSummary :: DiffSummary
   -- (patchSummary termSummary)
 
 -- Syntax Text DiffSummary -> DiffSummary Text
