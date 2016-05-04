@@ -8,8 +8,8 @@ import Data.Text.Arbitrary ()
 import Alignment
 import ArbitraryTerm (arbitraryLeaf)
 import Control.Arrow
-import Control.Comonad.Cofree
-import Control.Monad.Free hiding (unfold)
+import Control.Comonad.Trans.Cofree
+import Control.Monad.Trans.Free hiding (unfold)
 import Data.Adjoined
 import Data.Copointed
 import Data.Functor.Both as Both
@@ -32,34 +32,34 @@ spec = parallel $ do
   describe "splitDiffByLines" $ do
     prop "preserves line counts in equal sources" $
       \ source ->
-        length (splitDiffByLines (pure source) (Free $ Annotated (pure $ Info (totalRange source) mempty 1) (Indexed . Prelude.fst $ foldl combineIntoLeaves ([], 0) source))) `shouldBe` length (filter (== '\n') $ toString source) + 1
+        length (splitDiffByLines (pure source) (free . Free $ (pure $ Info (totalRange source) mempty 1) :< (Indexed . Prelude.fst $ foldl combineIntoLeaves ([], 0) source))) `shouldBe` length (filter (== '\n') $ toString source) + 1
 
     prop "produces the maximum line count in inequal sources" $
       \ sources -> let ranges = actualLineRanges <$> (totalRange <$> sources) <*> sources in
-        length (splitDiffByLines sources (Free $ Annotated ((\ s -> Info (totalRange s) mempty 0) <$> sources) (Indexed $ leafWithRangesInSources sources <$> runBothWith (zipWith both) ranges))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toString <$> sources)
+        length (splitDiffByLines sources (free . Free $ ((\ s -> Info (totalRange s) mempty 0) <$> sources) :< (Indexed $ leafWithRangesInSources sources <$> runBothWith (zipWith both) ranges))) `shouldBe` runBothWith max ((+ 1) . length . filter (== '\n') . toString <$> sources)
 
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
       \ source -> let range = totalRange source in
-        splitAbstractedTerm (:<) (Identity source) (Identity (Info range mempty 0)) (Leaf source) `shouldBe` (Identity . lineMap (fmap (((:< Leaf source) . (\ r -> Info r mempty 0) &&& id))) <$> linesInRangeOfSource range source)
+        splitAbstractedTerm ((cofree .) . (:<)) (Identity source) (Identity (Info range mempty 0) :< Leaf source) `shouldBe` (Identity . lineMap (fmap (cofree . (:< Leaf source) . (\ r -> Info r mempty 0) &&& id)) <$> linesInRangeOfSource range source)
 
-    let makeTerm = ((Free .) . Annotated) :: Info -> Syntax (Source Char) (SplitDiff (Source Char) Info) -> SplitDiff (Source Char) Info
+    let makeTerm = ((free .) . (Free .) . (:<)) :: Info -> Syntax (Source Char) (SplitDiff (Source Char) Info) -> SplitDiff (Source Char) Info
     prop "outputs one row for single-line unchanged leaves" $
       forAll (arbitraryLeaf `suchThat` isOnSingleLine) $
-        \ (source, (Info range categories _), syntax) -> splitAbstractedTerm makeTerm (pure source) (pure $ Info range categories 0) syntax `shouldBe` fromList [
+        \ (source, (Info range categories _), syntax) -> splitAbstractedTerm makeTerm (pure source) (pure (Info range categories 0) :< syntax) `shouldBe` fromList [
           both (pure (makeTerm (Info range categories 0) $ Leaf source, Range 0 (length source))) (pure (makeTerm (Info range categories 0) $ Leaf source, Range 0 (length source))) ]
 
     prop "outputs one row for single-line empty unchanged indexed nodes" $
       forAll (arbitrary `suchThat` (\ a -> filter (/= '\n') (toString a) == toString a)) $
-          \ source -> splitAbstractedTerm makeTerm (pure source) (pure $ Info (totalRange source) mempty 0) (Indexed []) `shouldBe` fromList [
+          \ source -> splitAbstractedTerm makeTerm (pure source) (pure (Info (totalRange source) mempty 0) :< Indexed []) `shouldBe` fromList [
             both (pure (makeTerm (Info (totalRange source) mempty 0) $ Indexed [], Range 0 (length source))) (pure (makeTerm (Info (totalRange source) mempty 0) $ Indexed [], Range 0 (length source))) ]
 
     where
       isOnSingleLine (a, _, _) = filter (/= '\n') (toString a) == toString a
 
-      combineIntoLeaves (leaves, start) char = (leaves ++ [ Free $ Annotated (Info <$> pure (Range start $ start + 1) <*> mempty <*> pure 1) (Leaf [ char ]) ], start + 1)
+      combineIntoLeaves (leaves, start) char = (leaves ++ [ free . Free $ (Info <$> pure (Range start $ start + 1) <*> mempty <*> pure 1) :< Leaf [ char ] ], start + 1)
 
-      leafWithRangesInSources sources ranges = Free $ Annotated (Info <$> ranges <*> pure mempty <*> pure 1) (Leaf $ runBothWith (++) (toString <$> sources))
+      leafWithRangesInSources sources ranges = free . Free $ (Info <$> ranges <*> pure mempty <*> pure 1) :< (Leaf $ runBothWith (++) (toString <$> sources))
 
       leafWithRangeInSource source range = Info range mempty 1 :< Leaf source
 

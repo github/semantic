@@ -4,19 +4,19 @@ import Diff
 import qualified Interpreter as I
 import Range
 import Syntax
-import Control.Comonad.Cofree
-import Control.Monad.Free
+import Control.Comonad.Trans.Cofree
+import Control.Monad.Trans.Free
 import Patch
 import Info
 import Category
 import Test.Hspec
 
 spec :: Spec
-spec = parallel $ do
-  describe "interpret" $ do
+spec = parallel $
+  describe "interpret" $
     it "returns a replacement when comparing two unicode equivalent terms" $
-      I.interpret comparable diffCost (Info range mempty 0 :< Leaf "t\776") (Info range2 mempty 0 :< Leaf "\7831") `shouldBe`
-      Pure (Replace (Info range mempty 0 :< Leaf "t\776") (Info range2 mempty 0 :< Leaf "\7831"))
+      I.interpret comparable diffCost (cofree (Info range mempty 0 :< Leaf "t\776")) (cofree (Info range2 mempty 0 :< Leaf "\7831")) `shouldBe`
+      free (Pure (Replace (cofree (Info range mempty 0 :< Leaf "t\776")) (cofree (Info range2 mempty 0 :< Leaf "\7831"))))
 
     where
       range = Range 0 2
