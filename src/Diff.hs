@@ -24,9 +24,8 @@ annotate = (:<)
 -- | An annotated series of patches of terms.
 type DiffF a annotation = FreeF (CofreeF (Syntax a) (Both annotation)) (Patch (Term a annotation))
 type Diff a annotation = Free (CofreeF (Syntax a) (Both annotation)) (Patch (Term a annotation))
-type instance Base (Diff a annotation) = DiffF a annotation
-type instance Base (Free f a) = FreeF f a
 
+type instance Base (Free f a) = FreeF f a
 instance (Functor f) => Foldable.Foldable (Free f a) where project = runFree
 
 diffSum :: (Patch (Term a annotation) -> Integer) -> Diff a annotation -> Integer

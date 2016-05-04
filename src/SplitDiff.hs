@@ -1,7 +1,7 @@
 module SplitDiff where
 
 import Syntax
-import Control.Monad.Free (Free)
+import Control.Monad.Trans.Free (Free)
 import Control.Comonad.Trans.Cofree
 import Term (Term)
 

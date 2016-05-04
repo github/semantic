@@ -40,7 +40,7 @@ isFixed = not . Set.null . Set.intersection fixedCategories
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
 termConstructor :: (String -> Set.Set Category) -> Constructor
-termConstructor mapping source range name children = Fix (Info range categories (1 + sum (size . headF . unfix <$> children)) :< construct children)
+termConstructor mapping source range name children = cofree (Info range categories (1 + sum (size . headF . runCofree <$> children)) :< construct children)
   where
     categories = mapping name
     construct :: [Term Text Info] -> Syntax Text (Term Text Info)
@@ -48,6 +48,6 @@ termConstructor mapping source range name children = Fix (Info range categories 
     construct children | isFixed categories = Fixed children
     construct children | isKeyed categories = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed children
-    assignKey node@(Fix (Info _ categories _ :< Fixed (key : _))) | Set.member Pair categories = (getSubstring key, node)
+    assignKey node | Info _ categories _ :< Fixed (key : _) <- runCofree node, Set.member Pair categories = (getSubstring key, node)
     assignKey node = (getSubstring node, node)
-    getSubstring (Fix (Info range _ _ :< _)) = pack . toString $ slice range source
+    getSubstring term | Info range _ _ :< _ <- runCofree term = pack . toString $ slice range source

@@ -13,7 +13,7 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 
-import Control.Monad.Free
+import Control.Monad.Trans.Free
 import Control.Comonad.Trans.Cofree
 import Data.Functor.Both
 import Data.Functor.Foldable
@@ -35,8 +35,8 @@ parserForType mediaType = case languageForType mediaType of
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser
-lineByLineParser input = return . Fix . root $ case foldl' annotateLeaves ([], 0) lines of
-  (leaves, _) -> Fix <$> leaves
+lineByLineParser input = return . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
+  (leaves, _) -> cofree <$> leaves
   where
     lines = actualLines input
     root children = Info (Range 0 $ length input) mempty (1 + fromIntegral (length children)) :< Indexed children
@@ -58,11 +58,11 @@ breakDownLeavesByWord source = cata replaceIn
     replaceIn (Info range categories _ :< Leaf _)
       | ranges <- rangesAndWordsInSource range
       , length ranges > 1
-      = Fix $ Info range categories (1 + fromIntegral (length ranges)) :< Indexed (makeLeaf categories <$> ranges)
+      = cofree $ Info range categories (1 + fromIntegral (length ranges)) :< Indexed (makeLeaf categories <$> ranges)
     replaceIn (Info range categories _ :< syntax)
-      = Fix $ Info range categories (1 + sum (size . headF . unfix <$> syntax)) :< syntax
+      = cofree $ Info range categories (1 + sum (size . headF . runCofree <$> syntax)) :< syntax
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
-    makeLeaf categories (range, substring) = Fix $ Info range categories 1 :< Leaf (T.pack substring)
+    makeLeaf categories (range, substring) = cofree $ Info range categories 1 :< Leaf (T.pack substring)
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
@@ -90,9 +90,10 @@ diffFiles parser renderer sourceBlobs = do
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermSizes :: Diff a Info -> Integer
-diffCostWithCachedTermSizes = diffSum (getSum . foldMap (Sum . size . headF . unfix))
+diffCostWithCachedTermSizes = diffSum (getSum . foldMap (Sum . size . headF . runCofree))
 
 -- | The absolute difference between the node counts of a diff.
 diffCostWithAbsoluteDifferenceOfCachedDiffSizes :: Diff a Info -> Integer
-diffCostWithAbsoluteDifferenceOfCachedDiffSizes (Free (Both (before, after) :< _)) = abs $ size before - size after
-diffCostWithAbsoluteDifferenceOfCachedDiffSizes (Pure patch) = sum $ size . headF . unfix <$> patch
+diffCostWithAbsoluteDifferenceOfCachedDiffSizes term = case runFree term of
+  (Free (Both (before, after) :< _)) -> abs $ size before - size after
+  (Pure patch)                       -> sum $ size . headF . runCofree <$> patch

@@ -12,7 +12,7 @@ import Control.Arrow
 import Control.Comonad.Trans.Cofree
 import Data.Functor.Foldable hiding (Foldable)
 import Control.Monad
-import Control.Monad.Free
+import Control.Monad.Trans.Free
 import Data.Adjoined
 import Data.Align
 import Data.Bifunctor.These
@@ -49,17 +49,17 @@ hasChanges = or . fmap (or . (True <$))
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs paired with the Range of characters spanned by that Row on each side of the diff.
 splitDiffByLines :: Both (Source Char) -> Diff leaf Info -> [Row (SplitDiff leaf Info, Range)]
-splitDiffByLines sources = toList . iter (\ (infos :< syntax) -> splitAbstractedTerm ((Free .) . (:<)) sources (infos :< syntax)) . fmap (splitPatchByLines sources)
+splitDiffByLines sources = toList . iter (\ (infos :< syntax) -> splitAbstractedTerm ((free .)  . (Free .) . (:<)) sources (infos :< syntax)) . fmap (splitPatchByLines sources)
 
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> Adjoined (Both (Line (SplitDiff leaf Info, Range)))
 splitPatchByLines sources patch = wrapTermInPatch <$> splitAndFoldTerm (unPatch patch)
     where
       splitAndFoldTerm :: These (Term leaf Info) (Term leaf Info) -> Adjoined (Both (Line (Term leaf Info, Range)))
-      splitAndFoldTerm (This deleted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm ((Fix .) . (:<)) (Identity $ fst sources)) (hylo (Fix . annotationMap Identity) unfix deleted)) nil
-      splitAndFoldTerm (That inserted) = tsequenceL mempty $ both nil (runIdentity <$> cata (splitAbstractedTerm ((Fix .) . (:<)) (Identity $ snd sources)) (hylo (Fix . annotationMap Identity) unfix inserted))
-      splitAndFoldTerm (These deleted inserted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm ((Fix .) . (:<)) (Identity $ fst sources)) (hylo (Fix . annotationMap Identity) unfix deleted)) (runIdentity <$> cata (splitAbstractedTerm ((Fix .) . (:<)) (Identity $ snd sources)) (hylo (Fix . annotationMap Identity) unfix inserted))
-      wrapTermInPatch = fmap (fmap (first (Pure . constructor patch)))
+      splitAndFoldTerm (This deleted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm ((cofree.) . (:<)) (Identity $ fst sources)) (hylo (cofree . annotationMap Identity) runCofree deleted)) nil
+      splitAndFoldTerm (That inserted) = tsequenceL mempty $ both nil (runIdentity <$> cata (splitAbstractedTerm ((cofree .) . (:<)) (Identity $ snd sources)) (hylo (cofree . annotationMap Identity) runCofree inserted))
+      splitAndFoldTerm (These deleted inserted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm ((cofree  .) . (:<)) (Identity $ fst sources)) (hylo (cofree . annotationMap Identity) runCofree deleted)) (runIdentity <$> cata (splitAbstractedTerm ((cofree .) . (:<)) (Identity $ snd sources)) (hylo (cofree . annotationMap Identity) runCofree inserted))
+      wrapTermInPatch = fmap (fmap (first (free . Pure . constructor patch)))
       constructor (Replace _ _) = SplitReplace
       constructor (Insert _) = SplitInsert
       constructor (Delete _) = SplitDelete

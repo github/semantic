@@ -17,7 +17,6 @@ library
                      , Alignment
                      , Category
                      , Control.Comonad.CofreeExtras
-                     , Control.Monad.Free
                      , Data.Adjoined
                      , Data.Align
                      , Data.Bifunctor.These

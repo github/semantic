@@ -7,8 +7,7 @@ module Renderer.JSON (
 import Alignment
 import Category
 import Control.Comonad.Trans.Cofree
-import Data.Functor.Foldable
-import Control.Monad.Free
+import Control.Monad.Trans.Free
 import Data.Aeson hiding (json)
 import Data.Aeson.Encode
 import Data.Functor.Both
@@ -17,7 +16,6 @@ import Data.Text.Lazy (toStrict)
 import Data.Text.Lazy.Builder (toLazyText)
 import qualified Data.Text as T
 import Data.Vector hiding (toList)
-import Diff
 import Info
 import Line
 import Range
@@ -47,16 +45,18 @@ instance ToJSON a => ToJSON (Both a) where
   toJSON (Both (a, b)) = Array . fromList $ toJSON <$> [ a, b ]
   toEncoding = foldable
 instance ToJSON (SplitDiff leaf Info) where
-  toJSON (Free (info :< syntax)) = object (termFields info syntax)
-  toJSON (Pure patch) = object (patchFields patch)
-  toEncoding (Free (info :< syntax)) = pairs $ mconcat (termFields info syntax)
-  toEncoding (Pure patch) = pairs $ mconcat (patchFields patch)
+  toJSON splitDiff = case runFree splitDiff of
+    (Free (info :< syntax)) -> object (termFields info syntax)
+    (Pure patch)            -> object (patchFields patch)
+  toEncoding splitDiff = case runFree splitDiff of
+    (Free (info :< syntax)) -> pairs $ mconcat (termFields info syntax)
+    (Pure patch)            -> pairs $ mconcat (patchFields patch)
 instance ToJSON value => ToJSON (OrderedMap T.Text value) where
   toJSON map = object $ uncurry (.=) <$> toList map
   toEncoding map = pairs . mconcat $ uncurry (.=) <$> toList map
 instance ToJSON (Term leaf Info) where
-  toJSON (Fix (info :< syntax)) = object (termFields info syntax)
-  toEncoding (Fix (info :< syntax)) = pairs $ mconcat (termFields info syntax)
+  toJSON term     | (info :< syntax) <- runCofree term = object (termFields info syntax)
+  toEncoding term | (info :< syntax) <- runCofree term = pairs $ mconcat (termFields info syntax)
 
 lineFields :: KeyValue kv => Int -> Line (SplitDiff leaf Info, Range) -> [kv]
 lineFields n line | isEmpty line = []
@@ -79,4 +79,4 @@ patchFields patch = case patch of
   SplitInsert term -> fields "insert" term
   SplitDelete term -> fields "delete" term
   SplitReplace term -> fields "replace" term
-  where fields kind (Fix (info :< syntax)) = "patch" .= T.pack kind : termFields info syntax
+  where fields kind term | (info :< syntax) <- runCofree term = "patch" .= T.pack kind : termFields info syntax

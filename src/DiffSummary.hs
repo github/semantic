@@ -12,8 +12,6 @@ import Data.Functor.Both
 import Data.Monoid
 import Data.Maybe (listToMaybe)
 import Data.Set (toList)
-import Control.Arrow
-import Control.Monad
 import Control.Comonad
 import Control.Comonad.Trans.Cofree
 import Control.Monad.Trans.Free

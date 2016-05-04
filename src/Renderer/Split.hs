@@ -4,7 +4,7 @@ module Renderer.Split where
 import Alignment
 import Category
 import Control.Comonad.Trans.Cofree
-import Control.Monad.Free
+import Control.Monad.Trans.Free
 import Data.Foldable
 import Data.Functor.Both
 import Data.Functor.Foldable
@@ -108,8 +108,8 @@ instance ToMarkup (Renderable (Source Char, Term a Info)) where
 instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
   toMarkup (Renderable (source, diff)) = Prelude.fst $ iter (\ (info@(Info range _ _) :< syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) $ toMarkupAndRange <$> diff
     where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
-          toMarkupAndRange patch = let term@(Fix (Info range _ _ :< _)) = getSplitTerm patch in
-            ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue . show $ termSize term)) . toMarkup $ Renderable (source, term), range)
+          toMarkupAndRange patch = let term@(Info range _ _ :< _) = runCofree $ getSplitTerm patch in
+            ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue . show . termSize $ cofree term)) . toMarkup $ Renderable (source, cofree term), range)
 
 
 instance ToMarkup a => ToMarkup (Renderable (Bool, Int, Line a)) where

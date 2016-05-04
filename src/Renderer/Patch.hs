@@ -17,7 +17,7 @@ import Source hiding ((++), break)
 import SplitDiff
 import Control.Comonad.Trans.Cofree
 import Data.Functor.Foldable
-import Control.Monad.Free
+import Control.Monad.Trans.Free
 import Data.Functor.Both as Both
 import Data.List
 import Data.Maybe
@@ -86,8 +86,9 @@ showLine source line | isEmpty line = Nothing
 
 -- | Return the range from a split diff.
 getRange :: SplitDiff leaf Info -> Range
-getRange (Free (Info range _ _ :< _)) = range
-getRange (Pure patch) = let (Fix (Info range _ _ :< _)) = getSplitTerm patch in range
+getRange splitDiff = case runFree splitDiff of
+  (Free (Info range _ _ :< _)) -> range
+  (Pure patch) -> range where (Info range _ _ :< _) = runCofree $ getSplitTerm patch
 
 -- | Returns the header given two source blobs and a hunk.
 header :: Both SourceBlob -> String
