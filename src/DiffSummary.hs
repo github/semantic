@@ -47,8 +47,8 @@ instance (Monoid DiffSummary)  where
 emptyDiffSummary :: DiffSummary
 emptyDiffSummary = EmptySummary
 
-patchSummary :: (Term a Info -> DiffSummary) -> Patch (Term a Info) -> DiffSummary
-patchSummary termSummary patch = memptyOrDiff (before patch) <> memptyOrDiff (after patch)
+patchToSummary :: (Term a Info -> DiffSummary) -> Patch (Term a Info) -> DiffSummary
+patchToSummary termSummary patch = memptyOrDiff (before patch) <> memptyOrDiff (after patch)
   where
     memptyOrDiff = maybe emptyDiffSummary termSummary
 
@@ -56,7 +56,7 @@ type DiffSummaryF leaf annotation = FreeF (CofreeF (Syntax leaf) (Both annotatio
 
 diffSummary :: Diff leaf Info -> DiffSummary
 -- histo :: Foldable t => (Base t (Cofree (Base t) a) -> a) -> t -> a
-diffSummary = histo diffSummary' . fmap (patchSummary termToSummary) where
+diffSummary = histo diffSummary' . fmap (patchToSummary termToSummary) where
   --diffSummary' :: DiffF leaf (Cofree.Cofree (DiffF leaf Info) DiffSummary) f -> DiffSummary
   -- Skip any child that doesn't have any changes (that will always include leaves)
   diffSummary' :: DiffSummaryF leaf annotation DiffSummary (Cofree.Cofree (DiffSummaryF leaf annotation DiffSummary) DiffSummary) -> DiffSummary
