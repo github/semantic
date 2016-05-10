@@ -16,7 +16,6 @@ library
   exposed-modules:     Algorithm
                      , Alignment
                      , Category
-                     , Control.Comonad.CofreeExtras
                      , Data.Adjoined
                      , Data.Align
                      , Data.Bifunctor.These
