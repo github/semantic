@@ -7,7 +7,7 @@ import Info
 import Patch
 import Term
 import Syntax
-import qualified Category
+import Category as Category
 import Data.Functor.Both
 import Data.Monoid
 import Data.Maybe (listToMaybe)
@@ -81,6 +81,7 @@ termToSummary = Foldable.cata summary where
   summary (info :< Fixed children) = toCategory info
   summary (info :< Keyed _) = toCategory info
 
+maybeFirstCategory :: (Categorizable a) => a -> Maybe Category
 maybeFirstCategory term = listToMaybe . toList $ Category.categories term
 
 toCategory :: Info -> DiffSummary
