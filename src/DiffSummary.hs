@@ -1,6 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, DataKinds, RecordWildCards #-}
 module DiffSummary where
 
+import Prelude hiding (fst, snd)
 import Diff
 import Info
 import Patch
@@ -11,6 +12,7 @@ import Data.Functor.Both
 import Data.Monoid
 import Data.Maybe (listToMaybe)
 import Data.Set (toList)
+import Control.Comonad
 import Control.Comonad.Trans.Cofree
 import Control.Monad.Trans.Free
 import qualified Control.Comonad.Cofree as Cofree
@@ -59,10 +61,10 @@ diffSummary :: Diff leaf Info -> DiffSummary
 diffSummary = histo diffSummary' . fmap (patchToSummary termToSummary) where
   --diffSummary' :: DiffF leaf (Cofree.Cofree (DiffF leaf Info) DiffSummary) f -> DiffSummary
   -- Skip any child that doesn't have any changes (that will always include leaves)
-  diffSummary' :: DiffSummaryF leaf annotation DiffSummary (Cofree.Cofree (DiffSummaryF leaf annotation DiffSummary) DiffSummary) -> DiffSummary
-  diffSummary' (Free (_ :< Leaf _)) = undefined
-  diffSummary' (Free (_ :< Indexed children)) = DiffSummary {}
-  diffSummary' (Free (_ :< Fixed children)) = undefined
+  diffSummary' :: DiffSummaryF leaf Info DiffSummary (Cofree.Cofree (DiffSummaryF leaf Info DiffSummary) DiffSummary) -> DiffSummary
+  diffSummary' (Free (info :< Leaf _)) = toCategory (fst info) <> toCategory (snd info)
+  diffSummary' (Free (_ :< Indexed children)) = mconcat $ extract <$> children
+  diffSummary' (Free (_ :< Fixed children)) = mconcat $ extract <$> children
   diffSummary' (Free (_ :< Keyed children)) = undefined
   diffSummary' (Pure diffSummary) = diffSummary :: DiffSummary
   -- (patchSummary termSummary)
@@ -79,8 +81,9 @@ termToSummary = Foldable.cata summary where
   summary (info :< Fixed children) = toCategory info
   summary (info :< Keyed _) = toCategory info
 
-  toCategory :: Info -> DiffSummary
-  toCategory term = case maybeFirstCategory term of
-    Just category -> TermSummary { termName = show category }
-    Nothing -> EmptySummary
-  maybeFirstCategory term = listToMaybe . toList $ Category.categories term
+maybeFirstCategory term = listToMaybe . toList $ Category.categories term
+
+toCategory :: Info -> DiffSummary
+toCategory info = case maybeFirstCategory info of
+  Just category -> TermSummary { termName = show category }
+  Nothing -> EmptySummary
