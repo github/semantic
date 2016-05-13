@@ -153,12 +153,11 @@ alignBranch getRange children ranges = case intersectingChildren of
   [] -> (flip (,) [] <$> headRanges) : alignBranch getRange children (drop 1 <$> ranges)
   -- | At least one child intersects on at least one side.
   _ -> if any (and . intersects getRange headRanges . head) children
-    -- | No child intersects on both sides, so align asymmetrically.
+    -- | No child intersects on both sides, so align asymmetrically, arbitrarily picking the left side first.
     then []
     -- | At least one child intersects on both sides, so align symmetrically.
-    else let (them, remainingLinesOfIntersectingChildren) = alignChildren headRanges intersectingChildren in
-      fromJust ((,) <$> headRanges `applyThese` Join (runBothWith These them))
-      : alignBranch getRange (remainingLinesOfIntersectingChildren ++ nonIntersectingChildren) (drop 1 <$> ranges)
+    else let (line, remaining) = lineAndRemaining headRanges intersectingChildren in
+      line : alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
   where (intersectingChildren, nonIntersectingChildren) = span (or . intersects getRange headRanges . head) children
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
         -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
@@ -178,6 +177,8 @@ alignBranch getRange children ranges = case intersectingChildren of
           _ -> (both [] [], [])
           where toTerms line = modifyJoin (fromThese [] []) (pure <$> line)
                 (l, r) = splitThese firstLine
+        lineAndRemaining ranges children = let (intersections, remaining) = alignChildren ranges children in
+          (fromJust ((,) <$> ranges `applyThese` Join (runBothWith These intersections)), remaining)
 
 {-
 
