@@ -152,7 +152,10 @@ alignBranch _ _ (Join ([], [])) = []
 -- There are no more children, so we can just zip the remaining ranges together.
 alignBranch _ [] ranges = runBothWith (alignWith Join) (fmap (flip (,) []) <$> ranges)
 -- There are both children and ranges, so we need to proceed line by line
-alignBranch getRange children ranges = []
+alignBranch getRange children ranges = case intersectingChildren of
+  -- | No child intersects the current ranges on either side, so advance.
+  [] -> (flip (,) [] <$> headRanges) : alignBranch getRange children (drop 1 <$> ranges)
+  _ -> []
   where (intersectingChildren, nonIntersectingChildren) = span (or . intersects) children
         intersects (line:_) = fromMaybe (Join (These False False)) (intersectsRange . Prelude.fst <$> line `applyThese` headRanges)
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
