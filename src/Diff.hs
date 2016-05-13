@@ -27,6 +27,7 @@ type Diff a annotation = Free (CofreeF (Syntax a) (Both annotation)) (Patch (Ter
 
 type instance Base (Free f a) = FreeF f a
 instance (Functor f) => Foldable.Foldable (Free f a) where project = runFree
+instance (Functor f) => Foldable.Unfoldable (Free f a) where embed = free
 
 diffSum :: (Patch (Term a annotation) -> Integer) -> Diff a annotation -> Integer
 diffSum patchCost diff = sum $ fmap patchCost diff
