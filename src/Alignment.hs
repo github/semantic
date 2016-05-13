@@ -30,6 +30,7 @@ import Diff
 import Info
 import Patch
 import Prelude hiding (fst, snd)
+import qualified Prelude
 import Range
 import Source hiding (fromList, uncons, (++))
 import SplitDiff
@@ -143,6 +144,18 @@ Lines without children on them are aligned irrespective of their textual content
 
 type Line term = Join These (Range, [term])
 type Result term = [Line term]
+
+-- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
+alignBranch :: (term -> Range) -> [Result term] -> Both [Range] -> Result term
+-- There are no more ranges, so we’re done.
+alignBranch _ _ (Join ([], [])) = []
+-- There are no more children, so we can just zip the remaining ranges together.
+alignBranch _ [] ranges = runBothWith (alignWith Join) (fmap (flip (,) []) <$> ranges)
+-- There are both children and ranges, so we need to proceed line by line
+alignBranch getRange children ranges = []
+  where (intersectingChildren, nonIntersectingChildren) = span (or . intersects) children
+        intersects (line:_) = fromMaybe (Join (These False False)) (intersectsRange . Prelude.fst <$> line `applyThese` headRanges)
+        Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
 
 {-
 
