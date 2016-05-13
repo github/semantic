@@ -172,7 +172,8 @@ alignBranch getRange children ranges = case intersectingChildren of
         alignChildren ([]:rest) = alignChildren rest
         alignChildren ((firstLine:restOfLines):rest) = if and (intersects firstLine)
           -- | It intersects on both sides, so we can just take the first line whole.
-          then (modifyJoin (fromThese [] []) (Prelude.snd <$> firstLine), restOfLines : [])
+          then let (firstRemaining, restRemaining) = alignChildren rest in
+            ((++) <$> modifyJoin (fromThese [] []) (Prelude.snd <$> firstLine) <*> firstRemaining, restOfLines : restRemaining)
           -- | It only intersects on one side, so we have to split it up.
           else (both [] [], [])
 
