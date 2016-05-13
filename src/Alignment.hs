@@ -83,6 +83,64 @@ alignChildrenInRanges getRange ranges children
   = merged : moreLines
   | otherwise = fmap (flip (,) []) <$> sequenceL ranges
 
+{-
+
+
+We align asymmetrically since the first child is asymmetrical, and then continue aligning symmetrically afterwards:
+[         | [
+  a       |
+, b       |   b
+]         | ]
+
+
+
+[ [ Join This  (Range 4 5, [ pure (Delete (Info (Range 4 5) mempty 0 :< Leaf "a")) ]) ]
+, [ Join These (Range 4 5, [ liftF (Info (Range 4 5) mempty 0 :< Leaf "b") ])
+               (Range 4 5, [ liftF (Info (Range 4 5) mempty 0 :< Leaf "b") ])
+]
+
+
+The first child is asymmetrical but there is also a symmetrical child on the same line, so we align symmetrically, producing:
+[ a, b ] | [ b ]
+
+and not:
+[ a, b ] |
+         | [ b ]
+
+
+We align the child symmetrically, and thus have to take the first line range on the right asymmetrically so as not to break the child’s alignment.
+      | [
+[ b ] |   b
+      | ]
+(Eventually, we’ll align the left hand side of this up a line, but that constraint is undecidable for now.)
+
+
+If a is replaced with b in a Replace patch, we would like to align them side by side (that’s what makes it a replacement—they correlate), but a catamorphism which loses the Replace relationship (by splitting it into two SplitReplaces) can’t know that they’re related:
+[ a ] | [ b ]
+
+If a is deleted and b is coincidentally inserted, we want to separate them, because they’re semantically unrelated:
+[ a ] |
+      | [ b ]
+
+The presence of a symmetrical child forces it to be symmetrical again:
+[ a, c ] | [ c, b ]
+
+We might split up children so `This` and `That` aren’t 1:1 with `Delete` and `Insert`. This is because earlier symmetrical children take precedence over later ones:
+[ a, b ] | [ a
+         | , b
+         | ]
+
+Lines without children on them are aligned irrespective of their textual content:
+[\n      | [\n
+  a\n    |   a, b\n
+,\n      | \n
+  b\n    | \n
+]        | ]
+
+[ [ Join That (Range 4 5, [ liftF (Info (Range 4 5) mempty 0 :< Leaf "b") ]) ] ]
+
+-}
+
 spanAndSplitFirstLines :: (Copointed c, Functor c, Foldable f) => (Join These a -> Join These Bool) -> f (c [Join These a]) -> ([c (Join These a)], [c [Join These a]], [c [Join These a]])
 spanAndSplitFirstLines pred = foldr (go pred) ([], [], [])
   where go pred child (this, next, nonintersecting)
