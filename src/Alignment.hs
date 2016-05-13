@@ -156,7 +156,7 @@ alignBranch getRange children ranges = case intersectingChildren of
     -- | No child intersects on both sides, so align asymmetrically, arbitrarily picking the left side first.
     then []
     -- | At least one child intersects on both sides, so align symmetrically.
-    else let (line, remaining) = lineAndRemaining headRanges intersectingChildren in
+    else let (line, remaining) = lineAndRemaining intersectingChildren headRanges in
       line : alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
   where (intersectingChildren, nonIntersectingChildren) = span (or . intersects getRange headRanges . head) children
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
@@ -177,7 +177,7 @@ alignBranch getRange children ranges = case intersectingChildren of
           _ -> (both [] [], [])
           where toTerms line = modifyJoin (fromThese [] []) (pure <$> line)
                 (l, r) = splitThese firstLine
-        lineAndRemaining ranges children = let (intersections, remaining) = alignChildren ranges children in
+        lineAndRemaining children ranges = let (intersections, remaining) = alignChildren ranges children in
           (fromJust ((,) <$> ranges `applyThese` Join (runBothWith These intersections)), remaining)
 
 {-
