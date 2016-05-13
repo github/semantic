@@ -152,21 +152,20 @@ alignBranch getRange children ranges = case intersectingChildren of
   -- | No child intersects the current ranges on either side, so advance.
   [] -> (flip (,) [] <$> headRanges) : alignBranch getRange children (drop 1 <$> ranges)
   -- | At least one child intersects on at least one side.
-  _ -> if any (and . intersects . head) children
+  _ -> if any (and . intersects getRange headRanges . head) children
     -- | No child intersects on both sides, so align asymmetrically.
     then []
     -- | At least one child intersects on both sides, so align symmetrically.
     else let (them, remainingLinesOfIntersectingChildren) = alignChildren intersectingChildren in
       fromJust ((,) <$> headRanges `applyThese` Join (runBothWith These them))
       : alignBranch getRange (remainingLinesOfIntersectingChildren ++ nonIntersectingChildren) (drop 1 <$> ranges)
-  where (intersectingChildren, nonIntersectingChildren) = span (or . intersects . head) children
-        intersects line = fromMaybe (Join (These False False)) (intersectsRange . getRange <$> line `applyThese` headRanges)
+  where (intersectingChildren, nonIntersectingChildren) = span (or . intersects getRange headRanges . head) children
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
         -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
         alignChildren :: [[Join These term]] -> (Both [term], [[Join These term]])
         alignChildren [] = (both [] [], [])
         alignChildren ([]:rest) = alignChildren rest
-        alignChildren ((firstLine:restOfLines):rest) = if and (intersects firstLine)
+        alignChildren ((firstLine:restOfLines):rest) = if and (intersects getRange headRanges firstLine)
           -- | It intersects on both sides, so we can just take the first line whole.
           then let (firstRemaining, restRemaining) = alignChildren rest in
             ((++) <$> modifyJoin (fromThese [] []) (pure <$> firstLine) <*> firstRemaining, restOfLines : restRemaining)
