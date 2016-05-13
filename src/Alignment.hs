@@ -165,12 +165,12 @@ alignBranch getRange children ranges = case intersectingChildren of
         alignChildren :: [[Join These term]] -> (Both [term], [[Join These term]])
         alignChildren [] = (both [] [], [])
         alignChildren ([]:rest) = alignChildren rest
-        alignChildren ((firstLine:restOfLines):rest) = if and (intersects getRange headRanges firstLine)
+        alignChildren ((firstLine:restOfLines):rest) = case fromThese False False . runJoin $ intersects getRange headRanges firstLine of
           -- | It intersects on both sides, so we can just take the first line whole.
-          then let (firstRemaining, restRemaining) = alignChildren rest in
+          (True, True) -> let (firstRemaining, restRemaining) = alignChildren rest in
             ((++) <$> modifyJoin (fromThese [] []) (pure <$> firstLine) <*> firstRemaining, restOfLines : restRemaining)
           -- | It only intersects on one side, so we have to split it up.
-          else (both [] [], [])
+          _ -> (both [] [], [])
 
 {-
 
