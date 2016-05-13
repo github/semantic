@@ -141,6 +141,17 @@ Lines without children on them are aligned irrespective of their textual content
 
 -}
 
+{-
+
+Properties of well-formed alignments:
+
+- nodes are aligned in order, with priority given to earlier siblings over later ones (i.e. later nodes can be split up if necessary to allow earlier ones to be aligned)
+- insertions alone on a line should not break the alignment of later siblings
+- ✔︎ nodes should be aligned starting at the same line
+- ✔︎ nodes should have the same height (# of lines spanned) on both sides, padding with blank lines as necessary
+
+-}
+
 spanAndSplitFirstLines :: (Copointed c, Functor c, Foldable f) => (Join These a -> Join These Bool) -> f (c [Join These a]) -> ([c (Join These a)], [c [Join These a]], [c [Join These a]])
 spanAndSplitFirstLines pred = foldr (go pred) ([], [], [])
   where go pred child (this, next, nonintersecting)
