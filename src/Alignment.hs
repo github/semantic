@@ -66,7 +66,7 @@ alignPatch sources patch = case patch of
 alignSyntax :: Applicative f => (forall a. f a -> Join These a) -> (Info -> Syntax leaf term -> term) -> (term -> Range) -> f (Source Char) -> f Info -> Syntax leaf [Join These term] -> [Join These term]
 alignSyntax toJoinThese toNode getRange sources infos syntax = case syntax of
   Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> sequenceL lineRanges
-  Indexed children -> catMaybes $ wrapInBranch (Indexed . fmap runIdentity) <$> alignChildrenInRanges getRange lineRanges (Identity <$> children)
+  Indexed children -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange children (modifyJoin (fromThese [] []) lineRanges)
   Fixed children -> catMaybes $ wrapInBranch (Fixed . fmap runIdentity) <$> alignChildrenInRanges getRange lineRanges (Identity <$> children)
   Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> alignChildrenInRanges getRange lineRanges (Map.toList children)
   where lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
@@ -152,7 +152,7 @@ alignBranch getRange children ranges = case intersectingChildren of
   -- | No child intersects the current ranges on either side, so advance.
   [] -> (flip (,) [] <$> headRanges) : alignBranch getRange children (drop 1 <$> ranges)
   -- | At least one child intersects on at least one side.
-  _ -> if any (and . intersects getRange headRanges . head) children
+  _ -> if any (and . intersectsFirstLine headRanges) children
     -- | No child intersects on both sides, so align asymmetrically, arbitrarily picking the left side first.
     then let (leftRange, rightRange) = splitThese headRanges
              (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ lineAndRemaining intersectingChildren <$> leftRange
@@ -161,7 +161,8 @@ alignBranch getRange children ranges = case intersectingChildren of
     -- | At least one child intersects on both sides, so align symmetrically.
     else let (line, remaining) = lineAndRemaining intersectingChildren headRanges in
       line : alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
-  where (intersectingChildren, nonIntersectingChildren) = span (or . intersects getRange headRanges . head) children
+  where (intersectingChildren, nonIntersectingChildren) = span (or . intersectsFirstLine headRanges) children
+        intersectsFirstLine ranges = maybe (Join (These False False)) (intersects getRange ranges) . listToMaybe
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
         -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
         alignChildren :: Join These Range -> [[Join These term]] -> (Both [term], [[Join These term]])
