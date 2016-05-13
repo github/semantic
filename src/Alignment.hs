@@ -154,7 +154,10 @@ alignBranch getRange children ranges = case intersectingChildren of
   -- | At least one child intersects on at least one side.
   _ -> if any (and . intersects getRange headRanges . head) children
     -- | No child intersects on both sides, so align asymmetrically, arbitrarily picking the left side first.
-    then []
+    then let (leftRange, rightRange) = splitThese headRanges
+             (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ lineAndRemaining intersectingChildren <$> leftRange
+             (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ lineAndRemaining intersectingChildren <$> rightRange in
+      leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (drop 1 <$> ranges)
     -- | At least one child intersects on both sides, so align symmetrically.
     else let (line, remaining) = lineAndRemaining intersectingChildren headRanges in
       line : alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
