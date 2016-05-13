@@ -4,7 +4,7 @@ import Alignment
 import ArbitraryTerm ()
 import Control.Comonad.Cofree
 import Control.Monad.Free
-import Data.Align
+import Data.Align hiding (align)
 import Data.Bifunctor.Join
 import Data.Foldable (toList)
 import Data.Functor.Both as Both
@@ -91,9 +91,8 @@ spec = parallel $ do
         ]
 
     it "aligns context following insertions" $
-      let sources = both (Source.fromList "a\nc") (Source.fromList "a\nb\nc")
-          align = PrettyDiff sources . alignDiff sources in
-      align (both (info 0 3) (info 0 5) `branch` [ pure (info 0 1) `leaf` "a", Pure (Insert (info 2 3 :< Leaf "b")), both (info 2 3) (info 4 5) `leaf` "c" ])
+      let sources = both (Source.fromList "a\nc") (Source.fromList "a\nb\nc") in
+      align sources (both (info 0 3) (info 0 5) `branch` [ pure (info 0 1) `leaf` "a", Pure (Insert (info 2 3 :< Leaf "b")), both (info 2 3) (info 4 5) `leaf` "c" ])
         `shouldBe` PrettyDiff sources
         [ Join (These (info 0 2 `branch` [ info 0 1 `leaf` "a" ])
                       (info 0 2 `branch` [ info 0 1 `leaf` "a" ]))
@@ -108,6 +107,9 @@ spec = parallel $ do
 
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
+
+align :: Both (Source.Source Char) -> Diff String Info -> PrettyDiff
+align sources = PrettyDiff sources . alignDiff sources
 
 branch :: annotation -> [Free (Annotated String annotation) patch] -> Free (Annotated String annotation) patch
 branch annotation = Free . Annotated annotation . Indexed
