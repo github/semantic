@@ -165,6 +165,15 @@ alignBranch getRange children ranges = case intersectingChildren of
         intersects (line:_) = fromMaybe (Join (These False False)) (intersectsRange . Prelude.fst <$> line `applyThese` headRanges)
         intersects [] = Join (These False False)
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
+        -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
+        alignChildren :: [Result term] -> (Both [term], [Result term])
+        alignChildren [] = (both [] [], [])
+        alignChildren ([]:rest) = alignChildren rest
+        alignChildren ((firstLine:restOfLines):rest) = if and (intersects firstLine)
+          -- | It intersects on both sides, so we can just take the first line whole.
+          then (modifyJoin (fromThese [] []) (Prelude.snd <$> firstLine), restOfLines : [])
+          -- | It only intersects on one side, so we have to split it up.
+          else (both [] [], [])
 
 {-
 
