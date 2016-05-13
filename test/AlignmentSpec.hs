@@ -45,12 +45,14 @@ spec = parallel $ do
 
   describe "alignDiff" $ do
     it "aligns identical branches on a single line" $
-      alignDiff (both (Source.fromList "[ foo ]") (Source.fromList "[ foo ]")) (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe`
+      let sources = both (Source.fromList "[ foo ]") (Source.fromList "[ foo ]") in
+      align sources (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe` PrettyDiff sources
         [ Join (These (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])
                       (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])) ]
 
     it "aligns identical branches spanning multiple lines" $
-      alignDiff (both (Source.fromList "[\nfoo\n]") (Source.fromList "[\nfoo\n]")) (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe`
+      let sources = both (Source.fromList "[\nfoo\n]") (Source.fromList "[\nfoo\n]") in
+      align sources (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe` PrettyDiff sources
         [ Join (These (info 0 2 `branch` [])
                       (info 0 2 `branch` []))
         , Join (These (info 2 6 `branch` [ info 2 5 `leaf` "foo" ])
@@ -60,7 +62,8 @@ spec = parallel $ do
         ]
 
     it "aligns reformatted branches" $
-      alignDiff (both (Source.fromList "[ foo ]") (Source.fromList "[\nfoo\n]")) (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe`
+      let sources = both (Source.fromList "[ foo ]") (Source.fromList "[\nfoo\n]") in
+      align sources (pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ]) `shouldBe` PrettyDiff sources
         [ Join (That  (info 0 2 `branch` []))
         , Join (These (info 0 7 `branch` [ info 2 5 `leaf` "foo" ])
                       (info 2 6 `branch` [ info 2 5 `leaf` "foo" ]))
@@ -68,7 +71,8 @@ spec = parallel $ do
         ]
 
     it "aligns nodes following reformatted branches" $
-      alignDiff (both (Source.fromList "[ foo ]\nbar\n") (Source.fromList "[\nfoo\n]\nbar\n")) (pure (info 0 12) `branch` [ pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ], pure (info 8 11) `leaf` "bar" ]) `shouldBe`
+      let sources = both (Source.fromList "[ foo ]\nbar\n") (Source.fromList "[\nfoo\n]\nbar\n") in
+      align sources (pure (info 0 12) `branch` [ pure (info 0 7) `branch` [ pure (info 2 5) `leaf` "foo" ], pure (info 8 11) `leaf` "bar" ]) `shouldBe` PrettyDiff sources
         [ Join (That  (info 0 2 `branch` [ info 0 2 `branch` [] ]))
         , Join (These (info 0 8 `branch` [ info 0 7 `branch` [ info 2 5 `leaf` "foo" ] ])
                       (info 2 6 `branch` [ info 2 6 `branch` [ info 2 5 `leaf` "foo" ] ]))
@@ -80,11 +84,13 @@ spec = parallel $ do
         ]
 
     it "aligns identical branches with multiple children on the same line" $
-      alignDiff (pure (Source.fromList "[ foo, bar ]")) (pure (info 0 12) `branch` [ pure (info 2 5) `leaf` "foo", pure (info 7 10) `leaf` "bar" ]) `shouldBe`
+      let sources = pure (Source.fromList "[ foo, bar ]") in
+      align sources (pure (info 0 12) `branch` [ pure (info 2 5) `leaf` "foo", pure (info 7 10) `leaf` "bar" ]) `shouldBe` PrettyDiff sources
         [ Join (runBothWith These (pure (info 0 12 `branch` [ info 2 5 `leaf` "foo", info 7 10 `leaf` "bar" ])) ) ]
 
     it "aligns insertions" $
-      alignDiff (both (Source.fromList "a") (Source.fromList "a\nb")) (both (info 0 1) (info 0 3) `branch` [ pure (info 0 1) `leaf` "a", Pure (Insert (info 2 3 :< Leaf "b")) ]) `shouldBe`
+      let sources = both (Source.fromList "a") (Source.fromList "a\nb") in
+      align sources (both (info 0 1) (info 0 3) `branch` [ pure (info 0 1) `leaf` "a", Pure (Insert (info 2 3 :< Leaf "b")) ]) `shouldBe` PrettyDiff sources
         [ Join (These (info 0 1 `branch` [ info 0 1 `leaf` "a" ])
                       (info 0 2 `branch` [ info 0 1 `leaf` "a" ]))
         , Join (That (info 2 3 `branch` [ Pure (SplitInsert (info 2 3 :< Leaf "b")) ]))
