@@ -161,7 +161,7 @@ alignBranch getRange children ranges = case intersectingChildren of
     then []
     -- | At least one child intersects on both sides, so align symmetrically.
     else []
-  where (intersectingChildren, nonIntersectingChildren) = span (or . intersects) children
+  where (intersectingChildren, _) = span (or . intersects) children
         intersects (line:_) = fromMaybe (Join (These False False)) (intersectsRange . Prelude.fst <$> line `applyThese` headRanges)
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
 
