@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
 module Alignment
 ( hasChanges
 , numberedRows
@@ -30,7 +30,6 @@ import Diff
 import Info
 import Patch
 import Prelude hiding (fst, snd)
-import qualified Prelude
 import Range
 import Source hiding (fromList, uncons, (++))
 import SplitDiff
@@ -142,11 +141,8 @@ Lines without children on them are aligned irrespective of their textual content
 
 -}
 
-type Line term = Join These (Range, [term])
-type Result term = [Line term]
-
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
-alignBranch :: (term -> Range) -> [Result term] -> Both [Range] -> Result term
+alignBranch :: forall term. (term -> Range) -> [[Join These term]] -> Both [Range] -> [Join These (Range, [term])]
 -- There are no more ranges, so we’re done.
 alignBranch _ _ (Join ([], [])) = []
 -- There are no more children, so we can just zip the remaining ranges together.
@@ -164,16 +160,16 @@ alignBranch getRange children ranges = case intersectingChildren of
       fromJust ((,) <$> headRanges `applyThese` Join (runBothWith These them))
       : alignBranch getRange (remainingLinesOfIntersectingChildren ++ nonIntersectingChildren) (drop 1 <$> ranges)
   where (intersectingChildren, nonIntersectingChildren) = span (or . intersects . head) children
-        intersects line = fromMaybe (Join (These False False)) (intersectsRange . Prelude.fst <$> line `applyThese` headRanges)
+        intersects line = fromMaybe (Join (These False False)) (intersectsRange . getRange <$> line `applyThese` headRanges)
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
         -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
-        alignChildren :: [Result term] -> (Both [term], [Result term])
+        alignChildren :: [[Join These term]] -> (Both [term], [[Join These term]])
         alignChildren [] = (both [] [], [])
         alignChildren ([]:rest) = alignChildren rest
         alignChildren ((firstLine:restOfLines):rest) = if and (intersects firstLine)
           -- | It intersects on both sides, so we can just take the first line whole.
           then let (firstRemaining, restRemaining) = alignChildren rest in
-            ((++) <$> modifyJoin (fromThese [] []) (Prelude.snd <$> firstLine) <*> firstRemaining, restOfLines : restRemaining)
+            ((++) <$> modifyJoin (fromThese [] []) (pure <$> firstLine) <*> firstRemaining, restOfLines : restRemaining)
           -- | It only intersects on one side, so we have to split it up.
           else (both [] [], [])
 
