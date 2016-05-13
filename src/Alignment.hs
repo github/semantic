@@ -141,6 +141,9 @@ Lines without children on them are aligned irrespective of their textual content
 
 -}
 
+type Line term = Join These (Range, [term])
+type Result term = [Line term]
+
 {-
 
 Properties of well-formed alignments:
