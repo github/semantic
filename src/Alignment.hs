@@ -157,7 +157,7 @@ alignBranch getRange children ranges = case intersectingChildren of
     then let (leftRange, rightRange) = splitThese headRanges
              (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ lineAndRemaining intersectingChildren <$> leftRange
              (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ lineAndRemaining intersectingChildren <$> rightRange in
-      leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (drop 1 <$> ranges)
+      leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast intersectingChildren)) ranges)
     -- | At least one child intersects on both sides, so align symmetrically.
     else let (line, remaining) = lineAndRemaining intersectingChildren headRanges in
       line : alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
@@ -182,6 +182,7 @@ alignBranch getRange children ranges = case intersectingChildren of
                 (l, r) = splitThese firstLine
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren ranges children in
           (fromJust ((,) <$> ranges `applyThese` Join (runBothWith These intersections)), remaining)
+        advancePast lines = fromThese id id . runJoin . (drop 1 <$) $ unionThese (head <$> lines)
 
 {-
 
