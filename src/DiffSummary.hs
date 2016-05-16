@@ -41,14 +41,6 @@ diffSummary = cata diffSummary' where
 prependSummary :: a -> DiffSummary a -> DiffSummary a
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
 
-termToSummary :: Term leaf Info -> DiffSummary a
-termToSummary = Foldable.cata summary where
-  summary :: TermF leaf Info f -> DiffSummary a
-  summary (info :< Leaf replace) = undefined
-  summary (info :< Indexed children) = undefined
-  summary (info :< Fixed children) = undefined
-  summary (info :< Keyed _) = undefined
-
 maybeFirstCategory :: (Categorizable a) => a -> Maybe Category
 maybeFirstCategory term = listToMaybe . toList $ Category.categories term
 
