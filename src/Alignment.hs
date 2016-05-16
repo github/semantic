@@ -147,6 +147,8 @@ alignBranch :: forall term. (term -> Range) -> [[Join These term]] -> Both [Rang
 alignBranch _ _ (Join ([], [])) = []
 -- There are no more children, so we can just zip the remaining ranges together.
 alignBranch _ [] ranges = runBothWith (alignWith Join) (fmap (flip (,) []) <$> ranges)
+-- The first child is empty, and so can safely be dropped.
+alignBranch getRange ([]:children) ranges = alignBranch getRange children ranges
 -- There are both children and ranges, so we need to proceed line by line
 alignBranch getRange children ranges = case intersectingChildren of
   -- | No child intersects the current ranges on either side, so advance.
