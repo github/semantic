@@ -5,7 +5,6 @@ import Prelude hiding (fst, snd)
 import Diff
 import Info
 import Patch
-import Term
 import Syntax
 import Category
 import Data.Maybe (listToMaybe)
@@ -30,7 +29,7 @@ type instance Base (DiffSummary a) = Prim (DiffSummary a)
 diffSummary :: Diff leaf Info -> [DiffSummary ()]
 diffSummary = cata diffSummary' where
   diffSummary' :: DiffF leaf Info [DiffSummary ()] -> [DiffSummary ()]
-  diffSummary' (Free (info :< Leaf _)) = [] -- Skip leaves since they don't have any changes
+  diffSummary' (Free (_ :< Leaf _)) = [] -- Skip leaves since they don't have any changes
   diffSummary' (Free (_ :< Indexed children)) = prependSummary () <$> join children
   diffSummary' (Free (_ :< Fixed children)) = prependSummary () <$> join children
   diffSummary' (Free (_ :< Keyed children)) = prependSummary () <$> join (F.toList children)
