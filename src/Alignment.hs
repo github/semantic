@@ -173,11 +173,11 @@ alignBranch getRange children ranges = case intersectingChildren of
           (True, True) -> let (firstRemaining, restRemaining) = alignChildren headRanges rest in
             ((++) <$> toTerms firstLine <*> firstRemaining, restOfLines : restRemaining)
           -- | It only intersects on the left, so split it up.
-          (True, False) -> let (firstRemaining, restRemaining) = alignChildren headRanges (maybeToList r : rest) in
-            ((++) <$> toTerms (fromJust l) <*> firstRemaining, restOfLines : restRemaining)
+          (True, False) -> let (firstRemaining, restRemaining) = alignChildren headRanges rest in
+            ((++) <$> toTerms (fromJust l) <*> firstRemaining, maybeToList r : restOfLines : restRemaining)
           -- | It only intersects on the right, so split it up.
-          (False, True) -> let (firstRemaining, restRemaining) = alignChildren headRanges (maybeToList l : rest) in
-            ((++) <$> toTerms (fromJust r) <*> firstRemaining, restOfLines : restRemaining)
+          (False, True) -> let (firstRemaining, restRemaining) = alignChildren headRanges rest in
+            ((++) <$> toTerms (fromJust r) <*> firstRemaining, maybeToList l : restOfLines : restRemaining)
           _ -> (both [] [], [])
           where toTerms line = modifyJoin (fromThese [] []) (pure <$> line)
                 (l, r) = splitThese firstLine
