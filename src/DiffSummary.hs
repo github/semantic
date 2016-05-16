@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, DataKinds, RecordWildCards, TypeFamilies #-}
+{-# LANGUAGE DataKinds, TypeFamilies #-}
 module DiffSummary where
 
 import Prelude hiding (fst, snd)
@@ -7,22 +7,14 @@ import Info
 import Patch
 import Term
 import Syntax
-import qualified Range as R
-import Category as Category
-import Data.Functor.Both
-import Data.Monoid
+import Category
 import Data.Maybe (listToMaybe)
 import Data.Set (toList)
-import Control.Comonad
 import Control.Comonad.Trans.Cofree
 import Control.Monad.Trans.Free
-import qualified Control.Monad.Free as Free
-import qualified Control.Comonad.Cofree as Cofree
+import Control.Monad
 import Data.Functor.Foldable as Foldable
 import qualified Data.Foldable as F
-import Control.Monad.State hiding (sequence)
-import qualified Data.Map as M
-import Data.Functor.Identity
 
 data DiffSummary a = TermSummary {
   description :: String,
