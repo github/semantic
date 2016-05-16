@@ -19,34 +19,25 @@ import Control.Monad.Trans.Free
 import qualified Control.Monad.Free as Free
 import qualified Control.Comonad.Cofree as Cofree
 import Data.Functor.Foldable as Foldable
+import qualified Data.Foldable as F
 import Control.Monad.State hiding (sequence)
 import qualified Data.Map as M
 import Data.Functor.Identity
 
-instance Unfoldable (DiffSummary a) where
-  embed (DiffSummary x y) = (DDiffSummary x y)
-  embed (TermSummary s b f) = DTermSummary s b
-  embed EmptySummary = DEmptySummary
-
-  apo f a = case f a of
-    Cons x (Left xs) -> x : xs
-    Cons x (Right b) -> x : apo f b
-    Nil -> []
-
-
--- * --
---   -- *
-
-data DiffSummary a = BranchSummary [DiffSummary a]
-  | TermSummary String a
-  | EmptySummary
+data DiffSummary a = TermSummary {
+  description :: String,
+  annotation :: a,
+  parentAnnotations :: [a]
+}
   deriving (Eq, Show, Functor, Ord)
 
-data instance Prim (DiffSummary a) b = PBranchSummary (Prim [a] b) b | PTermSummary String a b | PEmptySummary
+data instance Prim (DiffSummary a) b = PBranchSummary a b | PTermSummary String a b | PParentSummary a
+  deriving (Show, Functor)
 
 type instance Base (DiffSummary a) = Prim (DiffSummary a)
-instance Foldable.Foldable (DiffSummary a) where project = Const
-instance Unfoldable (DiffSummary a) where embed = getConst
+-- instance Unfoldable (DiffSummary a) where
+--   embed (PTermSummary s a b) = TermSummary s a b
+--   embed (PParentSummary a) = ParentSummary a
 
 -- data DiffSummary' = [(String, [String])]
 
@@ -118,31 +109,43 @@ eIndexed = free . Pure . Insert . cofree $ info :< Indexed [cofree $ info :< Lea
 
 patchToSummary :: (Term a Info -> DiffSummary a) -> Patch (Term a Info) -> DiffSummary a
 patchToSummary termSummary patch = undefined -- memptyOrDiff (before patch) <> memptyOrDiff (after patch)
-  
--- diffSummary :: Diff leaf Info -> DiffSummary a
--- -- histo :: Foldable t => (Base t (Cofree (Base t) a) -> a) -> t -> a
--- diffSummary = histo diffSummary' . fmap (patchToSummary termToSummary) where
---   --diffSummary' :: DiffF leaf (Cofree.Cofree (DiffF leaf Info) DiffSummary) f -> DiffSummary
---   -- Skip any child that doesn't have any changes (that will always include leaves)
---   diffSummary' :: DiffSummaryF leaf Info DiffSummary (Cofree.Cofree (DiffSummaryF leaf Info DiffSummary) DiffSummary) -> DiffSummary
---   -- Prune leaves
---   diffSummary' (Free (info :< Leaf _)) = undefined
---   -- Return a contextless indexed summary with it's indexed context distributed to its children
---   diffSummary' (Free (_ :< Indexed [])) = undefined
---   diffSummary' (Free (_ :< Indexed ((summary Cofree.:< f):xs))) = summary :: DiffSummary
---   -- Return a contextless fixed diff summary with it's fixed context distributed to its children
---   diffSummary' (Free (_ :< Fixed children)) = undefined
---   diffSummary' (Free (_ :< Keyed children)) = undefined
---   -- Return a contextless diff summary
---   diffSummary' (Pure summary) = summary :: DiffSummary
---   -- (patchSummary termSummary)
 
-diffSummary' :: Diff leaf Info -> DiffSummary a
--- futu :: Unfoldable t => (a -> Base t (Free (Base t) a)) -> a -> t
-diffSummary' = futu diffSummary'' where
-  diffSummary'' :: (Diff leaf Info) -> Prim (DiffSummary a) (Free.Free (Prim (DiffSummary a)) (Diff leaf Info))
-  diffSummary'' diff = case project diff of
+diffSummary :: Diff leaf Info -> [DiffSummary ()]
+-- histo :: Foldable t => (Base t (Cofree (Base t) a) -> a) -> t -> a
+diffSummary = cata diffSummary' where
+  diffSummary' :: DiffF leaf Info [DiffSummary ()] -> [DiffSummary ()]
+  -- Skip any child that doesn't have any changes (that will always include leaves)
+  -- Prune leaves
+  diffSummary' (Free (info :< Leaf _)) = []
+  -- Return a contextless indexed summary with it's indexed context distributed to its children
+  diffSummary' (Free (_ :< Indexed children)) = prependSummary () <$> join children
+  -- Return a contextless fixed diff summary with it's fixed context distributed to its children
+  diffSummary' (Free (_ :< Fixed children)) = prependSummary () <$> join children
+  diffSummary' (Free (_ :< Keyed children)) = prependSummary () <$> join (F.toList children)
+  -- Return a contextless diff summary
+  diffSummary' (Pure (Insert term)) = [TermSummary "insert" () []]
+  diffSummary' (Pure (Delete term)) = [TermSummary "delete" () []]
+  diffSummary' (Pure (Replace t1 t2)) = [TermSummary "replace" () []]
 
+prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
+  -- (patchSummary termSummary)
+
+-- diffSummary'' :: Diff leaf Info -> DiffSummary ()
+-- diffSummary'' = hylo combineSummaries tearDiffs where
+--   combineSummaries :: FreeF (Syntax leaf) (Patch (Term leaf Info)) (DiffSummary ()) -> DiffSummary ()
+--   combineSummaries (Pure (Insert term)) = TermSummary "insert" () 
+--   tearDiffs :: Diff leaf Info -> FreeF (Syntax leaf) (Patch (Term leaf Info)) (Diff leaf Info)
+--   tearDiffs = undefined
+
+-- diffSummary' :: Diff leaf Info -> DiffSummary ()
+-- -- futu :: Unfoldable t => (a -> Base t (Free (Base t) a)) -> a -> t
+-- diffSummary' = futu diffSummary'' where
+--   diffSummary'' :: Diff leaf Info -> Prim (DiffSummary a) (Free.Free (Prim (DiffSummary a)) (Diff leaf Info))
+--   diffSummary'' diff = case project diff of
+--     Pure (Insert term) -> PTermSummary "insert" () undefined
+--     Pure (Delete term) -> undefined
+--     Pure (Replace t1 t2) -> undefined
+--     Free (ann :< Leaf a) -> undefined
 -- Syntax Text DiffSummary -> DiffSummary Text
 -- If termSummary returns a DiffEntry that just contains the term name, we need to
 -- Instead of foldMap we need a histomorphism
@@ -150,15 +153,15 @@ diffSummary' = futu diffSummary'' where
 termToSummary :: Term leaf Info -> DiffSummary a
 termToSummary = Foldable.cata summary where
   summary :: TermF leaf Info f -> DiffSummary a
-  summary (info :< Leaf replace) = toCategory info replace
-  summary (info :< Indexed children) = _
-  summary (info :< Fixed children) = _
-  summary (info :< Keyed _) = _
+  summary (info :< Leaf replace) = undefined
+  summary (info :< Indexed children) = undefined
+  summary (info :< Fixed children) = undefined
+  summary (info :< Keyed _) = undefined
 
 maybeFirstCategory :: (Categorizable a) => a -> Maybe Category
 maybeFirstCategory term = listToMaybe . toList $ Category.categories term
 
 toCategory :: Info -> a -> DiffSummary a
 toCategory info a = case maybeFirstCategory info of
-  Just category -> DTermSummary (show category) a
-  Nothing -> DEmptySummary
+  Just category -> undefined
+  Nothing -> undefined
