@@ -185,7 +185,7 @@ alignBranch getRange children ranges = case intersectingChildren of
                 (l, r) = splitThese firstLine
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren ranges children in
           (fromJust ((,) <$> ranges `applyThese` Join (runBothWith These intersections)), remaining)
-        advancePast lines = fromThese id id . runJoin . (drop 1 <$) $ unionThese (head <$> lines)
+        advancePast children = fromThese id id . runJoin . (drop 1 <$) $ unionThese (head <$> children)
 
 {-
 
