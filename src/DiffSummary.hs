@@ -28,8 +28,7 @@ data DiffSummary a = TermSummary {
   description :: String,
   annotation :: a,
   parentAnnotations :: [a]
-}
-  deriving (Eq, Show, Functor, Ord)
+} deriving (Eq, Show, Functor, Ord)
 
 data instance Prim (DiffSummary a) b = PBranchSummary a b | PTermSummary String a b | PParentSummary a
   deriving (Show, Functor)
