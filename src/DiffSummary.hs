@@ -47,6 +47,7 @@ diffSummary = cata diffSummary' where
   diffSummary' (Pure (Delete term)) = [TermSummary "delete" () []]
   diffSummary' (Pure (Replace t1 t2)) = [TermSummary "replace" () []]
 
+prependSummary :: a -> DiffSummary a -> DiffSummary a
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
 
 termToSummary :: Term leaf Info -> DiffSummary a
