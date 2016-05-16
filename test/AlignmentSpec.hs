@@ -93,7 +93,7 @@ spec = parallel $ do
       align sources (both (info 0 1) (info 0 3) `branch` [ pure (info 0 1) `leaf` "a", Pure (Insert (info 2 3 :< Leaf "b")) ]) `shouldBe` PrettyDiff sources
         [ Join (These (info 0 1 `branch` [ info 0 1 `leaf` "a" ])
                       (info 0 2 `branch` [ info 0 1 `leaf` "a" ]))
-        , Join (That (info 2 3 `branch` [ Pure (SplitInsert (info 2 3 :< Leaf "b")) ]))
+        , Join (That  (info 2 3 `branch` [ Pure (SplitInsert (info 2 3 :< Leaf "b")) ]))
         ]
 
     it "aligns context following insertions" $
