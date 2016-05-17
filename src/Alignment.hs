@@ -31,7 +31,7 @@ import Info
 import Patch
 import Prelude hiding (fst, snd)
 import Range
-import Source hiding (fromList, uncons, (++))
+import Source hiding (break, fromList, uncons, (++))
 import SplitDiff
 import Syntax
 import Term
@@ -156,7 +156,8 @@ alignBranch getRange children ranges = case intersectingChildren of
   -- | At least one child intersects on at least one side.
   _ -> if not $ any (and . intersectsFirstLine headRanges) children
     -- | No child intersects on both sides, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
-    then let (leftRange, rightRange) = splitThese headRanges
+    then let (asymmetricalChildren, symmetricalChildren) = break (and . modifyJoin (fromThese False False) . (True <$) . head) intersectingChildren
+             (leftRange, rightRange) = splitThese headRanges
              (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ lineAndRemaining intersectingChildren <$> leftRange
              (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ lineAndRemaining intersectingChildren <$> rightRange in
       leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast intersectingChildren)) ranges)
