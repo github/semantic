@@ -176,6 +176,7 @@ alignBranch getRange children ranges = case intersectingChildren of
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange ranges children in
           (fromJust ((,) <$> ranges `applyThese` Join (runBothWith These intersections)), remaining)
+        lineAndRemainingWhere predicate children = if any predicate children then Just . lineAndRemaining children else const Nothing
         advancePast children = fromThese id id . runJoin . (drop 1 <$) $ unionThese (head <$> children)
 
 -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
