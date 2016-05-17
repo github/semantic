@@ -172,7 +172,7 @@ alignBranch getRange children ranges = case intersectingChildren of
     else let (line, remaining) = lineAndRemaining intersectingChildren headRanges in
       line : alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
   where (intersectingChildren, nonIntersectingChildren) = span (or . intersectsFirstLine headRanges) children
-        intersectsFirstLine ranges = maybe (Join (These False False)) (intersects getRange ranges) . listToMaybe
+        intersectsFirstLine ranges = maybe (False <$ ranges) (intersects getRange ranges) . listToMaybe
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange ranges children in
           (fromJust ((,) <$> ranges `applyThese` Join (runBothWith These intersections)), remaining)

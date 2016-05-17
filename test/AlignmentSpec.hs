@@ -113,7 +113,7 @@ spec = parallel $ do
         `shouldBe` PrettyDiff sources
         [ Join (These (info 0 2 `branch` [ info 0 1 `leaf` "a" ])
                       (info 0 2 `branch` [ info 0 1 `leaf` "a" ]))
-        , Join (That (info 2 4 `branch` [ Pure (SplitInsert (info 2 3 :< Leaf "b")) ]))
+        , Join (That  (info 2 4 `branch` [ Pure (SplitInsert (info 2 3 :< Leaf "b")) ]))
         , Join (These (info 2 3 `branch` [ info 2 3 `leaf` "c" ])
                       (info 4 5 `branch` [ info 4 5 `leaf` "c" ]))
         ]
