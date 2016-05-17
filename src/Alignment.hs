@@ -227,7 +227,7 @@ pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRan
 
 -- | Test ranges and terms for intersection on either or both sides.
 intersects :: (term -> Range) -> Join These Range -> Join These term -> Join These Bool
-intersects getRange ranges line = fromMaybe (False <$ line) $ intersectsRange <$> ranges `applyThese` (getRange <$> line)
+intersects getRange ranges line = fromMaybe (False <$ ranges) $ intersectsRange <$> ranges `applyThese` (getRange <$> line)
 
 -- | Split a These value up into independent These values representing the left and right sides, if any.
 splitThese :: Join These a -> (Maybe (Join These a), Maybe (Join These a))
