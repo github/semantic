@@ -1,5 +1,5 @@
-{-# LANGUAGE DataKinds, TypeFamilies #-}
-module DiffSummary where
+{-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
+module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..)) where
 
 import Prelude hiding (fst, snd)
 import Diff
@@ -15,16 +15,19 @@ import Control.Monad
 import Data.Functor.Foldable as Foldable
 import qualified Data.Foldable as F
 
-data DiffSummary a = TermSummary {
+data DiffInfo = DiffInfo deriving (Eq)
+
+data DiffSummary a = DiffSummary {
   description :: String,
-  annotation :: a,
+  patch :: Patch DiffInfo,
   parentAnnotations :: [a]
-} deriving (Eq, Show, Functor, Ord)
+} deriving (Eq, Functor)
 
-data instance Prim (DiffSummary a) b = PBranchSummary a b | PTermSummary String a b | PParentSummary a
-  deriving (Show, Functor)
-
-type instance Base (DiffSummary a) = Prim (DiffSummary a)
+instance Show a => Show (DiffSummary a) where
+  show diffSummary = case patch diffSummary of
+    (Replace _ _) -> "Replaced "
+    (Insert term) -> "Added "
+    (Delete term) -> "Deleted "
 
 diffSummary :: Diff leaf Info -> [DiffSummary ()]
 diffSummary = cata diffSummary' where
@@ -33,9 +36,9 @@ diffSummary = cata diffSummary' where
   diffSummary' (Free (_ :< Indexed children)) = prependSummary () <$> join children
   diffSummary' (Free (_ :< Fixed children)) = prependSummary () <$> join children
   diffSummary' (Free (_ :< Keyed children)) = prependSummary () <$> join (F.toList children)
-  diffSummary' (Pure (Insert term)) = [TermSummary "insert" () []]
-  diffSummary' (Pure (Delete term)) = [TermSummary "delete" () []]
-  diffSummary' (Pure (Replace t1 t2)) = [TermSummary "replace" () []]
+  diffSummary' (Pure (Insert _)) = [DiffSummary "insert" (Insert DiffInfo) []]
+  diffSummary' (Pure (Delete _)) = [DiffSummary "delete" (Delete DiffInfo) []]
+  diffSummary' (Pure (Replace _ _)) = [DiffSummary "delete" (Replace DiffInfo DiffInfo) []]
 
 prependSummary :: a -> DiffSummary a -> DiffSummary a
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
