@@ -139,6 +139,13 @@ Lines without children on them are aligned irrespective of their textual content
 
 [ [ Join That (Range 4 5, [ liftF (Info (Range 4 5) mempty 0 :< Leaf "b") ]) ] ]
 
+
+
+We should avoid taking asymmetrical children greedily so as not to misalign asymmetrical children before symmetrical children on the same line:
+         | [ a
+[ b, c ] | , c
+         | ]
+
 -}
 
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
