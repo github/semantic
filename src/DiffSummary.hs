@@ -5,9 +5,10 @@ import Prelude hiding (fst, snd)
 import Diff
 import Info
 import Patch
+import Term
 import Syntax
 import Category
-import Data.Maybe (listToMaybe)
+import Data.Maybe (fromMaybe)
 import Data.Set (toList)
 import Control.Comonad.Trans.Cofree
 import Control.Monad.Trans.Free
@@ -15,10 +16,9 @@ import Control.Monad
 import Data.Functor.Foldable as Foldable
 import qualified Data.Foldable as F
 
-data DiffInfo = DiffInfo deriving (Eq)
+data DiffInfo = DiffInfo { termName :: String } deriving (Eq)
 
 data DiffSummary a = DiffSummary {
-  description :: String,
   patch :: Patch DiffInfo,
   parentAnnotations :: [a]
 } deriving (Eq, Functor)
@@ -26,27 +26,29 @@ data DiffSummary a = DiffSummary {
 instance Show a => Show (DiffSummary a) where
   show diffSummary = case patch diffSummary of
     (Replace _ _) -> "Replaced "
-    (Insert term) -> "Added "
-    (Delete term) -> "Deleted "
+    (Insert termInfo) -> "Added " ++ show (termName termInfo)
+    (Delete termInfo) -> "Deleted "
 
-diffSummary :: Diff leaf Info -> [DiffSummary ()]
+diffSummary :: Show leaf => Diff leaf Info -> [DiffSummary ()]
 diffSummary = cata diffSummary' where
-  diffSummary' :: DiffF leaf Info [DiffSummary ()] -> [DiffSummary ()]
+  diffSummary' :: Show leaf => DiffF leaf Info [DiffSummary ()] -> [DiffSummary ()]
   diffSummary' (Free (_ :< Leaf _)) = [] -- Skip leaves since they don't have any changes
   diffSummary' (Free (_ :< Indexed children)) = prependSummary () <$> join children
   diffSummary' (Free (_ :< Fixed children)) = prependSummary () <$> join children
   diffSummary' (Free (_ :< Keyed children)) = prependSummary () <$> join (F.toList children)
-  diffSummary' (Pure (Insert _)) = [DiffSummary "insert" (Insert DiffInfo) []]
-  diffSummary' (Pure (Delete _)) = [DiffSummary "delete" (Delete DiffInfo) []]
-  diffSummary' (Pure (Replace _ _)) = [DiffSummary "delete" (Replace DiffInfo DiffInfo) []]
+  diffSummary' (Pure (Insert term)) = [DiffSummary (Insert (DiffInfo (toTermName term))) []]
+  diffSummary' (Pure (Delete term)) = [DiffSummary (Delete (DiffInfo (toTermName term))) []]
+  diffSummary' (Pure (Replace t1 t2)) = [DiffSummary (Replace (DiffInfo (toTermName t1)) (DiffInfo (toTermName t2))) []]
 
 prependSummary :: a -> DiffSummary a -> DiffSummary a
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
 
-maybeFirstCategory :: (Categorizable a) => a -> Maybe Category
-maybeFirstCategory term = listToMaybe . toList $ Category.categories term
+toTermName :: Show leaf => Term leaf Info -> String
+toTermName term = case runCofree term of
+  (_ :< (Leaf leaf)) -> show leaf
+  (info :< Indexed _) -> show $ toCategory info
+  (info :< Fixed _) -> show $ toCategory info
+  (info :< Keyed _) -> show $ toCategory info
 
-toCategory :: Info -> a -> DiffSummary a
-toCategory info a = case maybeFirstCategory info of
-  Just category -> undefined
-  Nothing -> undefined
+toCategory :: Info -> Category
+toCategory info = fromMaybe (Other "Unknown") (maybeFirstCategory info)
