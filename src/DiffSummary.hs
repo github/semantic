@@ -63,7 +63,9 @@ instance Show a => Show (DiffSummary a) where
       ++ if null parentAnnotations then "" else " to the " ++ intercalate "#" (termName <$> parentAnnotations) ++ " context"
     (Delete termInfo) -> "Deleted the " ++ "'" ++ fromJust (term termInfo) ++ "' " ++ termName termInfo
       ++ if null parentAnnotations then "" else " in the " ++ intercalate "#" (termName <$> parentAnnotations) ++ " context"
-    (Replace t1 t2) -> "Replaced "
+    (Replace t1 t2) -> "Replaced the " ++ "'" ++ fromJust (term t1) ++ "' " ++ termName t1
+      ++ " with the " ++ "'" ++ fromJust (term t2) ++ "' " ++ termName t2
+      ++ if null parentAnnotations then "" else " in the " ++ intercalate "#" (termName <$> parentAnnotations) ++ " context"
 
 diffSummary :: IsTerm leaf => Diff leaf Info -> [DiffSummary DiffInfo]
 diffSummary = cata diffSummary' where
