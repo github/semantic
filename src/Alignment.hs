@@ -163,8 +163,7 @@ alignBranch getRange children ranges = case intersectingChildren of
   -- At least one child intersects on at least one side.
   _ -> if not $ any (and . intersectsFirstLine headRanges) children
     -- No child intersects on both sides, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
-    then let (asymmetricalChildren, remainingIntersectingChildren) = break (isThese . runJoin . head) intersectingChildren
-             (leftRange, rightRange) = splitThese headRanges in
+    then let (leftRange, rightRange) = splitThese headRanges in
       case fromThese False False . runJoin . intersectsFirstLine headRanges <$> listToMaybe remainingIntersectingChildren of
         Just (False, True) -> let (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> leftRange in
           leftLine $ alignBranch getRange (remainingAtLeft ++ remainingIntersectingChildren ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast [ [ Join (This ()) ] ])) ranges)
@@ -177,6 +176,7 @@ alignBranch getRange children ranges = case intersectingChildren of
     else let (line, remaining) = lineAndRemaining intersectingChildren headRanges in
       line : alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
   where (intersectingChildren, nonIntersectingChildren) = span (or . intersectsFirstLine headRanges) children
+        (asymmetricalChildren, remainingIntersectingChildren) = break (isThese . runJoin . head) intersectingChildren
         intersectsFirstLine ranges = maybe (False <$ ranges) (intersects getRange ranges) . listToMaybe
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange ranges children in
