@@ -49,10 +49,11 @@ data DiffSummary a = DiffSummary {
 
 instance Show a => Show (DiffSummary a) where
   show diffSummary = case patch diffSummary of
-    (Replace _ _) -> "Replaced "
-    (Insert termInfo) -> "Added the " ++ "'" ++ termName termInfo ++ "' "
+    (Insert termInfo) -> "Added " ++ "'" ++ termName termInfo ++ "' "
       ++ "to the " ++ intercalate "#" (termName <$> parentAnnotations diffSummary) ++ " context"
-    (Delete termInfo) -> "Deleted "
+    (Delete termInfo) -> "Deleted " ++ "'" ++ termName termInfo ++ "' "
+      ++ "in the " ++ intercalate "#" (termName <$> parentAnnotations diffSummary) ++ " context"
+    (Replace t1 t2) -> "Replaced "
 
 diffSummary :: Show leaf => Diff leaf Info -> [DiffSummary DiffInfo]
 diffSummary = cata diffSummary' where
