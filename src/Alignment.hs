@@ -193,16 +193,17 @@ alignChildren _ _ [] = (both [] [], [])
 alignChildren getRange headRanges ([]:rest) = alignChildren getRange headRanges rest
 alignChildren getRange headRanges ((firstLine:restOfLines):rest) = case fromThese False False . runJoin $ intersects getRange headRanges firstLine of
   -- It intersects on both sides, so we can just take the first line whole.
-  (True, True) -> let (firstRemaining, restRemaining) = alignChildren getRange headRanges rest in
+  (True, True) ->
     ((++) <$> toTerms firstLine <*> firstRemaining, restOfLines : restRemaining)
   -- It only intersects on the left, so split it up.
-  (True, False) -> let (firstRemaining, restRemaining) = alignChildren getRange headRanges rest in
+  (True, False) ->
     ((++) <$> toTerms (fromJust l) <*> firstRemaining, maybeToList r : restOfLines : restRemaining)
   -- It only intersects on the right, so split it up.
-  (False, True) -> let (firstRemaining, restRemaining) = alignChildren getRange headRanges rest in
+  (False, True) ->
     ((++) <$> toTerms (fromJust r) <*> firstRemaining, maybeToList l : restOfLines : restRemaining)
   _ -> (both [] [], [])
-  where toTerms line = modifyJoin (fromThese [] []) (pure <$> line)
+  where (firstRemaining, restRemaining) = alignChildren getRange headRanges rest
+        toTerms line = modifyJoin (fromThese [] []) (pure <$> line)
         (l, r) = splitThese firstLine
 
 {-
