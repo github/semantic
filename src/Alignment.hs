@@ -171,6 +171,8 @@ alignBranch getRange children ranges = case intersectingChildren of
     -- A symmetrical child intersects on the left, so align asymmetrically on the right.
     Just (True, False) -> let (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> rightRange in
       rightLine $ alignBranch getRange (remainingAtRight ++ remainingIntersectingChildren ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast [ [ Join (That ()) ] ])) ranges)
+    -- A symmetrical child intersects with the current lines, but not on either side, which is a contradiction in terms.
+    Just (False, False) -> (flip (,) [] <$> headRanges) : alignBranch getRange children (drop 1 <$> ranges)
     -- No symmetrical child intersects, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
     Nothing -> let (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ leftRange >>= lineAndRemainingWhere (any (isThis . runJoin . head)) asymmetricalChildren
                    (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ rightRange >>= lineAndRemainingWhere (any (isThat . runJoin . head)) asymmetricalChildren in
