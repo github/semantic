@@ -96,7 +96,7 @@ We align asymmetrically since the first child is asymmetrical, and then continue
 
 [ [ Join This  (Range 4 5, [ pure (Delete (Info (Range 4 5) mempty 0 :< Leaf "a")) ]) ]
 , [ Join These (Range 4 5, [ liftF (Info (Range 4 5) mempty 0 :< Leaf "b") ])
-               (Range 4 5, [ liftF (Info (Range 4 5) mempty 0 :< Leaf "b") ])
+               (Range 4 5, [ liftF (Info (Range 4 5) mempty 0 :< Leaf "b") ]) ]
 ]
 
 
