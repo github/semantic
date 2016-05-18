@@ -167,10 +167,10 @@ alignBranch getRange children ranges = case intersectingChildren of
       line : alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
     -- A symmetrical child intersects on the right, so align asymmetrically on the left.
     Just (False, True) -> let (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> leftRange in
-      leftLine $ alignBranch getRange (remainingAtLeft ++ remainingIntersectingChildren ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast [ [ Join (This ()) ] ])) ranges)
+      leftLine $ alignBranch getRange (remainingAtLeft ++ remainingIntersectingChildren ++ nonIntersectingChildren) (modifyJoin (first (drop 1)) ranges)
     -- A symmetrical child intersects on the left, so align asymmetrically on the right.
     Just (True, False) -> let (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> rightRange in
-      rightLine $ alignBranch getRange (remainingAtRight ++ remainingIntersectingChildren ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast [ [ Join (That ()) ] ])) ranges)
+      rightLine $ alignBranch getRange (remainingAtRight ++ remainingIntersectingChildren ++ nonIntersectingChildren) (modifyJoin (second (drop 1)) ranges)
     -- A symmetrical child intersects with the current lines, but not on either side, which is a contradiction in terms.
     Just (False, False) -> (flip (,) [] <$> headRanges) : alignBranch getRange children (drop 1 <$> ranges)
     -- No symmetrical child intersects, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
