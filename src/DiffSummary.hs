@@ -49,13 +49,13 @@ instance IsTerm Text where
 instance IsTerm Category where
   termName category = case category of
     BinaryOperator -> "binary operator"
-    DictionaryLiteral -> "dictionary literal"
+    DictionaryLiteral -> "dictionary"
     Pair -> "pair"
     FunctionCall -> "function call"
-    StringLiteral -> "string literal"
-    IntegerLiteral -> "integer literal"
-    SymbolLiteral -> "symbol literal"
-    ArrayLiteral -> "array literal"
+    StringLiteral -> "string"
+    IntegerLiteral -> "integer"
+    SymbolLiteral -> "symbol"
+    ArrayLiteral -> "array"
     (Other s) -> s
 
 data DiffSummary a = DiffSummary {
@@ -66,12 +66,12 @@ data DiffSummary a = DiffSummary {
 instance Show a => Show (DiffSummary a) where
   show DiffSummary{..} = case patch of
     (Insert termInfo) -> "Added the " ++ "'" ++ fromJust (term termInfo) ++ "' " ++ termName termInfo
-      ++ if null parentAnnotations then "" else " to the " ++ intercalate "#" (termName <$> parentAnnotations) ++ " context"
+      ++ if null parentAnnotations then "" else " to the " ++ intercalate "/" (termName <$> parentAnnotations) ++ " context"
     (Delete termInfo) -> "Deleted the " ++ "'" ++ fromJust (term termInfo) ++ "' " ++ termName termInfo
-      ++ if null parentAnnotations then "" else " in the " ++ intercalate "#" (termName <$> parentAnnotations) ++ " context"
+      ++ if null parentAnnotations then "" else " in the " ++ intercalate "/" (termName <$> parentAnnotations) ++ " context"
     (Replace t1 t2) -> "Replaced the " ++ "'" ++ fromJust (term t1) ++ "' " ++ termName t1
       ++ " with the " ++ "'" ++ fromJust (term t2) ++ "' " ++ termName t2
-      ++ if null parentAnnotations then "" else " in the " ++ intercalate "#" (termName <$> parentAnnotations) ++ " context"
+      ++ if null parentAnnotations then "" else " in the " ++ intercalate "/" (termName <$> parentAnnotations) ++ " context"
 
 diffSummary :: IsTerm leaf => Diff leaf Info -> [DiffSummary DiffInfo]
 diffSummary = cata diffSummary' where
