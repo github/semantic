@@ -158,11 +158,11 @@ alignBranch _ [] ranges = runBothWith (alignWith Join) (fmap (flip (,) []) <$> r
 alignBranch getRange ([]:children) ranges = alignBranch getRange children ranges
 -- There are both children and ranges, so we need to proceed line by line
 alignBranch getRange children ranges = case intersectingChildren of
-  -- | No child intersects the current ranges on either side, so advance.
+  -- No child intersects the current ranges on either side, so advance.
   [] -> (flip (,) [] <$> headRanges) : alignBranch getRange children (drop 1 <$> ranges)
-  -- | At least one child intersects on at least one side.
+  -- At least one child intersects on at least one side.
   _ -> if not $ any (and . intersectsFirstLine headRanges) children
-    -- | No child intersects on both sides, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
+    -- No child intersects on both sides, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
     then let (asymmetricalChildren, remainingIntersectingChildren) = break (isThese . runJoin . head) intersectingChildren
              (leftRange, rightRange) = splitThese headRanges
              (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ leftRange >>= lineAndRemainingWhere (isThis . runJoin . head) asymmetricalChildren
@@ -189,13 +189,13 @@ alignChildren :: (term -> Range) -> Join These Range -> [[Join These term]] -> (
 alignChildren _ _ [] = (both [] [], [])
 alignChildren getRange headRanges ([]:rest) = alignChildren getRange headRanges rest
 alignChildren getRange headRanges ((firstLine:restOfLines):rest) = case fromThese False False . runJoin $ intersects getRange headRanges firstLine of
-  -- | It intersects on both sides, so we can just take the first line whole.
+  -- It intersects on both sides, so we can just take the first line whole.
   (True, True) -> let (firstRemaining, restRemaining) = alignChildren getRange headRanges rest in
     ((++) <$> toTerms firstLine <*> firstRemaining, restOfLines : restRemaining)
-  -- | It only intersects on the left, so split it up.
+  -- It only intersects on the left, so split it up.
   (True, False) -> let (firstRemaining, restRemaining) = alignChildren getRange headRanges rest in
     ((++) <$> toTerms (fromJust l) <*> firstRemaining, maybeToList r : restOfLines : restRemaining)
-  -- | It only intersects on the right, so split it up.
+  -- It only intersects on the right, so split it up.
   (False, True) -> let (firstRemaining, restRemaining) = alignChildren getRange headRanges rest in
     ((++) <$> toTerms (fromJust r) <*> firstRemaining, maybeToList l : restOfLines : restRemaining)
   _ -> (both [] [], [])
