@@ -182,16 +182,16 @@ alignBranch getRange children ranges = case intersectingChildren of
         intersectsFirstLine ranges = maybe (False <$ ranges) (intersects getRange ranges) . listToMaybe
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
         (leftRange, rightRange) = splitThese headRanges
-        lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange ranges children in
+        lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange children ranges in
           (fromJust ((,) <$> ranges `applyThese` Join (runBothWith These intersections)), remaining)
         lineAndRemainingWhere predicate children = if predicate children then Just . lineAndRemaining children else const Nothing
         advancePast children = fromThese id id . runJoin . (drop 1 <$) $ unionThese (head <$> children)
 
 -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
-alignChildren :: (term -> Range) -> Join These Range -> [[Join These term]] -> (Both [term], [[Join These term]])
-alignChildren _ _ [] = (both [] [], [])
-alignChildren getRange headRanges ([]:rest) = alignChildren getRange headRanges rest
-alignChildren getRange headRanges ((firstLine:restOfLines):rest) = case fromThese False False . runJoin $ intersects getRange headRanges firstLine of
+alignChildren :: (term -> Range) -> [[Join These term]] -> Join These Range -> (Both [term], [[Join These term]])
+alignChildren _ [] _ = (both [] [], [])
+alignChildren getRange ([]:rest) headRanges = alignChildren getRange rest headRanges
+alignChildren getRange ((firstLine:restOfLines):rest) headRanges = case fromThese False False . runJoin $ intersects getRange headRanges firstLine of
   -- It intersects on both sides, so we can just take the first line whole.
   (True, True) -> ((++) <$> toTerms firstLine <*> firstRemaining, restOfLines : restRemaining)
   -- It only intersects on the left, so split it up.
@@ -200,7 +200,7 @@ alignChildren getRange headRanges ((firstLine:restOfLines):rest) = case fromThes
   (False, True) -> ((++) <$> toTerms (fromJust r) <*> firstRemaining, maybeToList l : restOfLines : restRemaining)
   -- It doesn’t intersect at all, so we’ve exhausted the children for this line.
   (False, False) -> (both [] [], (firstLine:restOfLines):rest)
-  where (firstRemaining, restRemaining) = alignChildren getRange headRanges rest
+  where (firstRemaining, restRemaining) = alignChildren getRange rest headRanges
         toTerms line = modifyJoin (fromThese [] []) (pure <$> line)
         (l, r) = splitThese firstLine
 
