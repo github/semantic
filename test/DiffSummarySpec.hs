@@ -22,13 +22,13 @@ testDiff :: Diff String Info
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])
 
 testSummary :: DiffSummary Char
-testSummary = DiffSummary { patch = Insert (DiffInfo "string literal"), parentAnnotations = [] }
+testSummary = DiffSummary { patch = Insert (DiffInfo "string literal" (Just "a")), parentAnnotations = [] }
 
 spec :: Spec
 spec = parallel $ do
   describe "diffSummary" $ do
     it "outputs a diff summary" $ do
-      diffSummary testDiff `shouldBe` [ DiffSummary { patch = Insert (DiffInfo "string literal"), parentAnnotations = [ DiffInfo "array literal" ] } ]
+      diffSummary testDiff `shouldBe` [ DiffSummary { patch = Insert (DiffInfo "string literal" (Just "a")), parentAnnotations = [ DiffInfo "array literal" Nothing ] } ]
   describe "show" $ do
     it "should print adds" $
-      show testSummary `shouldBe` "Added an 'a' expression"
+      show testSummary `shouldBe` "Added the 'a' string literal"

@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables, FlexibleInstances #-}
+{-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables, FlexibleInstances, RecordWildCards #-}
 module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..)) where
 
 import Prelude hiding (fst, snd)
@@ -14,12 +14,22 @@ import Control.Comonad
 import Control.Comonad.Trans.Cofree
 import Control.Monad.Trans.Free
 import Control.Monad
+import Data.Maybe
 import Data.List
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import qualified Data.Foldable as F
 
-data DiffInfo = DiffInfo { name :: String } deriving (Eq, Show)
+data DiffInfo = DiffInfo { name :: String, term :: Maybe String } deriving (Eq, Show)
+
+class ToTerm a where
+  toTerm :: a -> Maybe String
+
+
+instance IsTerm leaf => ToTerm (Term leaf Info) where
+  toTerm term = case runCofree term of
+    (_ :< Leaf leaf) -> Just (termName leaf)
+    _ -> Nothing
 
 class IsTerm a where
   termName :: a -> String
@@ -48,28 +58,28 @@ data DiffSummary a = DiffSummary {
 } deriving (Eq, Functor)
 
 instance Show a => Show (DiffSummary a) where
-  show diffSummary = case patch diffSummary of
-    (Insert termInfo) -> "Added " ++ "'" ++ termName termInfo ++ "' "
-      ++ "to the " ++ intercalate "#" (termName <$> parentAnnotations diffSummary) ++ " context"
-    (Delete termInfo) -> "Deleted " ++ "'" ++ termName termInfo ++ "' "
-      ++ "in the " ++ intercalate "#" (termName <$> parentAnnotations diffSummary) ++ " context"
+  show DiffSummary{..} = case patch of
+    (Insert termInfo) -> "Added the " ++ "'" ++ fromJust (term termInfo) ++ "' " ++ termName termInfo
+      ++ if null parentAnnotations then "" else " to the " ++ intercalate "#" (termName <$> parentAnnotations) ++ " context"
+    (Delete termInfo) -> "Deleted the " ++ "'" ++ fromJust (term termInfo) ++ "' " ++ termName termInfo
+      ++ if null parentAnnotations then "" else " in the " ++ intercalate "#" (termName <$> parentAnnotations) ++ " context"
     (Replace t1 t2) -> "Replaced "
 
-diffSummary :: Show leaf => Diff leaf Info -> [DiffSummary DiffInfo]
+diffSummary :: IsTerm leaf => Diff leaf Info -> [DiffSummary DiffInfo]
 diffSummary = cata diffSummary' where
-  diffSummary' :: Show leaf => DiffF leaf Info [DiffSummary DiffInfo] -> [DiffSummary DiffInfo]
+  diffSummary' :: IsTerm leaf => DiffF leaf Info [DiffSummary DiffInfo] -> [DiffSummary DiffInfo]
   diffSummary' (Free (_ :< Leaf _)) = [] -- Skip leaves since they don't have any changes
-  diffSummary' (Free (infos :< Indexed children)) = prependSummary (DiffInfo . termName . toCategory $ snd infos) <$> join children
-  diffSummary' (Free (infos :< Fixed children)) = prependSummary (DiffInfo . termName . toCategory $ snd infos) <$> join children
-  diffSummary' (Free (infos :< Keyed children)) = prependSummary (DiffInfo . termName . toCategory $ snd infos) <$> join (F.toList children)
-  diffSummary' (Pure (Insert term)) = [DiffSummary (Insert (DiffInfo (toTermName term))) []]
-  diffSummary' (Pure (Delete term)) = [DiffSummary (Delete (DiffInfo (toTermName term))) []]
-  diffSummary' (Pure (Replace t1 t2)) = [DiffSummary (Replace (DiffInfo (toTermName t1)) (DiffInfo (toTermName t2))) []]
+  diffSummary' (Free (infos :< Indexed children)) = prependSummary (DiffInfo (termName . toCategory $ snd infos) Nothing) <$> join children
+  diffSummary' (Free (infos :< Fixed children)) = prependSummary (DiffInfo (termName . toCategory $ snd infos) Nothing) <$> join children
+  diffSummary' (Free (infos :< Keyed children)) = prependSummary (DiffInfo (termName . toCategory $ snd infos) Nothing) <$> join (F.toList children)
+  diffSummary' (Pure (Insert term)) = [DiffSummary (Insert (DiffInfo (toTermName term) (toTerm term))) []]
+  diffSummary' (Pure (Delete term)) = [DiffSummary (Delete (DiffInfo (toTermName term) (toTerm term))) []]
+  diffSummary' (Pure (Replace t1 t2)) = [DiffSummary (Replace (DiffInfo (toTermName t1) (toTerm t1)) (DiffInfo (toTermName t2) (toTerm t2))) []]
 
 prependSummary :: DiffInfo -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
 
-toTermName :: Show leaf => Term leaf Info -> String
+toTermName :: IsTerm leaf => Term leaf Info -> String
 toTermName term = termName $ case runCofree term of
   (info :< Leaf _) -> toCategory info
   (info :< Indexed _) -> toCategory info
