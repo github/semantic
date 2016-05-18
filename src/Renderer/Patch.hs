@@ -16,7 +16,6 @@ import Renderer
 import Source hiding ((++), break)
 import SplitDiff
 import Control.Comonad.Trans.Cofree
-import Data.Functor.Foldable
 import Control.Monad.Trans.Free
 import Data.Functor.Both as Both
 import Data.List
@@ -29,7 +28,7 @@ truncatePatch :: DiffArguments -> Both SourceBlob -> Text
 truncatePatch _ blobs = pack $ header blobs ++ "#timed_out\nTruncating diff: timeout reached.\n"
 
 -- | Render a diff in the traditional patch format.
-patch :: Renderer a
+patch :: Renderer
 patch diff blobs = pack $ case getLast (foldMap (Last . Just) string) of
   Just c | c /= '\n' -> string ++ "\n\\ No newline at end of file\n"
   _ -> string

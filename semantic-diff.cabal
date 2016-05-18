@@ -39,6 +39,7 @@ library
                      , Renderer.JSON
                      , Renderer.Patch
                      , Renderer.Split
+                     , Renderer.Summary
                      , SES
                      , Source
                      , SplitDiff

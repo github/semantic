@@ -26,7 +26,7 @@ import Syntax
 import Term
 
 -- | Render a diff to a string representing its JSON.
-json :: Renderer a
+json :: Renderer
 json diff sources = toStrict . toLazyText . encodeToTextBuilder $ object ["rows" .= annotateRows (splitDiffByLines (source <$> sources) diff), "oids" .= (oid <$> sources), "paths" .= (path <$> sources)]
   where annotateRows = fmap (fmap NumberedLine) . numberedRows
 

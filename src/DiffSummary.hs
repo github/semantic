@@ -8,9 +8,7 @@ import Patch
 import Term
 import Syntax
 import Category
-import Data.Maybe (fromMaybe)
-import Data.Set (toList)
-import Control.Comonad
+
 import Control.Comonad.Trans.Cofree
 import Control.Monad.Trans.Free
 import Control.Monad
@@ -19,6 +17,7 @@ import Data.List
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import qualified Data.Foldable as F
+import Data.Text as Text (unpack, Text)
 
 data DiffInfo = DiffInfo { name :: String, term :: Maybe String } deriving (Eq, Show)
 
@@ -39,6 +38,9 @@ instance IsTerm DiffInfo where
 
 instance IsTerm String where
   termName = id
+
+instance IsTerm Text where
+  termName = unpack
 
 instance IsTerm Category where
   termName category = case category of

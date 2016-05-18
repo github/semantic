@@ -6,6 +6,7 @@ import Diffing
 import Parser
 import qualified Renderer.JSON as J
 import qualified Renderer.Patch as P
+import qualified Renderer.Summary as S
 import Renderer
 import Renderer.Split
 import Source
@@ -20,6 +21,7 @@ textDiff parser arguments sources = case format arguments of
   Split -> diffFiles parser split sources
   Patch -> diffFiles parser P.patch sources
   JSON -> diffFiles parser J.json sources
+  Summary -> diffFiles parser S.summary sources
 
 -- | Returns a truncated diff given diff arguments and two source blobs.
 truncatedDiff :: DiffArguments -> Both SourceBlob -> IO Text
@@ -27,6 +29,7 @@ truncatedDiff arguments sources = case format arguments of
   Split -> return ""
   Patch -> return $ P.truncatePatch arguments sources
   JSON -> return "{}"
+  Summary -> return ""
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
 printDiff :: Parser -> DiffArguments -> Both SourceBlob -> IO ()
@@ -42,3 +45,4 @@ printDiff parser arguments sources = case format arguments of
         IO.withFile outputPath IO.WriteMode (`TextIO.hPutStr` rendered)
   Patch -> TextIO.putStr =<< diffFiles parser P.patch sources
   JSON -> TextIO.putStr =<< diffFiles parser J.json sources
+  Summary -> TextIO.putStr =<< diffFiles parser S.summary sources
