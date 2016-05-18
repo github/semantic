@@ -8,7 +8,7 @@ import Patch
 import Term
 import Syntax
 import Category
-
+import Control.Comonad
 import Control.Comonad.Trans.Cofree
 import Control.Monad.Trans.Free
 import Control.Monad
@@ -16,6 +16,7 @@ import Data.Maybe
 import Data.List
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
+import Data.OrderedMap
 import qualified Data.Foldable as F
 import Data.Text as Text (unpack, Text)
 
@@ -28,7 +29,10 @@ class ToTerm a where
 instance IsTerm leaf => ToTerm (Term leaf Info) where
   toTerm term = case runCofree term of
     (_ :< Leaf leaf) -> Just (termName leaf)
-    _ -> Nothing
+    (_ :< Keyed children) -> Just (unpack . mconcat $ keys children)
+    (_ :< Indexed children) -> Just (termName . toCategory . head $ extract <$> children)
+    (_ :< Fixed children) -> Just (termName . toCategory . head $ extract <$> children)
+
 
 class IsTerm a where
   termName :: a -> String
