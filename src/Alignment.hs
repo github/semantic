@@ -198,7 +198,8 @@ alignChildren getRange headRanges ((firstLine:restOfLines):rest) = case fromThes
   (True, False) -> ((++) <$> toTerms (fromJust l) <*> firstRemaining, maybeToList r : restOfLines : restRemaining)
   -- It only intersects on the right, so split it up.
   (False, True) -> ((++) <$> toTerms (fromJust r) <*> firstRemaining, maybeToList l : restOfLines : restRemaining)
-  _ -> (both [] [], [])
+  -- It doesn’t intersect at all, so we’ve exhausted the children for this line.
+  (False, False) -> (both [] [], (firstLine:restOfLines):rest)
   where (firstRemaining, restRemaining) = alignChildren getRange headRanges rest
         toTerms line = modifyJoin (fromThese [] []) (pure <$> line)
         (l, r) = splitThese firstLine
