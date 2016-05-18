@@ -163,7 +163,7 @@ alignBranch getRange children ranges = case intersectingChildren of
   -- | At least one child intersects on at least one side.
   _ -> if not $ any (and . intersectsFirstLine headRanges) children
     -- | No child intersects on both sides, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
-    then let (asymmetricalChildren, remainingIntersectingChildren) = break (and . modifyJoin (fromThese False False) . (True <$) . head) intersectingChildren
+    then let (asymmetricalChildren, remainingIntersectingChildren) = break (isThese . runJoin . head) intersectingChildren
              (leftRange, rightRange) = splitThese headRanges
              (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ leftRange >>= lineAndRemainingWhere (isThis . runJoin . head) asymmetricalChildren
              (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ rightRange >>= lineAndRemainingWhere (isThat . runJoin . head) asymmetricalChildren in
