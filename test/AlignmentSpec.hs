@@ -107,7 +107,7 @@ spec = parallel $ do
         [ Join (These (info 0 3 `branch` [])
                       (info 0 3 `branch` [ Pure (SplitInsert (info 1 2 :< Leaf "a")) ])) ]
 
-    it "aligns context following insertions" $
+    it "aligns symmetrically following insertions" $
       let sources = both (Source.fromList "a\nc") (Source.fromList "a\nb\nc") in
       align sources (both (info 0 3) (info 0 5) `branch` [ pure (info 0 1) `leaf` "a", Pure (Insert (info 2 3 :< Leaf "b")), both (info 2 3) (info 4 5) `leaf` "c" ])
         `shouldBe` PrettyDiff sources
