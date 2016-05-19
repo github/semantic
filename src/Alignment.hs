@@ -222,12 +222,6 @@ maybeThese (Just a) _ = Just (This a)
 maybeThese _ (Just b) = Just (That b)
 maybeThese _ _ = Nothing
 
--- Distributes a copointed functor through another functor.
---
--- This allows us to preserve any associated state while embedding the contents of the other functor into it.
-distribute :: (Copointed c, Functor c, Functor f) => c (f a) -> f (c a)
-distribute c = (<$ c) <$> copoint c
-
 -- | A Monoid wrapping Join These, for which mappend is the smallest shape covering both arguments.
 newtype Union a = Union { getUnion :: Maybe (Join These a) }
   deriving (Eq, Functor, Show)
