@@ -193,18 +193,6 @@ Properties of well-formed alignments:
 
 -}
 
-spanAndSplitFirstLines :: (Copointed c, Functor c, Foldable f) => (Join These a -> Join These Bool) -> f (c [Join These a]) -> ([c (Join These a)], [c [Join These a]], [c [Join These a]])
-spanAndSplitFirstLines pred = foldr (go pred) ([], [], [])
-  where go pred child (this, next, nonintersecting)
-          | (first : rest) <- copoint child
-          , ~(l, r) <- splitThese first
-          = case fromThese False False . runJoin $ pred first of
-              (True, True) -> ((first <$ child) : this, (rest <$ child) : next, nonintersecting)
-              (True, False) -> ((fromJust l <$ child) : this, (maybe rest (: rest) r <$ child) : next, nonintersecting)
-              (False, True) -> ((fromJust r <$ child) : this, (maybe rest (: rest) l <$ child) : next, nonintersecting)
-              _ -> (this, next, child : nonintersecting)
-          | otherwise = (this, next, nonintersecting)
-
 unionThese :: (Alternative f, Foldable f, Monoid (f a)) => f (Join These a) -> Join These (f a)
 unionThese as = fromMaybe (Join (These empty empty)) . getUnion . fold $ Union . Just . fmap pure <$> as
 
