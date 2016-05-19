@@ -178,7 +178,7 @@ alignBranch getRange children ranges = case intersectingChildren of
 alignChildren :: (term -> Range) -> [[Join These term]] -> Join These Range -> (Both [term], [[Join These term]])
 alignChildren _ [] _ = (both [] [], [])
 alignChildren getRange ([]:rest) headRanges = alignChildren getRange rest headRanges
-alignChildren getRange ((firstLine:restOfLines):rest) headRanges = case fromThese False False . runJoin $ intersects getRange headRanges firstLine of
+alignChildren getRange ((firstLine:restOfLines):rest) headRanges = case fromThese True True . runJoin $ intersects getRange headRanges firstLine of
   -- It intersects on both sides, so we can just take the first line whole.
   (True, True) -> ((++) <$> toTerms firstLine <*> firstRemaining, restOfLines : restRemaining)
   -- It only intersects on the left, so split it up.
