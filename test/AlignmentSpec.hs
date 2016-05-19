@@ -142,6 +142,21 @@ spec = parallel $ do
         , Join (That (info 0 5 `branch` [ insert (info 2 3 `leaf` "b") ]))
         ]
 
+    it "aligns context-only lines symmetrically" $
+      let sources = both (Source.fromList "[\n  a\n,\n  b\n]") (Source.fromList "[\n  a, b\n\n\n]") in
+      align sources (both (info 0 13) (info 0 12) `branch` [ pure (info 4 5) `leaf` "a", both (info 10 11) (info 7 8) `leaf` "b" ]) `shouldBe` prettyDiff sources
+        [ Join (These (info 0 2 `branch` [])
+                      (info 0 2 `branch` []))
+        , Join (These (info 2 6 `branch` [ info 4 5 `leaf` "a" ])
+                      (info 2 9 `branch` [ info 4 5 `leaf` "a", info 7 8 `leaf` "b" ]))
+        , Join (These (info 6 8 `branch` [])
+                      (info 9 10 `branch` []))
+        , Join (These (info 8 12 `branch` [ info 10 11 `leaf` "b" ])
+                      (info 10 11 `branch` []))
+        , Join (These (info 12 13 `branch` [])
+                      (info 11 12 `branch` []))
+        ]
+
   describe "numberedRows" $
     prop "counts only non-empty values" $
       \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
