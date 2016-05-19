@@ -4,7 +4,7 @@ module Alignment
 , numberedRows
 , AlignedDiff
 , alignDiff
-, alignChildrenInRanges
+, alignBranch
 , applyThese
 , modifyJoin
 ) where

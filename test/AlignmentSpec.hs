@@ -29,9 +29,9 @@ import Test.Hspec.QuickCheck
 
 spec :: Spec
 spec = parallel $ do
-  describe "alignChildrenInRanges" $ do
+  describe "alignBranch" $ do
     it "produces symmetrical context" $
-      alignChildrenInRanges getRange (Join (These [Range 0 2, Range 2 4] [Range 0 2, Range 2 4])) ([] :: [Identity [Join These (SplitDiff String Info)]]) `shouldBe`
+      alignBranch getRange ([] :: [Identity [Join These (SplitDiff String Info)]]) (both [Range 0 2, Range 2 4] [Range 0 2, Range 2 4]) `shouldBe`
         [ Join (These (Range 0 2, [])
                       (Range 0 2, []))
         , Join (These (Range 2 4, [])
@@ -39,7 +39,7 @@ spec = parallel $ do
         ]
 
     it "produces asymmetrical context" $
-      alignChildrenInRanges getRange (Join (These [Range 0 2, Range 2 4] [Range 0 1])) ([] :: [Identity [Join These (SplitDiff String Info)]]) `shouldBe`
+      alignBranch getRange ([] :: [Identity [Join These (SplitDiff String Info)]]) (both [Range 0 2, Range 2 4] [Range 0 1]) `shouldBe`
         [ Join (These (Range 0 2, [])
                       (Range 0 1, []))
         , Join (This  (Range 2 4, []))
