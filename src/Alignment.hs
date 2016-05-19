@@ -167,7 +167,6 @@ alignBranch getRange children ranges = case intersectingChildren of
 alignChildren :: (Copointed c, Functor c) => (term -> Range) -> [c [Join These term]] -> Join These Range -> (Both [c term], [c [Join These term]])
 alignChildren _ [] _ = (both [] [], [])
 alignChildren getRange (first:rest) headRanges
-  | null (copoint first) = alignChildren getRange rest headRanges
   | (firstLine:restOfLines) <- copoint first
   , ~(l, r) <- splitThese firstLine
   = case fromThese True True . runJoin $ intersects getRange headRanges firstLine of
@@ -179,6 +178,7 @@ alignChildren getRange (first:rest) headRanges
   (False, True) -> ((++) <$> toTerms (fromJust r) <*> firstRemaining, (maybeToList l <$ first) : (restOfLines <$ first) : restRemaining)
   -- It doesn’t intersect at all, so we’ve exhausted the children for this line.
   (False, False) -> (both [] [], first:rest)
+  | otherwise = alignChildren getRange rest headRanges
   where (firstRemaining, restRemaining) = alignChildren getRange rest headRanges
         toTerms line = modifyJoin (fromThese [] []) (pure . (<$ first) <$> line)
 
