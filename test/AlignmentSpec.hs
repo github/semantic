@@ -124,6 +124,15 @@ spec = parallel $ do
         [ Join (These (info 0 8 `branch` [ Pure (SplitDelete (info 2 3 :< Leaf "a")), info 5 6 `leaf` "b" ])
                       (info 0 8 `branch` [ info 2 3 `leaf` "b", Pure (SplitInsert (info 5 6 :< Leaf "c")) ])) ]
 
+    it "when one of two symmetrical nodes must be split, splits the latter" $
+      let sources = both (Source.fromList "[ a, b ]") (Source.fromList "[ a\n, b\n]") in
+      align sources (both (info 0 8) (info 0 9) `branch` [ pure (info 2 3) `leaf` "a", both (info 5 6) (info 6 7) `leaf` "b" ]) `shouldBe` PrettyDiff sources
+        [ Join (These (info 0 8 `branch` [ info 2 3 `leaf` "a", info 5 6 `leaf` "b" ])
+                      (info 0 4 `branch` [ info 2 3 `leaf` "a" ]))
+        , Join (That  (info 4 8 `branch` [ info 6 7 `leaf` "b" ]))
+        , Join (That  (info 8 9 `branch` []))
+        ]
+
   describe "numberedRows" $
     prop "counts only non-empty values" $
       \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
