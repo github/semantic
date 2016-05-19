@@ -90,39 +90,39 @@ spec = parallel $ do
 
     it "aligns insertions" $
       let sources = both (Source.fromList "a") (Source.fromList "a\nb") in
-      align sources (both (info 0 1) (info 0 3) `branch` [ pure (info 0 1) `leaf` "a", Pure (Insert (info 2 3 :< Leaf "b")) ]) `shouldBe` PrettyDiff sources
+      align sources (both (info 0 1) (info 0 3) `branch` [ pure (info 0 1) `leaf` "a", Pure (insert (info 2 3 :< Leaf "b")) ]) `shouldBe` PrettyDiff sources
         [ Join (These (info 0 1 `branch` [ info 0 1 `leaf` "a" ])
                       (info 0 2 `branch` [ info 0 1 `leaf` "a" ]))
-        , Join (That  (info 2 3 `branch` [ Pure (SplitInsert (info 2 3 :< Leaf "b")) ]))
+        , Join (That  (info 2 3 `branch` [ Pure (insert (info 2 3 :< Leaf "b")) ]))
         ]
 
     it "aligns total insertions" $
       let sources = both (Source.fromList "") (Source.fromList "a") in
-      align sources (Pure (Insert (info 0 1 :< Leaf "a"))) `shouldBe` PrettyDiff sources
-        [ Join (That (Pure (SplitInsert (info 0 1 :< Leaf "a")))) ]
+      align sources (Pure (insert (info 0 1 :< Leaf "a"))) `shouldBe` PrettyDiff sources
+        [ Join (That (Pure (insert (info 0 1 :< Leaf "a")))) ]
 
     it "aligns insertions into empty branches" $
       let sources = both (Source.fromList "[ ]") (Source.fromList "[a]") in
-      align sources (pure (info 0 3) `branch` [ Pure (Insert (info 1 2 :< Leaf "a")) ]) `shouldBe` PrettyDiff sources
+      align sources (pure (info 0 3) `branch` [ Pure (insert (info 1 2 :< Leaf "a")) ]) `shouldBe` PrettyDiff sources
         [ Join (These (info 0 3 `branch` [])
-                      (info 0 3 `branch` [ Pure (SplitInsert (info 1 2 :< Leaf "a")) ])) ]
+                      (info 0 3 `branch` [ Pure (insert (info 1 2 :< Leaf "a")) ])) ]
 
     it "aligns symmetrically following insertions" $
       let sources = both (Source.fromList "a\nc") (Source.fromList "a\nb\nc") in
-      align sources (both (info 0 3) (info 0 5) `branch` [ pure (info 0 1) `leaf` "a", Pure (Insert (info 2 3 :< Leaf "b")), both (info 2 3) (info 4 5) `leaf` "c" ])
+      align sources (both (info 0 3) (info 0 5) `branch` [ pure (info 0 1) `leaf` "a", Pure (insert (info 2 3 :< Leaf "b")), both (info 2 3) (info 4 5) `leaf` "c" ])
         `shouldBe` PrettyDiff sources
         [ Join (These (info 0 2 `branch` [ info 0 1 `leaf` "a" ])
                       (info 0 2 `branch` [ info 0 1 `leaf` "a" ]))
-        , Join (That  (info 2 4 `branch` [ Pure (SplitInsert (info 2 3 :< Leaf "b")) ]))
+        , Join (That  (info 2 4 `branch` [ Pure (insert (info 2 3 :< Leaf "b")) ]))
         , Join (These (info 2 3 `branch` [ info 2 3 `leaf` "c" ])
                       (info 4 5 `branch` [ info 4 5 `leaf` "c" ]))
         ]
 
     it "symmetrical nodes force the alignment of asymmetrical nodes on both sides" $
       let sources = both (Source.fromList "[ a, b ]") (Source.fromList "[ b, c ]") in
-      align sources (pure (info 0 8) `branch` [ Pure (Delete (info 2 3 :< Leaf "a")), both (info 5 6) (info 2 3) `leaf` "b", Pure (Insert (info 5 6 :< Leaf "c")) ]) `shouldBe` PrettyDiff sources
-        [ Join (These (info 0 8 `branch` [ Pure (SplitDelete (info 2 3 :< Leaf "a")), info 5 6 `leaf` "b" ])
-                      (info 0 8 `branch` [ info 2 3 `leaf` "b", Pure (SplitInsert (info 5 6 :< Leaf "c")) ])) ]
+      align sources (pure (info 0 8) `branch` [ Pure (delete (info 2 3 :< Leaf "a")), both (info 5 6) (info 2 3) `leaf` "b", Pure (insert (info 5 6 :< Leaf "c")) ]) `shouldBe` PrettyDiff sources
+        [ Join (These (info 0 8 `branch` [ Pure (delete (info 2 3 :< Leaf "a")), info 5 6 `leaf` "b" ])
+                      (info 0 8 `branch` [ info 2 3 `leaf` "b", Pure (insert (info 5 6 :< Leaf "c")) ])) ]
 
     it "when one of two symmetrical nodes must be split, splits the latter" $
       let sources = both (Source.fromList "[ a, b ]") (Source.fromList "[ a\n, b\n]") in
