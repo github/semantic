@@ -124,6 +124,12 @@ spec = parallel $ do
         [ Join (These (info 0 8 `branch` [ Pure (SplitDelete (info 2 3 :< Leaf "a")), info 5 6 `leaf` "b" ])
                       (info 0 5 `branch` [ info 2 3 `leaf` "b" ])) ]
 
+    it "symmetrical nodes force the alignment of following coincident asymmetrical nodes" $
+      let sources = both (Source.fromList "[ a, b ]") (Source.fromList "[ a ]") in
+      align sources (both (info 0 8) (info 0 5) `branch` [ both (info 5 6) (info 2 3) `leaf` "a", Pure (Delete (info 2 3 :< Leaf "b")) ]) `shouldBe` PrettyDiff sources
+        [ Join (These (info 0 8 `branch` [ info 5 6 `leaf` "a", Pure (SplitDelete (info 2 3 :< Leaf "b")) ])
+                      (info 0 5 `branch` [ info 2 3 `leaf` "a" ])) ]
+
   describe "numberedRows" $
     prop "counts only non-empty values" $
       \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
