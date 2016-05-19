@@ -182,17 +182,6 @@ alignChildren getRange (first:rest) headRanges
   where (firstRemaining, restRemaining) = alignChildren getRange rest headRanges
         toTerms line = modifyJoin (fromThese [] []) (pure . (<$ first) <$> line)
 
-{-
-
-Properties of well-formed alignments:
-
-- nodes are aligned in order, with priority given to earlier siblings over later ones (i.e. later nodes can be split up if necessary to allow earlier ones to be aligned)
-- insertions alone on a line should not break the alignment of later siblings
-- ✔︎ nodes should be aligned starting at the same line
-- ✔︎ nodes should have the same height (# of lines spanned) on both sides, padding with blank lines as necessary
-
--}
-
 unionThese :: (Alternative f, Foldable f, Monoid (f a)) => f (Join These a) -> Join These (f a)
 unionThese as = fromMaybe (Join (These empty empty)) . getUnion . fold $ Union . Just . fmap pure <$> as
 
