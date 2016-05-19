@@ -162,3 +162,7 @@ instance Show PrettyDiff where
           showDiff diff = filter (/= '\n') . toList . Source.slice (getRange diff)
           pad n string = showString (take n string) (replicate (max 0 (n - length string)) ' ')
           toBoth them = showDiff <$> them `applyThese` modifyJoin (uncurry These) sources
+
+class PatchConstructible p where
+  insert :: a -> p a
+  delete :: a -> p a
