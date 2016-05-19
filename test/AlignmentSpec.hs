@@ -157,6 +157,15 @@ spec = parallel $ do
                       (info 11 12 `branch` []))
         ]
 
+    it "aligns asymmetrical nodes preceding their symmetrical siblings conservatively" $
+      let sources = both (Source.fromList "[ b, c ]") (Source.fromList "[ a\n, c\n]") in
+      align sources (both (info 0 8) (info 0 9) `branch` [ insert (info 2 3 `leaf` "a"), delete (info 2 3 `leaf` "b"), both (info 5 6) (info 6 7) `leaf` "c" ]) `shouldBe` prettyDiff sources
+        [ Join (That  (info 0 4 `branch` [ insert (info 2 3 `leaf` "a") ]))
+        , Join (These (info 0 8 `branch` [ delete (info 2 3 `leaf` "b"), info 5 6 `leaf` "c" ])
+                      (info 4 8 `branch` [ info 6 7 `leaf` "c" ]))
+        , Join (That  (info 8 9 `branch` []))
+        ]
+
   describe "numberedRows" $
     prop "counts only non-empty values" $
       \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
