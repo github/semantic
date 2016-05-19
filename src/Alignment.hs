@@ -196,9 +196,6 @@ Properties of well-formed alignments:
 unionThese :: (Alternative f, Foldable f, Monoid (f a)) => f (Join These a) -> Join These (f a)
 unionThese as = fromMaybe (Join (These empty empty)) . getUnion . fold $ Union . Just . fmap pure <$> as
 
-pairRangesWithLine :: Monoid b => Join These a -> Join These b -> Join These (a, b)
-pairRangesWithLine headRanges childLine = fromMaybe (flip (,) mempty <$> headRanges) $ (,) <$> headRanges `applyThese` childLine
-
 -- | Test ranges and terms for intersection on either or both sides.
 intersects :: (term -> Range) -> Join These Range -> Join These term -> Join These Bool
 intersects getRange ranges line = fromMaybe (False <$ ranges) $ intersectsRange <$> ranges `applyThese` modifyJoin (uncurry These . fromThese (Range (-1) (-1)) (Range (-1) (-1))) (getRange <$> line)
