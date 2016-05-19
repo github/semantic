@@ -126,8 +126,8 @@ spec = parallel $ do
 
     it "symmetrical nodes force the alignment of following coincident asymmetrical nodes" $
       let sources = both (Source.fromList "[ a, b ]") (Source.fromList "[ a ]") in
-      align sources (both (info 0 8) (info 0 5) `branch` [ both (info 5 6) (info 2 3) `leaf` "a", Pure (Delete (info 2 3 :< Leaf "b")) ]) `shouldBe` PrettyDiff sources
-        [ Join (These (info 0 8 `branch` [ info 5 6 `leaf` "a", Pure (SplitDelete (info 2 3 :< Leaf "b")) ])
+      align sources (both (info 0 8) (info 0 5) `branch` [ pure (info 2 3) `leaf` "a", Pure (Delete (info 5 6 :< Leaf "b")) ]) `shouldBe` PrettyDiff sources
+        [ Join (These (info 0 8 `branch` [ info 2 3 `leaf` "a", Pure (SplitDelete (info 5 6 :< Leaf "b")) ])
                       (info 0 5 `branch` [ info 2 3 `leaf` "a" ])) ]
 
   describe "numberedRows" $
