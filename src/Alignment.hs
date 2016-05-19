@@ -68,7 +68,7 @@ alignSyntax toJoinThese toNode getRange sources infos syntax = case syntax of
   Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> sequenceL lineRanges
   Indexed children -> catMaybes $ wrapInBranch (Indexed . fmap runIdentity) <$> alignBranch getRange (Identity <$> children) (modifyJoin (fromThese [] []) lineRanges)
   Fixed children -> catMaybes $ wrapInBranch (Fixed . fmap runIdentity) <$> alignBranch getRange (Identity <$> children) (modifyJoin (fromThese [] []) lineRanges)
-  Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> alignChildrenInRanges getRange lineRanges (Map.toList children)
+  Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> alignBranch getRange (Map.toList children) (modifyJoin (fromThese [] []) lineRanges)
   where lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
         wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (info { characterRange = range }) (constructor children)) <$> infos)
 
