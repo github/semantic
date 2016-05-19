@@ -92,21 +92,12 @@ We align asymmetrically since the first child is asymmetrical, and then continue
 , b       |   b
 ]         | ]
 
-
-
-[ [ Join This  (Range 4 5, [ pure (Delete (Info (Range 4 5) mempty 0 :< Leaf "a")) ]) ]
-, [ Join These (Range 4 5, [ liftF (Info (Range 4 5) mempty 0 :< Leaf "b") ])
-               (Range 4 5, [ liftF (Info (Range 4 5) mempty 0 :< Leaf "b") ]) ]
-]
-
-
 The first child is asymmetrical but there is also a symmetrical child on the same line, so we align symmetrically, producing:
 [ a, b ] | [ b ]
 
 and not:
 [ a, b ] |
          | [ b ]
-
 
 We align the child symmetrically, and thus have to take the first line range on the right asymmetrically so as not to break the child’s alignment.
       | [
@@ -136,10 +127,6 @@ Lines without children on them are aligned irrespective of their textual content
 ,\n      | \n
   b\n    | \n
 ]        | ]
-
-[ [ Join That (Range 4 5, [ liftF (Info (Range 4 5) mempty 0 :< Leaf "b") ]) ] ]
-
-
 
 We should avoid taking asymmetrical children greedily so as not to misalign asymmetrical children before symmetrical children on the same line:
          | [ a
