@@ -118,18 +118,6 @@ spec = parallel $ do
                       (info 4 5 `branch` [ info 4 5 `leaf` "c" ]))
         ]
 
-    it "symmetrical nodes force the alignment of preceding coincident asymmetrical nodes" $
-      let sources = both (Source.fromList "[ a, b ]") (Source.fromList "[ b ]") in
-      align sources (both (info 0 8) (info 0 5) `branch` [ Pure (Delete (info 2 3 :< Leaf "a")), both (info 5 6) (info 2 3) `leaf` "b" ]) `shouldBe` PrettyDiff sources
-        [ Join (These (info 0 8 `branch` [ Pure (SplitDelete (info 2 3 :< Leaf "a")), info 5 6 `leaf` "b" ])
-                      (info 0 5 `branch` [ info 2 3 `leaf` "b" ])) ]
-
-    it "symmetrical nodes force the alignment of following coincident asymmetrical nodes" $
-      let sources = both (Source.fromList "[ a, b ]") (Source.fromList "[ a ]") in
-      align sources (both (info 0 8) (info 0 5) `branch` [ pure (info 2 3) `leaf` "a", Pure (Delete (info 5 6 :< Leaf "b")) ]) `shouldBe` PrettyDiff sources
-        [ Join (These (info 0 8 `branch` [ info 2 3 `leaf` "a", Pure (SplitDelete (info 5 6 :< Leaf "b")) ])
-                      (info 0 5 `branch` [ info 2 3 `leaf` "a" ])) ]
-
     it "symmetrical nodes force the alignment of asymmetrical nodes on both sides" $
       let sources = both (Source.fromList "[ a, b ]") (Source.fromList "[ b, c ]") in
       align sources (pure (info 0 8) `branch` [ Pure (Delete (info 2 3 :< Leaf "a")), both (info 5 6) (info 2 3) `leaf` "b", Pure (Insert (info 5 6 :< Leaf "c")) ]) `shouldBe` PrettyDiff sources
