@@ -72,17 +72,6 @@ alignSyntax toJoinThese toNode getRange sources infos syntax = case syntax of
   where lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
         wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (info { characterRange = range }) (constructor children)) <$> infos)
 
-alignChildrenInRanges :: (Copointed c, Functor c, Foldable f) => (term -> Range) -> Join These [Range] -> f (c [Join These term]) -> [Join These (Range, [c term])]
-alignChildrenInRanges getRange ranges children
-  | Just headRanges <- sequenceL $ listToMaybe <$> ranges
-  , (thisLine, nextLines, nonintersecting) <- spanAndSplitFirstLines (intersects getRange headRanges) children
-  , thisRanges <- fromMaybe headRanges $ const <$> headRanges `applyThese` unionThese (distribute <$> (thisLine ++ (nextLines >>= distribute)))
-  , merged <- pairRangesWithLine thisRanges (modifyJoin (uncurry These . fromThese [] []) (unionThese (distribute <$> thisLine)))
-  , advance <- fromThese id id . runJoin . (drop 1 <$) $ unionThese (nextLines >>= copoint)
-  , moreLines <- alignChildrenInRanges getRange (modifyJoin (uncurry bimap advance) ranges) (nextLines ++ nonintersecting)
-  = merged : moreLines
-  | otherwise = fmap (flip (,) []) <$> sequenceL ranges
-
 {-
 
 
