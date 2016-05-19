@@ -166,3 +166,11 @@ instance Show PrettyDiff where
 class PatchConstructible p where
   insert :: a -> p a
   delete :: a -> p a
+
+instance PatchConstructible Patch where
+  insert = Insert
+  delete = Delete
+
+instance PatchConstructible SplitPatch where
+  insert = SplitInsert
+  delete = SplitDelete
