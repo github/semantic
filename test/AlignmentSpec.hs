@@ -135,6 +135,13 @@ spec = parallel $ do
         , Join (That  (info 8 9 `branch` []))
         ]
 
+    it "aligns deletions before insertions" $
+      let sources = both (Source.fromList "[ a ]") (Source.fromList "[ b ]") in
+      align sources (pure (info 0 5) `branch` [ delete (info 2 3 `leaf` "a"), insert (info 2 3 `leaf` "b") ]) `shouldBe` prettyDiff sources
+        [ Join (This (info 0 5 `branch` [ delete (info 2 3 `leaf` "a") ]))
+        , Join (That (info 0 5 `branch` [ insert (info 2 3 `leaf` "b") ]))
+        ]
+
   describe "numberedRows" $
     prop "counts only non-empty values" $
       \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
