@@ -27,6 +27,7 @@ import Syntax
 import Term
 import Test.Hspec
 import Test.Hspec.QuickCheck
+import Test.QuickCheck
 
 spec :: Spec
 spec = parallel $ do
@@ -185,6 +186,9 @@ data Child = Child
   , childContentsLength :: Int
   , childMargin :: [Char]
   }
+
+instance Arbitrary Child where
+  arbitrary = Child <$> arbitrary <*> arbitrary <*> arbitrary
 
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
