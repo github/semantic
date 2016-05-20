@@ -182,7 +182,7 @@ spec = parallel $ do
       \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
 
 data Child = Child
-  { childKey :: Char
+  { childKey :: String
   , childContentsLength :: Int
   , childMargin :: [Char]
   }
