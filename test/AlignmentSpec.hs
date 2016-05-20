@@ -184,7 +184,7 @@ spec = parallel $ do
 data Child = Child
   { childKey :: String
   , childContentsLength :: Int
-  , childMargin :: [Char]
+  , childMargin :: String
   }
 
 instance Arbitrary Child where
