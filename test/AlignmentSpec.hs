@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE FlexibleInstances, RecordWildCards #-}
 module AlignmentSpec where
 
 import Alignment
@@ -196,7 +196,7 @@ instance Arbitrary Child where
                                    , (1, pure '\n') ]
 
 instance Show Child where
-  show child = childMargin child ++ "(" ++ childKey child ++ childContents child ++ ")"
+  show Child {..} = childMargin ++ "(" ++ childKey ++ childContents ++ ")"
 
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
