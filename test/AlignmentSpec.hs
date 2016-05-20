@@ -46,6 +46,15 @@ spec = parallel $ do
         , Join (This  (Range 2 4, []))
         ]
 
+    prop "covers every input line" $
+      pendingWith "TBD"
+
+    prop "covers every input child" $
+      pendingWith "TBD"
+
+    prop "covers every line of every input child" $
+      pendingWith "TBD"
+
   describe "alignDiff" $ do
     it "aligns identical branches on a single line" $
       let sources = both (Source.fromList "[ foo ]") (Source.fromList "[ foo ]") in
