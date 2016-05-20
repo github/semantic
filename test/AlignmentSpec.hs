@@ -3,6 +3,7 @@ module AlignmentSpec where
 
 import Alignment
 import ArbitraryTerm ()
+import Control.Arrow ((&&&))
 import Control.Comonad.Cofree
 import Control.Monad.Free
 import Data.Align hiding (align)
@@ -173,24 +174,24 @@ spec = parallel $ do
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
 
-align :: Both (Source.Source Char) -> ConstructibleFree (Patch (Term String Info)) (Both Info) -> PrettyDiff
-align sources = PrettyDiff sources . alignDiff sources . deconstruct
+align :: Both (Source.Source Char) -> ConstructibleFree (Patch (Term String Info)) (Both Info) -> PrettyDiff (SplitDiff String Info)
+align sources = PrettyDiff sources . fmap (fmap (getRange &&& id)) . alignDiff sources . deconstruct
 
 info :: Int -> Int -> Info
 info = ((\ r -> Info r mempty 0) .) . Range
 
-prettyDiff :: Both (Source.Source Char) -> [Join These (ConstructibleFree (SplitPatch (Term String Info)) Info)] -> PrettyDiff
-prettyDiff sources = PrettyDiff sources . fmap (fmap deconstruct)
+prettyDiff :: Both (Source.Source Char) -> [Join These (ConstructibleFree (SplitPatch (Term String Info)) Info)] -> PrettyDiff (SplitDiff String Info)
+prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& id) . deconstruct))
 
-data PrettyDiff = PrettyDiff { unPrettySources :: Both (Source.Source Char), unPrettyLines :: [Join These (SplitDiff String Info)] }
+data PrettyDiff a = PrettyDiff { unPrettySources :: Both (Source.Source Char), unPrettyLines :: [Join These (Range, a)] }
   deriving Eq
 
-instance Show PrettyDiff where
+instance Show a => Show (PrettyDiff a) where
   show (PrettyDiff sources lines) = prettyPrinted -- ++ "\n" ++ show lines
     where prettyPrinted = showLine (maximum (0 : (maximum . fmap length <$> shownLines))) <$> shownLines >>= ('\n':)
           shownLines = catMaybes $ toBoth <$> lines
           showLine n line = uncurry ((++) . (++ " | ")) (fromThese (replicate n ' ') (replicate n ' ') (runJoin (pad n <$> line)))
-          showDiff diff = filter (/= '\n') . toList . Source.slice (getRange diff)
+          showDiff (range, _) = filter (/= '\n') . toList . Source.slice range
           pad n string = showString (take n string) (replicate (max 0 (n - length string)) ' ')
           toBoth them = showDiff <$> them `applyThese` modifyJoin (uncurry These) sources
 
