@@ -195,6 +195,8 @@ instance Arbitrary Child where
           padding char = frequency [ (10, pure char)
                                    , (1, pure '\n') ]
 
+  shrink Child {..} = Child childKey <$> shrink childContents <*> shrink childMargin
+
 instance Show Child where
   show Child {..} = childMargin ++ "(" ++ childKey ++ childContents ++ ")"
 
