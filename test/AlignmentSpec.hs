@@ -188,7 +188,8 @@ data Child = Child
   }
 
 instance Arbitrary Child where
-  arbitrary = Child <$> arbitrary <*> arbitrary <*> arbitrary
+  arbitrary = Child <$> key <*> arbitrary <*> arbitrary
+    where key = listOf1 (elements (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9']))
 
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
