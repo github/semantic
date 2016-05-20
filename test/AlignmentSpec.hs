@@ -180,6 +180,12 @@ spec = parallel $ do
     prop "counts only non-empty values" $
       \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
 
+data Child = Child
+  { childKey :: Char
+  , childContentsLength :: Int
+  , childMargin :: [Char]
+  }
+
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
 
