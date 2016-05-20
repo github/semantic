@@ -195,6 +195,9 @@ instance Arbitrary Child where
           padding char = frequency [ (10, pure char)
                                    , (1, pure '\n') ]
 
+instance Show Child where
+  show child = childMargin child ++ "(" ++ childKey child ++ childContents child ++ ")"
+
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
 
