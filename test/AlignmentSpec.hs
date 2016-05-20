@@ -183,7 +183,7 @@ spec = parallel $ do
 
 data Child = Child
   { childKey :: String
-  , childContentsLength :: Int
+  , childContents :: String
   , childMargin :: String
   }
 
