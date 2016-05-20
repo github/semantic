@@ -188,8 +188,9 @@ data Child = Child
   }
 
 instance Arbitrary Child where
-  arbitrary = Child <$> key <*> arbitrary <*> margin
+  arbitrary = Child <$> key <*> contents <*> margin
     where key = listOf1 (elements (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9']))
+          contents = listOf (elements "*\n")
           margin = listOf (elements " \n")
 
 counts :: [Join These (Int, a)] -> Both Int
