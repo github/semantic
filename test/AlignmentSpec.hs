@@ -182,8 +182,8 @@ spec = parallel $ do
       \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
 
 data BranchElement
-  = Child String (Join These String {- newlines or asterisks -})
-  | Margin (Join These String {- newlines or hyphens -})
+  = Child String (Join These String)
+  | Margin (Join These String)
 
 alignBranchElement :: BranchElement -> [BranchElement]
 alignBranchElement (Child key contents) = Child key <$> traverse lines contents
