@@ -185,6 +185,10 @@ data BranchElement
   = Child String (Join These String {- newlines or asterisks -})
   | Margin (Join These String {- newlines or hyphens -})
 
+alignBranchElement :: BranchElement -> [BranchElement]
+alignBranchElement (Child key contents) = Child key <$> traverse lines contents
+alignBranchElement (Margin contents) = Margin <$> traverse lines contents
+
 toSource :: [BranchElement] -> Source.Source Char
 toSource = Source.fromList . concatMap show
 
