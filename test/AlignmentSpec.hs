@@ -193,9 +193,6 @@ alignBranchElement :: BranchElement -> [BranchElement]
 alignBranchElement (Child key contents) = Child key <$> traverse lines contents
 alignBranchElement (Margin contents) = Margin <$> traverse lines contents
 
-toSource :: [BranchElement] -> Source.Source Char
-toSource = Source.fromList . concatMap show
-
 toSources :: [BranchElement] -> Both (Source.Source Char)
 toSources = fmap (foldMap Source.fromList) . bothContents
 
