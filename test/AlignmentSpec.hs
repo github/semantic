@@ -204,6 +204,11 @@ toSourcesAndRanges elements = (sources, Source.actualLineRanges <$> totalRanges 
   where sources = toSources elements
         totalRanges = totalRange <$> sources
 
+toAlignedChildren :: [BranchElement] -> [(String, [Join These String])]
+toAlignedChildren elements = elements >>= go
+  where go child@(Child key contents) = [ (key, branchElementContents <$> alignBranchElement child) ]
+        go (Margin _) = []
+
 instance Arbitrary BranchElement where
   arbitrary = oneof [ key >>= \ key -> Child key <$> joinTheseOf (contents key)
                     , Margin <$> joinTheseOf margin ]
