@@ -190,6 +190,9 @@ data Child = Child
 toSource :: [Child] -> Source.Source Char
 toSource = Source.fromList . concatMap show
 
+toChildLists :: [Join These Child] -> Both [Child]
+toChildLists = foldMap (modifyJoin (fromThese [] []) . fmap (:[]))
+
 instance Arbitrary Child where
   arbitrary = Child <$> key <*> contents <*> margin
     where key = listOf1 (elements (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9']))
