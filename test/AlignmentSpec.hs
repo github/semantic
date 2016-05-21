@@ -187,6 +187,9 @@ data Child = Child
   , childMargin :: String
   }
 
+toSource :: [Child] -> Source.Source Char
+toSource = Source.fromList . concatMap show
+
 instance Arbitrary Child where
   arbitrary = Child <$> key <*> contents <*> margin
     where key = listOf1 (elements (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9']))
