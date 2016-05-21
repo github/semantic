@@ -191,13 +191,13 @@ data BranchElement
   = Child' String (Join These String {- newlines or asterisks -})
   | Margin (Join These String {- newlines or hyphens -})
 
-toSource :: [Child] -> Source.Source Char
+toSource :: [BranchElement] -> Source.Source Char
 toSource = Source.fromList . concatMap show
 
-toSources :: [Join These Child] -> Both (Source.Source Char)
+toSources :: [Join These BranchElement] -> Both (Source.Source Char)
 toSources = fmap toSource . toChildLists
 
-toChildLists :: [Join These Child] -> Both [Child]
+toChildLists :: [Join These BranchElement] -> Both [BranchElement]
 toChildLists = foldMap (modifyJoin (fromThese [] []) . fmap (:[]))
 
 instance Arbitrary Child where
