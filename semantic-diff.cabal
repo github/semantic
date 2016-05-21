@@ -80,6 +80,7 @@ test-suite semantic-diff-test
                      , filepath
                      , Glob
                      , hspec >= 2.1.10
+                     , mtl
                      , QuickCheck >= 2.8.1
                      , quickcheck-text
                      , semantic-diff
