@@ -206,7 +206,8 @@ instance Arbitrary BranchElement where
   arbitrary = oneof [ Child <$> key <*> joinTheseOf contents
                     , Margin <$> joinTheseOf margin ]
     where key = listOf1 (elements (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9']))
-          contents = listOf (padding '*')
+          contents = key >>= \ key -> wrap key <$> listOf (padding '*')
+          wrap key contents = "(" ++ key ++ contents ++ ")" :: String
           margin = listOf (padding '-')
           padding char = frequency [ (10, pure char)
                                    , (1, pure '\n') ]
