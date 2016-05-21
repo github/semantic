@@ -199,8 +199,8 @@ toSources = fmap (foldMap Source.fromList) . bothContents
 bothContents :: [BranchElement] -> Both [String]
 bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
 
-toRanges :: [BranchElement] -> Both [Range]
-toRanges elements = Source.actualLineRanges <$> totalRanges <*> sources
+toSourcesAndRanges :: [BranchElement] -> (Both (Source.Source Char), Both [Range])
+toSourcesAndRanges elements = (sources, Source.actualLineRanges <$> totalRanges <*> sources)
   where sources = toSources elements
         totalRanges = totalRange <$> sources
 
