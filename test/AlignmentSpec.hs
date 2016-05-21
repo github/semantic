@@ -204,10 +204,18 @@ toSourcesAndRanges elements = (sources, Source.actualLineRanges <$> totalRanges 
   where sources = toSources elements
         totalRanges = totalRange <$> sources
 
-toAlignedChildren :: [BranchElement] -> [(String, [Join These String])]
-toAlignedChildren elements = elements >>= go
-  where go child@(Child key contents) = [ (key, branchElementContents <$> alignBranchElement child) ]
-        go (Margin _) = []
+toAlignedChildren :: [BranchElement] -> [(String, [Join These Range])]
+toAlignedChildren = join . (`evalState` both 0 0) . mapM go
+  where go :: BranchElement -> State (Both Int) [(String, [Join These Range])]
+        go child@(Child key contents) = do
+          prev <- get
+          put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
+          lines <- join <$> mapM go (alignBranchElement child)
+          return [ (key, lines >>= Prelude.snd) ]
+        go (Margin contents) = do
+          prev <- get
+          put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
+          return []
 
 instance Arbitrary BranchElement where
   arbitrary = oneof [ key >>= \ key -> Child key <$> joinTheseOf (contents key)
