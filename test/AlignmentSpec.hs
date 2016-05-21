@@ -200,10 +200,10 @@ bothContents :: [BranchElement] -> Both [String]
 bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
 
 instance Arbitrary BranchElement where
-  arbitrary = oneof [ Child <$> key <*> joinTheseOf contents
+  arbitrary = oneof [ key >>= \ key -> Child key <$> joinTheseOf (contents key)
                     , Margin <$> joinTheseOf margin ]
     where key = listOf1 (elements (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9']))
-          contents = wrap <$> key <*> listOf (padding '*')
+          contents key = wrap key <$> listOf (padding '*')
           wrap key contents = "(" ++ key ++ contents ++ ")" :: String
           margin = listOf (padding '-')
           padding char = frequency [ (10, pure char)
