@@ -223,6 +223,9 @@ instance Arbitrary BranchElement where
                                 , Join . That <$> g
                                 , (Join .) . These <$> g <*> g ]
 
+  shrink (Child' key contents) = Child' key <$> traverse (shrinkList (const [])) contents
+  shrink (Margin contents) = Margin <$> traverse (shrinkList (const [])) contents
+
 instance Show Child where
   show Child {..} = childMargin ++ "(" ++ childKey ++ childContents ++ ")"
 
