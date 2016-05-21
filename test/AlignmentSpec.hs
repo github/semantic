@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, RecordWildCards #-}
+{-# LANGUAGE FlexibleInstances #-}
 module AlignmentSpec where
 
 import Alignment
@@ -181,12 +181,6 @@ spec = parallel $ do
     prop "counts only non-empty values" $
       \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
 
-data Child = Child
-  { childKey :: String
-  , childContents :: String
-  , childMargin :: String
-  }
-
 data BranchElement
   = Child' String (Join These String {- newlines or asterisks -})
   | Margin (Join These String {- newlines or hyphens -})
@@ -199,17 +193,6 @@ toSources = fmap toSource . toChildLists
 
 toChildLists :: [Join These BranchElement] -> Both [BranchElement]
 toChildLists = foldMap (modifyJoin (fromThese [] []) . fmap (:[]))
-
-instance Arbitrary Child where
-  arbitrary = Child <$> key <*> contents <*> margin
-    where key = listOf1 (elements (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9']))
-          contents = listOf (padding '*')
-          margin = listOf (padding '-')
-          padding char = frequency [ (10, pure char)
-                                   , (1, pure '\n') ]
-
-  shrink Child {..} | null childContents, null childMargin = []
-                    | otherwise = Child childKey <$> "" : shrinkList (const []) childContents <*> "" : shrinkList (const []) childMargin
 
 instance Arbitrary BranchElement where
   arbitrary = oneof [ Child' <$> key <*> joinTheseOf contents
@@ -225,9 +208,6 @@ instance Arbitrary BranchElement where
 
   shrink (Child' key contents) = Child' key <$> traverse (shrinkList (const [])) contents
   shrink (Margin contents) = Margin <$> traverse (shrinkList (const [])) contents
-
-instance Show Child where
-  show Child {..} = childMargin ++ "(" ++ childKey ++ childContents ++ ")"
 
 instance Show BranchElement where
   show (Child' key contents) = showThese (showContents <$> contents)
