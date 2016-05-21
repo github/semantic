@@ -187,6 +187,10 @@ data Child = Child
   , childMargin :: String
   }
 
+data BranchElement
+  = Child' String (Join These String {- newlines or asterisks -})
+  | Margin (Join These String {- newlines or hyphens -})
+
 toSource :: [Child] -> Source.Source Char
 toSource = Source.fromList . concatMap show
 
