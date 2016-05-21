@@ -190,6 +190,9 @@ data Child = Child
 toSource :: [Child] -> Source.Source Char
 toSource = Source.fromList . concatMap show
 
+toSources :: [Join These Child] -> Both (Source.Source Char)
+toSources = fmap toSource . toChildLists
+
 toChildLists :: [Join These Child] -> Both [Child]
 toChildLists = foldMap (modifyJoin (fromThese [] []) . fmap (:[]))
 
