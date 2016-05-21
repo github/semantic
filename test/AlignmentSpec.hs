@@ -182,7 +182,7 @@ spec = parallel $ do
       \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
 
 data BranchElement
-  = Child' String (Join These String {- newlines or asterisks -})
+  = Child String (Join These String {- newlines or asterisks -})
   | Margin (Join These String {- newlines or hyphens -})
 
 toSource :: [BranchElement] -> Source.Source Char
@@ -195,7 +195,7 @@ toChildLists :: [Join These BranchElement] -> Both [BranchElement]
 toChildLists = foldMap (modifyJoin (fromThese [] []) . fmap (:[]))
 
 instance Arbitrary BranchElement where
-  arbitrary = oneof [ Child' <$> key <*> joinTheseOf contents
+  arbitrary = oneof [ Child <$> key <*> joinTheseOf contents
                     , Margin <$> joinTheseOf margin ]
     where key = listOf1 (elements (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9']))
           contents = listOf (padding '*')
@@ -206,11 +206,11 @@ instance Arbitrary BranchElement where
                                 , Join . That <$> g
                                 , (Join .) . These <$> g <*> g ]
 
-  shrink (Child' key contents) = Child' key <$> traverse (shrinkList (const [])) contents
+  shrink (Child key contents) = Child key <$> traverse (shrinkList (const [])) contents
   shrink (Margin contents) = Margin <$> traverse (shrinkList (const [])) contents
 
 instance Show BranchElement where
-  show (Child' key contents) = showThese (showContents <$> contents)
+  show (Child key contents) = showThese (showContents <$> contents)
     where showContents contents = "(" ++ key ++ contents ++ ")"
   show (Margin contents) = showThese contents
 
