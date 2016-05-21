@@ -216,10 +216,7 @@ instance Arbitrary BranchElement where
   shrink (Margin contents) = Margin <$> traverse (shrinkList (const [])) contents
 
 instance Show BranchElement where
-  show = showThese . branchElementContents
-
-showThese :: Join These String -> String
-showThese = these ('<':) ('>':) (\ a b -> a ++ " | " ++ b) . runJoin
+  show = show . branchElementContents
 
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
