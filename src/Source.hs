@@ -82,3 +82,8 @@ actualLines source = case Source.break (== '\n') source of
 actualLineRanges :: Range -> Source Char -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous string = Range (end previous) $ end previous + length string
+
+
+instance Monoid (Source a) where
+  mempty = fromList []
+  mappend = (Source.++)
