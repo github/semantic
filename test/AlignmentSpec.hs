@@ -229,8 +229,10 @@ instance Show Child where
 instance Show BranchElement where
   show (Child' key contents) = showThese (showContents <$> contents)
     where showContents contents = "(" ++ key ++ contents ++ ")"
-          showThese = these (('<':) . show) (('>':) . show) (\ a b -> a ++ " | " ++ b) . runJoin
   show (Margin contents) = show contents
+
+showThese :: Join These String -> String
+showThese = these (('<':) . show) (('>':) . show) (\ a b -> a ++ " | " ++ b) . runJoin
 
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
