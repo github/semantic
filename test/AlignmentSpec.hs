@@ -219,9 +219,7 @@ instance Arbitrary BranchElement where
   shrink (Margin contents) = Margin <$> traverse (shrinkList (const [])) contents
 
 instance Show BranchElement where
-  show (Child key contents) = showThese (showContents <$> contents)
-    where showContents contents = "(" ++ key ++ contents ++ ")"
-  show (Margin contents) = showThese contents
+  show = showThese . branchElementContents
 
 showThese :: Join These String -> String
 showThese = these ('<':) ('>':) (\ a b -> a ++ " | " ++ b) . runJoin
