@@ -196,11 +196,11 @@ alignBranchElement (Margin contents) = Margin <$> traverse lines contents
 toSource :: [BranchElement] -> Source.Source Char
 toSource = Source.fromList . concatMap show
 
-toSources :: [Join These BranchElement] -> Both (Source.Source Char)
-toSources = fmap toSource . toChildLists
+toSources :: [BranchElement] -> Both (Source.Source Char)
+toSources = fmap (foldMap Source.fromList) . bothContents
 
-toChildLists :: [Join These BranchElement] -> Both [BranchElement]
-toChildLists = foldMap (modifyJoin (fromThese [] []) . fmap (:[]))
+bothContents :: [BranchElement] -> Both [String]
+bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
 
 instance Arbitrary BranchElement where
   arbitrary = oneof [ Child <$> key <*> joinTheseOf contents
