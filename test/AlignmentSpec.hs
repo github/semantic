@@ -229,7 +229,7 @@ instance Show Child where
 instance Show BranchElement where
   show (Child' key contents) = showThese (showContents <$> contents)
     where showContents contents = "(" ++ key ++ contents ++ ")"
-  show (Margin contents) = show contents
+  show (Margin contents) = showThese contents
 
 showThese :: Join These String -> String
 showThese = these (('<':) . show) (('>':) . show) (\ a b -> a ++ " | " ++ b) . runJoin
