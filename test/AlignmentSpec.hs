@@ -214,6 +214,11 @@ instance Arbitrary Child where
 instance Show Child where
   show Child {..} = childMargin ++ "(" ++ childKey ++ childContents ++ ")"
 
+instance Show BranchElement where
+  show (Child' key contents) = show (showContents <$> contents)
+    where showContents contents = "(" ++ key ++ contents ++ ")"
+  show (Margin contents) = show contents
+
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
 
