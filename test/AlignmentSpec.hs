@@ -227,8 +227,9 @@ instance Show Child where
   show Child {..} = childMargin ++ "(" ++ childKey ++ childContents ++ ")"
 
 instance Show BranchElement where
-  show (Child' key contents) = show (showContents <$> contents)
+  show (Child' key contents) = showThese (showContents <$> contents)
     where showContents contents = "(" ++ key ++ contents ++ ")"
+          showThese = these (('<':) . show) (('>':) . show) (\ a b -> a ++ " | " ++ b) . runJoin
   show (Margin contents) = show contents
 
 counts :: [Join These (Int, a)] -> Both Int
