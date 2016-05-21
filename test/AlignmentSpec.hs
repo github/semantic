@@ -211,6 +211,18 @@ instance Arbitrary Child where
   shrink Child {..} | null childContents, null childMargin = []
                     | otherwise = Child childKey <$> "" : shrinkList (const []) childContents <*> "" : shrinkList (const []) childMargin
 
+instance Arbitrary BranchElement where
+  arbitrary = oneof [ Child' <$> key <*> joinTheseOf contents
+                    , Margin <$> joinTheseOf margin ]
+    where key = listOf1 (elements (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9']))
+          contents = listOf (padding '*')
+          margin = listOf (padding '-')
+          padding char = frequency [ (10, pure char)
+                                   , (1, pure '\n') ]
+          joinTheseOf g = oneof [ Join . This <$> g
+                                , Join . That <$> g
+                                , (Join .) . These <$> g <*> g ]
+
 instance Show Child where
   show Child {..} = childMargin ++ "(" ++ childKey ++ childContents ++ ")"
 
