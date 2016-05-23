@@ -20,11 +20,10 @@ import Data.OrderedMap
 import qualified Data.Foldable as F
 import Data.Text as Text (unpack, Text)
 
-data DiffInfo = DiffInfo { name :: String, term :: Maybe String } deriving (Eq, Show)
+data DiffInfo = DiffInfo { categoryName :: String, value :: Maybe String } deriving (Eq, Show)
 
 class ToTerm a where
   toTerm :: a -> Maybe String
-
 
 instance IsTerm leaf => ToTerm (Term leaf Info) where
   toTerm term = case runCofree term of
@@ -33,12 +32,11 @@ instance IsTerm leaf => ToTerm (Term leaf Info) where
     (_ :< Indexed children) -> Just (termName . toCategory . head $ extract <$> children)
     (_ :< Fixed children) -> Just (termName . toCategory . head $ extract <$> children)
 
-
 class IsTerm a where
   termName :: a -> String
 
 instance IsTerm DiffInfo where
-  termName = name
+  termName = categoryName
 
 instance IsTerm String where
   termName = id
@@ -65,12 +63,12 @@ data DiffSummary a = DiffSummary {
 
 instance Show a => Show (DiffSummary a) where
   show DiffSummary{..} = case patch of
-    (Insert termInfo) -> "Added the " ++ "'" ++ fromJust (term termInfo) ++ "' " ++ termName termInfo
+    (Insert termInfo) -> "Added the " ++ "'" ++ fromJust (value termInfo) ++ "' " ++ termName termInfo
       ++ if null parentAnnotations then "" else " to the " ++ intercalate "/" (termName <$> parentAnnotations) ++ " context"
-    (Delete termInfo) -> "Deleted the " ++ "'" ++ fromJust (term termInfo) ++ "' " ++ termName termInfo
+    (Delete termInfo) -> "Deleted the " ++ "'" ++ fromJust (value termInfo) ++ "' " ++ termName termInfo
       ++ if null parentAnnotations then "" else " in the " ++ intercalate "/" (termName <$> parentAnnotations) ++ " context"
-    (Replace t1 t2) -> "Replaced the " ++ "'" ++ fromJust (term t1) ++ "' " ++ termName t1
-      ++ " with the " ++ "'" ++ fromJust (term t2) ++ "' " ++ termName t2
+    (Replace t1 t2) -> "Replaced the " ++ "'" ++ fromJust (value t1) ++ "' " ++ termName t1
+      ++ " with the " ++ "'" ++ fromJust (value t2) ++ "' " ++ termName t2
       ++ if null parentAnnotations then "" else " in the " ++ intercalate "/" (termName <$> parentAnnotations) ++ " context"
 
 diffSummary :: IsTerm leaf => Diff leaf Info -> [DiffSummary DiffInfo]
