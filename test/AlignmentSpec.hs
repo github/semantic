@@ -6,6 +6,7 @@ import ArbitraryTerm ()
 import Control.Arrow ((&&&))
 import Control.Comonad.Cofree
 import Control.Monad.Free
+import Control.Monad.State
 import Data.Align hiding (align)
 import Data.Bifunctor.Join
 import Data.Foldable (toList)
