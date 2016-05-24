@@ -244,6 +244,9 @@ instance Arbitrary BranchElement where
 instance Show BranchElement where
   show = show . branchElementContents
 
+instance Arbitrary (PrettyDiff [(String, Range)]) where
+  arbitrary = toPrettyDiff <$> listOf1 arbitrary
+
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
 
