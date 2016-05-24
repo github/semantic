@@ -35,9 +35,6 @@ instance IsTerm leaf => ToTerm (Term leaf Info) where
 class IsTerm a where
   termName :: a -> String
 
-instance IsTerm DiffInfo where
-  termName = categoryName
-
 instance IsTerm String where
   termName = id
 
@@ -63,13 +60,13 @@ data DiffSummary a = DiffSummary {
 
 instance Show a => Show (DiffSummary a) where
   show DiffSummary{..} = case patch of
-    (Insert termInfo) -> "Added the " ++ "'" ++ fromJust (value termInfo) ++ "' " ++ termName termInfo
-      ++ if null parentAnnotations then "" else " to the " ++ intercalate "/" (termName <$> parentAnnotations) ++ " context"
-    (Delete termInfo) -> "Deleted the " ++ "'" ++ fromJust (value termInfo) ++ "' " ++ termName termInfo
-      ++ if null parentAnnotations then "" else " in the " ++ intercalate "/" (termName <$> parentAnnotations) ++ " context"
-    (Replace t1 t2) -> "Replaced the " ++ "'" ++ fromJust (value t1) ++ "' " ++ termName t1
-      ++ " with the " ++ "'" ++ fromJust (value t2) ++ "' " ++ termName t2
-      ++ if null parentAnnotations then "" else " in the " ++ intercalate "/" (termName <$> parentAnnotations) ++ " context"
+    (Insert termInfo) -> "Added the " ++ "'" ++ fromJust (value termInfo) ++ "' " ++ categoryName termInfo
+      ++ if null parentAnnotations then "" else " to the " ++ intercalate "/" (categoryName <$> parentAnnotations) ++ " context"
+    (Delete termInfo) -> "Deleted the " ++ "'" ++ fromJust (value termInfo) ++ "' " ++ categoryName termInfo
+      ++ if null parentAnnotations then "" else " in the " ++ intercalate "/" (categoryName <$> parentAnnotations) ++ " context"
+    (Replace t1 t2) -> "Replaced the " ++ "'" ++ fromJust (value t1) ++ "' " ++ categoryName t1
+      ++ " with the " ++ "'" ++ fromJust (value t2) ++ "' " ++ categoryName t2
+      ++ if null parentAnnotations then "" else " in the " ++ intercalate "/" (categoryName <$> parentAnnotations) ++ " context"
 
 diffSummary :: IsTerm leaf => Diff leaf Info -> [DiffSummary DiffInfo]
 diffSummary = cata diffSummary' where
