@@ -228,9 +228,7 @@ toPrettyDiff elements = PrettyDiff sources (alignBranch id children ranges)
         children = toAlignedChildren elements
 
 keysOfAlignedChildren :: [Join These (Range, [(String, Range)])] -> [String]
-keysOfAlignedChildren lines = do
-  line <- lines
-  these id id (++) (runJoin (fmap Prelude.fst . Prelude.snd <$> line))
+keysOfAlignedChildren lines = lines >>= these id id (++) . runJoin . fmap (fmap Prelude.fst . Prelude.snd)
 
 instance Arbitrary BranchElement where
   arbitrary = oneof [ key >>= \ key -> Child key <$> joinTheseOf (contents key)
