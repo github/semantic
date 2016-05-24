@@ -53,6 +53,13 @@ instance IsTerm Category where
     ArrayLiteral -> "array"
     (Other s) -> s
 
+instance IsTerm leaf => IsTerm (Term leaf Info) where
+  termName term = termName $ case runCofree term of
+    (info :< Leaf _) -> toCategory info
+    (info :< Indexed _) -> toCategory info
+    (info :< Fixed _) -> toCategory info
+    (info :< Keyed _) -> toCategory info
+
 data DiffSummary a = DiffSummary {
   patch :: Patch DiffInfo,
   parentAnnotations :: [DiffInfo]
@@ -78,19 +85,12 @@ diffSummary = cata diffSummary' where
   diffSummary' (Free (infos :< Indexed children)) = prependSummary (DiffInfo (termName . toCategory $ snd infos) Nothing) <$> join children
   diffSummary' (Free (infos :< Fixed children)) = prependSummary (DiffInfo (termName . toCategory $ snd infos) Nothing) <$> join children
   diffSummary' (Free (infos :< Keyed children)) = prependSummary (DiffInfo (termName . toCategory $ snd infos) Nothing) <$> join (F.toList children)
-  diffSummary' (Pure (Insert term)) = [DiffSummary (Insert (DiffInfo (toTermName term) (toTerm term))) []]
-  diffSummary' (Pure (Delete term)) = [DiffSummary (Delete (DiffInfo (toTermName term) (toTerm term))) []]
-  diffSummary' (Pure (Replace t1 t2)) = [DiffSummary (Replace (DiffInfo (toTermName t1) (toTerm t1)) (DiffInfo (toTermName t2) (toTerm t2))) []]
+  diffSummary' (Pure (Insert term)) = [DiffSummary (Insert (DiffInfo (termName term) (toTerm term))) []]
+  diffSummary' (Pure (Delete term)) = [DiffSummary (Delete (DiffInfo (termName term) (toTerm term))) []]
+  diffSummary' (Pure (Replace t1 t2)) = [DiffSummary (Replace (DiffInfo (termName t1) (toTerm t1)) (DiffInfo (termName t2) (toTerm t2))) []]
 
 prependSummary :: DiffInfo -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
-
-toTermName :: IsTerm leaf => Term leaf Info -> String
-toTermName term = termName $ case runCofree term of
-  (info :< Leaf _) -> toCategory info
-  (info :< Indexed _) -> toCategory info
-  (info :< Fixed _) -> toCategory info
-  (info :< Keyed _) -> toCategory info
 
 toCategory :: Info -> Category
 toCategory info = fromMaybe (Other "Unknown") (maybeFirstCategory info)
