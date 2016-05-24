@@ -190,6 +190,10 @@ branchElementContents :: BranchElement -> Join These String
 branchElementContents (Child _ contents) = contents
 branchElementContents (Margin contents) = contents
 
+branchElementKey :: BranchElement -> Maybe String
+branchElementKey (Child key _) = Just key
+branchElementKey _ = Nothing
+
 alignBranchElement :: BranchElement -> [BranchElement]
 alignBranchElement (Child key contents) = Child key <$> traverse lines contents
 alignBranchElement (Margin contents) = Margin <$> traverse lines contents
