@@ -20,29 +20,29 @@ import Data.OrderedMap
 import qualified Data.Foldable as F
 import Data.Text as Text (unpack, Text)
 
-data DiffInfo = DiffInfo { categoryName :: String, value :: Maybe String } deriving (Eq, Show)
+data DiffInfo = DiffInfo { category :: String, value :: Maybe String } deriving (Eq, Show)
 
 class ToTerm a where
   toTerm :: a -> Maybe String
 
-instance IsTerm leaf => ToTerm (Term leaf Info) where
+instance HasCategory leaf => ToTerm (Term leaf Info) where
   toTerm term = case runCofree term of
-    (_ :< Leaf leaf) -> Just (termName leaf)
+    (_ :< Leaf leaf) -> Just (categoryName leaf)
     (_ :< Keyed children) -> Just (unpack . mconcat $ keys children)
-    (_ :< Indexed children) -> Just (termName . toCategory . head $ extract <$> children)
-    (_ :< Fixed children) -> Just (termName . toCategory . head $ extract <$> children)
+    (_ :< Indexed children) -> Just (categoryName . toCategory . head $ extract <$> children)
+    (_ :< Fixed children) -> Just (categoryName . toCategory . head $ extract <$> children)
 
-class IsTerm a where
-  termName :: a -> String
+class HasCategory a where
+  categoryName :: a -> String
 
-instance IsTerm String where
-  termName = id
+instance HasCategory String where
+  categoryName = id
 
-instance IsTerm Text where
-  termName = unpack
+instance HasCategory Text where
+  categoryName = unpack
 
-instance IsTerm Category where
-  termName category = case category of
+instance HasCategory Category where
+  categoryName category = case category of
     BinaryOperator -> "binary operator"
     DictionaryLiteral -> "dictionary"
     Pair -> "pair"
@@ -53,12 +53,13 @@ instance IsTerm Category where
     ArrayLiteral -> "array"
     (Other s) -> s
 
-instance IsTerm leaf => IsTerm (Term leaf Info) where
-  termName term = termName $ case runCofree term of
+instance HasCategory leaf => HasCategory (Term leaf Info) where
+  categoryName term = categoryName $ case runCofree term of
     (info :< Leaf _) -> toCategory info
     (info :< Indexed _) -> toCategory info
     (info :< Fixed _) -> toCategory info
     (info :< Keyed _) -> toCategory info
+
 
 data DiffSummary a = DiffSummary {
   patch :: Patch DiffInfo,
@@ -67,27 +68,27 @@ data DiffSummary a = DiffSummary {
 
 instance Show a => Show (DiffSummary a) where
   show DiffSummary{..} = case patch of
-    (Insert termInfo) -> "Added the " ++ "'" ++ fromJust (value termInfo) ++ "' " ++ categoryName termInfo
+    (Insert termInfo) -> "Added the " ++ "'" ++ fromJust (value termInfo) ++ "' " ++ category termInfo
       ++ maybeParentContext parentAnnotations
-    (Delete termInfo) -> "Deleted the " ++ "'" ++ fromJust (value termInfo) ++ "' " ++ categoryName termInfo
+    (Delete termInfo) -> "Deleted the " ++ "'" ++ fromJust (value termInfo) ++ "' " ++ category termInfo
       ++ maybeParentContext parentAnnotations
-    (Replace t1 t2) -> "Replaced the " ++ "'" ++ fromJust (value t1) ++ "' " ++ categoryName t1
-      ++ " with the " ++ "'" ++ fromJust (value t2) ++ "' " ++ categoryName t2
+    (Replace t1 t2) -> "Replaced the " ++ "'" ++ fromJust (value t1) ++ "' " ++ category t1
+      ++ " with the " ++ "'" ++ fromJust (value t2) ++ "' " ++ category t2
       ++ maybeParentContext parentAnnotations
     where maybeParentContext parentAnnotations = if null parentAnnotations
             then ""
-            else " in the " ++ intercalate "/" (categoryName <$> parentAnnotations) ++ " context"
+            else " in the " ++ intercalate "/" (category <$> parentAnnotations) ++ " context"
 
-diffSummary :: IsTerm leaf => Diff leaf Info -> [DiffSummary DiffInfo]
+diffSummary :: HasCategory leaf => Diff leaf Info -> [DiffSummary DiffInfo]
 diffSummary = cata diffSummary' where
-  diffSummary' :: IsTerm leaf => DiffF leaf Info [DiffSummary DiffInfo] -> [DiffSummary DiffInfo]
+  diffSummary' :: HasCategory leaf => DiffF leaf Info [DiffSummary DiffInfo] -> [DiffSummary DiffInfo]
   diffSummary' (Free (_ :< Leaf _)) = [] -- Skip leaves since they don't have any changes
-  diffSummary' (Free (infos :< Indexed children)) = prependSummary (DiffInfo (termName . toCategory $ snd infos) Nothing) <$> join children
-  diffSummary' (Free (infos :< Fixed children)) = prependSummary (DiffInfo (termName . toCategory $ snd infos) Nothing) <$> join children
-  diffSummary' (Free (infos :< Keyed children)) = prependSummary (DiffInfo (termName . toCategory $ snd infos) Nothing) <$> join (F.toList children)
-  diffSummary' (Pure (Insert term)) = [DiffSummary (Insert (DiffInfo (termName term) (toTerm term))) []]
-  diffSummary' (Pure (Delete term)) = [DiffSummary (Delete (DiffInfo (termName term) (toTerm term))) []]
-  diffSummary' (Pure (Replace t1 t2)) = [DiffSummary (Replace (DiffInfo (termName t1) (toTerm t1)) (DiffInfo (termName t2) (toTerm t2))) []]
+  diffSummary' (Free (infos :< Indexed children)) = prependSummary (DiffInfo (categoryName . toCategory $ snd infos) Nothing) <$> join children
+  diffSummary' (Free (infos :< Fixed children)) = prependSummary (DiffInfo (categoryName . toCategory $ snd infos) Nothing) <$> join children
+  diffSummary' (Free (infos :< Keyed children)) = prependSummary (DiffInfo (categoryName . toCategory $ snd infos) Nothing) <$> join (F.toList children)
+  diffSummary' (Pure (Insert term)) = [DiffSummary (Insert (DiffInfo (categoryName term) (toTerm term))) []]
+  diffSummary' (Pure (Delete term)) = [DiffSummary (Delete (DiffInfo (categoryName term) (toTerm term))) []]
+  diffSummary' (Pure (Replace t1 t2)) = [DiffSummary (Replace (DiffInfo (categoryName t1) (toTerm t1)) (DiffInfo (categoryName t2) (toTerm t2))) []]
 
 prependSummary :: DiffInfo -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
