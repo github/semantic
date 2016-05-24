@@ -218,6 +218,11 @@ toAlignedChildren = join . (`evalState` both 0 0) . mapM go
           put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
           return []
 
+toPrettyDiff :: [BranchElement] -> PrettyDiff [(String, Range)]
+toPrettyDiff elements = PrettyDiff sources (alignBranch id children ranges)
+  where (sources, ranges) = toSourcesAndRanges elements
+        children = toAlignedChildren elements
+
 instance Arbitrary BranchElement where
   arbitrary = oneof [ key >>= \ key -> Child key <$> joinTheseOf (contents key)
                     , Margin <$> joinTheseOf margin ]
