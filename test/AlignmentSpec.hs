@@ -51,7 +51,8 @@ spec = parallel $ do
         ]
 
     prop "covers every input line" $
-      pendingWith "TBD"
+      \ elements -> let (_, ranges) = toSourcesAndRanges elements in
+        modifyJoin (fromThese [] []) (unionThese (fmap Prelude.fst <$> alignmentFromBranchElements elements)) `shouldBe` ranges
 
     prop "covers every input child" $
       \ elements -> sort (nub (keysOfAlignedChildren (alignmentFromBranchElements elements))) `shouldBe` sort (catMaybes (branchElementKey <$> elements))

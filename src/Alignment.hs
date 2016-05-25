@@ -7,6 +7,7 @@ module Alignment
 , alignBranch
 , applyThese
 , modifyJoin
+, unionThese
 ) where
 
 import Control.Applicative
