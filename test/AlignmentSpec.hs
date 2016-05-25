@@ -192,8 +192,6 @@ data BranchElement
   | Margin (Join These String)
   deriving Show
 
-data BranchAlignment = BranchAlignment { branchElements :: [BranchElement] }
-
 branchElementContents :: BranchElement -> Join These String
 branchElementContents (Child _ contents) = contents
 branchElementContents (Margin contents) = contents
