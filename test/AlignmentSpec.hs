@@ -52,10 +52,11 @@ spec = parallel $ do
 
     prop "covers every input line" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        modifyJoin (fromThese [] []) (unionThese (fmap Prelude.fst <$> alignmentFromBranchElements elements)) `shouldBe` ranges
+        modifyJoin (fromThese [] []) (unionThese (fmap Prelude.fst <$> alignBranch id children ranges)) `shouldBe` ranges
 
     prop "covers every input child" $
-      \ elements -> sort (nub (keysOfAlignedChildren (alignmentFromBranchElements elements))) `shouldBe` sort (catMaybes (branchElementKey <$> elements))
+      \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
+        sort (nub (keysOfAlignedChildren (alignBranch id children ranges))) `shouldBe` sort (catMaybes (branchElementKey <$> elements))
 
     prop "covers every line of every input child" $
       pendingWith "TBD"
@@ -189,10 +190,6 @@ data BranchElement
   = Child String (Join These String)
   | Margin (Join These String)
   deriving Show
-
-alignmentFromBranchElements :: [BranchElement] -> [Join These (Range, [(String, Range)])]
-alignmentFromBranchElements elements = alignBranch id children ranges
-  where (sources, children, ranges) = toAlignBranchInputs elements
 
 branchElementContents :: BranchElement -> Join These String
 branchElementContents (Child _ contents) = contents
