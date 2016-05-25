@@ -258,9 +258,6 @@ instance Arbitrary BranchElement where
           (prefix, suffix) = ('(' : key, ")" :: String)
   shrink (Margin contents) = Margin <$> traverse (shrinkList (const [])) contents
 
-instance Arbitrary BranchAlignment where
-  arbitrary = BranchAlignment <$> listOf1 arbitrary
-
 instance Arbitrary (PrettyDiff [(String, Range)]) where
   arbitrary = toPrettyDiff <$> listOf1 arbitrary
 
