@@ -200,8 +200,11 @@ branchElementKey (Child key _) = Just key
 branchElementKey _ = Nothing
 
 alignBranchElement :: BranchElement -> [BranchElement]
-alignBranchElement (Child key contents) = Child key <$> crosswalk lines contents
-alignBranchElement (Margin contents) = Margin <$> crosswalk lines contents
+alignBranchElement element = case element of
+  Child key contents -> Child key <$> crosswalk lines contents
+  Margin contents -> Margin <$> crosswalk lines contents
+  where lines = fmap toList . Source.actualLines . Source.fromList
+
 
 toAlignBranchInputs :: [BranchElement] -> (Both (Source.Source Char), [(String, [Join These Range])], Both [Range])
 toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . mapM go $ elements, ranges)
