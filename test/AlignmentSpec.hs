@@ -54,10 +54,7 @@ spec = parallel $ do
       pendingWith "TBD"
 
     prop "covers every input child" $
-      \ elements ->
-        let (_, ranges) = toSourcesAndRanges elements
-            children = toAlignedChildren elements in
-            sort (nub (keysOfAlignedChildren (alignBranch id children ranges))) `shouldBe` sort (catMaybes (branchElementKey <$> elements))
+      \ elements -> sort (nub (keysOfAlignedChildren (alignmentFromBranchElements elements))) `shouldBe` sort (catMaybes (branchElementKey <$> elements))
 
     prop "covers every line of every input child" $
       pendingWith "TBD"
@@ -191,6 +188,11 @@ data BranchElement
   = Child String (Join These String)
   | Margin (Join These String)
   deriving Show
+
+alignmentFromBranchElements :: [BranchElement] -> [Join These (Range, [(String, Range)])]
+alignmentFromBranchElements elements = alignBranch id children ranges
+  where (_, ranges) = toSourcesAndRanges elements
+        children = toAlignedChildren elements
 
 branchElementContents :: BranchElement -> Join These String
 branchElementContents (Child _ contents) = contents
