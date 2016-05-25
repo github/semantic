@@ -126,12 +126,12 @@ We should avoid taking asymmetrical children greedily so as not to misalign asym
 
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
 alignBranch :: (Copointed c, Functor c) => (term -> Range) -> [c [Join These term]] -> Both [Range] -> [Join These (Range, [c term])]
+-- The first child is empty, and so can safely be dropped.
+alignBranch getRange (first:children) ranges | null (copoint first) = alignBranch getRange children ranges
 -- There are no more ranges, so we’re done.
 alignBranch _ _ (Join ([], [])) = []
 -- There are no more children, so we can just zip the remaining ranges together.
 alignBranch _ [] ranges = runBothWith (alignWith Join) (fmap (flip (,) []) <$> ranges)
--- The first child is empty, and so can safely be dropped.
-alignBranch getRange (first:children) ranges | null (copoint first) = alignBranch getRange children ranges
 -- There are both children and ranges, so we need to proceed line by line
 alignBranch getRange children ranges = case intersectingChildren of
   -- No child intersects the current ranges on either side, so advance.
