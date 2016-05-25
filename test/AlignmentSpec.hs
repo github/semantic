@@ -8,6 +8,7 @@ import Control.Comonad.Cofree
 import Control.Monad.Free
 import Control.Monad.State
 import Data.Align hiding (align)
+import Data.Bifunctor
 import Data.Bifunctor.Join
 import Data.Foldable (toList)
 import Data.Functor.Both as Both
@@ -212,11 +213,13 @@ toSourcesAndRanges elements = (sources, Source.actualLineRanges <$> totalRanges 
 toAlignedChildren :: [BranchElement] -> [(String, [Join These Range])]
 toAlignedChildren = join . (`evalState` both 0 0) . mapM go
   where go :: BranchElement -> State (Both Int) [(String, [Join These Range])]
-        go child@(Child key contents) = do
+        go child@(Child key _) = do
           prev <- get
-          put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
-          lines <- join <$> mapM go (alignBranchElement child)
-          return [ (key, lines >>= Prelude.snd) ]
+          lines <- mapM (\ (Child _ contents) -> do
+            let next = (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
+            put next
+            return $! modifyJoin (runBothWith bimap (const <$> (Range <$> prev <*> next))) contents) (alignBranchElement child)
+          return [ (key, lines) ]
         go (Margin contents) = do
           prev <- get
           put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
