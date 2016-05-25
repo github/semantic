@@ -221,7 +221,7 @@ toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . mapM go
           put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
           return []
         sources = foldMap Source.fromList <$> bothContents elements
-        ranges = Source.actualLineRanges <$> (totalRange <$> sources) <*> sources
+        ranges = fmap (filter (\ (Range start end) -> start /= end)) $ Source.actualLineRanges <$> (totalRange <$> sources) <*> sources
         bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
 
 keysOfAlignedChildren :: [Join These (Range, [(String, Range)])] -> [String]
