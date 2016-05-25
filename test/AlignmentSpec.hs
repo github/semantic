@@ -207,15 +207,12 @@ alignBranchElement :: BranchElement -> [BranchElement]
 alignBranchElement (Child key contents) = Child key <$> crosswalk lines contents
 alignBranchElement (Margin contents) = Margin <$> crosswalk lines contents
 
-toSources :: [BranchElement] -> Both (Source.Source Char)
-toSources = fmap (foldMap Source.fromList) . bothContents
-
 bothContents :: [BranchElement] -> Both [String]
 bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
 
 toSourcesAndRanges :: [BranchElement] -> (Both (Source.Source Char), Both [Range])
 toSourcesAndRanges elements = (sources, Source.actualLineRanges <$> totalRanges <*> sources)
-  where sources = toSources elements
+  where sources = foldMap Source.fromList <$> bothContents elements
         totalRanges = totalRange <$> sources
 
 toAlignedChildren :: [BranchElement] -> [(String, [Join These Range])]
