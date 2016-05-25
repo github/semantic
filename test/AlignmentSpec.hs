@@ -51,7 +51,7 @@ spec = parallel $ do
         ]
 
     prop "covers every input line" $
-      \ elements -> let (_, ranges) = toSourcesAndRanges elements in
+      \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
         modifyJoin (fromThese [] []) (unionThese (fmap Prelude.fst <$> alignmentFromBranchElements elements)) `shouldBe` ranges
 
     prop "covers every input child" $
@@ -192,8 +192,7 @@ data BranchElement
 
 alignmentFromBranchElements :: [BranchElement] -> [Join These (Range, [(String, Range)])]
 alignmentFromBranchElements elements = alignBranch id children ranges
-  where (_, ranges) = toSourcesAndRanges elements
-        children = toAlignedChildren elements
+  where (sources, children, ranges) = toAlignBranchInputs elements
 
 branchElementContents :: BranchElement -> Join These String
 branchElementContents (Child _ contents) = contents
@@ -207,14 +206,8 @@ alignBranchElement :: BranchElement -> [BranchElement]
 alignBranchElement (Child key contents) = Child key <$> crosswalk lines contents
 alignBranchElement (Margin contents) = Margin <$> crosswalk lines contents
 
-toSourcesAndRanges :: [BranchElement] -> (Both (Source.Source Char), Both [Range])
-toSourcesAndRanges elements = (sources, Source.actualLineRanges <$> totalRanges <*> sources)
-  where sources = foldMap Source.fromList <$> bothContents elements
-        totalRanges = totalRange <$> sources
-        bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
-
-toAlignedChildren :: [BranchElement] -> [(String, [Join These Range])]
-toAlignedChildren = join . (`evalState` both 0 0) . mapM go
+toAlignBranchInputs :: [BranchElement] -> (Both (Source.Source Char), [(String, [Join These Range])], Both [Range])
+toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . mapM go $ elements, ranges)
   where go :: BranchElement -> State (Both Int) [(String, [Join These Range])]
         go child@(Child key _) = do
           prev <- get
@@ -227,11 +220,13 @@ toAlignedChildren = join . (`evalState` both 0 0) . mapM go
           prev <- get
           put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
           return []
+        sources = foldMap Source.fromList <$> bothContents elements
+        ranges = Source.actualLineRanges <$> (totalRange <$> sources) <*> sources
+        bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
 
 toPrettyDiff :: [BranchElement] -> PrettyDiff [(String, Range)]
 toPrettyDiff elements = PrettyDiff sources (alignBranch id children ranges)
-  where (sources, ranges) = toSourcesAndRanges elements
-        children = toAlignedChildren elements
+  where (sources, children, ranges) = toAlignBranchInputs elements
 
 keysOfAlignedChildren :: [Join These (Range, [(String, Range)])] -> [String]
 keysOfAlignedChildren lines = lines >>= these id id (++) . runJoin . fmap (fmap Prelude.fst . Prelude.snd)
