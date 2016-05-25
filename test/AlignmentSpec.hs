@@ -210,8 +210,8 @@ toAlignBranchInputs :: [BranchElement] -> (Both (Source.Source Char), [(String, 
 toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . mapM go $ elements, ranges)
   where go :: BranchElement -> State (Both Int) [(String, [Join These Range])]
         go child@(Child key _) = do
-          prev <- get
           lines <- mapM (\ (Child _ contents) -> do
+            prev <- get
             let next = (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
             put next
             return $! modifyJoin (runBothWith bimap (const <$> (Range <$> prev <*> next))) contents) (alignBranchElement child)
