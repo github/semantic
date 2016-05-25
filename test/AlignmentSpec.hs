@@ -201,8 +201,8 @@ branchElementKey (Child key _) = Just key
 branchElementKey _ = Nothing
 
 alignBranchElement :: BranchElement -> [BranchElement]
-alignBranchElement (Child key contents) = Child key <$> traverse lines contents
-alignBranchElement (Margin contents) = Margin <$> traverse lines contents
+alignBranchElement (Child key contents) = Child key <$> crosswalk lines contents
+alignBranchElement (Margin contents) = Margin <$> crosswalk lines contents
 
 toSources :: [BranchElement] -> Both (Source.Source Char)
 toSources = fmap (foldMap Source.fromList) . bothContents
