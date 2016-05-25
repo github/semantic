@@ -221,10 +221,6 @@ toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . mapM go
         ranges = Source.actualLineRanges <$> (totalRange <$> sources) <*> sources
         bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
 
-toPrettyDiff :: [BranchElement] -> PrettyDiff [(String, Range)]
-toPrettyDiff elements = PrettyDiff sources (alignBranch id children ranges)
-  where (sources, children, ranges) = toAlignBranchInputs elements
-
 keysOfAlignedChildren :: [Join These (Range, [(String, Range)])] -> [String]
 keysOfAlignedChildren lines = lines >>= these id id (++) . runJoin . fmap (fmap Prelude.fst . Prelude.snd)
 
@@ -245,9 +241,6 @@ instance Arbitrary BranchElement where
     where shrinkContents string = (++ suffix) . (prefix ++) <$> shrinkList (const []) (drop (length prefix) (take (length string - length suffix) string))
           (prefix, suffix) = ('(' : key, ")" :: String)
   shrink (Margin contents) = Margin <$> crosswalk (shrinkList (const [])) contents
-
-instance Arbitrary (PrettyDiff [(String, Range)]) where
-  arbitrary = toPrettyDiff <$> listOf1 arbitrary
 
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
