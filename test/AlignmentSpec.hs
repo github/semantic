@@ -251,10 +251,10 @@ instance Arbitrary BranchElement where
                                 , Join . That <$> g
                                 , (Join .) . These <$> g <*> g ]
 
-  shrink (Child key contents) = Child key <$> traverse shrinkContents contents
+  shrink (Child key contents) = Child key <$> crosswalk shrinkContents contents
     where shrinkContents string = (++ suffix) . (prefix ++) <$> shrinkList (const []) (drop (length prefix) (take (length string - length suffix) string))
           (prefix, suffix) = ('(' : key, ")" :: String)
-  shrink (Margin contents) = Margin <$> traverse (shrinkList (const [])) contents
+  shrink (Margin contents) = Margin <$> crosswalk (shrinkList (const [])) contents
 
 instance Arbitrary (PrettyDiff [(String, Range)]) where
   arbitrary = toPrettyDiff <$> listOf1 arbitrary
