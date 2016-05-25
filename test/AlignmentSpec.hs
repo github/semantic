@@ -190,6 +190,7 @@ spec = parallel $ do
 data BranchElement
   = Child String (Join These String)
   | Margin (Join These String)
+  deriving Show
 
 branchElementContents :: BranchElement -> Join These String
 branchElementContents (Child _ contents) = contents
@@ -254,9 +255,6 @@ instance Arbitrary BranchElement where
     where shrinkContents string = (++ suffix) . (prefix ++) <$> shrinkList (const []) (drop (length prefix) (take (length string - length suffix) string))
           (prefix, suffix) = ('(' : key, ")" :: String)
   shrink (Margin contents) = Margin <$> traverse (shrinkList (const [])) contents
-
-instance Show BranchElement where
-  show = show . branchElementContents
 
 instance Arbitrary (PrettyDiff [(String, Range)]) where
   arbitrary = toPrettyDiff <$> listOf1 arbitrary
