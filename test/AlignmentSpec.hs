@@ -261,6 +261,9 @@ instance Arbitrary BranchElement where
 instance Arbitrary BranchAlignment where
   arbitrary = BranchAlignment <$> listOf1 arbitrary
 
+instance Show BranchAlignment where
+  show b = show $ toPrettyDiff $ branchElements b
+
 instance Arbitrary (PrettyDiff [(String, Range)]) where
   arbitrary = toPrettyDiff <$> listOf1 arbitrary
 
