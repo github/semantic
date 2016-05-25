@@ -13,6 +13,7 @@ import Data.Bifunctor.Join
 import Data.Foldable (toList)
 import Data.Functor.Both as Both
 import Data.Functor.Identity
+import Data.List (nub, sort)
 import Data.Maybe (catMaybes, fromMaybe)
 import Data.Monoid
 import Data.Text.Arbitrary ()
@@ -53,7 +54,10 @@ spec = parallel $ do
       pendingWith "TBD"
 
     prop "covers every input child" $
-      pendingWith "TBD"
+      \ elements ->
+        let (_, ranges) = toSourcesAndRanges elements
+            children = toAlignedChildren elements in
+            sort (nub (keysOfAlignedChildren (alignBranch id children ranges))) `shouldBe` sort (catMaybes (branchElementKey <$> elements))
 
     prop "covers every line of every input child" $
       pendingWith "TBD"
