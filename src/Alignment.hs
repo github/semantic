@@ -142,8 +142,8 @@ alignBranch getRange children ranges = case intersectingChildren of
   -- At least one child intersects on at least one side.
   _ -> case fromThese True True . runJoin . intersectsFirstLine headRanges <$> listToMaybe remainingIntersectingChildren of
     -- At least one child intersects on both sides, so align symmetrically.
-    Just (True, True) -> let (nextChildren, nextRanges, lines) = linesOf getRange children ranges in
-      lines ++ alignBranch getRange nextChildren nextRanges
+    Just (True, True) -> let (line, remaining) = lineAndRemaining intersectingChildren headRanges in
+      line : alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
     -- A symmetrical child intersects on the right, so align asymmetrically on the left.
     Just (False, True) -> let (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> leftRange in
       leftLine $ alignBranch getRange (remainingAtLeft ++ remainingIntersectingChildren ++ nonIntersectingChildren) (modifyJoin (first (drop 1)) ranges)
