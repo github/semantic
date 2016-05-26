@@ -161,7 +161,7 @@ alignBranch getRange children ranges = case intersectingChildren of
         (leftRange, rightRange) = splitThese headRanges
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange children ranges in
           (fromJust ((,) <$> ranges `applyThese` Join (runBothWith These intersections)), remaining)
-        lineAndRemainingWhere predicate children = if any predicate children then Just . lineAndRemaining children else const Nothing
+        lineAndRemainingWhere predicate children = if any predicate children then Just . lineAndRemaining (filter predicate children) else const Nothing
         advancePast children = fromThese id id . runJoin . (drop 1 <$) $ unionThese (head . copoint <$> children)
 
 -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
