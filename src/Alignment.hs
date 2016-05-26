@@ -169,16 +169,17 @@ advancePast children = fromThese identity identity . runJoin . (drop 1 <$) $ uni
 headRangesOf :: Both [Range] -> Maybe (Join These Range)
 headRangesOf ranges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
 
-linesOf :: (Copointed c, Functor c) => (term -> Range) -> [c [Join These term]] -> Both [Range] -> [Join These (Range, [c term])]
+linesOf :: (Copointed c, Functor c) => (term -> Range) -> [c [Join These term]] -> Both [Range] -> (Both [Range], [Join These (Range, [c term])])
 linesOf getRange children ranges
-  | Join ([], []) <- ranges = []
-  | [] <- children = []
+  | Join ([], []) <- ranges = (ranges, [])
+  | [] <- children = (ranges, [])
   | (first:rest) <- children
   , null (copoint first) = linesOf getRange rest ranges
   | otherwise = let (intersections, remaining) = alignChildren getRange children headRanges
                     Just headRanges = headRangesOf ranges
-                    joined = Join (runBothWith These intersections) in
-  fromJust ((,) <$> headRanges `applyThese` joined) : linesOf getRange remaining (modifyJoin (uncurry bimap (advancePast (sequenceL (fmap copoint <$> joined)))) ranges)
+                    joined = Join (runBothWith These intersections)
+                    (nextRanges, lines) = linesOf getRange remaining (modifyJoin (uncurry bimap (advancePast (sequenceL (fmap copoint <$> joined)))) ranges) in
+  (nextRanges, fromJust ((,) <$> headRanges `applyThese` joined) : lines)
 
 -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
 alignChildren :: (Copointed c, Functor c) => (term -> Range) -> [c [Join These term]] -> Join These Range -> (Both [c term], [c [Join These term]])
