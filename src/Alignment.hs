@@ -37,6 +37,7 @@ import Source hiding (break, fromList, uncons, (++))
 import SplitDiff
 import Syntax
 import Term
+import Debug.Trace
 
 -- | Assign line numbers to the lines on each side of a list of rows.
 numberedRows :: [Join These a] -> [Join These (Int, a)]
@@ -131,7 +132,8 @@ alignBranch :: (Copointed c, Functor c) => (term -> Range) -> [c [Join These ter
 -- The first child is empty, and so can safely be dropped.
 alignBranch getRange (first:children) ranges | null (copoint first) = alignBranch getRange children ranges
 -- There are no more ranges, so we’re done.
-alignBranch _ _ (Join ([], [])) = []
+alignBranch _ [] (Join ([], [])) = []
+alignBranch _ children (Join ([], [])) = trace ("exhausted ranges with " ++ show (length children) ++ " children remaining") []
 -- There are no more children, so we can just zip the remaining ranges together.
 alignBranch _ [] ranges = runBothWith (alignWith Join) (fmap (flip (,) []) <$> ranges)
 -- There are both children and ranges, so we need to proceed line by line
