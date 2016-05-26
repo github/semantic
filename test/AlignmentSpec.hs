@@ -59,7 +59,11 @@ spec = parallel $ do
         sort (nub (keysOfAlignedChildren (alignBranch id children ranges))) `shouldBe` sort (nub (catMaybes (branchElementKey <$> elements)))
 
     prop "covers every line of every input child" $
-      pendingWith "TBD"
+      \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
+        sort (keysOfAlignedChildren (alignBranch id children ranges)) `shouldBe` sort (do
+          (key, lines) <- children
+          line <- lines
+          these id id (++) . runJoin . ([key] <$) $ line)
 
   describe "alignDiff" $ do
     it "aligns identical branches on a single line" $
