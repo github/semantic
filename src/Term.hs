@@ -7,9 +7,6 @@ import Data.Functor.Both
 import Data.OrderedMap hiding (size)
 import Syntax
 
-unfix :: Fix f -> f (Fix f)
-unfix (Fix f) = f
-
 -- | An annotated node (Syntax) in an abstract syntax tree.
 type TermF a annotation = CofreeF (Syntax a) annotation
 type Term a annotation = Cofree (Syntax a) annotation
