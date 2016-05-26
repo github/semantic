@@ -46,12 +46,7 @@ instance HasCategory Category where
     (Other s) -> s
 
 instance HasCategory leaf => HasCategory (Term leaf Info) where
-  toCategoryName term = toCategoryName $ case runCofree term of
-    (info :< Leaf _) -> toCategory info
-    (info :< Indexed _) -> toCategory info
-    (info :< Fixed _) -> toCategory info
-    (info :< Keyed _) -> toCategory info
-
+  toCategoryName = toCategoryName . toCategory . extract
 
 data DiffSummary a = DiffSummary {
   patch :: Patch DiffInfo,
