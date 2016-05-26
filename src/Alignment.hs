@@ -152,7 +152,7 @@ alignBranch getRange children ranges = case intersectingChildren of
     -- No symmetrical child intersects, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
     _ -> let (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ leftRange >>= lineAndRemainingWhere (isThis . runJoin . head . copoint) asymmetricalChildren
              (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ rightRange >>= lineAndRemainingWhere (isThat . runJoin . head . copoint) asymmetricalChildren in
-      leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast asymmetricalChildren)) ranges)
+      leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast (copoint <$> asymmetricalChildren))) ranges)
   where (intersectingChildren, nonIntersectingChildren) = partition (or . intersectsFirstLine headRanges) children
         (remainingIntersectingChildren, asymmetricalChildren) = partition (isThese . runJoin . head . copoint) intersectingChildren
         intersectsFirstLine ranges = maybe (False <$ ranges) (intersects getRange ranges) . listToMaybe . copoint
@@ -161,7 +161,9 @@ alignBranch getRange children ranges = case intersectingChildren of
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange children ranges in
           (fromJust ((,) <$> ranges `applyThese` Join (runBothWith These intersections)), remaining)
         lineAndRemainingWhere predicate children = if any predicate children then Just . lineAndRemaining (filter predicate children) else const Nothing
-        advancePast children = fromThese id id . runJoin . (drop 1 <$) $ unionThese (head . copoint <$> children)
+
+advancePast :: [[Join These term]] -> ([a] -> [a], [a] -> [a])
+advancePast children = fromThese id id . runJoin . (drop 1 <$) $ unionThese (head <$> children)
 
 headRangesOf :: Both [Range] -> Maybe (Join These Range)
 headRangesOf ranges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
