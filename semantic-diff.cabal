@@ -64,7 +64,6 @@ library
                      , recursion-schemes
                      , free
                      , comonad
-                     , split
                      , protolude
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, OverloadedStrings, NoImplicitPrelude
