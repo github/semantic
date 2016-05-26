@@ -156,7 +156,7 @@ alignBranch getRange children ranges = case intersectingChildren of
                    (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ rightRange >>= lineAndRemainingWhere (isThat . runJoin . head . copoint) asymmetricalChildren in
       leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast asymmetricalChildren)) ranges)
   where (intersectingChildren, nonIntersectingChildren) = partition (or . intersectsFirstLine headRanges) children
-        (asymmetricalChildren, remainingIntersectingChildren) = break (isThese . runJoin . head . copoint) intersectingChildren
+        (remainingIntersectingChildren, asymmetricalChildren) = partition (isThese . runJoin . head . copoint) intersectingChildren
         intersectsFirstLine ranges = maybe (False <$ ranges) (intersects getRange ranges) . listToMaybe . copoint
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
         (leftRange, rightRange) = splitThese headRanges
