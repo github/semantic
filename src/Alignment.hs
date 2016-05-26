@@ -175,9 +175,9 @@ alignChildren getRange (first:rest) headRanges
   -- It intersects on both sides, so we can just take the first line whole.
   (True, True) -> ((++) <$> toTerms firstLine <*> firstRemaining, (restOfLines <$ first) : restRemaining)
   -- It only intersects on the left, so split it up.
-  (True, False) -> ((++) <$> toTerms (fromJust l) <*> firstRemaining, ((maybeToList r ++ restOfLines) <$ first) : restRemaining)
+  (True, False) -> ((++) <$> toTerms (fromJust l) <*> firstRemaining, (maybe id (:) r restOfLines <$ first) : restRemaining)
   -- It only intersects on the right, so split it up.
-  (False, True) -> ((++) <$> toTerms (fromJust r) <*> firstRemaining, ((maybeToList l ++ restOfLines) <$ first) : restRemaining)
+  (False, True) -> ((++) <$> toTerms (fromJust r) <*> firstRemaining, (maybe id (:) l restOfLines <$ first) : restRemaining)
   -- It doesn’t intersect at all, so skip it and move along.
   (False, False) -> (firstRemaining, first:restRemaining)
   | otherwise = alignChildren getRange rest headRanges
