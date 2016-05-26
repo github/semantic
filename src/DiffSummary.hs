@@ -21,8 +21,8 @@ maybeTermName :: HasCategory leaf => Term leaf Info -> Maybe String
 maybeTermName term = case runCofree term of
   (_ :< Leaf leaf) -> Just (toCategoryName leaf)
   (_ :< Keyed children) -> Just (unpack . mconcat $ keys children)
-  (_ :< Indexed children) -> Just (toCategoryName . maybe (Other "Unknown") toCategory . head $ extract <$> children)
-  (_ :< Fixed children) -> Just (toCategoryName . maybe (Other "Unknown") toCategory . head $ extract <$> children)
+  (_ :< Indexed children) -> toCategoryName . toCategory <$> head (extract <$> children)
+  (_ :< Fixed children) -> toCategoryName . toCategory <$> head (extract <$> children)
 
 class HasCategory a where
   toCategoryName :: a -> String
