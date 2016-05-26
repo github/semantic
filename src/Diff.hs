@@ -8,15 +8,6 @@ import Patch
 import Syntax
 import Term
 
--- | An annotated syntax in a diff tree.
-type Annotated a annotation f = CofreeF (Syntax a) annotation f
-
-annotation :: Annotated a annotation f -> annotation
-annotation = headF
-
-syntax :: Annotated a annotation f -> Syntax a f
-syntax = tailF
-
 annotate :: annotation -> Syntax a f -> CofreeF (Syntax a) annotation f
 annotate = (:<)
 
