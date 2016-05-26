@@ -1,6 +1,6 @@
 module Data.Copointed where
 
-import Data.Functor.Identity
+import Prologue
 
 -- | A value that can return its content.
 class Copointed c where

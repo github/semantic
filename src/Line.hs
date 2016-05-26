@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Line where
 
-import Control.Applicative
+import Prologue
 import Data.Align
 import Data.Coalescent
 import Data.Functor.Both

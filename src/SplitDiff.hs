@@ -1,8 +1,7 @@
 module SplitDiff where
 
+import Prologue
 import Syntax
-import Control.Monad.Trans.Free (Free)
-import Control.Comonad.Trans.Cofree
 import Term (Term)
 
 -- | A patch to only one side of a diff.

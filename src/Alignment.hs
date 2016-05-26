@@ -29,8 +29,8 @@ import Diff
 import Info
 import Line
 import Patch
-import Prelude hiding (fst, snd)
-import qualified Prelude
+import Prologue hiding (first, fst, snd)
+import qualified Prologue
 import Range
 import Source hiding (fromList, uncons)
 import SplitDiff
@@ -87,8 +87,8 @@ adjoinChildren sources infos constructor children = wrap <$> leadingContext <> l
         sizes = size <$> infos
         leadingContext = tsequenceL (pure mempty) $ makeContextLines <$> (linesInRangeOfSource <$> (Range <$> (start <$> ranges) <*> next) <*> sources)
         wrap = (wrapLineContents <$> (makeBranchTerm constructor <$> categories <*> sizes <*> next) <*>)
-        makeBranchTerm constructor categories size next children = let range = unionRangesFrom (rangeAt next) $ Prelude.snd <$> children in
-          (constructor (Info range categories size) . catMaybes . toList $ Prelude.fst <$> children, range)
+        makeBranchTerm constructor categories size next children = let range = unionRangesFrom (rangeAt next) $ Prologue.snd <$> children in
+          (constructor (Info range categories size) . catMaybes . toList $ Prologue.fst <$> children, range)
 
 -- | Accumulate the lines of and between a branch term’s children.
 childLines :: (Copointed c, Functor c, Applicative f, Coalescent (f (Line (Maybe (c a), Range))), Foldable f, TotalCrosswalk f) => f (Source Char) -> c (Adjoined (f (Line (a, Range)))) -> (Adjoined (f (Line (Maybe (c a), Range))), f Int) -> (Adjoined (f (Line (Maybe (c a), Range))), f Int)
@@ -99,7 +99,7 @@ childLines sources child (nextLines, next) | or ((>) . end <$> childRanges <*> n
                                                          <> nextLines, start <$> childRanges)
   where makeChildLines = fmap (fmap (first (Just . (<$ child))))
         trailingContextLines = linesInRangeOfSource <$> (Range <$> (end <$> childRanges) <*> next) <*> sources
-        childRanges = unionRangesFrom <$> (rangeAt <$> next) <*> (concat . fmap (fmap Prelude.snd . unLine) <$> sequenceA (copoint child))
+        childRanges = unionRangesFrom <$> (rangeAt <$> next) <*> (concat . fmap (fmap Prologue.snd . unLine) <$> sequenceA (copoint child))
 
 makeContextLines :: Adjoined (Line Range) -> Adjoined (Line (Maybe a, Range))
 makeContextLines = fmap (fmap ((,) Nothing))

@@ -1,5 +1,6 @@
 module Patch (Patch(..), after, before, unPatch, patchSum) where
 
+import Prologue
 import Data.Bifunctor.These
 
 -- | An operation to replace, insert, or delete an item.

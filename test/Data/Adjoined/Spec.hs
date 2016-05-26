@@ -1,10 +1,10 @@
 module Data.Adjoined.Spec (spec) where
 
+import Prologue
+import Data.String
 import ArbitraryTerm ()
-import Control.Applicative
 import Data.Adjoined
 import Data.Coalescent
-import Data.Foldable
 import Data.Functor.Both
 import Data.Typeable
 import Line

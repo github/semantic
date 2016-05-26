@@ -1,8 +1,7 @@
 module Data.Coalescent where
 
-import Control.Applicative
+import Prologue
 import Data.Align
-import Data.Functor.Identity
 
 -- | The class of types which can optionally be coalesced together.
 class Coalescent a where

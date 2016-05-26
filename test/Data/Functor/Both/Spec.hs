@@ -1,5 +1,6 @@
 module Data.Functor.Both.Spec (spec) where
 
+import Prologue
 import Data.Adjoined
 import Data.Coalescent
 import Data.Functor.Both

@@ -1,11 +1,11 @@
 module DiffSummarySpec where
 
+import Prologue
+import Data.String
 import Test.Hspec
 import Diff
 import Info
 import Syntax
-import Control.Comonad.Trans.Cofree
-import Control.Monad.Trans.Free
 import Patch
 import Range
 import Category
@@ -34,6 +34,6 @@ spec = parallel $ do
       diffSummary testDiff `shouldBe` [ DiffSummary { patch = Insert (DiffInfo "string" (Just "a")), parentAnnotations = [ DiffInfo "array" Nothing ] } ]
   describe "show" $ do
     it "should print adds" $
-      show testSummary `shouldBe` "Added the 'a' string"
+      show testSummary `shouldBe` ("Added the 'a' string" :: String)
     it "prints a replacement" $ do
-      show replacementSummary `shouldBe` "Replaced the 'a' string with the 'b' symbol in the array context"
+      show replacementSummary `shouldBe` ("Replaced the 'a' string with the 'b' symbol in the array context" :: String)

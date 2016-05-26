@@ -1,6 +1,6 @@
 module Data.Bifunctor.These where
 
-import Data.Bifunctor
+import Prologue
 
 data These a b = This a | That b | These a b
   deriving (Eq, Show)

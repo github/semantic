@@ -1,9 +1,10 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Range where
 
-import Control.Applicative ((<|>))
-import qualified Data.Char as Char
-import Data.Maybe (fromMaybe)
+import Prologue
+import Data.String
+import Data.Char as Char
+import Data.List (span)
 import Data.Option
 
 -- | A half-open interval of integers, defined by start & end indices.
@@ -35,7 +36,7 @@ rangesAndWordsFrom startIndex string = fromMaybe [] $ take isWord <|> take isPun
     endFor parsed = startIndex + length parsed
     parse transform predicate = case span predicate string of
       ([], _) -> Nothing
-      (parsed, rest) -> Just $ maybe id (:) (transform parsed) $ rangesAndWordsFrom (endFor parsed) rest
+      (parsed, rest) -> Just $ maybe identity (:) (transform parsed) $ rangesAndWordsFrom (endFor parsed) rest
     -- | Is this a word character?
     -- | Word characters are defined as in [Ruby’s `\p{Word}` syntax](http://ruby-doc.org/core-2.1.1/Regexp.html#class-Regexp-label-Character+Properties), i.e.:
     -- | > A member of one of the following Unicode general category _Letter_, _Mark_, _Number_, _Connector_Punctuation_

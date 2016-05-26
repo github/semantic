@@ -1,10 +1,9 @@
 {-# LANGUAGE TypeFamilies, TypeSynonymInstances, FlexibleInstances #-}
 module Term where
 
-import Control.Comonad.Trans.Cofree
+import Prologue
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
-import Data.Maybe
 import Data.OrderedMap hiding (size)
 import Syntax
 

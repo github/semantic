@@ -1,12 +1,11 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Adjoined where
 
-import Control.Applicative
-import Control.Monad
+import Prologue hiding (uncons, (:<))
+import Data.Sequence as Seq hiding (null)
 import Data.Align
 import Data.Bifunctor.These
 import Data.Coalescent
-import Data.Sequence as Seq hiding (null)
 
 -- | A collection of elements which can be adjoined onto other such collections associatively. There are two big wins with Data.Adjoined:
 -- |
@@ -48,7 +47,7 @@ instance Alternative Adjoined where
   Adjoined a <|> Adjoined b = Adjoined (a >< b)
 
 instance Monad Adjoined where
-  return = Adjoined . return
+  return = Adjoined . pure
   a >>= f | Just (a, as) <- uncons a = f a <|> (as >>= f)
           | otherwise = Adjoined Seq.empty
 

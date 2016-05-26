@@ -1,5 +1,6 @@
 module OrderedMapSpec where
 
+import Prologue
 import qualified Data.OrderedMap as Map
 import Test.Hspec
 

@@ -1,5 +1,6 @@
 module Renderer.Summary where
 
+import Prologue
 import Renderer
 import DiffSummary
 import Data.Text (pack)

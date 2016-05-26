@@ -16,11 +16,10 @@ import Data.Functor.Both as Both
 import Diff
 import Info
 import qualified Data.Maybe as Maybe
-import Data.Functor.Identity
 import Line
 import Patch
-import Prelude hiding (fst, snd)
-import qualified Prelude
+import Prologue hiding (fst, snd)
+import qualified Prologue
 import Range
 import Source hiding ((++), fromList)
 import qualified Source
@@ -32,7 +31,7 @@ spec = parallel $ do
   describe "splitDiffByLines" $ do
     prop "preserves line counts in equal sources" $
       \ source ->
-        length (splitDiffByLines (pure source) (free . Free $ (pure $ Info (totalRange source) mempty 1) :< (Indexed . Prelude.fst $ foldl combineIntoLeaves ([], 0) source))) `shouldBe` length (filter (== '\n') $ toString source) + 1
+        length (splitDiffByLines (pure source) (free . Free $ (pure $ Info (totalRange source) mempty 1) :< (Indexed . Prologue.fst $ foldl combineIntoLeaves ([], 0) source))) `shouldBe` length (filter (== '\n') $ toString source) + 1
 
     prop "produces the maximum line count in inequal sources" $
       \ sources -> let ranges = actualLineRanges <$> (totalRange <$> sources) <*> sources in
@@ -41,7 +40,7 @@ spec = parallel $ do
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
       \ source -> let range = totalRange source in
-        splitAbstractedTerm ((cofree .) . (:<)) (Identity source) (Identity (Info range mempty 0) :< Leaf source) `shouldBe` (Identity . lineMap (fmap (cofree . (:< Leaf source) . (\ r -> Info r mempty 0) &&& id)) <$> linesInRangeOfSource range source)
+        splitAbstractedTerm ((cofree .) . (:<)) (Identity source) (Identity (Info range mempty 0) :< Leaf source) `shouldBe` (Identity . lineMap (fmap (cofree . (:< Leaf source) . (\ r -> Info r mempty 0) &&& identity)) <$> linesInRangeOfSource range source)
 
     let makeTerm = ((free .) . (Free .) . (:<)) :: Info -> Syntax (Source Char) (SplitDiff (Source Char) Info) -> SplitDiff (Source Char) Info
     prop "outputs one row for single-line unchanged leaves" $

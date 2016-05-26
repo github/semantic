@@ -1,7 +1,6 @@
 module PatchOutputSpec where
 
-import Control.Comonad.Trans.Cofree
-import Control.Monad.Trans.Free
+import Prologue
 import Data.Functor.Both
 import Info
 import Range

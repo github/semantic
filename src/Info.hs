@@ -1,8 +1,7 @@
 module Info where
 
-import Data.Maybe (listToMaybe)
+import Prologue
 import Category
-import Data.Set
 import Range
 
 -- | An annotation for a source file, including the source range and semantic

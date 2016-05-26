@@ -1,9 +1,10 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Category where
 
-import Term
-import Control.Comonad.Trans.Cofree
+import Prologue
+import Data.String
 import Data.Set
+import Term
 
 -- | A standardized category of AST node. Used to determine the semantics for
 -- | semantic diffing and define comparability of nodes.

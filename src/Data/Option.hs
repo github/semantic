@@ -1,6 +1,8 @@
 {-# LANGUAGE FlexibleContexts #-}
 module Data.Option where
 
+import Prologue
+
 newtype Option a = Option { getOption :: Maybe a }
 
 option :: b -> (a -> b) -> Option a -> b

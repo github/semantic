@@ -1,5 +1,6 @@
 module InterpreterSpec where
 
+import Prologue
 import Diff
 import qualified Interpreter as I
 import Range

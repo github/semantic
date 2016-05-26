@@ -5,23 +5,19 @@ module Renderer.Patch (
   truncatePatch
 ) where
 
+import Data.String
 import Alignment
 import Diff
 import Info
 import Line
-import Prelude hiding (fst, snd)
-import qualified Prelude
+import Prologue hiding (snd)
+import Data.List (span)
 import Range
 import Renderer
 import Source hiding ((++), break)
 import SplitDiff
-import Control.Comonad.Trans.Cofree
-import Control.Monad.Trans.Free
 import Data.Functor.Both as Both
-import Data.List
-import Data.Maybe
-import Data.Monoid
-import Data.Text (pack, Text)
+import Data.Text (pack)
 
 -- | Render a timed out file as a truncated diff.
 truncatePatch :: DiffArguments -> Both SourceBlob -> Text
@@ -125,7 +121,7 @@ hunks _ blobs | sources <- source <$> blobs
               , sourcesNull <- runBothWith (&&) (null <$> sources)
               , sourcesEqual || sourcesNull
   = [emptyHunk]
-hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap (fmap Prelude.fst) <$> splitDiffByLines (source <$> blobs) diff
+hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap (fmap Prologue.fst) <$> splitDiffByLines (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.

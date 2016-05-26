@@ -1,8 +1,7 @@
 {-# LANGUAGE TypeFamilies, TypeSynonymInstances, FlexibleInstances #-}
 module Diff where
 
-import Control.Comonad.Trans.Cofree
-import Control.Monad.Trans.Free
+import Prologue
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Patch
