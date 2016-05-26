@@ -4,6 +4,7 @@ module Renderer.JSON (
   json
 ) where
 
+import Prologue hiding (toList)
 import Alignment
 import Category
 import Control.Comonad.Cofree
@@ -60,9 +61,9 @@ instance ToJSON (Term leaf Info) where
 lineFields :: KeyValue kv => Int -> Line (SplitDiff leaf Info, Range) -> [kv]
 lineFields n line | isEmpty line = []
                   | otherwise = [ "number" .= n
-                                , "terms" .= unLine (Prelude.fst <$> line)
-                                , "range" .= unionRanges (Prelude.snd <$> line)
-                                , "hasChanges" .= hasChanges (Prelude.fst <$> line)
+                                , "terms" .= unLine (Prologue.fst <$> line)
+                                , "range" .= unionRanges (Prologue.snd <$> line)
+                                , "hasChanges" .= hasChanges (Prologue.fst <$> line)
                                 ]
 
 termFields :: (ToJSON recur, KeyValue kv) => Info -> Syntax leaf recur -> [kv]

@@ -5,12 +5,13 @@ module Renderer.Patch (
   truncatePatch
 ) where
 
+import Prologue hiding (snd)
+import Data.String
 import Alignment
 import Diff
 import Info
 import Line
-import Prelude hiding (fst, snd)
-import qualified Prelude
+import Prologue hiding (fst, snd)
 import Range
 import Renderer
 import Source hiding ((++), break)
@@ -124,7 +125,7 @@ hunks _ blobs | sources <- source <$> blobs
               , sourcesNull <- runBothWith (&&) (null <$> sources)
               , sourcesEqual || sourcesNull
   = [emptyHunk]
-hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap (fmap Prelude.fst) <$> splitDiffByLines (source <$> blobs) diff
+hunks diff blobs = hunksInRows (Both (1, 1)) $ fmap (fmap Prologue.fst) <$> splitDiffByLines (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.

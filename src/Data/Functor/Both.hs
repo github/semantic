@@ -5,8 +5,8 @@ import Data.Align
 import Data.Bifunctor
 import Data.Bifunctor.These
 import Data.Maybe
-import Prelude hiding (zipWith, fst, snd)
-import qualified Prelude
+import Prologue hiding (zipWith, fst, snd)
+import qualified Prologue
 
 -- | A computation over both sides of a pair.
 newtype Both a = Both { runBoth :: (a, a) }
@@ -30,11 +30,11 @@ runBothWith f = uncurry f . runBoth
 
 -- | Runs the left side of a `Both`.
 fst :: Both a -> a
-fst = Prelude.fst . runBoth
+fst = Prologue.fst . runBoth
 
 -- | Runs the right side of a `Both`.
 snd :: Both a -> a
-snd = Prelude.snd . runBoth
+snd = Prologue.snd . runBoth
 
 unzip :: [Both a] -> Both [a]
 unzip = foldr pair (pure [])

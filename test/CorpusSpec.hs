@@ -15,8 +15,8 @@ import Data.Maybe
 import Data.Set as Set
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
-import Prelude hiding (fst, snd)
-import qualified Prelude
+import Prologue hiding (fst, snd)
+import qualified Prologue
 import qualified Source as S
 import System.FilePath
 import System.FilePath.Glob

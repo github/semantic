@@ -1,5 +1,6 @@
 module SplitDiff where
 
+import Prologue
 import Diff (Annotated)
 import Control.Monad.Free (Free)
 import Term (Term)

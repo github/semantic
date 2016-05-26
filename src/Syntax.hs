@@ -1,5 +1,6 @@
 module Syntax where
 
+import Prologue
 import Data.OrderedMap
 import qualified Data.Text as T
 

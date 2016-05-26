@@ -12,7 +12,7 @@ import Diff
 import Info
 import Line
 import Patch
-import Prelude hiding (fst, snd)
+import Prologue hiding (fst, snd)
 import Range
 import Source hiding ((++))
 import Syntax

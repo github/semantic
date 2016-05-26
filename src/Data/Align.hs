@@ -1,7 +1,7 @@
 module Data.Align where
 
+import Prologue
 import Data.Bifunctor.These
-import Data.Functor.Identity
 
 -- | A functor which can be aligned, essentially the union of (potentially) asymmetrical values.
 -- |
@@ -13,7 +13,7 @@ class Functor f => Align f where
   -- |
   -- | Analogous with `zip`.
   align :: f a -> f b -> f (These a b)
-  align = alignWith id
+  align = alignWith identity
   -- | Combine two structures into a structure by applying a function to pairs of values in `These` where they overlap, and individual values in `This` and `That` elsewhere.
   -- |
   -- | Analogous with `zipWith`.
@@ -31,7 +31,7 @@ class Functor t => TotalCrosswalk t where
 
   -- | Given some default value, convolute (invert the embedding of) a structure over an `Align`able functor.
   tsequenceL :: Align f => t a -> t (f a) -> f (t a)
-  tsequenceL d = tcrosswalk d id
+  tsequenceL d = tcrosswalk d identity
 
 instance TotalCrosswalk Identity where
   tcrosswalk _ f = fmap Identity . f . runIdentity
