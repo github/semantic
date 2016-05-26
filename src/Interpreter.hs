@@ -3,14 +3,10 @@ module Interpreter (interpret, Comparable, diffTerms) where
 import Algorithm
 import Category
 import Data.Functor.Foldable
-import Control.Comonad
-import Control.Monad.Trans.Free
-import Control.Comonad.Trans.Cofree
 import Data.Functor.Both
 import qualified Data.OrderedMap as Map
 import qualified Data.List as List
 import Data.List ((\\))
-import Data.Maybe
 import Data.OrderedMap ((!))
 import Diff
 import Operation

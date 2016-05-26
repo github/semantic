@@ -8,14 +8,10 @@ import Data.Text.Arbitrary ()
 import Alignment
 import ArbitraryTerm (arbitraryLeaf)
 import Control.Arrow
-import Control.Comonad.Trans.Cofree
-import Control.Monad.Trans.Free hiding (unfold)
 import Data.Adjoined
-import Data.Copointed
 import Data.Functor.Both as Both
 import Diff
 import Info
-import qualified Data.Maybe as Maybe
 import Line
 import Patch
 import Prologue hiding (fst, snd)

@@ -7,8 +7,6 @@ module Renderer.JSON (
 import Prologue hiding (toList)
 import Alignment
 import Category
-import Control.Comonad.Trans.Cofree
-import Control.Monad.Trans.Free
 import Data.Aeson hiding (json)
 import Data.Aeson.Encode
 import Data.Functor.Both

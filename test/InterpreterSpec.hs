@@ -5,8 +5,6 @@ import Diff
 import qualified Interpreter as I
 import Range
 import Syntax
-import Control.Comonad.Trans.Cofree
-import Control.Monad.Trans.Free
 import Patch
 import Info
 import Category

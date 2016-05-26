@@ -1,15 +1,12 @@
 module ArbitraryTerm where
 
 import Category
-import Control.Comonad.Trans.Cofree
 import Data.Functor.Foldable
-import Control.Monad
 import Data.Functor.Both
 import qualified Data.OrderedMap as Map
 import qualified Data.List as List
 import qualified Data.Set as Set
 import Data.Text.Arbitrary ()
-import Diff
 import Info
 import Line
 import Patch
@@ -17,7 +14,6 @@ import Prologue hiding (fst, snd)
 import Range
 import Source hiding ((++))
 import Syntax
-import GHC.Generics
 import Term
 import Test.QuickCheck hiding (Fixed)
 
