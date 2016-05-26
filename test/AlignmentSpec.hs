@@ -210,13 +210,6 @@ branchElementKey :: BranchElement -> Maybe String
 branchElementKey (Child key _) = Just key
 branchElementKey _ = Nothing
 
-alignBranchElement :: BranchElement -> [BranchElement]
-alignBranchElement element = case element of
-  Child key contents -> Child key <$> crosswalk lines contents
-  Margin contents -> Margin <$> crosswalk lines contents
-  where lines = fmap toList . Source.actualLines . Source.fromList
-
-
 toAlignBranchInputs :: [BranchElement] -> (Both (Source.Source Char), [(String, [Join These Range])], Both [Range])
 toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . mapM go $ elements, ranges)
   where go :: BranchElement -> State (Both Int) [(String, [Join These Range])]
@@ -231,6 +224,10 @@ toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . mapM go
           prev <- get
           put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
           return []
+        alignBranchElement element = case element of
+          Child key contents -> Child key <$> crosswalk lines contents
+          Margin contents -> Margin <$> crosswalk lines contents
+          where lines = fmap toList . Source.actualLines . Source.fromList
         sources = foldMap Source.fromList <$> bothContents elements
         ranges = fmap (filter (\ (Range start end) -> start /= end)) $ Source.actualLineRanges <$> (totalRange <$> sources) <*> sources
         bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
