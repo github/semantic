@@ -5,31 +5,26 @@ module Renderer.Patch (
   truncatePatch
 ) where
 
-import Prologue hiding (snd)
 import Data.String
 import Alignment
 import Diff
 import Info
 import Line
-import Prologue hiding (fst, snd)
+import Prologue hiding (snd)
+import Data.List (span)
 import Range
 import Renderer
 import Source hiding ((++), break)
 import SplitDiff
-import Control.Comonad.Cofree
-import Control.Monad.Free
 import Data.Functor.Both as Both
-import Data.List
-import Data.Maybe
-import Data.Monoid
-import Data.Text (pack, Text)
+import Data.Text (pack)
 
 -- | Render a timed out file as a truncated diff.
 truncatePatch :: DiffArguments -> Both SourceBlob -> Text
 truncatePatch _ blobs = pack $ header blobs ++ "#timed_out\nTruncating diff: timeout reached.\n"
 
 -- | Render a diff in the traditional patch format.
-patch :: Renderer a
+patch :: Renderer
 patch diff blobs = pack $ case getLast (foldMap (Last . Just) string) of
   Just c | c /= '\n' -> string ++ "\n\\ No newline at end of file\n"
   _ -> string
@@ -86,8 +81,9 @@ showLine source line | isEmpty line = Nothing
 
 -- | Return the range from a split diff.
 getRange :: SplitDiff leaf Info -> Range
-getRange (Free (Annotated (Info range _ _) _)) = range
-getRange (Pure patch) = let Info range _ _ :< _ = getSplitTerm patch in range
+getRange splitDiff = case runFree splitDiff of
+  (Free (Info range _ _ :< _)) -> range
+  (Pure patch) -> range where (Info range _ _ :< _) = runCofree $ getSplitTerm patch
 
 -- | Returns the header given two source blobs and a hunk.
 header :: Both SourceBlob -> String

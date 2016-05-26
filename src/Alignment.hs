@@ -9,9 +9,10 @@ module Alignment
 ) where
 
 import Control.Arrow
-import Control.Comonad.Cofree
+import Control.Comonad.Trans.Cofree
+import Data.Functor.Foldable hiding (Foldable)
 import Control.Monad
-import Control.Monad.Free
+import Control.Monad.Trans.Free
 import Data.Adjoined
 import Data.Align
 import Data.Bifunctor.These
@@ -48,22 +49,27 @@ hasChanges = or . fmap (or . (True <$))
 
 -- | Split a diff, which may span multiple lines, into rows of split diffs paired with the Range of characters spanned by that Row on each side of the diff.
 splitDiffByLines :: Both (Source Char) -> Diff leaf Info -> [Row (SplitDiff leaf Info, Range)]
-splitDiffByLines sources = toList . iter (\ (Annotated infos syntax) -> splitAbstractedTerm ((Free .) . Annotated) sources infos syntax) . fmap (splitPatchByLines sources)
+splitDiffByLines sources = toList . iter (\ (infos :< syntax) -> splitAbstractedTerm ((free .)  . (Free .) . (:<)) sources (infos :< syntax)) . fmap (splitPatchByLines sources)
 
 -- | Split a patch, which may span multiple lines, into rows of split diffs.
 splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> Adjoined (Both (Line (SplitDiff leaf Info, Range)))
 splitPatchByLines sources patch = wrapTermInPatch <$> splitAndFoldTerm (unPatch patch)
-    where splitAndFoldTerm (This deleted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm (:<) (Identity $ fst sources)) (Identity <$> deleted)) nil
-          splitAndFoldTerm (That inserted) = tsequenceL mempty $ both nil (runIdentity <$> cata (splitAbstractedTerm (:<) (Identity $ snd sources)) (Identity <$> inserted))
-          splitAndFoldTerm (These deleted inserted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm (:<) (Identity $ fst sources)) (Identity <$> deleted)) (runIdentity <$> cata (splitAbstractedTerm (:<) (Identity $ snd sources)) (Identity <$> inserted))
-          wrapTermInPatch = fmap (fmap (first (Pure . constructor patch)))
-          constructor (Replace _ _) = SplitReplace
-          constructor (Insert _) = SplitInsert
-          constructor (Delete _) = SplitDelete
+    where
+      splitAndFoldTerm :: These (Term leaf Info) (Term leaf Info) -> Adjoined (Both (Line (Term leaf Info, Range)))
+      splitAndFoldTerm (This deleted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm ((cofree.) . (:<)) (Identity $ fst sources)) (hylo (cofree . annotationMap Identity) runCofree deleted)) nil
+      splitAndFoldTerm (That inserted) = tsequenceL mempty $ both nil (runIdentity <$> cata (splitAbstractedTerm ((cofree .) . (:<)) (Identity $ snd sources)) (hylo (cofree . annotationMap Identity) runCofree inserted))
+      splitAndFoldTerm (These deleted inserted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm ((cofree  .) . (:<)) (Identity $ fst sources)) (hylo (cofree . annotationMap Identity) runCofree deleted)) (runIdentity <$> cata (splitAbstractedTerm ((cofree .) . (:<)) (Identity $ snd sources)) (hylo (cofree . annotationMap Identity) runCofree inserted))
+      wrapTermInPatch = fmap (fmap (first (free . Pure . constructor patch)))
+      constructor (Replace _ _) = SplitReplace
+      constructor (Insert _) = SplitInsert
+      constructor (Delete _) = SplitDelete
+
+annotationMap :: (a -> b) -> TermF leaf a f -> TermF leaf b f
+annotationMap f (a :< r) = f a :< r
 
 -- | Split a term comprised of an Info & Syntax up into one `outTerm` (abstracted by an alignment function & constructor) per line in `Source`.
-splitAbstractedTerm :: (Applicative f, Coalescent (f (Line (Maybe (Identity outTerm), Range))), Coalescent (f (Line (Maybe (T.Text, outTerm), Range))), Foldable f, TotalCrosswalk f) => (Info -> Syntax leaf outTerm -> outTerm) -> f (Source Char) -> f Info -> Syntax leaf (Adjoined (f (Line (outTerm, Range)))) -> Adjoined (f (Line (outTerm, Range)))
-splitAbstractedTerm makeTerm sources infos syntax = case syntax of
+splitAbstractedTerm :: (Applicative f, Coalescent (f (Line (Maybe (Identity outTerm), Range))), Coalescent (f (Line (Maybe (T.Text, outTerm), Range))), Foldable f, TotalCrosswalk f) => (Info -> Syntax leaf outTerm -> outTerm) -> f (Source Char) -> CofreeF (Syntax leaf) (f Info) (Adjoined (f (Line (outTerm, Range)))) -> Adjoined (f (Line (outTerm, Range)))
+splitAbstractedTerm makeTerm sources (infos :< syntax) = case syntax of
   Leaf a -> let lineRanges = linesInRangeOfSource <$> (characterRange <$> infos) <*> sources in
     tsequenceL (pure mempty)
       $ fmap <$> ((\ info -> fmap (\ range -> (makeTerm info { characterRange = range } (Leaf a), range))) <$> infos) <*> lineRanges

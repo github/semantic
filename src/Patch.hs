@@ -1,4 +1,4 @@
-module Patch where
+module Patch (Patch(..), after, before, unPatch, patchSum) where
 
 import Prologue
 import Data.Bifunctor.These

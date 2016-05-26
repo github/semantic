@@ -7,8 +7,6 @@ module Renderer.JSON (
 import Prologue hiding (toList)
 import Alignment
 import Category
-import Control.Comonad.Cofree
-import Control.Monad.Free
 import Data.Aeson hiding (json)
 import Data.Aeson.Encode
 import Data.Functor.Both
@@ -17,7 +15,6 @@ import Data.Text.Lazy (toStrict)
 import Data.Text.Lazy.Builder (toLazyText)
 import qualified Data.Text as T
 import Data.Vector hiding (toList)
-import Diff
 import Info
 import Line
 import Range
@@ -28,7 +25,7 @@ import Syntax
 import Term
 
 -- | Render a diff to a string representing its JSON.
-json :: Renderer a
+json :: Renderer
 json diff sources = toStrict . toLazyText . encodeToTextBuilder $ object ["rows" .= annotateRows (splitDiffByLines (source <$> sources) diff), "oids" .= (oid <$> sources), "paths" .= (path <$> sources)]
   where annotateRows = fmap (fmap NumberedLine) . numberedRows
 
@@ -47,16 +44,18 @@ instance ToJSON a => ToJSON (Both a) where
   toJSON (Both (a, b)) = Array . fromList $ toJSON <$> [ a, b ]
   toEncoding = foldable
 instance ToJSON (SplitDiff leaf Info) where
-  toJSON (Free (Annotated info syntax)) = object (termFields info syntax)
-  toJSON (Pure patch) = object (patchFields patch)
-  toEncoding (Free (Annotated info syntax)) = pairs $ mconcat (termFields info syntax)
-  toEncoding (Pure patch) = pairs $ mconcat (patchFields patch)
+  toJSON splitDiff = case runFree splitDiff of
+    (Free (info :< syntax)) -> object (termFields info syntax)
+    (Pure patch)            -> object (patchFields patch)
+  toEncoding splitDiff = case runFree splitDiff of
+    (Free (info :< syntax)) -> pairs $ mconcat (termFields info syntax)
+    (Pure patch)            -> pairs $ mconcat (patchFields patch)
 instance ToJSON value => ToJSON (OrderedMap T.Text value) where
   toJSON map = object $ uncurry (.=) <$> toList map
   toEncoding map = pairs . mconcat $ uncurry (.=) <$> toList map
 instance ToJSON (Term leaf Info) where
-  toJSON (info :< syntax) = object (termFields info syntax)
-  toEncoding (info :< syntax) = pairs $ mconcat (termFields info syntax)
+  toJSON term     | (info :< syntax) <- runCofree term = object (termFields info syntax)
+  toEncoding term | (info :< syntax) <- runCofree term = pairs $ mconcat (termFields info syntax)
 
 lineFields :: KeyValue kv => Int -> Line (SplitDiff leaf Info, Range) -> [kv]
 lineFields n line | isEmpty line = []
@@ -74,9 +73,9 @@ termFields (Info range categories _) syntax = "range" .= range : "categories" .=
   Keyed c -> childrenFields c
   where childrenFields c = [ "children" .= c ]
 
-patchFields :: KeyValue kv => SplitPatch (Cofree (Syntax leaf) Info) -> [kv]
+patchFields :: KeyValue kv => SplitPatch (Term leaf Info) -> [kv]
 patchFields patch = case patch of
   SplitInsert term -> fields "insert" term
   SplitDelete term -> fields "delete" term
   SplitReplace term -> fields "replace" term
-  where fields kind (info :< syntax) = "patch" .= T.pack kind : termFields info syntax
+  where fields kind term | (info :< syntax) <- runCofree term = "patch" .= T.pack kind : termFields info syntax

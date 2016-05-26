@@ -8,3 +8,6 @@ error "generalize forM_" = forM_ ==> for_
 error "Avoid return" =
     return ==> pure
     where note = "return is obsolete as of GHC 7.10"
+
+error "use pure" = free . Pure ==> pure
+error "use extract" = headF . runCofree ==> extract

@@ -20,6 +20,7 @@ data Language =
     | R
     | Ruby
     | Swift
+    deriving (Show)
 
 -- | Returns a Language based on the file extension (including the ".").
 languageForType :: Text -> Maybe Language

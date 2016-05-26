@@ -11,3 +11,6 @@ data Info = Info { characterRange :: !Range, categories :: !(Set Category), size
 
 instance Categorizable Info where
   categories = Info.categories
+
+maybeFirstCategory :: (Categorizable a) => a -> Maybe Category
+maybeFirstCategory term = listToMaybe . toList $ Category.categories term

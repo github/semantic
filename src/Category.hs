@@ -3,7 +3,6 @@ module Category where
 
 import Prologue
 import Data.String
-import Control.Comonad.Cofree
 import Data.Set
 import Term
 
@@ -35,7 +34,7 @@ class Categorizable a where
   categories :: a -> Set Category
 
 instance Categorizable annotation => Categorizable (Term a annotation) where
-  categories (annotation :< _) = categories annotation
+  categories term | (annotation :< _) <- runCofree term = categories annotation
 
 -- | Test whether the categories from the categorizables intersect.
 comparable :: Categorizable a => a -> a -> Bool

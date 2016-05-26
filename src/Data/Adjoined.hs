@@ -1,7 +1,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Data.Adjoined where
 
-import Prologue hiding (uncons)
+import Prologue hiding (uncons, (:<))
 import Data.Sequence as Seq hiding (null)
 import Data.Align
 import Data.Bifunctor.These
