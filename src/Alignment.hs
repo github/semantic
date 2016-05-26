@@ -171,8 +171,8 @@ headRangesOf ranges = sequenceL (listToMaybe <$> Join (runBothWith These ranges)
 
 linesOf :: (Copointed c, Functor c) => (term -> Range) -> [c [Join These term]] -> Both [Range] -> [Join These (Range, [c term])]
 linesOf getRange children ranges
-  | Join ([], []) <- ranges
-  = []
+  | Join ([], []) <- ranges = []
+  | [] <- children = []
   | (first:rest) <- children
   , null (copoint first) = linesOf getRange rest ranges
   | otherwise = let (intersections, remaining) = alignChildren getRange children headRanges
