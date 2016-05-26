@@ -56,7 +56,7 @@ spec = parallel $ do
 
     prop "covers every input child" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        sort (nub (keysOfAlignedChildren (alignBranch id children ranges))) `shouldBe` sort (catMaybes (branchElementKey <$> elements))
+        sort (nub (keysOfAlignedChildren (alignBranch id children ranges))) `shouldBe` sort (nub (catMaybes (branchElementKey <$> elements)))
 
     prop "covers every line of every input child" $
       pendingWith "TBD"
