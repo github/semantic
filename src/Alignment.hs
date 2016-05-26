@@ -23,6 +23,7 @@ import Data.Foldable
 import Data.Function
 import Data.Functor.Both as Both
 import Data.Functor.Identity
+import Data.List (partition)
 import Data.Maybe
 import Data.Monoid
 import qualified Data.OrderedMap as Map
@@ -154,7 +155,7 @@ alignBranch getRange children ranges = case intersectingChildren of
     Nothing -> let (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ leftRange >>= lineAndRemainingWhere (isThis . runJoin . head . copoint) asymmetricalChildren
                    (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ rightRange >>= lineAndRemainingWhere (isThat . runJoin . head . copoint) asymmetricalChildren in
       leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast asymmetricalChildren)) ranges)
-  where (intersectingChildren, nonIntersectingChildren) = span (or . intersectsFirstLine headRanges) children
+  where (intersectingChildren, nonIntersectingChildren) = partition (or . intersectsFirstLine headRanges) children
         (asymmetricalChildren, remainingIntersectingChildren) = break (isThese . runJoin . head . copoint) intersectingChildren
         intersectsFirstLine ranges = maybe (False <$ ranges) (intersects getRange ranges) . listToMaybe . copoint
         Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
