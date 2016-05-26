@@ -25,7 +25,7 @@ diffTerms cost = interpret comparable cost
 
 -- | Diff two terms, given a function that determines whether two terms can be compared.
 interpret :: (Eq a, Eq annotation) => Comparable a annotation -> Cost a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
-interpret comparable cost a b = fromMaybe (free . Pure $ Replace a b) $ constructAndRun comparable cost a b
+interpret comparable cost a b = fromMaybe (pure $ Replace a b) $ constructAndRun comparable cost a b
 
 -- | Constructs an algorithm and runs it
 constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Cost a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
@@ -38,9 +38,9 @@ constructAndRun comparable cost t1 t2 =
     algorithm (Indexed a') (Indexed b') = free . Free $ ByIndex a' b' (annotate . Indexed)
     algorithm (Keyed a') (Keyed b') = free . Free $ ByKey a' b' (annotate . Keyed)
     algorithm (Leaf a') (Leaf b') | a' == b' = annotate $ Leaf b'
-    algorithm a' b' = free . Free $ Recursive (cofree (annotation1 :< a')) (cofree (annotation2 :< b')) (free . Pure)
+    algorithm a' b' = free . Free $ Recursive (cofree (annotation1 :< a')) (cofree (annotation2 :< b')) pure
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
-    annotate = free . Pure . free . Free . (:<) (both annotation1 annotation2)
+    annotate = pure . free . Free . (:<) (both annotation1 annotation2)
 
 -- | Runs the diff algorithm
 run :: (Eq a, Eq annotation) => Comparable a annotation -> Cost a annotation -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
@@ -56,11 +56,11 @@ run comparable cost algorithm = case runFree algorithm of
       bKeys = Map.keys b'
       repack key = (key, interpretInBoth key a' b')
       interpretInBoth key x y = interpret comparable cost (x ! key) (y ! key)
-    recur _ _ = free . Pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
+    recur _ _ = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
   Free (ByKey a b f) -> run comparable cost $ f byKey where
     byKey = Map.fromList $ toKeyValue <$> List.union aKeys bKeys
-    toKeyValue key | key `List.elem` deleted = (key, free . Pure . Delete $ a ! key)
-    toKeyValue key | key `List.elem` inserted = (key, free . Pure . Insert $ b ! key)
+    toKeyValue key | key `List.elem` deleted = (key, pure . Delete $ a ! key)
+    toKeyValue key | key `List.elem` inserted = (key, pure . Insert $ b ! key)
     toKeyValue key = (key, interpret comparable cost (a ! key) (b ! key))
     aKeys = Map.keys a
     bKeys = Map.keys b
