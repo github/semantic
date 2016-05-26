@@ -1,5 +1,7 @@
 module CorpusSpec where
 
+import System.IO
+import Data.String
 import Diffing
 import Renderer
 import qualified Renderer.JSON as J
@@ -11,12 +13,11 @@ import Data.Functor.Both
 import qualified Data.ByteString.Lazy.Char8 as B
 import Data.List as List
 import Data.Map as Map
-import Data.Maybe
 import Data.Set as Set
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
-import Prelude hiding (fst, snd)
-import qualified Prelude
+import Prologue hiding (fst, snd)
+import qualified Prologue
 import qualified Source as S
 import System.FilePath
 import System.FilePath.Glob
@@ -24,7 +25,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = parallel $ do
-  describe "crashers crash" $ runTestsIn "test/crashers-todo/" $ \ a b -> a `deepseq` return (a == b) `shouldThrow` anyException
+  describe "crashers crash" $ runTestsIn "test/crashers-todo/" $ \ a b -> a `deepseq` pure (a == b) `shouldThrow` anyException
   describe "crashers should not crash" $ runTestsIn "test/crashers/" shouldBe
   describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" shouldNotBe
   describe "should produce the correct diff" $ runTestsIn "test/diffs/" shouldBe
@@ -38,7 +39,7 @@ spec = parallel $ do
     runTestsIn directory matcher = do
       paths <- runIO $ examples directory
       let tests = correctTests =<< paths
-      mapM_ (\ (formatName, renderer, paths, output) -> it (normalizeName (fst paths) ++ " (" ++ formatName ++ ")") $ testDiff renderer paths output matcher) tests
+      traverse_ (\ (formatName, renderer, paths, output) -> it (normalizeName (fst paths) ++ " (" ++ formatName ++ ")") $ testDiff renderer paths output matcher) tests
 
     correctTests :: (Both FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer a, Both FilePath, Maybe FilePath)]
     correctTests paths@(_, Nothing, Nothing, Nothing) = testsForPaths paths
@@ -57,7 +58,7 @@ examples directory = do
   patches <- toDict <$> globFor "*.patch.*"
   splits <- toDict <$> globFor "*.split.*"
   let keys = Set.unions $ keysSet <$> [as, bs]
-  return $ (\name -> (Both (as ! name, bs ! name), Map.lookup name jsons, Map.lookup name patches, Map.lookup name splits)) <$> sort (Set.toList keys)
+  pure $ (\name -> (Both (as ! name, bs ! name), Map.lookup name jsons, Map.lookup name patches, Map.lookup name splits)) <$> sort (Set.toList keys)
   where
     globFor :: String -> IO [FilePath]
     globFor p = globDir1 (compile p) directory

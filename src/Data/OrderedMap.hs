@@ -13,7 +13,7 @@ module Data.OrderedMap (
   , difference
   ) where
 
-import qualified Data.Maybe as Maybe
+import Prologue hiding (toList, empty)
 
 -- | An ordered map of keys and values.
 data OrderedMap key value = OrderedMap { toList :: [(key, value)] }
@@ -35,11 +35,11 @@ infixl 9 !
 
 -- | Look up a value in the map by key, erroring if it doesn't exist.
 (!) :: Eq key => OrderedMap key value -> key -> value
-map ! key = Maybe.fromMaybe (error "no value found for key") $ Data.OrderedMap.lookup key map
+map ! key = fromMaybe (error "no value found for key") $ Data.OrderedMap.lookup key map
 
 -- | Look up a value in the map by key, returning Nothing if it doesn't exist.
 lookup :: Eq key => key -> OrderedMap key value -> Maybe value
-lookup key = Prelude.lookup key . toList
+lookup key = Prologue.lookup key . toList
 
 -- | Return the number of pairs in the map.
 size :: OrderedMap key value -> Int
@@ -60,7 +60,7 @@ unions = foldl union empty
 -- | Return an ordered map by combining the values from `a` and `b` that have
 -- | the same key, dropping any values that are only in one of the maps.
 intersectionWith :: Eq key => (a -> b -> c) -> OrderedMap key a -> OrderedMap key b -> OrderedMap key c
-intersectionWith combine (OrderedMap a) (OrderedMap b) = OrderedMap $ a >>= (\ (key, value) -> maybe [] (pure . (,) key . combine value) $ Prelude.lookup key b)
+intersectionWith combine (OrderedMap a) (OrderedMap b) = OrderedMap $ a >>= (\ (key, value) -> maybe [] (pure . (,) key . combine value) $ Prologue.lookup key b)
 
 -- | Return an ordered map with the pairs from `a` whose key isn't in `b`.
 difference :: Eq key => OrderedMap key a -> OrderedMap key b -> OrderedMap key a

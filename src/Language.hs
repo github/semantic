@@ -1,6 +1,6 @@
 module Language where
 
-import Data.Text
+import Prologue
 
 -- | A programming language.
 data Language =

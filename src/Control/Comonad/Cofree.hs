@@ -1,6 +1,7 @@
 {-# LANGUAGE UndecidableInstances #-}
 module Control.Comonad.Cofree where
 
+import Prologue
 import Data.Copointed
 
 data Cofree functor annotation = annotation :< (functor (Cofree functor annotation))

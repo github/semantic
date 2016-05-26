@@ -1,5 +1,6 @@
 module Diff where
 
+import Prologue
 import Control.Monad.Free
 import Data.Functor.Both
 import Patch

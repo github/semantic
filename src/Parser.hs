@@ -1,5 +1,8 @@
 module Parser where
 
+import Prologue hiding (Constructor)
+import Data.String
+import Data.Text (pack)
 import Category
 import Info
 import Range
@@ -10,7 +13,6 @@ import Data.Copointed
 import qualified Data.OrderedMap as Map
 import qualified Data.Set as Set
 import Source
-import Data.Text as Text
 
 -- | A function that takes a source file and returns an annotated AST.
 -- | The return is in the IO monad because some of the parsers are written in C

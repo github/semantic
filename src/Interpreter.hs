@@ -15,7 +15,7 @@ import Data.OrderedMap ((!))
 import Diff
 import Operation
 import Patch
-import Prelude hiding (lookup)
+import Prologue hiding (lookup)
 import SES
 import Syntax
 import Term
