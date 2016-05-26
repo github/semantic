@@ -78,7 +78,7 @@ instance Show a => Show (DiffSummary a) where
 
 diffSummary :: HasCategory leaf => Diff leaf Info -> [DiffSummary DiffInfo]
 diffSummary = cata diffSummary' where
-  diffSummary' :: HasCategory leaf => DiffF leaf Info [DiffSummary DiffInfo] -> [DiffSummary DiffInfo]
+  diffSummary' :: HasCategory leaf => Base (Diff leaf Info) [DiffSummary DiffInfo] -> [DiffSummary DiffInfo]
   diffSummary' (Free (_ :< Leaf _)) = [] -- Skip leaves since they don't have any changes
   diffSummary' (Free (infos :< Indexed children)) = prependSummary (DiffInfo (toCategoryName . toCategory $ snd infos) Nothing) <$> join children
   diffSummary' (Free (infos :< Fixed children)) = prependSummary (DiffInfo (toCategoryName . toCategory $ snd infos) Nothing) <$> join children

@@ -21,7 +21,6 @@ annotate :: annotation -> Syntax a f -> CofreeF (Syntax a) annotation f
 annotate = (:<)
 
 -- | An annotated series of patches of terms.
-type DiffF a annotation = FreeF (CofreeF (Syntax a) (Both annotation)) (Patch (Term a annotation))
 type Diff a annotation = Free (CofreeF (Syntax a) (Both annotation)) (Patch (Term a annotation))
 
 type instance Base (Free f a) = FreeF f a
