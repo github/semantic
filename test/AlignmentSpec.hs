@@ -182,6 +182,17 @@ spec = parallel $ do
         , Join (That  (info 8 9 `branch` []))
         ]
 
+    it "aligns symmetrical reformatted nodes" $
+      let sources = both (Source.fromList "a [ b ]\nc") (Source.fromList "a [\nb\n]\nc") in
+      align sources (pure (info 0 9) `branch` [ pure (info 0 1) `leaf` "a", pure (info 2 7) `branch` [ pure (info 4 5) `leaf` "b" ], pure (info 8 9) `leaf` "c" ]) `shouldBe` prettyDiff sources
+        [ Join (These (info 0 8 `branch` [ info 0 1 `leaf` "a", info 2 7 `branch` [ info 4 5 `leaf` "b" ] ])
+                      (info 0 4 `branch` [ info 0 1 `leaf` "a", info 2 4 `branch` [] ]))
+        , Join (That  (info 4 6 `branch` [ info 4 6 `branch` [ info 4 5 `leaf` "b" ] ]))
+        , Join (That  (info 6 8 `branch` [ info 6 7 `branch` [] ]))
+        , Join (These (info 8 9 `branch` [ info 8 9 `leaf` "c" ])
+                      (info 8 9 `branch` [ info 8 9 `leaf` "c" ]))
+        ]
+
   describe "numberedRows" $
     prop "counts only non-empty values" $
       \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
