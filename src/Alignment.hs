@@ -178,8 +178,9 @@ linesOf getRange children ranges
   | otherwise = let (intersections, remaining) = alignChildren getRange children headRanges
                     Just headRanges = headRangesOf ranges
                     joined = Join (runBothWith These intersections)
-                    (nextRanges, lines) = linesOf getRange remaining (modifyJoin (uncurry bimap (advancePast (sequenceL (fmap copoint <$> joined)))) ranges) in
-  (nextRanges, fromJust ((,) <$> headRanges `applyThese` joined) : lines)
+                    line = fromJust ((,) <$> headRanges `applyThese` joined)
+                    (nextRanges, lines) = linesOf getRange remaining (modifyJoin (uncurry bimap (advancePast [ line ])) ranges) in
+  (nextRanges, line : lines)
 
 -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
 alignChildren :: (Copointed c, Functor c) => (term -> Range) -> [c [Join These term]] -> Join These Range -> (Both [c term], [c [Join These term]])
