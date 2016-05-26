@@ -202,10 +202,6 @@ data BranchElement
   | Margin (Join These String)
   deriving Show
 
-branchElementContents :: BranchElement -> Join These String
-branchElementContents (Child _ contents) = contents
-branchElementContents (Margin contents) = contents
-
 branchElementKey :: BranchElement -> Maybe String
 branchElementKey (Child key _) = Just key
 branchElementKey _ = Nothing
@@ -231,6 +227,8 @@ toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . mapM go
         sources = foldMap Source.fromList <$> bothContents elements
         ranges = fmap (filter (\ (Range start end) -> start /= end)) $ Source.actualLineRanges <$> (totalRange <$> sources) <*> sources
         bothContents = foldMap (modifyJoin (fromThese [] []) . fmap (:[]) . branchElementContents)
+        branchElementContents (Child _ contents) = contents
+        branchElementContents (Margin contents) = contents
 
 keysOfAlignedChildren :: [Join These (Range, [(String, Range)])] -> [String]
 keysOfAlignedChildren lines = lines >>= these id id (++) . runJoin . fmap (fmap Prelude.fst . Prelude.snd)
