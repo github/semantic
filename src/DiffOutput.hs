@@ -1,5 +1,6 @@
 module DiffOutput where
 
+import Prologue
 import qualified Data.Text.IO as TextIO
 import Data.Functor.Both
 import Diffing
@@ -12,7 +13,6 @@ import Source
 import System.Directory
 import System.FilePath
 import qualified System.IO as IO
-import Data.Text hiding (split)
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
 textDiff :: Parser -> DiffArguments -> Both SourceBlob -> IO Text
@@ -24,9 +24,9 @@ textDiff parser arguments sources = case format arguments of
 -- | Returns a truncated diff given diff arguments and two source blobs.
 truncatedDiff :: DiffArguments -> Both SourceBlob -> IO Text
 truncatedDiff arguments sources = case format arguments of
-  Split -> return ""
-  Patch -> return $ P.truncatePatch arguments sources
-  JSON -> return "{}"
+  Split -> pure ""
+  Patch -> pure $ P.truncatePatch arguments sources
+  JSON -> pure "{}"
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
 printDiff :: Parser -> DiffArguments -> Both SourceBlob -> IO ()

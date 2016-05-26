@@ -3,12 +3,13 @@ module Control.Comonad.Cofree where
 
 import Control.Arrow
 import Data.Copointed
+import Prologue
 
 data Cofree functor annotation = annotation :< (functor (Cofree functor annotation))
   deriving (Functor, Foldable, Traversable)
 
 instance (Eq annotation, Eq (functor (Cofree functor annotation))) => Eq (Cofree functor annotation) where
-  a :< f == b :< g = a == b && f == g
+  (a :< f) == (b :< g) = a == b && f == g
 
 instance (Show annotation, Show (functor (Cofree functor annotation))) => Show (Cofree functor annotation) where
   showsPrec n (a :< f) = showsPrec n a . (" :< " ++) . showsPrec n f

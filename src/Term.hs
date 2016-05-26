@@ -1,9 +1,8 @@
 module Term where
 
+import Prologue
 import Control.Comonad.Cofree
-import Data.Bifunctor
 import Data.Functor.Both
-import Data.Maybe
 import Data.OrderedMap hiding (size)
 import Syntax
 

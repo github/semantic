@@ -10,19 +10,18 @@ import Control.Monad.State
 import Data.Align hiding (align)
 import Data.Bifunctor
 import Data.Bifunctor.Join
-import Data.Foldable (toList)
 import Data.Functor.Both as Both
 import Data.Functor.Identity
-import Data.List (nub, sort)
-import Data.Maybe (catMaybes, fromMaybe)
+import Data.List (nub)
 import Data.Monoid
+import Data.String
 import Data.Text.Arbitrary ()
 import Data.These
 import Diff
 import Info
 import Patch
-import Prelude hiding (fst, snd)
-import qualified Prelude
+import Prologue hiding (fst, snd)
+import qualified Prologue
 import Range
 import qualified Source
 import SplitDiff
@@ -52,18 +51,18 @@ spec = parallel $ do
 
     prop "covers every input line" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        modifyJoin (fromThese [] []) (unionThese (fmap Prelude.fst <$> alignBranch id children ranges)) `shouldBe` ranges
+        modifyJoin (fromThese [] []) (unionThese (fmap Prologue.fst <$> alignBranch identity children ranges)) `shouldBe` ranges
 
     prop "covers every input child" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        sort (nub (keysOfAlignedChildren (alignBranch id children ranges))) `shouldBe` sort (nub (catMaybes (branchElementKey <$> elements)))
+        sort (nub (keysOfAlignedChildren (alignBranch identity children ranges))) `shouldBe` sort (nub (catMaybes (branchElementKey <$> elements)))
 
     prop "covers every line of every input child" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        sort (keysOfAlignedChildren (alignBranch id children ranges)) `shouldBe` sort (do
+        sort (keysOfAlignedChildren (alignBranch identity children ranges)) `shouldBe` sort (do
           (key, lines) <- children
           line <- lines
-          these id id (++) . runJoin . ([key] <$) $ line)
+          these identity identity (++) . runJoin . ([key] <$) $ line)
 
   describe "alignDiff" $ do
     it "aligns identical branches on a single line" $
@@ -211,19 +210,19 @@ branchElementKey (Child key _) = Just key
 branchElementKey _ = Nothing
 
 toAlignBranchInputs :: [BranchElement] -> (Both (Source.Source Char), [(String, [Join These Range])], Both [Range])
-toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . mapM go $ elements, ranges)
+toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . traverse go $ elements, ranges)
   where go :: BranchElement -> State (Both Int) [(String, [Join These Range])]
         go child@(Child key _) = do
-          lines <- mapM (\ (Child _ contents) -> do
+          lines <- traverse (\ (Child _ contents) -> do
             prev <- get
             let next = (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
             put next
-            return $! modifyJoin (runBothWith bimap (const <$> (Range <$> prev <*> next))) contents) (alignBranchElement child)
-          return [ (key, lines) ]
+            pure $! modifyJoin (runBothWith bimap (const <$> (Range <$> prev <*> next))) contents) (alignBranchElement child)
+          pure [ (key, lines) ]
         go (Margin contents) = do
           prev <- get
           put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
-          return []
+          pure []
         alignBranchElement element = case element of
           Child key contents -> Child key <$> crosswalk lines contents
           Margin contents -> Margin <$> crosswalk lines contents
@@ -235,7 +234,7 @@ toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . mapM go
         branchElementContents (Margin contents) = contents
 
 keysOfAlignedChildren :: [Join These (Range, [(String, Range)])] -> [String]
-keysOfAlignedChildren lines = lines >>= these id id (++) . runJoin . fmap (fmap Prelude.fst . Prelude.snd)
+keysOfAlignedChildren lines = lines >>= these identity identity (++) . runJoin . fmap (fmap Prologue.fst . Prologue.snd)
 
 instance Arbitrary BranchElement where
   arbitrary = oneof [ key >>= \ key -> Child key <$> joinTheseOf (contents key)
@@ -256,27 +255,27 @@ instance Arbitrary BranchElement where
   shrink (Margin contents) = Margin <$> crosswalk (shrinkList (const [])) contents
 
 counts :: [Join These (Int, a)] -> Both Int
-counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prelude.fst <$> numbered))
+counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prologue.fst <$> numbered))
 
 align :: Both (Source.Source Char) -> ConstructibleFree (Patch (Term String Info)) (Both Info) -> PrettyDiff (SplitDiff String Info)
-align sources = PrettyDiff sources . fmap (fmap (getRange &&& id)) . alignDiff sources . deconstruct
+align sources = PrettyDiff sources . fmap (fmap (getRange &&& identity)) . alignDiff sources . deconstruct
 
 info :: Int -> Int -> Info
 info = ((\ r -> Info r mempty 0) .) . Range
 
 prettyDiff :: Both (Source.Source Char) -> [Join These (ConstructibleFree (SplitPatch (Term String Info)) Info)] -> PrettyDiff (SplitDiff String Info)
-prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& id) . deconstruct))
+prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& identity) . deconstruct))
 
 data PrettyDiff a = PrettyDiff { unPrettySources :: Both (Source.Source Char), unPrettyLines :: [Join These (Range, a)] }
   deriving Eq
 
 instance Show a => Show (PrettyDiff a) where
-  show (PrettyDiff sources lines) = prettyPrinted -- ++ "\n" ++ show lines
+  showsPrec _ (PrettyDiff sources lines) = (prettyPrinted ++) -- . ("\n" ++ show lines ++)
     where prettyPrinted = showLine (maximum (0 : (maximum . fmap length <$> shownLines))) <$> shownLines >>= ('\n':)
           shownLines = catMaybes $ toBoth <$> lines
           showLine n line = uncurry ((++) . (++ " | ")) (fromThese (replicate n ' ') (replicate n ' ') (runJoin (pad n <$> line)))
           showDiff (range, _) = filter (/= '\n') . toList . Source.slice range
-          pad n string = showString (take n string) (replicate (max 0 (n - length string)) ' ')
+          pad n string = (++) (take n string) (replicate (max 0 (n - length string)) ' ')
           toBoth them = showDiff <$> them `applyThese` modifyJoin (uncurry These) sources
 
 newtype ConstructibleFree patch annotation = ConstructibleFree { deconstruct :: Free (Annotated String annotation) patch }

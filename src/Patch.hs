@@ -1,6 +1,7 @@
 module Patch where
 
 import Data.These
+import Prologue
 
 -- | An operation to replace, insert, or delete an item.
 data Patch a =

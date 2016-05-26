@@ -1,5 +1,7 @@
 module TreeSitter where
 
+import Prologue hiding (Constructor)
+import Data.String
 import Category
 import Language
 import Parser
@@ -21,7 +23,7 @@ treeSitterParser language grammar contents = do
     ts_document_parse document
     term <- documentToTerm (termConstructor $ categoriesForLanguage language) document contents
     ts_document_free document
-    return term)
+    pure term)
 
 -- Given a language and a node name, return the correct categories.
 categoriesForLanguage :: Language -> String -> Set.Set Category

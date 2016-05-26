@@ -31,18 +31,17 @@ import Data.These
 import Diff
 import Info
 import Patch
-import Prelude hiding (fst, snd)
+import Prologue hiding (fst, snd)
 import Range
 import Source hiding (break, fromList, uncons, (++))
 import SplitDiff
 import Syntax
 import Term
-import Debug.Trace
 
 -- | Assign line numbers to the lines on each side of a list of rows.
 numberedRows :: [Join These a] -> [Join These (Int, a)]
 numberedRows = countUp (both 1 1)
-  where countUp from (row : rows) = fromJust ((,) <$> modifyJoin (uncurry These) from `applyThese` row) : countUp (modifyJoin (fromThese id id) (succ <$ row) <*> from) rows
+  where countUp from (row : rows) = fromJust ((,) <$> modifyJoin (uncurry These) from `applyThese` row) : countUp (modifyJoin (fromThese identity identity) (succ <$ row) <*> from) rows
         countUp _ [] = []
 
 -- | Determine whether a line contains any patches.
@@ -58,7 +57,7 @@ alignPatch :: Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
 alignPatch sources patch = case patch of
   Delete term -> fmap (Pure . SplitDelete) <$> hylo (alignSyntax this (:<) getRange (Identity (fst sources))) unCofree (Identity <$> term)
   Insert term -> fmap (Pure . SplitInsert) <$> hylo (alignSyntax that (:<) getRange (Identity (snd sources))) unCofree (Identity <$> term)
-  Replace term1 term2 -> fmap (Pure . SplitReplace) <$> alignWith (fmap (these id id const . runJoin) . Join)
+  Replace term1 term2 -> fmap (Pure . SplitReplace) <$> alignWith (fmap (these identity identity const . runJoin) . Join)
     (hylo (alignSyntax this (:<) getRange (Identity (fst sources))) unCofree (Identity <$> term1))
     (hylo (alignSyntax that (:<) getRange (Identity (snd sources))) unCofree (Identity <$> term2))
   where getRange = characterRange . copoint
@@ -152,11 +151,11 @@ alignBranch getRange children ranges = case intersectingChildren of
     Just (True, False) -> let (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> rightRange in
       rightLine $ alignBranch getRange (remainingAtRight ++ remainingIntersectingChildren ++ nonIntersectingChildren) (modifyJoin (second (drop 1)) ranges)
     -- No symmetrical child intersects, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
-    _ -> let (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ leftRange >>= lineAndRemainingWhere (isThis . runJoin . head . copoint) asymmetricalChildren
-             (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ rightRange >>= lineAndRemainingWhere (isThat . runJoin . head . copoint) asymmetricalChildren in
-      leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast (head . copoint <$> asymmetricalChildren))) ranges)
+    _ -> let (leftLine, remainingAtLeft) = maybe (identity, []) (first (:)) $ leftRange >>= lineAndRemainingWhere (isThis . runJoin . fromJust . head . copoint) asymmetricalChildren
+             (rightLine, remainingAtRight) = maybe (identity, []) (first (:)) $ rightRange >>= lineAndRemainingWhere (isThat . runJoin . fromJust . head . copoint) asymmetricalChildren in
+      leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast (fromJust . head . copoint <$> asymmetricalChildren))) ranges)
   where (intersectingChildren, nonIntersectingChildren) = partition (or . intersectsFirstLine headRanges) children
-        (remainingIntersectingChildren, asymmetricalChildren) = partition (isThese . runJoin . head . copoint) intersectingChildren
+        (remainingIntersectingChildren, asymmetricalChildren) = partition (isThese . runJoin . fromJust . head . copoint) intersectingChildren
         intersectsFirstLine ranges = maybe (False <$ ranges) (intersects getRange ranges) . listToMaybe . copoint
         Just headRanges = headRangesOf ranges
         (leftRange, rightRange) = splitThese headRanges
@@ -165,7 +164,7 @@ alignBranch getRange children ranges = case intersectingChildren of
         lineAndRemainingWhere predicate children = if any predicate children then Just . lineAndRemaining (filter predicate children) else const Nothing
 
 advancePast :: [Join These term] -> ([a] -> [a], [a] -> [a])
-advancePast children = fromThese id id . runJoin . (drop 1 <$) $ unionThese children
+advancePast children = fromThese identity identity . runJoin . (drop 1 <$) $ unionThese children
 
 headRangesOf :: Both [Range] -> Maybe (Join These Range)
 headRangesOf ranges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
@@ -186,9 +185,9 @@ alignChildren getRange (first:rest) headRanges
   -- It intersects on both sides, so we can just take the first line whole.
   (True, True) -> ((++) <$> toTerms firstLine <*> firstRemaining, (restOfLines <$ first) : restRemaining)
   -- It only intersects on the left, so split it up.
-  (True, False) -> ((++) <$> toTerms (fromJust l) <*> firstRemaining, (maybe id (:) r restOfLines <$ first) : restRemaining)
+  (True, False) -> ((++) <$> toTerms (fromJust l) <*> firstRemaining, (maybe identity (:) r restOfLines <$ first) : restRemaining)
   -- It only intersects on the right, so split it up.
-  (False, True) -> ((++) <$> toTerms (fromJust r) <*> firstRemaining, (maybe id (:) l restOfLines <$ first) : restRemaining)
+  (False, True) -> ((++) <$> toTerms (fromJust r) <*> firstRemaining, (maybe identity (:) l restOfLines <$ first) : restRemaining)
   -- It doesn’t intersect at all, so skip it and move along.
   (False, False) -> (firstRemaining, first:restRemaining)
   | otherwise = alignChildren getRange rest headRanges

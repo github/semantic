@@ -14,7 +14,7 @@ import Data.Text.Arbitrary ()
 import Data.These
 import Info
 import Patch
-import Prelude hiding (fst, snd)
+import Prologue hiding (fst, snd)
 import Range
 import Source hiding ((++))
 import Syntax

@@ -4,6 +4,7 @@ module Renderer.JSON (
   json
 ) where
 
+import Prologue hiding (toList)
 import Alignment
 import Category
 import Control.Comonad.Cofree
@@ -54,8 +55,8 @@ instance ToJSON (SplitDiff leaf Info) where
   toEncoding (Free (Annotated info syntax)) = pairs $ mconcat (termFields info syntax)
   toEncoding (Pure patch) = pairs $ mconcat (patchFields patch)
 instance ToJSON value => ToJSON (OrderedMap T.Text value) where
-  toJSON map = object $ uncurry (.=) <$> toList map
-  toEncoding map = pairs . mconcat $ uncurry (.=) <$> toList map
+  toJSON kv = object $ uncurry (.=) <$> toList kv
+  toEncoding kv = pairs . mconcat $ uncurry (.=) <$> toList kv
 instance ToJSON (Term leaf Info) where
   toJSON (info :< syntax) = object (termFields info syntax)
   toEncoding (info :< syntax) = pairs $ mconcat (termFields info syntax)

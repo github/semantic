@@ -1,5 +1,6 @@
 module Main where
 
+import Prologue
 import qualified AlignmentSpec
 import qualified CorpusSpec
 import qualified InterpreterSpec

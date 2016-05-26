@@ -5,20 +5,19 @@ module Renderer.Patch (
   truncatePatch
 ) where
 
+import Data.String
 import Alignment
 import Diff
 import Info
 import Patch
-import Prelude hiding (snd)
+import Prologue hiding (fst, snd)
 import Renderer
 import Source hiding ((++), break)
 import SplitDiff
 import Data.Bifunctor.Join
 import Data.Functor.Both as Both
 import Data.List
-import Data.Maybe
-import Data.Monoid
-import Data.Text (pack, Text)
+import Data.Text (pack)
 import Data.These
 
 -- | Render a timed out file as a truncated diff.

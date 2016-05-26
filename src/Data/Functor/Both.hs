@@ -2,8 +2,8 @@
 module Data.Functor.Both where
 
 import Data.Bifunctor.Join
-import Prelude hiding (zipWith, fst, snd)
-import qualified Prelude
+import Prologue hiding (zipWith, fst, snd)
+import qualified Prologue
 
 -- | A computation over both sides of a pair.
 type Both a = Join (,) a
@@ -18,11 +18,11 @@ runBothWith f = uncurry f . runJoin
 
 -- | Runs the left side of a `Both`.
 fst :: Both a -> a
-fst = Prelude.fst . runJoin
+fst = Prologue.fst . runJoin
 
 -- | Runs the right side of a `Both`.
 snd :: Both a -> a
-snd = Prelude.snd . runJoin
+snd = Prologue.snd . runJoin
 
 instance Monoid a => Monoid (Join (,) a) where
   mempty = pure mempty

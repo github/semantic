@@ -1,7 +1,9 @@
 module PatchOutputSpec where
 
+import Prologue
 import Control.Monad.Free
 import Data.Functor.Both
+import Data.String
 import Diff
 import Info
 import Range

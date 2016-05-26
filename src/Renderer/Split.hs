@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Renderer.Split where
 
+import Data.String
 import Alignment
 import Category
 import Control.Comonad.Cofree
@@ -14,8 +15,8 @@ import qualified Data.Text.Lazy as TL
 import Data.These
 import Diff
 import Info
-import Prelude hiding (div, head, span, fst, snd)
-import qualified Prelude
+import Prologue hiding (div, head, fst, snd, link)
+import qualified Prologue
 import Range
 import Renderer
 import Source hiding ((++))
@@ -71,7 +72,7 @@ split diff blobs = TL.toStrict . renderHtml
     numbered = numberedRows (alignDiff sources diff)
     maxNumber = case numbered of
       [] -> 0
-      (row : _) -> mergeThese max . runJoin $ Prelude.fst <$> row
+      (row : _) -> mergeThese max . runJoin $ Prologue.fst <$> row
 
     -- | The number of digits in a number (e.g. 342 has 3 digits).
     digits :: Int -> Int
@@ -116,10 +117,10 @@ wrapIn _ l@Blaze.Comment{} = l
 wrapIn f p = f p
 
 instance ToMarkup (Renderable (Source Char, Term a Info)) where
-  toMarkup (Renderable (source, term)) = Prelude.fst $ cata (\ info@(Info range _ _) syntax -> (toMarkup $ Renderable (source, info, syntax), range)) term
+  toMarkup (Renderable (source, term)) = Prologue.fst $ cata (\ info@(Info range _ _) syntax -> (toMarkup $ Renderable (source, info, syntax), range)) term
 
 instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
-  toMarkup (Renderable (source, diff)) = Prelude.fst $ iter (\ (Annotated info@(Info range _ _) syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) $ toMarkupAndRange <$> diff
+  toMarkup (Renderable (source, diff)) = Prologue.fst $ iter (\ (Annotated info@(Info range _ _) syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) $ toMarkupAndRange <$> diff
     where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
           toMarkupAndRange patch = let term@(Info range _ size :< _) = getSplitTerm patch in
             ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue (show size))) . toMarkup $ Renderable (source, term), range)

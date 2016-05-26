@@ -6,6 +6,7 @@ import Control.Monad.Free (Free(..))
 import Data.Copointed
 import Diff (Annotated(..))
 import Range
+import Prologue
 import Term (Term)
 
 -- | A patch to only one side of a diff.
