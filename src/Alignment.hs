@@ -156,12 +156,15 @@ alignBranch getRange children ranges = case intersectingChildren of
   where (intersectingChildren, nonIntersectingChildren) = partition (or . intersectsFirstLine headRanges) children
         (remainingIntersectingChildren, asymmetricalChildren) = partition (isThese . runJoin . head . copoint) intersectingChildren
         intersectsFirstLine ranges = maybe (False <$ ranges) (intersects getRange ranges) . listToMaybe . copoint
-        Just headRanges = sequenceL $ listToMaybe <$> Join (runBothWith These ranges)
+        Just headRanges = headRangesOf ranges
         (leftRange, rightRange) = splitThese headRanges
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange children ranges in
           (fromJust ((,) <$> ranges `applyThese` Join (runBothWith These intersections)), remaining)
         lineAndRemainingWhere predicate children = if any predicate children then Just . lineAndRemaining (filter predicate children) else const Nothing
         advancePast children = fromThese id id . runJoin . (drop 1 <$) $ unionThese (head . copoint <$> children)
+
+headRangesOf :: Both [Range] -> Maybe (Join These Range)
+headRangesOf ranges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
 
 -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
 alignChildren :: (Copointed c, Functor c) => (term -> Range) -> [c [Join These term]] -> Join These Range -> (Both [c term], [c [Join These term]])
