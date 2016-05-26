@@ -151,8 +151,8 @@ alignBranch getRange children ranges = case intersectingChildren of
     -- A symmetrical child intersects with the current lines, but not on either side, which is a contradiction in terms.
     Just (False, False) -> (flip (,) [] <$> headRanges) : alignBranch getRange children (drop 1 <$> ranges)
     -- No symmetrical child intersects, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
-    Nothing -> let (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ leftRange >>= lineAndRemainingWhere (any (isThis . runJoin . head . copoint)) asymmetricalChildren
-                   (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ rightRange >>= lineAndRemainingWhere (any (isThat . runJoin . head . copoint)) asymmetricalChildren in
+    Nothing -> let (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ leftRange >>= lineAndRemainingWhere (isThis . runJoin . head . copoint) asymmetricalChildren
+                   (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ rightRange >>= lineAndRemainingWhere (isThat . runJoin . head . copoint) asymmetricalChildren in
       leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast asymmetricalChildren)) ranges)
   where (intersectingChildren, nonIntersectingChildren) = span (or . intersectsFirstLine headRanges) children
         (asymmetricalChildren, remainingIntersectingChildren) = break (isThese . runJoin . head . copoint) intersectingChildren
@@ -161,7 +161,7 @@ alignBranch getRange children ranges = case intersectingChildren of
         (leftRange, rightRange) = splitThese headRanges
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange children ranges in
           (fromJust ((,) <$> ranges `applyThese` Join (runBothWith These intersections)), remaining)
-        lineAndRemainingWhere predicate children = if predicate children then Just . lineAndRemaining children else const Nothing
+        lineAndRemainingWhere predicate children = if any predicate children then Just . lineAndRemaining children else const Nothing
         advancePast children = fromThese id id . runJoin . (drop 1 <$) $ unionThese (head . copoint <$> children)
 
 -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
