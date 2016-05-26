@@ -16,7 +16,6 @@ import Data.Functor.Both as Both
 import Diff
 import Info
 import qualified Data.Maybe as Maybe
-import Data.Functor.Identity
 import Line
 import Patch
 import Prologue hiding (fst, snd)
@@ -41,7 +40,7 @@ spec = parallel $ do
   describe "splitAbstractedTerm" $ do
     prop "preserves line count" $
       \ source -> let range = totalRange source in
-        splitAbstractedTerm (:<) (Identity source) (Identity (Info range mempty 0)) (Leaf source) `shouldBe` (Identity . lineMap (fmap (((:< Leaf source) . (\ r -> Info r mempty 0) &&& id))) <$> linesInRangeOfSource range source)
+        splitAbstractedTerm (:<) (Identity source) (Identity (Info range mempty 0)) (Leaf source) `shouldBe` (Identity . lineMap (fmap (((:< Leaf source) . (\ r -> Info r mempty 0) &&& identity))) <$> linesInRangeOfSource range source)
 
     let makeTerm = ((Free .) . Annotated) :: Info -> Syntax (Source Char) (SplitDiff (Source Char) Info) -> SplitDiff (Source Char) Info
     prop "outputs one row for single-line unchanged leaves" $

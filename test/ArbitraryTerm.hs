@@ -1,5 +1,6 @@
 module ArbitraryTerm where
 
+import Prologue
 import Category
 import Control.Comonad.Cofree
 import Control.Monad
