@@ -139,7 +139,7 @@ alignBranch getRange children ranges = case intersectingChildren of
   -- No child intersects the current ranges on either side, so advance.
   [] -> (flip (,) [] <$> headRanges) : alignBranch getRange children (drop 1 <$> ranges)
   -- At least one child intersects on at least one side.
-  _ -> case fromThese True True . runJoin . intersectsAnyLine getRange headRanges . copoint <$> listToMaybe remainingIntersectingChildren of
+  _ -> case fromThese True True . runJoin . intersectsFirstLine getRange headRanges . copoint <$> listToMaybe remainingIntersectingChildren of
     -- At least one child intersects on both sides, so align symmetrically.
     Just (True, True) -> let (line, remaining) = lineAndRemaining intersectingChildren headRanges in
       line : alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
@@ -153,7 +153,7 @@ alignBranch getRange children ranges = case intersectingChildren of
     _ -> let (leftLine, remainingAtLeft) = maybe (identity, []) (first (:)) $ leftRange >>= lineAndRemainingWhere (isThis . runJoin . fromJust . head . copoint) asymmetricalChildren
              (rightLine, remainingAtRight) = maybe (identity, []) (first (:)) $ rightRange >>= lineAndRemainingWhere (isThat . runJoin . fromJust . head . copoint) asymmetricalChildren in
       leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast (fromJust . head . copoint <$> asymmetricalChildren))) ranges)
-  where (intersectingChildren, nonIntersectingChildren) = partition (or . intersectsAnyLine getRange headRanges . copoint) children
+  where (intersectingChildren, nonIntersectingChildren) = partition (or . intersectsFirstLine getRange headRanges . copoint) children
         (remainingIntersectingChildren, asymmetricalChildren) = partition (isThese . runJoin . fromJust . head . copoint) intersectingChildren
         Just headRanges = headRangesOf ranges
         (leftRange, rightRange) = splitThese headRanges
