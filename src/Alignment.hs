@@ -10,21 +10,15 @@ module Alignment
 , unionThese
 ) where
 
-import Control.Applicative
 import Control.Arrow ((***))
-import Control.Monad
 import Data.Align
 import Data.Biapplicative
 import Data.Bifunctor.Join
-import Data.Copointed
-import Data.Foldable
 import Data.Function
 import Data.Functor.Both as Both
-import Data.Functor.Foldable hiding (Foldable, fold)
-import Data.Functor.Identity
+import Data.Functor.Foldable (hylo)
 import Data.List (partition)
-import Data.Maybe
-import Data.Monoid
+import Data.Maybe (fromJust)
 import qualified Data.OrderedMap as Map
 import Data.These
 import Diff
