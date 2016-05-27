@@ -167,6 +167,9 @@ advancePast children = fromThese identity identity . runJoin . (drop 1 <$) $ uni
 headRangesOf :: Both [Range] -> Maybe (Join These Range)
 headRangesOf ranges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
 
+intersectsFirstLine :: (term -> Range) -> Join These Range -> [Join These term] -> Join These Bool
+intersectsFirstLine getRange ranges = maybe (False <$ ranges) (intersects getRange ranges) . listToMaybe
+
 intersectsAnyLine :: (term -> Range) -> Join These Range -> [Join These term] -> Join These Bool
 intersectsAnyLine getRange ranges = foldr (orIntersects ranges) (False <$ ranges)
   where orIntersects ranges line next = fromMaybe (False <$ ranges) ((||) <$> intersects getRange ranges line `applyThese` next)
