@@ -265,7 +265,7 @@ data PrettyDiff a = PrettyDiff { unPrettySources :: Both (Source.Source Char), u
   deriving Eq
 
 instance Show a => Show (PrettyDiff a) where
-  showsPrec _ (PrettyDiff sources lines) = (prettyPrinted ++) -- . ("\n" ++ show lines ++)
+  showsPrec _ (PrettyDiff sources lines) = (prettyPrinted ++) -- . (("\n" ++ show lines) ++)
     where prettyPrinted = showLine (maximum (0 : (maximum . fmap length <$> shownLines))) <$> shownLines >>= ('\n':)
           shownLines = catMaybes $ toBoth <$> lines
           showLine n line = uncurry ((++) . (++ " | ")) (fromThese (replicate n ' ') (replicate n ' ') (runJoin (pad n <$> line)))
