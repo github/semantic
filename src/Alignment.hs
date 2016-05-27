@@ -2,7 +2,6 @@
 module Alignment
 ( hasChanges
 , numberedRows
-, AlignedDiff
 , alignDiff
 , alignBranch
 , applyThese
@@ -41,12 +40,10 @@ numberedRows = countUp (both 1 1)
 hasChanges :: SplitDiff leaf Info -> Bool
 hasChanges = or . (True <$)
 
-type AlignedDiff leaf = [Join These (SplitDiff leaf Info)]
-
-alignDiff :: Show leaf => Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
+alignDiff :: Show leaf => Both (Source Char) -> Diff leaf Info -> [Join These (SplitDiff leaf Info)]
 alignDiff sources diff = iter (alignSyntax (runBothWith ((Join .) . These)) (free . Free) getRange sources) (alignPatch sources <$> diff)
 
-alignPatch :: Show leaf => Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
+alignPatch :: Show leaf => Both (Source Char) -> Patch (Term leaf Info) -> [Join These (SplitDiff leaf Info)]
 alignPatch sources patch = case patch of
   Delete term -> fmap (pure . SplitDelete) <$> hylo (alignSyntax this cofree getRange (Identity (fst sources))) runCofree (Identity <$> term)
   Insert term -> fmap (pure . SplitInsert) <$> hylo (alignSyntax that cofree getRange (Identity (snd sources))) runCofree (Identity <$> term)
