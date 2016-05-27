@@ -31,6 +31,7 @@ import Diff
 import Info
 import Patch
 import Prologue hiding (fst, snd)
+import qualified Prologue
 import Range
 import Source hiding (break, fromList, uncons, (++))
 import SplitDiff
@@ -67,11 +68,12 @@ alignPatch sources patch = case patch of
 alignSyntax :: (Applicative f, Show term) => (forall a. f a -> Join These a) -> (CofreeF (Syntax leaf) Info term -> term) -> (term -> Range) -> f (Source Char) -> CofreeF (Syntax leaf) (f Info) [Join These term] -> [Join These term]
 alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax of
   Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> sequenceL lineRanges
-  Indexed children -> catMaybes $ wrapInBranch (Indexed . fmap runIdentity) <$> alignBranch getRange (Identity <$> children) (modifyJoin (fromThese [] []) lineRanges)
-  Fixed children -> catMaybes $ wrapInBranch (Fixed . fmap runIdentity) <$> alignBranch getRange (Identity <$> children) (modifyJoin (fromThese [] []) lineRanges)
-  Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> alignBranch getRange (Map.toList children) (modifyJoin (fromThese [] []) lineRanges)
+  Indexed children -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) (modifyJoin (fromThese [] []) lineRanges)
+  Fixed children -> catMaybes $ wrapInBranch Fixed <$> alignBranch getRange (join children) (modifyJoin (fromThese [] []) lineRanges)
+  Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> alignBranch (getRange . Prologue.snd) (Map.toList children >>= pairWithKey) (modifyJoin (fromThese [] []) lineRanges)
   where lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
         wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (info { characterRange = range } :< constructor children)) <$> infos)
+        pairWithKey (key, values) = fmap ((,) key) <$> values
 
 {-
 
@@ -126,9 +128,7 @@ We should avoid taking asymmetrical children greedily so as not to misalign asym
 -}
 
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
-alignBranch :: (Copointed c, Functor c, Show term) => (term -> Range) -> [c [Join These term]] -> Both [Range] -> [Join These (Range, [c term])]
--- The first child is empty, and so can safely be dropped.
-alignBranch getRange (first:children) ranges | null (copoint first) = alignBranch getRange children ranges
+alignBranch :: Show term => (term -> Range) -> [Join These term] -> Both [Range] -> [Join These (Range, [term])]
 -- There are no more ranges, so we’re done.
 alignBranch _ [] (Join ([], [])) = []
 alignBranch _ children (Join ([], [])) = trace ("exhausted ranges with " ++ show (length children) ++ " children remaining") []
@@ -139,7 +139,7 @@ alignBranch getRange children ranges = case intersectingChildren of
   -- No child intersects the current ranges on either side, so advance.
   [] -> (flip (,) [] <$> headRanges) : alignBranch getRange children (drop 1 <$> ranges)
   -- At least one child intersects on at least one side.
-  _ -> case fromThese True True . runJoin . intersectsFirstLine getRange headRanges . copoint <$> listToMaybe remainingIntersectingChildren of
+  _ -> case fromThese True True . runJoin . intersects getRange headRanges <$> listToMaybe remainingIntersectingChildren of
     -- At least one child intersects on both sides, so align symmetrically.
     Just (True, True) -> let (line, remaining) = lineAndRemaining intersectingChildren headRanges in
       line : alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
@@ -150,13 +150,13 @@ alignBranch getRange children ranges = case intersectingChildren of
     Just (True, False) -> let (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> rightRange in
       rightLine $ alignBranch getRange (remainingAtRight ++ remainingIntersectingChildren ++ nonIntersectingChildren) (modifyJoin (second (drop 1)) ranges)
     -- No symmetrical child intersects, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
-    _ -> if any (maybe False (isThis . runJoin) . head . copoint) asymmetricalChildren
+    _ -> if any (isThis . runJoin) asymmetricalChildren
         then let (leftLine, remainingAtLeft) = maybe (identity, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> leftRange in
           leftLine $ alignBranch getRange (remainingAtLeft ++ nonIntersectingChildren) (modifyJoin (first (drop 1)) ranges)
         else let (rightLine, remainingAtRight) = maybe (identity, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> rightRange in
           rightLine $ alignBranch getRange (remainingAtRight ++ nonIntersectingChildren) (modifyJoin (second (drop 1)) ranges)
-  where (intersectingChildren, nonIntersectingChildren) = partition (or . intersectsFirstLine getRange headRanges . copoint) children
-        (remainingIntersectingChildren, asymmetricalChildren) = partition (maybe False (isThese . runJoin) . head . copoint) intersectingChildren
+  where (intersectingChildren, nonIntersectingChildren) = partition (or . intersects getRange headRanges) children
+        (remainingIntersectingChildren, asymmetricalChildren) = partition (isThese . runJoin) intersectingChildren
         Just headRanges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
         (leftRange, rightRange) = splitThese headRanges
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange children ranges in
@@ -170,23 +170,22 @@ intersectsAnyLine getRange ranges = foldr (orIntersects ranges) (False <$ ranges
   where orIntersects ranges line next = fromMaybe (False <$ ranges) ((||) <$> intersects getRange ranges line `applyThese` next)
 
 -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
-alignChildren :: (Copointed c, Functor c) => (term -> Range) -> [c [Join These term]] -> Join These Range -> (Both [c term], [c [Join These term]])
+alignChildren :: (term -> Range) -> [Join These (term)] -> Join These Range -> (Both [term], [Join These term])
 alignChildren _ [] _ = (both [] [], [])
 alignChildren getRange (first:rest) headRanges
-  | (firstLine:restOfLines) <- copoint first
-  , ~(l, r) <- splitThese firstLine
-  = case fromThese False False . runJoin $ intersectsFirstLine getRange headRanges (copoint first) of
+  | ~(l, r) <- splitThese first
+  = case fromThese False False . runJoin $ intersects getRange headRanges first of
     -- It intersects on both sides, so we can just take the first line whole.
-    (True, True) -> ((++) <$> toTerms firstLine <*> firstRemaining, (restOfLines <$ first) : restRemaining)
+    (True, True) -> ((++) <$> toTerms first <*> firstRemaining, restRemaining)
     -- It only intersects on the left, so split it up.
-    (True, False) -> ((++) <$> toTerms (fromJust l) <*> firstRemaining, (maybe identity (:) r restOfLines <$ first) : restRemaining)
+    (True, False) -> ((++) <$> toTerms (fromJust l) <*> firstRemaining, maybe identity (:) r restRemaining)
     -- It only intersects on the right, so split it up.
-    (False, True) -> ((++) <$> toTerms (fromJust r) <*> firstRemaining, (maybe identity (:) l restOfLines <$ first) : restRemaining)
+    (False, True) -> ((++) <$> toTerms (fromJust r) <*> firstRemaining, maybe identity (:) l restRemaining)
     -- It doesn’t intersect at all, so skip it and move along.
     (False, False) -> (firstRemaining, first:restRemaining)
   | otherwise = alignChildren getRange rest headRanges
   where (firstRemaining, restRemaining) = alignChildren getRange rest headRanges
-        toTerms line = modifyJoin (fromThese [] []) (pure . (<$ first) <$> line)
+        toTerms line = modifyJoin (fromThese [] []) (pure <$> line)
 
 unionThese :: (Alternative f, Foldable f, Monoid (f a)) => f (Join These a) -> Join These (f a)
 unionThese as = fromMaybe (Join (These empty empty)) . getUnion . fold $ Union . Just . fmap pure <$> as

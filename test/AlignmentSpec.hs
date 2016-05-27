@@ -32,7 +32,7 @@ spec :: Spec
 spec = parallel $ do
   describe "alignBranch" $ do
     it "produces symmetrical context" $
-      alignBranch getRange ([] :: [Identity [Join These (SplitDiff String Info)]]) (both [Range 0 2, Range 2 4] [Range 0 2, Range 2 4]) `shouldBe`
+      alignBranch getRange ([] :: [Join These (SplitDiff String Info)]) (both [Range 0 2, Range 2 4] [Range 0 2, Range 2 4]) `shouldBe`
         [ Join (These (Range 0 2, [])
                       (Range 0 2, []))
         , Join (These (Range 2 4, [])
@@ -40,7 +40,7 @@ spec = parallel $ do
         ]
 
     it "produces asymmetrical context" $
-      alignBranch getRange ([] :: [Identity [Join These (SplitDiff String Info)]]) (both [Range 0 2, Range 2 4] [Range 0 1]) `shouldBe`
+      alignBranch getRange ([] :: [Join These (SplitDiff String Info)]) (both [Range 0 2, Range 2 4] [Range 0 1]) `shouldBe`
         [ Join (These (Range 0 2, [])
                       (Range 0 1, []))
         , Join (This  (Range 2 4, []))
@@ -48,18 +48,17 @@ spec = parallel $ do
 
     prop "covers every input line" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        modifyJoin (fromThese [] []) (unionThese (fmap Prologue.fst <$> alignBranch identity children ranges)) `shouldBe` ranges
+        modifyJoin (fromThese [] []) (unionThese (fmap Prologue.fst <$> alignBranch Prologue.snd children ranges)) `shouldBe` ranges
 
     prop "covers every input child" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        sort (nub (keysOfAlignedChildren (alignBranch identity children ranges))) `shouldBe` sort (nub (catMaybes (branchElementKey <$> elements)))
+        sort (nub (keysOfAlignedChildren (alignBranch Prologue.snd children ranges))) `shouldBe` sort (nub (catMaybes (branchElementKey <$> elements)))
 
     prop "covers every line of every input child" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        sort (keysOfAlignedChildren (alignBranch identity children ranges)) `shouldBe` sort (do
-          (key, lines) <- children
-          line <- lines
-          these identity identity (++) . runJoin . ([key] <$) $ line)
+        sort (keysOfAlignedChildren (alignBranch Prologue.snd children ranges)) `shouldBe` sort (do
+          line <- children
+          these (pure . Prologue.fst) (pure . Prologue.fst) (\ (k1, _) (k2, _) -> [ k1, k2 ]) . runJoin $ line)
 
   describe "alignDiff" $ do
     it "aligns identical branches on a single line" $
@@ -206,16 +205,16 @@ branchElementKey :: BranchElement -> Maybe String
 branchElementKey (Child key _) = Just key
 branchElementKey _ = Nothing
 
-toAlignBranchInputs :: [BranchElement] -> (Both (Source.Source Char), [(String, [Join These Range])], Both [Range])
+toAlignBranchInputs :: [BranchElement] -> (Both (Source.Source Char), [Join These (String, Range)], Both [Range])
 toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . traverse go $ elements, ranges)
-  where go :: BranchElement -> State (Both Int) [(String, [Join These Range])]
+  where go :: BranchElement -> State (Both Int) [Join These (String, Range)]
         go child@(Child key _) = do
           lines <- traverse (\ (Child _ contents) -> do
             prev <- get
             let next = (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
             put next
             pure $! modifyJoin (runBothWith bimap (const <$> (Range <$> prev <*> next))) contents) (alignBranchElement child)
-          pure [ (key, lines) ]
+          pure $! fmap ((,) key) <$> lines
         go (Margin contents) = do
           prev <- get
           put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
