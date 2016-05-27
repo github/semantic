@@ -47,7 +47,7 @@ spec = parallel $ do
 
     prop "covers every input line" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        modifyJoin (fromThese [] []) (unionThese (fmap Prologue.fst <$> alignBranch Prologue.snd children ranges)) `shouldBe` ranges
+        join <$> (sequenceA (modifyJoin (fromThese [] []) . fmap pure <$> (fmap Prologue.fst <$> alignBranch Prologue.snd children ranges))) `shouldBe` ranges
 
     prop "covers every input child" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
