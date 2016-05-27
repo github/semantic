@@ -121,6 +121,7 @@ alignChildren getRange (first:rest) headRanges
   where (firstRemaining, restRemaining) = alignChildren getRange rest headRanges
         toTerms line = modifyJoin (fromThese [] []) (pure <$> line)
 
+-- | Compute the union of a collection of Join These. E.g. if the collection contains a This and a That, the union is a These. Values in multiple Thises, Thats, and Theses are mappended together.
 unionThese :: (Alternative f, Foldable f, Monoid (f a)) => f (Join These a) -> Join These (f a)
 unionThese as = fromMaybe (Join (These empty empty)) . getUnion . fold $ Union . Just . fmap pure <$> as
 
