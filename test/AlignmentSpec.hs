@@ -9,7 +9,6 @@ import Data.Align hiding (align)
 import Data.Bifunctor
 import Data.Bifunctor.Join
 import Data.Functor.Both as Both
-import Data.Functor.Identity
 import Data.List (nub)
 import Data.Monoid
 import Data.String
