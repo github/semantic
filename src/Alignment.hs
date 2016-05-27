@@ -124,8 +124,7 @@ We should avoid taking asymmetrical children greedily so as not to misalign asym
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
 alignBranch :: Show term => (term -> Range) -> [Join These term] -> Both [Range] -> [Join These (Range, [term])]
 -- There are no more ranges, so we’re done.
-alignBranch _ [] (Join ([], [])) = []
-alignBranch _ children (Join ([], [])) = trace ("exhausted ranges with remaining children: " ++ show children) []
+alignBranch _ _ (Join ([], [])) = []
 -- There are no more children, so we can just zip the remaining ranges together.
 alignBranch _ [] ranges = runBothWith (alignWith Join) (fmap (flip (,) []) <$> ranges)
 -- There are both children and ranges, so we need to proceed line by line
