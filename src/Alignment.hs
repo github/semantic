@@ -125,7 +125,7 @@ We should avoid taking asymmetrical children greedily so as not to misalign asym
 alignBranch :: Show term => (term -> Range) -> [Join These term] -> Both [Range] -> [Join These (Range, [term])]
 -- There are no more ranges, so we’re done.
 alignBranch _ [] (Join ([], [])) = []
-alignBranch _ children (Join ([], [])) = trace ("exhausted ranges with " ++ show (length children) ++ " children remaining") []
+alignBranch _ children (Join ([], [])) = trace ("exhausted ranges with remaining children: " ++ show children) []
 -- There are no more children, so we can just zip the remaining ranges together.
 alignBranch _ [] ranges = runBothWith (alignWith Join) (fmap (flip (,) []) <$> ranges)
 -- There are both children and ranges, so we need to proceed line by line
