@@ -184,6 +184,16 @@ alignChildren getRange (first:rest) headRanges
   where (firstRemaining, restRemaining) = alignChildren getRange rest headRanges
         toTerms line = modifyJoin (fromThese [] []) (pure . (<$ first) <$> line)
 
+mergeOntoThese :: Maybe (Join These a) -> [Join These a] -> [Join These a]
+mergeOntoThese newHead list = case newHead of
+  Just t -> case list of
+    (first:rest) -> case (t, first) of
+      (Join (This a), Join (That b)) -> Join (These a b) : rest
+      (Join (That b), Join (This a)) -> Join (These a b) : rest
+      _ -> t : first : rest
+    [] -> [t]
+  Nothing -> list
+
 unionThese :: (Alternative f, Foldable f, Monoid (f a)) => f (Join These a) -> Join These (f a)
 unionThese as = fromMaybe (Join (These empty empty)) . getUnion . fold $ Union . Just . fmap pure <$> as
 
