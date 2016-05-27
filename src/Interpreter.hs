@@ -40,7 +40,7 @@ constructAndRun comparable cost t1 t2 =
     algorithm (Leaf a') (Leaf b') | a' == b' = annotate $ Leaf b'
     algorithm a' b' = free . Free $ Recursive (cofree (annotation1 :< a')) (cofree (annotation2 :< b')) pure
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
-    annotate = pure . free . Free . (:<) (both annotation1 annotation2)
+    annotate = pure . free . Free . (both annotation1 annotation2 :<)
 
 -- | Runs the diff algorithm
 run :: (Eq a, Eq annotation) => Comparable a annotation -> Cost a annotation -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
