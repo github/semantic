@@ -162,9 +162,6 @@ alignBranch getRange children ranges = case intersectingChildren of
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange children ranges in
           ((,) <$> ranges `applyToBoth` intersections, remaining)
 
-advancePast :: [Join These term] -> ([a] -> [a], [a] -> [a])
-advancePast children = fromThese identity identity . runJoin . (drop 1 <$) $ unionThese children
-
 headRangesOf :: Both [Range] -> Maybe (Join These Range)
 headRangesOf ranges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
 
