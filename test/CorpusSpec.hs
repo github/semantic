@@ -10,14 +10,11 @@ import qualified Renderer.Split as Split
 
 import Control.DeepSeq
 import Data.Functor.Both
-import qualified Data.ByteString.Lazy.Char8 as B
 import Data.List as List
 import Data.Map as Map
 import Data.Set as Set
 import qualified Data.Text as T
-import qualified Data.Text.Lazy as TL
 import Prologue hiding (fst, snd)
-import qualified Prologue
 import qualified Source as S
 import System.FilePath
 import System.FilePath.Glob
@@ -58,7 +55,7 @@ examples directory = do
   patches <- toDict <$> globFor "*.patch.*"
   splits <- toDict <$> globFor "*.split.*"
   let keys = Set.unions $ keysSet <$> [as, bs]
-  pure $ (\name -> (Both (as ! name, bs ! name), Map.lookup name jsons, Map.lookup name patches, Map.lookup name splits)) <$> sort (Set.toList keys)
+  pure $ (\name -> (both (as ! name) (bs ! name), Map.lookup name jsons, Map.lookup name patches, Map.lookup name splits)) <$> sort (Set.toList keys)
   where
     globFor :: String -> IO [FilePath]
     globFor p = globDir1 (compile p) directory
@@ -81,4 +78,4 @@ testDiff renderer paths diff matcher = do
       expected <- T.pack <$> readFile file
       matcher actual expected
   where parser = parserForFilepath (fst paths)
-        sourceBlobs sources = Both (S.SourceBlob, S.SourceBlob) <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)
+        sourceBlobs sources = pure S.SourceBlob <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)

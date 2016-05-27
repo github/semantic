@@ -1,6 +1,13 @@
 module Diffing where
 
 import Prologue
+import Data.Bifunctor.Join
+import qualified Data.ByteString.Char8 as B1
+import Data.Functor.Both
+import Data.Functor.Foldable
+import qualified Data.Text as T
+import qualified Data.Text.ICU.Detect as Detect
+import qualified Data.Text.ICU.Convert as Convert
 import Diff
 import Info
 import Interpreter
@@ -10,17 +17,10 @@ import Range
 import Renderer
 import Source hiding ((++))
 import Syntax
+import System.FilePath
 import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
-
-import Data.Functor.Both
-import Data.Functor.Foldable
-import qualified Data.ByteString.Char8 as B1
-import qualified Data.Text as T
-import qualified Data.Text.ICU.Detect as Detect
-import qualified Data.Text.ICU.Convert as Convert
-import System.FilePath
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: T.Text -> Parser
@@ -56,8 +56,8 @@ breakDownLeavesByWord source = cata replaceIn
       | ranges <- rangesAndWordsInSource range
       , length ranges > 1
       = cofree $ Info range categories (1 + fromIntegral (length ranges)) :< Indexed (makeLeaf categories <$> ranges)
-    replaceIn (Info range categories _ :< syntax)
-      = cofree $ Info range categories (1 + sum (size . extract <$> syntax)) :< syntax
+    replaceIn (info :< syntax)
+      = cofree $ info { size = 1 + sum (size . extract <$> syntax) } :< syntax
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
     makeLeaf categories (range, substring) = cofree $ Info range categories 1 :< Leaf (T.pack substring)
 
@@ -92,5 +92,5 @@ diffCostWithCachedTermSizes = diffSum (getSum . foldMap (Sum . size . extract))
 -- | The absolute difference between the node counts of a diff.
 diffCostWithAbsoluteDifferenceOfCachedDiffSizes :: Diff a Info -> Integer
 diffCostWithAbsoluteDifferenceOfCachedDiffSizes term = case runFree term of
-  (Free (Both (before, after) :< _)) -> abs $ size before - size after
-  (Pure patch)                       -> sum $ size . extract <$> patch
+  Free (Join (before, after) :< _) -> abs $ size before - size after
+  Pure patch                       -> sum $ size . extract <$> patch
