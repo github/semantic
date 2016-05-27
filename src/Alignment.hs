@@ -40,9 +40,11 @@ numberedRows = countUp (both 1 1)
 hasChanges :: SplitDiff leaf Info -> Bool
 hasChanges = or . (True <$)
 
+-- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
 alignDiff :: Show leaf => Both (Source Char) -> Diff leaf Info -> [Join These (SplitDiff leaf Info)]
 alignDiff sources diff = iter (alignSyntax (runBothWith ((Join .) . These)) (free . Free) getRange sources) (alignPatch sources <$> diff)
 
+-- | Align the contents of a patch into a list of lines on the corresponding side(s) of the diff.
 alignPatch :: Show leaf => Both (Source Char) -> Patch (Term leaf Info) -> [Join These (SplitDiff leaf Info)]
 alignPatch sources patch = case patch of
   Delete term -> fmap (pure . SplitDelete) <$> hylo (alignSyntax this cofree getRange (Identity (fst sources))) runCofree (Identity <$> term)
