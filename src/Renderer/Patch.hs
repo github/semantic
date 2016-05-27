@@ -116,7 +116,7 @@ hunks _ blobs | sources <- source <$> blobs
               , sourcesNull <- runBothWith (&&) (null <$> sources)
               , sourcesEqual || sourcesNull
   = [emptyHunk]
-hunks diff blobs = hunksInRows (Join (1, 1)) $ alignDiff (source <$> blobs) diff
+hunks diff blobs = hunksInRows (pure 1) $ alignDiff (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
