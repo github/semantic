@@ -120,8 +120,9 @@ spec = parallel $ do
     it "aligns insertions into empty branches" $
       let sources = both (Source.fromList "[ ]") (Source.fromList "[a]") in
       align sources (pure (info 0 3) `branch` [ insert (info 1 2 `leaf` "a") ]) `shouldBe` prettyDiff sources
-        [ Join (These (info 0 3 `branch` [])
-                      (info 0 3 `branch` [ insert (info 1 2 `leaf` "a") ])) ]
+        [ Join (That  (info 0 3 `branch` [ insert (info 1 2 `leaf` "a") ]))
+        , Join (This  (info 0 3 `branch` []))
+        ]
 
     it "aligns symmetrically following insertions" $
       let sources = both (Source.fromList "a\nc") (Source.fromList "a\nb\nc") in
@@ -165,10 +166,10 @@ spec = parallel $ do
                       (info 2 9 `branch` [ info 4 5 `leaf` "a", info 7 8 `leaf` "b" ]))
         , Join (These (info 6 8 `branch` [])
                       (info 9 10 `branch` []))
-        , Join (These (info 8 12 `branch` [ info 10 11 `leaf` "b" ])
-                      (info 10 11 `branch` []))
+        , Join (This  (info 8 12 `branch` [ info 10 11 `leaf` "b" ]))
         , Join (These (info 12 13 `branch` [])
-                      (info 11 12 `branch` []))
+                      (info 10 11 `branch` []))
+        , Join (That  (info 11 12 `branch` []))
         ]
 
     it "aligns asymmetrical nodes preceding their symmetrical siblings conservatively" $
