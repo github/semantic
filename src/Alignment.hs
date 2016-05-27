@@ -165,6 +165,10 @@ alignBranch getRange children ranges = case intersectingChildren of
 intersectsFirstLine :: (term -> Range) -> Join These Range -> [Join These term] -> Join These Bool
 intersectsFirstLine getRange ranges = maybe (False <$ ranges) (intersects getRange ranges) . listToMaybe
 
+intersectsAnyLine :: (term -> Range) -> Join These Range -> [Join These term] -> Join These Bool
+intersectsAnyLine getRange ranges = foldr (orIntersects ranges) (False <$ ranges)
+  where orIntersects ranges line next = fromMaybe (False <$ ranges) ((||) <$> intersects getRange ranges line `applyThese` next)
+
 -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
 alignChildren :: (Copointed c, Functor c) => (term -> Range) -> [c [Join These term]] -> Join These Range -> (Both [c term], [c [Join These term]])
 alignChildren _ [] _ = (both [] [], [])
