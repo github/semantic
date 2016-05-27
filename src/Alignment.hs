@@ -161,7 +161,6 @@ alignBranch getRange children ranges = case intersectingChildren of
         (leftRange, rightRange) = splitThese headRanges
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange children ranges in
           ((,) <$> ranges `applyToBoth` intersections, remaining)
-        lineAndRemainingWhere predicate children = if any predicate children then Just . lineAndRemaining (filter predicate children) else const Nothing
 
 advancePast :: [Join These term] -> ([a] -> [a], [a] -> [a])
 advancePast children = fromThese identity identity . runJoin . (drop 1 <$) $ unionThese children
