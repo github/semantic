@@ -180,7 +180,7 @@ alignChildren _ [] _ = (both [] [], [])
 alignChildren getRange (first:rest) headRanges
   | (firstLine:restOfLines) <- copoint first
   , ~(l, r) <- splitThese firstLine
-  = case fromThese False False . runJoin $ intersects getRange headRanges firstLine of
+  = case fromThese False False . runJoin $ intersectsFirstLine getRange headRanges (copoint first) of
   -- It intersects on both sides, so we can just take the first line whole.
   (True, True) -> ((++) <$> toTerms firstLine <*> firstRemaining, (restOfLines <$ first) : restRemaining)
   -- It only intersects on the left, so split it up.
