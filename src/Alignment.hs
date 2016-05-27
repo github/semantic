@@ -62,10 +62,11 @@ alignPatch sources patch = case patch of
 alignSyntax :: (Applicative f, Show term) => (forall a. f a -> Join These a) -> (CofreeF (Syntax leaf) Info term -> term) -> (term -> Range) -> f (Source Char) -> CofreeF (Syntax leaf) (f Info) [Join These term] -> [Join These term]
 alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax of
   Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> sequenceL lineRanges
-  Indexed children -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) (modifyJoin (fromThese [] []) lineRanges)
-  Fixed children -> catMaybes $ wrapInBranch Fixed <$> alignBranch getRange (join children) (modifyJoin (fromThese [] []) lineRanges)
-  Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> alignBranch (getRange . Prologue.snd) (Map.toList children >>= pairWithKey) (modifyJoin (fromThese [] []) lineRanges)
-  where lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
+  Indexed children -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
+  Fixed children -> catMaybes $ wrapInBranch Fixed <$> alignBranch getRange (join children) bothRanges
+  Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> alignBranch (getRange . Prologue.snd) (Map.toList children >>= pairWithKey) bothRanges
+  where bothRanges = modifyJoin (fromThese [] []) lineRanges
+        lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
         wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (info { characterRange = range } :< constructor children)) <$> infos)
         pairWithKey (key, values) = fmap ((,) key) <$> values
 
