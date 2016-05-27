@@ -1,13 +1,12 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Source where
 
-import Data.Foldable
-import qualified Data.Text as T
+import Prologue hiding (uncons)
+import Data.Text (unpack)
+import Data.String
 import qualified Data.Vector as Vector
-import Data.Word
 import Numeric
 import Range
-import Data.Maybe
 
 data SourceKind = PlainBlob Word32  | ExecutableBlob Word32 | SymlinkBlob Word32
   deriving (Show, Eq)
@@ -43,8 +42,8 @@ fromList :: [a] -> Source a
 fromList = Source . Vector.fromList
 
 -- | Return a Source of Chars from a Text.
-fromText :: T.Text -> Source Char
-fromText = Source . Vector.fromList . T.unpack
+fromText :: Text -> Source Char
+fromText = Source . Vector.fromList . unpack
 
 -- | Return a Source that contains a slice of the given Source.
 slice :: Range -> Source a -> Source a
@@ -82,3 +81,8 @@ actualLines source = case Source.break (== '\n') source of
 actualLineRanges :: Range -> Source Char -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous string = Range (end previous) $ end previous + length string
+
+
+instance Monoid (Source a) where
+  mempty = fromList []
+  mappend = (Source.++)

@@ -4,6 +4,8 @@ import Test.Hspec
 import Test.Hspec.QuickCheck
 import Data.Text.Arbitrary ()
 
+import Prologue
+import Data.String
 import Category
 import Interpreter
 import Diff

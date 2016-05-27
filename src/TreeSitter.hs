@@ -1,5 +1,7 @@
 module TreeSitter where
 
+import Prologue hiding (Constructor)
+import Data.String
 import Category
 import Language
 import Parser
@@ -21,7 +23,7 @@ treeSitterParser language grammar contents = do
     ts_document_parse document
     term <- documentToTerm (termConstructor $ categoriesForLanguage language) document contents
     ts_document_free document
-    return term)
+    pure term)
 
 -- Given a language and a node name, return the correct categories.
 categoriesForLanguage :: Language -> String -> Set.Set Category
@@ -52,11 +54,11 @@ documentToTerm constructor document contents = alloca $ \ root -> do
           name <- ts_node_p_name node document
           name <- peekCString name
           count <- ts_node_p_named_child_count node
-          children <- mapM (alloca . getChild node) $ take (fromIntegral count) [0..]
+          children <- traverse (alloca . getChild node) $ take (fromIntegral count) [0..]
           -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
-          range <- return $! Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
+          range <- pure $! Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
 
-          return $! constructor contents range name children
+          pure $! constructor contents range name children
         getChild node n out = do
           _ <- ts_node_p_named_child node n out
           toTerm out

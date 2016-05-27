@@ -1,7 +1,8 @@
 module PatchOutputSpec where
 
-import Control.Monad.Free
+import Prologue
 import Data.Functor.Both
+import Data.String
 import Diff
 import Info
 import Range
@@ -14,4 +15,4 @@ spec :: Spec
 spec = parallel $
   describe "hunks" $
     it "empty diffs have empty hunks" $
-        hunks (Free . Annotated (pure (Info (Range 0 0) mempty 1)) $ Leaf "") (Both (SourceBlob (fromList "") "abcde" "path2.txt" (Just defaultPlainBlob), SourceBlob (fromList "") "xyz" "path2.txt" (Just defaultPlainBlob))) `shouldBe` [Hunk {offset = Both (0, 0), changes = [], trailingContext = []}]
+        hunks (free . Free $ pure (Info (Range 0 0) mempty 1) :< Leaf "") (both (SourceBlob (fromList "") "abcde" "path2.txt" (Just defaultPlainBlob)) (SourceBlob (fromList "") "xyz" "path2.txt" (Just defaultPlainBlob))) `shouldBe` [Hunk {offset = pure 0, changes = [], trailingContext = []}]
