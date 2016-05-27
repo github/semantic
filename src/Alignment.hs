@@ -198,7 +198,7 @@ unionThese as = fromMaybe (Join (These empty empty)) . getUnion . fold $ Union .
 
 -- | Test ranges and terms for intersection on either or both sides.
 intersects :: (term -> Range) -> Join These Range -> Join These term -> Join These Bool
-intersects getRange ranges line = fromMaybe (False <$ ranges) $ intersectsRange <$> ranges `applyThese` modifyJoin (uncurry These . fromThese (Range (-1) (-1)) (Range (-1) (-1))) (getRange <$> line)
+intersects getRange ranges line = intersectsRange <$> ranges `applyToBoth` modifyJoin (fromThese (Range (-1) (-1)) (Range (-1) (-1))) (getRange <$> line)
 
 -- | Split a These value up into independent These values representing the left and right sides, if any.
 splitThese :: Join These a -> (Maybe (Join These a), Maybe (Join These a))
