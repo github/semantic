@@ -109,7 +109,7 @@ alignChildren :: (term -> Range) -> [Join These (term)] -> Join These Range -> (
 alignChildren _ [] _ = (both [] [], [])
 alignChildren getRange (first:rest) headRanges
   | ~(l, r) <- splitThese first
-  = case fromThese False False . runJoin $ intersects getRange headRanges first of
+  = case intersectionsWithHeadRanges first of
     -- It intersects on both sides, so we can just take the first line whole.
     (True, True) -> ((++) <$> toTerms first <*> firstRemaining, restRemaining)
     -- It only intersects on the left, so split it up.
@@ -121,6 +121,7 @@ alignChildren getRange (first:rest) headRanges
   | otherwise = alignChildren getRange rest headRanges
   where (firstRemaining, restRemaining) = alignChildren getRange rest headRanges
         toTerms line = modifyJoin (fromThese [] []) (pure <$> line)
+        intersectionsWithHeadRanges = fromThese False False . runJoin . intersects getRange headRanges
 
 -- | Test ranges and terms for intersection on either or both sides.
 intersects :: (term -> Range) -> Join These Range -> Join These term -> Join These Bool
