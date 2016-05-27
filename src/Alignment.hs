@@ -211,6 +211,8 @@ applyThese :: Join These (a -> b) -> Join These a -> Maybe (Join These b)
 applyThese (Join fg) (Join ab) = fmap Join . uncurry maybeThese $ uncurry (***) (bimap (<*>) (<*>) (unpack fg)) (unpack ab)
   where unpack = fromThese Nothing Nothing . bimap Just Just
 
+infixl 4 `applyToBoth`
+
 -- | Like `<*>`, but it takes a `Both` on the right to ensure that it can always return a value.
 applyToBoth :: Join These (a -> b) -> Both a -> Join These b
 applyToBoth (Join fg) (Join (a, b)) = Join $ these (This . ($ a)) (That . ($ b)) (\ f g -> These (f a) (g b)) fg
