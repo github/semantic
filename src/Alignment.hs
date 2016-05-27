@@ -33,8 +33,10 @@ import Term
 -- | Assign line numbers to the lines on each side of a list of rows.
 numberedRows :: [Join These a] -> [Join These (Int, a)]
 numberedRows = countUp (both 1 1)
-  where countUp from (row : rows) = fromJust ((,) <$> modifyJoin (uncurry These) from `applyThese` row) : countUp (modifyJoin (fromThese identity identity) (succ <$ row) <*> from) rows
-        countUp _ [] = []
+  where countUp _ [] = []
+        countUp from (row : rows) = numberedLine from row : countUp (nextLineNumbers from row) rows
+        numberedLine from row = fromJust ((,) <$> modifyJoin (uncurry These) from `applyThese` row)
+        nextLineNumbers from row = modifyJoin (fromThese identity identity) (succ <$ row) <*> from
 
 -- | Determine whether a line contains any patches.
 hasChanges :: SplitDiff leaf Info -> Bool
