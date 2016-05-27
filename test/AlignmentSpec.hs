@@ -15,7 +15,6 @@ import Data.Monoid
 import Data.String
 import Data.Text.Arbitrary ()
 import Data.These
-import Diff
 import Info
 import Patch
 import Prologue hiding (fst, snd)
