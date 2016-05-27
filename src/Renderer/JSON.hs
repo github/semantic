@@ -8,12 +8,9 @@ import Prologue hiding (toList)
 import Alignment
 import Category
 import Data.Aeson hiding (json)
-import Data.Aeson.Encode
 import Data.Bifunctor.Join
 import Data.ByteString.Builder
 import Data.OrderedMap hiding (fromList)
-import Data.Text.Lazy (toStrict)
-import Data.Text.Lazy.Builder (toLazyText)
 import qualified Data.Text as T
 import Data.These
 import Data.Vector hiding (toList)
