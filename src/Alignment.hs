@@ -157,13 +157,10 @@ alignBranch getRange children ranges = case intersectingChildren of
           rightLine $ alignBranch getRange (remainingAtRight ++ nonIntersectingChildren) (modifyJoin (second (drop 1)) ranges)
   where (intersectingChildren, nonIntersectingChildren) = partition (or . intersectsFirstLine getRange headRanges . copoint) children
         (remainingIntersectingChildren, asymmetricalChildren) = partition (maybe False (isThese . runJoin) . head . copoint) intersectingChildren
-        Just headRanges = headRangesOf ranges
+        Just headRanges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
         (leftRange, rightRange) = splitThese headRanges
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange children ranges in
           ((,) <$> ranges `applyToBoth` intersections, remaining)
-
-headRangesOf :: Both [Range] -> Maybe (Join These Range)
-headRangesOf ranges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
 
 intersectsFirstLine :: (term -> Range) -> Join These Range -> [Join These term] -> Join These Bool
 intersectsFirstLine getRange ranges = maybe (False <$ ranges) (intersects getRange ranges) . listToMaybe
