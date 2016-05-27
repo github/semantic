@@ -162,9 +162,6 @@ alignBranch getRange children ranges = case intersectingChildren of
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange children ranges in
           ((,) <$> ranges `applyToBoth` intersections, remaining)
 
-intersectsFirstLine :: (term -> Range) -> Join These Range -> [Join These term] -> Join These Bool
-intersectsFirstLine getRange ranges = maybe (False <$ ranges) (intersects getRange ranges) . listToMaybe
-
 intersectsAnyLine :: (term -> Range) -> Join These Range -> [Join These term] -> Join These Bool
 intersectsAnyLine getRange ranges = foldr (orIntersects ranges) (False <$ ranges)
   where orIntersects ranges line next = fromMaybe (False <$ ranges) ((||) <$> intersects getRange ranges line `applyThese` next)
