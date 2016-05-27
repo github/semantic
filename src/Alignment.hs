@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
 module Alignment
 ( hasChanges
 , numberedRows
@@ -47,14 +47,16 @@ alignDiff :: Show leaf => Both (Source Char) -> Diff leaf Info -> [Join These (S
 alignDiff sources diff = iter (alignSyntax (runBothWith ((Join .) . These)) (free . Free) getRange sources) (alignPatch sources <$> diff)
 
 -- | Align the contents of a patch into a list of lines on the corresponding side(s) of the diff.
-alignPatch :: Show leaf => Both (Source Char) -> Patch (Term leaf Info) -> [Join These (SplitDiff leaf Info)]
+alignPatch :: forall leaf. Show leaf => Both (Source Char) -> Patch (Term leaf Info) -> [Join These (SplitDiff leaf Info)]
 alignPatch sources patch = case patch of
-  Delete term -> fmap (pure . SplitDelete) <$> hylo (alignSyntax this cofree getRange (Identity (fst sources))) runCofree (Identity <$> term)
-  Insert term -> fmap (pure . SplitInsert) <$> hylo (alignSyntax that cofree getRange (Identity (snd sources))) runCofree (Identity <$> term)
+  Delete term -> fmap (pure . SplitDelete) <$> alignSyntax' this (fst sources) term
+  Insert term -> fmap (pure . SplitInsert) <$> alignSyntax' that (snd sources) term
   Replace term1 term2 -> fmap (pure . SplitReplace) <$> alignWith (fmap (these identity identity const . runJoin) . Join)
-    (hylo (alignSyntax this cofree getRange (Identity (fst sources))) runCofree (Identity <$> term1))
-    (hylo (alignSyntax that cofree getRange (Identity (snd sources))) runCofree (Identity <$> term2))
+    (alignSyntax' this (fst sources) term1)
+    (alignSyntax' that (snd sources) term2)
   where getRange = characterRange . extract
+        alignSyntax' :: (forall a. Identity a -> Join These a) -> Source Char -> Term leaf Info -> [Join These (Term leaf Info)]
+        alignSyntax' side source term = hylo (alignSyntax side cofree getRange (Identity source)) runCofree (Identity <$> term)
         this = Join . This . runIdentity
         that = Join . That . runIdentity
 
