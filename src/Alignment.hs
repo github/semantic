@@ -152,20 +152,8 @@ maybeThese (Just a) _ = Just (This a)
 maybeThese _ (Just b) = Just (That b)
 maybeThese _ _ = Nothing
 
--- | A Monoid wrapping Join These, for which mappend is the smallest shape covering both arguments.
-newtype Union a = Union { getUnion :: Maybe (Join These a) }
-  deriving (Eq, Functor, Show)
-
 
 -- | Instances
-
-instance Monoid a => Monoid (Union a) where
-  mempty = Union Nothing
-  Union (Just a) `mappend` Union (Just b) = Union $ Join <$> uncurry maybeThese (uncurry (***) (bimap mappend mappend (unpack a)) (unpack b))
-    where unpack = fromThese Nothing Nothing . runJoin . fmap Just
-  Union (Just a) `mappend` _ = Union $ Just a
-  Union _ `mappend` Union (Just b) = Union $ Just b
-  _ `mappend` _ = Union Nothing
 
 instance Bicrosswalk t => Crosswalk (Join t) where
   crosswalk f = fmap Join . bicrosswalk f f . runJoin
