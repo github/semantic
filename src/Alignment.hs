@@ -49,10 +49,10 @@ hasChanges = or . (True <$)
 
 type AlignedDiff leaf = [Join These (SplitDiff leaf Info)]
 
-alignDiff :: Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
+alignDiff :: Show leaf => Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
 alignDiff sources diff = iter (alignSyntax (runBothWith ((Join .) . These)) (free . Free) getRange sources) (alignPatch sources <$> diff)
 
-alignPatch :: Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
+alignPatch :: Show leaf => Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
 alignPatch sources patch = case patch of
   Delete term -> fmap (pure . SplitDelete) <$> hylo (alignSyntax this cofree getRange (Identity (fst sources))) runCofree (Identity <$> term)
   Insert term -> fmap (pure . SplitInsert) <$> hylo (alignSyntax that cofree getRange (Identity (snd sources))) runCofree (Identity <$> term)
@@ -64,7 +64,7 @@ alignPatch sources patch = case patch of
         that = Join . That . runIdentity
 
 -- | The Applicative instance f is either Identity or Both. Identity is for Terms in Patches, Both is for Diffs in unchanged portions of the diff.
-alignSyntax :: Applicative f => (forall a. f a -> Join These a) -> (CofreeF (Syntax leaf) Info term -> term) -> (term -> Range) -> f (Source Char) -> CofreeF (Syntax leaf) (f Info) [Join These term] -> [Join These term]
+alignSyntax :: (Applicative f, Show term) => (forall a. f a -> Join These a) -> (CofreeF (Syntax leaf) Info term -> term) -> (term -> Range) -> f (Source Char) -> CofreeF (Syntax leaf) (f Info) [Join These term] -> [Join These term]
 alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax of
   Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> sequenceL lineRanges
   Indexed children -> catMaybes $ wrapInBranch (Indexed . fmap runIdentity) <$> alignBranch getRange (Identity <$> children) (modifyJoin (fromThese [] []) lineRanges)
@@ -126,7 +126,7 @@ We should avoid taking asymmetrical children greedily so as not to misalign asym
 -}
 
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
-alignBranch :: (Copointed c, Functor c) => (term -> Range) -> [c [Join These term]] -> Both [Range] -> [Join These (Range, [c term])]
+alignBranch :: (Copointed c, Functor c, Show term) => (term -> Range) -> [c [Join These term]] -> Both [Range] -> [Join These (Range, [c term])]
 -- The first child is empty, and so can safely be dropped.
 alignBranch getRange (first:children) ranges | null (copoint first) = alignBranch getRange children ranges
 -- There are no more ranges, so we’re done.

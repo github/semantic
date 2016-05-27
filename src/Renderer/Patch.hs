@@ -110,7 +110,7 @@ emptyHunk :: Hunk (SplitDiff a Info)
 emptyHunk = Hunk { offset = mempty, changes = [], trailingContext = [] }
 
 -- | Render a diff as a series of hunks.
-hunks :: Diff a Info -> Both SourceBlob -> [Hunk (SplitDiff a Info)]
+hunks :: Show a => Diff a Info -> Both SourceBlob -> [Hunk (SplitDiff a Info)]
 hunks _ blobs | sources <- source <$> blobs
               , sourcesEqual <- runBothWith (==) sources
               , sourcesNull <- runBothWith (&&) (null <$> sources)
