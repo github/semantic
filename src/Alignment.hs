@@ -177,14 +177,14 @@ alignChildren getRange (first:rest) headRanges
   | (firstLine:restOfLines) <- copoint first
   , ~(l, r) <- splitThese firstLine
   = case fromThese False False . runJoin $ intersectsFirstLine getRange headRanges (copoint first) of
-  -- It intersects on both sides, so we can just take the first line whole.
-  (True, True) -> ((++) <$> toTerms firstLine <*> firstRemaining, (restOfLines <$ first) : restRemaining)
-  -- It only intersects on the left, so split it up.
-  (True, False) -> ((++) <$> toTerms (fromJust l) <*> firstRemaining, (maybe identity (:) r restOfLines <$ first) : restRemaining)
-  -- It only intersects on the right, so split it up.
-  (False, True) -> ((++) <$> toTerms (fromJust r) <*> firstRemaining, (maybe identity (:) l restOfLines <$ first) : restRemaining)
-  -- It doesn’t intersect at all, so skip it and move along.
-  (False, False) -> (firstRemaining, first:restRemaining)
+    -- It intersects on both sides, so we can just take the first line whole.
+    (True, True) -> ((++) <$> toTerms firstLine <*> firstRemaining, (restOfLines <$ first) : restRemaining)
+    -- It only intersects on the left, so split it up.
+    (True, False) -> ((++) <$> toTerms (fromJust l) <*> firstRemaining, (maybe identity (:) r restOfLines <$ first) : restRemaining)
+    -- It only intersects on the right, so split it up.
+    (False, True) -> ((++) <$> toTerms (fromJust r) <*> firstRemaining, (maybe identity (:) l restOfLines <$ first) : restRemaining)
+    -- It doesn’t intersect at all, so skip it and move along.
+    (False, False) -> (firstRemaining, first:restRemaining)
   | otherwise = alignChildren getRange rest headRanges
   where (firstRemaining, restRemaining) = alignChildren getRange rest headRanges
         toTerms line = modifyJoin (fromThese [] []) (pure . (<$ first) <$> line)
