@@ -150,9 +150,11 @@ alignBranch getRange children ranges = case intersectingChildren of
     Just (True, False) -> let (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> rightRange in
       rightLine $ alignBranch getRange (remainingAtRight ++ remainingIntersectingChildren ++ nonIntersectingChildren) (modifyJoin (second (drop 1)) ranges)
     -- No symmetrical child intersects, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
-    _ -> let (leftLine, remainingAtLeft) = maybe (identity, []) (first (:)) $ leftRange >>= lineAndRemainingWhere (maybe False (isThis . runJoin) . head . copoint) asymmetricalChildren
-             (rightLine, remainingAtRight) = maybe (identity, []) (first (:)) $ rightRange >>= lineAndRemainingWhere (maybe False (isThat . runJoin) . head . copoint) asymmetricalChildren in
-      leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast (fromJust . head . copoint <$> asymmetricalChildren))) ranges)
+    _ -> if any (maybe False (isThis . runJoin) . head . copoint) asymmetricalChildren
+        then let (leftLine, remainingAtLeft) = maybe (identity, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> leftRange in
+          leftLine $ alignBranch getRange (remainingAtLeft ++ nonIntersectingChildren) (modifyJoin (first (drop 1)) ranges)
+        else let (rightLine, remainingAtRight) = maybe (identity, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> rightRange in
+          rightLine $ alignBranch getRange (remainingAtRight ++ nonIntersectingChildren) (modifyJoin (second (drop 1)) ranges)
   where (intersectingChildren, nonIntersectingChildren) = partition (or . intersectsFirstLine getRange headRanges . copoint) children
         (remainingIntersectingChildren, asymmetricalChildren) = partition (maybe False (isThese . runJoin) . head . copoint) intersectingChildren
         Just headRanges = headRangesOf ranges
