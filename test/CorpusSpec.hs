@@ -10,14 +10,11 @@ import qualified Renderer.Split as Split
 
 import Control.DeepSeq
 import Data.Functor.Both
-import qualified Data.ByteString.Lazy.Char8 as B
 import Data.List as List
 import Data.Map as Map
 import Data.Set as Set
 import qualified Data.Text as T
-import qualified Data.Text.Lazy as TL
 import Prologue hiding (fst, snd)
-import qualified Prologue
 import qualified Source as S
 import System.FilePath
 import System.FilePath.Glob
