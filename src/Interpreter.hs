@@ -29,7 +29,7 @@ interpret comparable cost a b = fromMaybe (pure $ Replace a b) $ constructAndRun
 
 -- | Constructs an algorithm and runs it
 constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Cost a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
-constructAndRun _ _ a b | a == b = hylo (\termF -> free . Free $ headF termF :< tailF termF) runCofree <$> zipTerms a b
+constructAndRun _ _ a b | a == b = hylo (free . Free) runCofree <$> zipTerms a b
 
 constructAndRun comparable _ a b | not $ comparable a b = Nothing
 
