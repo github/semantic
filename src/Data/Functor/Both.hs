@@ -44,10 +44,12 @@ instance Applicative Both where
   pure a = Both (a, a)
   Both (f, g) <*> Both (a, b) = Both (f a, g b)
 
-instance Monoid a => Monoid (Both a) where
+instance (Semigroup a, Monoid a) => Monoid (Both a) where
   mempty = pure mempty
-  mappend a b = mappend <$> a <*> b
+  mappend = (<>)
 
+instance Semigroup a => Semigroup (Both a) where
+  a <> b = (<>) <$> a <*> b
 
 instance TotalCrosswalk Both where
   tsequenceL d = runBothWith (alignWith (\ these -> fromMaybe <$> d <*> maybeBothOfThese these))

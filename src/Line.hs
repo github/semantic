@@ -52,9 +52,13 @@ instance Applicative Line where
   as <*> bs | isOpen as && isOpen bs = Line (unLine as <*> unLine bs)
             | otherwise = Closed (unLine as <*> unLine bs)
 
+
+instance Semigroup (Line a) where
+  xs <> ys = lineMap ((<>) (unLine xs)) ys
+
 instance Monoid (Line a) where
   mempty = Line []
-  mappend xs ys = lineMap (mappend (unLine xs)) ys
+  mappend = (<>)
 
 instance Coalescent (Line a) where
   coalesce a b | isOpen a = pure (a `mappend` b)

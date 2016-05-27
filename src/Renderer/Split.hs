@@ -22,6 +22,7 @@ import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 import qualified Text.Blaze.Internal as Blaze
 
+
 -- | Add the first category from a Foldable of categories as a class name as a
 -- | class name on the markup, prefixed by `category-`.
 classifyMarkup :: Prologue.Foldable f => f Category -> Markup -> Markup
@@ -51,10 +52,10 @@ splitPatchToClassName patch = stringValue $ "patch " ++ case patch of
 split :: Renderer
 split diff blobs = TL.toStrict . renderHtml
   . docTypeHtml
-    . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
+    . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") `mappend`)
     . body
       . (table ! A.class_ (stringValue "diff")) $
-        ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
+        ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) `mappend` col `mappend` (col ! A.width (stringValue . show $ columnWidth)) `mappend` col) `mappend`)
         . mconcat $ numberedLinesToMarkup <$> numbered
   where
     sources = Source.source <$> blobs
@@ -72,7 +73,7 @@ split diff blobs = TL.toStrict . renderHtml
 
     -- | Render a line with numbers as an HTML row.
     numberedLinesToMarkup :: Both (Int, Line (SplitDiff a Info)) -> Markup
-    numberedLinesToMarkup numberedLines = tr $ runBothWith (<>) (renderLine <$> numberedLines <*> sources) <> string "\n"
+    numberedLinesToMarkup numberedLines = tr $ runBothWith mappend (renderLine <$> numberedLines <*> sources) `mappend` string "\n"
 
     renderLine :: (Int, Line (SplitDiff leaf Info)) -> Source Char -> Markup
     renderLine (number, line) source = toMarkup $ Renderable (hasChanges line, number, Renderable . (,) source <$> line)
@@ -111,9 +112,9 @@ instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
 instance ToMarkup a => ToMarkup (Renderable (Bool, Int, Line a)) where
   toMarkup (Renderable (_, _, line)) | isEmpty line =
     td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
-    <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
-    <> string "\n"
+    `mappend` td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
+    `mappend` string "\n"
   toMarkup (Renderable (hasChanges, num, line)) =
     td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
-    <> td (mconcat $ toMarkup <$> unLine line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
-    <> string "\n"
+    `mappend` td (mconcat $ toMarkup <$> unLine line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
+    `mappend` string "\n"

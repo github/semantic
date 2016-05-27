@@ -9,28 +9,20 @@ module Alignment
 ) where
 
 import Control.Arrow
-import Control.Comonad.Trans.Cofree
-import Data.Functor.Foldable hiding (Foldable)
-import Control.Monad
-import Control.Monad.Trans.Free
+import Data.Functor.Foldable
 import Data.Adjoined
 import Data.Align
 import Data.Bifunctor.These
 import Data.Coalescent
 import Data.Copointed
-import Data.Foldable
 import Data.Functor.Both as Both
-import Data.Functor.Identity
-import Data.Maybe
-import Data.Monoid
 import qualified Data.OrderedMap as Map
 import qualified Data.Text as T
 import Diff
 import Info
 import Line
 import Patch
-import Prologue hiding (first, fst, snd)
-import qualified Prologue
+import Prologue as Prologue hiding (first)
 import Range
 import Source hiding (fromList, uncons)
 import SplitDiff
@@ -56,9 +48,9 @@ splitPatchByLines :: Both (Source Char) -> Patch (Term leaf Info) -> Adjoined (B
 splitPatchByLines sources patch = wrapTermInPatch <$> splitAndFoldTerm (unPatch patch)
     where
       splitAndFoldTerm :: These (Term leaf Info) (Term leaf Info) -> Adjoined (Both (Line (Term leaf Info, Range)))
-      splitAndFoldTerm (This deleted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm ((cofree.) . (:<)) (Identity $ fst sources)) (hylo (cofree . annotationMap Identity) runCofree deleted)) nil
-      splitAndFoldTerm (That inserted) = tsequenceL mempty $ both nil (runIdentity <$> cata (splitAbstractedTerm ((cofree .) . (:<)) (Identity $ snd sources)) (hylo (cofree . annotationMap Identity) runCofree inserted))
-      splitAndFoldTerm (These deleted inserted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm ((cofree  .) . (:<)) (Identity $ fst sources)) (hylo (cofree . annotationMap Identity) runCofree deleted)) (runIdentity <$> cata (splitAbstractedTerm ((cofree .) . (:<)) (Identity $ snd sources)) (hylo (cofree . annotationMap Identity) runCofree inserted))
+      splitAndFoldTerm (This deleted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm ((cofree.) . (:<)) (Identity $ Both.fst sources)) (hylo (cofree . annotationMap Identity) runCofree deleted)) nil
+      splitAndFoldTerm (That inserted) = tsequenceL mempty $ both nil (runIdentity <$> cata (splitAbstractedTerm ((cofree .) . (:<)) (Identity $ Both.snd sources)) (hylo (cofree . annotationMap Identity) runCofree inserted))
+      splitAndFoldTerm (These deleted inserted) = tsequenceL mempty $ both (runIdentity <$> cata (splitAbstractedTerm ((cofree  .) . (:<)) (Identity $ Both.fst sources)) (hylo (cofree . annotationMap Identity) runCofree deleted)) (runIdentity <$> cata (splitAbstractedTerm ((cofree .) . (:<)) (Identity $ Both.snd sources)) (hylo (cofree . annotationMap Identity) runCofree inserted))
       wrapTermInPatch = fmap (fmap (first (free . Pure . constructor patch)))
       constructor (Replace _ _) = SplitReplace
       constructor (Insert _) = SplitInsert

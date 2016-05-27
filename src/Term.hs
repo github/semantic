@@ -12,8 +12,8 @@ type TermF a annotation = CofreeF (Syntax a) annotation
 type Term a annotation = Cofree (Syntax a) annotation
 
 type instance Base (Cofree f a) = CofreeF f a
-instance Functor f => Foldable.Foldable (Cofree f a) where project = runCofree
-instance Functor f => Foldable.Unfoldable (Cofree f a) where embed = cofree
+instance Functor f => Recursive (Cofree f a) where project = runCofree
+instance Functor f => Corecursive (Cofree f a) where embed = cofree
 
 -- | Zip two terms by combining their annotations into a pair of annotations.
 -- | If the structure of the two terms don't match, then Nothing will be returned.

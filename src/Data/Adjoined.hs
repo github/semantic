@@ -53,7 +53,10 @@ instance Monad Adjoined where
 
 instance Coalescent a => Monoid (Adjoined a) where
   mempty = Adjoined Seq.empty
-  a `mappend` b | Just (as, a) <- unsnoc a,
+  a `mappend` b = a <> b
+
+instance Coalescent a => Semigroup (Adjoined a) where
+  a <> b | Just (as, a) <- unsnoc a,
                   Just (b, bs) <- uncons b
                 = as <|> coalesce a b <|> bs
                 | otherwise = Adjoined (unAdjoined a >< unAdjoined b)
