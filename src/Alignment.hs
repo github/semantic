@@ -81,28 +81,28 @@ alignBranch getRange children ranges = case intersectingChildren of
   -- No child intersects the current ranges on either side, so advance.
   [] -> (flip (,) [] <$> headRanges) : alignBranch getRange children (drop 1 <$> ranges)
   -- At least one child intersects on at least one side.
-  _ -> case fromThese True True . runJoin . intersects getRange headRanges <$> listToMaybe remainingIntersectingChildren of
+  _ -> case intersectionsWithHeadRanges <$> listToMaybe symmetricalChildren of
     -- At least one child intersects on both sides, so align symmetrically.
-    Just (True, True) -> let (line, remaining) = lineAndRemaining intersectingChildren headRanges in
-      line : alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
+    Just (True, True) -> let (line, remaining) = lineAndRemaining intersectingChildren (Just headRanges) in
+      line $ alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
     -- A symmetrical child intersects on the right, so align asymmetrically on the left.
-    Just (False, True) -> let (leftLine, remainingAtLeft) = maybe (id, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> leftRange in
-      leftLine $ alignBranch getRange (remainingAtLeft ++ remainingIntersectingChildren ++ nonIntersectingChildren) (modifyJoin (first (drop 1)) ranges)
+    Just (False, True) -> alignAsymmetrically leftRange first
     -- A symmetrical child intersects on the left, so align asymmetrically on the right.
-    Just (True, False) -> let (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> rightRange in
-      rightLine $ alignBranch getRange (remainingAtRight ++ remainingIntersectingChildren ++ nonIntersectingChildren) (modifyJoin (second (drop 1)) ranges)
+    Just (True, False) -> alignAsymmetrically rightRange second
     -- No symmetrical child intersects, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
     _ -> if any (isThis . runJoin) asymmetricalChildren
-        then let (leftLine, remainingAtLeft) = maybe (identity, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> leftRange in
-          leftLine $ alignBranch getRange (remainingAtLeft ++ nonIntersectingChildren) (modifyJoin (first (drop 1)) ranges)
-        else let (rightLine, remainingAtRight) = maybe (identity, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> rightRange in
-          rightLine $ alignBranch getRange (remainingAtRight ++ nonIntersectingChildren) (modifyJoin (second (drop 1)) ranges)
+         then alignAsymmetrically leftRange first
+         else alignAsymmetrically rightRange second
   where (intersectingChildren, nonIntersectingChildren) = partition (or . intersects getRange headRanges) children
-        (remainingIntersectingChildren, asymmetricalChildren) = partition (isThese . runJoin) intersectingChildren
+        (symmetricalChildren, asymmetricalChildren) = partition (isThese . runJoin) intersectingChildren
+        intersectionsWithHeadRanges = fromThese True True . runJoin . intersects getRange headRanges
         Just headRanges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
         (leftRange, rightRange) = splitThese headRanges
-        lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange children ranges in
-          ((,) <$> ranges `applyToBoth` intersections, remaining)
+        alignAsymmetrically range advanceBy = let (line, remaining) = lineAndRemaining asymmetricalChildren range in
+          line $ alignBranch getRange (remaining ++ symmetricalChildren ++ nonIntersectingChildren) (modifyJoin (advanceBy (drop 1)) ranges)
+        lineAndRemaining _ Nothing = (identity, [])
+        lineAndRemaining children (Just ranges) = let (intersections, remaining) = alignChildren getRange children ranges in
+          ((:) $ (,) <$> ranges `applyToBoth` intersections, remaining)
 
 -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
 alignChildren :: (term -> Range) -> [Join These (term)] -> Join These Range -> (Both [term], [Join These term])
