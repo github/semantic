@@ -1,12 +1,9 @@
 module SplitDiff where
 
 import Info
-import Control.Comonad.Cofree ()
-import Control.Monad.Free (Free(..))
-import Data.Copointed
-import Diff (Annotated(..))
 import Range
 import Prologue
+import Syntax
 import Term (Term)
 
 -- | A patch to only one side of a diff.
@@ -21,9 +18,9 @@ getSplitTerm (SplitReplace a) = a
 
 -- | Get the range of a SplitDiff.
 getRange :: SplitDiff leaf Info -> Range
-getRange diff = characterRange $ case diff of
-  Free annotated -> annotation annotated
-  Pure patch -> copoint (getSplitTerm patch)
+getRange diff = characterRange $ case runFree diff of
+  Free annotated -> headF annotated
+  Pure patch -> extract (getSplitTerm patch)
 
 -- | A diff with only one side’s annotations.
-type SplitDiff leaf annotation = Free (Annotated leaf annotation) (SplitPatch (Term leaf annotation))
+type SplitDiff leaf annotation = Free (CofreeF (Syntax leaf) annotation) (SplitPatch (Term leaf annotation))

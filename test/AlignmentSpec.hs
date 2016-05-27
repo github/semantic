@@ -4,8 +4,6 @@ module AlignmentSpec where
 import Alignment
 import ArbitraryTerm ()
 import Control.Arrow ((&&&))
-import Control.Comonad.Cofree
-import Control.Monad.Free
 import Control.Monad.State
 import Data.Align hiding (align)
 import Data.Bifunctor
@@ -278,7 +276,7 @@ instance Show a => Show (PrettyDiff a) where
           pad n string = (++) (take n string) (replicate (max 0 (n - length string)) ' ')
           toBoth them = showDiff <$> them `applyThese` modifyJoin (uncurry These) sources
 
-newtype ConstructibleFree patch annotation = ConstructibleFree { deconstruct :: Free (Annotated String annotation) patch }
+newtype ConstructibleFree patch annotation = ConstructibleFree { deconstruct :: Free (CofreeF (Syntax String) annotation) patch }
 
 
 class PatchConstructible p where
@@ -294,18 +292,17 @@ instance PatchConstructible (SplitPatch (Term String Info)) where
   delete = SplitDelete
 
 instance PatchConstructible patch => PatchConstructible (ConstructibleFree patch annotation) where
-  insert = ConstructibleFree . Pure . insert
-  delete = ConstructibleFree . Pure . delete
-
+  insert = ConstructibleFree . pure . insert
+  delete = ConstructibleFree . pure . delete
 
 class SyntaxConstructible s where
   leaf :: annotation -> String -> s annotation
   branch :: annotation -> [s annotation] -> s annotation
 
 instance SyntaxConstructible (ConstructibleFree patch) where
-  leaf info = ConstructibleFree . Free . Annotated info . Leaf
-  branch info = ConstructibleFree . Free . Annotated info . Indexed . fmap deconstruct
+  leaf info = ConstructibleFree . free . Free . (info :<) . Leaf
+  branch info = ConstructibleFree . free . Free . (info :<) . Indexed . fmap deconstruct
 
 instance SyntaxConstructible (Cofree (Syntax String)) where
-  info `leaf` value = info :< Leaf value
-  info `branch` children = info :< Indexed children
+  info `leaf` value = cofree $ info :< Leaf value
+  info `branch` children = cofree $ info :< Indexed children

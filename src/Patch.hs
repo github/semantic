@@ -1,4 +1,12 @@
-module Patch where
+module Patch
+( Patch(..)
+, after
+, before
+, unPatch
+, patchSum
+, maybeFst
+, maybeSnd
+) where
 
 import Data.These
 import Prologue

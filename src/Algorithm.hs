@@ -1,6 +1,6 @@
 module Algorithm where
 
-import Control.Monad.Free
+import Control.Monad.Trans.Free
 import Operation
 
 -- | A lazily-produced AST for diffing.

@@ -11,10 +11,8 @@ module Alignment
 ) where
 
 import Control.Applicative
-import Control.Arrow ((&&&), (***))
-import Control.Comonad.Cofree
+import Control.Arrow ((***))
 import Control.Monad
-import Control.Monad.Free
 import Data.Align
 import Data.Biapplicative
 import Data.Bifunctor.Join
@@ -22,6 +20,7 @@ import Data.Copointed
 import Data.Foldable
 import Data.Function
 import Data.Functor.Both as Both
+import Data.Functor.Foldable hiding (Foldable, fold)
 import Data.Functor.Identity
 import Data.List (partition)
 import Data.Maybe
@@ -51,28 +50,28 @@ hasChanges = or . (True <$)
 type AlignedDiff leaf = [Join These (SplitDiff leaf Info)]
 
 alignDiff :: Both (Source Char) -> Diff leaf Info -> AlignedDiff leaf
-alignDiff sources diff = iter (uncurry (alignSyntax (runBothWith ((Join .) . These)) ((Free .) . Annotated) getRange sources) . (annotation &&& syntax)) (alignPatch sources <$> diff)
+alignDiff sources diff = iter (alignSyntax (runBothWith ((Join .) . These)) (free . Free) getRange sources) (alignPatch sources <$> diff)
 
 alignPatch :: Both (Source Char) -> Patch (Term leaf Info) -> AlignedDiff leaf
 alignPatch sources patch = case patch of
-  Delete term -> fmap (Pure . SplitDelete) <$> hylo (alignSyntax this (:<) getRange (Identity (fst sources))) unCofree (Identity <$> term)
-  Insert term -> fmap (Pure . SplitInsert) <$> hylo (alignSyntax that (:<) getRange (Identity (snd sources))) unCofree (Identity <$> term)
-  Replace term1 term2 -> fmap (Pure . SplitReplace) <$> alignWith (fmap (these identity identity const . runJoin) . Join)
-    (hylo (alignSyntax this (:<) getRange (Identity (fst sources))) unCofree (Identity <$> term1))
-    (hylo (alignSyntax that (:<) getRange (Identity (snd sources))) unCofree (Identity <$> term2))
-  where getRange = characterRange . copoint
+  Delete term -> fmap (pure . SplitDelete) <$> hylo (alignSyntax this cofree getRange (Identity (fst sources))) runCofree (Identity <$> term)
+  Insert term -> fmap (pure . SplitInsert) <$> hylo (alignSyntax that cofree getRange (Identity (snd sources))) runCofree (Identity <$> term)
+  Replace term1 term2 -> fmap (pure . SplitReplace) <$> alignWith (fmap (these identity identity const . runJoin) . Join)
+    (hylo (alignSyntax this cofree getRange (Identity (fst sources))) runCofree (Identity <$> term1))
+    (hylo (alignSyntax that cofree getRange (Identity (snd sources))) runCofree (Identity <$> term2))
+  where getRange = characterRange . extract
         this = Join . This . runIdentity
         that = Join . That . runIdentity
 
 -- | The Applicative instance f is either Identity or Both. Identity is for Terms in Patches, Both is for Diffs in unchanged portions of the diff.
-alignSyntax :: Applicative f => (forall a. f a -> Join These a) -> (Info -> Syntax leaf term -> term) -> (term -> Range) -> f (Source Char) -> f Info -> Syntax leaf [Join These term] -> [Join These term]
-alignSyntax toJoinThese toNode getRange sources infos syntax = case syntax of
+alignSyntax :: Applicative f => (forall a. f a -> Join These a) -> (CofreeF (Syntax leaf) Info term -> term) -> (term -> Range) -> f (Source Char) -> CofreeF (Syntax leaf) (f Info) [Join These term] -> [Join These term]
+alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax of
   Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> sequenceL lineRanges
   Indexed children -> catMaybes $ wrapInBranch (Indexed . fmap runIdentity) <$> alignBranch getRange (Identity <$> children) (modifyJoin (fromThese [] []) lineRanges)
   Fixed children -> catMaybes $ wrapInBranch (Fixed . fmap runIdentity) <$> alignBranch getRange (Identity <$> children) (modifyJoin (fromThese [] []) lineRanges)
   Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> alignBranch getRange (Map.toList children) (modifyJoin (fromThese [] []) lineRanges)
   where lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
-        wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (info { characterRange = range }) (constructor children)) <$> infos)
+        wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (info { characterRange = range } :< constructor children)) <$> infos)
 
 {-
 

@@ -5,8 +5,13 @@ module Renderer.Patch (
   truncatePatch
 ) where
 
-import Data.String
 import Alignment
+import Data.Bifunctor.Join
+import Data.Functor.Both as Both
+import Data.List (span, unzip)
+import Data.String
+import Data.Text (pack)
+import Data.These
 import Diff
 import Info
 import Patch
@@ -14,18 +19,13 @@ import Prologue hiding (fst, snd)
 import Renderer
 import Source hiding ((++), break)
 import SplitDiff
-import Data.Bifunctor.Join
-import Data.Functor.Both as Both
-import Data.List
-import Data.Text (pack)
-import Data.These
 
 -- | Render a timed out file as a truncated diff.
 truncatePatch :: DiffArguments -> Both SourceBlob -> Text
 truncatePatch _ blobs = pack $ header blobs ++ "#timed_out\nTruncating diff: timeout reached.\n"
 
 -- | Render a diff in the traditional patch format.
-patch :: Renderer a
+patch :: Renderer
 patch diff blobs = pack $ case getLast (foldMap (Last . Just) string) of
   Just c | c /= '\n' -> string ++ "\n\\ No newline at end of file\n"
   _ -> string

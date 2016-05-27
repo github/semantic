@@ -3,10 +3,9 @@
 module ArbitraryTerm where
 
 import Category
-import Control.Comonad.Cofree
-import Control.Monad
 import Data.Bifunctor.Join
 import Data.Functor.Both
+import Data.Functor.Foldable
 import qualified Data.OrderedMap as Map
 import qualified Data.List as List
 import qualified Data.Set as Set
@@ -18,7 +17,6 @@ import Prologue hiding (fst, snd)
 import Range
 import Source hiding ((++))
 import Syntax
-import GHC.Generics
 import Term
 import Test.QuickCheck hiding (Fixed)
 
@@ -27,7 +25,7 @@ newtype ArbitraryTerm a annotation = ArbitraryTerm (annotation, Syntax a (Arbitr
 
 unTerm :: ArbitraryTerm a annotation -> Term a annotation
 unTerm = unfold unpack
-  where unpack (ArbitraryTerm (annotation, syntax)) = (annotation, syntax)
+  where unpack (ArbitraryTerm (annotation, syntax)) = annotation :< syntax
 
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = scale (`div` 2) $ sized (\ x -> boundedTerm x x) -- first indicates the cube of the max length of lists, second indicates the cube of the max depth of the tree

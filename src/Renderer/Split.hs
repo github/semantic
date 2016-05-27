@@ -4,16 +4,12 @@ module Renderer.Split where
 import Data.String
 import Alignment
 import Category
-import Control.Comonad.Cofree
-import Control.Monad.Free
 import Data.Bifunctor.Join
 import Data.Foldable
 import Data.Functor.Both
-import Data.Maybe
-import Data.Monoid
+import Data.Functor.Foldable (cata)
 import qualified Data.Text.Lazy as TL
 import Data.These
-import Diff
 import Info
 import Prologue hiding (div, head, fst, snd, link)
 import qualified Prologue
@@ -35,7 +31,7 @@ maybeFirst = foldr (const . Just) Nothing
 
 -- | Add the first category from a Foldable of categories as a class name as a
 -- | class name on the markup, prefixed by `category-`.
-classifyMarkup :: Foldable f => f Category -> Markup -> Markup
+classifyMarkup :: Prologue.Foldable f => f Category -> Markup -> Markup
 classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . styleName) $ maybeFirst categories
 
 -- | Return the appropriate style name for the given category.
@@ -59,7 +55,7 @@ splitPatchToClassName patch = stringValue $ "patch " ++ case patch of
   SplitReplace _ -> "replace"
 
 -- | Render a diff as an HTML split diff.
-split :: Renderer leaf
+split :: Renderer
 split diff blobs = TL.toStrict . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
@@ -117,14 +113,13 @@ wrapIn _ l@Blaze.Comment{} = l
 wrapIn f p = f p
 
 instance ToMarkup (Renderable (Source Char, Term a Info)) where
-  toMarkup (Renderable (source, term)) = Prologue.fst $ cata (\ info@(Info range _ _) syntax -> (toMarkup $ Renderable (source, info, syntax), range)) term
+  toMarkup (Renderable (source, term)) = Prologue.fst $ cata (\ (info@(Info range _ _) :< syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) term
 
 instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
-  toMarkup (Renderable (source, diff)) = Prologue.fst $ iter (\ (Annotated info@(Info range _ _) syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) $ toMarkupAndRange <$> diff
+  toMarkup (Renderable (source, diff)) = Prologue.fst $ iter (\ (info@(Info range _ _) :< syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) $ toMarkupAndRange <$> diff
     where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
-          toMarkupAndRange patch = let term@(Info range _ size :< _) = getSplitTerm patch in
-            ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue (show size))) . toMarkup $ Renderable (source, term), range)
-
+          toMarkupAndRange patch = let term@(Info range _ size :< _) = runCofree $ getSplitTerm patch in
+            ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue (show size))) . toMarkup $ Renderable (source, cofree term), range)
 
 instance ToMarkup a => ToMarkup (Renderable (Bool, Int, a)) where
   toMarkup (Renderable (hasChanges, num, line)) =

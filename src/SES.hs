@@ -4,8 +4,7 @@ import Prologue
 import Patch
 import Diff
 import Term
-import Control.Monad.Free
-import Data.Map as Map hiding (foldr)
+import qualified Data.Map as Map
 
 -- | A function that maybe creates a diff from two terms.
 type Compare a annotation = Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
@@ -22,9 +21,9 @@ ses diffTerms cost as bs = fst <$> evalState diffState Map.empty where
 diffAt :: Compare a annotation -> Cost a annotation -> (Integer, Integer) -> [Term a annotation] -> [Term a annotation] -> State (Map.Map (Integer, Integer) [(Diff a annotation, Integer)]) [(Diff a annotation, Integer)]
 diffAt _ _ _ [] [] = pure []
 diffAt _ cost _ [] bs = pure $ foldr toInsertions [] bs where
-  toInsertions each = consWithCost cost (Pure . Insert $ each)
+  toInsertions each = consWithCost cost (free . Pure . Insert $ each)
 diffAt _ cost _ as [] = pure $ foldr toDeletions [] as where
-  toDeletions each = consWithCost cost (Pure . Delete $ each)
+  toDeletions each = consWithCost cost (free . Pure . Delete $ each)
 diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
   cachedDiffs <- get
   case Map.lookup (i, j) cachedDiffs of
@@ -41,8 +40,8 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
       put $ Map.insert (i, j) nomination cachedDiffs'
       pure nomination
   where
-    delete = consWithCost cost (Pure . Delete $ a)
-    insert = consWithCost cost (Pure . Insert $ b)
+    delete = consWithCost cost (free . Pure . Delete $ a)
+    insert = consWithCost cost (free . Pure . Insert $ b)
     costOf [] = 0
     costOf ((_, c) : _) = c
     best = minimumBy (comparing costOf)
