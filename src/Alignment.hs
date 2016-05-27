@@ -150,11 +150,11 @@ alignBranch getRange children ranges = case intersectingChildren of
     Just (True, False) -> let (rightLine, remainingAtRight) = maybe (id, []) (first (:)) $ lineAndRemaining asymmetricalChildren <$> rightRange in
       rightLine $ alignBranch getRange (remainingAtRight ++ remainingIntersectingChildren ++ nonIntersectingChildren) (modifyJoin (second (drop 1)) ranges)
     -- No symmetrical child intersects, so align asymmetrically, picking the left side first to match the deletion/insertion order convention in diffs.
-    _ -> let (leftLine, remainingAtLeft) = maybe (identity, []) (first (:)) $ leftRange >>= lineAndRemainingWhere (isThis . runJoin . fromJust . head . copoint) asymmetricalChildren
-             (rightLine, remainingAtRight) = maybe (identity, []) (first (:)) $ rightRange >>= lineAndRemainingWhere (isThat . runJoin . fromJust . head . copoint) asymmetricalChildren in
+    _ -> let (leftLine, remainingAtLeft) = maybe (identity, []) (first (:)) $ leftRange >>= lineAndRemainingWhere (maybe False (isThis . runJoin) . head . copoint) asymmetricalChildren
+             (rightLine, remainingAtRight) = maybe (identity, []) (first (:)) $ rightRange >>= lineAndRemainingWhere (maybe False (isThat . runJoin) . head . copoint) asymmetricalChildren in
       leftLine $ rightLine $ alignBranch getRange (remainingAtLeft ++ remainingAtRight ++ nonIntersectingChildren) (modifyJoin (uncurry bimap (advancePast (fromJust . head . copoint <$> asymmetricalChildren))) ranges)
   where (intersectingChildren, nonIntersectingChildren) = partition (or . intersectsFirstLine getRange headRanges . copoint) children
-        (remainingIntersectingChildren, asymmetricalChildren) = partition (isThese . runJoin . fromJust . head . copoint) intersectingChildren
+        (remainingIntersectingChildren, asymmetricalChildren) = partition (maybe False (isThese . runJoin) . head . copoint) intersectingChildren
         Just headRanges = headRangesOf ranges
         (leftRange, rightRange) = splitThese headRanges
         lineAndRemaining children ranges = let (intersections, remaining) = alignChildren getRange children ranges in
