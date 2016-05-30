@@ -82,7 +82,7 @@ testDiff renderer paths diff matcher = do
         sourceBlobs sources = pure S.SourceBlob <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)
 
 newtype Verbatim = Verbatim Text
-  deriving Eq
+  deriving (Eq, NFData)
 
 instance Show Verbatim where
   showsPrec _ (Verbatim text) = (T.unpack text ++)
