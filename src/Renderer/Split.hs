@@ -126,3 +126,11 @@ instance ToMarkup a => ToMarkup (Renderable (Bool, Int, a)) where
     td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
     <> td (toMarkup line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
     <> string "\n"
+
+showRational :: Rational -> String
+showRational n = maybe (show n) show (toRoundIntegral n)
+  where toRoundIntegral :: Rational -> Maybe Integer
+        toRoundIntegral n = if n == fromIntegral integral
+          then Just integral
+          else Nothing
+        integral = round n
