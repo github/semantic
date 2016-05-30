@@ -127,6 +127,7 @@ instance ToMarkup a => ToMarkup (Renderable (Bool, Int, a)) where
     <> td (toMarkup line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
     <> string "\n"
 
+-- | Show round `Rational` values as equivalent `Integer`s, falling back to the `Show` instance for other values.
 showRational :: Rational -> String
 showRational n = maybe (show n) show (toRoundIntegral n)
   where toRoundIntegral :: Rational -> Maybe Integer
