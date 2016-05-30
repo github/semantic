@@ -32,7 +32,7 @@ spec = parallel $ do
     examples "test/diffs/" `shouldNotReturn` []
 
   where
-    runTestsIn :: String -> (T.Text -> T.Text -> Expectation) -> SpecWith ()
+    runTestsIn :: FilePath -> (T.Text -> T.Text -> Expectation) -> SpecWith ()
     runTestsIn directory matcher = do
       paths <- runIO $ examples directory
       let tests = correctTests =<< paths
