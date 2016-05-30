@@ -57,7 +57,7 @@ examples directory = do
   let keys = Set.unions $ keysSet <$> [as, bs]
   pure $ (\name -> (both (as ! name) (bs ! name), Map.lookup name jsons, Map.lookup name patches, Map.lookup name splits)) <$> sort (Set.toList keys)
   where
-    globFor :: String -> IO [FilePath]
+    globFor :: FilePath -> IO [FilePath]
     globFor p = globDir1 (compile p) directory
     toDict list = Map.fromList ((normalizeName <$> list) `zip` list)
 
