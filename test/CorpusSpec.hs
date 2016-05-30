@@ -80,8 +80,8 @@ testDiff renderer paths diff matcher = do
   where parser = parserForFilepath (fst paths)
         sourceBlobs sources = pure S.SourceBlob <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)
 
-newtype Verbatim = Verbatim String
+newtype Verbatim = Verbatim Text
   deriving Eq
 
 instance Show Verbatim where
-  showsPrec _ (Verbatim string) = (string++)
+  showsPrec _ (Verbatim string) = (T.unpack string ++)
