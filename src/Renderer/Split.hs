@@ -92,7 +92,7 @@ split diff blobs = TL.toStrict . renderHtml
 newtype Renderable a = Renderable a
 
 instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Range))) where
-  toMarkup (Renderable (source, Info range categories size, syntax)) = (! A.data_ (stringValue (showRational size))) . classifyMarkup categories $ case syntax of
+  toMarkup (Renderable (source, Info range categories size, syntax)) = (! A.data_ (stringValue (show size))) . classifyMarkup categories $ case syntax of
     Leaf _ -> span . string . toString $ slice range source
     Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source range children
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source range children
@@ -119,7 +119,7 @@ instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
   toMarkup (Renderable (source, diff)) = Prologue.fst $ iter (\ (info@(Info range _ _) :< syntax) -> (toMarkup $ Renderable (source, info, syntax), range)) $ toMarkupAndRange <$> diff
     where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
           toMarkupAndRange patch = let term@(Info range _ size :< _) = runCofree $ getSplitTerm patch in
-            ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue (showRational size))) . toMarkup $ Renderable (source, cofree term), range)
+            ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue (show size))) . toMarkup $ Renderable (source, cofree term), range)
 
 instance ToMarkup a => ToMarkup (Renderable (Bool, Int, a)) where
   toMarkup (Renderable (hasChanges, num, line)) =
