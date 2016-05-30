@@ -79,3 +79,5 @@ testDiff renderer paths diff matcher = do
       matcher actual expected
   where parser = parserForFilepath (fst paths)
         sourceBlobs sources = pure S.SourceBlob <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)
+
+newtype Verbatim = Verbatim String
