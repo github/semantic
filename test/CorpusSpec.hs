@@ -33,7 +33,7 @@ spec = parallel $ do
     examples "test/diffs/" `shouldNotReturn` []
 
   where
-    runTestsIn :: FilePath -> (T.Text -> T.Text -> Expectation) -> SpecWith ()
+    runTestsIn :: FilePath -> (Verbatim -> Verbatim -> Expectation) -> SpecWith ()
     runTestsIn directory matcher = do
       paths <- runIO $ examples directory
       let tests = correctTests =<< paths
@@ -69,14 +69,14 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | Given file paths for A, B, and, optionally, a diff, return whether diffing
 -- | the files will produce the diff. If no diff is provided, then the result
 -- | is true, but the diff will still be calculated.
-testDiff :: Renderer -> Both FilePath -> Maybe FilePath -> (T.Text -> T.Text -> Expectation) -> Expectation
+testDiff :: Renderer -> Both FilePath -> Maybe FilePath -> (Verbatim -> Verbatim -> Expectation) -> Expectation
 testDiff renderer paths diff matcher = do
   sources <- sequence $ readAndTranscodeFile <$> paths
-  actual <- diffFiles parser renderer (sourceBlobs sources)
+  actual <- Verbatim <$> diffFiles parser renderer (sourceBlobs sources)
   case diff of
     Nothing -> matcher actual actual
     Just file -> do
-      expected <- T.pack <$> readFile file
+      expected <- Verbatim . T.pack <$> readFile file
       matcher actual expected
   where parser = parserForFilepath (fst paths)
         sourceBlobs sources = pure S.SourceBlob <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)
