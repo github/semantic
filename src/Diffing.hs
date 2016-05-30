@@ -83,7 +83,7 @@ diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sources
   let replaceLeaves = breakDownLeavesByWord <$> sources
-  pure $! renderer (runBothWith (diffTerms diffCostWithAbsoluteDifferenceOfCachedDiffSizes) $ replaceLeaves <*> terms) sourceBlobs
+  pure $! renderer (runBothWith (diffTerms diffCostWithCachedTermSizes) $ replaceLeaves <*> terms) sourceBlobs
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermSizes :: Diff a Info -> Rational
