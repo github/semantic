@@ -84,4 +84,4 @@ newtype Verbatim = Verbatim Text
   deriving Eq
 
 instance Show Verbatim where
-  showsPrec _ (Verbatim string) = (T.unpack string ++)
+  showsPrec _ (Verbatim text) = (T.unpack text ++)
