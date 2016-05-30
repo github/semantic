@@ -85,4 +85,4 @@ newtype Verbatim = Verbatim Text
   deriving (Eq, NFData)
 
 instance Show Verbatim where
-  showsPrec _ (Verbatim text) = (T.unpack text ++)
+  showsPrec _ (Verbatim text) = ('\n':) . (T.unpack text ++)
