@@ -94,9 +94,9 @@ newtype Renderable a = Renderable a
 instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Range))) where
   toMarkup (Renderable (source, Info range categories size, syntax)) = (! A.data_ (stringValue (show size))) . classifyMarkup categories $ case syntax of
     Leaf _ -> span . string . toString $ slice range source
-    Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source range children
-    Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source range children
-    Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements source range children
+    Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source range (sortBy (compare `on` Prologue.snd) children)
+    Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source range (sortBy (compare `on` Prologue.snd) children)
+    Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements source range (sortBy (compare `on` Prologue.snd) (toList children))
 
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
