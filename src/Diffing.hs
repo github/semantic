@@ -86,11 +86,11 @@ diffFiles parser renderer sourceBlobs = do
   pure $! renderer (runBothWith (diffTerms diffCostWithCachedTermSizes) $ replaceLeaves <*> terms) sourceBlobs
 
 -- | The sum of the node count of the diff’s patches.
-diffCostWithCachedTermSizes :: Diff a Info -> Rational
+diffCostWithCachedTermSizes :: Diff a Info -> Integer
 diffCostWithCachedTermSizes = diffSum (getSum . foldMap (Sum . size . extract))
 
 -- | The absolute difference between the node counts of a diff.
-diffCostWithAbsoluteDifferenceOfCachedDiffSizes :: Diff a Info -> Rational
+diffCostWithAbsoluteDifferenceOfCachedDiffSizes :: Diff a Info -> Integer
 diffCostWithAbsoluteDifferenceOfCachedDiffSizes diff = case runFree diff of
   Free (Join (before, after) :< _) -> abs $ size before - size after
   Pure patch                       -> sum $ size . extract <$> patch
