@@ -30,6 +30,6 @@ zipTerms t1 t2 = annotate (zipUnwrap a b)
     zipUnwrapMaps a' b' key = (,) key <$> zipTerms (a' ! key) (b' ! key)
 
 -- | Return the node count of a term.
-termSize :: Term a annotation -> Rational
+termSize :: Num n => Term a annotation -> n
 termSize = cata size where
   size (_ :< syntax) = 1 + sum syntax
