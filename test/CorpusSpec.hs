@@ -81,6 +81,7 @@ testDiff renderer paths diff matcher = do
   where parser = parserForFilepath (fst paths)
         sourceBlobs sources = pure S.SourceBlob <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)
 
+-- | A wrapper around `Text` with a more readable `Show` instance.
 newtype Verbatim = Verbatim Text
   deriving (Eq, NFData)
 
