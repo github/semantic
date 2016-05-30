@@ -81,3 +81,6 @@ testDiff renderer paths diff matcher = do
         sourceBlobs sources = pure S.SourceBlob <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)
 
 newtype Verbatim = Verbatim String
+
+instance Show Verbatim where
+  showsPrec _ (Verbatim string) = (string++)
