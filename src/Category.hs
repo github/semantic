@@ -3,7 +3,6 @@ module Category where
 
 import Prologue
 import Data.String
-import Data.Set
 import Term
 
 -- | A standardized category of AST node. Used to determine the semantics for
@@ -35,7 +34,3 @@ class Categorizable a where
 
 instance Categorizable annotation => Categorizable (Term a annotation) where
   category term | (annotation :< _) <- runCofree term = category annotation
-
--- | Test whether the categories from the categorizables intersect.
-comparable :: Categorizable a => a -> a -> Bool
-comparable a b = category a == category b
