@@ -49,11 +49,11 @@ instance HasCategory leaf => HasCategory (Term leaf Info) where
   toCategoryName = toCategoryName . toCategory . extract
 
 data DiffSummary a = DiffSummary {
-  patch :: Patch DiffInfo,
-  parentAnnotations :: [DiffInfo]
+  patch :: Patch a,
+  parentAnnotations :: [a]
 } deriving (Eq, Functor)
 
-instance Show a => Show (DiffSummary a) where
+instance Show (DiffSummary DiffInfo) where
   showsPrec _ DiffSummary{..} s = (++s) $ case patch of
     (Insert termInfo) -> "Added the " ++ "'" ++ fromJust (termName termInfo) ++ "' " ++ categoryName termInfo
       ++ maybeParentContext parentAnnotations
