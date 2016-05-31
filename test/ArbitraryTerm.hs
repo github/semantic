@@ -1,14 +1,17 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module ArbitraryTerm where
 
 import Category
-import Data.Functor.Foldable
+import Data.Bifunctor.Join
 import Data.Functor.Both
+import Data.Functor.Foldable
 import qualified Data.OrderedMap as Map
 import qualified Data.List as List
 import qualified Data.Set as Set
 import Data.Text.Arbitrary ()
+import Data.These
 import Info
-import Line
 import Patch
 import Prologue hiding (fst, snd)
 import Range
@@ -27,14 +30,14 @@ unTerm = unfold unpack
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = scale (`div` 2) $ sized (\ x -> boundedTerm x x) -- first indicates the cube of the max length of lists, second indicates the cube of the max depth of the tree
     where boundedTerm maxLength maxDepth = ArbitraryTerm <$> ((,) <$> arbitrary <*> boundedSyntax maxLength maxDepth)
-          boundedSyntax _ maxDepth | maxDepth <= 0 = liftM Leaf arbitrary
+          boundedSyntax _ maxDepth | maxDepth <= 0 = Leaf <$> arbitrary
           boundedSyntax maxLength maxDepth = frequency
-            [ (12, liftM Leaf arbitrary),
-              (1, liftM Indexed $ take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
-              (1, liftM Fixed $ take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
-              (1, liftM (Keyed . Map.fromList) $ take maxLength <$> listOf (arbitrary >>= (\x -> (,) x <$> smallerTerm maxLength maxDepth))) ]
+            [ (12, Leaf <$> arbitrary),
+              (1, Indexed . take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
+              (1, Fixed . take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
+              (1, Keyed . Map.fromList . take maxLength <$> listOf (arbitrary >>= (\x -> (,) x <$> smallerTerm maxLength maxDepth))) ]
           smallerTerm maxLength maxDepth = boundedTerm (div maxLength 3) (div maxDepth 3)
-  shrink term@(ArbitraryTerm (annotation, syntax)) = (++) (subterms term) $ filter (/= term) $
+  shrink term@(ArbitraryTerm (annotation, syntax)) = (subterms term ++) $ filter (/= term) $
     ArbitraryTerm <$> ((,) <$> shrink annotation <*> case syntax of
       Leaf a -> Leaf <$> shrink a
       Indexed i -> Indexed <$> (List.subsequences i >>= recursivelyShrink)
@@ -52,13 +55,19 @@ instance Categorizable CategorySet where
 instance Arbitrary CategorySet where
   arbitrary = elements [ A, B, C, D ]
 
-instance Arbitrary a => Arbitrary (Both a) where
-  arbitrary = pure (curry Both) <*> arbitrary <*> arbitrary
-  shrink b = both <$> (shrink (fst b)) <*> (shrink (snd b))
+instance Arbitrary a => Arbitrary (Join (,) a) where
+  arbitrary = both <$> arbitrary <*> arbitrary
+  shrink b = both <$> shrink (fst b) <*> shrink (snd b)
 
-instance Arbitrary a => Arbitrary (Line a) where
-  arbitrary = oneof [ Line <$> arbitrary, Closed <$> arbitrary ]
-  shrink line = (`lineMap` line) . const <$> shrinkList shrink (unLine line)
+instance (Arbitrary a, Arbitrary b) => Arbitrary (These a b) where
+  arbitrary = oneof [ This <$> arbitrary
+                    , That <$> arbitrary
+                    , These <$> arbitrary <*> arbitrary ]
+  shrink = these (fmap This . shrink) (fmap That . shrink) (\ a b -> (This <$> shrink a) ++ (That <$> shrink b) ++ (These <$> shrink a <*> shrink b))
+
+instance Arbitrary a => Arbitrary (Join These a) where
+  arbitrary = Join <$> arbitrary
+  shrink (Join a) = Join <$> shrink a
 
 instance Arbitrary a => Arbitrary (Patch a) where
   arbitrary = oneof [

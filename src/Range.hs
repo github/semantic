@@ -1,11 +1,11 @@
 {-# LANGUAGE FlexibleInstances #-}
 module Range where
 
-import Prologue
-import Data.String
-import Data.Char as Char
+import qualified Data.Char as Char
 import Data.List (span)
-import Data.Option
+import Data.Semigroup
+import Data.String
+import Prologue
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: !Int, end :: !Int }
@@ -48,6 +48,15 @@ maybeLastIndex :: Range -> Maybe Int
 maybeLastIndex (Range start end) | start == end = Nothing
 maybeLastIndex (Range _ end) = Just $ end - 1
 
+-- | Test two ranges for intersection.
+intersectsRange :: Range -> Range -> Bool
+intersectsRange range1 range2 = isWellFormedAndNonEmpty $ intersectionRange range1 range2
+  where isWellFormedAndNonEmpty range = start range < end range
+
+-- Return the (possibly empty, possibly ill-formed) intersection of two ranges.
+intersectionRange :: Range -> Range -> Range
+intersectionRange range1 range2 = Range (max (start range1) (start range2)) (min (end range1) (end range2))
+
 -- | Return a range that contains both the given ranges.
 unionRange :: Range -> Range -> Range
 unionRange (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (max end1 end2)
@@ -56,16 +65,16 @@ unionRange (Range start1 end1) (Range start2 end2) = Range (min start1 start2) (
 unionRanges :: Foldable f => f Range -> Range
 unionRanges = unionRangesFrom (Range 0 0)
 
+-- | Return Just the concatenation of any elements in a Foldable, or Nothing if it is empty.
+maybeConcat :: (Foldable f, Semigroup a) => f a -> Maybe a
+maybeConcat = getOption . foldMap (Option . Just)
+
 -- | Return a range that contains all the ranges in a Foldable, or the passed Range if the Foldable is empty.
 unionRangesFrom :: Foldable f => Range -> f Range -> Range
 unionRangesFrom range = fromMaybe range . maybeConcat
 
-instance Monoid (Option Range) where
-  mempty = Option Nothing
-  mappend (Option (Just a)) (Option (Just b)) = Option (Just (unionRange a b))
-  mappend a@(Option (Just _)) _ = a
-  mappend _ b@(Option (Just _)) = b
-  mappend _ _ = mempty
+instance Semigroup Range where
+  a <> b = unionRange a b
 
 instance Ord Range where
   a <= b = start a <= start b

@@ -29,7 +29,7 @@ interpret comparable cost a b = fromMaybe (pure $ Replace a b) $ constructAndRun
 
 -- | Constructs an algorithm and runs it
 constructAndRun :: (Eq a, Eq annotation) => Comparable a annotation -> Cost a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
-constructAndRun _ _ a b | a == b = hylo (\termF -> free . Free $ headF termF :< tailF termF) runCofree <$> zipTerms a b
+constructAndRun _ _ a b | a == b = hylo (free . Free) runCofree <$> zipTerms a b
 
 constructAndRun comparable _ a b | not $ comparable a b = Nothing
 
@@ -40,15 +40,15 @@ constructAndRun comparable cost t1 t2 =
     algorithm (Leaf a') (Leaf b') | a' == b' = annotate $ Leaf b'
     algorithm a' b' = free . Free $ Recursive (cofree (annotation1 :< a')) (cofree (annotation2 :< b')) pure
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
-    annotate = pure . free . Free . (:<) (both annotation1 annotation2)
+    annotate = pure . free . Free . (both annotation1 annotation2 :<)
 
 -- | Runs the diff algorithm
 run :: (Eq a, Eq annotation) => Comparable a annotation -> Cost a annotation -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
 run comparable cost algorithm = case runFree algorithm of
-  (Pure diff) -> Just diff
-  (Free (Recursive t1 t2 f)) -> run comparable cost . f $ recur a b where
+  Pure diff -> Just diff
+  Free (Recursive t1 t2 f) -> run comparable cost . f $ recur a b where
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
-    annotate = free . Free . (Both (annotation1, annotation2) :<)
+    annotate = free . Free . (both annotation1 annotation2 :<)
 
     recur (Indexed a') (Indexed b') | length a' == length b' = annotate . Indexed $ zipWith (interpret comparable cost) a' b'
     recur (Fixed a') (Fixed b') | length a' == length b' = annotate . Fixed $ zipWith (interpret comparable cost) a' b'
@@ -57,6 +57,7 @@ run comparable cost algorithm = case runFree algorithm of
       repack key = (key, interpretInBoth key a' b')
       interpretInBoth key x y = interpret comparable cost (x ! key) (y ! key)
     recur _ _ = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
+
   Free (ByKey a b f) -> run comparable cost $ f byKey where
     byKey = Map.fromList $ toKeyValue <$> List.union aKeys bKeys
     toKeyValue key | key `List.elem` deleted = (key, pure . Delete $ a ! key)
@@ -66,5 +67,5 @@ run comparable cost algorithm = case runFree algorithm of
     bKeys = Map.keys b
     deleted = aKeys \\ bKeys
     inserted = bKeys \\ aKeys
-  Free (ByIndex a b f) -> run comparable cost . f $ ses (constructAndRun comparable cost) cost a b
 
+  Free (ByIndex a b f) -> run comparable cost . f $ ses (constructAndRun comparable cost) cost a b

@@ -16,13 +16,7 @@ library
   exposed-modules:     Algorithm
                      , Alignment
                      , Category
-                     , Data.Adjoined
-                     , Data.Align
-                     , Data.Bifunctor.These
-                     , Data.Coalescent
-                     , Data.Copointed
                      , Data.Functor.Both
-                     , Data.Option
                      , Data.OrderedMap
                      , Diff
                      , Diffing
@@ -30,7 +24,6 @@ library
                      , Info
                      , Interpreter
                      , Language
-                     , Line
                      , Operation
                      , Parser
                      , Patch
@@ -50,6 +43,7 @@ library
                      , Prologue
   build-depends:       aeson
                      , base >= 4.8 && < 5
+                     , bifunctors
                      , blaze-html
                      , blaze-markup
                      , bytestring
@@ -57,8 +51,11 @@ library
                      , directory
                      , filepath
                      , mtl
+                     , pointed
+                     , semigroups
                      , text >= 1.2.1.3
                      , text-icu
+                     , these
                      , tree-sitter-parsers
                      , vector
                      , recursion-schemes
@@ -76,24 +73,25 @@ test-suite semantic-diff-test
   other-modules:       AlignmentSpec
                      , ArbitraryTerm
                      , CorpusSpec
-                     , Data.Adjoined.Spec
-                     , Data.Functor.Both.Spec
                      , InterpreterSpec
                      , OrderedMapSpec
                      , PatchOutputSpec
                      , TermSpec
                      , DiffSummarySpec
   build-depends:       base
+                     , bifunctors
                      , bytestring
                      , containers
                      , deepseq
                      , filepath
                      , Glob
                      , hspec >= 2.1.10
+                     , mtl
                      , QuickCheck >= 2.8.1
                      , quickcheck-text
                      , semantic-diff
                      , text >= 1.2.1.3
+                     , these
                      , free
                      , recursion-schemes >= 4.1
   if os(darwin)
