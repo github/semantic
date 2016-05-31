@@ -17,12 +17,13 @@ main = do
 
 generativeBenchmark :: (Arbitrary a, Show m) => String -> (a -> m) -> (a -> Benchmarkable) -> IO Benchmark
 generativeBenchmark name metric benchmark = do
-  benchmarks <- traverse measure [50,75..100]
+  benchmarks <- traverse measure (replicate 10 defaultSize)
   pure $! bgroup name benchmarks
   where measure n = do
           input <- generate (resize n arbitrary)
           let measurement = metric input
           pure $! bench (show measurement) (benchmark input)
+        defaultSize = 100
 
 
 -- Instances
