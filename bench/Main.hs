@@ -2,6 +2,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Main where
 
+import Alignment
 import Criterion.Main
 import Data.Bifunctor.Join
 import Data.String
@@ -10,8 +11,9 @@ import Prologue
 import Test.QuickCheck
 
 main :: IO ()
-main = defaultMain
-  []
+main = do
+  benchmarks <- sequenceA [ generativeBenchmark "numberedRows" length (nf (numberedRows :: [Join These ()] -> [Join These (Int, ())])) ]
+  defaultMain benchmarks
 
 generativeBenchmark :: (Arbitrary a, Show m) => String -> (a -> m) -> (a -> Benchmarkable) -> IO Benchmark
 generativeBenchmark name metric benchmark = do
