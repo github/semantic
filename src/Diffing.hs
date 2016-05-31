@@ -83,14 +83,8 @@ diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sources
   let replaceLeaves = breakDownLeavesByWord <$> sources
-  pure $! renderer (runBothWith (diffTerms diffCostWithAbsoluteDifferenceOfCachedDiffSizes) $ replaceLeaves <*> terms) sourceBlobs
+  pure $! renderer (runBothWith (diffTerms diffCostWithCachedTermSizes) $ replaceLeaves <*> terms) sourceBlobs
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermSizes :: Diff a Info -> Integer
 diffCostWithCachedTermSizes = diffSum (getSum . foldMap (Sum . size . extract))
-
--- | The absolute difference between the node counts of a diff.
-diffCostWithAbsoluteDifferenceOfCachedDiffSizes :: Diff a Info -> Integer
-diffCostWithAbsoluteDifferenceOfCachedDiffSizes term = case runFree term of
-  Free (Join (before, after) :< _) -> abs $ size before - size after
-  Pure patch                       -> sum $ size . extract <$> patch
