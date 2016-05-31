@@ -21,10 +21,10 @@ literalInfo = Info (rangeAt 1) (singleton StringLiteral) 1
 testDiff :: Diff String Info
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])
 
-testSummary :: DiffSummary Char
+testSummary :: DiffSummary DiffInfo
 testSummary = DiffSummary { patch = Insert (DiffInfo "string" (Just "a")), parentAnnotations = [] }
 
-replacementSummary :: DiffSummary Char
+replacementSummary :: DiffSummary DiffInfo
 replacementSummary = DiffSummary { patch = Replace (DiffInfo "string" (Just "a")) (DiffInfo "symbol" (Just "b")), parentAnnotations = [ (DiffInfo "array" (Just "switch {}")) ] }
 
 spec :: Spec
