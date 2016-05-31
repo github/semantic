@@ -1,7 +1,11 @@
+{-# LANGUAGE DeriveAnyClass, FlexibleInstances, StandaloneDeriving #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Main where
 
 import Criterion.Main
+import Data.Bifunctor.Join
 import Data.String
+import Data.These
 import Prologue
 import Test.QuickCheck
 
@@ -17,3 +21,9 @@ generativeBenchmark name metric benchmark = do
           input <- generate (resize n arbitrary)
           let measurement = metric input
           pure $! bench (show measurement) (benchmark input)
+
+
+-- Instances
+
+deriving instance (NFData a, NFData b) => NFData (These a b)
+deriving instance NFData a => NFData (Join These a)
