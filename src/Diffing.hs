@@ -10,6 +10,7 @@ import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
 import Diff
 import Info
+import Category
 import Interpreter
 import Language
 import Parser
@@ -36,8 +37,8 @@ lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 
   (leaves, _) -> cofree <$> leaves
   where
     lines = actualLines input
-    root children = Info (Range 0 $ length input) mempty (1 + fromIntegral (length children)) :< Indexed children
-    leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) mempty 1 :< Leaf line
+    root children = Info (Range 0 $ length input) (Other "Unknown") (1 + fromIntegral (length children)) :< Indexed children
+    leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) (Other "Unknown") 1 :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum ++ [ leaf charIndex (toText line) ]
       , charIndex + length line)

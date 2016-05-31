@@ -26,24 +26,24 @@ treeSitterParser language grammar contents = do
     pure term)
 
 -- Given a language and a node name, return the correct categories.
-categoriesForLanguage :: Language -> String -> Set.Set Category
+categoriesForLanguage :: Language -> String -> Category
 categoriesForLanguage language name = case (language, name) of
-  (JavaScript, "object") -> Set.singleton DictionaryLiteral
-  (JavaScript, "rel_op") -> Set.singleton BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
+  (JavaScript, "object") -> DictionaryLiteral
+  (JavaScript, "rel_op") -> BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
 
-  (Ruby, "hash") -> Set.singleton DictionaryLiteral
+  (Ruby, "hash") -> DictionaryLiteral
   _ -> defaultCategoryForNodeName name
 
 -- | Given a node name from TreeSitter, return the correct categories.
-defaultCategoryForNodeName :: String -> Set.Set Category
+defaultCategoryForNodeName :: String -> Category
 defaultCategoryForNodeName name = case name of
-  "function_call" -> Set.singleton FunctionCall
-  "pair" -> Set.singleton Pair
-  "string" -> Set.singleton StringLiteral
-  "integer" -> Set.singleton IntegerLiteral
-  "symbol" -> Set.singleton SymbolLiteral
-  "array" -> Set.singleton ArrayLiteral
-  _ -> Set.singleton (Other name)
+  "function_call" -> FunctionCall
+  "pair" -> Pair
+  "string" -> StringLiteral
+  "integer" -> IntegerLiteral
+  "symbol" -> SymbolLiteral
+  "array" -> ArrayLiteral
+  _ -> (Other name)
 
 -- | Given a constructor and a tree sitter document, return a parser.
 documentToTerm :: Constructor -> Ptr Document -> Parser

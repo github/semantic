@@ -31,8 +31,8 @@ maybeFirst = foldr (const . Just) Nothing
 
 -- | Add the first category from a Foldable of categories as a class name as a
 -- | class name on the markup, prefixed by `category-`.
-classifyMarkup :: Prologue.Foldable f => f Category -> Markup -> Markup
-classifyMarkup categories element = maybe element ((element !) . A.class_ . stringValue . styleName) $ maybeFirst categories
+classifyMarkup :: Category -> Markup -> Markup
+classifyMarkup category element = (element !) . A.class_ . stringValue $ styleName category
 
 -- | Return the appropriate style name for the given category.
 styleName :: Category -> String
@@ -92,7 +92,7 @@ split diff blobs = TL.toStrict . renderHtml
 newtype Renderable a = Renderable a
 
 instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Range))) where
-  toMarkup (Renderable (source, Info range categories size, syntax)) = (! A.data_ (stringValue (show size))) . classifyMarkup categories $ case syntax of
+  toMarkup (Renderable (source, Info range category size, syntax)) = (! A.data_ (stringValue (show size))) . classifyMarkup category $ case syntax of
     Leaf _ -> span . string . toString $ slice range source
     Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source range children
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source range children
