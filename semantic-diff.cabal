@@ -72,6 +72,7 @@ benchmark semantic-diff-bench
   hs-source-dirs:      bench
   build-depends:       base
                      , criterion
+                     , QuickCheck >= 2.8.1
                      , semantic-diff
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -j -O2 -static
   default-language:    Haskell2010
