@@ -9,8 +9,8 @@ main :: IO ()
 main = defaultMain
   []
 
-arbitraryBenchmark :: (Arbitrary a, Show m) => String -> (a -> m) -> Benchmarkable -> IO Benchmark
-arbitraryBenchmark name metric benchmark = do
+generativeBenchmark :: (Arbitrary a, Show m) => String -> (a -> m) -> Benchmarkable -> IO Benchmark
+generativeBenchmark name metric benchmark = do
   benchmarks <- traverse measure [0..100]
   pure $! bgroup name benchmarks
   where measure n = do
