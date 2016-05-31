@@ -66,6 +66,16 @@ library
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, OverloadedStrings, NoImplicitPrelude
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -threaded -fprof-auto "-with-rtsopts=-N -p -s -h -i0.1" -j
 
+benchmark semantic-diff-bench
+  type:                exitcode-stdio-1.0
+  main-is:             Main.hs
+  hs-source-dirs:      bench
+  build-depends:       base
+                     , criterion
+                     , semantic-diff
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -j -O2 -static
+  default-extensions:  OverloadedStrings, NoImplicitPrelude
+
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
