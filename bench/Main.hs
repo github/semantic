@@ -12,12 +12,12 @@ import Test.QuickCheck
 
 main :: IO ()
 main = do
-  benchmarks <- sequenceA [ generativeBenchmark "numberedRows" length (nf (numberedRows :: [Join These ()] -> [Join These (Int, ())])) ]
+  benchmarks <- sequenceA [ generativeBenchmark "numberedRows" 10 length (nf (numberedRows :: [Join These ()] -> [Join These (Int, ())])) ]
   defaultMain benchmarks
 
-generativeBenchmark :: (Arbitrary a, Show m) => String -> (a -> m) -> (a -> Benchmarkable) -> IO Benchmark
-generativeBenchmark name metric benchmark = do
-  benchmarks <- traverse measure (replicate 10 defaultSize)
+generativeBenchmark :: (Arbitrary a, Show m) => String -> Int -> (a -> m) -> (a -> Benchmarkable) -> IO Benchmark
+generativeBenchmark name n metric benchmark = do
+  benchmarks <- traverse measure (replicate n defaultSize)
   pure $! bgroup name benchmarks
   where measure n = do
           input <- generate (resize n arbitrary)
