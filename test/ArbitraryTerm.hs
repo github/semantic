@@ -23,8 +23,8 @@ import Test.QuickCheck hiding (Fixed)
 newtype ArbitraryTerm a annotation = ArbitraryTerm { unArbitraryTerm :: TermF a annotation (ArbitraryTerm a annotation) }
   deriving (Show, Eq, Generic)
 
-unTerm :: ArbitraryTerm a annotation -> Term a annotation
-unTerm = unfold unArbitraryTerm
+toTerm :: ArbitraryTerm a annotation -> Term a annotation
+toTerm = unfold unArbitraryTerm
 
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = scale (`div` 2) $ sized (\ x -> boundedTerm x x) -- first indicates the cube of the max length of lists, second indicates the cube of the max depth of the tree

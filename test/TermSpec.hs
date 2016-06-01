@@ -15,13 +15,13 @@ spec :: Spec
 spec = parallel $ do
   describe "Term" $ do
     prop "equality is reflexive" $
-      \ a -> unTerm a == unTerm (a :: ArbitraryTerm String ())
+      \ a -> toTerm a == toTerm (a :: ArbitraryTerm String ())
 
   describe "Diff" $ do
     prop "equality is reflexive" $
-      \ a b -> let diff = interpret comparable diffCost (unTerm a) (unTerm (b :: ArbitraryTerm String CategorySet)) in
+      \ a b -> let diff = interpret comparable diffCost (toTerm a) (toTerm (b :: ArbitraryTerm String CategorySet)) in
         diff == diff
 
     prop "equal terms produce identity diffs" $
-      \ a -> let term = unTerm (a :: ArbitraryTerm String CategorySet) in
+      \ a -> let term = toTerm (a :: ArbitraryTerm String CategorySet) in
         diffCost (interpret comparable diffCost term term) == 0
