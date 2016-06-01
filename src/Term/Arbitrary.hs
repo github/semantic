@@ -35,7 +35,9 @@ termOfSize n = (ArbitraryTerm .) . (:<) <$> arbitrary <*> syntaxOfSize n
 -- Instances
 
 instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbitrary (ArbitraryTerm leaf annotation) where
-  arbitrary = sized termOfSize
+  arbitrary = sized $ \ n -> do
+    m <- choose (0, n)
+    termOfSize m
 
   shrink term@(ArbitraryTerm (annotation :< syntax)) = (subterms term ++) $ filter (/= term) $
     (ArbitraryTerm .) . (:<) <$> shrink annotation <*> case syntax of
