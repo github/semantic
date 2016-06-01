@@ -30,6 +30,9 @@ termOfSize n = (ArbitraryTerm .) . (:<) <$> arbitrary <*> syntaxOfSize n
           rest <- childrenOfSize (n - m)
           pure $! first : rest
 
+
+-- Instances
+
 instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbitrary (ArbitraryTerm leaf annotation) where
   arbitrary = sized termOfSize
 
