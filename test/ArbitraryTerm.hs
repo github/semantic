@@ -37,11 +37,11 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
               (1, Keyed . Map.fromList . take maxLength <$> listOf (arbitrary >>= (\x -> (,) x <$> smallerTerm maxLength maxDepth))) ]
           smallerTerm maxLength maxDepth = boundedTerm (div maxLength 3) (div maxDepth 3)
   shrink term@(ArbitraryTerm (annotation :< syntax)) = (subterms term ++) $ filter (/= term) $
-    ArbitraryTerm <$> ((:<) <$> shrink annotation <*> case syntax of
+    (ArbitraryTerm .) . (:<) <$> shrink annotation <*> case syntax of
       Leaf a -> Leaf <$> shrink a
       Indexed i -> Indexed <$> (List.subsequences i >>= recursivelyShrink)
       Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
-      Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink))
+      Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink)
 
 data CategorySet = A | B | C | D deriving (Eq, Show)
 
