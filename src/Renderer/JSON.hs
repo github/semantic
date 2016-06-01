@@ -66,7 +66,7 @@ lineFields n term range = [ "number" .= n
                           ]
 
 termFields :: (ToJSON recur, KeyValue kv) => Info -> Syntax leaf recur -> [kv]
-termFields (Info range categories _) syntax = "range" .= range : "categories" .= categories : case syntax of
+termFields (Info range category _) syntax = "range" .= range : "category" .= category : case syntax of
   Leaf _ -> []
   Indexed c -> childrenFields c
   Fixed c -> childrenFields c

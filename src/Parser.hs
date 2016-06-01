@@ -30,16 +30,16 @@ fixedCategories :: Set.Set Category
 fixedCategories = Set.fromList [ BinaryOperator, Pair ]
 
 -- | Should these categories be treated as keyed nodes?
-isKeyed :: Set.Set Category -> Bool
-isKeyed = not . Set.null . Set.intersection keyedCategories
+isKeyed :: Category -> Bool
+isKeyed = flip Set.member keyedCategories
 
 -- | Should these categories be treated as fixed nodes?
-isFixed :: Set.Set Category -> Bool
-isFixed = not . Set.null . Set.intersection fixedCategories
+isFixed :: Category -> Bool
+isFixed = flip Set.member fixedCategories
 
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
-termConstructor :: (String -> Set.Set Category) -> Constructor
+termConstructor :: (String -> Category) -> Constructor
 termConstructor mapping source range name children = cofree (Info range categories (1 + sum (size . extract <$> children)) :< construct children)
   where
     categories = mapping name
@@ -48,6 +48,6 @@ termConstructor mapping source range name children = cofree (Info range categori
     construct children | isFixed categories = Fixed children
     construct children | isKeyed categories = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed children
-    assignKey node | Info _ categories _ :< Fixed (key : _) <- runCofree node, Set.member Pair categories = (getSubstring key, node)
+    assignKey node | Info _ category _ :< Fixed (key : _) <- runCofree node, Pair == category = (getSubstring key, node)
     assignKey node = (getSubstring node, node)
     getSubstring term | Info range _ _ :< _ <- runCofree term = pack . toString $ slice range source
