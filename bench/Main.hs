@@ -5,6 +5,7 @@ module Main where
 import Alignment
 import Criterion.Main
 import Data.Bifunctor.Join
+import Data.Functor.Foldable
 import Data.String
 import Data.These
 import Diff
@@ -32,6 +33,9 @@ generativeBenchmark name n metric benchmark = do
 
 newtype ArbitraryDiff leaf annotation = ArbitraryDiff { unArbitraryDiff :: DiffF leaf annotation (ArbitraryDiff leaf annotation) }
   deriving (Show, Eq, Generic)
+
+toDiff :: ArbitraryDiff leaf annotation -> Diff leaf annotation
+toDiff = unfold unArbitraryDiff
 
 
 -- Instances
