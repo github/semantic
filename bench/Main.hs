@@ -58,7 +58,7 @@ instance Arbitrary a => Arbitrary (Join These a) where
 
 instance (Arbitrary leaf, Arbitrary annotation) => Arbitrary (ArbitraryDiff leaf annotation) where
   arbitrary = scale (`div` 2) $ sized (\ x -> boundedTerm x x) -- first indicates the cube of the max length of lists, second indicates the cube of the max depth of the tree
-    where boundedTerm maxLength maxDepth = ArbitraryDiff <$> ((Free .) . (:<) <$> (pure <$> arbitrary) <*> boundedSyntax maxLength maxDepth)
+    where boundedTerm maxLength maxDepth = (ArbitraryDiff .) . (Free .) . (:<) <$> (pure <$> arbitrary) <*> boundedSyntax maxLength maxDepth
           boundedSyntax _ maxDepth | maxDepth <= 0 = Leaf <$> arbitrary
           boundedSyntax maxLength maxDepth = frequency
             [ (12, Leaf <$> arbitrary),
