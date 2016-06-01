@@ -1,6 +1,6 @@
 module Diffing where
 
-import Prologue
+import Prologue hiding (fst, snd)
 import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
 import Data.Functor.Foldable
@@ -13,6 +13,7 @@ import Category
 import Interpreter
 import Language
 import Parser
+import Patch
 import Range
 import Renderer
 import Source hiding ((++))
@@ -83,7 +84,11 @@ diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sources
   let replaceLeaves = breakDownLeavesByWord <$> sources
-  pure $! renderer (runBothWith (diffTerms diffCostWithCachedTermSizes) $ replaceLeaves <*> terms) sourceBlobs
+  let textDiff = case runJoin $ (== nullOid) . oid <$> sourceBlobs of
+        (True, False) -> pure $ Insert (snd terms)
+        (False, True) -> pure $ Delete (fst terms)
+        (_, _) -> runBothWith (diffTerms diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
+  pure $! renderer textDiff sourceBlobs
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermSizes :: Diff a Info -> Integer
