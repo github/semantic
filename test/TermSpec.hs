@@ -19,6 +19,7 @@ spec = parallel $ do
     prop "equality is reflexive" $
       \ a -> toTerm a == toTerm (a :: ArbitraryTerm String ())
 
+  describe "ArbitraryTerm" $
     prop "generates terms of a specific size" $ forAll ((arbitrary >>= \ n -> (,) n <$> termOfSize n) `suchThat` ((> 0) . fst)) $
       \ (n, term) -> cata (succ . sum) (toTerm (term :: ArbitraryTerm String ())) `shouldBe` n
 
