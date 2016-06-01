@@ -1,15 +1,15 @@
 module TermSpec where
 
+import ArbitraryTerm
+import Category
+import Data.String
+import Data.Text.Arbitrary ()
+import Diff
+import Interpreter
+import Prologue
+import Term.Arbitrary
 import Test.Hspec
 import Test.Hspec.QuickCheck
-import Data.Text.Arbitrary ()
-
-import Prologue
-import Data.String
-import Category
-import Interpreter
-import Diff
-import ArbitraryTerm
 
 spec :: Spec
 spec = parallel $ do
