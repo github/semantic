@@ -6,6 +6,7 @@ import Alignment
 import Criterion.Main
 import Data.Bifunctor.Join
 import Data.Functor.Foldable
+import qualified Data.List as List
 import qualified Data.OrderedMap as Map
 import Data.String
 import Data.Text.Arbitrary ()
@@ -79,6 +80,8 @@ instance Arbitrary a => Arbitrary (Patch a) where
     Insert <$> arbitrary,
     Delete <$> arbitrary,
     Replace <$> arbitrary <*> arbitrary ]
+
+  shrink patch = traverse shrink patch
 
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = scale (`div` 2) $ sized (\ x -> boundedTerm x x) -- first indicates the cube of the max length of lists, second indicates the cube of the max depth of the tree
