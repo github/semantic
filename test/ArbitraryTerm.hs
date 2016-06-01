@@ -20,7 +20,7 @@ import Syntax
 import Term
 import Test.QuickCheck hiding (Fixed)
 
-newtype ArbitraryTerm a annotation = ArbitraryTerm (CofreeF (Syntax a) annotation (ArbitraryTerm a annotation))
+newtype ArbitraryTerm a annotation = ArbitraryTerm (TermF a annotation (ArbitraryTerm a annotation))
   deriving (Show, Eq, Generic)
 
 unTerm :: ArbitraryTerm a annotation -> Term a annotation
