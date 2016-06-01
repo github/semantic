@@ -11,6 +11,7 @@ import Data.String
 import Data.Text.Arbitrary ()
 import Data.These
 import Diff
+import Patch
 import Prologue
 import Syntax
 import Term
@@ -73,3 +74,9 @@ instance (Arbitrary leaf, Arbitrary annotation) => Arbitrary (ArbitraryDiff leaf
               (1, Fixed . take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
               (1, Keyed . Map.fromList . take maxLength <$> listOf (arbitrary >>= (\x -> (,) x <$> smallerTerm maxLength maxDepth))) ]
           smallerTerm maxLength maxDepth = boundedTerm (div maxLength 3) (div maxDepth 3)
+instance Arbitrary a => Arbitrary (Patch a) where
+  arbitrary = oneof [
+    Insert <$> arbitrary,
+    Delete <$> arbitrary,
+    Replace <$> arbitrary <*> arbitrary ]
+
