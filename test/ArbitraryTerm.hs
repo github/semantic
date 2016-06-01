@@ -20,16 +20,16 @@ import Syntax
 import Term
 import Test.QuickCheck hiding (Fixed)
 
-newtype ArbitraryTerm a annotation = ArbitraryTerm (annotation, Syntax a (ArbitraryTerm a annotation))
+newtype ArbitraryTerm a annotation = ArbitraryTerm (CofreeF (Syntax a) annotation (ArbitraryTerm a annotation))
   deriving (Show, Eq, Generic)
 
 unTerm :: ArbitraryTerm a annotation -> Term a annotation
 unTerm = unfold unpack
-  where unpack (ArbitraryTerm (annotation, syntax)) = annotation :< syntax
+  where unpack (ArbitraryTerm (annotation :< syntax)) = annotation :< syntax
 
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = scale (`div` 2) $ sized (\ x -> boundedTerm x x) -- first indicates the cube of the max length of lists, second indicates the cube of the max depth of the tree
-    where boundedTerm maxLength maxDepth = ArbitraryTerm <$> ((,) <$> arbitrary <*> boundedSyntax maxLength maxDepth)
+    where boundedTerm maxLength maxDepth = ArbitraryTerm <$> ((:<) <$> arbitrary <*> boundedSyntax maxLength maxDepth)
           boundedSyntax _ maxDepth | maxDepth <= 0 = Leaf <$> arbitrary
           boundedSyntax maxLength maxDepth = frequency
             [ (12, Leaf <$> arbitrary),
@@ -37,8 +37,8 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
               (1, Fixed . take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
               (1, Keyed . Map.fromList . take maxLength <$> listOf (arbitrary >>= (\x -> (,) x <$> smallerTerm maxLength maxDepth))) ]
           smallerTerm maxLength maxDepth = boundedTerm (div maxLength 3) (div maxDepth 3)
-  shrink term@(ArbitraryTerm (annotation, syntax)) = (subterms term ++) $ filter (/= term) $
-    ArbitraryTerm <$> ((,) <$> shrink annotation <*> case syntax of
+  shrink term@(ArbitraryTerm (annotation :< syntax)) = (subterms term ++) $ filter (/= term) $
+    ArbitraryTerm <$> ((:<) <$> shrink annotation <*> case syntax of
       Leaf a -> Leaf <$> shrink a
       Indexed i -> Indexed <$> (List.subsequences i >>= recursivelyShrink)
       Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
