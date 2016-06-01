@@ -23,7 +23,7 @@ termOfSize n = (ArbitraryTerm .) . (:<) <$> arbitrary <*> syntaxOfSize n
           , Fixed <$> childrenOfSize (pred n)
           , (Keyed .) . (Map.fromList .) . zip <$> infiniteListOf arbitrary <*> childrenOfSize (pred n)
           ]
-        childrenOfSize 0 = pure []
+        childrenOfSize n | n <= 0 = pure []
         childrenOfSize n = do
           m <- choose (1, n)
           first <- termOfSize m
