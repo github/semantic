@@ -21,7 +21,7 @@ type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
 
 -- | Diff two terms, given the default Categorizable.comparable function and a function computing the cost of a given diff.
 diffTerms :: (Eq a, Eq annotation, Categorizable annotation) => Cost a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
-diffTerms cost = interpret comparable cost
+diffTerms cost = interpret ((==) `on` category) cost
 
 -- | Diff two terms, given a function that determines whether two terms can be compared.
 interpret :: (Eq a, Eq annotation) => Comparable a annotation -> Cost a annotation -> Term a annotation -> Term a annotation -> Diff a annotation

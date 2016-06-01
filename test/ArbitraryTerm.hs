@@ -47,10 +47,11 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
 data CategorySet = A | B | C | D deriving (Eq, Show)
 
 instance Categorizable CategorySet where
-  categories A = Set.fromList [ Other "a" ]
-  categories B = Set.fromList [ Other "b" ]
-  categories C = Set.fromList [ Other "c" ]
-  categories D = Set.fromList [ Other "d" ]
+  category s = case s of
+    A -> Other "a"
+    B -> Other "b"
+    C -> Other "c"
+    D -> Other "d"
 
 instance Arbitrary CategorySet where
   arbitrary = elements [ A, B, C, D ]
@@ -80,4 +81,4 @@ instance Arbitrary a => Arbitrary (Source a) where
 
 arbitraryLeaf :: Gen (Source Char, Info, Syntax (Source Char) f)
 arbitraryLeaf = toTuple <$> arbitrary
-  where toTuple string = (string, Info (Range 0 $ length string) mempty 1, Leaf string)
+  where toTuple string = (string, Info (Range 0 $ length string) StringLiteral 1, Leaf string)
