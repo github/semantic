@@ -104,6 +104,7 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
               (1, Fixed . take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
               (1, Keyed . Map.fromList . take maxLength <$> listOf (arbitrary >>= (\x -> (,) x <$> smallerTerm maxLength maxDepth))) ]
           smallerTerm maxLength maxDepth = boundedTerm (div maxLength 3) (div maxDepth 3)
+
   shrink term@(ArbitraryTerm (annotation :< syntax)) = (subterms term ++) $ filter (/= term) $
     (ArbitraryTerm .) . (:<) <$> shrink annotation <*> case syntax of
       Leaf a -> Leaf <$> shrink a
