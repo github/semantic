@@ -17,9 +17,10 @@ toTerm = unfold unArbitraryTerm
 
 termOfSize :: (Arbitrary leaf, Arbitrary annotation) => Int -> Gen (ArbitraryTerm leaf annotation)
 termOfSize n = (ArbitraryTerm .) . (:<) <$> arbitrary <*> syntaxOfSize n
-  where syntaxOfSize n = oneof
-          [ Leaf <$> arbitrary
-          , Indexed <$> childrenOfSize (pred n)
+  where syntaxOfSize n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsOfSize n
+                       | otherwise = oneof $ branchGeneratorsOfSize n
+        branchGeneratorsOfSize n =
+          [ Indexed <$> childrenOfSize (pred n)
           , Fixed <$> childrenOfSize (pred n)
           , (Keyed .) . (Map.fromList .) . zip <$> infiniteListOf arbitrary <*> childrenOfSize (pred n)
           ]
