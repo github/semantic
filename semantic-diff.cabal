@@ -38,6 +38,7 @@ library
                      , SplitDiff
                      , Syntax
                      , Term
+                     , Term.Arbitrary
                      , TreeSitter
                      , DiffSummary
                      , Prologue
