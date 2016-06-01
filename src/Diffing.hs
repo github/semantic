@@ -83,11 +83,14 @@ diffFiles :: Parser -> Renderer -> Both SourceBlob -> IO T.Text
 diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sources
+
   let replaceLeaves = breakDownLeavesByWord <$> sources
-  let textDiff = case runJoin $ (== nullOid) . oid <$> sourceBlobs of
+  let areNullOids = runJoin $ (== nullOid) . oid <$> sourceBlobs
+  let textDiff = case areNullOids of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
         (_, _) -> runBothWith (diffTerms diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
+
   pure $! renderer textDiff sourceBlobs
 
 -- | The sum of the node count of the diff’s patches.
