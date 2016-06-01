@@ -95,15 +95,20 @@ instance Arbitrary a => Arbitrary (Patch a) where
   shrink patch = traverse shrink patch
 
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
-  arbitrary = scale (`div` 2) $ sized (\ x -> boundedTerm x x) -- first indicates the cube of the max length of lists, second indicates the cube of the max depth of the tree
-    where boundedTerm maxLength maxDepth = ArbitraryTerm <$> ((:<) <$> arbitrary <*> boundedSyntax maxLength maxDepth)
-          boundedSyntax _ maxDepth | maxDepth <= 0 = Leaf <$> arbitrary
-          boundedSyntax maxLength maxDepth = frequency
-            [ (12, Leaf <$> arbitrary),
-              (1, Indexed . take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
-              (1, Fixed . take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
-              (1, Keyed . Map.fromList . take maxLength <$> listOf (arbitrary >>= (\x -> (,) x <$> smallerTerm maxLength maxDepth))) ]
-          smallerTerm maxLength maxDepth = boundedTerm (div maxLength 3) (div maxDepth 3)
+  arbitrary = sized termOfSize
+    where termOfSize n = (ArbitraryTerm .) . (:<) <$> arbitrary <*> syntaxOfSize n
+          syntaxOfSize n = oneof
+            [ Leaf <$> arbitrary
+            , Indexed <$> childrenOfSize (pred n)
+            , Fixed <$> childrenOfSize (pred n)
+            , (Keyed .) . (Map.fromList .) . zip <$> infiniteListOf arbitrary <*> childrenOfSize (pred n)
+            ]
+          childrenOfSize 0 = pure []
+          childrenOfSize n = do
+            m <- choose (1, n)
+            first <- termOfSize m
+            rest <- childrenOfSize (n - m)
+            pure $! first : rest
 
   shrink term@(ArbitraryTerm (annotation :< syntax)) = (subterms term ++) $ filter (/= term) $
     (ArbitraryTerm .) . (:<) <$> shrink annotation <*> case syntax of
