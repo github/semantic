@@ -37,11 +37,11 @@ generativeBenchmark name n metric benchmark = do
         defaultSize = 100
 
 
-newtype ArbitraryDiff leaf annotation = ArbitraryDiff { unArbitraryDiff :: DiffF leaf annotation (ArbitraryDiff leaf annotation) }
+newtype ArbitraryDiff leaf annotation = ArbitraryDiff { unArbitraryDiff :: FreeF (CofreeF (Syntax leaf) (Join (,) annotation)) (Patch (ArbitraryTerm leaf annotation)) (ArbitraryDiff leaf annotation) }
   deriving (Show, Eq, Generic)
 
 toDiff :: ArbitraryDiff leaf annotation -> Diff leaf annotation
-toDiff = unfold unArbitraryDiff
+toDiff = fmap (fmap toTerm) . unfold unArbitraryDiff
 
 newtype ArbitraryTerm a annotation = ArbitraryTerm { unArbitraryTerm :: TermF a annotation (ArbitraryTerm a annotation) }
   deriving (Show, Eq, Generic)
