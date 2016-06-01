@@ -15,7 +15,7 @@ import Diff
 import Patch
 import Prologue
 import Syntax
-import Term
+import Term.Arbitrary
 import Test.QuickCheck hiding (Fixed)
 
 main :: IO ()
@@ -42,12 +42,6 @@ newtype ArbitraryDiff leaf annotation = ArbitraryDiff { unArbitraryDiff :: FreeF
 
 toDiff :: ArbitraryDiff leaf annotation -> Diff leaf annotation
 toDiff = fmap (fmap toTerm) . unfold unArbitraryDiff
-
-newtype ArbitraryTerm a annotation = ArbitraryTerm { unArbitraryTerm :: TermF a annotation (ArbitraryTerm a annotation) }
-  deriving (Show, Eq, Generic)
-
-toTerm :: ArbitraryTerm a annotation -> Term a annotation
-toTerm = unfold unArbitraryTerm
 
 
 -- Instances
@@ -93,26 +87,3 @@ instance Arbitrary a => Arbitrary (Patch a) where
     Replace <$> arbitrary <*> arbitrary ]
 
   shrink patch = traverse shrink patch
-
-instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
-  arbitrary = sized termOfSize
-    where termOfSize n = (ArbitraryTerm .) . (:<) <$> arbitrary <*> syntaxOfSize n
-          syntaxOfSize n = oneof
-            [ Leaf <$> arbitrary
-            , Indexed <$> childrenOfSize (pred n)
-            , Fixed <$> childrenOfSize (pred n)
-            , (Keyed .) . (Map.fromList .) . zip <$> infiniteListOf arbitrary <*> childrenOfSize (pred n)
-            ]
-          childrenOfSize 0 = pure []
-          childrenOfSize n = do
-            m <- choose (1, n)
-            first <- termOfSize m
-            rest <- childrenOfSize (n - m)
-            pure $! first : rest
-
-  shrink term@(ArbitraryTerm (annotation :< syntax)) = (subterms term ++) $ filter (/= term) $
-    (ArbitraryTerm .) . (:<) <$> shrink annotation <*> case syntax of
-      Leaf a -> Leaf <$> shrink a
-      Indexed i -> Indexed <$> (List.subsequences i >>= recursivelyShrink)
-      Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
-      Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink)
