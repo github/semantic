@@ -13,6 +13,7 @@ import Data.These
 import Diff
 import Prologue
 import Syntax
+import Term
 import Test.QuickCheck hiding (Fixed)
 
 main :: IO ()
@@ -39,6 +40,12 @@ newtype ArbitraryDiff leaf annotation = ArbitraryDiff { unArbitraryDiff :: DiffF
 
 toDiff :: ArbitraryDiff leaf annotation -> Diff leaf annotation
 toDiff = unfold unArbitraryDiff
+
+newtype ArbitraryTerm a annotation = ArbitraryTerm { unArbitraryTerm :: TermF a annotation (ArbitraryTerm a annotation) }
+  deriving (Show, Eq, Generic)
+
+toTerm :: ArbitraryTerm a annotation -> Term a annotation
+toTerm = unfold unArbitraryTerm
 
 
 -- Instances
