@@ -74,6 +74,8 @@ benchmark semantic-diff-bench
                      , bifunctors
                      , criterion
                      , QuickCheck >= 2.8.1
+                     , quickcheck-text
+                     , recursion-schemes
                      , semantic-diff
                      , these
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -j -O2 -static
