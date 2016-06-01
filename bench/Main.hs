@@ -7,6 +7,7 @@ import Criterion.Main
 import Data.Bifunctor.Join
 import Data.String
 import Data.These
+import Diff
 import Prologue
 import Test.QuickCheck
 
@@ -27,6 +28,10 @@ generativeBenchmark name n metric benchmark = do
           let measurement = metric input
           pure $! (measurement, bench (show measurement) (benchmark input))
         defaultSize = 100
+
+
+newtype ArbitraryDiff leaf annotation = ArbitraryDiff { unArbitraryDiff :: DiffF leaf annotation (ArbitraryDiff leaf annotation) }
+  deriving (Show, Eq, Generic)
 
 
 -- Instances
