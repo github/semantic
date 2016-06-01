@@ -24,8 +24,7 @@ newtype ArbitraryTerm a annotation = ArbitraryTerm { unArbitraryTerm :: TermF a 
   deriving (Show, Eq, Generic)
 
 unTerm :: ArbitraryTerm a annotation -> Term a annotation
-unTerm = unfold unpack
-  where unpack (ArbitraryTerm (annotation :< syntax)) = annotation :< syntax
+unTerm = unfold unArbitraryTerm
 
 instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (ArbitraryTerm a annotation) where
   arbitrary = scale (`div` 2) $ sized (\ x -> boundedTerm x x) -- first indicates the cube of the max length of lists, second indicates the cube of the max depth of the tree
