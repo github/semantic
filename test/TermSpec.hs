@@ -25,9 +25,9 @@ spec = parallel $ do
 
   describe "Diff" $ do
     prop "equality is reflexive" $
-      \ a b -> let diff = interpret comparable diffCost (toTerm a) (toTerm (b :: ArbitraryTerm String CategorySet)) in
+      \ a b -> let diff = interpret ((==) `on` category) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm String CategorySet)) in
         diff == diff
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = toTerm (a :: ArbitraryTerm String CategorySet) in
-        diffCost (interpret comparable diffCost term term) == 0
+        diffCost (interpret ((==) `on` category) diffCost term term) == 0
