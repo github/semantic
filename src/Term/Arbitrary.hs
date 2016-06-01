@@ -15,22 +15,23 @@ newtype ArbitraryTerm leaf annotation = ArbitraryTerm { unArbitraryTerm :: TermF
 toTerm :: ArbitraryTerm leaf annotation -> Term leaf annotation
 toTerm = unfold unArbitraryTerm
 
+termOfSize :: (Arbitrary leaf, Arbitrary annotation) => Int -> Gen (ArbitraryTerm leaf annotation)
+termOfSize n = (ArbitraryTerm .) . (:<) <$> arbitrary <*> syntaxOfSize n
+  where syntaxOfSize n = oneof
+          [ Leaf <$> arbitrary
+          , Indexed <$> childrenOfSize (pred n)
+          , Fixed <$> childrenOfSize (pred n)
+          , (Keyed .) . (Map.fromList .) . zip <$> infiniteListOf arbitrary <*> childrenOfSize (pred n)
+          ]
+        childrenOfSize 0 = pure []
+        childrenOfSize n = do
+          m <- choose (1, n)
+          first <- termOfSize m
+          rest <- childrenOfSize (n - m)
+          pure $! first : rest
 
 instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbitrary (ArbitraryTerm leaf annotation) where
   arbitrary = sized termOfSize
-    where termOfSize n = (ArbitraryTerm .) . (:<) <$> arbitrary <*> syntaxOfSize n
-          syntaxOfSize n = oneof
-            [ Leaf <$> arbitrary
-            , Indexed <$> childrenOfSize (pred n)
-            , Fixed <$> childrenOfSize (pred n)
-            , (Keyed .) . (Map.fromList .) . zip <$> infiniteListOf arbitrary <*> childrenOfSize (pred n)
-            ]
-          childrenOfSize 0 = pure []
-          childrenOfSize n = do
-            m <- choose (1, n)
-            first <- termOfSize m
-            rest <- childrenOfSize (n - m)
-            pure $! first : rest
 
   shrink term@(ArbitraryTerm (annotation :< syntax)) = (subterms term ++) $ filter (/= term) $
     (ArbitraryTerm .) . (:<) <$> shrink annotation <*> case syntax of
