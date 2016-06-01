@@ -1,7 +1,6 @@
 module Diffing where
 
 import Prologue
-import Data.Bifunctor.Join
 import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
 import Data.Functor.Foldable
