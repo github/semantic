@@ -8,6 +8,3 @@ import Range
 -- | categories.
 data Info = Info { characterRange :: !Range, category :: !Category, size :: !Integer }
   deriving (Eq, Show)
-
-instance Categorizable Info where
-  category = Info.category

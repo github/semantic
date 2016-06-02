@@ -7,7 +7,6 @@ import Language
 import Parser
 import Range
 import Source
-import qualified Data.Set as Set
 import Foreign
 import Foreign.C.String
 import Text.Parser.TreeSitter hiding (Language(..))

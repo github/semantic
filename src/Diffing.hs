@@ -89,7 +89,7 @@ diffFiles parser renderer sourceBlobs = do
   let textDiff = case areNullOids of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
-        (_, _) -> runBothWith (diffTerms diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
+        (_, _) -> runBothWith (diffTerms ((==) `on` category . extract) diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
 
   pure $! renderer textDiff sourceBlobs
 
