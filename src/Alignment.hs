@@ -107,7 +107,7 @@ alignBranch getRange children ranges = case intersectingChildren of
           ((:) $ (,) <$> ranges `applyToBoth` (sortBy (compare `on` getRange) <$> intersections), remaining)
 
 -- | Given a list of aligned children, produce lists of their intersecting first lines, and a list of the remaining lines/nonintersecting first lines.
-alignChildren :: (term -> Range) -> [Join These (term)] -> Join These Range -> (Both [term], [Join These term])
+alignChildren :: (term -> Range) -> [Join These term] -> Join These Range -> (Both [term], [Join These term])
 alignChildren _ [] _ = (both [] [], [])
 alignChildren getRange (first:rest) headRanges
   | ~(l, r) <- splitThese first
