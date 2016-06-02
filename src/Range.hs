@@ -50,8 +50,7 @@ maybeLastIndex (Range _ end) = Just $ end - 1
 
 -- | Test two ranges for intersection.
 intersectsRange :: Range -> Range -> Bool
-intersectsRange range1 range2 = isWellFormedAndNonEmpty $ intersectionRange range1 range2
-  where isWellFormedAndNonEmpty range = start range < end range
+intersectsRange range1 range2 = start range1 < end range2 && start range2 < end range1
 
 -- Return the (possibly empty, possibly ill-formed) intersection of two ranges.
 intersectionRange :: Range -> Range -> Range
