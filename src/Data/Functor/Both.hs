@@ -1,7 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
-module Data.Functor.Both where
+module Data.Functor.Both (Both,both, runBothWith, fst, snd, module X) where
 
-import Data.Bifunctor.Join
+import Data.Bifunctor.Join as X
 import Prologue hiding (zipWith, fst, snd)
 import qualified Prologue
 
