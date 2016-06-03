@@ -48,6 +48,7 @@ termConstructor mapping source range name children = cofree (Info range categori
     construct children | isFixed categories = Fixed children
     construct children | isKeyed categories = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed children
-    assignKey node | Info _ category _ :< Fixed (key : _) <- runCofree node, Pair == category = (getSubstring key, node)
-    assignKey node = (getSubstring node, node)
+    assignKey node = case runCofree node of
+      info :< Fixed (key : _) | Pair == category info -> (getSubstring key, node)
+      _ -> (getSubstring node, node)
     getSubstring term = pack . toString $ slice (characterRange (extract term)) source
