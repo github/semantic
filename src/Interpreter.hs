@@ -22,8 +22,8 @@ type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
 type DiffConstructor leaf annotation = CofreeF (Syntax leaf) (Both annotation) (Diff leaf annotation) -> Diff leaf annotation
 
 -- | Diff two terms, given a function that determines whether two terms can be compared and a cost function.
-diffTerms :: (Eq a, Eq annotation) => Comparable a annotation -> Cost a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
-diffTerms comparable cost a b = fromMaybe (pure $ Replace a b) $ constructAndRun (free . Free) comparable cost a b
+diffTerms :: (Eq a, Eq annotation) => DiffConstructor a annotation -> Comparable a annotation -> Cost a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
+diffTerms construct comparable cost a b = fromMaybe (pure $ Replace a b) $ constructAndRun construct comparable cost a b
 
 -- | Constructs an algorithm and runs it
 constructAndRun :: (Eq a, Eq annotation) => DiffConstructor a annotation -> Comparable a annotation -> Cost a annotation -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
@@ -48,19 +48,19 @@ run construct comparable cost algorithm = case runFree algorithm of
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
     annotate = construct . (both annotation1 annotation2 :<)
 
-    recur (Indexed a') (Indexed b') | length a' == length b' = annotate . Indexed $ zipWith (diffTerms comparable cost) a' b'
-    recur (Fixed a') (Fixed b') | length a' == length b' = annotate . Fixed $ zipWith (diffTerms comparable cost) a' b'
+    recur (Indexed a') (Indexed b') | length a' == length b' = annotate . Indexed $ zipWith (diffTerms construct comparable cost) a' b'
+    recur (Fixed a') (Fixed b') | length a' == length b' = annotate . Fixed $ zipWith (diffTerms construct comparable cost) a' b'
     recur (Keyed a') (Keyed b') | Map.keys a' == bKeys = annotate . Keyed . Map.fromList . fmap repack $ bKeys where
       bKeys = Map.keys b'
       repack key = (key, interpretInBoth key a' b')
-      interpretInBoth key x y = diffTerms comparable cost (x ! key) (y ! key)
+      interpretInBoth key x y = diffTerms construct comparable cost (x ! key) (y ! key)
     recur _ _ = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
 
   Free (ByKey a b f) -> run construct comparable cost $ f byKey where
     byKey = Map.fromList $ toKeyValue <$> List.union aKeys bKeys
     toKeyValue key | key `List.elem` deleted = (key, pure . Delete $ a ! key)
     toKeyValue key | key `List.elem` inserted = (key, pure . Insert $ b ! key)
-    toKeyValue key = (key, diffTerms comparable cost (a ! key) (b ! key))
+    toKeyValue key = (key, diffTerms construct comparable cost (a ! key) (b ! key))
     aKeys = Map.keys a
     bKeys = Map.keys b
     deleted = aKeys \\ bKeys

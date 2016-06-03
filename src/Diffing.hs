@@ -7,6 +7,7 @@ import Data.Functor.Foldable
 import qualified Data.Text as T
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
+import Data.These
 import Diff
 import Info
 import Category
@@ -91,9 +92,16 @@ diffFiles parser renderer sourceBlobs = do
   let textDiff = case areNullOids of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
-        (_, _) -> runBothWith (diffTerms ((==) `on` category . extract) diffCostWithCachedTermSizes) $ cacheTermCosts <$> (replaceLeaves <*> terms)
+        (_, _) -> runBothWith (diffTerms construct ((==) `on` category . extract) diffCostWithCachedTermSizes) $ cacheTermCosts <$> (replaceLeaves <*> terms)
 
   pure $! renderer textDiff sourceBlobs
+  where construct :: CofreeF (Syntax Text) (Both Info) (Diff Text Info) -> Diff Text Info
+        construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
+        setCost info cost = info { cost = cost }
+        sumCost = fmap getSum . foldMap (fmap Sum . getCost)
+        getCost diff = case runFree diff of
+          Free (info :< _) -> cost <$> info
+          Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermSizes :: Diff a Info -> Integer

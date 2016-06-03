@@ -18,9 +18,9 @@ spec = parallel $ do
 
   describe "Diff" $ do
     prop "equality is reflexive" $
-      \ a b -> let diff = diffTerms ((==) `on` extract) diffCost (unTerm a) (unTerm (b :: ArbitraryTerm String CategorySet)) in
+      \ a b -> let diff = diffTerms (free . Free) ((==) `on` extract) diffCost (unTerm a) (unTerm (b :: ArbitraryTerm String CategorySet)) in
         diff == diff
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = unTerm (a :: ArbitraryTerm String CategorySet) in
-        diffCost (diffTerms ((==) `on` extract) diffCost term term) == 0
+        diffCost (diffTerms (free . Free) ((==) `on` extract) diffCost term term) == 0
