@@ -5,9 +5,9 @@ import Data.String
 
 -- | A standardized category of AST node. Used to determine the semantics for
 -- | semantic diffing and define comparability of nodes.
-data Category =
+data Category
   -- | An operator with 2 operands.
-  BinaryOperator
+  = BinaryOperator
   -- | A literal key-value data structure.
   | DictionaryLiteral
   -- | A pair, e.g. of a key & value
