@@ -45,7 +45,7 @@ defaultCategoryForNodeName name = case name of
   "integer" -> IntegerLiteral
   "symbol" -> SymbolLiteral
   "array" -> ArrayLiteral
-  _ -> (Other name)
+  _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Language -> Ptr Document -> Parser
