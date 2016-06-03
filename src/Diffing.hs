@@ -59,7 +59,7 @@ breakDownLeavesByWord source = cata replaceIn
               _ -> syntax
             ranges = rangesAndWordsInSource (characterRange info)
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
-    makeLeaf categories (range, substring) = cofree $ Info range categories 1 :< Leaf (T.pack substring)
+    makeLeaf category (range, substring) = cofree $ Info range category 1 :< Leaf (T.pack substring)
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
