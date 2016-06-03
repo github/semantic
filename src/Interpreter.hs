@@ -18,6 +18,7 @@ import Term
 -- | Returns whether two terms are comparable
 type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
 
+-- | Constructs a diff from the CofreeF containing its annotation and syntax. This function has the opportunity to, for example, cache properties in the annotation.
 type DiffConstructor leaf annotation = CofreeF (Syntax leaf) (Both annotation) (Diff leaf annotation) -> Diff leaf annotation
 
 -- | Diff two terms, given a function that determines whether two terms can be compared and a cost function.
