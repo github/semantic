@@ -18,6 +18,8 @@ import Term
 -- | Returns whether two terms are comparable
 type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
 
+type DiffConstructor leaf annotation = CofreeF (Syntax leaf) (Both annotation) (Diff leaf annotation) -> Diff leaf annotation
+
 -- | Diff two terms, given a function that determines whether two terms can be compared and a cost function.
 diffTerms :: (Eq a, Eq annotation) => Comparable a annotation -> Cost a annotation -> Term a annotation -> Term a annotation -> Diff a annotation
 diffTerms comparable cost a b = fromMaybe (pure $ Replace a b) $ constructAndRun comparable cost a b
