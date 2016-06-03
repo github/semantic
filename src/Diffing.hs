@@ -107,4 +107,4 @@ diffFiles parser renderer sourceBlobs = do
 diffCostWithCachedTermSizes :: Diff a Info -> Integer
 diffCostWithCachedTermSizes diff = case runFree diff of
   Free (info :< _) -> sum (cost <$> info)
-  Pure patch -> sum (Join (fromThese 0 0 (unPatch (cost . extract <$> patch))))
+  Pure patch -> sum (cost . extract <$> patch)
