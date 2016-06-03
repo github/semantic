@@ -36,6 +36,7 @@ instance HasCategory Text where
 instance HasCategory Category where
   toCategoryName category = case category of
     Program -> "top level"
+    Error -> "error"
     BinaryOperator -> "binary operator"
     DictionaryLiteral -> "dictionary"
     Pair -> "pair"

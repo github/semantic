@@ -8,6 +8,8 @@ import Data.String
 data Category
   -- | The top-level branch node.
   = Program
+  -- | A node indicating syntax errors.
+  | Error
   -- | An operator with 2 operands.
   | BinaryOperator
   -- | A literal key-value data structure.

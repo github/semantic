@@ -37,6 +37,7 @@ classifyMarkup category element = (element !) . A.class_ . stringValue $ styleNa
 styleName :: Category -> String
 styleName category = "category-" ++ case category of
   Program -> "program"
+  Error -> "error"
   BinaryOperator -> "binary-operator"
   DictionaryLiteral -> "dictionary"
   Pair -> "pair"
