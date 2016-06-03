@@ -36,6 +36,7 @@ classifyMarkup category element = (element !) . A.class_ . stringValue $ styleNa
 -- | Return the appropriate style name for the given category.
 styleName :: Category -> String
 styleName category = "category-" ++ case category of
+  Program -> "program"
   BinaryOperator -> "binary-operator"
   DictionaryLiteral -> "dictionary"
   Pair -> "pair"
