@@ -74,6 +74,9 @@ readAndTranscodeFile path = do
   text <- B1.readFile path
   transcode text
 
+cacheTermCosts :: Term leaf Info -> Term leaf Info
+cacheTermCosts = fmap $ \ info -> info { cost = size info }
+
 -- | Given a parser and renderer, diff two sources and return the rendered
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
@@ -88,7 +91,7 @@ diffFiles parser renderer sourceBlobs = do
   let textDiff = case areNullOids of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
-        (_, _) -> runBothWith (diffTerms ((==) `on` category . extract) diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
+        (_, _) -> runBothWith (diffTerms ((==) `on` category . extract) diffCostWithCachedTermSizes) $ cacheTermCosts <$> (replaceLeaves <*> terms)
 
   pure $! renderer textDiff sourceBlobs
 
