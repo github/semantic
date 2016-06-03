@@ -15,8 +15,7 @@ import Source
 -- | and aren't pure.
 type Parser = Source Char -> IO (Term Text Info)
 
--- | Given a source string, the term's range, production name, and
--- | production/child pairs, construct the term.
+-- | A function which constructs a term from a source string, annotation, and children.
 type Constructor = Source Char -> Info -> [Term Text Info] -> Term Text Info
 
 -- | Categories that are treated as keyed nodes.
