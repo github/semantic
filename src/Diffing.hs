@@ -53,12 +53,11 @@ breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
 breakDownLeavesByWord source = cata replaceIn
   where
     replaceIn :: TermF T.Text Info (Term T.Text Info) -> Term T.Text Info
-    replaceIn (info :< Leaf _)
-      | ranges <- rangesAndWordsInSource (characterRange info)
-      , length ranges > 1
-      = cofree $ info { size = 1 + fromIntegral (length ranges) } :< Indexed (makeLeaf (category info) <$> ranges)
-    replaceIn (info :< syntax)
-      = cofree $ info { size = 1 + sum (size . extract <$> syntax) } :< syntax
+    replaceIn (info :< syntax) = cofree $ info { size = 1 + sum (size . extract <$> syntax') } :< syntax'
+      where syntax' = case (ranges, syntax) of
+              (_:_:_, Leaf _) -> Indexed (makeLeaf (category info) <$> ranges)
+              _ -> syntax
+            ranges = rangesAndWordsInSource (characterRange info)
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
     makeLeaf categories (range, substring) = cofree $ Info range categories 1 :< Leaf (T.pack substring)
 
