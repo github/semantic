@@ -94,7 +94,12 @@ diffFiles parser renderer sourceBlobs = do
 
   pure $! renderer textDiff sourceBlobs
   where construct :: CofreeF (Syntax Text) (Both Info) (Diff Text Info) -> Diff Text Info
-        construct = free . Free
+        construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
+        setCost info cost = info { cost = cost }
+        sumCost = fmap getSum . foldMap (fmap Sum . getCost)
+        getCost diff = case runFree diff of
+          Free (info :< _) -> cost <$> info
+          Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermSizes :: Diff a Info -> Integer
