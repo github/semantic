@@ -38,6 +38,7 @@ categoriesForLanguage language name = case (language, name) of
 defaultCategoryForNodeName :: String -> Category
 defaultCategoryForNodeName name = case name of
   "program" -> Program
+  "ERROR" -> Error
   "function_call" -> FunctionCall
   "pair" -> Pair
   "string" -> StringLiteral
