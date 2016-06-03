@@ -1,4 +1,4 @@
-module Interpreter (Comparable, diffTerms) where
+module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
 import Data.Functor.Foldable
