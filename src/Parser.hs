@@ -40,15 +40,15 @@ isFixed = flip Set.member fixedCategories
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
 termConstructor :: (String -> Category) -> Constructor
-termConstructor mapping source range name children = cofree (Info range categories (1 + sum (size . extract <$> children)) :< construct children)
+termConstructor mapping source range name children = cofree (Info range category (1 + sum (size . extract <$> children)) :< construct children)
   where
-    categories = mapping name
+    category = mapping name
     construct :: [Term Text Info] -> Syntax Text (Term Text Info)
     construct [] = Leaf . pack . toString $ slice range source
-    construct children | isFixed categories = Fixed children
-    construct children | isKeyed categories = Keyed . Map.fromList $ assignKey <$> children
+    construct children | isFixed category = Fixed children
+    construct children | isKeyed category = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed children
     assignKey node = case runCofree node of
-      info :< Fixed (key : _) | Pair == category info -> (getSubstring key, node)
+      info :< Fixed (key : _) | Pair == Info.category info -> (getSubstring key, node)
       _ -> (getSubstring node, node)
     getSubstring term = pack . toString $ slice (characterRange (extract term)) source
