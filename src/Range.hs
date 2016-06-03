@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
 module Range where
 
 import qualified Data.Char as Char

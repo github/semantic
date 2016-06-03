@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables, FlexibleInstances, RecordWildCards #-}
+{-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
 module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..)) where
 
 import Prologue hiding (fst, snd)

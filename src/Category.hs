@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
 module Category where
 
 import Prologue
