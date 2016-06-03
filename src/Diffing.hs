@@ -53,14 +53,13 @@ breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
 breakDownLeavesByWord source = cata replaceIn
   where
     replaceIn :: TermF T.Text Info (Term T.Text Info) -> Term T.Text Info
-    replaceIn (Info range categories _ :< Leaf _)
-      | ranges <- rangesAndWordsInSource range
-      , length ranges > 1
-      = cofree $ Info range categories (1 + fromIntegral (length ranges)) :< Indexed (makeLeaf categories <$> ranges)
-    replaceIn (info :< syntax)
-      = cofree $ info { size = 1 + sum (size . extract <$> syntax) } :< syntax
+    replaceIn (info :< syntax) = cofree $ info { size = 1 + sum (size . extract <$> syntax') } :< syntax'
+      where syntax' = case (ranges, syntax) of
+              (_:_:_, Leaf _) -> Indexed (makeLeaf info <$> ranges)
+              _ -> syntax
+            ranges = rangesAndWordsInSource (characterRange info)
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
-    makeLeaf categories (range, substring) = cofree $ Info range categories 1 :< Leaf (T.pack substring)
+    makeLeaf info (range, substring) = cofree $ info { characterRange = range } :< Leaf (T.pack substring)
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
@@ -89,7 +88,7 @@ diffFiles parser renderer sourceBlobs = do
   let textDiff = case areNullOids of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
-        (_, _) -> runBothWith (diffTerms diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
+        (_, _) -> runBothWith (diffTerms ((==) `on` category . extract) diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
 
   pure $! renderer textDiff sourceBlobs
 

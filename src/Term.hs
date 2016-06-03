@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, TypeSynonymInstances, FlexibleInstances #-}
+{-# LANGUAGE TypeFamilies, TypeSynonymInstances #-}
 module Term where
 
 import Prologue

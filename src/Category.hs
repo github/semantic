@@ -1,9 +1,7 @@
-{-# LANGUAGE FlexibleInstances #-}
 module Category where
 
 import Prologue
 import Data.String
-import Term
 
 -- | A standardized category of AST node. Used to determine the semantics for
 -- | semantic diffing and define comparability of nodes.
@@ -27,10 +25,3 @@ data Category =
   -- | A non-standard category, which can be used for comparability.
   | Other String
   deriving (Eq, Show, Ord)
-
--- | The class of types that have categories.
-class Categorizable a where
-  category :: a -> Category
-
-instance Categorizable annotation => Categorizable (Term a annotation) where
-  category term | (annotation :< _) <- runCofree term = category annotation

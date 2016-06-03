@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module ArbitraryTerm where
 
@@ -45,13 +44,6 @@ instance (Eq a, Eq annotation, Arbitrary a, Arbitrary annotation) => Arbitrary (
       Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink))
 
 data CategorySet = A | B | C | D deriving (Eq, Show)
-
-instance Categorizable CategorySet where
-  category s = case s of
-    A -> Other "a"
-    B -> Other "b"
-    C -> Other "c"
-    D -> Other "d"
 
 instance Arbitrary CategorySet where
   arbitrary = elements [ A, B, C, D ]
