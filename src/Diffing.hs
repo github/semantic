@@ -105,4 +105,6 @@ diffFiles parser renderer sourceBlobs = do
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermSizes :: Diff a Info -> Integer
-diffCostWithCachedTermSizes = diffSum (getSum . foldMap (Sum . size . extract))
+diffCostWithCachedTermSizes diff = case runFree diff of
+  Free (info :< _) -> sum (cost <$> info)
+  Pure patch -> sum (Join (fromThese 0 0 (unPatch (cost . extract <$> patch))))
