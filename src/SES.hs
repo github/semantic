@@ -19,12 +19,11 @@ ses diffTerms cost as bs = fst <$> evalState diffState Map.empty where
 
 -- | Find the shortest edit script between two terms at a given vertex in the edit graph.
 diffAt :: Compare a annotation -> Cost a annotation -> (Integer, Integer) -> [Term a annotation] -> [Term a annotation] -> State (Map.Map (Integer, Integer) [(Diff a annotation, Integer)]) [(Diff a annotation, Integer)]
-diffAt _ _ _ [] [] = pure []
-diffAt _ cost _ [] bs = pure $ foldr toInsertions [] bs where
-  toInsertions each = consWithCost cost (pure . Insert $ each)
-diffAt _ cost _ as [] = pure $ foldr toDeletions [] as where
-  toDeletions each = consWithCost cost (pure . Delete $ each)
-diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
+diffAt diffTerms cost (i, j) as bs
+  | null as, null bs = pure []
+  | null as = pure $ foldr insert [] bs
+  | null bs = pure $ foldr delete [] as
+  | (a : as) <- as, (b : bs) <- bs = do
   cachedDiffs <- get
   case Map.lookup (i, j) cachedDiffs of
     Just diffs -> pure diffs
@@ -34,14 +33,14 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
       nomination <- fmap best $ case diffTerms a b of
         Just diff -> do
           diagonal <- recur (succ i, succ j) as bs
-          pure [ delete down, insert right, consWithCost cost diff diagonal ]
-        Nothing -> pure [ delete down, insert right ]
+          pure [ delete a down, insert b right, consWithCost cost diff diagonal ]
+        Nothing -> pure [ delete a down, insert b right ]
       cachedDiffs' <- get
       put $ Map.insert (i, j) nomination cachedDiffs'
       pure nomination
   where
-    delete = consWithCost cost (pure . Delete $ a)
-    insert = consWithCost cost (pure . Insert $ b)
+    delete = consWithCost cost . pure . Delete
+    insert = consWithCost cost . pure . Insert
     costOf [] = 0
     costOf ((_, c) : _) = c
     best = minimumBy (comparing costOf)
