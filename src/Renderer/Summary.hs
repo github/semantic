@@ -8,4 +8,4 @@ import Data.ByteString.Builder
 import Data.Text (pack)
 
 summary :: Renderer
-summary diff sources = toS . toLazyByteString . fromEncoding . foldable $ pack . show <$> diffSummary diff
+summary diff _ = toS . toLazyByteString . fromEncoding . foldable $ pack . show <$> diffSummary diff

@@ -14,4 +14,4 @@ spec :: Spec
 spec = parallel $
   describe "hunks" $
     it "empty diffs have empty hunks" $
-        hunks (free . Free $ pure (Info (Range 0 0) StringLiteral 1) :< Leaf "") (both (SourceBlob (fromList "") "abcde" "path2.txt" (Just defaultPlainBlob)) (SourceBlob (fromList "") "xyz" "path2.txt" (Just defaultPlainBlob))) `shouldBe` [Hunk {offset = pure 0, changes = [], trailingContext = []}]
+        hunks (free . Free $ pure (Info (Range 0 0) StringLiteral 1 0) :< Leaf "") (both (SourceBlob (fromList "") "abcde" "path2.txt" (Just defaultPlainBlob)) (SourceBlob (fromList "") "xyz" "path2.txt" (Just defaultPlainBlob))) `shouldBe` [Hunk {offset = pure 0, changes = [], trailingContext = []}]

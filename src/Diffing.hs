@@ -7,6 +7,7 @@ import Data.Functor.Foldable
 import qualified Data.Text as T
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
+import Data.These
 import Diff
 import Info
 import Category
@@ -37,8 +38,9 @@ lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 
   (leaves, _) -> cofree <$> leaves
   where
     lines = actualLines input
-    root children = Info (Range 0 $ length input) (Other "program") (1 + fromIntegral (length children)) :< Indexed children
-    leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) (Other "program") 1 :< Leaf line
+    root children = let size = 1 + fromIntegral (length children) in
+      Info (Range 0 $ length input) (Other "program") size size :< Indexed children
+    leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) (Other "program") 1 1 :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum ++ [ leaf charIndex (toText line) ]
       , charIndex + length line)
@@ -53,7 +55,7 @@ breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
 breakDownLeavesByWord source = cata replaceIn
   where
     replaceIn :: TermF T.Text Info (Term T.Text Info) -> Term T.Text Info
-    replaceIn (info :< syntax) = cofree $ info { size = 1 + sum (size . extract <$> syntax') } :< syntax'
+    replaceIn (info :< syntax) = let size' = 1 + sum (size . extract <$> syntax') in cofree $ info { size = size', cost = size' } :< syntax'
       where syntax' = case (ranges, syntax) of
               (_:_:_, Leaf _) -> Indexed (makeLeaf info <$> ranges)
               _ -> syntax
@@ -88,10 +90,19 @@ diffFiles parser renderer sourceBlobs = do
   let textDiff = case areNullOids of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
-        (_, _) -> runBothWith (diffTerms ((==) `on` category . extract) diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
+        (_, _) -> runBothWith (diffTerms construct ((==) `on` category . extract) diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
 
   pure $! renderer textDiff sourceBlobs
+  where construct :: CofreeF (Syntax Text) (Both Info) (Diff Text Info) -> Diff Text Info
+        construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
+        setCost info cost = info { cost = cost }
+        sumCost = fmap getSum . foldMap (fmap Sum . getCost)
+        getCost diff = case runFree diff of
+          Free (info :< _) -> cost <$> info
+          Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermSizes :: Diff a Info -> Integer
-diffCostWithCachedTermSizes = diffSum (getSum . foldMap (Sum . size . extract))
+diffCostWithCachedTermSizes diff = case runFree diff of
+  Free (info :< _) -> sum (cost <$> info)
+  Pure patch -> sum (cost . extract <$> patch)
