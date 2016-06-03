@@ -21,9 +21,9 @@ ses diffTerms cost as bs = fst <$> evalState diffState Map.empty where
 diffAt :: Compare a annotation -> Cost a annotation -> (Integer, Integer) -> [Term a annotation] -> [Term a annotation] -> State (Map.Map (Integer, Integer) [(Diff a annotation, Integer)]) [(Diff a annotation, Integer)]
 diffAt _ _ _ [] [] = pure []
 diffAt _ cost _ [] bs = pure $ foldr toInsertions [] bs where
-  toInsertions each = consWithCost cost (free . Pure . Insert $ each)
+  toInsertions each = consWithCost cost (pure . Insert $ each)
 diffAt _ cost _ as [] = pure $ foldr toDeletions [] as where
-  toDeletions each = consWithCost cost (free . Pure . Delete $ each)
+  toDeletions each = consWithCost cost (pure . Delete $ each)
 diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
   cachedDiffs <- get
   case Map.lookup (i, j) cachedDiffs of
@@ -40,8 +40,8 @@ diffAt diffTerms cost (i, j) (a : as) (b : bs) = do
       put $ Map.insert (i, j) nomination cachedDiffs'
       pure nomination
   where
-    delete = consWithCost cost (free . Pure . Delete $ a)
-    insert = consWithCost cost (free . Pure . Insert $ b)
+    delete = consWithCost cost (pure . Delete $ a)
+    insert = consWithCost cost (pure . Insert $ b)
     costOf [] = 0
     costOf ((_, c) : _) = c
     best = minimumBy (comparing costOf)
