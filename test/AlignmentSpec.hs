@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
 module AlignmentSpec where
 
 import Alignment

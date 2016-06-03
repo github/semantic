@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleInstances, RecordWildCards #-}
 module Renderer.Split where
 
 import Data.String
