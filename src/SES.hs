@@ -2,23 +2,21 @@ module SES where
 
 import Prologue
 import Patch
-import Diff
-import Term
 import qualified Data.Map as Map
 
--- | A function that maybe creates a diff from two terms.
-type Compare a annotation = Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
+-- | Edit constructor for two terms, if comparable. Otherwise returns Nothing.
+type Compare term edit = term -> term -> Maybe edit
 
--- | A function that computes the cost of a diff.
-type Cost a annotation = Diff a annotation -> Integer
+-- | A function that computes the cost of an edit.
+type Cost edit = edit -> Integer
 
 -- | Find the shortest edit script (diff) between two terms given a function to compute the cost.
-ses :: Compare a annotation -> Cost a annotation -> [Term a annotation] -> [Term a annotation] -> [Diff a annotation]
+ses :: Applicative edit => Compare term (edit (Patch term)) -> Cost (edit (Patch term)) -> [term] -> [term] -> [edit (Patch term)]
 ses diffTerms cost as bs = fst <$> evalState diffState Map.empty where
   diffState = diffAt diffTerms cost (0, 0) as bs
 
 -- | Find the shortest edit script between two terms at a given vertex in the edit graph.
-diffAt :: Compare a annotation -> Cost a annotation -> (Integer, Integer) -> [Term a annotation] -> [Term a annotation] -> State (Map.Map (Integer, Integer) [(Diff a annotation, Integer)]) [(Diff a annotation, Integer)]
+diffAt :: Applicative edit => Compare term (edit (Patch term)) -> Cost (edit (Patch term)) -> (Integer, Integer) -> [term] -> [term] -> State (Map.Map (Integer, Integer) [(edit (Patch term), Integer)]) [(edit (Patch term), Integer)]
 diffAt diffTerms cost (i, j) as bs
   | null as, null bs = pure []
   | null as = pure $ foldr insert [] bs
@@ -46,6 +44,6 @@ diffAt diffTerms cost (i, j) as bs
     best = minimumBy (comparing costOf)
     recur = diffAt diffTerms cost
 
--- | Prepend a diff to the list with the cumulative cost.
-consWithCost :: Cost a annotation -> Diff a annotation -> [(Diff a annotation, Integer)] -> [(Diff a annotation, Integer)]
-consWithCost cost diff rest = (diff, cost diff + maybe 0 snd (fst <$> uncons rest)) : rest
+-- | Prepend an edit script and the cumulative cost onto the edit script.
+consWithCost :: Cost edit -> edit -> [(edit, Integer)] -> [(edit, Integer)]
+consWithCost cost edit rest = (edit, cost edit + maybe 0 snd (fst <$> uncons rest)) : rest
