@@ -27,9 +27,9 @@ diffTerms construct comparable cost a b = fromMaybe (pure $ Replace a b) $ const
 
 -- | Constructs an algorithm and runs it
 constructAndRun :: (Eq a, Eq annotation) => DiffConstructor a annotation -> Comparable a annotation -> Cost (Diff a annotation) -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
-constructAndRun construct _ _ a b | (() <$ a) == (() <$ b) = hylo construct runCofree <$> zipTerms a b
-
 constructAndRun _ comparable _ a b | not $ comparable a b = Nothing
+
+constructAndRun construct _ _ a b | (() <$ a) == (() <$ b) = hylo construct runCofree <$> zipTerms a b
 
 constructAndRun construct comparable cost t1 t2 =
   run construct comparable cost $ algorithm a b where
