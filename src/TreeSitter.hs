@@ -58,7 +58,7 @@ documentToTerm language document contents = alloca $ \ root -> do
           -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
           range <- pure $! Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
 
-          let info = Info range (categoriesForLanguage language name) (1 + sum (size . extract <$> children))
+          let info = Info range (categoriesForLanguage language name) (1 + sum (size . extract <$> children)) 0
           pure $! termConstructor contents info children
         getChild node n out = do
           _ <- ts_node_p_named_child node n out

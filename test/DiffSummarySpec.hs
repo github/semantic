@@ -9,14 +9,13 @@ import Syntax
 import Patch
 import Range
 import Category
-import Data.Set
 import DiffSummary
 
 arrayInfo :: Info
-arrayInfo = Info (rangeAt 0) ArrayLiteral 2
+arrayInfo = Info (rangeAt 0) ArrayLiteral 2 0
 
 literalInfo :: Info
-literalInfo = Info (rangeAt 1) StringLiteral 1
+literalInfo = Info (rangeAt 1) StringLiteral 1 0
 
 testDiff :: Diff String Info
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])

@@ -8,7 +8,6 @@ import Data.Functor.Both
 import Data.Functor.Foldable
 import qualified Data.OrderedMap as Map
 import qualified Data.List as List
-import qualified Data.Set as Set
 import Data.Text.Arbitrary ()
 import Data.These
 import Info
@@ -74,4 +73,4 @@ instance Arbitrary a => Arbitrary (Source a) where
 
 arbitraryLeaf :: Gen (Source Char, Info, Syntax (Source Char) f)
 arbitraryLeaf = toTuple <$> arbitrary
-  where toTuple string = (string, Info (Range 0 $ length string) StringLiteral 1, Leaf string)
+  where toTuple string = (string, Info (Range 0 $ length string) StringLiteral 1 0, Leaf string)
