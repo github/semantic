@@ -30,8 +30,8 @@ newtype Source a = Source { getVector :: Vector.Vector a  }
 
 -- | Map blobs with Nothing blobKind to empty blobs.
 idOrEmptySourceBlob :: SourceBlob -> SourceBlob
-idOrEmptySourceBlob blob = if isNothing (Source.blobKind blob)
-                           then (blob { Source.oid = nullOid, Source.blobKind = Nothing })
+idOrEmptySourceBlob blob = if isNothing (blobKind blob)
+                           then blob { oid = nullOid, blobKind = Nothing }
                            else blob
 
 nullOid :: String

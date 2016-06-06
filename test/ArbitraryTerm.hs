@@ -1,11 +1,9 @@
-{-# LANGUAGE FlexibleInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module ArbitraryTerm where
 
 import Category
 import Data.Bifunctor.Join
 import Data.Functor.Both
-import qualified Data.Set as Set
 import Data.Text.Arbitrary ()
 import Data.These
 import Info
@@ -17,13 +15,6 @@ import Syntax
 import Test.QuickCheck hiding (Fixed)
 
 data CategorySet = A | B | C | D deriving (Eq, Show)
-
-instance Categorizable CategorySet where
-  category s = case s of
-    A -> Other "a"
-    B -> Other "b"
-    C -> Other "c"
-    D -> Other "d"
 
 instance Arbitrary CategorySet where
   arbitrary = elements [ A, B, C, D ]
@@ -53,4 +44,4 @@ instance Arbitrary a => Arbitrary (Source a) where
 
 arbitraryLeaf :: Gen (Source Char, Info, Syntax (Source Char) f)
 arbitraryLeaf = toTuple <$> arbitrary
-  where toTuple string = (string, Info (Range 0 $ length string) StringLiteral 1, Leaf string)
+  where toTuple string = (string, Info (Range 0 $ length string) StringLiteral 1 0, Leaf string)

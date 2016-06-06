@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, TypeSynonymInstances, FlexibleInstances #-}
+{-# LANGUAGE TypeFamilies, TypeSynonymInstances #-}
 module Diff where
 
 import Prologue

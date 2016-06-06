@@ -1,11 +1,11 @@
-{-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables, FlexibleInstances, RecordWildCards #-}
+{-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
 module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..)) where
 
 import Prologue hiding (fst, snd)
 import Data.String
 import Data.Maybe (fromJust)
 import Diff
-import Info (Info)
+import Info (Info, category)
 import Patch
 import Term
 import Syntax
@@ -49,11 +49,11 @@ instance HasCategory leaf => HasCategory (Term leaf Info) where
   toCategoryName = toCategoryName . category . extract
 
 data DiffSummary a = DiffSummary {
-  patch :: Patch DiffInfo,
-  parentAnnotations :: [DiffInfo]
+  patch :: Patch a,
+  parentAnnotations :: [a]
 } deriving (Eq, Functor)
 
-instance Show a => Show (DiffSummary a) where
+instance Show (DiffSummary DiffInfo) where
   showsPrec _ DiffSummary{..} s = (++s) $ case patch of
     (Insert termInfo) -> "Added the " ++ "'" ++ fromJust (termName termInfo) ++ "' " ++ categoryName termInfo
       ++ maybeParentContext parentAnnotations

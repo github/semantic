@@ -1,7 +1,6 @@
 module TermSpec where
 
 import ArbitraryTerm
-import Category
 import Data.String
 import Data.Functor.Foldable
 import Data.Text.Arbitrary ()
@@ -25,9 +24,9 @@ spec = parallel $ do
 
   describe "Diff" $ do
     prop "equality is reflexive" $
-      \ a b -> let diff = interpret ((==) `on` category) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm String CategorySet)) in
+      \ a b -> let diff = diffTerms (free . Free) (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm String CategorySet)) in
         diff == diff
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = toTerm (a :: ArbitraryTerm String CategorySet) in
-        diffCost (interpret ((==) `on` category) diffCost term term) == 0
+        diffCost (diffTerms (free . Free) (==) diffCost term term) == 0

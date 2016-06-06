@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
 module AlignmentSpec where
 
 import Alignment
@@ -258,7 +257,7 @@ align :: Both (Source.Source Char) -> ConstructibleFree (Patch (Term String Info
 align sources = PrettyDiff sources . fmap (fmap (getRange &&& identity)) . alignDiff sources . deconstruct
 
 info :: Int -> Int -> Info
-info = ((\ r -> Info r StringLiteral 0) .) . Range
+info start end = Info (Range start end) StringLiteral 0 0
 
 prettyDiff :: Both (Source.Source Char) -> [Join These (ConstructibleFree (SplitPatch (Term String Info)) Info)] -> PrettyDiff (SplitDiff String Info)
 prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& identity) . deconstruct))
