@@ -7,7 +7,7 @@ import Data.Functor.Foldable (unfold)
 import qualified Data.List as List
 import qualified Data.OrderedMap as Map
 import Patch
-import Patch.Arbitrary
+import Patch.Arbitrary ()
 import Syntax
 import Prologue
 import Term.Arbitrary
@@ -22,7 +22,7 @@ toDiff = fmap (fmap toTerm) . unfold unArbitraryDiff
 diffOfSize :: (Arbitrary leaf, Arbitrary annotation) => Int -> Gen (ArbitraryDiff leaf annotation)
 diffOfSize n = oneof
   [ (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize n
-  , ArbitraryDiff . Pure <$> patchOf (termOfSize n) ]
+  , ArbitraryDiff . Pure <$> patchOfSize n ]
   where syntaxOfSize n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsOfSize n
                        | otherwise = oneof $ branchGeneratorsOfSize n
         branchGeneratorsOfSize n =
@@ -36,6 +36,13 @@ diffOfSize n = oneof
           first <- diffOfSize m
           rest <- childrenOfSize (n - m)
           pure $! first : rest
+        patchOfSize n = do
+          m <- choose (1, n - 1)
+          left <- termOfSize m
+          right <- termOfSize (n - m)
+          oneof [ Insert <$> termOfSize n
+                , Delete <$> termOfSize n
+                , pure (Replace left right) ]
 
 arbitraryDiffSize :: ArbitraryDiff leaf annotation -> Int
 arbitraryDiffSize = iter (succ . sum) . fmap (sum . fmap (arbitraryTermSize . unfold runCofree)) . toDiff
