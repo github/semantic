@@ -2,7 +2,6 @@ module TermSpec where
 
 import ArbitraryTerm
 import Data.String
-import Data.Functor.Foldable
 import Data.Text.Arbitrary ()
 import Diff
 import Diff.Arbitrary
