@@ -37,13 +37,15 @@ categoriesForLanguage language name = case (language, name) of
 -- | Given a node name from TreeSitter, return the correct categories.
 defaultCategoryForNodeName :: String -> Category
 defaultCategoryForNodeName name = case name of
+  "program" -> Program
+  "ERROR" -> Error
   "function_call" -> FunctionCall
   "pair" -> Pair
   "string" -> StringLiteral
   "integer" -> IntegerLiteral
   "symbol" -> SymbolLiteral
   "array" -> ArrayLiteral
-  _ -> (Other name)
+  _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Language -> Ptr Document -> Parser

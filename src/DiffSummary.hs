@@ -35,6 +35,8 @@ instance HasCategory Text where
 
 instance HasCategory Category where
   toCategoryName category = case category of
+    Program -> "top level"
+    Error -> "error"
     BinaryOperator -> "binary operator"
     DictionaryLiteral -> "dictionary"
     Pair -> "pair"
@@ -43,7 +45,7 @@ instance HasCategory Category where
     IntegerLiteral -> "integer"
     SymbolLiteral -> "symbol"
     ArrayLiteral -> "array"
-    (Other s) -> s
+    Other s -> s
 
 instance HasCategory leaf => HasCategory (Term leaf Info) where
   toCategoryName = toCategoryName . category . extract
