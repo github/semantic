@@ -2,18 +2,15 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Main where
 
-import Alignment
 import Criterion.Main
 import Data.Bifunctor.Join
 import Data.Bifunctor.Join.Arbitrary ()
-import Data.Functor.Foldable
 import Data.String
 import Data.Text.Arbitrary ()
 import Data.These
 import Data.These.Arbitrary ()
 import Patch.Arbitrary ()
 import Prologue
-import Term.Arbitrary
 import Test.QuickCheck hiding (Fixed)
 
 main :: IO ()
