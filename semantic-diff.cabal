@@ -51,6 +51,7 @@ library
                      , directory
                      , filepath
                      , mtl
+                     , parallel
                      , pointed
                      , semigroups
                      , text >= 1.2.1.3
