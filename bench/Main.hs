@@ -3,15 +3,22 @@
 module Main where
 
 import Criterion.Main
+import Data.Function
 import Data.String
 import Patch
 import Prologue
+import SES
 import Test.QuickCheck hiding (Fixed)
 
 main :: IO ()
 main = do
-  benchmarks <- sequenceA []
+  benchmarks <- sequenceA [ generativeBenchmark "ses" 10 (uncurry ((*) `on` length)) (nf (uncurry benchmarkSES)) ]
   defaultMain benchmarks
+
+benchmarkSES :: [Int] -> [Int] -> [Either Int (Patch Int)]
+benchmarkSES as bs = ses compare cost as bs
+  where compare a b = if a == b then Just (Left a) else Nothing
+        cost = either (const 0) (sum . (1 <$))
 
 instance NFData a => NFData (Patch a)
 
