@@ -32,7 +32,7 @@ generativeBenchmark name n metric benchmark = generativeBenchmarkWith name n arb
 
 generativeBenchmarkWith :: (Show m, Ord m) => String -> Int -> Gen a -> (a -> m) -> (a -> Benchmarkable) -> IO Benchmark
 generativeBenchmarkWith name n generator metric benchmark = do
-  benchmarks <- traverse measure [0,(defaultSize `div` n)..defaultSize]
+  benchmarks <- traverse measure (take n [0,(defaultSize `div` n)..defaultSize])
   pure $! bgroup name (snd <$> (sortOn fst benchmarks))
   where measure n = do
           input <- generate (resize n generator)
