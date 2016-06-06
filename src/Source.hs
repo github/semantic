@@ -2,7 +2,7 @@
 module Source where
 
 import Prologue hiding (uncons)
-import Data.Text (unpack)
+import Data.Text (unpack, pack)
 import Data.String
 import qualified Data.Vector as Vector
 import Numeric
@@ -52,6 +52,10 @@ slice range = Source . Vector.slice (start range) (rangeLength range) . getVecto
 -- | Return a String with the contents of the Source.
 toString :: Source Char -> String
 toString = toList
+
+-- | Return a text with the contents of the Source.
+toText :: Source Char -> Text
+toText = pack . toList
 
 -- | Return the item at the given  index.
 at :: Source a -> Int -> a

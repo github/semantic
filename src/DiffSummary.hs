@@ -2,7 +2,6 @@
 module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..)) where
 
 import Prologue hiding (fst, snd)
-import Data.String
 import Data.Maybe (fromJust)
 import Diff
 import Info (Info, category)
@@ -13,25 +12,22 @@ import Category
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.OrderedMap
-import Data.Text as Text (unpack)
+import Data.Text as Text (pack)
 
-data DiffInfo = DiffInfo { categoryName :: String, termName :: Maybe String } deriving (Eq, Show)
+data DiffInfo = DiffInfo { categoryName :: Text, termNames :: [Text] } deriving (Eq, Show)
 
-maybeTermName :: HasCategory leaf => Term leaf Info -> Maybe String
-maybeTermName term = case runCofree term of
-  (_ :< Leaf leaf) -> Just (toCategoryName leaf)
-  (_ :< Keyed children) -> Just (unpack . mconcat $ keys children)
-  (_ :< Indexed children) -> toCategoryName . category <$> head (extract <$> children)
-  (_ :< Fixed children) -> toCategoryName . category <$> head (extract <$> children)
+maybeTermNames :: HasCategory leaf => Term leaf Info -> [Text]
+maybeTermNames term = case runCofree term of
+  (_ :< Leaf leaf) -> pure $ toCategoryName leaf
+  (_ :< Keyed children) -> keys children
+  (_ :< Indexed children) -> toCategoryName . category <$> extract <$> children
+  (_ :< Fixed children) -> toCategoryName . category <$> extract <$> children
 
 class HasCategory a where
-  toCategoryName :: a -> String
-
-instance HasCategory String where
-  toCategoryName = identity
+  toCategoryName :: a -> Text
 
 instance HasCategory Text where
-  toCategoryName = unpack
+  toCategoryName = identity
 
 instance HasCategory Category where
   toCategoryName category = case category of
@@ -56,13 +52,16 @@ data DiffSummary a = DiffSummary {
 } deriving (Eq, Functor)
 
 instance Show (DiffSummary DiffInfo) where
-  showsPrec _ DiffSummary{..} s = (++s) $ case patch of
-    (Insert termInfo) -> "Added the " ++ "'" ++ fromJust (termName termInfo) ++ "' " ++ categoryName termInfo
-      ++ maybeParentContext parentAnnotations
-    (Delete termInfo) -> "Deleted the " ++ "'" ++ fromJust (termName termInfo) ++ "' " ++ categoryName termInfo
-      ++ maybeParentContext parentAnnotations
-    (Replace t1 t2) -> "Replaced the " ++ "'" ++ fromJust (termName t1) ++ "' " ++ categoryName t1
-      ++ " with the " ++ "'" ++ fromJust (termName t2) ++ "' " ++ categoryName t2
+  showsPrec _ DiffSummary{..} s = (++s) . intercalate "\n" $ case patch of
+    (Insert termInfo) -> for (termNames termInfo) $ \name ->
+      "Added the " <> "'" <> name <> "' " <> categoryName termInfo
+      <> maybeParentContext parentAnnotations
+    (Delete termInfo) -> for (termNames termInfo) $ \name ->
+      "Deleted the " <> "'" <> name <> "' " <> categoryName termInfo
+      <> maybeParentContext parentAnnotations
+    (Replace t1 t2) -> for (zip (termNames t1) (termNames t2)) $ \(name1, name2) ->
+      "Replaced the " <> "'" ++ name1 ++ "' " ++ categoryName t1
+      ++ " with the " ++ "'" ++ name2 ++ "' " ++ categoryName t2
       ++ maybeParentContext parentAnnotations
     where maybeParentContext parentAnnotations = if null parentAnnotations
             then ""
@@ -71,12 +70,12 @@ instance Show (DiffSummary DiffInfo) where
 diffSummary :: HasCategory leaf => Diff leaf Info -> [DiffSummary DiffInfo]
 diffSummary = cata $ \case
   (Free (_ :< Leaf _)) -> [] -- Skip leaves since they don't have any changes
-  (Free (infos :< Indexed children)) -> prependSummary (DiffInfo (toCategoryName . category $ snd infos) Nothing) <$> join children
-  (Free (infos :< Fixed children)) -> prependSummary (DiffInfo (toCategoryName . category $ snd infos) Nothing) <$> join children
-  (Free (infos :< Keyed children)) -> prependSummary (DiffInfo (toCategoryName . category $ snd infos) Nothing) <$> join (Prologue.toList children)
-  (Pure (Insert term)) -> [DiffSummary (Insert (DiffInfo (toCategoryName term) (maybeTermName term))) []]
-  (Pure (Delete term)) -> [DiffSummary (Delete (DiffInfo (toCategoryName term) (maybeTermName term))) []]
-  (Pure (Replace t1 t2)) -> [DiffSummary (Replace (DiffInfo (toCategoryName t1) (maybeTermName t1)) (DiffInfo (toCategoryName t2) (maybeTermName t2))) []]
+  (Free (infos :< Indexed children)) -> prependSummary (DiffInfo (toCategoryName . category $ snd infos) []) <$> join children
+  (Free (infos :< Fixed children)) -> prependSummary (DiffInfo (toCategoryName . category $ snd infos) []) <$> join children
+  (Free (infos :< Keyed children)) -> prependSummary (DiffInfo (toCategoryName . category $ snd infos) []) <$> join (Prologue.toList children)
+  (Pure (Insert term)) -> [DiffSummary (Insert (DiffInfo (toCategoryName term) (maybeTermNames term))) []]
+  (Pure (Delete term)) -> [DiffSummary (Delete (DiffInfo (toCategoryName term) (maybeTermNames term))) []]
+  (Pure (Replace t1 t2)) -> [DiffSummary (Replace (DiffInfo (toCategoryName t1) (maybeTermNames t1)) (DiffInfo (toCategoryName t2) (maybeTermNames t2))) []]
 
 prependSummary :: DiffInfo -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }

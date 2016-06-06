@@ -27,5 +27,5 @@ data Category
   -- | An array literal.
   | ArrayLiteral
   -- | A non-standard category, which can be used for comparability.
-  | Other String
+  | Other Text
   deriving (Eq, Show, Ord)

@@ -1,6 +1,6 @@
+{-# LANGUAGE OverloadedStrings #-}
 module Renderer.Split where
 
-import Data.String
 import Alignment
 import Category
 import Data.Bifunctor.Join
@@ -31,11 +31,11 @@ maybeFirst = foldr (const . Just) Nothing
 -- | Add the first category from a Foldable of categories as a class name as a
 -- | class name on the markup, prefixed by `category-`.
 classifyMarkup :: Category -> Markup -> Markup
-classifyMarkup category element = (element !) . A.class_ . stringValue $ styleName category
+classifyMarkup category element = (element !) . A.class_ . textValue $ styleName category
 
 -- | Return the appropriate style name for the given category.
-styleName :: Category -> String
-styleName category = "category-" ++ case category of
+styleName :: Category -> Text
+styleName category = "category-" <> case category of
   Program -> "program"
   Error -> "error"
   BinaryOperator -> "binary-operator"
@@ -93,18 +93,18 @@ split diff blobs = TL.toStrict . renderHtml
 newtype Renderable a = Renderable a
 
 instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Range))) where
-  toMarkup (Renderable (source, Info {..}, syntax)) = (! A.data_ (stringValue (show size))) . classifyMarkup category $ case syntax of
-    Leaf _ -> span . string . toString $ slice characterRange source
+  toMarkup (Renderable (source, Info {..}, syntax)) = (! A.data_ (textValue (show size))) . classifyMarkup category $ case syntax of
+    Leaf _ -> span . text . toText $ slice characterRange source
     Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source characterRange children
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source characterRange children
     Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements source characterRange children
 
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
-  string (toString (slice (Range (start range) (max next (start range))) source)) : elements
+  text (toText (slice (Range (start range) (max next (start range))) source)) : elements
 
 markupForContextAndChild :: ToMarkup f => Source Char -> (f, Range) -> ([Markup], Int) -> ([Markup], Int)
-markupForContextAndChild source (child, range) (rows, next) = (toMarkup child : string (toString (slice (Range (end range) next) source)) : rows, start range)
+markupForContextAndChild source (child, range) (rows, next) = (toMarkup child : text (toText (slice (Range (end range) next) source)) : rows, start range)
 
 wrapIn :: (Markup -> Markup) -> Markup -> Markup
 wrapIn _ l@Blaze.Leaf{} = l
