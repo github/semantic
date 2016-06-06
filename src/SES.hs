@@ -1,8 +1,8 @@
 module SES where
 
-import Prologue
-import Patch
 import qualified Data.Map as Map
+import Patch
+import Prologue
 
 -- | Edit constructor for two terms, if comparable. Otherwise returns Nothing.
 type Compare term edit = term -> term -> Maybe edit
