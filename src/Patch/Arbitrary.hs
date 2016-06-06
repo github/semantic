@@ -13,9 +13,6 @@ patchOf gen = oneof
   ]
 
 instance Arbitrary a => Arbitrary (Patch a) where
-  arbitrary = oneof [
-    Insert <$> arbitrary,
-    Delete <$> arbitrary,
-    Replace <$> arbitrary <*> arbitrary ]
+  arbitrary = patchOf arbitrary
 
   shrink patch = traverse shrink patch
