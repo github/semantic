@@ -26,11 +26,14 @@ instance NFData a => NFData (Patch a)
 -- |
 -- | The inputs’ sizes at each iteration are measured by a metric function, which gives the name of the benchmark. This makes it convenient to correlate a benchmark of some function over lists with e.g. input `length`.
 generativeBenchmark :: (Arbitrary a, Show m, Ord m) => String -> Int -> (a -> m) -> (a -> Benchmarkable) -> IO Benchmark
-generativeBenchmark name n metric benchmark = do
+generativeBenchmark name n metric benchmark = generativeBenchmarkWith name n arbitrary metric benchmark
+
+generativeBenchmarkWith :: (Show m, Ord m) => String -> Int -> Gen a -> (a -> m) -> (a -> Benchmarkable) -> IO Benchmark
+generativeBenchmarkWith name n generator metric benchmark = do
   benchmarks <- traverse measure (replicate n defaultSize)
   pure $! bgroup name (snd <$> (sortOn fst benchmarks))
   where measure n = do
-          input <- generate (resize n arbitrary)
+          input <- generate (resize n generator)
           let measurement = metric input
           pure $! (measurement, bench (show measurement) (benchmark input))
         defaultSize = 100
