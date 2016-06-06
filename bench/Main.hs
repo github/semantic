@@ -15,7 +15,7 @@ main = do
   benchmarks <- sequenceA [ generativeBenchmark "ses" 10 (uncurry ((*) `on` length)) (nf (uncurry benchmarkSES)) ]
   defaultMain benchmarks
 
-benchmarkSES :: [Int] -> [Int] -> [Either Int (Patch Int)]
+benchmarkSES :: [String] -> [String] -> [Either String (Patch String)]
 benchmarkSES as bs = ses compare cost as bs
   where compare a b = if a == b then Just (Left a) else Nothing
         cost = either (const 0) (sum . (1 <$))
