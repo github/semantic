@@ -18,7 +18,3 @@ instance Arbitrary CategorySet where
 
 instance Arbitrary a => Arbitrary (Source a) where
   arbitrary = Source.fromList <$> arbitrary
-
-arbitraryLeaf :: Gen (Source Char, Info, Syntax (Source Char) f)
-arbitraryLeaf = toTuple <$> arbitrary
-  where toTuple string = (string, Info (Range 0 $ length string) StringLiteral 1 0, Leaf string)
