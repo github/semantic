@@ -21,6 +21,7 @@ library
                      , Data.OrderedMap
                      , Data.These.Arbitrary
                      , Diff
+                     , Diff.Arbitrary
                      , Diffing
                      , DiffOutput
                      , Info
