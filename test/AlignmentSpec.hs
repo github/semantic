@@ -7,6 +7,7 @@ import Control.Monad.State
 import Data.Align hiding (align)
 import Data.Bifunctor
 import Data.Bifunctor.Join
+import Data.Bifunctor.Join.Arbitrary ()
 import Data.Functor.Both as Both
 import Data.List (nub)
 import Data.Monoid

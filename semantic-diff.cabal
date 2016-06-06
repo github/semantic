@@ -16,6 +16,7 @@ library
   exposed-modules:     Algorithm
                      , Alignment
                      , Category
+                     , Data.Bifunctor.Join.Arbitrary
                      , Data.Functor.Both
                      , Data.OrderedMap
                      , Data.These.Arbitrary

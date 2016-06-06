@@ -2,10 +2,7 @@
 module ArbitraryTerm where
 
 import Category
-import Data.Bifunctor.Join
-import Data.Functor.Both
 import Data.Text.Arbitrary ()
-import Data.These
 import Data.These.Arbitrary ()
 import Info
 import Prologue hiding (fst, snd)
@@ -18,14 +15,6 @@ data CategorySet = A | B | C | D deriving (Eq, Show)
 
 instance Arbitrary CategorySet where
   arbitrary = elements [ A, B, C, D ]
-
-instance Arbitrary a => Arbitrary (Join (,) a) where
-  arbitrary = both <$> arbitrary <*> arbitrary
-  shrink b = both <$> shrink (fst b) <*> shrink (snd b)
-
-instance Arbitrary a => Arbitrary (Join These a) where
-  arbitrary = Join <$> arbitrary
-  shrink (Join a) = Join <$> shrink a
 
 instance Arbitrary a => Arbitrary (Source a) where
   arbitrary = Source.fromList <$> arbitrary

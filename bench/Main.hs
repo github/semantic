@@ -5,6 +5,7 @@ module Main where
 import Alignment
 import Criterion.Main
 import Data.Bifunctor.Join
+import Data.Bifunctor.Join.Arbitrary ()
 import Data.Functor.Foldable
 import qualified Data.List as List
 import qualified Data.OrderedMap as Map
@@ -50,10 +51,6 @@ toDiff = fmap (fmap toTerm) . unfold unArbitraryDiff
 
 deriving instance (NFData a, NFData b) => NFData (These a b)
 deriving instance NFData a => NFData (Join These a)
-
-instance Arbitrary a => Arbitrary (Join These a) where
-  arbitrary = Join <$> arbitrary
-  shrink (Join a) = Join <$> shrink a
 
 instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbitrary (ArbitraryDiff leaf annotation) where
   arbitrary = scale (`div` 2) $ sized (\ x -> boundedTerm x x) -- first indicates the cube of the max length of lists, second indicates the cube of the max depth of the tree
