@@ -5,14 +5,14 @@ import Patch
 import Prologue
 import Test.QuickCheck
 
-patchOf :: Gen a -> Gen (Patch a)
-patchOf gen = oneof
-  [ Insert <$> gen
-  , Delete <$> gen
-  , Replace <$> gen <*> gen
+patchOf :: Gen a -> Gen a -> Gen (Patch a)
+patchOf l r = oneof
+  [ Insert <$> r
+  , Delete <$> l
+  , Replace <$> l <*> r
   ]
 
 instance Arbitrary a => Arbitrary (Patch a) where
-  arbitrary = patchOf arbitrary
+  arbitrary = patchOf arbitrary arbitrary
 
   shrink patch = traverse shrink patch
