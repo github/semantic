@@ -13,8 +13,9 @@ import Test.QuickCheck hiding (Fixed)
 
 main :: IO ()
 main = do
-  benchmarks <- sequenceA [ generativeBenchmark "ses" 10 (uncurry ((*) `on` length)) (nf (uncurry benchmarkSES)) ]
+  benchmarks <- sequenceA [ generativeBenchmarkWith "ses" 10 arbitrarySESInputs (uncurry ((*) `on` length)) (nf (uncurry benchmarkSES)) ]
   defaultMain benchmarks
+  where arbitrarySESInputs = (,) <$> sized (`vectorOf` arbitrary) <*> sized (`vectorOf` arbitrary)
 
 benchmarkSES :: [String] -> [String] -> [Either String (Patch String)]
 benchmarkSES as bs = ses compare cost as bs
