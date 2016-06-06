@@ -16,7 +16,7 @@ data Patch a =
   Replace a a
   | Insert a
   | Delete a
-  deriving (Foldable, Functor, Show, Eq)
+  deriving (Eq, Foldable, Functor, Show, Traversable)
 
 -- | Return the item from the after side of the patch.
 after :: Patch a -> Maybe a
