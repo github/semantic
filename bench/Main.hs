@@ -4,6 +4,7 @@ module Main where
 
 import Criterion.Main
 import Data.Function
+import Data.List (genericLength)
 import Data.String
 import Patch
 import Prologue
@@ -18,7 +19,7 @@ main = do
 benchmarkSES :: [String] -> [String] -> [Either String (Patch String)]
 benchmarkSES as bs = ses compare cost as bs
   where compare a b = if a == b then Just (Left a) else Nothing
-        cost = either (const 0) (sum . (1 <$))
+        cost = either (const 0) (sum . fmap genericLength)
 
 instance NFData a => NFData (Patch a)
 
