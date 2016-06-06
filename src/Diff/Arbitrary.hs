@@ -20,9 +20,11 @@ toDiff :: ArbitraryDiff leaf annotation -> Diff leaf annotation
 toDiff = fmap (fmap toTerm) . unfold unArbitraryDiff
 
 diffOfSize :: (Arbitrary leaf, Arbitrary annotation) => Int -> Gen (ArbitraryDiff leaf annotation)
-diffOfSize n = oneof
-  [ (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize n
-  , ArbitraryDiff . Pure <$> patchOfSize n ]
+diffOfSize n
+  | n <= 0 = (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize n
+  | otherwise = oneof
+    [ (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize n
+    , ArbitraryDiff . Pure <$> patchOfSize n ]
   where syntaxOfSize n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsOfSize n
                        | otherwise = oneof $ branchGeneratorsOfSize n
         branchGeneratorsOfSize n =
@@ -36,6 +38,8 @@ diffOfSize n = oneof
           first <- diffOfSize m
           rest <- childrenOfSize (n - m)
           pure $! first : rest
+        patchOfSize 1 = oneof [ Insert <$> termOfSize 1
+                              , Delete <$> termOfSize 1 ]
         patchOfSize n = do
           m <- choose (1, n - 1)
           left <- termOfSize m
