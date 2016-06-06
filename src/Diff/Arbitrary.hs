@@ -8,7 +8,7 @@ import Data.Functor.Foldable (Base, cata, unfold, Unfoldable(embed))
 import qualified Data.List as List
 import qualified Data.OrderedMap as Map
 import Patch
-import Patch.Arbitrary ()
+import Patch.Arbitrary
 import Syntax
 import Prologue
 import Term
@@ -22,7 +22,9 @@ toDiff :: ArbitraryDiff leaf annotation -> Diff leaf annotation
 toDiff = fmap (fmap toTerm) . unfold unArbitraryDiff
 
 diffOfSize :: (Arbitrary leaf, Arbitrary annotation) => Int -> Gen (ArbitraryDiff leaf annotation)
-diffOfSize n = (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize n
+diffOfSize n = oneof
+  [ (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize n
+  , ArbitraryDiff . Pure <$> patchOf (termOfSize n) ]
   where syntaxOfSize n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsOfSize n
                        | otherwise = oneof $ branchGeneratorsOfSize n
         branchGeneratorsOfSize n =
@@ -58,7 +60,7 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
         Indexed i -> Indexed <$> (List.subsequences i >>= recursivelyShrink)
         Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
         Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink)
-    -- Pure patch -> pure . Pure <$> shrink patch
+    Pure patch -> ArbitraryDiff . Pure <$> shrink patch
 
 
 -- Instances
