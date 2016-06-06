@@ -6,7 +6,6 @@ import Data.Text.Arbitrary ()
 
 import Prologue
 import Data.String
-import Category
 import Interpreter
 import Diff
 import ArbitraryTerm
@@ -19,9 +18,9 @@ spec = parallel $ do
 
   describe "Diff" $ do
     prop "equality is reflexive" $
-      \ a b -> let diff = interpret comparable diffCost (unTerm a) (unTerm (b :: ArbitraryTerm String CategorySet)) in
+      \ a b -> let diff = diffTerms (free . Free) ((==) `on` extract) diffCost (unTerm a) (unTerm (b :: ArbitraryTerm String CategorySet)) in
         diff == diff
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = unTerm (a :: ArbitraryTerm String CategorySet) in
-        diffCost (interpret comparable diffCost term term) == 0
+        diffCost (diffTerms (free . Free) ((==) `on` extract) diffCost term term) == 0
