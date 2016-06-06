@@ -1,6 +1,6 @@
 module Term.Arbitrary where
 
-import Data.Functor.Foldable (unfold)
+import Data.Functor.Foldable (cata, unfold)
 import qualified Data.List as List
 import qualified Data.OrderedMap as Map
 import Data.Text.Arbitrary ()
@@ -31,6 +31,8 @@ termOfSize n = (ArbitraryTerm .) . (:<) <$> arbitrary <*> syntaxOfSize n
           rest <- childrenOfSize (n - m)
           pure $! first : rest
 
+arbitraryTermSize :: ArbitraryTerm leaf annotation -> Int
+arbitraryTermSize = cata (succ . sum) . toTerm
 
 -- Instances
 
