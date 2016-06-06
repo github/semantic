@@ -38,7 +38,7 @@ diffOfSize n = oneof
           pure $! first : rest
 
 arbitraryDiffSize :: ArbitraryDiff leaf annotation -> Int
-arbitraryDiffSize = cata (succ . sum) . fmap (fmap (arbitraryTermSize . unfold runCofree)) . toDiff
+arbitraryDiffSize = iter (succ . sum) . fmap (sum . fmap (arbitraryTermSize . unfold runCofree)) . toDiff
 
 
 -- Instances
