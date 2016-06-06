@@ -6,6 +6,7 @@ import Data.Bifunctor.Join
 import Data.Functor.Both
 import Data.Text.Arbitrary ()
 import Data.These
+import Data.These.Arbitrary ()
 import Info
 import Prologue hiding (fst, snd)
 import Range
@@ -21,12 +22,6 @@ instance Arbitrary CategorySet where
 instance Arbitrary a => Arbitrary (Join (,) a) where
   arbitrary = both <$> arbitrary <*> arbitrary
   shrink b = both <$> shrink (fst b) <*> shrink (snd b)
-
-instance (Arbitrary a, Arbitrary b) => Arbitrary (These a b) where
-  arbitrary = oneof [ This <$> arbitrary
-                    , That <$> arbitrary
-                    , These <$> arbitrary <*> arbitrary ]
-  shrink = these (fmap This . shrink) (fmap That . shrink) (\ a b -> (This <$> shrink a) ++ (That <$> shrink b) ++ (These <$> shrink a <*> shrink b))
 
 instance Arbitrary a => Arbitrary (Join These a) where
   arbitrary = Join <$> arbitrary

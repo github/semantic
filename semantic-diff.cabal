@@ -18,6 +18,7 @@ library
                      , Category
                      , Data.Functor.Both
                      , Data.OrderedMap
+                     , Data.These.Arbitrary
                      , Diff
                      , Diffing
                      , DiffOutput

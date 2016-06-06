@@ -11,6 +11,7 @@ import qualified Data.OrderedMap as Map
 import Data.String
 import Data.Text.Arbitrary ()
 import Data.These
+import Data.These.Arbitrary ()
 import Diff
 import Patch
 import Patch.Arbitrary ()
@@ -49,12 +50,6 @@ toDiff = fmap (fmap toTerm) . unfold unArbitraryDiff
 
 deriving instance (NFData a, NFData b) => NFData (These a b)
 deriving instance NFData a => NFData (Join These a)
-
-instance (Arbitrary a, Arbitrary b) => Arbitrary (These a b) where
-  arbitrary = oneof [ This <$> arbitrary
-                    , That <$> arbitrary
-                    , These <$> arbitrary <*> arbitrary ]
-  shrink = these (fmap This . shrink) (fmap That . shrink) (\ a b -> (This <$> shrink a) ++ (That <$> shrink b) ++ (These <$> shrink a <*> shrink b))
 
 instance Arbitrary a => Arbitrary (Join These a) where
   arbitrary = Join <$> arbitrary
