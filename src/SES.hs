@@ -1,5 +1,6 @@
 module SES where
 
+import Control.Parallel.Strategies
 import qualified Data.Map as Map
 import Patch
 import Prologue
@@ -46,4 +47,4 @@ diffAt diffTerms cost (i, j) as bs
 
 -- | Prepend an edit script and the cumulative cost onto the edit script.
 consWithCost :: Cost edit -> edit -> [(edit, Integer)] -> [(edit, Integer)]
-consWithCost cost edit rest = (edit, cost edit + maybe 0 snd (fst <$> uncons rest)) : rest
+consWithCost cost edit rest = (edit, (cost edit `using` rpar) + maybe 0 snd (fst <$> uncons rest)) : rest
