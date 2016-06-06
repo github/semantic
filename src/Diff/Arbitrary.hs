@@ -61,27 +61,3 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
         Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
         Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink)
     Pure patch -> ArbitraryDiff . Pure <$> shrink patch
-
-
--- Instances
-
--- instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbitrary (ArbitraryDiff leaf annotation) where
---   arbitrary = scale (`div` 2) $ sized (\ x -> boundedTerm x x) -- first indicates the cube of the max length of lists, second indicates the cube of the max depth of the tree
---     where boundedTerm maxLength maxDepth = oneof [ (ArbitraryDiff .) . (Free .) . (:<) <$> (pure <$> arbitrary) <*> boundedSyntax maxLength maxDepth
---                                                  , ArbitraryDiff . Pure <$> arbitrary ]
---           boundedSyntax _ maxDepth | maxDepth <= 0 = Leaf <$> arbitrary
---           boundedSyntax maxLength maxDepth = frequency
---             [ (12, Leaf <$> arbitrary),
---               (1, Indexed . take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
---               (1, Fixed . take maxLength <$> listOf (smallerTerm maxLength maxDepth)),
---               (1, Keyed . Map.fromList . take maxLength <$> listOf (arbitrary >>= (\x -> (,) x <$> smallerTerm maxLength maxDepth))) ]
---           smallerTerm maxLength maxDepth = boundedTerm (div maxLength 3) (div maxDepth 3)
---
---   shrink (ArbitraryDiff diff) = case diff of
---     Free (annotation :< syntax) -> (subterms (ArbitraryDiff diff) ++) $ filter (/= ArbitraryDiff diff) $
---       (ArbitraryDiff .) . (Free .) . (:<) <$> traverse shrink annotation <*> case syntax of
---         Leaf a -> Leaf <$> shrink a
---         Indexed i -> Indexed <$> (List.subsequences i >>= recursivelyShrink)
---         Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
---         Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink)
---     Pure patch -> ArbitraryDiff . Pure <$> shrink patch
