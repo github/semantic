@@ -21,11 +21,11 @@ spec = parallel $ do
 
   describe "ArbitraryTerm" $
     prop "generates terms of a specific size" $ forAll ((arbitrary >>= \ n -> (,) n <$> termOfSize n) `suchThat` ((> 0) . fst)) $
-      \ (n, term) -> cata (succ . sum) (toTerm (term :: ArbitraryTerm String ())) `shouldBe` n
+      \ (n, term) -> arbitraryTermSize (term :: ArbitraryTerm String ()) `shouldBe` n
 
   describe "ArbitraryDiff" $
     prop "generates diffs of a specific size" $ forAll ((arbitrary >>= \ n -> (,) n <$> diffOfSize n) `suchThat` ((> 0) . fst)) $
-      \ (n, diff) -> cata (succ . sum) (fmap (cata (succ . sum)) <$> (toDiff (diff :: ArbitraryDiff String ()))) `shouldBe` n
+      \ (n, diff) -> arbitraryDiffSize (diff :: ArbitraryDiff String ()) `shouldBe` n
 
   describe "Diff" $ do
     prop "equality is reflexive" $
