@@ -18,9 +18,6 @@ ses diffTerms cost as bs = fst <$> evalState diffState Map.empty where
 -- | Find the shortest edit script between two terms at a given vertex in the edit graph.
 diffAt :: Applicative edit => Compare term (edit (Patch term)) -> Cost (edit (Patch term)) -> (Integer, Integer) -> [term] -> [term] -> State (Map.Map (Integer, Integer) [(edit (Patch term), Integer)]) [(edit (Patch term), Integer)]
 diffAt diffTerms cost (i, j) as bs
-  | null as, null bs = pure []
-  | null as = pure $ foldr insert [] bs
-  | null bs = pure $ foldr delete [] as
   | (a : as) <- as, (b : bs) <- bs = do
   cachedDiffs <- get
   case Map.lookup (i, j) cachedDiffs of
@@ -36,6 +33,9 @@ diffAt diffTerms cost (i, j) as bs
       cachedDiffs' <- get
       put $ Map.insert (i, j) nomination cachedDiffs'
       pure nomination
+  | null as = pure $ foldr insert [] bs
+  | null bs = pure $ foldr delete [] as
+  | otherwise = pure []
   where
     delete = consWithCost cost . pure . Delete
     insert = consWithCost cost . pure . Insert
