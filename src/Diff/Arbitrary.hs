@@ -1,17 +1,15 @@
-{-# LANGUAGE TypeFamilies #-}
 module Diff.Arbitrary where
 
 import Diff
 import Data.Bifunctor.Join
 import Data.Bifunctor.Join.Arbitrary ()
-import Data.Functor.Foldable (Base, cata, unfold, Unfoldable(embed))
+import Data.Functor.Foldable (unfold)
 import qualified Data.List as List
 import qualified Data.OrderedMap as Map
 import Patch
 import Patch.Arbitrary
 import Syntax
 import Prologue
-import Term
 import Term.Arbitrary
 import Test.QuickCheck hiding (Fixed)
 
@@ -44,9 +42,6 @@ arbitraryDiffSize = cata (succ . sum) . fmap (fmap (arbitraryTermSize . unfold r
 
 
 -- Instances
-
-type instance Base (ArbitraryTerm leaf annotation) = CofreeF (Syntax leaf) annotation
-instance Unfoldable (ArbitraryTerm leaf annotation) where embed = ArbitraryTerm
 
 instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbitrary (ArbitraryDiff leaf annotation) where
   arbitrary = sized $ \ n -> do
