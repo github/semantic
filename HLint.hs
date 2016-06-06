@@ -1,3 +1,5 @@
+import "hint" HLint.HLint
+
 error "generalize fmap"  = map  ==> fmap
 
 -- AMP fallout
