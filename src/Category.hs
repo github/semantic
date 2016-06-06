@@ -1,7 +1,6 @@
 module Category where
 
 import Prologue
-import Data.String
 
 -- | A standardized category of AST node. Used to determine the semantics for
 -- | semantic diffing and define comparability of nodes.

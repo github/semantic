@@ -33,7 +33,7 @@ instance ToJSON (NumberedLine (SplitDiff leaf Info)) where
   toJSON (NumberedLine (n, a)) = object (lineFields n a (getRange a))
   toEncoding (NumberedLine (n, a)) = pairs $ mconcat (lineFields n a (getRange a))
 instance ToJSON Category where
-  toJSON (Other s) = String $ T.pack s
+  toJSON (Other s) = String s
   toJSON s = String . T.pack $ show s
 instance ToJSON Range where
   toJSON (Range start end) = Array . fromList $ toJSON <$> [ start, end ]

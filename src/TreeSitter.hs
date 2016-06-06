@@ -1,7 +1,7 @@
 module TreeSitter where
 
 import Prologue hiding (Constructor)
-import Data.String
+import Data.Text (pack)
 import Category
 import Info
 import Language
@@ -26,7 +26,7 @@ treeSitterParser language grammar contents = do
     pure term)
 
 -- Given a language and a node name, return the correct categories.
-categoriesForLanguage :: Language -> String -> Category
+categoriesForLanguage :: Language -> Text -> Category
 categoriesForLanguage language name = case (language, name) of
   (JavaScript, "object") -> DictionaryLiteral
   (JavaScript, "rel_op") -> BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
@@ -35,7 +35,7 @@ categoriesForLanguage language name = case (language, name) of
   _ -> defaultCategoryForNodeName name
 
 -- | Given a node name from TreeSitter, return the correct categories.
-defaultCategoryForNodeName :: String -> Category
+defaultCategoryForNodeName :: Text -> Category
 defaultCategoryForNodeName name = case name of
   "program" -> Program
   "ERROR" -> Error
@@ -61,7 +61,7 @@ documentToTerm language document contents = alloca $ \ root -> do
           range <- pure $! Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
 
           let size' = 1 + sum (size . extract <$> children)
-          let info = Info range (categoriesForLanguage language name) size' size'
+          let info = Info range (categoriesForLanguage language (pack name)) size' size'
           pure $! termConstructor contents info children
         getChild node n out = do
           _ <- ts_node_p_named_child node n out
