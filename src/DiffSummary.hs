@@ -51,9 +51,6 @@ data DiffSummary a = DiffSummary {
   parentAnnotations :: [a]
 } deriving (Eq, Functor)
 
-b :: Text
-b = "hello"
-
 instance Show (DiffSummary DiffInfo) where
   showsPrec _ DiffSummary{..} s = (++s) . unpack . Text.intercalate "\n" $ case patch of
     (Insert diffInfo) -> (flip fmap) (termNames diffInfo) $ \name ->
