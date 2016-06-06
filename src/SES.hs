@@ -25,7 +25,7 @@ diffAt diffTerms cost (i, j) as bs
     Nothing -> do
       down <- recur (i, succ j) as (b : bs)
       right <- recur (succ i, j) (a : as) bs
-      nomination <- fmap best $ case diffTerms a b of
+      nomination <- best <$> case diffTerms a b of
         Just diff -> do
           diagonal <- recur (succ i, succ j) as bs
           pure [ delete a down, insert b right, consWithCost cost diff diagonal ]
