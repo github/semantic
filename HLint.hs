@@ -2,8 +2,6 @@ import "hint" HLint.Default
 import "hint" HLint.Dollar
 import "hint" HLint.Generalise
 
-error "generalize fmap"  = map  ==> fmap
-
 -- AMP fallout
 error "generalize mapM"  = mapM  ==> traverse
 error "generalize mapM_" = mapM_ ==> traverse_
