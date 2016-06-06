@@ -1,8 +1,8 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
+
 module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..)) where
 
-import Prologue hiding (fst, snd)
-import Data.Maybe (fromJust)
+import Prologue hiding (fst, snd, intercalate)
 import Diff
 import Info (Info, category)
 import Patch
@@ -12,7 +12,7 @@ import Category
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.OrderedMap
-import Data.Text as Text (pack)
+import Data.Text as Text (intercalate, unpack)
 
 data DiffInfo = DiffInfo { categoryName :: Text, termNames :: [Text] } deriving (Eq, Show)
 
@@ -51,21 +51,22 @@ data DiffSummary a = DiffSummary {
   parentAnnotations :: [a]
 } deriving (Eq, Functor)
 
+b :: Text
+b = "hello"
+
 instance Show (DiffSummary DiffInfo) where
-  showsPrec _ DiffSummary{..} s = (++s) . intercalate "\n" $ case patch of
-    (Insert termInfo) -> for (termNames termInfo) $ \name ->
-      "Added the " <> "'" <> name <> "' " <> categoryName termInfo
+  showsPrec _ DiffSummary{..} s = (++s) . unpack . Text.intercalate "\n" $ case patch of
+    (Insert diffInfo) -> (flip fmap) (termNames diffInfo) $ \name ->
+      "Added the " <> "'" <> name <> "' " <> categoryName diffInfo <> maybeParentContext parentAnnotations
+    (Delete termInfo) -> (flip fmap) (termNames termInfo) $ \name ->
+      "Deleted the " <> "'" <> name <> "' " <> categoryName termInfo <> maybeParentContext parentAnnotations
+    (Replace t1 t2) -> (flip fmap) (zip (termNames t1) (termNames t2)) $ \(name1, name2) ->
+      "Replaced the " <> "'" <> name1 <> "' " <> categoryName t1
+      <> " with the " <> "'" <> name2 <> "' " <> categoryName t2
       <> maybeParentContext parentAnnotations
-    (Delete termInfo) -> for (termNames termInfo) $ \name ->
-      "Deleted the " <> "'" <> name <> "' " <> categoryName termInfo
-      <> maybeParentContext parentAnnotations
-    (Replace t1 t2) -> for (zip (termNames t1) (termNames t2)) $ \(name1, name2) ->
-      "Replaced the " <> "'" ++ name1 ++ "' " ++ categoryName t1
-      ++ " with the " ++ "'" ++ name2 ++ "' " ++ categoryName t2
-      ++ maybeParentContext parentAnnotations
     where maybeParentContext parentAnnotations = if null parentAnnotations
             then ""
-            else " in the " ++ intercalate "/" (categoryName <$> parentAnnotations) ++ " context"
+            else " in the " <> intercalate "/" (categoryName <$> parentAnnotations) <> " context"
 
 diffSummary :: HasCategory leaf => Diff leaf Info -> [DiffSummary DiffInfo]
 diffSummary = cata $ \case
