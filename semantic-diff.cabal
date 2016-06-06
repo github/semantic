@@ -27,6 +27,7 @@ library
                      , Operation
                      , Parser
                      , Patch
+                     , Patch.Arbitrary
                      , Range
                      , Renderer
                      , Renderer.JSON

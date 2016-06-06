@@ -13,6 +13,7 @@ import Data.Text.Arbitrary ()
 import Data.These
 import Diff
 import Patch
+import Patch.Arbitrary ()
 import Prologue
 import Syntax
 import Term.Arbitrary
@@ -79,11 +80,3 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
         Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
         Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink)
     Pure patch -> ArbitraryDiff . Pure <$> shrink patch
-
-instance Arbitrary a => Arbitrary (Patch a) where
-  arbitrary = oneof [
-    Insert <$> arbitrary,
-    Delete <$> arbitrary,
-    Replace <$> arbitrary <*> arbitrary ]
-
-  shrink patch = traverse shrink patch

@@ -7,7 +7,6 @@ import Data.Functor.Both
 import Data.Text.Arbitrary ()
 import Data.These
 import Info
-import Patch
 import Prologue hiding (fst, snd)
 import Range
 import Source hiding ((++))
@@ -32,12 +31,6 @@ instance (Arbitrary a, Arbitrary b) => Arbitrary (These a b) where
 instance Arbitrary a => Arbitrary (Join These a) where
   arbitrary = Join <$> arbitrary
   shrink (Join a) = Join <$> shrink a
-
-instance Arbitrary a => Arbitrary (Patch a) where
-  arbitrary = oneof [
-    Insert <$> arbitrary,
-    Delete <$> arbitrary,
-    Replace <$> arbitrary <*> arbitrary ]
 
 instance Arbitrary a => Arbitrary (Source a) where
   arbitrary = Source.fromList <$> arbitrary
