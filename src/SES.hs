@@ -82,7 +82,7 @@ memoizeEnum :: Enum a => (a -> b) -> a -> b
 memoizeEnum f = (fmap f [toEnum 0 ..] !!) . fromEnum
 
 memoize2d :: Int -> Int -> (Int -> Int -> a) -> (Int -> Int -> a)
-memoize2d width height f = outof (fmap (into f) [0..] !!)
+memoize2d width height f = outof (Vector.generate ((width + 1) * (height + 1)) (into f) Vector.!)
   where into f i | width > 0 = if i < (width * height)
                     then f (i `div` width) (i `mod` width)
                     else f width height
