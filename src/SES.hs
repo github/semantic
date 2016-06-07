@@ -87,6 +87,11 @@ memoize f = (fmap f [0 ..] !!)
 memoizeEnum :: Enum a => (a -> b) -> a -> b
 memoizeEnum f = (fmap f [toEnum 0 ..] !!) . fromEnum
 
+memoize2d :: Int -> (Int -> Int -> a) -> (Int -> Int -> a)
+memoize2d width f = outof (memoize (into f))
+  where into f i = f (i `div` width) (i `mod` width)
+        outof f i j = f (i * width + j)
+
 memoize2 :: ((Int, Int) -> a) -> ((Int, Int) -> a)
 memoize2 f = fromJust . (`lookup` memo)
   where memo = zipWith (\ i j -> ((i, j), f (i, j))) [0 ..] [0 ..]
