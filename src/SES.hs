@@ -2,11 +2,13 @@ module SES where
 
 import Control.Parallel.Strategies
 import Data.Function (fix)
-import Data.List ((!!))
+import Data.List ((!!), genericLength)
 import qualified Data.Map as Map
 import Patch
 import Prologue
 import Unsafe
+import Data.String
+
 
 -- | Edit constructor for two terms, if comparable. Otherwise returns Nothing.
 type Compare term edit = term -> term -> Maybe edit
@@ -90,3 +92,9 @@ memoize2 f = fromJust . (`lookup` memo)
 -- | Prepend an edit script and the cumulative cost onto the edit script.
 consWithCost :: Cost edit -> edit -> [(edit, Integer)] -> [(edit, Integer)]
 consWithCost cost edit rest = (edit, (cost edit `using` rpar) + maybe 0 snd (fst <$> uncons rest)) : rest
+
+
+benchmarkSES :: [String] -> [String] -> [Either String (Patch String)]
+benchmarkSES as bs = ses compare cost as bs
+  where compare a b = if a == b then Just (Left a) else Nothing
+        cost = either (const 0) (sum . fmap genericLength)
