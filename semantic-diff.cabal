@@ -16,9 +16,12 @@ library
   exposed-modules:     Algorithm
                      , Alignment
                      , Category
+                     , Data.Bifunctor.Join.Arbitrary
                      , Data.Functor.Both
                      , Data.OrderedMap
+                     , Data.These.Arbitrary
                      , Diff
+                     , Diff.Arbitrary
                      , Diffing
                      , DiffOutput
                      , Info
@@ -27,6 +30,7 @@ library
                      , Operation
                      , Parser
                      , Patch
+                     , Patch.Arbitrary
                      , Range
                      , Renderer
                      , Renderer.JSON
@@ -38,6 +42,7 @@ library
                      , SplitDiff
                      , Syntax
                      , Term
+                     , Term.Arbitrary
                      , TreeSitter
                      , DiffSummary
                      , Prologue
@@ -52,6 +57,8 @@ library
                      , filepath
                      , mtl
                      , pointed
+                     , QuickCheck >= 2.8.1
+                     , quickcheck-text
                      , semigroups
                      , text >= 1.2.1.3
                      , text-icu
@@ -65,6 +72,22 @@ library
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, LambdaCase
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -threaded -fprof-auto "-with-rtsopts=-N -p -s -h -i0.1" -j
+
+benchmark semantic-diff-bench
+  type:                exitcode-stdio-1.0
+  main-is:             Main.hs
+  hs-source-dirs:      bench
+  build-depends:       base
+                     , bifunctors
+                     , criterion
+                     , QuickCheck >= 2.8.1
+                     , quickcheck-text
+                     , recursion-schemes
+                     , semantic-diff
+                     , these
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -j -O2 -static
+  default-language:    Haskell2010
+  default-extensions:  OverloadedStrings, NoImplicitPrelude
 
 test-suite semantic-diff-test
   type:                exitcode-stdio-1.0
