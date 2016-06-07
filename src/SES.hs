@@ -58,16 +58,16 @@ ses' diffTerms cost as bs = fst <$> diffAtMemo 0 0
           where elements = Vector.fromList list
 
 diffAt' :: Applicative edit => Compare term (edit (Patch term)) -> Cost (edit (Patch term)) -> (Int -> Maybe term) -> (Int -> Maybe term) -> (Int -> Int -> [(edit (Patch term), Integer)]) -> Int -> Int -> [(edit (Patch term), Integer)]
-diffAt' diffTerms cost as bs recur i j
-  | Just a <- as i, Just b <- bs j = do
+diffAt' diffTerms cost as bs recur i j = case (as i, bs j) of
+  (Just a, Just b) -> do
     let down = recur i (succ j)
         right = recur (succ i) j in
         best $ case diffTerms a b of
           Just diff -> [ delete a down, insert b right, consWithCost cost diff (recur (succ i) (succ j)) ]
           Nothing -> [ delete a down, insert b right ]
-  | Nothing <- as i, Just b <- bs j = insert b (recur i (succ j))
-  | Nothing <- bs j, Just a <- as i = delete a (recur (succ i) j)
-  | otherwise = []
+  (_, Just b) -> insert b (recur i (succ j))
+  (Just a, _) ->  delete a (recur (succ i) j)
+  _ -> []
   where
     delete = consWithCost cost . pure . Delete
     insert = consWithCost cost . pure . Insert
