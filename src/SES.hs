@@ -52,7 +52,7 @@ diffAt diffTerms cost (i, j) as bs
 
 ses' :: Applicative edit => Compare term (edit (Patch term)) -> Cost (edit (Patch term)) -> [term] -> [term] -> [edit (Patch term)]
 ses' diffTerms cost as bs = fst <$> diffAtMemo 0 0
-  where diffAtMemo = fix (memoize2d (length as) . diffAt' diffTerms cost (index as) (index bs))
+  where diffAtMemo = fix (memoize2d (length as) (length bs) . diffAt' diffTerms cost (index as) (index bs))
         index elements i = if i < length elements then Just (elements !! i) else Nothing
 
 diffAt' :: Applicative edit => Compare term (edit (Patch term)) -> Cost (edit (Patch term)) -> (Int -> Maybe term) -> (Int -> Maybe term) -> (Int -> Int -> [(edit (Patch term), Integer)]) -> Int -> Int -> [(edit (Patch term), Integer)]
@@ -80,9 +80,11 @@ memoize f = (fmap f [0 ..] !!)
 memoizeEnum :: Enum a => (a -> b) -> a -> b
 memoizeEnum f = (fmap f [toEnum 0 ..] !!) . fromEnum
 
-memoize2d :: Int -> (Int -> Int -> a) -> (Int -> Int -> a)
-memoize2d width f = outof (memoize (into f))
-  where into f i | width > 0 = f (i `div` width) (i `mod` width)
+memoize2d :: Int -> Int -> (Int -> Int -> a) -> (Int -> Int -> a)
+memoize2d width height f = outof (fmap (into f) [0..] !!)
+  where into f i | width > 0 = if i < (width * height)
+                    then f (i `div` width) (i `mod` width)
+                    else f width height
                  | otherwise = f 0 i
         outof f i j = f (i * width + j)
 
