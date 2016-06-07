@@ -1,7 +1,6 @@
 module SES where
 
 import Control.Parallel.Strategies
-import Data.Function (fix)
 import Data.List ((!!), genericLength)
 import qualified Data.Map as Map
 import Patch
