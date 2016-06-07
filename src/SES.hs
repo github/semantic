@@ -72,7 +72,6 @@ diffAt' diffTerms cost as bs recur i j
     costOf [] = 0
     costOf ((_, c) : _) = c
     best = minimumBy (comparing costOf)
-    -- recur = diffAt' diffTerms cost
 
 memoize :: (Int -> a) -> (Int -> a)
 memoize f = (fmap f [0 ..] !!)
