@@ -82,7 +82,8 @@ memoizeEnum f = (fmap f [toEnum 0 ..] !!) . fromEnum
 
 memoize2d :: Int -> (Int -> Int -> a) -> (Int -> Int -> a)
 memoize2d width f = outof (memoize (into f))
-  where into f i = f (i `div` width) (i `mod` width)
+  where into f i | width > 0 = f (i `div` width) (i `mod` width)
+                 | otherwise = f 0 i
         outof f i j = f (i * width + j)
 
 memoize2 :: ((Int, Int) -> a) -> ((Int, Int) -> a)
