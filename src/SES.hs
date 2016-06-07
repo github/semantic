@@ -53,7 +53,6 @@ diffAt diffTerms cost (i, j) as bs
 
 ses' :: Applicative edit => Compare term (edit (Patch term)) -> Cost (edit (Patch term)) -> [term] -> [term] -> [edit (Patch term)]
 ses' diffTerms cost as bs = fst <$> diffAtMemo 0 0
-        -- diffByColumn = fix (memoize . diffAt' diffTerms cost (indexMemo as) (indexMemo bs))
   where diffAtMemo = fix (memoize2d (length as) . diffAt' diffTerms cost (index as) (index bs))
         index elements i = if i < length elements then Just (elements !! i) else Nothing
 
