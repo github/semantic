@@ -84,6 +84,9 @@ diffAt' diffTerms cost as bs recur (i, j)
 memoize :: (Int -> a) -> (Int -> a)
 memoize f = (fmap f [0 ..] !!)
 
+memoizeEnum :: Enum a => (a -> b) -> a -> b
+memoizeEnum f = (fmap f [toEnum 0 ..] !!) . fromEnum
+
 memoize2 :: ((Int, Int) -> a) -> ((Int, Int) -> a)
 memoize2 f = fromJust . (`lookup` memo)
   where memo = zipWith (\ i j -> ((i, j), f (i, j))) [0 ..] [0 ..]
