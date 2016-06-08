@@ -49,7 +49,7 @@ termConstructor source info children = cofree (info :< syntax)
     syntax = construct children
     construct :: [Term Text Info] -> Syntax Text (Term Text Info)
     construct [] = Leaf . pack . toString $ slice (characterRange info) source
-    construct children | isFunctionCall (category info), (x:xs) <- children = FunctionCall x xs
+    construct children | isFunctionCall (category info), (x:xs) <- children = Syntax.FunctionCall x xs
     construct children | isFixed (category info) = Fixed children
     construct children | isKeyed (category info) = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed children
