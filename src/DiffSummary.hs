@@ -69,9 +69,16 @@ diffSummary = cata $ \case
   (Free (infos :< Indexed children)) -> prependSummary (category $ snd infos) <$> join children
   (Free (infos :< Fixed children)) -> prependSummary (category $ snd infos) <$> join children
   (Free (infos :< Keyed children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList children)
-  (Pure (Insert term)) -> [DiffSummary (Insert (DiffInfo (toCategoryName term) (toTermName term))) []]
-  (Pure (Delete term)) -> [DiffSummary (Delete (DiffInfo (toCategoryName term) (toTermName term))) []]
-  (Pure (Replace t1 t2)) -> [DiffSummary (Replace (DiffInfo (toCategoryName t1) (toTermName t1)) (DiffInfo (toCategoryName t2) (toTermName t2))) []]
+  (Pure (Insert term)) -> (\info -> DiffSummary (Insert info) []) <$> termToDiffInfo term
+  (Pure (Delete term)) -> (\info -> DiffSummary (Delete info) []) <$> termToDiffInfo term
+  (Pure (Replace t1 t2)) -> (\(info1, info2) -> DiffSummary (Replace info1 info2) []) <$> zip (termToDiffInfo t1) (termToDiffInfo t2)
+
+termToDiffInfo :: HasCategory leaf => Term leaf Info -> [DiffInfo]
+termToDiffInfo term = case runCofree term of
+  (_ :< Leaf _) -> [ DiffInfo (toCategoryName term) (toTermName term) ]
+  (_ :< Indexed children) -> join $ termToDiffInfo <$> children
+  (_ :< Fixed children) -> join $ termToDiffInfo <$> children
+  (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
