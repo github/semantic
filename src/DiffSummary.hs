@@ -29,6 +29,9 @@ class HasCategory a where
 instance HasCategory Text where
   toCategoryName = identity
 
+instance HasCategory Info where
+  toCategoryName = toCategoryName . category
+
 instance HasCategory Category where
   toCategoryName category = case category of
     Program -> "top level"
@@ -79,6 +82,7 @@ termToDiffInfo term = case runCofree term of
   (_ :< Indexed children) -> join $ termToDiffInfo <$> children
   (_ :< Fixed children) -> join $ termToDiffInfo <$> children
   (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
+  (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
