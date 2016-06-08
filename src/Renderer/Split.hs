@@ -41,7 +41,7 @@ styleName category = "category-" <> case category of
   BinaryOperator -> "binary-operator"
   DictionaryLiteral -> "dictionary"
   Pair -> "pair"
-  FunctionCall -> "function_call"
+  Category.FunctionCall -> "function_call"
   StringLiteral -> "string"
   SymbolLiteral -> "symbol"
   IntegerLiteral -> "integer"

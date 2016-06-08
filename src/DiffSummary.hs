@@ -36,7 +36,7 @@ instance HasCategory Category where
     BinaryOperator -> "binary operator"
     DictionaryLiteral -> "dictionary"
     Pair -> "pair"
-    FunctionCall -> "function call"
+    Category.FunctionCall -> "function call"
     StringLiteral -> "string"
     IntegerLiteral -> "integer"
     SymbolLiteral -> "symbol"
