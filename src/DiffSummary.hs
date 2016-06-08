@@ -14,14 +14,14 @@ import Data.Functor.Both
 import Data.OrderedMap
 import Data.Text as Text (intercalate, unpack)
 
-data DiffInfo = DiffInfo { categoryName :: Text, termNames :: [Text] } deriving (Eq, Show)
+data DiffInfo = DiffInfo { categoryName :: Text, termName :: Text } deriving (Eq, Show)
 
-maybeTermNames :: HasCategory leaf => Term leaf Info -> [Text]
-maybeTermNames term = case runCofree term of
-  (_ :< Leaf leaf) -> pure $ toCategoryName leaf
-  (_ :< Keyed children) -> keys children
-  (_ :< Indexed children) -> toCategoryName . category <$> extract <$> children
-  (_ :< Fixed children) -> toCategoryName . category <$> extract <$> children
+toTermName :: HasCategory leaf => Term leaf Info -> Text
+toTermName term = case runCofree term of
+  (_ :< Leaf leaf) -> toCategoryName leaf
+  (_ :< Keyed children) -> mconcat $ keys children
+  (_ :< Indexed children) -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
+  (_ :< Fixed children) -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
 
 class HasCategory a where
   toCategoryName :: a -> Text
@@ -69,9 +69,9 @@ diffSummary = cata $ \case
   (Free (infos :< Indexed children)) -> prependSummary (category $ snd infos) <$> join children
   (Free (infos :< Fixed children)) -> prependSummary (category $ snd infos) <$> join children
   (Free (infos :< Keyed children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList children)
-  (Pure (Insert term)) -> [DiffSummary (Insert (DiffInfo (toCategoryName term) (maybeTermName term))) []]
-  (Pure (Delete term)) -> [DiffSummary (Delete (DiffInfo (toCategoryName term) (maybeTermName term))) []]
-  (Pure (Replace t1 t2)) -> [DiffSummary (Replace (DiffInfo (toCategoryName t1) (maybeTermName t1)) (DiffInfo (toCategoryName t2) (maybeTermName t2))) []]
+  (Pure (Insert term)) -> [DiffSummary (Insert (DiffInfo (toCategoryName term) (toTermName term))) []]
+  (Pure (Delete term)) -> [DiffSummary (Delete (DiffInfo (toCategoryName term) (toTermName term))) []]
+  (Pure (Replace t1 t2)) -> [DiffSummary (Replace (DiffInfo (toCategoryName t1) (toTermName t1)) (DiffInfo (toCategoryName t2) (toTermName t2))) []]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
