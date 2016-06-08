@@ -98,6 +98,7 @@ instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Ran
     Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source characterRange children
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source characterRange children
     Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements source characterRange children
+    Syntax.FunctionCall identifier children -> dl . mconcat $ (wrapIn dt <$> (contentElements source characterRange [identifier])) <> (wrapIn dd <$> contentElements source characterRange children)
 
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
