@@ -12,4 +12,4 @@
 	url = https://github.com/jquery/jquery
 [submodule "test/repos/js-test"]
 	path = test/repos/js-test
-	url = https://github.com/rewinfrey/js-test
+	url = https://github.com/rewinfrey/js-test.git
