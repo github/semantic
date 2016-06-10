@@ -17,9 +17,13 @@ data Category
   | Pair
   -- | A call to a function.
   | FunctionCall
-  -- | A function declaration
+  -- | A function declaration.
   | Function
+  -- | An identifier.
+  | Identifier
+  -- | A function's parameters
   | Params
+  -- | A function's expression statements
   | ExpressionStatements
   -- | A string literal.
   | StringLiteral
