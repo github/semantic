@@ -23,6 +23,7 @@ toTermName term = case runCofree term of
   (_ :< Indexed children) -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
   (_ :< Fixed children) -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
   (_ :< Syntax.FunctionCall i _) -> toTermName i
+  (_ :< Syntax.Function _) -> "anonymous function"
 
 class HasCategory a where
   toCategoryName :: a -> Text

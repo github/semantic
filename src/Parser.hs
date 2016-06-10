@@ -30,6 +30,10 @@ fixedCategories = Set.fromList [ BinaryOperator, Pair ]
 functionCallCategories :: Set.Set Category
 functionCallCategories = Set.singleton Category.FunctionCall
 
+-- | Categories that are treated as functionCall nodes.
+functionCategories :: Set.Set Category
+functionCategories = Set.singleton Category.Function
+
 -- | Should these categories be treated as keyed nodes?
 isKeyed :: Category -> Bool
 isKeyed = flip Set.member keyedCategories
@@ -41,6 +45,9 @@ isFixed = flip Set.member fixedCategories
 isFunctionCall :: Category -> Bool
 isFunctionCall = flip Set.member functionCallCategories
 
+isFunction :: Category -> Bool
+isFunction = flip Set.member functionCategories
+
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
 termConstructor :: Constructor
@@ -50,6 +57,7 @@ termConstructor source info children = cofree (info :< syntax)
     construct :: [Term Text Info] -> Syntax Text (Term Text Info)
     construct [] = Leaf . pack . toString $ slice (characterRange info) source
     construct children | isFunctionCall (category info), (x:xs) <- children = Syntax.FunctionCall x xs
+    construct children | isFunction (category info) = Syntax.Function children
     construct children | isFixed (category info) = Fixed children
     construct children | isKeyed (category info) = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed children

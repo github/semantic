@@ -19,4 +19,6 @@ data Syntax
   | Keyed (OrderedMap T.Text f)
   -- | A function call has an identifier where f is a (Leaf a) and a list of arguments.
   | FunctionCall f [f]
+  -- | A function has a list of expressions.
+  | Function [f]
   deriving (Functor, Show, Eq, Foldable, Traversable)

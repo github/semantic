@@ -17,6 +17,8 @@ data Category
   | Pair
   -- | A call to a function.
   | FunctionCall
+  -- | A function declaration
+  | Function
   -- | A string literal.
   | StringLiteral
   -- | An integer literal.
