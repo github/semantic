@@ -19,6 +19,8 @@ data Category
   | FunctionCall
   -- | A function declaration
   | Function
+  | Params
+  | ExpressionStatements
   -- | A string literal.
   | StringLiteral
   -- | An integer literal.
