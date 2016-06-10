@@ -65,6 +65,7 @@ alignSyntax :: (Applicative f, Show term) => (forall a. f a -> Join These a) -> 
 alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax of
   Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> sequenceL lineRanges
   Indexed children -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
+  Syntax.Function children -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
   -- Align FunctionCalls like Indexed nodes by appending identifier to its children.
   Syntax.FunctionCall identifier children -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join (identifier : children)) bothRanges
   Fixed children -> catMaybes $ wrapInBranch Fixed <$> alignBranch getRange (join children) bothRanges
