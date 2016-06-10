@@ -30,10 +30,6 @@ fixedCategories = Set.fromList [ BinaryOperator, Pair ]
 functionCallCategories :: Set.Set Category
 functionCallCategories = Set.singleton Category.FunctionCall
 
--- | Categories that are treated as functionCall nodes.
-functionCategories :: Set.Set Category
-functionCategories = Set.singleton Category.Function
-
 -- | Should these categories be treated as keyed nodes?
 isKeyed :: Category -> Bool
 isKeyed = flip Set.member keyedCategories
@@ -46,7 +42,16 @@ isFunctionCall :: Category -> Bool
 isFunctionCall = flip Set.member functionCallCategories
 
 isFunction :: Category -> Bool
-isFunction = flip Set.member functionCategories
+isFunction = flip Set.member (Set.singleton Category.Function)
+
+isSymbol :: Category -> Bool
+isSymbol = flip Set.member (Set.singleton SymbolLiteral)
+
+isParams :: Category -> Bool
+isParams = flip Set.member (Set.singleton Params)
+
+isExpressions :: Category -> Bool
+isExpressions = flip Set.member (Set.singleton ExpressionStatements)
 
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
@@ -56,8 +61,14 @@ termConstructor source info children = cofree (info :< syntax)
     syntax = construct children
     construct :: [Term Text Info] -> Syntax Text (Term Text Info)
     construct [] = Leaf . pack . toString $ slice (characterRange info) source
-    construct children | isFunctionCall (category info), (x:xs) <- children = Syntax.FunctionCall x xs
-    construct children | isFunction (category info) = Syntax.Function children
+    construct children | isFunction (category info) = case children of
+      (body:[]) -> Syntax.Function Nothing Nothing body
+      (params:body:[]) | (info :< _) <- runCofree params, isParams (category info) -> Syntax.Function Nothing (Just params) body
+      (id:params:body:[]) | isSymbol (category info) -> Syntax.Function (Just id) (Just params) body
+      x -> error $ "Expected a function declaration but got: " <> show x
+
+    construct children | isFunctionCall (category info), (x:xs) <- children =
+      Syntax.FunctionCall x xs
     construct children | isFixed (category info) = Fixed children
     construct children | isKeyed (category info) = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed children

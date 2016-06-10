@@ -23,7 +23,7 @@ toTermName term = case runCofree term of
   (_ :< Indexed children) -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
   (_ :< Fixed children) -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
   (_ :< Syntax.FunctionCall i _) -> toTermName i
-  (_ :< Syntax.Function _) -> "anonymous function"
+  (_ :< Syntax.Function identifier _ _) -> (maybe "anonymous function" toTermName identifier)
 
 class HasCategory a where
   toCategoryName :: a -> Text
@@ -75,7 +75,7 @@ diffSummary = cata $ \case
   (Free (infos :< Fixed children)) -> prependSummary (category $ snd infos) <$> join children
   (Free (infos :< Keyed children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList children)
   (Free (infos :< Syntax.FunctionCall identifier children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList (identifier : children))
-  (Free (infos :< Syntax.Function children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList children)
+  (Free (infos :< Syntax.Function id ps body)) -> prependSummary (category $ snd infos) <$> (fromMaybe [] id) <> (fromMaybe [] ps) <> body
   (Pure (Insert term)) -> (\info -> DiffSummary (Insert info) []) <$> termToDiffInfo term
   (Pure (Delete term)) -> (\info -> DiffSummary (Delete info) []) <$> termToDiffInfo term
   (Pure (Replace t1 t2)) -> (\(info1, info2) -> DiffSummary (Replace info1 info2) []) <$> zip (termToDiffInfo t1) (termToDiffInfo t2)
@@ -87,6 +87,7 @@ termToDiffInfo term = case runCofree term of
   (_ :< Fixed children) -> join $ termToDiffInfo <$> children
   (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
   (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
+  (info :< Syntax.Function identifier params _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous function" toTermName identifier) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }

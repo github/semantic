@@ -20,5 +20,5 @@ data Syntax
   -- | A function call has an identifier where f is a (Leaf a) and a list of arguments.
   | FunctionCall f [f]
   -- | A function has a list of expressions.
-  | Function [f]
+  | Function { id :: (Maybe f), params :: (Maybe f), expressions :: f }
   deriving (Functor, Show, Eq, Foldable, Traversable)
