@@ -67,6 +67,7 @@ termConstructor source info children = cofree (info :< syntax)
     construct children | isFunction (category info) = case children of
       (body:[]) -> Syntax.Function Nothing Nothing body
       (params:body:[]) | (info :< _) <- runCofree params, isParams (category info) -> Syntax.Function Nothing (Just params) body
+      (id:body:[]) | (info :< _) <- runCofree id, isIdentifier (category info) -> Syntax.Function (Just id) Nothing body
       (id:params:body:[]) | (info :< _) <- runCofree id, isIdentifier (category info) -> Syntax.Function (Just id) (Just params) body
       x -> error $ "Expected a function declaration but got: " <> show x
 
