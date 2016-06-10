@@ -45,6 +45,10 @@ defaultCategoryForNodeName name = case name of
   "integer" -> IntegerLiteral
   "symbol" -> SymbolLiteral
   "array" -> ArrayLiteral
+  "function" -> Function
+  "identifier" -> Identifier
+  "formal_parameters" -> Params
+  "statement_block" -> ExpressionStatements
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
