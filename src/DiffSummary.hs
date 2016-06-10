@@ -35,7 +35,7 @@ instance HasCategory Info where
   toCategoryName = toCategoryName . category
 
 instance HasCategory Category where
-  toCategoryName category = case category of
+  toCategoryName = \case
     Program -> "top level"
     Error -> "error"
     BinaryOperator -> "binary operator"
@@ -46,6 +46,10 @@ instance HasCategory Category where
     IntegerLiteral -> "integer"
     SymbolLiteral -> "symbol"
     ArrayLiteral -> "array"
+    Category.Function -> "function"
+    Identifier -> "identifier"
+    Params -> "params"
+    ExpressionStatements -> "expression statements"
     Other s -> s
 
 instance HasCategory leaf => HasCategory (Term leaf Info) where
