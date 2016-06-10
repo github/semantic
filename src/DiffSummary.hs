@@ -74,7 +74,8 @@ diffSummary = cata $ \case
   (Free (infos :< Indexed children)) -> prependSummary (category $ snd infos) <$> join children
   (Free (infos :< Fixed children)) -> prependSummary (category $ snd infos) <$> join children
   (Free (infos :< Keyed children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList children)
-  (Free (infos :< Syntax.FunctionCall _ children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList children)
+  (Free (infos :< Syntax.FunctionCall identifier children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList (identifier : children))
+  (Free (infos :< Syntax.Function children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList children)
   (Pure (Insert term)) -> (\info -> DiffSummary (Insert info) []) <$> termToDiffInfo term
   (Pure (Delete term)) -> (\info -> DiffSummary (Delete info) []) <$> termToDiffInfo term
   (Pure (Replace t1 t2)) -> (\(info1, info2) -> DiffSummary (Replace info1 info2) []) <$> zip (termToDiffInfo t1) (termToDiffInfo t2)
