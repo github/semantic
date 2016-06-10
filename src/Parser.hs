@@ -47,6 +47,9 @@ isFunction = flip Set.member (Set.singleton Category.Function)
 isSymbol :: Category -> Bool
 isSymbol = flip Set.member (Set.singleton SymbolLiteral)
 
+isIdentifier :: Category -> Bool
+isIdentifier = flip Set.member (Set.singleton Identifier)
+
 isParams :: Category -> Bool
 isParams = flip Set.member (Set.singleton Params)
 
@@ -64,7 +67,7 @@ termConstructor source info children = cofree (info :< syntax)
     construct children | isFunction (category info) = case children of
       (body:[]) -> Syntax.Function Nothing Nothing body
       (params:body:[]) | (info :< _) <- runCofree params, isParams (category info) -> Syntax.Function Nothing (Just params) body
-      (id:params:body:[]) | isSymbol (category info) -> Syntax.Function (Just id) (Just params) body
+      (id:params:body:[]) | (info :< _) <- runCofree id, isIdentifier (category info) -> Syntax.Function (Just id) (Just params) body
       x -> error $ "Expected a function declaration but got: " <> show x
 
     construct children | isFunctionCall (category info), (x:xs) <- children =
