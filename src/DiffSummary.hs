@@ -23,7 +23,7 @@ toTermName term = case runCofree term of
   (_ :< Indexed children) -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
   (_ :< Fixed children) -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
   (_ :< Syntax.FunctionCall i _) -> toTermName i
-  (_ :< Syntax.Function identifier _ _) -> (maybe "anonymous function" toTermName identifier)
+  (_ :< Syntax.Function identifier _ _) -> (maybe "anonymous" toTermName identifier)
 
 class HasCategory a where
   toCategoryName :: a -> Text
@@ -91,7 +91,7 @@ termToDiffInfo term = case runCofree term of
   (_ :< Fixed children) -> join $ termToDiffInfo <$> children
   (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
   (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
-  (info :< Syntax.Function identifier params _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous function" toTermName identifier) ]
+  (info :< Syntax.Function identifier params _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous" toTermName identifier) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
