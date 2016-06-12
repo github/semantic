@@ -25,6 +25,8 @@ data Category
   | Params
   -- | A function's expression statements.
   | ExpressionStatements
+  -- | A method call on an object.
+  | MethodCall
   -- | A string literal.
   | StringLiteral
   -- | An integer literal.

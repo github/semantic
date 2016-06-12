@@ -26,4 +26,7 @@ data Syntax
   -- | A member access contains a syntax, and another syntax that identifies a property or value in the first syntax.
   -- | e.g. in Javascript x.y represents a member access syntax.
   | MemberAccess { memberId :: f, property :: f }
+  -- | A method call consisting of its target, the method name, and the parameters passed to the method.
+  -- | e.g. in Javascript console.log('hello') represents a method call.
+  | MethodCall { targetId :: f, methodId :: f, methodParams :: f }
   deriving (Functor, Show, Eq, Foldable, Traversable)
