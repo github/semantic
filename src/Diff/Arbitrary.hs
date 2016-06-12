@@ -68,4 +68,5 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
         Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink)
         FunctionCall i children -> FunctionCall <$> shrink i <*> (List.subsequences children >>= recursivelyShrink)
         Function i params body -> Function <$> shrink i <*> shrink params <*> shrink body
+        MethodCall targetId methodId params -> MethodCall <$> shrink targetId <*> shrink methodId <*> shrink params
     Pure patch -> ArbitraryDiff . Pure <$> shrink patch

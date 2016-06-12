@@ -52,4 +52,5 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
       Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
       Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink)
       FunctionCall identifier children -> FunctionCall <$> shrink identifier <*> (List.subsequences children >>= recursivelyShrink)
-      Function id params body -> Function <$> shrink id <*> shrink params <*> shrink body
+      Function identifier params children -> FunctionCall <$> shrink identifier <*> shrink params <*> (List.subsequences children >>= recursivelyShrink)
+      MethodCall targetId methodId params -> MethodCall <$> shrink targetId <*> shrink methodId <*> shrink params
