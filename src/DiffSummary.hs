@@ -48,6 +48,7 @@ instance HasCategory Category where
     DictionaryLiteral -> "dictionary"
     Pair -> "pair"
     Category.FunctionCall -> "function call"
+    Category.MethodCall -> "method call"
     StringLiteral -> "string"
     IntegerLiteral -> "integer"
     SymbolLiteral -> "symbol"
@@ -102,9 +103,10 @@ termToDiffInfo term = case runCofree term of
   (_ :< Fixed children) -> join $ termToDiffInfo <$> children
   (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
   (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
-  (info :< Syntax.Function identifier params _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous" toTermName identifier) ]
+  (info :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous" toTermName identifier) ]
   (info :< Syntax.Assignment identifier value) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
   memberAccess@(info :< Syntax.MemberAccess{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree memberAccess) ]
+  (info :< Syntax.MethodCall _ methodId _) -> [ DiffInfo (toCategoryName info) (toTermName methodId) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
