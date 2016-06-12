@@ -21,9 +21,9 @@ data Category
   | Function
   -- | An identifier.
   | Identifier
-  -- | A function's parameters
+  -- | A function's parameters.
   | Params
-  -- | A function's expression statements
+  -- | A function's expression statements.
   | ExpressionStatements
   -- | A string literal.
   | StringLiteral
