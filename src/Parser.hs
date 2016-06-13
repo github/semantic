@@ -59,6 +59,9 @@ isExpressions = flip Set.member (Set.singleton ExpressionStatements)
 isAssignment :: Category -> Bool
 isAssignment = flip Set.member (Set.singleton Category.Assignment)
 
+isMemberAccess :: Category -> Bool
+isMemberAccess = flip Set.member (Set.singleton Category.MemberAccess)
+
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
 termConstructor :: Constructor
@@ -71,6 +74,8 @@ termConstructor source info children = cofree (info :< syntax)
       -- x.y = 0
       -- x.y
       (identifier:value:[]) -> Syntax.Assignment identifier value
+    construct children | isMemberAccess (category info) = case children of
+      (base:property:[]) -> Syntax.MemberAccess base property
     construct children | isFunction (category info) = case children of
       (body:[]) -> Syntax.Function Nothing Nothing body
       (params:body:[]) | (info :< _) <- runCofree params, isParams (category info) -> Syntax.Function Nothing (Just params) body
