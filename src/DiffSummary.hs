@@ -24,6 +24,8 @@ toTermName term = case runCofree term of
   (_ :< Fixed children) -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
   (_ :< Syntax.FunctionCall i _) -> toTermName i
   (_ :< Syntax.Function identifier _ _) -> (maybe "anonymous" toTermName identifier)
+  (_ :< Syntax.Assignment identifier value) -> toTermName identifier <> toTermName value
+
 
 class HasCategory a where
   toCategoryName :: a -> Text
@@ -50,6 +52,7 @@ instance HasCategory Category where
     Identifier -> "identifier"
     Params -> "params"
     ExpressionStatements -> "expression statements"
+    Category.Assignment -> "assignment"
     Other s -> s
 
 instance HasCategory leaf => HasCategory (Term leaf Info) where
@@ -80,6 +83,7 @@ diffSummary = cata $ \case
   (Free (infos :< Keyed children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList children)
   (Free (infos :< Syntax.FunctionCall identifier children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList (identifier : children))
   (Free (infos :< Syntax.Function id ps body)) -> prependSummary (category $ snd infos) <$> (fromMaybe [] id) <> (fromMaybe [] ps) <> body
+  (Free (infos :< Syntax.Assignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
   (Pure (Insert term)) -> (\info -> DiffSummary (Insert info) []) <$> termToDiffInfo term
   (Pure (Delete term)) -> (\info -> DiffSummary (Delete info) []) <$> termToDiffInfo term
   (Pure (Replace t1 t2)) -> (\(info1, info2) -> DiffSummary (Replace info1 info2) []) <$> zip (termToDiffInfo t1) (termToDiffInfo t2)
@@ -92,6 +96,7 @@ termToDiffInfo term = case runCofree term of
   (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
   (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
   (info :< Syntax.Function identifier params _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous" toTermName identifier) ]
+  (info :< Syntax.Assignment identifier value) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
