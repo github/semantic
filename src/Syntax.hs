@@ -21,4 +21,6 @@ data Syntax
   | FunctionCall f [f]
   -- | A function has a list of expressions.
   | Function { id :: (Maybe f), params :: (Maybe f), expressions :: f }
+  -- | An assignment has an indetifier where f is a (Leaf a) and a value (Leaf a).
+  | Assignment { assignmentId :: f, value :: f }
   deriving (Functor, Show, Eq, Foldable, Traversable)
