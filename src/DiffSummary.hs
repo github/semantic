@@ -25,7 +25,11 @@ toTermName term = case runCofree term of
   (_ :< Syntax.FunctionCall i _) -> toTermName i
   (_ :< Syntax.Function identifier _ _) -> (maybe "anonymous" toTermName identifier)
   (_ :< Syntax.Assignment identifier value) -> toTermName identifier <> toTermName value
-
+  (_ :< Syntax.MemberAccess base property) -> case (unwrap base, unwrap property) of
+    (Syntax.FunctionCall{}, Syntax.FunctionCall{}) -> toTermName base <> "()." <> toTermName property <> "()"
+    (Syntax.FunctionCall{}, _) -> toTermName base <> "()." <> toTermName property
+    (_, Syntax.FunctionCall{}) -> toTermName base <> "." <> toTermName property <> "()"
+    (_, _) -> toTermName base <> "." <> toTermName property
 
 class HasCategory a where
   toCategoryName :: a -> Text
