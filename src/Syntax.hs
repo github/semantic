@@ -21,7 +21,7 @@ data Syntax
   | FunctionCall f [f]
   -- | A function has a list of expressions.
   | Function { id :: (Maybe f), params :: (Maybe f), expressions :: f }
-  -- | An assignment has an indetifier where f is a (Leaf a) and a value (Leaf a).
+  -- | An assignment has an identifier where f can be a member access, and the value is another syntax element (function call, leaf, etc.)
   | Assignment { assignmentId :: f, value :: f }
   -- | A member access contains a syntax, and another syntax that identifies a property or value in the first syntax.
   -- | e.g. in Javascript x.y represents a member access syntax.
