@@ -33,8 +33,10 @@ data Category
   | SymbolLiteral
   -- | An array literal.
   | ArrayLiteral
-  -- | An assignment expression
+  -- | An assignment expression.
   | Assignment
+  -- | A member access expression.
+  | MemberAccess
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Show, Ord)
