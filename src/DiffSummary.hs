@@ -53,6 +53,7 @@ instance HasCategory Category where
     Params -> "params"
     ExpressionStatements -> "expression statements"
     Category.Assignment -> "assignment"
+    Category.MemberAccess -> "member access"
     Other s -> s
 
 instance HasCategory leaf => HasCategory (Term leaf Info) where
@@ -84,6 +85,7 @@ diffSummary = cata $ \case
   (Free (infos :< Syntax.FunctionCall identifier children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList (identifier : children))
   (Free (infos :< Syntax.Function id ps body)) -> prependSummary (category $ snd infos) <$> (fromMaybe [] id) <> (fromMaybe [] ps) <> body
   (Free (infos :< Syntax.Assignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
+  (Free (infos :< Syntax.MemberAccess base property)) -> prependSummary (category $ snd infos) <$> base <> property
   (Pure (Insert term)) -> (\info -> DiffSummary (Insert info) []) <$> termToDiffInfo term
   (Pure (Delete term)) -> (\info -> DiffSummary (Delete info) []) <$> termToDiffInfo term
   (Pure (Replace t1 t2)) -> (\(info1, info2) -> DiffSummary (Replace info1 info2) []) <$> zip (termToDiffInfo t1) (termToDiffInfo t2)
@@ -97,6 +99,7 @@ termToDiffInfo term = case runCofree term of
   (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
   (info :< Syntax.Function identifier params _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous" toTermName identifier) ]
   (info :< Syntax.Assignment identifier value) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
+  memberAccess@(info :< Syntax.MemberAccess{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree memberAccess) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
