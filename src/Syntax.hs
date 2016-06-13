@@ -23,4 +23,7 @@ data Syntax
   | Function { id :: (Maybe f), params :: (Maybe f), expressions :: f }
   -- | An assignment has an indetifier where f is a (Leaf a) and a value (Leaf a).
   | Assignment { assignmentId :: f, value :: f }
+  -- | A member access contains a syntax, and another syntax that identifies a property or value in the first syntax.
+  -- | e.g. in Javascript x.y represents a member access syntax.
+  | MemberAccess { memberId :: f, property :: f }
   deriving (Functor, Show, Eq, Foldable, Traversable)
