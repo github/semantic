@@ -56,6 +56,9 @@ isParams = flip Set.member (Set.singleton Params)
 isExpressions :: Category -> Bool
 isExpressions = flip Set.member (Set.singleton ExpressionStatements)
 
+isAssignment :: Category -> Bool
+isAssignment = flip Set.member (Set.singleton Category.Assignment)
+
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
 termConstructor :: Constructor
@@ -64,6 +67,10 @@ termConstructor source info children = cofree (info :< syntax)
     syntax = construct children
     construct :: [Term Text Info] -> Syntax Text (Term Text Info)
     construct [] = Leaf . pack . toString $ slice (characterRange info) source
+    construct children | isAssignment (category info) = case children of
+      -- x.y = 0
+      -- x.y
+      (identifier:value:[]) -> Syntax.Assignment identifier value
     construct children | isFunction (category info) = case children of
       (body:[]) -> Syntax.Function Nothing Nothing body
       (params:body:[]) | (info :< _) <- runCofree params, isParams (category info) -> Syntax.Function Nothing (Just params) body
