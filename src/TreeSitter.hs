@@ -50,6 +50,8 @@ defaultCategoryForNodeName name = case name of
   "identifier" -> Identifier
   "formal_parameters" -> Params
   "statement_block" -> ExpressionStatements
+  "assignment" -> Assignment
+  "member_access" -> MemberAccess
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
