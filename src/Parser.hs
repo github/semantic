@@ -71,8 +71,6 @@ termConstructor source info children = cofree (info :< syntax)
     construct :: [Term Text Info] -> Syntax Text (Term Text Info)
     construct [] = Leaf . pack . toString $ slice (characterRange info) source
     construct children | isAssignment (category info) = case children of
-      -- x.y = 0
-      -- x.y
       (identifier:value:[]) -> Syntax.Assignment identifier value
     construct children | isMemberAccess (category info) = case children of
       (base:property:[]) -> Syntax.MemberAccess base property
