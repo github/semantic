@@ -46,16 +46,20 @@ termConstructor source info = cofree . construct
       (identifier:value:[]) -> withDefaultInfo $ S.Assignment identifier value
     construct children | MemberAccess == category info = case children of
       (base:property:[]) -> withDefaultInfo $ S.MemberAccess base property
-    construct children | Function == category info = case children of
-      (body:[]) -> withDefaultInfo $ S.Function Nothing Nothing body
-      (params:body:[]) | (info :< _) <- runCofree params, Params == category info -> withDefaultInfo $ S.Function Nothing (Just params) body
-      (id:body:[]) | (info :< _) <- runCofree id, Identifier == category info -> withDefaultInfo $ S.Function (Just id) Nothing body
-      (id:params:body:[]) | (info :< _) <- runCofree id, Identifier == category info -> withDefaultInfo $ S.Function (Just id) (Just params) body
+    construct children | Function == category info = withDefaultInfo $ case children of
+      (body:[]) -> S.Function Nothing Nothing body
+      (params:body:[]) | (info :< _) <- runCofree params, Params == category info ->
+        S.Function Nothing (Just params) body
+      (id:body:[]) | (info :< _) <- runCofree id, Identifier == category info ->
+        S.Function (Just id) Nothing body
+      (id:params:body:[]) | (info :< _) <- runCofree id, Identifier == category info ->
+        S.Function (Just id) (Just params) body
       x -> error $ "Expected a function declaration but got: " <> show x
 
     construct children | FunctionCall == category info = case runCofree <$> children of
       [ (_ :< S.MemberAccess{..}), params@(_ :< S.Args{}) ] -> info { category = MethodCall } :< S.MethodCall memberId property (cofree params)
       (x:xs) -> withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
+
     construct children | Args == category info = withDefaultInfo $ S.Args children
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
     construct children | isKeyed (category info) = withDefaultInfo . S.Keyed . Map.fromList $ assignKey <$> children
