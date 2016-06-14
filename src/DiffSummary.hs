@@ -107,7 +107,7 @@ termToDiffInfo term = case runCofree term of
   (info :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous" toTermName identifier) ]
   (info :< Syntax.Assignment identifier value) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
   memberAccess@(info :< Syntax.MemberAccess{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree memberAccess) ]
-  (info :< Syntax.MethodCall _ methodId _) -> [ DiffInfo (toCategoryName info) (toTermName methodId) ]
+  methodCall@(info :< Syntax.MethodCall _ methodId _) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree methodCall) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
