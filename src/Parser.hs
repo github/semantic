@@ -68,29 +68,29 @@ isArgs = flip Set.member (Set.singleton Category.Args)
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
 termConstructor :: Constructor
-termConstructor source info children = cofree (info :< syntax)
+termConstructor source info = cofree . construct
   where
-    syntax = construct children
-    construct :: [Term Text Info] -> Syntax Text (Term Text Info)
-    construct [] = Leaf . pack . toString $ slice (characterRange info) source
+    withDefaultInfo syntax = (info :< syntax)
+    construct :: [Term Text Info] -> CofreeF (Syntax Text) Info (Term Text Info)
+    construct [] = withDefaultInfo $ Leaf . pack . toString $ slice (characterRange info) source
     construct children | isAssignment (category info) = case children of
-      (identifier:value:[]) -> Syntax.Assignment identifier value
+      (identifier:value:[]) -> withDefaultInfo $ Syntax.Assignment identifier value
     construct children | isMemberAccess (category info) = case children of
-      (base:property:[]) -> Syntax.MemberAccess base property
+      (base:property:[]) -> withDefaultInfo $ Syntax.MemberAccess base property
     construct children | isFunction (category info) = case children of
-      (body:[]) -> Syntax.Function Nothing Nothing body
-      (params:body:[]) | (info :< _) <- runCofree params, isParams (category info) -> Syntax.Function Nothing (Just params) body
-      (id:body:[]) | (info :< _) <- runCofree id, isIdentifier (category info) -> Syntax.Function (Just id) Nothing body
-      (id:params:body:[]) | (info :< _) <- runCofree id, isIdentifier (category info) -> Syntax.Function (Just id) (Just params) body
+      (body:[]) -> withDefaultInfo $ Syntax.Function Nothing Nothing body
+      (params:body:[]) | (info :< _) <- runCofree params, isParams (category info) -> withDefaultInfo $ Syntax.Function Nothing (Just params) body
+      (id:body:[]) | (info :< _) <- runCofree id, isIdentifier (category info) -> withDefaultInfo $ Syntax.Function (Just id) Nothing body
+      (id:params:body:[]) | (info :< _) <- runCofree id, isIdentifier (category info) -> withDefaultInfo $ Syntax.Function (Just id) (Just params) body
       x -> error $ "Expected a function declaration but got: " <> show x
 
     construct children | isFunctionCall (category info) = case runCofree <$> children of
-      [ (_ :< Syntax.MemberAccess{..}), params@(_ :< Syntax.Args{}) ] -> Syntax.MethodCall memberId property (cofree params)
-      (x:xs) -> Syntax.FunctionCall (cofree x) (cofree <$> xs)
-    construct children | isArgs (category info) = Syntax.Args children
-    construct children | isFixed (category info) = Fixed children
-    construct children | isKeyed (category info) = Keyed . Map.fromList $ assignKey <$> children
-    construct children = Indexed children
+      [ (_ :< Syntax.MemberAccess{..}), params@(_ :< Syntax.Args{}) ] -> (info { category = Category.MethodCall } :< Syntax.MethodCall memberId property (cofree params))
+      (x:xs) -> withDefaultInfo $ Syntax.FunctionCall (cofree x) (cofree <$> xs)
+    construct children | isArgs (category info) = withDefaultInfo $ Syntax.Args children
+    construct children | isFixed (category info) = withDefaultInfo $ Fixed children
+    construct children | isKeyed (category info) = withDefaultInfo . Keyed . Map.fromList $ assignKey <$> children
+    construct children = withDefaultInfo $ Indexed children
     assignKey node = case runCofree node of
       info :< Fixed (key : _) | Pair == category info -> (getSubstring key, node)
       _ -> (getSubstring node, node)
