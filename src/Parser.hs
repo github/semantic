@@ -63,7 +63,7 @@ isMemberAccess :: Category -> Bool
 isMemberAccess = flip Set.member (Set.singleton Category.MemberAccess)
 
 isArgs :: Category -> Bool
-isArgs = flip Set.member (Set.Singleton Category.Args)
+isArgs = flip Set.member (Set.singleton Category.Args)
 
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
