@@ -41,8 +41,6 @@ data Category
   | Assignment
   -- | A member access expression.
   | MemberAccess
-  -- | An if expression.
-  | If
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Show, Ord)

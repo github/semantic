@@ -32,5 +32,4 @@ data Syntax
   -- | The list of arguments to a method call.
   -- | TODO: It might be worth removing this and using Fixed instead.
   | Args [f]
-  | If { ifCond :: f, ifExpression :: f, elseExpression :: f }
   deriving (Functor, Show, Eq, Foldable, Traversable)
