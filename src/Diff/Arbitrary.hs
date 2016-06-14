@@ -69,4 +69,6 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
         FunctionCall i children -> FunctionCall <$> shrink i <*> (List.subsequences children >>= recursivelyShrink)
         Function i params body -> Function <$> shrink i <*> shrink params <*> shrink body
         MethodCall targetId methodId params -> MethodCall <$> shrink targetId <*> shrink methodId <*> shrink params
+        Assignment assignmentId value -> Assignment <$> shrink assignmentId <*> shrink value
+        Syntax.Args args -> Syntax.Args <$> (List.subsequences args >>= recursivelyShrink)
     Pure patch -> ArbitraryDiff . Pure <$> shrink patch
