@@ -30,8 +30,10 @@ toTermName term = case unwrap term of
     (Syntax.FunctionCall{}, _) -> toTermName base <> "()." <> toTermName property
     (_, Syntax.FunctionCall{}) -> toTermName base <> "." <> toTermName property <> "()"
     (_, _) -> toTermName base <> "." <> toTermName property
-  Syntax.MethodCall targetId methodId _ -> let sep = case unwrap targetId of Syntax.FunctionCall{} -> "()."; _ -> "." in
-    toTermName targetId <> sep <> toTermName methodId <> "()"
+  Syntax.MethodCall targetId methodId _ -> toTermName targetId <> sep <> toTermName methodId <> "()"
+    where sep = case unwrap targetId of
+            Syntax.FunctionCall{} -> "()."
+            _ -> "."
 
 class HasCategory a where
   toCategoryName :: a -> Text
