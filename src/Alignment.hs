@@ -68,6 +68,14 @@ alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax 
   Syntax.Function id params body -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (fromMaybe [] id <> fromMaybe []  params <> body) bothRanges
   -- Align FunctionCalls like Indexed nodes by appending identifier to its children.
   Syntax.FunctionCall identifier children -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join (identifier : children)) bothRanges
+  Syntax.Assignment assignmentId value ->
+    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (assignmentId <> value) bothRanges
+  Syntax.MemberAccess memberId property ->
+    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (memberId <> property) bothRanges
+  Syntax.MethodCall targetId methodId args ->
+    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (targetId <> methodId <> args) bothRanges
+  Syntax.Args children ->
+    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
   Fixed children -> catMaybes $ wrapInBranch Fixed <$> alignBranch getRange (join children) bothRanges
   Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> alignBranch (getRange . Prologue.snd) (Map.toList children >>= pairWithKey) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
