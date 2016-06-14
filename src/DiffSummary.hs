@@ -17,19 +17,20 @@ import Data.Text as Text (intercalate, unpack)
 data DiffInfo = DiffInfo { categoryName :: Text, termName :: Text } deriving (Eq, Show)
 
 toTermName :: HasCategory leaf => Term leaf Info -> Text
-toTermName term = case runCofree term of
-  (_ :< Leaf leaf) -> toCategoryName leaf
-  (_ :< Keyed children) -> mconcat $ keys children
-  (_ :< Indexed children) -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
-  (_ :< Fixed children) -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
-  (_ :< Syntax.FunctionCall i _) -> toTermName i
-  (_ :< Syntax.Function identifier _ _) -> (maybe "anonymous" toTermName identifier)
-  (_ :< Syntax.Assignment identifier value) -> toTermName identifier <> toTermName value
-  (_ :< Syntax.MemberAccess base property) -> case (unwrap base, unwrap property) of
+toTermName term = case unwrap term of
+  Leaf leaf -> toCategoryName leaf
+  Keyed children -> mconcat $ keys children
+  Indexed children -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
+  Fixed children -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
+  Syntax.FunctionCall i _ -> toTermName i
+  Syntax.Function identifier _ _ -> (maybe "anonymous" toTermName identifier)
+  Syntax.Assignment identifier value -> toTermName identifier <> toTermName value
+  Syntax.MemberAccess base property -> case (unwrap base, unwrap property) of
     (Syntax.FunctionCall{}, Syntax.FunctionCall{}) -> toTermName base <> "()." <> toTermName property <> "()"
     (Syntax.FunctionCall{}, _) -> toTermName base <> "()." <> toTermName property
     (_, Syntax.FunctionCall{}) -> toTermName base <> "." <> toTermName property <> "()"
     (_, _) -> toTermName base <> "." <> toTermName property
+  Syntax.MethodCall targetId methodId _ -> toTermName targetId <> "." <> toTermName methodId <> "()"
 
 class HasCategory a where
   toCategoryName :: a -> Text
