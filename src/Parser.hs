@@ -62,6 +62,9 @@ isAssignment = flip Set.member (Set.singleton Category.Assignment)
 isMemberAccess :: Category -> Bool
 isMemberAccess = flip Set.member (Set.singleton Category.MemberAccess)
 
+isArgs :: Category -> Bool
+isArgs = flip Set.member (Set.Singleton Category.Args)
+
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
 termConstructor :: Constructor
@@ -81,8 +84,10 @@ termConstructor source info children = cofree (info :< syntax)
       (id:params:body:[]) | (info :< _) <- runCofree id, isIdentifier (category info) -> Syntax.Function (Just id) (Just params) body
       x -> error $ "Expected a function declaration but got: " <> show x
 
-    construct children | isFunctionCall (category info), (x:xs) <- children =
-      Syntax.FunctionCall x xs
+    construct children | isFunctionCall (category info) = case runCofree <$> children of
+      [ (_ :< Syntax.MemberAccess{..}), params@(_ :< Args{}) ] -> Syntax.MethodCall memberId property (cofree params)
+      (x:xs) -> Syntax.FunctionCall (cofree x) (cofree <$> xs)
+    construct children | isArgs (category info) = Args children
     construct children | isFixed (category info) = Fixed children
     construct children | isKeyed (category info) = Keyed . Map.fromList $ assignKey <$> children
     construct children = Indexed children

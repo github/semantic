@@ -29,4 +29,5 @@ data Syntax
   -- | A method call consisting of its target, the method name, and the parameters passed to the method.
   -- | e.g. in Javascript console.log('hello') represents a method call.
   | MethodCall { targetId :: f, methodId :: f, methodParams :: f }
+  | Args [f]
   deriving (Functor, Show, Eq, Foldable, Traversable)

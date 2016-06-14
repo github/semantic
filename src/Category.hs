@@ -27,6 +27,8 @@ data Category
   | ExpressionStatements
   -- | A method call on an object.
   | MethodCall
+  -- | A method's arguments.
+  | Args
   -- | A string literal.
   | StringLiteral
   -- | An integer literal.

@@ -48,6 +48,9 @@ styleName category = "category-" <> case category of
   Category.FunctionCall -> "function_call"
   Category.Function -> "function"
   Category.MethodCall -> "method_call"
+  Category.Args -> "arguments"
+  Category.Assignment -> "assignment"
+  Category.MemberAccess -> "member_access"
   Identifier -> "identifier"
   Params -> "parameters"
   ExpressionStatements -> "expression_statements"
@@ -108,6 +111,12 @@ instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Ran
       contentElements source characterRange (catMaybes [identifier, params, Just expressions])
     Syntax.MethodCall targetId methodId methodParams -> ul . mconcat $ wrapIn li <$>
       contentElements source characterRange [targetId, methodId, methodParams]
+    Syntax.Args children -> ul . mconcat $ wrapIn li <$>
+      contentElements source characterRange children
+    Syntax.MemberAccess memberId property -> ul . mconcat $ wrapIn li <$>
+      contentElements source characterRange [memberId, property]
+    Syntax.Assignment  memberId value -> ul . mconcat $ wrapIn li <$>
+      contentElements source characterRange [memberId, value]
 
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
