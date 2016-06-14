@@ -75,6 +75,8 @@ termFields Info{..} syntax = "range" .= characterRange : "category" .= category 
   Syntax.Function identifier params c -> [ "identifier" .= identifier ] <> [ "params" .= params ] <> childrenFields c
   Syntax.MethodCall targetId methodId args -> [ "targetIdentifier" .= targetId ] <> [ "methodId" .= methodId ] <> [ "args" .= args ]
   Syntax.Args c -> childrenFields c
+  Syntax.Assignment assignmentId property -> [ "assignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
+  Syntax.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: KeyValue kv => SplitPatch (Term leaf Info) -> [kv]
