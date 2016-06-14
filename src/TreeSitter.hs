@@ -48,6 +48,7 @@ defaultCategoryForNodeName name = case name of
   "function" -> Function
   "identifier" -> Identifier
   "formal_parameters" -> Params
+  "arguments" -> Args
   "statement_block" -> ExpressionStatements
   "assignment" -> Assignment
   "member_access" -> MemberAccess
