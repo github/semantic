@@ -4,7 +4,7 @@ import Prologue hiding (Constructor)
 import Data.Text (pack)
 import Category
 import Info
-import Syntax as S
+import qualified Syntax as S
 import Term
 import qualified Data.OrderedMap as Map
 import qualified Data.Set as Set
@@ -40,8 +40,8 @@ termConstructor :: Constructor
 termConstructor source info = cofree . construct
   where
     withDefaultInfo syntax = (info :< syntax)
-    construct :: [Term Text Info] -> CofreeF (Syntax Text) Info (Term Text Info)
-    construct [] = withDefaultInfo $ Leaf . pack . toString $ slice (characterRange info) source
+    construct :: [Term Text Info] -> CofreeF (S.Syntax Text) Info (Term Text Info)
+    construct [] = withDefaultInfo $ S.Leaf . pack . toString $ slice (characterRange info) source
     construct children | Assignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.Assignment identifier value
     construct children | MemberAccess == category info = case children of
@@ -53,14 +53,16 @@ termConstructor source info = cofree . construct
       (id:params:body:[]) | (info :< _) <- runCofree id, Identifier == category info -> withDefaultInfo $ S.Function (Just id) (Just params) body
       x -> error $ "Expected a function declaration but got: " <> show x
 
-    construct children | isFunctionCall (category info) = case runCofree <$> children of
+    construct children | FunctionCall == category info = case runCofree <$> children of
       [ (_ :< S.MemberAccess{..}), params@(_ :< S.Args{}) ] -> info { category = MethodCall } :< S.MethodCall memberId property (cofree params)
       (x:xs) -> withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
     construct children | Args == category info = withDefaultInfo $ S.Args children
-    construct children | isFixed (category info) = withDefaultInfo $ Fixed children
-    construct children | isKeyed (category info) = withDefaultInfo . Keyed . Map.fromList $ assignKey <$> children
-    construct children = withDefaultInfo $ Indexed children
+    construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
+    construct children | isKeyed (category info) = withDefaultInfo . S.Keyed . Map.fromList $ assignKey <$> children
+    construct children = withDefaultInfo $ S.Indexed children
+
     assignKey node = case runCofree node of
-      info :< Fixed (key : _) | Pair == category info -> (getSubstring key, node)
+      info :< S.Fixed (key : _) | Pair == category info -> (getSubstring key, node)
       _ -> (getSubstring node, node)
+
     getSubstring term = pack . toString $ slice (characterRange (extract term)) source
