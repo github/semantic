@@ -71,4 +71,6 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
         MethodCall targetId methodId params -> MethodCall <$> shrink targetId <*> shrink methodId <*> shrink params
         Assignment assignmentId value -> Assignment <$> shrink assignmentId <*> shrink value
         Syntax.Args args -> Syntax.Args <$> (List.subsequences args >>= recursivelyShrink)
+        Syntax.MemberAccess memberId property -> Syntax.MemberAccess <$> shrink memberId <*> shrink property
+        Syntax.If cond ifExpr elseExpr -> Syntax.If <$> shrink cond <*> shrink ifExpr <*> shrink elseExpr
     Pure patch -> ArbitraryDiff . Pure <$> shrink patch
