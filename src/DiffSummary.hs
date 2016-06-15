@@ -124,6 +124,11 @@ termToDiffInfo term = case runCofree term of
   (info :< Syntax.Assignment identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
   memberAccess@(info :< Syntax.MemberAccess{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree memberAccess) ]
   methodCall@(info :< Syntax.MethodCall{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree methodCall) ]
+  -- TODO: We should remove Args from Syntax since I don't think we shouldn ever
+  -- evaluate Args as a single toTermName Text - joshvera
+  args@(info :< Syntax.Args{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree args) ]
+  varDecl@(info :< Syntax.VarDecl{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree varDecl) ]
+  varAssignment@(info :< Syntax.VarAssignment{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree varAssignment) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
