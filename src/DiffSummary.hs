@@ -34,6 +34,8 @@ toTermName term = case unwrap term of
     where sep = case unwrap targetId of
             Syntax.FunctionCall{} -> "()."
             _ -> "."
+  Syntax.VarDecl decl -> toTermName decl
+  Syntax.VarAssignment varId _ -> toTermName varId
 
 class HasCategory a where
   toCategoryName :: a -> Text
