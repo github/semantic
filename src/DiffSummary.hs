@@ -18,13 +18,13 @@ data DiffInfo = DiffInfo { categoryName :: Text, termName :: Text } deriving (Eq
 
 toTermName :: HasCategory leaf => Term leaf Info -> Text
 toTermName term = case unwrap term of
-  Leaf leaf -> toCategoryName leaf
-  Keyed children -> mconcat $ keys children
-  Indexed children -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
   Fixed children -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
-  Syntax.FunctionCall i _ -> toTermName i
-  Syntax.Function identifier _ _ -> (maybe "anonymous" toTermName identifier)
+  Indexed children -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
+  Keyed children -> mconcat $ keys children
+  Leaf leaf -> toCategoryName leaf
   Syntax.Assignment identifier value -> toTermName identifier <> toTermName value
+  Syntax.Function identifier _ _ -> (maybe "anonymous" toTermName identifier)
+  Syntax.FunctionCall i _ -> toTermName i
   Syntax.MemberAccess base property -> case (unwrap base, unwrap property) of
     (Syntax.FunctionCall{}, Syntax.FunctionCall{}) -> toTermName base <> "()." <> toTermName property <> "()"
     (Syntax.FunctionCall{}, _) -> toTermName base <> "()." <> toTermName property
@@ -34,8 +34,8 @@ toTermName term = case unwrap term of
     where sep = case unwrap targetId of
             Syntax.FunctionCall{} -> "()."
             _ -> "."
-  Syntax.VarDecl decl -> toTermName decl
   Syntax.VarAssignment varId _ -> toTermName varId
+  Syntax.VarDecl decl -> toTermName decl
 
 class HasCategory a where
   toCategoryName :: a -> Text
@@ -48,24 +48,24 @@ instance HasCategory Info where
 
 instance HasCategory Category where
   toCategoryName = \case
-    Program -> "top level"
-    Error -> "error"
+    ArrayLiteral -> "array"
     BinaryOperator -> "binary operator"
     DictionaryLiteral -> "dictionary"
-    Pair -> "pair"
-    Category.FunctionCall -> "function call"
-    Category.MethodCall -> "method call"
-    StringLiteral -> "string"
-    IntegerLiteral -> "integer"
-    SymbolLiteral -> "symbol"
-    ArrayLiteral -> "array"
-    Category.Function -> "function"
-    Identifier -> "identifier"
-    Params -> "params"
+    Error -> "error"
     ExpressionStatements -> "expression statements"
     Category.Assignment -> "assignment"
+    Category.Function -> "function"
+    Category.FunctionCall -> "function call"
     Category.MemberAccess -> "member access"
+    Category.MethodCall -> "method call"
+    Identifier -> "identifier"
+    IntegerLiteral -> "integer"
     Other s -> s
+    Pair -> "pair"
+    Params -> "params"
+    Program -> "top level"
+    StringLiteral -> "string"
+    SymbolLiteral -> "symbol"
 
 instance HasCategory leaf => HasCategory (Term leaf Info) where
   toCategoryName = toCategoryName . category . extract
