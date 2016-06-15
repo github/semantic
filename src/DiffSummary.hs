@@ -42,7 +42,7 @@ toTermName term = case unwrap term of
   -- TODO: We should remove Case from Syntax since I don't think we should ever
   -- evaluate Case as a single toTermName Text - joshvera
   Syntax.Case expr _ -> toTermName expr
-  Syntax.Switch expr cases -> toTermName expr
+  Syntax.Switch expr _ -> toTermName expr
 
 class HasCategory a where
   toCategoryName :: a -> Text
