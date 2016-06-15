@@ -110,9 +110,9 @@ termToDiffInfo term = case runCofree term of
   (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
   (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
   (info :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous" toTermName identifier) ]
-  (info :< Syntax.Assignment identifier value) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
+  (info :< Syntax.Assignment identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
   memberAccess@(info :< Syntax.MemberAccess{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree memberAccess) ]
-  methodCall@(info :< Syntax.MethodCall _ methodId _) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree methodCall) ]
+  methodCall@(info :< Syntax.MethodCall{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree methodCall) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
