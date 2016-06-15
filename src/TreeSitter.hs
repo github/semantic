@@ -54,6 +54,8 @@ defaultCategoryForNodeName name = case name of
   "member_access" -> MemberAccess
   "regex" -> Regex
   "template_string" -> TemplateString
+  "var_assignment" -> VarAssignment
+  "var_declaration" -> VarDecl
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
