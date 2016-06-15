@@ -71,7 +71,7 @@ library
                      , protolude
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
-  ghc-options:        -Wall -fno-warn-name-shadowing -O2 -threaded -fprof-auto "-with-rtsopts=-N -p -s -h -i0.1" -j -Wcompat
+  ghc-options:        -Wall -fno-warn-name-shadowing -O2 -fprof-auto -j -Wcompat
 
 benchmark semantic-diff-bench
   type:                exitcode-stdio-1.0
