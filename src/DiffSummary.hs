@@ -36,6 +36,9 @@ toTermName term = case unwrap term of
             _ -> "."
   Syntax.VarAssignment varId _ -> toTermName varId
   Syntax.VarDecl decl -> toTermName decl
+  -- TODO: We should remove Args from Syntax since I don't think we shouldn ever
+  -- evaluate Args as a single toTermName Text - joshvera
+  Syntax.Args args -> mconcat $ toTermName <$> args
 
 class HasCategory a where
   toCategoryName :: a -> Text
