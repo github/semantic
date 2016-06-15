@@ -63,7 +63,7 @@ instance HasCategory Category where
     Category.MethodCall -> "method call"
     Category.Args -> "arguments"
     Category.VarAssignment -> "var assignment"
-    Category.VarDecl -> "var declaration"
+    Category.VarDecl -> "variable"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
     Other s -> s
