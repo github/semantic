@@ -74,4 +74,6 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
         Syntax.MemberAccess memberId property -> Syntax.MemberAccess <$> shrink memberId <*> shrink property
         Syntax.VarDecl decl -> Syntax.VarDecl <$> shrink decl
         Syntax.VarAssignment varId value -> Syntax.VarAssignment <$> shrink varId <*> shrink value
+        Syntax.Switch switchExpr cases -> Syntax.Switch <$> shrink switchExpr <*> (List.subsequences cases >>= recursivelyShrink)
+        Syntax.Case expr statements -> Syntax.Case <$> shrink expr <*> shrink statements
     Pure patch -> ArbitraryDiff . Pure <$> shrink patch
