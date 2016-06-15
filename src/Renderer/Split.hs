@@ -53,6 +53,8 @@ styleName category = "category-" <> case category of
   Category.MemberAccess -> "member_access"
   Category.VarDecl -> "var_declaration"
   Category.VarAssignment -> "var_assignment"
+  Category.Switch -> "switch"
+  Category.Case -> "case"
   TemplateString -> "template_string"
   Regex -> "regex"
   Identifier -> "identifier"
