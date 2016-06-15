@@ -59,3 +59,5 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
       VarAssignment varId value -> VarAssignment <$> shrink varId <*> shrink value
       Assignment id value -> Assignment <$> shrink id <*> shrink value
       MemberAccess memberId property -> MemberAccess <$> shrink memberId <*> shrink property
+      Switch expr cases -> Switch <$> shrink expr <*> (List.subsequences cases >>= recursivelyShrink)
+      Case expr statements -> Case <$> shrink expr <*> shrink statements
