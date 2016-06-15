@@ -59,10 +59,10 @@ splitPatchToClassName patch = stringValue $ "patch " ++ case patch of
 split :: Renderer
 split diff blobs = TL.toStrict . renderHtml
   . docTypeHtml
-    . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") `mappend`)
+    . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body
       . (table ! A.class_ (stringValue "diff")) $
-        ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) `mappend` col `mappend` (col ! A.width (stringValue . show $ columnWidth)) `mappend` col) `mappend`)
+        ((colgroup $ (col ! A.width (stringValue . show $ columnWidth)) <> col <> (col ! A.width (stringValue . show $ columnWidth)) <> col) <>)
         . mconcat $ numberedLinesToMarkup <$> numbered
   where
     sources = Source.source <$> blobs
@@ -80,14 +80,14 @@ split diff blobs = TL.toStrict . renderHtml
 
     -- | Render a line with numbers as an HTML row.
     numberedLinesToMarkup :: Join These (Int, SplitDiff a Info) -> Markup
-    numberedLinesToMarkup numberedLines = tr $ runBothWith mappend (renderLine <$> Join (fromThese Nothing Nothing (runJoin (Just <$> numberedLines))) <*> sources) `mappend` string "\n"
+    numberedLinesToMarkup numberedLines = tr $ runBothWith (<>) (renderLine <$> Join (fromThese Nothing Nothing (runJoin (Just <$> numberedLines))) <*> sources) <> string "\n"
 
     renderLine :: Maybe (Int, SplitDiff leaf Info) -> Source Char -> Markup
     renderLine (Just (number, line)) source = toMarkup $ Renderable (hasChanges line, number, Renderable (source, line))
     renderLine _ _ =
       td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
-      `mappend` td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
-      `mappend` string "\n"
+      <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
+      <> string "\n"
 
 -- | Something that can be rendered as markup.
 newtype Renderable a = Renderable a
@@ -125,5 +125,8 @@ instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
 instance ToMarkup a => ToMarkup (Renderable (Bool, Int, a)) where
   toMarkup (Renderable (hasChanges, num, line)) =
     td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
-    `mappend` td (toMarkup line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
-    `mappend` string "\n"
+    <> td (toMarkup line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
+    <> string "\n"
+
+instance Semigroup Html where
+  (<>) = mappend
