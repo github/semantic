@@ -1,7 +1,7 @@
 {-# LANGUAGE TypeFamilies #-}
 module Term.Arbitrary where
 
-import Data.Functor.Foldable (Base, cata, unfold, Unfoldable(embed))
+import Data.Functor.Foldable (Base, cata, unfold, Corecursive(embed))
 import qualified Data.List as List
 import qualified Data.OrderedMap as Map
 import Data.Text.Arbitrary ()
@@ -38,7 +38,7 @@ arbitraryTermSize = cata (succ . sum) . toTerm
 -- Instances
 
 type instance Base (ArbitraryTerm leaf annotation) = CofreeF (Syntax leaf) annotation
-instance Unfoldable (ArbitraryTerm leaf annotation) where embed = ArbitraryTerm
+instance Corecursive (ArbitraryTerm leaf annotation) where embed = ArbitraryTerm
 
 instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbitrary (ArbitraryTerm leaf annotation) where
   arbitrary = sized $ \ n -> do
