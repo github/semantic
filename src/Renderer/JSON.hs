@@ -77,6 +77,10 @@ termFields Info{..} syntax = "range" .= characterRange : "category" .= category 
   Syntax.Args c -> childrenFields c
   Syntax.Assignment assignmentId property -> [ "assignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
   Syntax.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
+  Syntax.Switch expr cases -> [ "switchExpression" .= expr ] <> [ "cases" .= cases ]
+  Syntax.Case expr body -> [ "caseExpression" .= expr ] <> [ "caseStatement" .= body ]
+  Syntax.VarDecl decl -> [ "variableDeclaration" .= decl ]
+  Syntax.VarAssignment id value -> [ "varIdentifier" .= id ] <> [ "value" .= value ]
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: KeyValue kv => SplitPatch (Term leaf Info) -> [kv]
