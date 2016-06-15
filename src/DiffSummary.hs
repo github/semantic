@@ -64,6 +64,7 @@ instance HasCategory Category where
     Pair -> "pair"
     Params -> "params"
     Program -> "top level"
+    Regex -> "regex"
     StringLiteral -> "string"
     SymbolLiteral -> "symbol"
     TemplateString -> "template string"

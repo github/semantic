@@ -33,6 +33,8 @@ data Category
   | StringLiteral
   -- | An integer literal.
   | IntegerLiteral
+  -- | A regex literal.
+  | Regex
   -- | A symbol literal.
   | SymbolLiteral
   -- | A template string literal.

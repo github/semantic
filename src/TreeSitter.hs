@@ -52,6 +52,7 @@ defaultCategoryForNodeName name = case name of
   "statement_block" -> ExpressionStatements
   "assignment" -> Assignment
   "member_access" -> MemberAccess
+  "regex" -> Regex
   "template_string" -> TemplateString
   _ -> Other name
 
