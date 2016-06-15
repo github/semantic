@@ -68,6 +68,12 @@ termConstructor source info = cofree . construct
         toVarDecl :: Term Text Info -> Term Text Info
         toVarDecl child = cofree $ ((extract child) { category  = VarDecl } :< S.VarDecl child)
 
+    construct children | Switch == category info , (expr:cases) <- children =
+      withDefaultInfo $ S.Switch expr children
+
+    construct children | Case == category info , [expr, body] <- children =
+      withDefaultInfo $ S.Case expr body
+
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
     construct children | isKeyed (category info) = withDefaultInfo . S.Keyed . Map.fromList $ assignKey <$> children
     construct children = withDefaultInfo $ S.Indexed children
