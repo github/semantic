@@ -32,6 +32,8 @@ data Syntax
   -- | The list of arguments to a method call.
   -- | TODO: It might be worth removing this and using Fixed instead.
   | Args [f]
+  -- | A variable declaration. e.g. var foo;
   | VarDecl f
+  -- | A variable assignment in a variable declaration. var foo = bar;
   | VarAssignment { varId :: f, varValue :: f }
   deriving (Functor, Show, Eq, Foldable, Traversable)
