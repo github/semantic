@@ -66,7 +66,7 @@ termConstructor source info = cofree . construct
     construct children | VarDecl == category info = withDefaultInfo . S.Indexed $ toVarDecl <$> children
       where
         toVarDecl :: Term Text Info -> Term Text Info
-        toVarDecl child = cofree $ (extract child :< S.VarDecl child)
+        toVarDecl child = cofree $ ((extract child) { category  = VarDecl } :< S.VarDecl child)
 
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
     construct children | isKeyed (category info) = withDefaultInfo . S.Keyed . Map.fromList $ assignKey <$> children
