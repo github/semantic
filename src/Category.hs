@@ -35,6 +35,8 @@ data Category
   | IntegerLiteral
   -- | A symbol literal.
   | SymbolLiteral
+  -- | A template string literal.
+  | TemplateString
   -- | An array literal.
   | ArrayLiteral
   -- | An assignment expression.
