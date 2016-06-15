@@ -68,6 +68,8 @@ instance HasCategory Category where
     Category.Args -> "arguments"
     Category.VarAssignment -> "var assignment"
     Category.VarDecl -> "variable"
+    Category.Switch -> "switch statement"
+    Category.Case -> "case statement"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
     Other s -> s
