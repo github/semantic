@@ -41,6 +41,10 @@ data Category
   | Assignment
   -- | A member access expression.
   | MemberAccess
+  -- | A variable assignment within a variable declaration.
+  | VarAssignment
+  -- | A variable declaration.
+  | VarDecl
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Show, Ord)
