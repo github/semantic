@@ -66,6 +66,7 @@ instance HasCategory Category where
     Program -> "top level"
     StringLiteral -> "string"
     SymbolLiteral -> "symbol"
+    TemplateString -> "template string"
 
 instance HasCategory leaf => HasCategory (Term leaf Info) where
   toCategoryName = toCategoryName . category . extract
