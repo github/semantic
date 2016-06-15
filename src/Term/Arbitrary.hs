@@ -54,3 +54,8 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
       FunctionCall identifier children -> FunctionCall <$> shrink identifier <*> (List.subsequences children >>= recursivelyShrink)
       Function identifier params children -> Function <$> shrink identifier <*> shrink params <*> shrink children
       MethodCall targetId methodId params -> MethodCall <$> shrink targetId <*> shrink methodId <*> shrink params
+      Syntax.Args args -> Syntax.Args <$> (List.subsequences args >>= recursivelyShrink)
+      VarDecl decl -> VarDecl <$> shrink decl
+      VarAssignment varId value -> VarAssignment <$> shrink varId <*> shrink value
+      Assignment id value -> Assignment <$> shrink id <*> shrink value
+      MemberAccess memberId property -> MemberAccess <$> shrink memberId <*> shrink property
