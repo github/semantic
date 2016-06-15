@@ -61,6 +61,13 @@ termConstructor source info = cofree . construct
       (x:xs) -> withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
 
     construct children | Args == category info = withDefaultInfo $ S.Args children
+    construct children | VarAssignment == category info
+                         , [x, y] <- children = withDefaultInfo $ S.VarAssignment x y
+    construct children | VarDecl == category info = withDefaultInfo . S.Indexed $ toVarDecl <$> children
+      where
+        toVarDecl :: Term Text Info -> Term Text Info
+        toVarDecl child = cofree $ (extract child :< S.VarDecl child)
+
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
     construct children | isKeyed (category info) = withDefaultInfo . S.Keyed . Map.fromList $ assignKey <$> children
     construct children = withDefaultInfo $ S.Indexed children
