@@ -1,4 +1,6 @@
-error "generalize fmap"  = map  ==> fmap
+import "hint" HLint.Default
+import "hint" HLint.Dollar
+import "hint" HLint.Generalise
 
 -- AMP fallout
 error "generalize mapM"  = mapM  ==> traverse

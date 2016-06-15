@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances, OverloadedStrings, TypeSynonymInstances #-}
+{-# LANGUAGE OverloadedStrings, TypeSynonymInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Renderer.JSON (
   json
@@ -66,7 +66,7 @@ lineFields n term range = [ "number" .= n
                           ]
 
 termFields :: (ToJSON recur, KeyValue kv) => Info -> Syntax leaf recur -> [kv]
-termFields (Info range categories _) syntax = "range" .= range : "categories" .= categories : case syntax of
+termFields Info{..} syntax = "range" .= characterRange : "category" .= category : case syntax of
   Leaf _ -> []
   Indexed c -> childrenFields c
   Fixed c -> childrenFields c
