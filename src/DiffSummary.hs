@@ -133,6 +133,7 @@ termToDiffInfo term = case runCofree term of
   args@(info :< Syntax.Args{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree args) ]
   varDecl@(info :< Syntax.VarDecl{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree varDecl) ]
   varAssignment@(info :< Syntax.VarAssignment{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree varAssignment) ]
+  switch@(info :< Syntax.Switch{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree switch) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
