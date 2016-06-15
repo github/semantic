@@ -52,6 +52,7 @@ defaultCategoryForNodeName name = case name of
   "statement_block" -> ExpressionStatements
   "assignment" -> Assignment
   "member_access" -> MemberAccess
+  "template_string" -> TemplateString
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
