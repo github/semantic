@@ -61,6 +61,9 @@ instance HasCategory Category where
     Category.FunctionCall -> "function call"
     Category.MemberAccess -> "member access"
     Category.MethodCall -> "method call"
+    Category.Args -> "arguments"
+    Category.VarAssignment -> "var assignment"
+    Category.VarDecl -> "var declaration"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
     Other s -> s
