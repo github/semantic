@@ -36,4 +36,6 @@ data Syntax
   | VarDecl f
   -- | A variable assignment in a variable declaration. var foo = bar;
   | VarAssignment { varId :: f, varValue :: f }
+  | Switch { switchExpr :: f, cases :: [f] }
+  | Case { caseExpr :: f, caseStatements :: f }
   deriving (Functor, Show, Eq, Foldable, Traversable)
