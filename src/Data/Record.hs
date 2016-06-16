@@ -24,6 +24,7 @@ field = Tagged
 
 -- Classes
 
+-- | HasField enables indexing a Record by (phantom) type tags.
 class HasField (fields :: [*]) (field :: *) where
   getField :: Record fields -> field
 
