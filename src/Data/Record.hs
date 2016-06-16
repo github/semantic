@@ -33,6 +33,8 @@ class HasField (fields :: [*]) (field :: *) where
 
 -- Instances
 
+-- OVERLAPPABLE is required for the HasField instances so that we can handle the two cases: either the head of the non-empty h-list is the requested field, or it isn’t. The third possible case (the h-list is empty) is rejected at compile-time.
+
 instance {-# OVERLAPPABLE #-} HasField fields field => HasField (notIt ': fields) field where
   getField (RCons _ t) = getField t
 
