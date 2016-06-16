@@ -40,6 +40,9 @@ type family ValueOf field
 class HasField (fields :: [*]) (field :: *) where
   getField :: Record fields -> field
 
+class IsField field where
+  getValue :: field -> ValueOf field
+
 
 -- Instances
 
