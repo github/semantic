@@ -43,7 +43,7 @@ instance {-# OVERLAPPABLE #-} HasField (field ': fields) field where
 
 
 instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
-  showsPrec n (RCons h t) = showsPrec n h . (" : "++) . showsPrec n t
+  showsPrec n (RCons h t) = showsPrec n h . (" : " <>) . showsPrec n t
 
 instance Show (Record '[]) where
-  showsPrec _ RNil = ("'[]"++)
+  showsPrec _ RNil = ("'[]" <>)
