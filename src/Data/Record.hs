@@ -40,3 +40,7 @@ instance {-# OVERLAPPABLE #-} HasField fields field => HasField (notIt ': fields
 
 instance {-# OVERLAPPABLE #-} HasField (field ': fields) field where
   getField (RCons h _) = h
+
+
+instance Show (Record '[]) where
+  showsPrec _ RNil = ("'[]"++)
