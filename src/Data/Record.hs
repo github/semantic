@@ -42,6 +42,7 @@ class HasField (fields :: [*]) (field :: *) where
 
 class IsField field where
   getValue :: field -> ValueOf field
+  setValue :: ValueOf field -> field
 
 
 -- Instances
@@ -66,3 +67,4 @@ type instance ValueOf ((:=>) tag value) = value
 
 instance IsField (tag :=> value) where
   getValue = unField
+  setValue = field
