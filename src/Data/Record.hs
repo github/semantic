@@ -4,6 +4,7 @@ module Data.Record where
 import Data.Tagged
 import Prologue
 
+-- | A type-safe, extensible record structure.
 data Record :: [*] -> * where
   RNil :: Record '[]
   RCons :: h -> Record t -> Record (h ': t)
