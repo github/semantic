@@ -39,6 +39,7 @@ styleName category = "category-" <> case category of
   Program -> "program"
   Error -> "error"
   BinaryOperator -> "binary-operator"
+  Boolean -> "boolean"
   DictionaryLiteral -> "dictionary"
   Pair -> "pair"
   StringLiteral -> "string"
