@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
 module Data.Record where
 
 import Data.Tagged
@@ -41,6 +41,9 @@ instance {-# OVERLAPPABLE #-} HasField fields field => HasField (notIt ': fields
 instance {-# OVERLAPPABLE #-} HasField (field ': fields) field where
   getField (RCons h _) = h
 
+
+instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
+  showsPrec n (RCons h t) = showsPrec n h . (" : "++) . showsPrec n t
 
 instance Show (Record '[]) where
   showsPrec _ RNil = ("'[]"++)
