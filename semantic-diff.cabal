@@ -19,6 +19,7 @@ library
                      , Data.Bifunctor.Join.Arbitrary
                      , Data.Functor.Both
                      , Data.OrderedMap
+                     , Data.Record
                      , Data.These.Arbitrary
                      , Diff
                      , Diff.Arbitrary
