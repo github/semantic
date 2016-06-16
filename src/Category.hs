@@ -9,6 +9,8 @@ data Category
   = Program
   -- | A node indicating syntax errors.
   | Error
+  -- | A boolean expression.
+  | Boolean
   -- | An operator with 2 operands.
   | BinaryOperator
   -- | A literal key-value data structure.
