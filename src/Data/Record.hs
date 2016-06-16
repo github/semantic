@@ -39,6 +39,7 @@ type family ValueOf field
 -- | HasField enables indexing a Record by (phantom) type tags.
 class HasField (fields :: [*]) (field :: *) where
   getField :: Record fields -> field
+  setField :: Record fields -> field -> Record fields
 
 class IsField field where
   getValue :: field -> ValueOf field
@@ -51,9 +52,11 @@ class IsField field where
 
 instance {-# OVERLAPPABLE #-} HasField fields field => HasField (notIt ': fields) field where
   getField (RCons _ t) = getField t
+  setField (RCons h t) f = RCons h (setField t f)
 
 instance {-# OVERLAPPABLE #-} HasField (field ': fields) field where
   getField (RCons h _) = h
+  setField (RCons _ t) f = RCons f t
 
 
 instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
