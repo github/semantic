@@ -76,6 +76,14 @@ alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax 
     catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (targetId <> methodId <> args) bothRanges
   Syntax.Args children ->
     catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
+  Syntax.VarDecl decl ->
+    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange decl bothRanges
+  Syntax.VarAssignment id value ->
+    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (id <> value) bothRanges
+  Switch expr cases ->
+    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (expr <> join cases) bothRanges
+  Case expr body ->
+    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (expr <> body) bothRanges
   Fixed children -> catMaybes $ wrapInBranch Fixed <$> alignBranch getRange (join children) bothRanges
   Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> alignBranch (getRange . Prologue.snd) (Map.toList children >>= pairWithKey) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
