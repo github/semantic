@@ -47,13 +47,24 @@ run construct comparable cost algorithm = case runFree algorithm of
   Free (Recursive t1 t2 f) -> run construct comparable cost . f $ recur a b where
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
     annotate = construct . (both annotation1 annotation2 :<)
+    diffTerms' = diffTerms construct comparable cost
 
-    recur (Indexed a') (Indexed b') | length a' == length b' = annotate . Indexed $ zipWith (diffTerms construct comparable cost) a' b'
-    recur (Fixed a') (Fixed b') | length a' == length b' = annotate . Fixed $ zipWith (diffTerms construct comparable cost) a' b'
+    recur (Indexed a') (Indexed b') | length a' == length b' = annotate . Indexed $ zipWith diffTerms' a' b'
+    recur (Fixed a') (Fixed b') | length a' == length b' = annotate . Fixed $ zipWith diffTerms' a' b'
     recur (Keyed a') (Keyed b') | Map.keys a' == bKeys = annotate . Keyed . Map.fromList . fmap repack $ bKeys where
       bKeys = Map.keys b'
       repack key = (key, interpretInBoth key a' b')
-      interpretInBoth key x y = diffTerms construct comparable cost (x ! key) (y ! key)
+      interpretInBoth key x y = diffTerms' (x ! key) (y ! key)
+    recur (FunctionCall a' as') (FunctionCall b' bs') | length as' == length bs' = annotate $ FunctionCall (diffTerms' a' b') (zipWith diffTerms' as' bs')
+    recur (Function a' as' aExprs') (Function b' bs' bExprs') = annotate $ Function (liftA2 diffTerms' a' b') (liftA2 diffTerms' as' bs') (diffTerms' aExprs' bExprs')
+    recur (Assignment a' as') (Assignment b' bs') = annotate $ Assignment (diffTerms' a' b') (diffTerms' as' bs')
+    recur (MemberAccess a' as') (MemberAccess b' bs') = annotate $ MemberAccess (diffTerms' a' b') (diffTerms' as' bs')
+    recur (MethodCall a' as' aParams') (MethodCall b' bs' bParams') = annotate $ MethodCall (diffTerms' a' b') (diffTerms' as' bs') (diffTerms' aParams' bParams')
+    recur (Args as') (Args bs') = annotate . Args $ zipWith diffTerms' as' bs'
+    recur (VarDecl a') (VarDecl b') = annotate . VarDecl $ diffTerms' a' b'
+    recur (VarAssignment a' as') (VarAssignment b' bs') = annotate $ VarAssignment (diffTerms' a' b') (diffTerms' as' bs')
+    recur (Switch a' as') (Switch b' bs') = annotate $ Switch (diffTerms' a' b') (zipWith diffTerms' as' bs')
+    recur (Case a' as') (Case b' bs') = annotate $ Case (diffTerms' a' b') (diffTerms' as' bs')
     recur _ _ = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
 
   Free (ByKey a b f) -> run construct comparable cost $ f byKey where
