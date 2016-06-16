@@ -53,6 +53,7 @@ instance HasCategory Category where
   toCategoryName = \case
     ArrayLiteral -> "array"
     BinaryOperator -> "binary operator"
+    Boolean -> "boolean"
     DictionaryLiteral -> "dictionary"
     Error -> "error"
     ExpressionStatements -> "expression statements"
