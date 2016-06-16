@@ -1,12 +1,12 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, TypeOperators #-}
 module Data.Record where
 
+import Data.Tagged
 import Prologue
 
 infix 9 :=>
 
-newtype a :=> b = (:=>) b
-  deriving (Eq, Show)
+type a :=> b = Tagged a b
 
 field :: b -> a :=> b
-field = (:=>)
+field = Tagged
