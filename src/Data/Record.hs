@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, GADTs, GeneralizedNewtypeDeriving, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators #-}
 module Data.Record where
 
 import Prologue
@@ -27,6 +27,11 @@ newtype a :=> b = Field { unField :: b }
 -- | This has type a :=> b. When you require a to be some concrete type (and you usually will), it should be provided by context, whether using ascription, a type signature for the binding, `asTypeOf`, or some other way to allow the specific type to be inferred.
 field :: b -> a :=> b
 field = Field
+
+
+-- Families
+
+type family ValueOf field
 
 
 -- Classes
