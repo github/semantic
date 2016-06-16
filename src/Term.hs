@@ -30,6 +30,9 @@ zipTerms t1 t2 = annotate (zipUnwrap a b)
     zipUnwrap (Function idA' paramsA' exprsA') (Function idB' paramsB' exprsB') = case (zipTerms exprsA' exprsB') of
       Just exprs' ->  Just (Function (join $ liftA2 zipTerms idA' idB') (join $ liftA2 zipTerms paramsA' paramsB') exprs')
       _ -> Nothing
+    zipUnwrap (Case eA' bodyA') (Case eB' bodyB') = case (zipTerms eA' eB', zipTerms bodyA' bodyB') of
+      (Just id', Just body') -> Just $ Case id' body'
+      _ -> Nothing
     zipUnwrap (Fixed a') (Fixed b') = Just . Fixed . catMaybes $ zipWith zipTerms a' b'
     zipUnwrap (Keyed a') (Keyed b') | keys a' == keys b' = Just . Keyed . fromList . catMaybes $ zipUnwrapMaps a' b' <$> keys a'
     zipUnwrap _ _ = Nothing
