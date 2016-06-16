@@ -59,6 +59,8 @@ defaultCategoryForNodeName name = case name of
   "template_string" -> TemplateString
   "var_assignment" -> VarAssignment
   "var_declaration" -> VarDecl
+  "true" -> Boolean
+  "false" -> Boolean
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
