@@ -5,6 +5,8 @@ import Data.Tagged
 import Prologue
 
 -- | A type-safe, extensible record structure.
+-- |
+-- | This is heavily inspired by Aaron Levin’s [Extensible Effects in the van Laarhoven Free Monad](http://aaronlevin.ca/post/136494428283/extensible-effects-in-the-van-laarhoven-free-monad).
 data Record :: [*] -> * where
   RNil :: Record '[]
   RCons :: h -> Record t -> Record (h ': t)
