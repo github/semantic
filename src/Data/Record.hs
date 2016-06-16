@@ -55,11 +55,11 @@ class IsField field where
 instance {-# OVERLAPPABLE #-} HasField fields field => HasField (notIt ': fields) field where
   getField (RCons _ t) = getField t
 
-instance {-# OVERLAPPABLE #-} SetField fields field => SetField (notIt ': fields) field where
-  setField (RCons h t) f = RCons h (setField t f)
-
 instance {-# OVERLAPPABLE #-} HasField (field ': fields) field where
   getField (RCons h _) = h
+
+instance {-# OVERLAPPABLE #-} SetField fields field => SetField (notIt ': fields) field where
+  setField (RCons h t) f = RCons h (setField t f)
 
 instance {-# OVERLAPPABLE #-} SetField (field ': fields) field where
   setField (RCons _ t) f = RCons f t
