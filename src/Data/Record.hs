@@ -60,3 +60,9 @@ instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
 
 instance Show (Record '[]) where
   showsPrec _ RNil = ("'[]" <>)
+
+
+type instance ValueOf ((:=>) tag value) = value
+
+instance IsField (tag :=> value) where
+  getValue = unField
