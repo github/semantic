@@ -14,6 +14,8 @@ import Prologue hiding (lookup)
 import SES
 import Syntax
 import Term
+import Data.Align
+import Data.These
 
 -- | Returns whether two terms are comparable
 type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
@@ -63,7 +65,7 @@ run construct comparable cost algorithm = case runFree algorithm of
     recur (Args as') (Args bs') = annotate . Args $ zipWith diffTerms' as' bs'
     recur (VarDecl a') (VarDecl b') = annotate . VarDecl $ diffTerms' a' b'
     recur (VarAssignment a' as') (VarAssignment b' bs') = annotate $ VarAssignment (diffTerms' a' b') (diffTerms' as' bs')
-    recur (Switch a' as') (Switch b' bs') = annotate $ Switch (diffTerms' a' b') (zipWith diffTerms' as' bs')
+    recur (Switch a' as') (Switch b' bs') = annotate $ Switch (diffTerms' a' b') (alignWith (these (pure . Delete) (pure . Insert) diffTerms') as' bs')
     recur (Case a' as') (Case b' bs') = annotate $ Case (diffTerms' a' b') (diffTerms' as' bs')
     recur _ _ = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
 
