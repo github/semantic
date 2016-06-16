@@ -33,6 +33,9 @@ zipTerms t1 t2 = annotate (zipUnwrap a b)
     zipUnwrap (Case eA' bodyA') (Case eB' bodyB') = case (zipTerms eA' eB', zipTerms bodyA' bodyB') of
       (Just id', Just body') -> Just $ Case id' body'
       _ -> Nothing
+    zipUnwrap (Switch a' as') (Switch b' bs') = case (zipTerms a' b') of
+      (Just expr') -> Just $ Switch expr' (catMaybes $ zipWith zipTerms as' bs')
+      _ -> Nothing
     zipUnwrap (Fixed a') (Fixed b') = Just . Fixed . catMaybes $ zipWith zipTerms a' b'
     zipUnwrap (Keyed a') (Keyed b') | keys a' == keys b' = Just . Keyed . fromList . catMaybes $ zipUnwrapMaps a' b' <$> keys a'
     zipUnwrap _ _ = Nothing
