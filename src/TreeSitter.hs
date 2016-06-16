@@ -33,6 +33,7 @@ categoriesForLanguage language name = case (language, name) of
   (JavaScript, "this_expression") -> Identifier
   (JavaScript, "null") -> Identifier
   (JavaScript, "undefined") -> Identifier
+  (JavaScript, "arrow_function") -> Function
 
   (Ruby, "hash") -> DictionaryLiteral
   _ -> defaultCategoryForNodeName name
