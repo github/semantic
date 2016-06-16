@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, KindSignatures, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
 module Data.Record where
 
 import Data.Tagged
@@ -18,3 +18,6 @@ field = Tagged
 data Record :: [*] -> * where
   RNil :: Record '[]
   RCons :: h -> Record t -> Record (h ': t)
+
+class HasField (fields :: [*]) (field :: *) where
+  getField :: Record fields -> field
