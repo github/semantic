@@ -53,6 +53,8 @@ styleName category = "category-" <> case category of
   Category.MemberAccess -> "member_access"
   Category.VarDecl -> "var_declaration"
   Category.VarAssignment -> "var_assignment"
+  Category.Switch -> "switch"
+  Category.Case -> "case"
   TemplateString -> "template_string"
   Regex -> "regex"
   Identifier -> "identifier"
@@ -124,6 +126,8 @@ instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Ran
     Syntax.VarDecl decl -> ul . mconcat $ wrapIn li <$> contentElements source characterRange [decl]
     Syntax.VarAssignment varId value ->
       dl . mconcat $ (wrapIn dt <$> (contentElements source characterRange [varId])) <> (wrapIn dd <$> contentElements source characterRange [value])
+    Syntax.Switch expr cases -> ul . mconcat $ wrapIn li <$> contentElements source characterRange (expr : cases)
+    Syntax.Case expr body -> ul . mconcat $ wrapIn li <$> contentElements source characterRange [expr, body]
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
   text (toText (slice (Range (start range) (max next (start range))) source)) : elements

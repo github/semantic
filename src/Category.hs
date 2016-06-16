@@ -51,6 +51,8 @@ data Category
   | VarAssignment
   -- | A variable declaration.
   | VarDecl
+  | Switch
+  | Case
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Show, Ord)

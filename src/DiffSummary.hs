@@ -36,9 +36,13 @@ toTermName term = case unwrap term of
             _ -> "."
   Syntax.VarAssignment varId _ -> toTermName varId
   Syntax.VarDecl decl -> toTermName decl
-  -- TODO: We should remove Args from Syntax since I don't think we shouldn ever
+  -- TODO: We should remove Args from Syntax since I don't think we should ever
   -- evaluate Args as a single toTermName Text - joshvera
   Syntax.Args args -> mconcat $ toTermName <$> args
+  -- TODO: We should remove Case from Syntax since I don't think we should ever
+  -- evaluate Case as a single toTermName Text - joshvera
+  Syntax.Case expr _ -> toTermName expr
+  Syntax.Switch expr _ -> toTermName expr
 
 class HasCategory a where
   toCategoryName :: a -> Text
@@ -64,7 +68,9 @@ instance HasCategory Category where
     Category.MethodCall -> "method call"
     Category.Args -> "arguments"
     Category.VarAssignment -> "var assignment"
-    Category.VarDecl -> "var declaration"
+    Category.VarDecl -> "variable"
+    Category.Switch -> "switch statement"
+    Category.Case -> "case statement"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
     Other s -> s
@@ -110,6 +116,8 @@ diffSummary = cata $ \case
   (Free (infos :< Syntax.VarAssignment varId value)) -> prependSummary (category $ snd infos) <$> varId <> value
   (Free (infos :< Syntax.VarDecl decl)) -> prependSummary (category $ snd infos) <$> decl
   (Free (infos :< Syntax.Args args)) -> prependSummary (category $ snd infos) <$> join args
+  (Free (infos :< Syntax.Switch expr cases)) -> prependSummary (category $ snd infos) <$> expr <> join cases
+  (Free (infos :< Syntax.Case expr body)) -> prependSummary (category $ snd infos) <$> expr <> body
   (Pure (Insert term)) -> (\info -> DiffSummary (Insert info) []) <$> termToDiffInfo term
   (Pure (Delete term)) -> (\info -> DiffSummary (Delete info) []) <$> termToDiffInfo term
   (Pure (Replace t1 t2)) -> (\(info1, info2) -> DiffSummary (Replace info1 info2) []) <$> zip (termToDiffInfo t1) (termToDiffInfo t2)
@@ -130,6 +138,7 @@ termToDiffInfo term = case runCofree term of
   args@(info :< Syntax.Args{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree args) ]
   varDecl@(info :< Syntax.VarDecl{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree varDecl) ]
   varAssignment@(info :< Syntax.VarAssignment{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree varAssignment) ]
+  switch@(info :< Syntax.Switch{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree switch) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
