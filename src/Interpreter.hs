@@ -24,11 +24,11 @@ type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
 type DiffConstructor leaf annotation = CofreeF (Syntax leaf) (Both annotation) (Diff leaf annotation) -> Diff leaf annotation
 
 -- | Diff two terms, given a function that determines whether two terms can be compared and a cost function.
-diffTerms :: (Eq a, Eq annotation) => DiffConstructor a annotation -> Comparable a annotation -> Cost (Diff a annotation) -> Term a annotation -> Term a annotation -> Diff a annotation
+diffTerms :: (Show a, Show annotation, Eq a, Eq annotation) => DiffConstructor a annotation -> Comparable a annotation -> Cost (Diff a annotation) -> Term a annotation -> Term a annotation -> Diff a annotation
 diffTerms construct comparable cost a b = fromMaybe (pure $ Replace a b) $ constructAndRun construct comparable cost a b
 
 -- | Constructs an algorithm and runs it
-constructAndRun :: (Eq a, Eq annotation) => DiffConstructor a annotation -> Comparable a annotation -> Cost (Diff a annotation) -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
+constructAndRun :: (Show a, Show annotation, Eq a, Eq annotation) => DiffConstructor a annotation -> Comparable a annotation -> Cost (Diff a annotation) -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
 constructAndRun _ comparable _ a b | not $ comparable a b = Nothing
 
 constructAndRun construct _ _ a b | (() <$ a) == (() <$ b) = hylo construct runCofree <$> zipTerms a b
@@ -43,7 +43,7 @@ constructAndRun construct comparable cost t1 t2 =
     annotate = pure . construct . (both annotation1 annotation2 :<)
 
 -- | Runs the diff algorithm
-run :: (Eq a, Eq annotation) => DiffConstructor a annotation -> Comparable a annotation -> Cost (Diff a annotation) -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
+run :: (Show a, Eq a, Show annotation, Eq annotation) => DiffConstructor a annotation -> Comparable a annotation -> Cost (Diff a annotation) -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
 run construct comparable cost algorithm = case runFree algorithm of
   Pure diff -> Just diff
   Free (Recursive t1 t2 f) -> run construct comparable cost . f $ recur a b where
@@ -67,7 +67,8 @@ run construct comparable cost algorithm = case runFree algorithm of
     recur (VarAssignment a' as') (VarAssignment b' bs') = annotate $ VarAssignment (diffTerms' a' b') (diffTerms' as' bs')
     recur (Switch a' as') (Switch b' bs') = annotate $ Switch (diffTerms' a' b') (alignWith (these (pure . Delete) (pure . Insert) diffTerms') as' bs')
     recur (Case a' as') (Case b' bs') = annotate $ Case (diffTerms' a' b') (diffTerms' as' bs')
-    recur _ _ = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
+    recur (Leaf _) (Leaf _) = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
+    recur _ _ = error $ "Unimplemented Interpreter.run term comparison between a: " <> show a <> "\nb: " <> show b
 
   Free (ByKey a b f) -> run construct comparable cost $ f byKey where
     byKey = Map.fromList $ toKeyValue <$> List.union aKeys bKeys
