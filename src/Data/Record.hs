@@ -29,6 +29,9 @@ newtype a :=> b = (:=>) (Tagged a b)
 field :: b -> a :=> b
 field = (:=>) . Tagged
 
+unField :: a :=> b -> b
+unField ((:=>) b) = unTagged b
+
 
 -- Classes
 
