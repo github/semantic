@@ -11,6 +11,12 @@ data Record :: [*] -> * where
   RNil :: Record '[]
   RCons :: h -> Record t -> Record (h ': t)
 
+infixr 0 .:.
+
+-- | Infix synonym for `RCons`: `a .:. b .:. RNil == RCons a (RCons b RNil)`.
+(.:.) :: h -> Record t -> Record (h ': t)
+(.:.) = RCons
+
 
 infix 9 :=>
 
