@@ -30,6 +30,9 @@ categoriesForLanguage :: Language -> Text -> Category
 categoriesForLanguage language name = case (language, name) of
   (JavaScript, "object") -> DictionaryLiteral
   (JavaScript, "rel_op") -> BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
+  (JavaScript, "this_expression") -> Identifier
+  (JavaScript, "null") -> Identifier
+  (JavaScript, "undefined") -> Identifier
 
   (Ruby, "hash") -> DictionaryLiteral
   _ -> defaultCategoryForNodeName name
