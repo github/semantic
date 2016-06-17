@@ -69,7 +69,7 @@ alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax 
   Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> alignBranch (getRange . Prologue.snd) (Map.toList children >>= pairWithKey) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
         lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
-        wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (info { characterRange = range } :< constructor children)) <$> infos)
+        wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (setCharacterRange info range :< constructor children)) <$> infos)
         pairWithKey (key, values) = fmap ((,) key) <$> values
 
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.

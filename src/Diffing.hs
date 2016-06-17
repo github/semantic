@@ -55,13 +55,13 @@ breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
 breakDownLeavesByWord source = cata replaceIn
   where
     replaceIn :: TermF T.Text Info (Term T.Text Info) -> Term T.Text Info
-    replaceIn (info :< syntax) = let size' = 1 + sum (size . extract <$> syntax') in cofree $ info { size = size', cost = size' } :< syntax'
+    replaceIn (info :< syntax) = let size' = 1 + sum (size . extract <$> syntax') in cofree $ setCost (setSize info size') size' :< syntax'
       where syntax' = case (ranges, syntax) of
               (_:_:_, Leaf _) -> Indexed (makeLeaf info <$> ranges)
               _ -> syntax
             ranges = rangesAndWordsInSource (characterRange info)
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
-    makeLeaf info (range, substring) = cofree $ info { characterRange = range } :< Leaf (T.pack substring)
+    makeLeaf info (range, substring) = cofree $ setCharacterRange info range :< Leaf (T.pack substring)
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
@@ -95,7 +95,7 @@ diffFiles parser renderer sourceBlobs = do
   pure $! renderer textDiff sourceBlobs
   where construct :: CofreeF (Syntax Text) (Both Info) (Diff Text Info) -> Diff Text Info
         construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
-        setCost info cost = info { cost = cost }
+        setCost info cost = setCost info cost
         sumCost = fmap getSum . foldMap (fmap Sum . getCost)
         getCost diff = case runFree diff of
           Free (info :< _) -> cost <$> info
