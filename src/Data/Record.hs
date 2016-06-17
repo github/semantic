@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, GADTs, KindSignatures, MultiParamTypeClasses, TypeFamilies, TypeOperators #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
 module Data.Record where
 
 import Prologue
@@ -15,11 +15,6 @@ infixr 0 .:
 -- | Infix synonym for `RCons`: `a .: b .: RNil == RCons a (RCons b RNil)`.
 (.:) :: h -> Record t -> Record (h ': t)
 (.:) = RCons
-
-
--- Families
-
-type family ValueOf field
 
 
 -- Classes
