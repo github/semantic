@@ -58,3 +58,10 @@ instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
 
 instance Show (Record '[]) where
   showsPrec _ RNil = ("'[]" <>)
+
+
+instance (Eq h, Eq (Record t)) => Eq (Record (h ': t)) where
+  RCons h1 t1 == RCons h2 t2 = h1 == h2 && t1 == t2
+
+instance Eq (Record '[]) where
+  _ == _ = True
