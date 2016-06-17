@@ -78,6 +78,7 @@ instance HasCategory Category where
     Category.Case -> "case statement"
     Category.SubscriptAccess -> "subscript access"
     Category.MathAssignment -> "math assignment"
+    Category.Ternary -> "ternary"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
     Other s -> s
@@ -137,6 +138,7 @@ termToDiffInfo term = case runCofree term of
   (_ :< Fixed children) -> join $ termToDiffInfo <$> children
   (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
   (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
+  (info :< Syntax.Ternary ternaryCondition _) -> [ DiffInfo (toCategoryName info) (toTermName ternaryCondition) ]
   (info :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous" toTermName identifier) ]
   (info :< Syntax.Assignment identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
   (info :< Syntax.MathAssignment identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
