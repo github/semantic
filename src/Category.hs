@@ -55,9 +55,11 @@ data Category
   | VarAssignment
   -- | A variable declaration.
   | VarDecl
+  -- | A switch expression.
   | Switch
   -- | A ternary expression.
   | Ternary
+  -- | A case expression.
   | Case
   -- | A non-standard category, which can be used for comparability.
   | Other Text
