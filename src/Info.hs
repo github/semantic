@@ -7,9 +7,9 @@ import Category
 import Range
 
 newtype Size = Size { unSize :: Integer }
-  deriving (Eq, Show)
+  deriving (Eq, Num, Show)
 newtype Cost = Cost { unCost :: Integer }
-  deriving (Eq, Show)
+  deriving (Eq, Num, Show)
 
 type InfoFields = '[ Range, Category, Size, Cost ]
 
