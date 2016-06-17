@@ -64,6 +64,9 @@ termConstructor source info = cofree . construct
       [ (_ :< S.MemberAccess{..}), params@(_ :< S.Args{}) ] -> info { category = MethodCall } :< S.MethodCall memberId property (cofree params)
       (x:xs) -> withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
 
+    construct children | Ternary == category info = case children of
+      (condition:cases) -> withDefaultInfo $ S.Ternary condition cases
+
     construct children | Args == category info = withDefaultInfo $ S.Args children
     construct children | VarAssignment == category info
                          , [x, y] <- children = withDefaultInfo $ S.VarAssignment x y
