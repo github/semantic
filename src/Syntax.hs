@@ -36,6 +36,9 @@ data Syntax
   | VarDecl f
   -- | A variable assignment in a variable declaration. var foo = bar;
   | VarAssignment { varId :: f, varValue :: f }
+  -- | A subscript access contains a syntax, and another syntax that indefies a property or value in the first syntax.
+  -- | e.g. in Javascript x["y"] represents a subscript access syntax.
+  | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
   | Switch { switchExpr :: f, cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: f }
   deriving (Functor, Show, Eq, Foldable, Traversable)
