@@ -56,6 +56,8 @@ data Category
   -- | A variable declaration.
   | VarDecl
   | Switch
+  -- | A ternary expression.
+  | Ternary
   | Case
   -- | A non-standard category, which can be used for comparability.
   | Other Text
