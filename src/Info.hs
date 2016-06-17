@@ -43,3 +43,15 @@ setCost' = setField
 -- | categories.
 data Info = Info { characterRange :: !Range, category :: !Category, size :: !Integer, cost :: !Integer }
   deriving (Eq, Show)
+
+setCharacterRange :: Info -> Range -> Info
+setCharacterRange info range = info { characterRange = range }
+
+setCategory :: Info -> Category -> Info
+setCategory info category = info { category = category }
+
+setSize :: Info -> Integer -> Info
+setSize info size = info { size = size }
+
+setCost :: Info -> Integer -> Info
+setCost info cost = info { cost = cost }
