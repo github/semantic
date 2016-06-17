@@ -36,6 +36,8 @@ data Syntax
   -- | The list of arguments to a method call.
   -- | TODO: It might be worth removing this and using Fixed instead.
   | Args [f]
+  -- | An operator can be applied to a list of syntaxes.
+  | Operator [f]
   -- | A variable declaration. e.g. var foo;
   | VarDecl f
   -- | A variable assignment in a variable declaration. var foo = bar;
