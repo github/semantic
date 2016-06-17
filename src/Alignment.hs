@@ -86,7 +86,7 @@ alignBranch getRange children ranges = case intersectingChildren of
   _ -> case intersectionsWithHeadRanges <$> listToMaybe symmetricalChildren of
     -- At least one child intersects on both sides, so align symmetrically.
     Just (True, True) -> let (line, remaining) = lineAndRemaining intersectingChildren (Just headRanges) in
-      line $ alignBranch getRange (remaining ++ nonIntersectingChildren) (drop 1 <$> ranges)
+      line $ alignBranch getRange (remaining <> nonIntersectingChildren) (drop 1 <$> ranges)
     -- A symmetrical child intersects on the right, so align asymmetrically on the left.
     Just (False, True) -> alignAsymmetrically leftRange first
     -- A symmetrical child intersects on the left, so align asymmetrically on the right.
@@ -101,7 +101,7 @@ alignBranch getRange children ranges = case intersectingChildren of
         Just headRanges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
         (leftRange, rightRange) = splitThese headRanges
         alignAsymmetrically range advanceBy = let (line, remaining) = lineAndRemaining asymmetricalChildren range in
-          line $ alignBranch getRange (remaining ++ symmetricalChildren ++ nonIntersectingChildren) (modifyJoin (advanceBy (drop 1)) ranges)
+          line $ alignBranch getRange (remaining <> symmetricalChildren <> nonIntersectingChildren) (modifyJoin (advanceBy (drop 1)) ranges)
         lineAndRemaining _ Nothing = (identity, [])
         lineAndRemaining children (Just ranges) = let (intersections, remaining) = alignChildren getRange children ranges in
           ((:) $ (,) <$> ranges `applyToBoth` (sortBy (compare `on` getRange) <$> intersections), remaining)
