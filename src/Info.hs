@@ -41,7 +41,7 @@ setCost' = setField
 
 -- | An annotation for a source file, including the source range and semantic
 -- | categories.
-data Info = Info { characterRange :: !Range, category :: !Category, size :: !Integer, cost :: !Integer }
+data Info = Info { characterRange :: !Range, category :: !Category, size :: !Size, cost :: !Cost }
   deriving (Eq, Show)
 
 setCharacterRange :: Info -> Range -> Info
@@ -50,8 +50,8 @@ setCharacterRange info range = info { characterRange = range }
 setCategory :: Info -> Category -> Info
 setCategory info category = info { category = category }
 
-setSize :: Info -> Integer -> Info
+setSize :: Info -> Size -> Info
 setSize info size = info { size = size }
 
-setCost :: Info -> Integer -> Info
+setCost :: Info -> Cost -> Info
 setCost info cost = info { cost = cost }

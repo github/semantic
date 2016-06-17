@@ -39,7 +39,7 @@ lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 
   where
     lines = actualLines input
     root children = let size = 1 + fromIntegral (length children) in
-      Info (Range 0 $ length input) (Other "program") size size :< Indexed children
+      Info (Range 0 $ length input) (Other "program") size (Cost (unSize size)) :< Indexed children
     leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) (Other "program") 1 1 :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum ++ [ leaf charIndex (toText line) ]
@@ -55,7 +55,7 @@ breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
 breakDownLeavesByWord source = cata replaceIn
   where
     replaceIn :: TermF T.Text Info (Term T.Text Info) -> Term T.Text Info
-    replaceIn (info :< syntax) = let size' = 1 + sum (size . extract <$> syntax') in cofree $ setCost (setSize info size') size' :< syntax'
+    replaceIn (info :< syntax) = let size' = 1 + sum (size . extract <$> syntax') in cofree $ setCost (setSize info size') (Cost (unSize size')) :< syntax'
       where syntax' = case (ranges, syntax) of
               (_:_:_, Leaf _) -> Indexed (makeLeaf info <$> ranges)
               _ -> syntax
@@ -104,6 +104,6 @@ diffFiles parser renderer sourceBlobs = do
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermSizes :: Diff a Info -> Integer
-diffCostWithCachedTermSizes diff = case runFree diff of
+diffCostWithCachedTermSizes diff = unCost $ case runFree diff of
   Free (info :< _) -> sum (cost <$> info)
   Pure patch -> sum (cost . extract <$> patch)
