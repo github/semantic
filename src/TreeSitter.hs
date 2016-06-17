@@ -35,6 +35,9 @@ categoriesForLanguage language name = case (language, name) of
   (JavaScript, "undefined") -> Identifier
   (JavaScript, "arrow_function") -> Function
   (JavaScript, "generator_function") -> Function
+  (JavaScript, "delete_op") -> Operator
+  (JavaScript, "type_op") -> Operator
+  (JavaScript, "void_op") -> Operator
 
   (Ruby, "hash") -> DictionaryLiteral
   _ -> defaultCategoryForNodeName name
