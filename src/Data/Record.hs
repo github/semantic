@@ -22,8 +22,6 @@ infixr 0 .:
 -- | HasField enables indexing a Record by (phantom) type tags.
 class HasField (fields :: [*]) (field :: *) where
   getField :: Record fields -> field
-
-class SetField (fields :: [*]) (field :: *) where
   setField :: Record fields -> field -> Record fields
 
 
@@ -33,14 +31,10 @@ class SetField (fields :: [*]) (field :: *) where
 
 instance {-# OVERLAPPABLE #-} HasField fields field => HasField (notIt ': fields) field where
   getField (RCons _ t) = getField t
+  setField (RCons h t) f = RCons h (setField t f)
 
 instance {-# OVERLAPPABLE #-} HasField (field ': fields) field where
   getField (RCons h _) = h
-
-instance {-# OVERLAPPABLE #-} SetField fields field => SetField (notIt ': fields) field where
-  setField (RCons h t) f = RCons h (setField t f)
-
-instance {-# OVERLAPPABLE #-} SetField (field ': fields) field where
   setField (RCons _ t) f = RCons f t
 
 
