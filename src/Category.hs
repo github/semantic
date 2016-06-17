@@ -47,6 +47,8 @@ data Category
   | Assignment
   -- | A member access expression.
   | MemberAccess
+  -- | A subscript access expression.
+  | SubscriptAccess
   -- | A variable assignment within a variable declaration.
   | VarAssignment
   -- | A variable declaration.
