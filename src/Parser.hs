@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 module Parser where
 
 import Prologue hiding (Constructor)

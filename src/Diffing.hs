@@ -1,9 +1,11 @@
+{-# LANGUAGE FlexibleContexts #-}
 module Diffing where
 
 import Prologue hiding (fst, snd)
 import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
 import Data.Functor.Foldable
+import Data.Record
 import qualified Data.Text as T
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
@@ -39,8 +41,8 @@ lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 
   where
     lines = actualLines input
     root children = let size = 1 + fromIntegral (length children) in
-      Info (Range 0 $ length input) (Other "program") size (Cost (unSize size)) :< Indexed children
-    leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) (Other "program") 1 1 :< Leaf line
+      ((Range 0 $ length input) .: Other "program" .: size .: Cost (unSize size) .: RNil) :< Indexed children
+    leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Other "program" .: 1 .: 1 .: RNil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum ++ [ leaf charIndex (toText line) ]
       , charIndex + length line)
