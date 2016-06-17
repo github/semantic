@@ -6,10 +6,10 @@ import Prologue
 import Category
 import Range
 
-newtype SizeA = SizeA { unSizeA :: Integer }
-newtype CostA = CostA { unCostA :: Integer }
+newtype Size = Size { unSize :: Integer }
+newtype Cost = Cost { unCost :: Integer }
 
-type InfoFields = '[ Range, Category, SizeA, CostA ]
+type InfoFields = '[ Range, Category, Size, Cost ]
 
 type Info' = Record InfoFields
 
@@ -25,17 +25,17 @@ category' = getField
 setCategory' :: SetField fields Category => Record fields -> Category -> Record fields
 setCategory' = setField
 
-size' :: HasField fields SizeA => Record fields -> Integer
-size' = unSizeA . getField
+size' :: HasField fields Size => Record fields -> Size
+size' = getField
 
-setSize' :: SetField fields SizeA => Record fields -> Integer -> Record fields
-setSize' record = setField record . SizeA
+setSize' :: SetField fields Size => Record fields -> Size -> Record fields
+setSize' = setField
 
-cost' :: HasField fields CostA => Record fields -> Integer
-cost' = unCostA . getField
+cost' :: HasField fields Cost => Record fields -> Cost
+cost' = getField
 
-setCost' :: SetField fields CostA => Record fields -> Integer -> Record fields
-setCost' record = setField record . CostA
+setCost' :: SetField fields Cost => Record fields -> Cost -> Record fields
+setCost' = setField
 
 -- | An annotation for a source file, including the source range and semantic
 -- | categories.
