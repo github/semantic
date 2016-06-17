@@ -14,6 +14,8 @@ module Data.OrderedMap (
   , difference
   ) where
 
+import Data.Align
+import Data.These
 import Prologue hiding (toList, empty)
 import Test.QuickCheck
 
@@ -75,3 +77,7 @@ instance Eq key => Monoid (OrderedMap key value) where
 instance (Arbitrary key, Arbitrary value) => Arbitrary (OrderedMap key value) where
   arbitrary = fromList <$> arbitrary
   shrink = genericShrink
+
+instance Eq key => Align (OrderedMap key) where
+  nil = fromList []
+  align a b = intersectionWith These a b <> (This <$> difference a b) <> (That <$> difference b a)
