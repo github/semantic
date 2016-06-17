@@ -46,6 +46,8 @@ termConstructor source info = cofree . construct
       (identifier:value:[]) -> withDefaultInfo $ S.Assignment identifier value
     construct children | MemberAccess == category info = case children of
       (base:property:[]) -> withDefaultInfo $ S.MemberAccess base property
+    construct children | SubscriptAccess == category info = case children of
+      (base:element:[]) -> withDefaultInfo $ S.SubscriptAccess base element
     construct children | Function == category info = withDefaultInfo $ case children of
       (body:[]) -> S.Function Nothing Nothing body
       (params:body:[]) | (info :< _) <- runCofree params, Params == category info ->
