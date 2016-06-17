@@ -61,6 +61,8 @@ data Category
   | Ternary
   -- | A case expression.
   | Case
+  -- | An expression with an operator.
+  | Operator
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Show, Ord)
