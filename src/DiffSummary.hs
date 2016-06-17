@@ -79,6 +79,7 @@ instance HasCategory Category where
     Category.SubscriptAccess -> "subscript access"
     Category.MathAssignment -> "math assignment"
     Category.Ternary -> "ternary"
+    Category.Operator -> "operator"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
     Other s -> s
@@ -142,6 +143,10 @@ termToDiffInfo term = case runCofree term of
   (info :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous" toTermName identifier) ]
   (info :< Syntax.Assignment identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
   (info :< Syntax.MathAssignment identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
+  -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
+  -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
+  -- to indicate where that value should be when constructing DiffInfos.
+  (info :< Syntax.Operator _) -> [DiffInfo (toCategoryName info) "x"]
   memberAccess@(info :< Syntax.MemberAccess{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree memberAccess) ]
   subscriptAccess@(info :< Syntax.SubscriptAccess{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree subscriptAccess) ]
   methodCall@(info :< Syntax.MethodCall{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree methodCall) ]
