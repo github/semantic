@@ -23,6 +23,8 @@ data Syntax
   | Function { id :: (Maybe f), params :: (Maybe f), expressions :: f }
   -- | An assignment has an identifier where f can be a member access, and the value is another syntax element (function call, leaf, etc.)
   | Assignment { assignmentId :: f, value :: f }
+  -- | A math assignment represents expressions whose operator classifies as mathy (e.g. += or *=).
+  | MathAssignment { mathAssignmentId :: f, value :: f }
   -- | A member access contains a syntax, and another syntax that identifies a property or value in the first syntax.
   -- | e.g. in Javascript x.y represents a member access syntax.
   | MemberAccess { memberId :: f, property :: f }

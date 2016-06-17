@@ -45,6 +45,8 @@ data Category
   | ArrayLiteral
   -- | An assignment expression.
   | Assignment
+  -- | A math assignment expression.
+  | MathAssignment
   -- | A member access expression.
   | MemberAccess
   -- | A subscript access expression.

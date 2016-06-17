@@ -44,6 +44,8 @@ termConstructor source info = cofree . construct
     construct [] = withDefaultInfo $ S.Leaf . pack . toString $ slice (characterRange info) source
     construct children | Assignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.Assignment identifier value
+    construct children | MathAssignment == category info = case children of
+      (identifier:value:[]) -> withDefaultInfo $ S.MathAssignment identifier value
     construct children | MemberAccess == category info = case children of
       (base:property:[]) -> withDefaultInfo $ S.MemberAccess base property
     construct children | SubscriptAccess == category info = case children of

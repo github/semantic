@@ -77,6 +77,7 @@ instance HasCategory Category where
     Category.Switch -> "switch statement"
     Category.Case -> "case statement"
     Category.SubscriptAccess -> "subscript access"
+    Category.MathAssignment -> "math assignment"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
     Other s -> s
@@ -138,6 +139,7 @@ termToDiffInfo term = case runCofree term of
   (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
   (info :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous" toTermName identifier) ]
   (info :< Syntax.Assignment identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
+  (info :< Syntax.MathAssignment identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
   memberAccess@(info :< Syntax.MemberAccess{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree memberAccess) ]
   subscriptAccess@(info :< Syntax.SubscriptAccess{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree subscriptAccess) ]
   methodCall@(info :< Syntax.MethodCall{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree methodCall) ]

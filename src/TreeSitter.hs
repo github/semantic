@@ -63,6 +63,7 @@ defaultCategoryForNodeName name = case name of
   "var_assignment" -> VarAssignment
   "var_declaration" -> VarDecl
   "switch_statement" -> Switch
+  "math_assignment" -> MathAssignment
   "case" -> Case
   "true" -> Boolean
   "false" -> Boolean

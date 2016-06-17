@@ -60,6 +60,7 @@ run construct comparable cost algorithm = case runFree algorithm of
     recur (FunctionCall a' as') (FunctionCall b' bs') | length as' == length bs' = annotate $ FunctionCall (diffTerms' a' b') (zipWith diffTerms' as' bs')
     recur (Function a' as' aExprs') (Function b' bs' bExprs') = annotate $ Function (liftA2 diffTerms' a' b') (liftA2 diffTerms' as' bs') (diffTerms' aExprs' bExprs')
     recur (Assignment a' as') (Assignment b' bs') = annotate $ Assignment (diffTerms' a' b') (diffTerms' as' bs')
+    recur (MathAssignment a' as') (MathAssignment b' bs') = annotate $ MathAssignment (diffTerms' a' b') (diffTerms' as' bs')
     recur (MemberAccess a' as') (MemberAccess b' bs') = annotate $ MemberAccess (diffTerms' a' b') (diffTerms' as' bs')
     recur (SubscriptAccess a' as') (SubscriptAccess b' bs') = annotate $ SubscriptAccess (diffTerms' a' b') (diffTerms' as' bs')
     recur (MethodCall a' as' aParams') (MethodCall b' bs' bParams') = annotate $ MethodCall (diffTerms' a' b') (diffTerms' as' bs') (diffTerms' aParams' bParams')
