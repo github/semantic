@@ -31,10 +31,6 @@ class HasField (fields :: [*]) (field :: *) where
 class SetField (fields :: [*]) (field :: *) where
   setField :: Record fields -> field -> Record fields
 
-class IsField field where
-  getValue :: field -> ValueOf field
-  setValue :: ValueOf field -> field
-
 
 -- Instances
 
