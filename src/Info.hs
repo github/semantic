@@ -6,26 +6,24 @@ import Prologue
 import Category
 import Range
 
-newtype RangeA = RangeA { unRangeA :: Range }
-newtype CategoryA = CategoryA { unCategoryA :: Category }
 newtype SizeA = SizeA { unSizeA :: Integer }
 newtype CostA = CostA { unCostA :: Integer }
 
-type InfoFields = '[ RangeA, CategoryA, SizeA, CostA ]
+type InfoFields = '[ Range, Category, SizeA, CostA ]
 
 type Info' = Record InfoFields
 
-characterRange' :: HasField fields RangeA => Record fields -> Range
-characterRange' = unRangeA . getField
+characterRange' :: HasField fields Range => Record fields -> Range
+characterRange' = getField
 
-setCharacterRange' :: SetField fields RangeA => Record fields -> Range -> Record fields
-setCharacterRange' record = setField record . RangeA
+setCharacterRange' :: SetField fields Range => Record fields -> Range -> Record fields
+setCharacterRange' = setField
 
-category' :: HasField fields CategoryA => Record fields -> Category
-category' = unCategoryA . getField
+category' :: HasField fields Category => Record fields -> Category
+category' = getField
 
-setCategory' :: SetField fields CategoryA => Record fields -> Category -> Record fields
-setCategory' record = setField record . CategoryA
+setCategory' :: SetField fields Category => Record fields -> Category -> Record fields
+setCategory' = setField
 
 size' :: HasField fields SizeA => Record fields -> Integer
 size' = unSizeA . getField
