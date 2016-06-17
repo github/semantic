@@ -17,18 +17,6 @@ infixr 0 .:
 (.:) = RCons
 
 
-infix 9 :=>
-
--- | A phantom type tag constructor.
-newtype a :=> b = Field { unField :: b }
-
--- | Smart constructor for type-tagged data fields.
--- |
--- | This has type a :=> b. When you require a to be some concrete type (and you usually will), it should be provided by context, whether using ascription, a type signature for the binding, `asTypeOf`, or some other way to allow the specific type to be inferred.
-field :: b -> a :=> b
-field = Field
-
-
 -- Families
 
 type family ValueOf field
@@ -70,10 +58,3 @@ instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
 
 instance Show (Record '[]) where
   showsPrec _ RNil = ("'[]" <>)
-
-
-type instance ValueOf ((:=>) tag value) = value
-
-instance IsField (tag :=> value) where
-  getValue = unField
-  setValue = field
