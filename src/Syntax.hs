@@ -19,6 +19,8 @@ data Syntax
   | Keyed (OrderedMap T.Text f)
   -- | A function call has an identifier where f is a (Leaf a) and a list of arguments.
   | FunctionCall f [f]
+  -- | A ternary has a condition, a true case and a false case
+  | Ternary { ternaryCondition :: f, ternaryCases :: [f] }
   -- | A function has a list of expressions.
   | Function { id :: (Maybe f), params :: (Maybe f), expressions :: f }
   -- | An assignment has an identifier where f can be a member access, and the value is another syntax element (function call, leaf, etc.)
