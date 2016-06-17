@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, TypeOperators #-}
+{-# LANGUAGE DataKinds, FlexibleContexts #-}
 module Info where
 
 import Data.Record
