@@ -34,6 +34,11 @@ toTermName term = case unwrap term of
     where sep = case unwrap targetId of
             Syntax.FunctionCall{} -> "()."
             _ -> "."
+  Syntax.SubscriptAccess base element -> case (unwrap base, unwrap element) of
+    (Syntax.FunctionCall{}, Syntax.FunctionCall{}) -> toTermName base <> "()." <> toTermName element <> "()"
+    (Syntax.FunctionCall{}, _) -> toTermName base <> "()." <> toTermName element
+    (_, Syntax.FunctionCall{}) -> toTermName base <> "[" <> toTermName element <> "()" <> "]"
+    (_, _) -> toTermName base <> "[" <> toTermName element <> "]"
   Syntax.VarAssignment varId _ -> toTermName varId
   Syntax.VarDecl decl -> toTermName decl
   -- TODO: We should remove Args from Syntax since I don't think we should ever
@@ -71,6 +76,7 @@ instance HasCategory Category where
     Category.VarDecl -> "variable"
     Category.Switch -> "switch statement"
     Category.Case -> "case statement"
+    Category.SubscriptAccess -> "subscript access"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
     Other s -> s
@@ -112,6 +118,7 @@ diffSummary = cata $ \case
   (Free (infos :< Syntax.Function id ps body)) -> prependSummary (category $ snd infos) <$> (fromMaybe [] id) <> (fromMaybe [] ps) <> body
   (Free (infos :< Syntax.Assignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
   (Free (infos :< Syntax.MemberAccess base property)) -> prependSummary (category $ snd infos) <$> base <> property
+  (Free (infos :< Syntax.SubscriptAccess base property)) -> prependSummary (category $ snd infos) <$> base <> property
   (Free (infos :< Syntax.MethodCall targetId methodId ps)) -> prependSummary (category $ snd infos) <$> targetId <> methodId <> ps
   (Free (infos :< Syntax.VarAssignment varId value)) -> prependSummary (category $ snd infos) <$> varId <> value
   (Free (infos :< Syntax.VarDecl decl)) -> prependSummary (category $ snd infos) <$> decl
@@ -132,6 +139,7 @@ termToDiffInfo term = case runCofree term of
   (info :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous" toTermName identifier) ]
   (info :< Syntax.Assignment identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
   memberAccess@(info :< Syntax.MemberAccess{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree memberAccess) ]
+  subscriptAccess@(info :< Syntax.SubscriptAccess{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree subscriptAccess) ]
   methodCall@(info :< Syntax.MethodCall{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree methodCall) ]
   -- TODO: We should remove Args from Syntax since I don't think we shouldn ever
   -- evaluate Args as a single toTermName Text - joshvera
