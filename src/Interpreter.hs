@@ -64,6 +64,7 @@ run construct comparable cost algorithm = case runFree algorithm of
     recur (MemberAccess a' as') (MemberAccess b' bs') = annotate $ MemberAccess (diffTerms' a' b') (diffTerms' as' bs')
     recur (SubscriptAccess a' as') (SubscriptAccess b' bs') = annotate $ SubscriptAccess (diffTerms' a' b') (diffTerms' as' bs')
     recur (MethodCall a' as' aParams') (MethodCall b' bs' bParams') = annotate $ MethodCall (diffTerms' a' b') (diffTerms' as' bs') (diffTerms' aParams' bParams')
+    recur (Ternary aCondition' aCases') (Ternary bCondition' bCases') = annotate $ Ternary (diffTerms' aCondition' bCondition') (zipWith diffTerms' aCases' bCases')
     recur (Args as') (Args bs') = annotate . Args $ zipWith diffTerms' as' bs'
     recur (VarDecl a') (VarDecl b') = annotate . VarDecl $ diffTerms' a' b'
     recur (VarAssignment a' as') (VarAssignment b' bs') = annotate $ VarAssignment (diffTerms' a' b') (diffTerms' as' bs')
