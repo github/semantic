@@ -11,6 +11,7 @@ import Data.Bifunctor.Join.Arbitrary ()
 import Data.Functor.Both as Both
 import Data.List (nub)
 import Data.Monoid
+import Data.Record
 import Data.String
 import Data.Text.Arbitrary ()
 import Data.These
@@ -258,7 +259,7 @@ align :: Both (Source.Source Char) -> ConstructibleFree (Patch (Term String Info
 align sources = PrettyDiff sources . fmap (fmap (getRange &&& identity)) . alignDiff sources . deconstruct
 
 info :: Int -> Int -> Info
-info start end = Info (Range start end) StringLiteral 0 0
+info start end = Range start end .: StringLiteral .: 0 .: 0 .: RNil
 
 prettyDiff :: Both (Source.Source Char) -> [Join These (ConstructibleFree (SplitPatch (Term String Info)) Info)] -> PrettyDiff (SplitDiff String Info)
 prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& identity) . deconstruct))
