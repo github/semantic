@@ -1,6 +1,7 @@
 module DiffSummarySpec where
 
 import Prologue
+import Data.Record
 import Test.Hspec
 import Diff
 import Info
@@ -11,10 +12,10 @@ import Category
 import DiffSummary
 
 arrayInfo :: Info
-arrayInfo = Info (rangeAt 0) ArrayLiteral 2 0
+arrayInfo = rangeAt 0 .: ArrayLiteral .: 2 .: 0 .: RNil
 
 literalInfo :: Info
-literalInfo = Info (rangeAt 1) StringLiteral 1 0
+literalInfo = rangeAt 1 .: StringLiteral .: 1 .: 0 .: RNil
 
 testDiff :: Diff Text Info
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])

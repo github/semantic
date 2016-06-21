@@ -108,27 +108,28 @@ split diff blobs = TL.toStrict . renderHtml
 newtype Renderable a = Renderable a
 
 instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Range))) where
-  toMarkup (Renderable (source, Info {..}, syntax)) = (! A.data_ (textValue (show size))) . classifyMarkup category $ case syntax of
-    Leaf _ -> span . text . toText $ slice characterRange source
-    Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source characterRange children
-    Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source characterRange children
-    Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements source characterRange children
-    Syntax.FunctionCall identifier children -> dl . mconcat $ (wrapIn dt <$> (contentElements source characterRange [identifier])) <> (wrapIn dd <$> contentElements source characterRange children)
+  toMarkup (Renderable (source, info, syntax)) = (! A.data_ (textValue (show . unSize $ size info))) . classifyMarkup (category info) $ case syntax of
+    Leaf _ -> span . text . toText $ slice (characterRange info) source
+    Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
+    Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
+    Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements source (characterRange info) children
+    Syntax.FunctionCall identifier children -> dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [identifier])) <> (wrapIn dd <$> contentElements source (characterRange info) children)
     Syntax.Function identifier params expressions -> ul . mconcat $ wrapIn li <$>
-      contentElements source characterRange (catMaybes [identifier, params, Just expressions])
+      contentElements source (characterRange info) (catMaybes [identifier, params, Just expressions])
     Syntax.MethodCall targetId methodId methodParams -> ul . mconcat $ wrapIn li <$>
-      contentElements source characterRange [targetId, methodId, methodParams]
+      contentElements source (characterRange info) [targetId, methodId, methodParams]
     Syntax.Args children -> ul . mconcat $ wrapIn li <$>
-      contentElements source characterRange children
+      contentElements source (characterRange info) children
     Syntax.MemberAccess memberId property -> ul . mconcat $ wrapIn li <$>
-      contentElements source characterRange [memberId, property]
+      contentElements source (characterRange info) [memberId, property]
     Syntax.Assignment  memberId value -> ul . mconcat $ wrapIn li <$>
-      contentElements source characterRange [memberId, value]
-    Syntax.VarDecl decl -> ul . mconcat $ wrapIn li <$> contentElements source characterRange [decl]
+      contentElements source (characterRange info) [memberId, value]
+    Syntax.VarDecl decl -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) [decl]
     Syntax.VarAssignment varId value ->
-      dl . mconcat $ (wrapIn dt <$> (contentElements source characterRange [varId])) <> (wrapIn dd <$> contentElements source characterRange [value])
-    Syntax.Switch expr cases -> ul . mconcat $ wrapIn li <$> contentElements source characterRange (expr : cases)
-    Syntax.Case expr body -> ul . mconcat $ wrapIn li <$> contentElements source characterRange [expr, body]
+      dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [varId])) <> (wrapIn dd <$> contentElements source (characterRange info) [value])
+    Syntax.Switch expr cases -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (expr : cases)
+    Syntax.Case expr body -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) [expr, body]
+
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
   text (toText (slice (Range (start range) (max next (start range))) source)) : elements
@@ -144,13 +145,13 @@ wrapIn _ l@Blaze.Comment{} = l
 wrapIn f p = f p
 
 instance ToMarkup (Renderable (Source Char, Term a Info)) where
-  toMarkup (Renderable (source, term)) = Prologue.fst $ cata (\ (info@(Info{..}) :< syntax) -> (toMarkup $ Renderable (source, info, syntax), characterRange)) term
+  toMarkup (Renderable (source, term)) = Prologue.fst $ cata (\ (info :< syntax) -> (toMarkup $ Renderable (source, info, syntax), characterRange info)) term
 
 instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
-  toMarkup (Renderable (source, diff)) = Prologue.fst $ iter (\ (info@(Info{..}) :< syntax) -> (toMarkup $ Renderable (source, info, syntax), characterRange)) $ toMarkupAndRange <$> diff
+  toMarkup (Renderable (source, diff)) = Prologue.fst $ iter (\ (info :< syntax) -> (toMarkup $ Renderable (source, info, syntax), characterRange info)) $ toMarkupAndRange <$> diff
     where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
-          toMarkupAndRange patch = let term@(Info{..} :< _) = runCofree $ getSplitTerm patch in
-            ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue (show size))) . toMarkup $ Renderable (source, cofree term), characterRange)
+          toMarkupAndRange patch = let term@(info :< _) = runCofree $ getSplitTerm patch in
+            ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue (show (unSize (size info))))) . toMarkup $ Renderable (source, cofree term), characterRange info)
 
 instance ToMarkup a => ToMarkup (Renderable (Bool, Int, a)) where
   toMarkup (Renderable (hasChanges, num, line)) =

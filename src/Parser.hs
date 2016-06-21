@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 module Parser where
 
 import Prologue hiding (Constructor)
@@ -62,7 +63,7 @@ termConstructor source info = cofree . construct
       x -> error $ "Expected a function declaration but got: " <> show x
 
     construct children | FunctionCall == category info = case runCofree <$> children of
-      [ (_ :< S.MemberAccess{..}), params@(_ :< S.Args{}) ] -> info { category = MethodCall } :< S.MethodCall memberId property (cofree params)
+      [ (_ :< S.MemberAccess{..}), params@(_ :< S.Args{}) ] -> setCategory info MethodCall :< S.MethodCall memberId property (cofree params)
       (x:xs) -> withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
 
     construct children | Ternary == category info = case children of
@@ -74,7 +75,7 @@ termConstructor source info = cofree . construct
     construct children | VarDecl == category info = withDefaultInfo . S.Indexed $ toVarDecl <$> children
       where
         toVarDecl :: Term Text Info -> Term Text Info
-        toVarDecl child = cofree $ ((extract child) { category  = VarDecl } :< S.VarDecl child)
+        toVarDecl child = cofree $ (setCategory (extract child) VarDecl :< S.VarDecl child)
 
     construct children | Switch == category info , (expr:_) <- children =
       withDefaultInfo $ S.Switch expr children

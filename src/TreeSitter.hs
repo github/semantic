@@ -1,7 +1,7 @@
 module TreeSitter where
 
 import Prologue hiding (Constructor)
-import Data.Text (pack)
+import Data.Record
 import Category
 import Info
 import Language
@@ -88,7 +88,7 @@ documentToTerm language document contents = alloca $ \ root -> do
           range <- pure $! Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
 
           let size' = 1 + sum (size . extract <$> children)
-          let info = Info range (categoriesForLanguage language (pack name)) size' size'
+          let info = range .: (categoriesForLanguage language (toS name)) .: size' .: Cost (unSize size') .: RNil
           pure $! termConstructor contents info children
         getChild node n out = do
           _ <- ts_node_p_named_child node n out
