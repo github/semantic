@@ -57,6 +57,7 @@ library
                      , containers
                      , directory
                      , filepath
+                     , hashable
                      , mtl
                      , pointed
                      , QuickCheck >= 2.8.1
