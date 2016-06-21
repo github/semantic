@@ -48,6 +48,9 @@ toTermName term = case unwrap term of
   -- evaluate Case as a single toTermName Text - joshvera
   Syntax.Case expr _ -> toTermName expr
   Syntax.Switch expr _ -> toTermName expr
+  Syntax.Ternary expr _ -> toTermName expr
+  Syntax.MathAssignment id _ -> toTermName id
+  Syntax.Operator syntaxes -> mconcat $ toTermName <$> syntaxes
 
 class HasCategory a where
   toCategoryName :: a -> Text
@@ -128,6 +131,9 @@ diffSummary = cata $ \case
   (Free (infos :< Syntax.Args args)) -> prependSummary (category $ snd infos) <$> join args
   (Free (infos :< Syntax.Switch expr cases)) -> prependSummary (category $ snd infos) <$> expr <> join cases
   (Free (infos :< Syntax.Case expr body)) -> prependSummary (category $ snd infos) <$> expr <> body
+  Free (infos :< (Syntax.Ternary expr cases)) -> prependSummary (category $ snd infos) <$> expr <> join cases
+  Free (infos :< (Syntax.MathAssignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
+  Free (infos :< (Syntax.Operator syntaxes)) -> prependSummary (category $ snd infos) <$> join syntaxes
   (Pure (Insert term)) -> (\info -> DiffSummary (Insert info) []) <$> termToDiffInfo term
   (Pure (Delete term)) -> (\info -> DiffSummary (Delete info) []) <$> termToDiffInfo term
   (Pure (Replace t1 t2)) -> (\(info1, info2) -> DiffSummary (Replace info1 info2) []) <$> zip (termToDiffInfo t1) (termToDiffInfo t2)
