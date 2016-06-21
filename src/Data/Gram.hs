@@ -6,3 +6,5 @@ data Gram label = Gram { stem :: [label], base :: [label] }
 
 serialize :: Gram label -> [label]
 serialize gram = stem gram <> base gram
+
+newtype Bag a = Bag { unBag :: [a] -> [a] }
