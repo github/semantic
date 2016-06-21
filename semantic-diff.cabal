@@ -56,6 +56,7 @@ library
                      , bytestring
                      , containers
                      , directory
+                     , dlist
                      , filepath
                      , hashable
                      , mtl
