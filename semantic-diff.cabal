@@ -60,6 +60,7 @@ library
                      , filepath
                      , hashable
                      , mtl
+                     , MonadRandom
                      , pointed
                      , QuickCheck >= 2.8.1
                      , quickcheck-text
