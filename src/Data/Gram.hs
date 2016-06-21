@@ -10,6 +10,10 @@ serialize gram = stem gram <> base gram
 
 newtype Bag a = Bag { unBag :: [a] -> [a] }
 
+instance Hashable label => Hashable (Gram label) where
+  hashWithSalt _ = hash
+  hash = hash . serialize
+
 instance Hashable a => Hashable (Bag a) where
   hashWithSalt _ = hash
   hash = hash . ($ mempty) . unBag
