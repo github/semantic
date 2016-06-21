@@ -61,6 +61,10 @@ styleName category = "category-" <> case category of
   Identifier -> "identifier"
   Params -> "parameters"
   ExpressionStatements -> "expression_statements"
+  Category.MathAssignment -> "math_assignment"
+  Category.SubscriptAccess -> "subscript_access"
+  Category.Ternary -> "ternary"
+  Category.Operator -> "operator"
   Other string -> string
 
 -- | Pick the class name for a split patch.
@@ -129,6 +133,12 @@ instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Ran
       dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [varId])) <> (wrapIn dd <$> contentElements source (characterRange info) [value])
     Syntax.Switch expr cases -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (expr : cases)
     Syntax.Case expr body -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) [expr, body]
+    Syntax.Ternary expr cases -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (expr : cases)
+    Syntax.MathAssignment id value ->
+      dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [id])) <> (wrapIn dd <$> contentElements source (characterRange info) [value])
+    Syntax.SubscriptAccess target property ->
+      dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [target])) <> (wrapIn dd <$> contentElements source (characterRange info) [property])
+    Syntax.Operator syntaxes -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) syntaxes
 
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
