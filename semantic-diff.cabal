@@ -18,6 +18,7 @@ library
                      , Category
                      , Data.Bifunctor.Join.Arbitrary
                      , Data.Functor.Both
+                     , Data.Gram
                      , Data.OrderedMap
                      , Data.Record
                      , Data.These.Arbitrary
