@@ -101,11 +101,12 @@ test-suite semantic-diff-test
   other-modules:       AlignmentSpec
                      , ArbitraryTerm
                      , CorpusSpec
+                     , Data.Gram.Spec
+                     , DiffSummarySpec
                      , InterpreterSpec
                      , OrderedMapSpec
                      , PatchOutputSpec
                      , TermSpec
-                     , DiffSummarySpec
   build-depends:       base
                      , bifunctors
                      , bytestring
