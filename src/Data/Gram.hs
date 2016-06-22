@@ -16,7 +16,7 @@ serialize :: Gram label -> [Maybe label]
 serialize gram = stem gram <> base gram
 
 pqGrams :: Foldable.Foldable tree => Int -> Int -> (forall a. Base tree a -> (label, [a])) -> tree -> Bag (Gram label)
-pqGrams p q unpack = foldr (<>) empty . cata go
+pqGrams p q unpack = foldr (<>) empty . assignParent Nothing p . cata go
   where go functor = let (label, children) = unpack functor in
           DList.singleton (Gram [] [ Just label ]) : (children >>= assignParent (Just label) p)
         assignParent parentLabel n children
