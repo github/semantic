@@ -18,10 +18,10 @@ serialize gram = stem gram <> base gram
 
 pqGrams :: Int -> Int -> Cofree (Syntax leaf) label -> Bag (Gram label)
 pqGrams p q = cata merge . foldr (\ p rest -> assignParent Nothing p . rest) identity [0..p] . hylo go project
-  where go (label :< functor) = cofree (DList.singleton (Gram [] [ Just label ]) :< (assignParent (Just label) p <$> functor))
-        merge (head :< tail) = head <> Prologue.fold tail
+  where go (label :< functor) = cofree (Gram [] [ Just label ] :< (assignParent (Just label) p <$> functor))
+        merge (head :< tail) = DList.singleton head <> Prologue.fold tail
         assignParent parentLabel n tree
-          | n > 0 = let gram :< functor = runCofree tree in cofree $ (prependParent parentLabel <$> gram) :< (assignParent parentLabel (pred n) <$> functor)
+          | n > 0 = let gram :< functor = runCofree tree in cofree $ prependParent parentLabel gram :< (assignParent parentLabel (pred n) <$> functor)
           | otherwise = tree
         prependParent parentLabel gram = gram { stem = parentLabel : stem gram }
 
