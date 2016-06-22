@@ -2,6 +2,7 @@ module Data.Gram where
 
 import Control.Monad.Random
 import qualified Data.DList as DList
+import Data.Functor.Foldable as Foldable
 import Data.Hashable
 import qualified Data.Vector as Vector
 import Prologue
@@ -12,6 +13,9 @@ data Gram label = Gram { stem :: [label], base :: [label] }
 serialize :: Gram label -> [label]
 serialize gram = stem gram <> base gram
 
+pqGrams :: Foldable.Foldable tree => Int -> Int -> (Base tree a -> (label, a)) -> tree -> Bag (Gram label)
+pqGrams p q unpack = foldr (<>) empty . cata go
+  where go _ = []
 
 type Bag = DList.DList
 
