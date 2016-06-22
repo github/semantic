@@ -113,6 +113,7 @@ test-suite semantic-diff-test
                      , bytestring
                      , containers
                      , deepseq
+                     , dlist
                      , filepath
                      , Glob
                      , hspec >= 2.1.10
