@@ -1,6 +1,5 @@
 module Data.Gram.Spec where
 
-import Control.Arrow ((&&&))
 import Data.DList as DList hiding (toList)
 import Data.Gram
 import Data.Gram.Arbitrary ()
