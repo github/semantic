@@ -10,3 +10,5 @@ gramWithPQ p q = Gram <$> vectorOf p arbitrary <*> vectorOf q arbitrary
 
 instance Arbitrary label => Arbitrary (Gram label) where
   arbitrary = join $ gramWithPQ <$> arbitrary <*> arbitrary
+
+  shrink (Gram a b) = Gram <$> shrink a <*> shrink b
