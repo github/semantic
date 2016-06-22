@@ -7,6 +7,7 @@ import Data.String
 import Prologue
 import Test.Hspec
 import Test.Hspec.QuickCheck
+import Test.QuickCheck
 
 spec :: Spec
 spec = parallel $ do
@@ -14,5 +15,5 @@ spec = parallel $ do
     it "exists" pending
 
   describe "featureVector" $ do
-    prop "produces a vector of the specified dimension" $
-      \ grams d -> length (featureVector (fromList (grams :: [Gram String])) d) `shouldBe` d
+    prop "produces a vector of the specified dimension" $ forAll (arbitrary `suchThat` ((> 0) . snd)) $
+      \ (grams, d) -> length (featureVector (fromList (grams :: [Gram String])) d) `shouldBe` d
