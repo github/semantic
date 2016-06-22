@@ -19,6 +19,7 @@ library
                      , Data.Bifunctor.Join.Arbitrary
                      , Data.Functor.Both
                      , Data.Gram
+                     , Data.Gram.Arbitrary
                      , Data.OrderedMap
                      , Data.Record
                      , Data.These.Arbitrary
