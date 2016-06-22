@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-module Data.Gram.Arbitrary where
+module Data.RandomWalkSimilarity.Arbitrary where
 
-import Data.Gram
+import Data.RandomWalkSimilarity
 import Prologue
 import Test.QuickCheck
 

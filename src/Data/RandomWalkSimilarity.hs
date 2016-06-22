@@ -1,4 +1,4 @@
-module Data.Gram where
+module Data.RandomWalkSimilarity where
 
 import Control.Monad.Random
 import qualified Data.DList as DList

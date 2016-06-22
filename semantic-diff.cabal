@@ -18,8 +18,8 @@ library
                      , Category
                      , Data.Bifunctor.Join.Arbitrary
                      , Data.Functor.Both
-                     , Data.Gram
-                     , Data.Gram.Arbitrary
+                     , Data.RandomWalkSimilarity
+                     , Data.RandomWalkSimilarity.Arbitrary
                      , Data.OrderedMap
                      , Data.Record
                      , Data.These.Arbitrary

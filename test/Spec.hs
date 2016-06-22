@@ -3,7 +3,7 @@ module Main where
 import Prologue
 import qualified AlignmentSpec
 import qualified CorpusSpec
-import qualified Data.Gram.Spec
+import qualified Data.RandomWalkSimilarity.Spec
 import qualified DiffSummarySpec
 import qualified InterpreterSpec
 import qualified OrderedMapSpec
@@ -15,7 +15,7 @@ main :: IO ()
 main = hspec . parallel $ do
   describe "Alignment" AlignmentSpec.spec
   describe "Corpus" CorpusSpec.spec
-  describe "Data.Gram" Data.Gram.Spec.spec
+  describe "Data.RandomWalkSimilarity" Data.RandomWalkSimilarity.Spec.spec
   describe "DiffSummary" DiffSummarySpec.spec
   describe "Interpreter" InterpreterSpec.spec
   describe "OrderedMap" OrderedMapSpec.spec
