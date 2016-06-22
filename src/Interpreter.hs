@@ -7,6 +7,7 @@ import qualified Data.OrderedMap as Map
 import qualified Data.List as List
 import Data.List ((\\))
 import Data.OrderedMap ((!))
+import Data.RandomWalkSimilarity
 import Diff
 import Operation
 import Patch
@@ -67,3 +68,5 @@ run construct comparable cost algorithm = case runFree algorithm of
     inserted = bKeys \\ aKeys
 
   Free (ByIndex a b f) -> run construct comparable cost . f $ ses (constructAndRun construct comparable cost) cost a b
+
+  Free (ByRandomWalkSimilarity a b f) -> run construct comparable cost . f $ rws (constructAndRun construct comparable cost) a b

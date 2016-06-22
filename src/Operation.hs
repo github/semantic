@@ -16,4 +16,5 @@ data Operation
   | ByKey (OrderedMap Text (Term a annotation)) (OrderedMap Text (Term a annotation)) (OrderedMap Text (Diff a annotation) -> f)
   -- | Diff two arrays and pass the result to the continuation.
   | ByIndex [Term a annotation] [Term a annotation] ([Diff a annotation] -> f)
+  | ByRandomWalkSimilarity [Term a annotation] [Term a annotation] ([Diff a annotation] -> f)
   deriving Functor
