@@ -6,10 +6,14 @@ import Data.Functor.Foldable as Foldable
 import Data.Hashable
 import qualified Data.OrderedMap as Map
 import qualified Data.Vector as Vector
+import Diff
 import Prologue
 import Syntax
-import Term ()
+import Term
 import Test.QuickCheck.Random
+
+rws :: (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
+rws compare as bs = []
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
