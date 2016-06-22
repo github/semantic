@@ -4,6 +4,7 @@ import Control.Monad.Random
 import qualified Data.DList as DList
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
+import qualified Data.OrderedMap as Map
 import qualified Data.Vector as Vector
 import Prologue
 import Syntax
@@ -28,8 +29,9 @@ pqGrams p q = cata merge . (\ t -> let (a :< f) = runCofree t in cofree (setBase
           Leaf a -> Leaf a
           Indexed a -> Indexed $ windowed q setBases [] a
           Fixed a -> Fixed $ windowed q setBases [] a
-          Keyed a -> Keyed a
+          Keyed a -> Keyed . Map.fromList $ windowed q setBasesKV [] (Map.toList a)
         setBases child siblings rest = let (gram :< further) = (runCofree child) in cofree (setBase gram (siblings >>= base . extract) :< further) : rest
+        setBasesKV (key, child) siblings rest = let (gram :< further) = (runCofree child) in (key, cofree (setBase gram (siblings >>= base . extract . snd) :< further)) : rest
         setBase gram newBase = gram { base = take q (newBase <> repeat Nothing) }
 
 windowed :: Int -> (a -> [a] -> b -> b) -> b -> [a] -> b
