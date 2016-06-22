@@ -7,13 +7,20 @@ import Data.Hashable
 import qualified Data.OrderedMap as Map
 import qualified Data.Vector as Vector
 import Diff
+import Patch
 import Prologue
 import Syntax
 import Term
 import Test.QuickCheck.Random
 
 rws :: (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
-rws compare as bs = []
+rws compare as bs
+  | null as, null bs = []
+  | null as = insert <$> bs
+  | null bs = delete <$> as
+  | otherwise = []
+  where insert = pure . Insert
+        delete = pure . Delete
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
