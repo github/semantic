@@ -46,9 +46,11 @@ type Bag = DList.DList
 featureVector :: Hashable label => Bag (Gram label) -> Int -> Vector.Vector Double
 featureVector bag d = sumVectors $ unitDVector . hash <$> bag
   where unitDVector hash = normalize . (`evalRand` mkQCGen hash) $ Prologue.sequence (Vector.replicate d getRandom)
-        normalize vec = fmap (/ magnitude vec) vec
-        magnitude vec = sqrtDouble (Vector.sum (fmap (** 2) vec))
+        normalize vec = fmap (/ vmagnitude vec) vec
         sumVectors = DList.foldr (Vector.zipWith (+)) (Vector.replicate d 0)
+
+vmagnitude :: Vector.Vector Double -> Double
+vmagnitude vec = sqrtDouble (Vector.sum (fmap (** 2) vec))
 
 instance Hashable label => Hashable (Gram label) where
   hashWithSalt _ = hash
