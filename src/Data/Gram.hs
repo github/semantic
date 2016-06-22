@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 module Data.Gram where
 
 import Control.Monad.Random
@@ -13,7 +14,7 @@ data Gram label = Gram { stem :: [label], base :: [label] }
 serialize :: Gram label -> [label]
 serialize gram = stem gram <> base gram
 
-pqGrams :: Foldable.Foldable tree => Int -> Int -> (Base tree [Bag (Gram label)] -> (label, [Bag (Gram label)])) -> tree -> Bag (Gram label)
+pqGrams :: Foldable.Foldable tree => Int -> Int -> (forall a. Base tree a -> (label, a)) -> tree -> Bag (Gram label)
 pqGrams p q unpack = foldr (<>) empty . cata go
   where go functor = let (label, children) = unpack functor in []
 
