@@ -14,7 +14,7 @@ data Gram label = Gram { stem :: [label], base :: [label] }
 serialize :: Gram label -> [label]
 serialize gram = stem gram <> base gram
 
-pqGrams :: Foldable.Foldable tree => Int -> Int -> (forall a. Base tree a -> (label, a)) -> tree -> Bag (Gram label)
+pqGrams :: Foldable.Foldable tree => Int -> Int -> (forall a. Base tree a -> (label, [a])) -> tree -> Bag (Gram label)
 pqGrams p q unpack = foldr (<>) empty . snd . cata go
   where go functor = let (label, children) = unpack functor in (label, [])
 
