@@ -9,4 +9,4 @@ gramWithPQ :: Arbitrary label => Int -> Int -> Gen (Gram label)
 gramWithPQ p q = Gram <$> vectorOf p arbitrary <*> vectorOf q arbitrary
 
 instance Arbitrary label => Arbitrary (Gram label) where
-  arbitrary = Gram <$> arbitrary <*> arbitrary
+  arbitrary = join $ gramWithPQ <$> arbitrary <*> arbitrary
