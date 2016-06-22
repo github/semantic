@@ -25,10 +25,10 @@ pqGrams p q = cata merge . foldr (\ p rest -> assignParent Nothing p . rest) ide
           | otherwise = tree
         prependParent parentLabel gram = gram { stem = parentLabel : stem gram }
 
-windowed :: Int -> ([a] -> b -> b) -> b -> [a] -> b
+windowed :: Int -> (a -> [a] -> b -> b) -> b -> [a] -> b
 windowed n f seed = para alg
   where alg xs = case xs of
-          Cons a (as, b) -> f (take n $ a : as) b
+          Cons a (as, b) -> f a (take n $ a : as) b
           Nil -> seed
 
 type Bag = DList.DList
