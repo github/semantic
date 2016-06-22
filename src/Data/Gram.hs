@@ -10,6 +10,7 @@ import Prologue
 import Test.QuickCheck.Random
 
 data Gram label = Gram { stem :: [label], base :: [label] }
+  deriving (Eq, Show)
 
 serialize :: Gram label -> [label]
 serialize gram = stem gram <> base gram
