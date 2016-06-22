@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleContexts, RankNTypes, ScopedTypeVariables #-}
 module Data.Gram where
 
 import Control.Monad.Random
@@ -7,6 +6,7 @@ import Data.Functor.Foldable as Foldable
 import Data.Hashable
 import qualified Data.Vector as Vector
 import Prologue
+import Syntax
 import Term ()
 import Test.QuickCheck.Random
 
@@ -16,17 +16,16 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 serialize :: Gram label -> [Maybe label]
 serialize gram = stem gram <> base gram
 
-pqGrams :: forall label tree. (Foldable.Foldable tree, Prologue.Foldable (Base tree)) => Int -> Int -> (forall a. Base tree a -> label) -> tree -> Bag (Gram label)
-pqGrams p q getLabel = cata merge . foldr (\ p rest -> assignParent Nothing p . rest) identity [0..p] . hylo go project
-  where go functor = let label = getLabel functor in
-          cofree (DList.singleton (Gram [] [ Just label ]) :< (assignParent (Just label) p <$> functor))
+pqGrams :: Int -> Int -> Cofree (Syntax leaf) label -> Bag (Gram label)
+pqGrams p q = cata merge . foldr (\ p rest -> assignParent Nothing p . rest) identity [0..p] . hylo go project
+  where go (label :< functor) = cofree (DList.singleton (Gram [] [ Just label ]) :< (assignParent (Just label) p <$> functor))
         merge (head :< tail) = head <> Prologue.fold tail
         assignParent parentLabel n tree
           | n > 0 = let gram :< functor = runCofree tree in cofree $ (prependParent parentLabel <$> gram) :< (assignParent parentLabel (pred n) <$> functor)
           | otherwise = tree
         prependParent parentLabel gram = gram { stem = parentLabel : stem gram }
 
-windowed :: forall a b. Int -> ([a] -> b -> b) -> b -> [a] -> b
+windowed :: Int -> ([a] -> b -> b) -> b -> [a] -> b
 windowed n f seed = para alg
   where alg xs = case xs of
           Cons a (as, b) -> f (take n $ a : as) b

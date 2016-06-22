@@ -5,7 +5,6 @@ import Data.Gram
 import Data.Gram.Arbitrary ()
 import Data.String
 import Prologue
-import Syntax
 import Term
 import Term.Arbitrary
 import Test.Hspec
@@ -16,10 +15,10 @@ spec :: Spec
 spec = parallel $ do
   describe "pqGrams" $ do
     prop "produces grams with stems of the specified length" $ forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
-      \ (term, p, q) -> pqGrams p q headF (toTerm term :: Term String String) `shouldSatisfy` all ((== p) . length . stem)
+      \ (term, p, q) -> pqGrams p q (toTerm term :: Term String String) `shouldSatisfy` all ((== p) . length . stem)
 
     prop "produces grams with bases of the specified length" $ forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
-      \ (term, p, q) -> pqGrams p q headF (toTerm term :: Term String String) `shouldSatisfy` all ((== q) . length . base)
+      \ (term, p, q) -> pqGrams p q (toTerm term :: Term String String) `shouldSatisfy` all ((== q) . length . base)
 
   describe "featureVector" $ do
     prop "produces a vector of the specified dimension" $ forAll (arbitrary `suchThat` ((> 0) . snd)) $
