@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RankNTypes, ScopedTypeVariables #-}
 module Data.Gram where
 
 import Control.Monad.Random
@@ -7,6 +7,7 @@ import Data.Functor.Foldable as Foldable
 import Data.Hashable
 import qualified Data.Vector as Vector
 import Prologue
+import Term ()
 import Test.QuickCheck.Random
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
@@ -15,15 +16,18 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 serialize :: Gram label -> [Maybe label]
 serialize gram = stem gram <> base gram
 
-pqGrams :: Foldable.Foldable tree => Int -> Int -> (forall a. Base tree a -> (label, [a])) -> tree -> Bag (Gram label)
-pqGrams p q unpack = foldr (<>) empty . assignParent Nothing p . cata go
-  where go functor = let (label, children) = unpack functor in
-          DList.singleton (Gram [] [ Just label ]) : (children >>= assignParent (Just label) p)
-        assignParent parentLabel n children
-          | n == 0 = children
-          | otherwise = case children of
-            (head : tail) -> (prependParent parentLabel <$> head) : assignParent parentLabel (pred n) tail
-            [] -> []
+pqGrams :: forall label tree. Foldable.Foldable tree => Int -> Int -> (forall a. Base tree a -> (label, [a])) -> tree -> Bag (Gram label)
+pqGrams p q unpack = cata merge . hylo go project
+  where go :: Base tree (Cofree (Base tree) (Bag (Gram label))) -> Cofree (Base tree) (Bag (Gram label))
+        go functor = let (label, children) = unpack functor in
+          cofree (DList.singleton (Gram [] [ Just label ]) :< (assignParent (Just label) p <$> functor))
+        merge :: CofreeF (Base tree) (Bag (Gram label)) (Bag (Gram label)) -> Bag (Gram label)
+        merge (head :< tail) = let (label, children) = unpack tail in head <> foldr (<>) mempty children
+          -- DList.singleton (Gram [] [ Just label ]) : (children >>= assignParent (Just label) p)
+        assignParent :: Maybe label -> Int -> Cofree (Base tree) (Bag (Gram label)) -> Cofree (Base tree) (Bag (Gram label))
+        assignParent parentLabel n tree
+          | n > 0 = let gram :< functor = runCofree tree in cofree $ (prependParent parentLabel <$> gram) :< (assignParent parentLabel (pred n) <$> functor)
+          | otherwise = tree
         prependParent parentLabel gram = gram { stem = parentLabel : stem gram }
 
 type Bag = DList.DList
