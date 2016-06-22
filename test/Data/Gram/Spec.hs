@@ -15,12 +15,7 @@ import Test.QuickCheck hiding (Fixed)
 
 spec :: Spec
 spec = parallel $ do
-  describe "pqGrams" $
-    let getChildren (_ :< f) = case f of
-          Leaf _ -> []
-          Indexed c -> c
-          Fixed c -> c
-          Keyed c -> toList c in
+  describe "pqGrams" $ do
     prop "produces grams with stems of the specified length" $ forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
       \ (term, p, q) -> pqGrams p q headF (toTerm term :: Term String String) `shouldSatisfy` all ((== p) . length . stem)
 
