@@ -1,9 +1,9 @@
 module Data.Gram where
 
 import Control.Monad.Random
-import Data.DList as DList
+import qualified Data.DList as DList
 import Data.Hashable
-import Data.Vector as Vector
+import qualified Data.Vector as Vector
 import Prologue
 import Test.QuickCheck.Random
 
@@ -13,10 +13,10 @@ serialize :: Gram label -> [label]
 serialize gram = stem gram <> base gram
 
 
-type Bag = DList
+type Bag = DList.DList
 
 
-featureVector :: Hashable label => Bag (Gram label) -> Int -> Vector Double
+featureVector :: Hashable label => Bag (Gram label) -> Int -> Vector.Vector Double
 featureVector bag d = sumVectors $ unitDVector . hash <$> bag
   where unitDVector hash = normalize . (`evalRand` mkQCGen hash) $ Prologue.sequence (Vector.replicate d getRandom)
         normalize vec = fmap (/ magnitude vec) vec
