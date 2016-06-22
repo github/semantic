@@ -11,7 +11,7 @@ import qualified DiffSummarySpec
 import Test.Hspec
 
 main :: IO ()
-main = hspec $ parallel $ do
+main = hspec . parallel $ do
   describe "Alignment" AlignmentSpec.spec
   describe "Corpus" CorpusSpec.spec
   describe "Interpreter" InterpreterSpec.spec
