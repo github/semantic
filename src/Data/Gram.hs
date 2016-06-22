@@ -18,13 +18,9 @@ serialize gram = stem gram <> base gram
 
 pqGrams :: forall label tree. (Foldable.Foldable tree, Prologue.Foldable (Base tree)) => Int -> Int -> (forall a. Base tree a -> label) -> tree -> Bag (Gram label)
 pqGrams p q getLabel = cata merge . foldr (\ p rest -> assignParent Nothing p . rest) identity [0..p] . hylo go project
-  where go :: Base tree (Cofree (Base tree) (Bag (Gram label))) -> Cofree (Base tree) (Bag (Gram label))
-        go functor = let label = getLabel functor in
+  where go functor = let label = getLabel functor in
           cofree (DList.singleton (Gram [] [ Just label ]) :< (assignParent (Just label) p <$> functor))
-        merge :: CofreeF (Base tree) (Bag (Gram label)) (Bag (Gram label)) -> Bag (Gram label)
         merge (head :< tail) = head <> Prologue.fold tail
-          -- DList.singleton (Gram [] [ Just label ]) : (children >>= assignParent (Just label) p)
-        assignParent :: Maybe label -> Int -> Cofree (Base tree) (Bag (Gram label)) -> Cofree (Base tree) (Bag (Gram label))
         assignParent parentLabel n tree
           | n > 0 = let gram :< functor = runCofree tree in cofree $ (prependParent parentLabel <$> gram) :< (assignParent parentLabel (pred n) <$> functor)
           | otherwise = tree
