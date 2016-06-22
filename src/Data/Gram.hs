@@ -9,16 +9,16 @@ import qualified Data.Vector as Vector
 import Prologue
 import Test.QuickCheck.Random
 
-data Gram label = Gram { stem :: [label], base :: [label] }
+data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
-serialize :: Gram label -> [label]
+serialize :: Gram label -> [Maybe label]
 serialize gram = stem gram <> base gram
 
 pqGrams :: Foldable.Foldable tree => Int -> Int -> (forall a. Base tree a -> (label, [a])) -> tree -> Bag (Gram label)
 pqGrams p q unpack = foldr (<>) empty . cata go
   where go functor = let (label, children) = unpack functor in
-          DList.singleton (Gram [] [ label ]) : (children >>= assignParent label p)
+          DList.singleton (Gram [] [ Just label ]) : (children >>= assignParent (Just label) p)
         assignParent parentLabel n children
           | n == 0 = children
           | otherwise = case children of
