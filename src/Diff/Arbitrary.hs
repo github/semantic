@@ -80,4 +80,5 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
         Syntax.MathAssignment i value -> Syntax.MathAssignment <$> shrink i <*> shrink value
         Syntax.Operator syntaxes -> Syntax.Operator <$> (List.subsequences syntaxes >>= recursivelyShrink)
         Syntax.SubscriptAccess i property -> Syntax.SubscriptAccess <$> shrink i <*> shrink property
+        Syntax.Object keyValues -> Syntax.Object <$> (List.subsequences keyValues >>= recursivelyShrink)
     Pure patch -> ArbitraryDiff . Pure <$> shrink patch

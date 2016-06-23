@@ -63,6 +63,8 @@ data Category
   | Case
   -- | An expression with an operator.
   | Operator
+  -- | An object/dictionary/hash literal.
+  | Object
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Show, Ord)

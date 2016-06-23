@@ -65,3 +65,4 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
       MathAssignment id value -> MathAssignment <$> shrink id <*> shrink value
       Operator syntaxes -> Operator <$> (List.subsequences syntaxes >>= recursivelyShrink)
       SubscriptAccess value property -> SubscriptAccess <$> shrink value <*> shrink property
+      Object keyValues -> Object <$> (List.subsequences keyValues >>= recursivelyShrink)

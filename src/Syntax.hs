@@ -47,4 +47,5 @@ data Syntax
   | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
   | Switch { switchExpr :: f, cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: f }
+  | Object { keyValues :: [(f, f)] }
   deriving (Functor, Show, Eq, Foldable, Traversable)
