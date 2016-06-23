@@ -18,7 +18,7 @@ rws compare as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
-  | otherwise = []
+  | otherwise = (delete <$> as) <> (insert <$> bs)
   where insert = pure . Insert
         delete = pure . Delete
 
