@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, GADTs #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Data.Record.Arbitrary where
 
@@ -8,3 +8,5 @@ import Test.QuickCheck
 
 instance Arbitrary fields => Arbitrary (Record '[fields]) where
   arbitrary = RCons <$> arbitrary <*> pure RNil
+
+  shrink (RCons h t) = RCons <$> shrink h <*> pure t
