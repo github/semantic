@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
 module Data.Record where
 
 import Prologue

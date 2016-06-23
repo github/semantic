@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
 module Info where
 
 import Data.Record
