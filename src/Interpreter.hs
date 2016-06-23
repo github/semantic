@@ -1,14 +1,17 @@
 module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
+import Category
 import Data.Functor.Foldable
 import Data.Functor.Both
-import qualified Data.OrderedMap as Map
-import qualified Data.List as List
 import Data.List ((\\))
+import qualified Data.List as List
 import Data.OrderedMap ((!))
+import qualified Data.OrderedMap as Map
 import Data.RandomWalkSimilarity
+import Data.Record
 import Diff
+import Info
 import Operation
 import Patch
 import Prologue hiding (lookup)
@@ -23,11 +26,11 @@ type Comparable leaf annotation = Term leaf annotation -> Term leaf annotation -
 type DiffConstructor leaf annotation = CofreeF (Syntax leaf) (Both annotation) (Diff leaf annotation) -> Diff leaf annotation
 
 -- | Diff two terms, given a function that determines whether two terms can be compared and a cost function.
-diffTerms :: (Eq leaf, Eq annotation) => DiffConstructor leaf annotation -> Comparable leaf annotation -> Cost (Diff leaf annotation) -> Term leaf annotation -> Term leaf annotation -> Diff leaf annotation
+diffTerms :: (Eq leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Diff leaf (Record fields)
 diffTerms construct comparable cost a b = fromMaybe (pure $ Replace a b) $ constructAndRun construct comparable cost a b
 
 -- | Constructs an algorithm and runs it
-constructAndRun :: (Eq leaf, Eq annotation) => DiffConstructor leaf annotation -> Comparable leaf annotation -> Cost (Diff leaf annotation) -> Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)
+constructAndRun :: (Eq leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Maybe (Diff leaf (Record fields))
 constructAndRun _ comparable _ a b | not $ comparable a b = Nothing
 
 constructAndRun construct _ _ a b | (() <$ a) == (() <$ b) = hylo construct runCofree <$> zipTerms a b
@@ -42,7 +45,7 @@ constructAndRun construct comparable cost t1 t2 =
     annotate = pure . construct . (both annotation1 annotation2 :<)
 
 -- | Runs the diff algorithm
-run :: (Eq leaf, Eq annotation) => DiffConstructor leaf annotation -> Comparable leaf annotation -> Cost (Diff leaf annotation) -> Algorithm leaf annotation (Diff leaf annotation) -> Maybe (Diff leaf annotation)
+run :: (Eq leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Algorithm leaf (Record fields) (Diff leaf (Record fields)) -> Maybe (Diff leaf (Record fields))
 run construct comparable cost algorithm = case runFree algorithm of
   Pure diff -> Just diff
   Free (Recursive t1 t2 f) -> run construct comparable cost . f $ recur a b where
