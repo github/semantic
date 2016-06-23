@@ -1,6 +1,7 @@
 module Category where
 
 import Prologue
+import Data.Hashable
 import Data.String
 
 -- | A standardized category of AST node. Used to determine the semantics for
@@ -29,3 +30,6 @@ data Category
   -- | A non-standard category, which can be used for comparability.
   | Other String
   deriving (Eq, Generic, Ord, Show)
+
+
+instance Hashable Category
