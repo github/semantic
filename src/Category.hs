@@ -32,4 +32,6 @@ data Category
   deriving (Eq, Generic, Ord, Show)
 
 
+-- Instances
+
 instance Hashable Category
