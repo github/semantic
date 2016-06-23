@@ -5,7 +5,6 @@ import qualified Data.DList as DList
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
 import qualified Data.OrderedMap as Map
-import Data.Record
 import qualified Data.Vector as Vector
 import Diff
 import Patch
@@ -29,9 +28,9 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 serialize :: Gram label -> [Maybe label]
 serialize gram = stem gram <> base gram
 
-pqGrams :: HasField fields label => Int -> Int -> Cofree (Syntax leaf) (Record fields) -> Bag (Gram label)
-pqGrams p q = cata merge . setRootBase . setRootStem . hylo go project
-  where go (record :< functor) = cofree (Gram [] [ Just (getField record) ] :< (assignParent (Just (getField record)) p <$> functor))
+pqGrams :: Int -> Int -> (annotation -> label) -> Cofree (Syntax leaf) annotation -> Bag (Gram label)
+pqGrams p q getLabel = cata merge . setRootBase . setRootStem . hylo go project
+  where go (annotation :< functor) = cofree (Gram [] [ Just (getLabel annotation) ] :< (assignParent (Just (getLabel annotation)) p <$> functor))
         merge (head :< tail) = DList.singleton head <> Prologue.fold tail
         assignParent parentLabel n tree
           | n > 0 = let gram :< functor = runCofree tree in cofree $ prependParent parentLabel gram :< assignSiblings (assignParent parentLabel (pred n) <$> functor)
