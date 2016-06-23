@@ -23,4 +23,4 @@ spec = parallel $ do
 
   describe "featureVector" $ do
     prop "produces a vector of the specified dimension" . forAll (arbitrary `suchThat` ((> 0) . snd)) $
-      \ (grams, d) -> length (featureVector (fromList (grams :: [Gram String])) d) `shouldBe` d
+      \ (grams, d) -> length (featureVector d (fromList (grams :: [Gram String]))) `shouldBe` d
