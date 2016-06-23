@@ -103,7 +103,7 @@ test-suite semantic-diff-test
   other-modules:       AlignmentSpec
                      , ArbitraryTerm
                      , CorpusSpec
-                     , Data.Gram.Spec
+                     , Data.RandomWalkSimilarity.Spec
                      , DiffSummarySpec
                      , InterpreterSpec
                      , OrderedMapSpec
