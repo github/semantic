@@ -1,6 +1,8 @@
 module Data.RandomWalkSimilarity where
 
+import Control.Arrow ((&&&))
 import Control.Monad.Random
+import Control.Monad.State
 import qualified Data.DList as DList
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
@@ -18,9 +20,22 @@ rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
-  | otherwise = (delete <$> as) <> (insert <$> bs)
+  | otherwise = (`evalState` fbs) $ traverse diffAgainstNearestNeighbour fas
   where insert = pure . Insert
         delete = pure . Delete
+        (p, q) = (2, 2)
+        d = 15
+        (fas, fbs) = (featurize <$> as, featurize <$> bs)
+        featurize = featureVector d . pqGrams p q getLabel &&& identity
+        diffAgainstNearestNeighbour (k, v) = do
+          fbs <- get
+          case nearestNeighbour fbs k of
+            Just x -> case compare v x of
+              Just y -> do
+                put fbs
+                pure y
+              _ -> pure $! delete v
+            _ -> pure $! delete v
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
