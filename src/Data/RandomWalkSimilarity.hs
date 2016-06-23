@@ -13,8 +13,8 @@ import Syntax
 import Term
 import Test.QuickCheck.Random
 
-rws :: (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
-rws compare as bs
+rws :: Hashable label => (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> (annotation -> label) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
+rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
