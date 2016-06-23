@@ -61,3 +61,7 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
       MemberAccess memberId property -> MemberAccess <$> shrink memberId <*> shrink property
       Switch expr cases -> Switch <$> shrink expr <*> (List.subsequences cases >>= recursivelyShrink)
       Case expr statements -> Case <$> shrink expr <*> shrink statements
+      Ternary expr cases -> Ternary <$> shrink expr <*> (List.subsequences cases >>= recursivelyShrink)
+      MathAssignment id value -> MathAssignment <$> shrink id <*> shrink value
+      Operator syntaxes -> Operator <$> (List.subsequences syntaxes >>= recursivelyShrink)
+      SubscriptAccess value property -> SubscriptAccess <$> shrink value <*> shrink property
