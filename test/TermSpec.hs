@@ -1,8 +1,12 @@
+{-# LANGUAGE DataKinds #-}
 module TermSpec where
 
 import ArbitraryTerm
+import Category
 import Data.String
 import Data.Text.Arbitrary ()
+import Data.Record
+import Data.Record.Arbitrary ()
 import Diff
 import Diff.Arbitrary
 import Interpreter
@@ -28,9 +32,9 @@ spec = parallel $ do
 
   describe "Diff" $ do
     prop "equality is reflexive" $
-      \ a b -> let diff = diffTerms (free . Free) (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm String CategorySet)) in
+      \ a b -> let diff = diffTerms (free . Free) (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm String (Record '[Category]))) in
         diff == diff
 
     prop "equal terms produce identity diffs" $
-      \ a -> let term = toTerm (a :: ArbitraryTerm String CategorySet) in
+      \ a -> let term = toTerm (a :: ArbitraryTerm String (Record '[Category])) in
         diffCost (diffTerms (free . Free) (==) diffCost term term) == 0
