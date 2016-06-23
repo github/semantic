@@ -17,12 +17,12 @@ import Test.QuickCheck hiding (Fixed)
 spec :: Spec
 spec = parallel $ do
   describe "pqGrams" $ do
-    prop "produces grams with stems of the specified length" $ forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
+    prop "produces grams with stems of the specified length" . forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
       \ (term, p, q) -> (pqGrams p q (toTerm term :: Term String (Record '[String])) :: Bag (Gram String)) `shouldSatisfy` all ((== p) . length . stem)
 
-    prop "produces grams with bases of the specified length" $ forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
+    prop "produces grams with bases of the specified length" . forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
       \ (term, p, q) -> (pqGrams p q (toTerm term :: Term String (Record '[String])) :: Bag (Gram String)) `shouldSatisfy` all ((== q) . length . base)
 
   describe "featureVector" $ do
-    prop "produces a vector of the specified dimension" $ forAll (arbitrary `suchThat` ((> 0) . snd)) $
+    prop "produces a vector of the specified dimension" . forAll (arbitrary `suchThat` ((> 0) . snd)) $
       \ (grams, d) -> length (featureVector (fromList (grams :: [Gram String])) d) `shouldBe` d
