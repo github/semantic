@@ -29,7 +29,7 @@ serialize :: Gram label -> [Maybe label]
 serialize gram = stem gram <> base gram
 
 pqGrams :: Int -> Int -> Cofree (Syntax leaf) label -> Bag (Gram label)
-pqGrams p q = cata merge . setRootBase . foldr (\ p rest -> assignParent Nothing p . rest) identity [0..p] . hylo go project
+pqGrams p q = cata merge . setRootBase . setRootStem . hylo go project
   where go (label :< functor) = cofree (Gram [] [ Just label ] :< (assignParent (Just label) p <$> functor))
         merge (head :< tail) = DList.singleton head <> Prologue.fold tail
         assignParent parentLabel n tree
@@ -45,6 +45,7 @@ pqGrams p q = cata merge . setRootBase . foldr (\ p rest -> assignParent Nothing
         setBasesKV (key, child) siblings rest = let (gram :< further) = (runCofree child) in (key, cofree (setBase gram (siblings >>= base . extract . snd) :< further)) : rest
         setBase gram newBase = gram { base = take q (newBase <> repeat Nothing) }
         setRootBase term = let (a :< f) = runCofree term in cofree (setBase a (base a) :< f)
+        setRootStem = foldr (\ p rest -> assignParent Nothing p . rest) identity [0..p]
 
 windowed :: Int -> (a -> [a] -> b -> b) -> b -> [a] -> b
 windowed n f seed = para alg
