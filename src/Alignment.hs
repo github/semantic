@@ -133,11 +133,11 @@ alignChildren getRange (first:rest) headRanges
   | ~(l, r) <- splitThese first
   = case intersectionsWithHeadRanges first of
     -- It intersects on both sides, so we can just take the first line whole.
-    (True, True) -> ((++) <$> toTerms first <*> firstRemaining, restRemaining)
+    (True, True) -> ((<>) <$> toTerms first <*> firstRemaining, restRemaining)
     -- It only intersects on the left, so split it up.
-    (True, False) -> ((++) <$> toTerms (fromJust l) <*> firstRemaining, maybe identity (:) r restRemaining)
+    (True, False) -> ((<>) <$> toTerms (fromJust l) <*> firstRemaining, maybe identity (:) r restRemaining)
     -- It only intersects on the right, so split it up.
-    (False, True) -> ((++) <$> toTerms (fromJust r) <*> firstRemaining, maybe identity (:) l restRemaining)
+    (False, True) -> ((<>) <$> toTerms (fromJust r) <*> firstRemaining, maybe identity (:) l restRemaining)
     -- It doesn’t intersect at all, so skip it and move along.
     (False, False) -> (firstRemaining, first:restRemaining)
   | otherwise = alignChildren getRange rest headRanges

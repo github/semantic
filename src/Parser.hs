@@ -42,7 +42,7 @@ termConstructor source info = cofree . construct
   where
     withDefaultInfo syntax = (info :< syntax)
     construct :: [Term Text Info] -> CofreeF (S.Syntax Text) Info (Term Text Info)
-    construct [] = withDefaultInfo $ S.Leaf . pack . toString $ slice (characterRange info) source
+    construct [] = withDefaultInfo . S.Leaf . pack . toString $ slice (characterRange info) source
     construct children | Assignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.Assignment identifier value
     construct children | MathAssignment == category info = case children of

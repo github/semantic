@@ -2,6 +2,8 @@ import "hint" HLint.Default
 import "hint" HLint.Dollar
 import "hint" HLint.Generalise
 
+ignore "Use mappend"
+error "generalize ++" = (++) ==> (<>)
 -- AMP fallout
 error "generalize mapM"  = mapM  ==> traverse
 error "generalize mapM_" = mapM_ ==> traverse_
