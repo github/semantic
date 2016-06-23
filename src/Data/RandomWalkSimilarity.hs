@@ -65,7 +65,7 @@ featureVector d bag = sumVectors $ unitDVector . hash <$> bag
 vmagnitude :: Vector.Vector Double -> Double
 vmagnitude vec = sqrtDouble (Vector.sum (fmap (** 2) vec))
 
-nearestNeighbour :: Hashable label => [(Vector.Vector Double, Cofree (Syntax leaf) label)] -> Vector.Vector Double -> Maybe (Cofree (Syntax leaf) label)
+nearestNeighbour :: [(Vector.Vector Double, a)] -> Vector.Vector Double -> Maybe a
 nearestNeighbour [] _ = Nothing
 nearestNeighbour children v = Just . snd $ minimumBy (compare `on` distance v . fst) children
   where distance a b = vmagnitude $ Vector.zipWith (-) a b
