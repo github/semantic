@@ -30,12 +30,11 @@ rws compare getLabel as bs
         featurize = featureVector d . pqGrams p q getLabel &&& identity
         findNearestNeighbourTo kv@(_, v) = do
           fas <- get
-          fromMaybe (pure $! delete v) $ do
-            let (_, x) = KdTree.nearest fas kv
-            y <- compare v x
-            pure $! do
+          case compare v (snd (KdTree.nearest fas kv)) of
+            Just y -> do
               put fas
               pure y
+            _ -> pure $! delete v
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
