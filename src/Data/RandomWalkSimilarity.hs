@@ -6,6 +6,7 @@ import Control.Monad.State
 import qualified Data.DList as DList
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
+import qualified Data.KdTree.Static as KdTree
 import qualified Data.OrderedMap as Map
 import qualified Data.Vector as Vector
 import Diff
@@ -20,20 +21,20 @@ rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
-  | otherwise = (`evalState` fbs) $ traverse findNearestNeighbourTo fas
+  | otherwise = (`evalState` fas) $ traverse findNearestNeighbourTo (featurize <$> bs)
   where insert = pure . Insert
         delete = pure . Delete
         (p, q) = (2, 2)
         d = 15
-        (fas, fbs) = (featurize <$> as, featurize <$> bs)
+        fas = KdTree.build (Vector.toList . fst) (featurize <$> as)
         featurize = featureVector d . pqGrams p q getLabel &&& identity
-        findNearestNeighbourTo (k, v) = do
-          fbs <- get
+        findNearestNeighbourTo kv@(_, v) = do
+          fas <- get
           fromMaybe (pure $! delete v) $ do
-            x <- nearestNeighbour fbs k
+            let (_, x) = KdTree.nearest fas kv
             y <- compare v x
             pure $! do
-              put fbs
+              put fas
               pure y
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
