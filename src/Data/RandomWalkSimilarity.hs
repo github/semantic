@@ -8,6 +8,7 @@ import Data.Functor.Foldable as Foldable
 import Data.Hashable
 import qualified Data.KdTree.Static as KdTree
 import qualified Data.OrderedMap as Map
+import qualified Data.Set as Set
 import qualified Data.Vector as Vector
 import Diff
 import Patch
@@ -21,7 +22,7 @@ rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
-  | otherwise = (`evalState` fas) $ traverse findNearestNeighbourTo (featurize <$> bs)
+  | otherwise = (`evalState` Set.empty) $ traverse findNearestNeighbourTo (featurize <$> bs)
   where insert = pure . Insert
         delete = pure . Delete
         (p, q) = (2, 2)
@@ -29,12 +30,15 @@ rws compare getLabel as bs
         fas = KdTree.build (Vector.toList . fst) (featurize <$> as)
         featurize = featureVector d . pqGrams p q getLabel &&& identity
         findNearestNeighbourTo kv@(_, v) = do
-          fas <- get
-          case compare v (snd (KdTree.nearest fas kv)) of
-            Just y -> do
-              put fas
-              pure y
-            _ -> pure $! delete v
+          mapped <- get
+          let (k, nearest) = (KdTree.nearest fas kv)
+          if k `Set.member` mapped
+            then pure $! insert v
+            else case compare v nearest of
+              Just y -> do
+                put (Set.insert k mapped)
+                pure y
+              _ -> pure $! delete v
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
