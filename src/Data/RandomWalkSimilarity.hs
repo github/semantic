@@ -29,13 +29,12 @@ rws compare getLabel as bs
         featurize = featureVector d . pqGrams p q getLabel &&& identity
         diffAgainstNearestNeighbour (k, v) = do
           fbs <- get
-          case nearestNeighbour fbs k of
-            Just x -> case compare v x of
-              Just y -> do
-                put fbs
-                pure y
-              _ -> pure $! delete v
-            _ -> pure $! delete v
+          fromMaybe (pure $! delete v) $ do
+            x <- nearestNeighbour fbs k
+            y <- compare v x
+            pure $! do
+              put fbs
+              pure y
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
