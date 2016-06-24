@@ -20,14 +20,14 @@ rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
-  | otherwise = (`evalState` fbs) $ traverse diffAgainstNearestNeighbour fas
+  | otherwise = (`evalState` fbs) $ traverse findNearestNeighbourTo fas
   where insert = pure . Insert
         delete = pure . Delete
         (p, q) = (2, 2)
         d = 15
         (fas, fbs) = (featurize <$> as, featurize <$> bs)
         featurize = featureVector d . pqGrams p q getLabel &&& identity
-        diffAgainstNearestNeighbour (k, v) = do
+        findNearestNeighbourTo (k, v) = do
           fbs <- get
           fromMaybe (pure $! delete v) $ do
             x <- nearestNeighbour fbs k
