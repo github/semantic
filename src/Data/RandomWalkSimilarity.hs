@@ -34,7 +34,7 @@ rws compare getLabel as bs
           let (k, nearest) = (KdTree.nearest fas kv)
           if k `Set.member` mapped
             then pure $! insert v
-            else case compare v nearest of
+            else case compare nearest v of
               Just y -> do
                 put (Set.insert k mapped)
                 pure y
