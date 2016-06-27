@@ -2,9 +2,13 @@
 module Data.RandomWalkSimilarity.Spec where
 
 import Data.DList as DList hiding (toList)
+import Data.Functor.Both
 import Data.RandomWalkSimilarity
 import Data.RandomWalkSimilarity.Arbitrary ()
+import Diff
+import Patch
 import Prologue
+import Syntax
 import Term
 import Term.Arbitrary
 import Test.Hspec
@@ -21,5 +25,12 @@ spec = parallel $ do
       \ (term, p, q) -> pqGrams p q identity (toTerm term :: Term Text Text) `shouldSatisfy` all ((== q) . length . base)
 
   describe "featureVector" $ do
-    prop "produces a vector of the specified dimension" . forAll (arbitrary `suchThat` ((> 0) . snd)) $
+    prop "produces a vector of the specified dimension" . forAll (arbitrary `suchThat` ((> 0) . Prologue.snd)) $
       \ (grams, d) -> length (featureVector d (fromList (grams :: [Gram Text]))) `shouldBe` d
+
+  describe "rws" $ do
+    prop "produces correct diffs" $
+      \ as bs -> let termA = cofree ("" :< Indexed (toTerm <$> as))
+                     termB = cofree ("" :< Indexed (toTerm <$> bs))
+                     diff = free (Free (both "" "" :< Indexed (rws ((Just .) . (pure .) . Replace) identity (toTerm <$> as) (toTerm <$> bs) :: [Diff Text Text]))) in
+        (beforeTerm diff, afterTerm diff) `shouldBe` (Just termA, Just termB)
