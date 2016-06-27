@@ -24,6 +24,12 @@ diffSum patchCost diff = sum $ fmap patchCost diff
 diffCost :: Diff a annotation -> Integer
 diffCost = diffSum $ patchSum termSize
 
+merge :: (Patch (Term leaf annotation) -> Term leaf annotation) -> Diff leaf annotation -> Term leaf annotation
+merge transform = cata algebra . fmap transform
+  where algebra :: FreeF (CofreeF (Syntax leaf) (Both annotation)) (Term leaf annotation) (Term leaf annotation) -> Term leaf annotation
+        algebra (Pure p) = p
+        algebra (Free (annotations :< syntax)) = cofree (Both.fst annotations :< syntax)
+
 beforeTerm :: Diff leaf annotation -> Maybe (Term leaf annotation)
 beforeTerm = cata algebra
   where algebra :: FreeF (CofreeF (Syntax leaf) (Both annotation)) (Patch (Term leaf annotation)) (Maybe (Term leaf annotation)) -> Maybe (Term leaf annotation)
