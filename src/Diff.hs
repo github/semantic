@@ -30,6 +30,16 @@ merge transform = cata algebra . fmap transform
         algebra (Pure p) = p
         algebra (Free (annotations :< syntax)) = cofree (Both.fst annotations :< syntax)
 
+mergeMaybe :: (Patch (Term leaf annotation) -> Maybe (Term leaf annotation)) -> Diff leaf annotation -> Maybe (Term leaf annotation)
+mergeMaybe transform = cata algebra . fmap transform
+  where algebra :: FreeF (CofreeF (Syntax leaf) (Both annotation)) (Maybe (Term leaf annotation)) (Maybe (Term leaf annotation)) -> Maybe (Term leaf annotation)
+        algebra (Pure p) = p
+        algebra (Free (annotations :< syntax)) = Just . cofree $ Both.fst annotations :< case syntax of
+          Leaf s -> Leaf s
+          Indexed i -> Indexed (catMaybes i)
+          Fixed i -> Fixed (catMaybes i)
+          Keyed i -> Keyed (Map.fromList (Map.toList i >>= (\ (k, v) -> maybe [] (pure . (,) k) v)))
+
 beforeTerm :: Diff leaf annotation -> Maybe (Term leaf annotation)
 beforeTerm = cata algebra
   where algebra :: FreeF (CofreeF (Syntax leaf) (Both annotation)) (Patch (Term leaf annotation)) (Maybe (Term leaf annotation)) -> Maybe (Term leaf annotation)
