@@ -24,8 +24,10 @@ spec = parallel $ do
     \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category])) in
       diffCost (diffTerms (free . Free) (==) diffCost term term) `shouldBe` 0
 
-  describe "mergeMaybe" $ do
-    it "is symmetrical" $ pending
+  describe "beforeTerm" $ do
+    prop "recovers the before term" $
+      \ a b -> let diff = diffTerms (free . Free) (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Category]))) in
+        beforeTerm diff `shouldBe` Just (toTerm a)
 
   describe "ArbitraryDiff" $ do
     prop "generates diffs of a specific size" . forAll ((arbitrary >>= \ n -> (,) n <$> diffOfSize n) `suchThat` ((> 0) . fst)) $
