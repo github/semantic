@@ -42,3 +42,6 @@ mergeMaybe transform = cata algebra . fmap transform
 
 beforeTerm :: Diff leaf annotation -> Maybe (Term leaf annotation)
 beforeTerm = mergeMaybe before
+
+afterTerm :: Diff leaf annotation -> Maybe (Term leaf annotation)
+afterTerm = mergeMaybe after
