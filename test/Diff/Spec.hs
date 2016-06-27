@@ -18,11 +18,11 @@ spec :: Spec
 spec = parallel $ do
   prop "equality is reflexive" $
     \ a b -> let diff = diffTerms (free . Free) (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Category]))) in
-      diff == diff
+      diff `shouldBe` diff
 
   prop "equal terms produce identity diffs" $
     \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category])) in
-      diffCost (diffTerms (free . Free) (==) diffCost term term) == 0
+      diffCost (diffTerms (free . Free) (==) diffCost term term) `shouldBe` 0
 
   describe "mergeMaybe" $ do
     it "is symmetrical" $ pending
