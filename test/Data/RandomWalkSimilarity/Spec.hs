@@ -30,7 +30,7 @@ spec = parallel $ do
 
   describe "rws" $ do
     prop "produces correct diffs" $
-      \ as bs -> let termA = cofree ("" :< Indexed (toTerm <$> as))
-                     termB = cofree ("" :< Indexed (toTerm <$> bs))
-                     diff = free (Free (both "" "" :< Indexed (rws ((Just .) . (pure .) . Replace) identity (toTerm <$> as) (toTerm <$> bs) :: [Diff Text Text]))) in
-        (beforeTerm diff, afterTerm diff) `shouldBe` (Just termA, Just termB)
+      \ as bs -> let tas = toTerm <$> as
+                     tbs = toTerm <$> bs
+                     diff = free (Free (both "" "" :< Indexed (rws ((Just .) . (pure .) . Replace) identity tas tbs :: [Diff Text Text]))) in
+        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ("" :< Indexed tas)), Just (cofree ("" :< Indexed tbs)))
