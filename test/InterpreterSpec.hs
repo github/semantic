@@ -1,12 +1,12 @@
 module InterpreterSpec where
 
-import Prologue
+import Category
 import Diff
 import Data.Record
 import Interpreter
-import Syntax
 import Patch
-import Category
+import Prologue
+import Syntax
 import Test.Hspec
 
 spec :: Spec
