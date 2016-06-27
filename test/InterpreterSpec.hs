@@ -13,11 +13,9 @@ import Test.Hspec
 
 spec :: Spec
 spec = parallel $
-  describe "interpret" $
+  describe "interpret" $ do
     it "returns a replacement when comparing two unicode equivalent terms" $
-      I.diffTerms (free . Free) ((==) `on` extract) diffCost (cofree ((range .: StringLiteral .: 0 .: 0 .: RNil) :< Leaf "t\776")) (cofree ((range2 .: StringLiteral .: 0 .: 0 .: RNil) :< Leaf "\7831")) `shouldBe`
-      free (Pure (Replace (cofree ((range .: StringLiteral .: 0 .: 0 .: RNil) :< Leaf "t\776")) (cofree ((range2 .: StringLiteral .: 0 .: 0 .: RNil) :< Leaf "\7831"))))
-
-    where
-      range = Range 0 2
-      range2 = Range 0 1
+      let infoA = Range 0 2 .: StringLiteral .: 0 .: 0 .: RNil
+          infoB = Range 0 1 .: StringLiteral .: 0 .: 0 .: RNil in
+          I.diffTerms (free . Free) ((==) `on` extract) diffCost (cofree (infoA :< Leaf "t\776")) (cofree (infoB :< Leaf "\7831")) `shouldBe`
+          free (Pure (Replace (cofree (infoA :< Leaf "t\776")) (cofree (infoB :< Leaf "\7831"))))
