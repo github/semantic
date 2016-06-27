@@ -3,7 +3,8 @@ module Diff where
 
 import Prologue
 import Data.Functor.Foldable as Foldable
-import Data.Functor.Both
+import Data.Functor.Both as Both
+import qualified Data.OrderedMap as Map
 import Patch
 import Syntax
 import Term
@@ -22,3 +23,13 @@ diffSum patchCost diff = sum $ fmap patchCost diff
 -- | The sum of the node count of the diff’s patches.
 diffCost :: Diff a annotation -> Integer
 diffCost = diffSum $ patchSum termSize
+
+beforeTerm :: Diff leaf annotation -> Maybe (Term leaf annotation)
+beforeTerm = cata algebra
+  where algebra :: FreeF (CofreeF (Syntax leaf) (Both annotation)) (Patch (Term leaf annotation)) (Maybe (Term leaf annotation)) -> Maybe (Term leaf annotation)
+        algebra (Pure patch) = before patch
+        algebra (Free (annotations :< syntax)) = Just . cofree $ Both.fst annotations :< case syntax of
+          Leaf s -> Leaf s
+          Indexed i -> Indexed (catMaybes i)
+          Fixed i -> Fixed (catMaybes i)
+          Keyed i -> Keyed (Map.fromList (Map.toList i >>= (\ (k, v) -> maybe [] (pure . (,) k) v)))
