@@ -29,6 +29,11 @@ spec = parallel $ do
       \ a b -> let diff = diffTerms (free . Free) (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Category]))) in
         beforeTerm diff `shouldBe` Just (toTerm a)
 
+  describe "afterTerm" $ do
+    prop "recovers the after term" $
+      \ a b -> let diff = diffTerms (free . Free) (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Category]))) in
+        afterTerm diff `shouldBe` Just (toTerm b)
+
   describe "ArbitraryDiff" $ do
     prop "generates diffs of a specific size" . forAll ((arbitrary >>= \ n -> (,) n <$> diffOfSize n) `suchThat` ((> 0) . fst)) $
       \ (n, diff) -> arbitraryDiffSize (diff :: ArbitraryDiff Text ()) `shouldBe` n
