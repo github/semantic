@@ -10,7 +10,7 @@ import Term
 import Term.Arbitrary
 import Test.Hspec
 import Test.Hspec.QuickCheck
-import Test.QuickCheck hiding (Fixed)
+import Test.QuickCheck
 
 spec :: Spec
 spec = parallel $ do
