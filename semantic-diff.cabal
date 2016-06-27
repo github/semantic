@@ -102,7 +102,6 @@ test-suite semantic-diff-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       AlignmentSpec
-                     , ArbitraryTerm
                      , CorpusSpec
                      , Data.RandomWalkSimilarity.Spec
                      , Diff.Spec
