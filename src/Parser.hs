@@ -83,11 +83,11 @@ termConstructor source info = cofree . construct
     construct children | Case == category info, [expr, body] <- children =
       withDefaultInfo $ S.Case expr body
 
-    construct children | Object == category info = withDefaultInfo . S.Object $ toTuple <$> children
+    construct children | Object == category info = withDefaultInfo . S.Object $ toTuple =<< children
       where
-        toTuple :: Term Text Info -> (Term Text Info, Term Text Info)
-        toTuple child | S.Indexed [key,value] <- unwrap child = (key, value)
-
+        toTuple :: Term Text Info -> [(Term Text Info, Term Text Info)]
+        toTuple child | S.Indexed [key,value] <- unwrap child = [(key, value)]
+        toTuple child | S.Fixed [key,value] <- unwrap child = [(key, value)]
 
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
     construct children | isKeyed (category info) = withDefaultInfo . S.Keyed . Map.fromList $ assignKey <$> children

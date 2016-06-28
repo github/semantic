@@ -28,7 +28,7 @@ treeSitterParser language grammar contents = do
 -- Given a language and a node name, return the correct categories.
 categoriesForLanguage :: Language -> Text -> Category
 categoriesForLanguage language name = case (language, name) of
-  (JavaScript, "object") -> DictionaryLiteral
+  (JavaScript, "object") -> Object
   (JavaScript, "rel_op") -> BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
   (JavaScript, "this_expression") -> Identifier
   (JavaScript, "null") -> Identifier
@@ -39,7 +39,7 @@ categoriesForLanguage language name = case (language, name) of
   (JavaScript, "type_op") -> Operator
   (JavaScript, "void_op") -> Operator
 
-  (Ruby, "hash") -> DictionaryLiteral
+  (Ruby, "hash") -> Object
   _ -> defaultCategoryForNodeName name
 
 -- | Given a node name from TreeSitter, return the correct categories.

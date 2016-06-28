@@ -2,7 +2,7 @@
 
 module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..)) where
 
-import Prologue hiding (fst, snd, intercalate)
+import Prologue hiding (snd, intercalate)
 import Diff
 import Info (Info, category)
 import Patch
@@ -51,6 +51,7 @@ toTermName term = case unwrap term of
   Syntax.Ternary expr _ -> toTermName expr
   Syntax.MathAssignment id _ -> toTermName id
   Syntax.Operator syntaxes -> mconcat $ toTermName <$> syntaxes
+  Syntax.Object kvs -> mconcat $ toTermName . Prologue.fst <$> kvs
 
 class HasCategory a where
   toCategoryName :: a -> Text
@@ -93,6 +94,7 @@ instance HasCategory Category where
     StringLiteral -> "string"
     SymbolLiteral -> "symbol"
     TemplateString -> "template string"
+    Category.Object -> "object"
 
 instance HasCategory leaf => HasCategory (Term leaf Info) where
   toCategoryName = toCategoryName . category . extract
@@ -163,6 +165,7 @@ termToDiffInfo term = case runCofree term of
   varAssignment@(info :< Syntax.VarAssignment{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree varAssignment) ]
   switch@(info :< Syntax.Switch{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree switch) ]
   caseExpr@(info :< Syntax.Case{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree caseExpr) ]
+  object@(info :< Syntax.Object{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree object) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
