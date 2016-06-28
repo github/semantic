@@ -1,17 +1,27 @@
-# Semantic diff roadmap
+# Roadmap
 
-## Q1 2016
+## Things we are currently doing:
 
-1. [Staff ship & limited beta of semantic diffing on .com](https://github.com/github/semantic-diff/milestones/Staff%20Ship). This will be an opt-in, limited release of semantic diffs for a very small set of languages. UI in general will be unchanged; we’ll simply start showing better diffs for the languages in question. The goal is to ease ourselves into deployment of the system, and benchmark under real loads.
+1. Diff summaries for C & JavaScript.
+2. Semantic diffs on .com for C & JavaScript.
 
-2. [Semantic diffing on .com](https://github.com/github/semantic-diff/milestones/Dot%20Calm). General release of semantic diffs for the supported languages.
+## Follow-up things:
 
+1. Add support for more languages: Ruby, etc.
+2. Detecting & rendering moves.
+3. Merging.
+4. Refining the diff summaries we produce.
 
-## Q2–Q4 2016
+## Things we would like to do:
 
-We will discuss future milestones at the **@github/network-intelligence** minisummit mid-Q1 2016, and document them here at that point.
- 
+1. Interactively refining diffs.
+2. Filtering diffs.
+3. Diff table of contents.
+4. Jump to symbol definition.
+5. Abstract binding trees &c.
 
-## Ongoing
+## Things we would like to do modulo interest/support from other teams:
 
-- Creation, curation, and cultivation of grammars for semantic diffs.
+1. APIs/tooling for data science & engineering teams.
+2. Collect data on our heuristics &c. and refine them via e.g. ML.
+3. Diffs as a service.
