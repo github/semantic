@@ -40,7 +40,7 @@ rws compare getLabel as bs
                 put (Set.insert k mapped)
                 pure y
               _ -> pure $! delete v
-        deleteRemaining diff mapped = diff <> (delete . snd <$> filter ((`Set.member` mapped) . fst) fas)
+        deleteRemaining diff mapped = diff <> (delete . snd <$> filter (not . (`Set.member` mapped) . fst) fas)
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
