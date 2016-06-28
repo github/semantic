@@ -38,10 +38,7 @@ rws compare getLabel as bs
             then pure $! insert v
             else do
               put (Set.insert k mapped)
-              case compare nearest v of
-                Just y -> do
-                  pure y
-                _ -> pure $! replace nearest v
+              pure $! fromMaybe (replace nearest v) (compare nearest v)
         deleteRemaining diff mapped = diff <> (delete . snd <$> filter (not . (`Set.member` mapped) . fst) fas)
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
