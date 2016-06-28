@@ -29,8 +29,9 @@ spec = parallel $ do
       \ (grams, d) -> length (featureVector d (fromList (grams :: [Gram Text]))) `shouldBe` d
 
   describe "rws" $ do
+    let compare a b = if extract a == extract b then Just (pure (Replace a b)) else Nothing
     prop "produces correct diffs" $
       \ as bs -> let tas = toTerm <$> as
                      tbs = toTerm <$> bs
-                     diff = free (Free (pure Program :< Indexed (rws ((Just .) . (pure .) . Replace) identity tas tbs :: [Diff Text Category]))) in
+                     diff = free (Free (pure Program :< Indexed (rws compare identity tas tbs :: [Diff Text Category]))) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree (Program :< Indexed tas)), Just (cofree (Program :< Indexed tbs)))
