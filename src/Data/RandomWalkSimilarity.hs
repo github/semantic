@@ -25,6 +25,7 @@ rws compare getLabel as bs
   | otherwise = uncurry deleteRemaining . (`runState` Set.empty) $ traverse findNearestNeighbourTo (featurize <$> bs)
   where insert = pure . Insert
         delete = pure . Delete
+        replace = (pure .) . Replace
         (p, q) = (2, 2)
         d = 15
         fas = featurize <$> as
@@ -35,11 +36,12 @@ rws compare getLabel as bs
           let (k, nearest) = KdTree.nearest kdas kv
           if k `Set.member` mapped
             then pure $! insert v
-            else case compare nearest v of
-              Just y -> do
-                put (Set.insert k mapped)
-                pure y
-              _ -> pure $! delete v
+            else do
+              put (Set.insert k mapped)
+              case compare nearest v of
+                Just y -> do
+                  pure y
+                _ -> pure $! replace nearest v
         deleteRemaining diff mapped = diff <> (delete . snd <$> filter (not . (`Set.member` mapped) . fst) fas)
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
