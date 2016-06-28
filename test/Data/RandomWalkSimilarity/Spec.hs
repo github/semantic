@@ -1,8 +1,8 @@
 {-# LANGUAGE DataKinds #-}
 module Data.RandomWalkSimilarity.Spec where
 
+import Category
 import Data.DList as DList hiding (toList)
-import Data.Functor.Both
 import Data.RandomWalkSimilarity
 import Data.RandomWalkSimilarity.Arbitrary ()
 import Diff
@@ -32,5 +32,5 @@ spec = parallel $ do
     prop "produces correct diffs" $
       \ as bs -> let tas = toTerm <$> as
                      tbs = toTerm <$> bs
-                     diff = free (Free (both "" "" :< Indexed (rws ((Just .) . (pure .) . Replace) identity tas tbs :: [Diff Text Text]))) in
-        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ("" :< Indexed tas)), Just (cofree ("" :< Indexed tbs)))
+                     diff = free (Free (pure Program :< Indexed (rws ((Just .) . (pure .) . Replace) identity tas tbs :: [Diff Text Category]))) in
+        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree (Program :< Indexed tas)), Just (cofree (Program :< Indexed tbs)))
