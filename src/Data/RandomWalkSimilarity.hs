@@ -32,7 +32,7 @@ rws compare getLabel as bs
         featurize = featureVector d . pqGrams p q getLabel &&& identity
         findNearestNeighbourTo kv@(_, v) = do
           mapped <- get
-          let (k, nearest) = (KdTree.nearest kdas kv)
+          let (k, nearest) = KdTree.nearest kdas kv
           if k `Set.member` mapped
             then pure $! insert v
             else case compare nearest v of
