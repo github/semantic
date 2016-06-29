@@ -65,6 +65,7 @@ styleName category = "category-" <> case category of
   Category.SubscriptAccess -> "subscript_access"
   Category.Ternary -> "ternary"
   Category.Operator -> "operator"
+  Category.Object -> "object"
   Other string -> string
 
 -- | Pick the class name for a split patch.
