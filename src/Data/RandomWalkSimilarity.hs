@@ -36,11 +36,11 @@ rws compare getLabel as bs
           mapped <- get
           let ((k, nearest), j) = KdTree.nearest kdas kv
           if k `Set.member` mapped
-            then pure (j, insert v)
+            then pure (insert v, j)
             else do
               put (Set.insert k mapped)
-              pure $! maybe (j, replace nearest v) ((,) j) (compare nearest v)
-        deleteRemaining diff mapped = fmap snd diff <> (delete . snd . fst <$> filter (not . (`Set.member` mapped) . fst . fst) fas)
+              pure $! maybe (replace nearest v, j) (flip (,) j) (compare nearest v)
+        deleteRemaining diff mapped = fmap fst diff <> (delete . snd . fst <$> filter (not . (`Set.member` mapped) . fst . fst) fas)
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
