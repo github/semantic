@@ -5,6 +5,7 @@ import Category
 import Data.DList as DList hiding (toList)
 import Data.RandomWalkSimilarity
 import Data.RandomWalkSimilarity.Arbitrary ()
+import qualified Data.Set as Set
 import Diff
 import Patch
 import Prologue
@@ -30,10 +31,11 @@ spec = parallel $ do
 
   describe "rws" $ do
     let compare a b = if extract a == extract b then Just (pure (Replace a b)) else Nothing
-    let enumerate = zipWith (\ i t -> fmap ((,) i) t) [0..]
-    let sort term = let annotation :< (Indexed children) = runCofree term in cofree (annotation :< Indexed (sortOn (fst . extract) children))
     prop "produces correct diffs" $
-      \ as bs -> let tas = enumerate $ toTerm <$> as
-                     tbs = enumerate $ toTerm <$> bs
-                     diff = free (Free (pure (0, Program) :< Indexed (rws compare snd tas tbs :: [Diff Text (Integer, Category)]))) in
-        (sort <$> beforeTerm diff, sort <$> afterTerm diff) `shouldBe` (Just (cofree ((0, Program) :< Indexed tas)), Just (cofree ((0, Program) :< Indexed tbs)))
+      \ as bs -> let tas = toTerm <$> as
+                     tbs = toTerm <$> bs
+                     diff = free (Free (pure Program :< Indexed (rws compare identity tas tbs :: [Diff Text Category]))) in
+        (childrenOf <$> beforeTerm diff, childrenOf <$> afterTerm diff) `shouldBe` (Just (Set.fromList tas), Just (Set.fromList tbs))
+
+childrenOf :: (Ord leaf, Ord annotation) => Term leaf annotation -> Set.Set (Term leaf annotation)
+childrenOf term = let Indexed children = unwrap term in Set.fromList children
