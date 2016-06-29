@@ -30,8 +30,10 @@ spec = parallel $ do
 
   describe "rws" $ do
     let compare a b = if extract a == extract b then Just (pure (Replace a b)) else Nothing
+    let enumerate = zipWith (\ i t -> fmap ((,) i) t) [0..]
+    let sort term = let annotation :< (Indexed children) = runCofree term in cofree (annotation :< Indexed (sortOn (fst . extract) children))
     prop "produces correct diffs" $
-      \ as bs -> let tas = toTerm <$> as
-                     tbs = toTerm <$> bs
-                     diff = free (Free (pure Program :< Indexed (rws compare identity tas tbs :: [Diff Text Category]))) in
-        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree (Program :< Indexed tas)), Just (cofree (Program :< Indexed tbs)))
+      \ as bs -> let tas = enumerate $ toTerm <$> as
+                     tbs = enumerate $ toTerm <$> bs
+                     diff = free (Free (pure (0, Program) :< Indexed (rws compare snd tas tbs :: [Diff Text (Integer, Category)]))) in
+        (sort <$> beforeTerm diff, sort <$> afterTerm diff) `shouldBe` (Just (cofree ((0, Program) :< Indexed tas)), Just (cofree ((0, Program) :< Indexed tbs)))
