@@ -22,25 +22,24 @@ rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
-  | otherwise = uncurry deleteRemaining . (`runState` Set.empty) $ traverse findNearestNeighbourTo fbs
+  | otherwise = uncurry deleteRemaining . (`runState` Set.empty) $ traverse findNearestNeighbourTo (featurize <$> bs)
   where insert = pure . Insert
         delete = pure . Delete
         replace = (pure .) . Replace
         (p, q) = (2, 2)
         d = 15
-        fas = zip (featurize <$> as) [0..]
-        fbs = zip (featurize <$> bs) [0..]
-        kdas = KdTree.build (Vector.toList . fst . fst) fas
+        fas = featurize <$> as
+        kdas = KdTree.build (Vector.toList . fst) fas
         featurize = featureVector d . pqGrams p q getLabel &&& identity
-        findNearestNeighbourTo kv@((_, v), i) = do
+        findNearestNeighbourTo kv@(_, v) = do
           mapped <- get
-          let ((k, nearest), j) = KdTree.nearest kdas kv
+          let (k, nearest) = KdTree.nearest kdas kv
           if k `Set.member` mapped
             then pure $! insert v
             else do
               put (Set.insert k mapped)
               pure $! fromMaybe (replace nearest v) (compare nearest v)
-        deleteRemaining diff mapped = diff <> (delete . snd . fst <$> filter (not . (`Set.member` mapped) . fst . fst) fas)
+        deleteRemaining diff mapped = diff <> (delete . snd <$> filter (not . (`Set.member` mapped) . fst) fas)
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
