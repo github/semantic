@@ -39,7 +39,8 @@ rws compare getLabel as bs
             else do
               put (Set.insert k mapped)
               pure $! maybe (replace nearest v, j) (flip (,) j) (compare nearest v)
-        deleteRemaining diff mapped = diff <> (first (delete . snd) <$> filter (not . (`Set.member` mapped) . fst . fst) fas)
+        deleteRemaining diff mapped = diff <> deletions mapped
+        deletions mapped = first (delete . snd) <$> filter (not . (`Set.member` mapped) . fst . fst) fas
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
