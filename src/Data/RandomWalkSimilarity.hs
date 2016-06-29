@@ -22,7 +22,7 @@ rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
-  | otherwise = fmap fst . uncurry deleteRemaining . (`runState` Set.empty) $ traverse findNearestNeighbourTo fbs
+  | otherwise = uncurry deleteRemaining . (`runState` Set.empty) $ traverse findNearestNeighbourTo fbs
   where insert = pure . Insert
         delete = pure . Delete
         replace = (pure .) . Replace
@@ -40,7 +40,7 @@ rws compare getLabel as bs
             else do
               put (Set.insert k mapped)
               pure $! maybe (replace nearest v, j) (flip (,) j) (compare nearest v)
-        deleteRemaining diff mapped = diff <> (first (delete . snd) <$> filter (not . (`Set.member` mapped) . fst . fst) fas)
+        deleteRemaining diff mapped = fmap fst diff <> (delete . snd . fst <$> filter (not . (`Set.member` mapped) . fst . fst) fas)
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
