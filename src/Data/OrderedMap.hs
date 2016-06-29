@@ -18,7 +18,7 @@ import Prologue hiding (toList, empty)
 
 -- | An ordered map of keys and values.
 newtype OrderedMap key value = OrderedMap { toList :: [(key, value)] }
-  deriving (Show, Eq, Functor, Foldable, Traversable)
+  deriving (Eq, Foldable, Functor, Ord, Show, Traversable)
 
 -- | Construct an ordered map from a list of pairs of keys and values.
 fromList :: [(key, value)] -> OrderedMap key value
