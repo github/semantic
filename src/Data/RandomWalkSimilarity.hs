@@ -28,10 +28,10 @@ rws compare getLabel as bs
         replace = (pure .) . Replace
         (p, q) = (2, 2)
         d = 15
-        fas = zip (featurize <$> as) [0..]
-        fbs = zip (featurize <$> bs) [0..]
+        fas = featurize as
+        fbs = featurize bs
         kdas = KdTree.build (Vector.toList . fst . fst) fas
-        featurize = featureVector d . pqGrams p q getLabel &&& identity
+        featurize a = zip ((featureVector d . pqGrams p q getLabel &&& identity) <$> a) ([0..] :: [Integer])
         findNearestNeighbourTo kv@((_, v), i) = do
           mapped <- get
           let ((k, nearest), j) = KdTree.nearest kdas kv
