@@ -26,8 +26,7 @@ rws compare getLabel as bs
   where insert = pure . Insert
         delete = pure . Delete
         replace = (pure .) . Replace
-        (p, q) = (2, 2)
-        d = 15
+        (p, q, d) = (2, 2, 15)
         fas = featurize <$> as
         kdas = KdTree.build (Vector.toList . fst) fas
         featurize = featureVector d . pqGrams p q getLabel &&& identity
