@@ -31,7 +31,7 @@ rws compare getLabel as bs
         fbs = featurize bs
         kdas = KdTree.build (Vector.toList . fst . fst) fas
         featurize a = zip ((featureVector d . pqGrams p q getLabel &&& identity) <$> a) ([0..] :: [Integer])
-        findNearestNeighbourTo kv@((_, v), _) = do
+        findNearestNeighbourTo kv@((_, v), i) = do
           mapped <- get
           let ((k, nearest), j) = KdTree.nearest kdas kv
           if k `Set.member` mapped
