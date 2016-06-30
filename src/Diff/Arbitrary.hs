@@ -13,21 +13,24 @@ import Prologue
 import Term.Arbitrary
 import Test.QuickCheck hiding (Fixed)
 
-newtype ArbitraryDiff leaf annotation = ArbitraryDiff (FreeF (CofreeF (Syntax leaf) (Join (,) annotation)) (Patch (ArbitraryTerm leaf annotation)) (ArbitraryDiff leaf annotation))
+data ArbitraryDiff leaf annotation
+  = ArbitraryFree (Join (,) annotation) (Syntax leaf (ArbitraryDiff leaf annotation))
+  | ArbitraryPure (Patch (ArbitraryTerm leaf annotation))
   deriving (Show, Eq, Generic)
 
 unArbitraryDiff :: ArbitraryDiff leaf annotation -> FreeF (CofreeF (Syntax leaf) (Join (,) annotation)) (Patch (ArbitraryTerm leaf annotation)) (ArbitraryDiff leaf annotation)
-unArbitraryDiff (ArbitraryDiff a) = a
+unArbitraryDiff (ArbitraryFree a s) = Free (a :< s)
+unArbitraryDiff (ArbitraryPure p) = Pure p
 
 toDiff :: ArbitraryDiff leaf annotation -> Diff leaf annotation
 toDiff = fmap (fmap toTerm) . unfold unArbitraryDiff
 
 diffOfSize :: (Arbitrary leaf, Arbitrary annotation) => Int -> Gen (ArbitraryDiff leaf annotation)
 diffOfSize n
-  | n <= 0 = (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize diffOfSize n
+  | n <= 0 = ArbitraryFree <$> arbitrary <*> syntaxOfSize diffOfSize n
   | otherwise = oneof
-    [ (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize diffOfSize n
-    , ArbitraryDiff . Pure <$> patchOfSize n ]
+    [ ArbitraryFree <$> arbitrary <*> syntaxOfSize diffOfSize n
+    , ArbitraryPure <$> patchOfSize n ]
   where patchOfSize 1 = oneof [ Insert <$> termOfSize 1
                               , Delete <$> termOfSize 1 ]
         patchOfSize n = do
