@@ -22,12 +22,13 @@ rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
-  | otherwise = uncurry deleteRemaining . (`runState` []) $ traverse findNearestNeighbourTo (featurize <$> bs)
+  | otherwise = uncurry deleteRemaining . (`runState` []) $ traverse findNearestNeighbourTo fbs
   where insert = pure . Insert
         delete = pure . Delete
         replace = (pure .) . Replace
         (p, q, d) = (2, 2, 15)
         fas = featurize <$> as
+        fbs = featurize <$> bs
         kdas = KdTree.build (Vector.toList . fst) fas
         featurize = featureVector d . pqGrams p q getLabel &&& identity
         findNearestNeighbourTo kv@(_, v) = do
