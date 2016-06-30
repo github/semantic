@@ -13,8 +13,11 @@ import Prologue
 import Term.Arbitrary
 import Test.QuickCheck hiding (Fixed)
 
-newtype ArbitraryDiff leaf annotation = ArbitraryDiff { unArbitraryDiff :: FreeF (CofreeF (Syntax leaf) (Join (,) annotation)) (Patch (ArbitraryTerm leaf annotation)) (ArbitraryDiff leaf annotation) }
+newtype ArbitraryDiff leaf annotation = ArbitraryDiff (FreeF (CofreeF (Syntax leaf) (Join (,) annotation)) (Patch (ArbitraryTerm leaf annotation)) (ArbitraryDiff leaf annotation))
   deriving (Show, Eq, Generic)
+
+unArbitraryDiff :: ArbitraryDiff leaf annotation -> FreeF (CofreeF (Syntax leaf) (Join (,) annotation)) (Patch (ArbitraryTerm leaf annotation)) (ArbitraryDiff leaf annotation)
+unArbitraryDiff (ArbitraryDiff a) = a
 
 toDiff :: ArbitraryDiff leaf annotation -> Diff leaf annotation
 toDiff = fmap (fmap toTerm) . unfold unArbitraryDiff
