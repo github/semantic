@@ -50,7 +50,7 @@ serialize gram = stem gram <> base gram
 pqGrams :: Int -> Int -> (annotation -> label) -> Cofree (Syntax leaf) annotation -> Bag (Gram label)
 pqGrams p q getLabel = cata merge . setRootBase . setRootStem . hylo go project
   where go (annotation :< functor) = cofree (Gram [] [ Just (getLabel annotation) ] :< (assignParent (Just (getLabel annotation)) p <$> functor))
-        merge (head :< tail) = DList.singleton head <> Prologue.fold tail
+        merge (head :< tail) = DList.cons head (Prologue.fold tail)
         assignParent parentLabel n tree
           | n > 0 = let gram :< functor = runCofree tree in cofree $ prependParent parentLabel gram :< assignSiblings (assignParent parentLabel (pred n) <$> functor)
           | otherwise = tree
