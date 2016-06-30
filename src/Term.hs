@@ -1,4 +1,5 @@
 {-# LANGUAGE TypeFamilies, TypeSynonymInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Term where
 
 import Prologue
