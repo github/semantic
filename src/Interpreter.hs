@@ -2,6 +2,7 @@ module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
 import Category
+import Data.Align
 import Data.Functor.Foldable
 import Data.Functor.Both
 import Data.List ((\\))
@@ -10,6 +11,7 @@ import Data.OrderedMap ((!))
 import qualified Data.OrderedMap as Map
 import Data.RandomWalkSimilarity
 import Data.Record
+import Data.These
 import Diff
 import Info
 import Operation
@@ -52,13 +54,15 @@ run construct comparable cost algorithm = case runFree algorithm of
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
     annotate = construct . (both annotation1 annotation2 :<)
 
-    recur (Indexed a') (Indexed b') | length a' == length b' = annotate . Indexed $ zipWith (diffTerms construct comparable cost) a' b'
-    recur (Fixed a') (Fixed b') | length a' == length b' = annotate . Fixed $ zipWith (diffTerms construct comparable cost) a' b'
+    recur (Indexed a') (Indexed b') = annotate . Indexed $ alignWith diffThese a' b'
+    recur (Fixed a') (Fixed b') = annotate . Fixed $ alignWith diffThese a' b'
     recur (Keyed a') (Keyed b') | Map.keys a' == bKeys = annotate . Keyed . Map.fromList . fmap repack $ bKeys where
       bKeys = Map.keys b'
       repack key = (key, interpretInBoth key a' b')
       interpretInBoth key x y = diffTerms construct comparable cost (x ! key) (y ! key)
     recur _ _ = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
+
+    diffThese = these (pure . Delete) (pure . Insert) (diffTerms construct comparable cost)
 
   Free (ByKey a b f) -> run construct comparable cost $ f byKey where
     byKey = Map.fromList $ toKeyValue <$> List.union aKeys bKeys
