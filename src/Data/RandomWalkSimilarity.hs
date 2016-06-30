@@ -17,7 +17,7 @@ import Syntax
 import Term
 import Test.QuickCheck.Random
 
-rws :: Hashable label => (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> (annotation -> label) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
+rws :: (Hashable label, Eq leaf, Eq annotation) => (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> (annotation -> label) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
 rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
@@ -33,12 +33,12 @@ rws compare getLabel as bs
         findNearestNeighbourTo kv@(_, v) = do
           mapped <- get
           let (k, nearest) = KdTree.nearest kdas kv
-          if k `List.elem` mapped
+          if (k, nearest) `List.elem` mapped
             then pure $! insert v
             else do
-              put (k : mapped)
+              put ((k, nearest) : mapped)
               pure $! fromMaybe (replace nearest v) (compare nearest v)
-        deleteRemaining diff mapped = diff <> (delete . snd <$> filter (not . (`List.elem` mapped) . fst) fas)
+        deleteRemaining diff mapped = diff <> (delete . snd <$> filter (not . (`List.elem` mapped)) fas)
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
