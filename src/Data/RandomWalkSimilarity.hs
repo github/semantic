@@ -17,7 +17,7 @@ import Syntax
 import Term
 import Test.QuickCheck.Random
 
-rws :: (Hashable label, Eq leaf, Eq annotation) => (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> (annotation -> label) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
+rws :: (Hashable label, Hashable leaf, Eq leaf, Ord annotation) => (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> (annotation -> label) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
 rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
@@ -47,9 +47,11 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 serialize :: Gram label -> [Maybe label]
 serialize gram = stem gram <> base gram
 
-pqGrams :: Int -> Int -> (annotation -> label) -> Cofree (Syntax leaf) annotation -> Bag (Gram label)
+pqGrams :: Int -> Int -> (annotation -> label) -> Cofree (Syntax leaf) annotation -> Bag (Gram (label, Maybe leaf))
 pqGrams p q getLabel = cata merge . setRootBase . setRootStem . hylo go project
-  where go (annotation :< functor) = cofree (Gram [] [ Just (getLabel annotation) ] :< (assignParent (Just (getLabel annotation)) p <$> functor))
+  where go (annotation :< functor) = cofree (Gram [] [ Just (getLabel annotation, leafValue functor) ] :< (assignParent (Just (getLabel annotation, leafValue functor)) p <$> functor))
+        leafValue (Leaf s) = Just s
+        leafValue _ = Nothing
         merge (head :< tail) = DList.cons head (Prologue.fold tail)
         assignParent parentLabel n tree
           | n > 0 = let gram :< functor = runCofree tree in cofree $ prependParent parentLabel gram :< assignSiblings (assignParent parentLabel (pred n) <$> functor)
