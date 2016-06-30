@@ -23,3 +23,8 @@ spec = parallel $ do
     prop "produces correct diffs" $
       \ a b -> let diff = diffTerms (free . Free) ((==) `on` extract) diffCost (toTerm a) (toTerm b) :: Diff Text (Record '[Category]) in
                    (beforeTerm diff, afterTerm diff) `shouldBe` (Just (toTerm a), Just (toTerm b))
+
+    prop "constructs zero-cost diffs of equal terms" $
+      \ a -> let term = toTerm a
+                 diff = diffTerms (free . Free) ((==) `on` extract) diffCost term term :: Diff Text (Record '[Category]) in
+                 diffCost diff `shouldBe` 0
