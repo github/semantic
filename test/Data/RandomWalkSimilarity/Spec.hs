@@ -38,4 +38,4 @@ spec = parallel $ do
         (childrenOf <$> beforeTerm diff, childrenOf <$> afterTerm diff) `shouldBe` (Just (Set.fromList tas), Just (Set.fromList tbs))
 
 childrenOf :: (Ord leaf, Ord annotation) => Term leaf annotation -> Set.Set (Term leaf annotation)
-childrenOf term = Set.fromList (toList (unwrap term))
+childrenOf = Set.fromList . toList . unwrap
