@@ -35,6 +35,7 @@ termOfSize n = (ArbitraryTerm .) . (:<) <$> arbitrary <*> syntaxOfSize n
 arbitraryTermSize :: ArbitraryTerm leaf annotation -> Int
 arbitraryTermSize = cata (succ . sum) . toTerm
 
+
 -- Instances
 
 type instance Base (ArbitraryTerm leaf annotation) = CofreeF (Syntax leaf) annotation
