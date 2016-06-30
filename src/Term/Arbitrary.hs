@@ -2,8 +2,6 @@
 module Term.Arbitrary where
 
 import Data.Functor.Foldable (Base, cata, unfold, Unfoldable(embed))
-import qualified Data.List as List
-import qualified Data.OrderedMap as Map
 import Data.Text.Arbitrary ()
 import Prologue
 import Syntax
@@ -20,20 +18,7 @@ toTerm :: ArbitraryTerm leaf annotation -> Term leaf annotation
 toTerm = unfold unArbitraryTerm
 
 termOfSize :: (Arbitrary leaf, Arbitrary annotation) => Int -> Gen (ArbitraryTerm leaf annotation)
-termOfSize n = ArbitraryTerm <$> arbitrary <*> syntaxOfSize n
-  where syntaxOfSize n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsOfSize n
-                       | otherwise = oneof $ branchGeneratorsOfSize n
-        branchGeneratorsOfSize n =
-          [ Indexed <$> childrenOfSize (pred n)
-          , Fixed <$> childrenOfSize (pred n)
-          , (Keyed .) . (Map.fromList .) . zip <$> infiniteListOf arbitrary <*> childrenOfSize (pred n)
-          ]
-        childrenOfSize n | n <= 0 = pure []
-        childrenOfSize n = do
-          m <- choose (1, n)
-          first <- termOfSize m
-          rest <- childrenOfSize (n - m)
-          pure $! first : rest
+termOfSize n = ArbitraryTerm <$> arbitrary <*> syntaxOfSize termOfSize n
 
 arbitraryTermSize :: ArbitraryTerm leaf annotation -> Int
 arbitraryTermSize = cata (succ . sum) . toTerm
