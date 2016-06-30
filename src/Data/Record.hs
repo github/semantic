@@ -2,6 +2,7 @@
 module Data.Record where
 
 import Prologue
+import Test.QuickCheck
 
 -- | A type-safe, extensible record structure.
 -- |
@@ -58,3 +59,9 @@ instance (Ord h, Ord (Record t)) => Ord (Record (h ': t)) where
 
 instance Ord (Record '[]) where
   _ `compare` _ = EQ
+
+
+instance Arbitrary fields => Arbitrary (Record '[fields]) where
+  arbitrary = RCons <$> arbitrary <*> pure RNil
+
+  shrink (RCons h t) = RCons <$> shrink h <*> pure t

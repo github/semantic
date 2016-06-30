@@ -4,7 +4,6 @@ module InterpreterSpec where
 import Category
 import Diff
 import Data.Record
-import Data.Record.Arbitrary ()
 import Interpreter
 import Patch
 import Prologue

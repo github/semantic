@@ -22,7 +22,6 @@ library
                      , Data.RandomWalkSimilarity.Arbitrary
                      , Data.OrderedMap
                      , Data.Record
-                     , Data.Record.Arbitrary
                      , Data.These.Arbitrary
                      , Diff
                      , Diff.Arbitrary

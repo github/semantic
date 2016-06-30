@@ -3,7 +3,6 @@ module Diff.Spec where
 
 import Category
 import Data.Record
-import Data.Record.Arbitrary ()
 import Data.Text.Arbitrary ()
 import Diff
 import Diff.Arbitrary
