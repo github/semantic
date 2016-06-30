@@ -49,9 +49,4 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
     m <- choose (0, n)
     termOfSize m
 
-  shrink term@(ArbitraryTerm annotation syntax) = (subterms term ++) . filter (/= term) $
-    ArbitraryTerm <$> shrink annotation <*> case syntax of
-      Leaf a -> Leaf <$> shrink a
-      Indexed i -> Indexed <$> (List.subsequences i >>= recursivelyShrink)
-      Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
-      Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink)
+  shrink = genericShrink
