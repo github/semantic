@@ -12,8 +12,8 @@ import Data.These
 import Prologue
 
 -- | An operation to replace, insert, or delete an item.
-data Patch a =
-  Replace a a
+data Patch a
+  = Replace a a
   | Insert a
   | Delete a
   deriving (Eq, Foldable, Functor, Show, Traversable)
