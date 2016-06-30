@@ -2,8 +2,8 @@
 
 ## Things we are currently doing:
 
-1. [Diff summaries][] for C & JavaScript.
-2. [Semantic diffs][] on .com for C & JavaScript.
+1. [Diff summaries][] for C & JavaScript. Q3 2016 or so.
+2. [Semantic diffs][] on .com for C & JavaScript. Q4 2016 or so.
 
 ## Follow-up things:
 
