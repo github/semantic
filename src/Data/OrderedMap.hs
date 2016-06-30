@@ -15,6 +15,7 @@ module Data.OrderedMap (
   ) where
 
 import Prologue hiding (toList, empty)
+import Test.QuickCheck
 
 -- | An ordered map of keys and values.
 newtype OrderedMap key value = OrderedMap { toList :: [(key, value)] }
@@ -70,3 +71,7 @@ difference (OrderedMap a) (OrderedMap b) = OrderedMap $ filter ((`notElem` extan
 instance Eq key => Monoid (OrderedMap key value) where
   mempty = fromList []
   mappend = union
+
+instance (Arbitrary key, Arbitrary value) => Arbitrary (OrderedMap key value) where
+  arbitrary = fromList <$> arbitrary
+  shrink = genericShrink
