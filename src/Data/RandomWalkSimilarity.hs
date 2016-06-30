@@ -7,8 +7,8 @@ import qualified Data.DList as DList
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
 import qualified Data.KdTree.Static as KdTree
+import qualified Data.List as List
 import qualified Data.OrderedMap as Map
-import qualified Data.Set as Set
 import qualified Data.Vector as Vector
 import Diff
 import Patch
@@ -22,7 +22,7 @@ rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
-  | otherwise = uncurry deleteRemaining . (`runState` Set.empty) $ traverse findNearestNeighbourTo (featurize <$> bs)
+  | otherwise = uncurry deleteRemaining . (`runState` []) $ traverse findNearestNeighbourTo (featurize <$> bs)
   where insert = pure . Insert
         delete = pure . Delete
         replace = (pure .) . Replace
@@ -33,12 +33,12 @@ rws compare getLabel as bs
         findNearestNeighbourTo kv@(_, v) = do
           mapped <- get
           let (k, nearest) = KdTree.nearest kdas kv
-          if k `Set.member` mapped
+          if k `List.elem` mapped
             then pure $! insert v
             else do
-              put (Set.insert k mapped)
+              put (k : mapped)
               pure $! fromMaybe (replace nearest v) (compare nearest v)
-        deleteRemaining diff mapped = diff <> (delete . snd <$> filter (not . (`Set.member` mapped) . fst) fas)
+        deleteRemaining diff mapped = diff <> (delete . snd <$> filter (not . (`List.elem` mapped) . fst) fas)
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
