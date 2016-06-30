@@ -21,24 +21,11 @@ toDiff = fmap (fmap toTerm) . unfold unArbitraryDiff
 
 diffOfSize :: (Arbitrary leaf, Arbitrary annotation) => Int -> Gen (ArbitraryDiff leaf annotation)
 diffOfSize n
-  | n <= 0 = (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize n
+  | n <= 0 = (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize diffOfSize n
   | otherwise = oneof
-    [ (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize n
+    [ (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize diffOfSize n
     , ArbitraryDiff . Pure <$> patchOfSize n ]
-  where syntaxOfSize n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsOfSize n
-                       | otherwise = oneof $ branchGeneratorsOfSize n
-        branchGeneratorsOfSize n =
-          [ Indexed <$> childrenOfSize (pred n)
-          , Fixed <$> childrenOfSize (pred n)
-          , (Keyed .) . (Map.fromList .) . zip <$> infiniteListOf arbitrary <*> childrenOfSize (pred n)
-          ]
-        childrenOfSize n | n <= 0 = pure []
-        childrenOfSize n = do
-          m <- choose (1, n)
-          first <- diffOfSize m
-          rest <- childrenOfSize (n - m)
-          pure $! first : rest
-        patchOfSize 1 = oneof [ Insert <$> termOfSize 1
+  where patchOfSize 1 = oneof [ Insert <$> termOfSize 1
                               , Delete <$> termOfSize 1 ]
         patchOfSize n = do
           m <- choose (1, n - 1)
