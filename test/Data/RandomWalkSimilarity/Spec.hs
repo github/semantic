@@ -32,9 +32,9 @@ spec = parallel $ do
   describe "rws" $ do
     let compare a b = if extract a == extract b then Just (pure (Replace a b)) else Nothing
     prop "produces correct diffs" $
-      \ as bs -> let tas = toTerm <$> as
-                     tbs = toTerm <$> bs
-                     diff = free (Free (pure Program :< Indexed (rws compare identity tas tbs :: [Diff Text Category]))) in
+      \ (as, bs) -> let tas = toTerm <$> as
+                        tbs = toTerm <$> bs
+                        diff = free (Free (pure Program :< Indexed (rws compare identity tas tbs :: [Diff Text Category]))) in
         (childrenOf <$> beforeTerm diff, childrenOf <$> afterTerm diff) `shouldBe` (Just (Set.fromList tas), Just (Set.fromList tbs))
 
 childrenOf :: (Ord leaf, Ord annotation) => Term leaf annotation -> Set.Set (Term leaf annotation)
