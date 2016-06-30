@@ -31,7 +31,7 @@ spec = parallel $ do
 
   describe "rws" $ do
     let compare a b = if extract a == extract b then Just (pure (Replace a b)) else Nothing
-    prop "produces correct diffs" $
+    prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
       \ (as, bs) -> let tas = toTerm <$> as
                         tbs = toTerm <$> bs
                         diff = free (Free (pure Program :< Indexed (rws compare identity tas tbs :: [Diff Text Category]))) in
