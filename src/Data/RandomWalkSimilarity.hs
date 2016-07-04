@@ -34,7 +34,7 @@ rws compare getLabel as bs
         featurize = featureVector d . pqGrams p q getLabel &&& identity
         findNearestNeighbourTo kv@(_, v) = do
           unmapped <- get
-          let found@(k, nearest) = KdTree.nearest kdas kv
+          let (k, nearest) = KdTree.nearest kdas kv
           case find ((== k) . fst) unmapped of
             Nothing -> pure $! insert v
             Just found -> do
