@@ -40,7 +40,7 @@ rws compare getLabel as bs
             Just found -> do
               put (List.delete found unmapped)
               pure $! fromMaybe (replace nearest v) (compare nearest v)
-        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing firstAnnotation))) diffs (delete . snd <$> filter (`List.elem` unmapped) fas)
+        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing firstAnnotation))) diffs (delete . snd <$> unmapped)
 
 firstAnnotation :: Diff leaf annotation -> Maybe annotation
 firstAnnotation diff = case runFree diff of
