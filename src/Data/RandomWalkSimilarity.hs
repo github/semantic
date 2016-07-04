@@ -22,7 +22,7 @@ rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
-  | otherwise = uncurry deleteRemaining . (`runState` []) $ traverse findNearestNeighbourTo fbs
+  | otherwise = uncurry deleteRemaining . (`runState` fas) $ traverse findNearestNeighbourTo fbs
   where insert = pure . Insert
         delete = pure . Delete
         replace = (pure .) . Replace
@@ -32,12 +32,12 @@ rws compare getLabel as bs
         kdas = KdTree.build (Vector.toList . fst) fas
         featurize = featureVector d . pqGrams p q getLabel &&& identity
         findNearestNeighbourTo kv@(_, v) = do
-          mapped <- get
-          let found@(_, nearest) = KdTree.nearest kdas kv
-          if found `List.elem` mapped
-            then pure $! insert v
-            else do
-              put (found : mapped)
+          unmapped <- get
+          let found@(k, nearest) = KdTree.nearest kdas kv
+          case find ((== k) . fst) unmapped of
+            Nothing -> pure $! insert v
+            Just found -> do
+              put (List.delete found unmapped)
               pure $! fromMaybe (replace nearest v) (compare nearest v)
         deleteRemaining diff mapped = diff <> (delete . snd <$> filter (not . (`List.elem` mapped)) fas)
 
