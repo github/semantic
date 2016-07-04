@@ -34,12 +34,12 @@ rws compare getLabel as bs
         featurize = featureVector d . pqGrams p q getLabel &&& identity
         findNearestNeighbourTo kv@(_, v) = do
           unmapped <- get
-          let (k, nearest) = KdTree.nearest kdas kv
-          case find ((== k) . fst) unmapped of
+          let (k, _) = KdTree.nearest kdas kv
+          case k `List.lookup` unmapped of
             Nothing -> pure $! insert v
             Just found -> do
-              put (List.delete found unmapped)
-              pure $! fromMaybe (replace nearest v) (compare nearest v)
+              put (List.delete (k, found) unmapped)
+              pure $! fromMaybe (replace found v) (compare found v)
         deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing firstAnnotation))) diffs (delete . snd <$> unmapped)
 
 firstAnnotation :: Diff leaf annotation -> Maybe annotation
