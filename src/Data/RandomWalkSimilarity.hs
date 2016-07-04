@@ -3,6 +3,7 @@ module Data.RandomWalkSimilarity where
 import Control.Arrow ((&&&))
 import Control.Monad.Random
 import Control.Monad.State
+import Data.Bifunctor.Join
 import qualified Data.DList as DList
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
@@ -39,7 +40,12 @@ rws compare getLabel as bs
             Just found -> do
               put (List.delete found unmapped)
               pure $! fromMaybe (replace nearest v) (compare nearest v)
-        deleteRemaining diff mapped = diff <> (delete . snd <$> filter (not . (`List.elem` mapped)) fas)
+        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing firstAnnotation))) diffs (delete . snd <$> filter (`List.elem` unmapped) fas)
+
+firstAnnotation :: Diff leaf annotation -> Maybe annotation
+firstAnnotation diff = case runFree diff of
+  Free (annotations :< _) -> Just (fst (runJoin annotations))
+  Pure patch -> maybeFst (unPatch $ extract <$> patch)
 
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
