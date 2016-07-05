@@ -82,6 +82,7 @@ windowed n f seed = para alg
           Nil -> seed
 
 
+-- | Compute a vector with the specified number of dimensions, as an approximation of a bag of `Gram`s summarizing a tree.
 featureVector :: Hashable label => Int -> DList.DList (Gram label) -> Vector.Vector Double
 featureVector d bag = sumVectors $ unitDVector . hash <$> bag
   where unitDVector hash = normalize . (`evalRand` mkQCGen hash) $ Prologue.sequence (Vector.replicate d getRandom)
