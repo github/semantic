@@ -51,6 +51,7 @@ firstAnnotation diff = case runFree diff of
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
+-- | Compute the bag of grams with stems of length _p_ and bases of length _q_, with labels computed from annotations, which summarize the entire subtree of a term.
 pqGrams :: Int -> Int -> (annotation -> label) -> Cofree (Syntax leaf) annotation -> DList.DList (Gram (label, Maybe leaf))
 pqGrams p q getLabel = cata merge . setRootBase . setRootStem . hylo go project
   where go (annotation :< functor) = cofree (Gram [] [ Just (getLabel annotation, leafValue functor) ] :< (assignParent (Just (getLabel annotation, leafValue functor)) p <$> functor))
