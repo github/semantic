@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module Data.RandomWalkSimilarity.Spec where
 
 import Category
