@@ -43,6 +43,7 @@ rws compare getLabel as bs
               pure $! fromMaybe (replace found v) (compare found v)
         deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing firstAnnotation))) diffs (delete . snd <$> unmapped)
 
+-- | Extract the annotation for the before state of a diff node. This is returned in `Maybe` because e.g. an `Insert` patch does not have an annotation for the before state.
 firstAnnotation :: Diff leaf annotation -> Maybe annotation
 firstAnnotation diff = case runFree diff of
   Free (annotations :< _) -> Just (fst (runJoin annotations))
