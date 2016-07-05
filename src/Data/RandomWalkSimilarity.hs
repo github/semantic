@@ -41,7 +41,7 @@ rws compare getLabel as bs
             Nothing -> pure (negate 1, insert v)
             Just (i, found) -> do
               put (List.delete (k, (i, found)) unmapped)
-              pure (negate 1, fromMaybe (replace found v) (compare found v))
+              pure (i, fromMaybe (replace found v) (compare found v))
         deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) diffs (second delete . snd <$> unmapped)
 
 -- | Extract the annotation for the before state of a diff node. This is returned in `Maybe` because e.g. an `Insert` patch does not have an annotation for the before state.
