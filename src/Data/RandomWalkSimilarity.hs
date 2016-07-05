@@ -28,7 +28,6 @@ rws compare getLabel as bs
   | otherwise = fmap snd . uncurry deleteRemaining . (`runState` fas) $ traverse findNearestNeighbourTo fbs
   where insert = pure . Insert
         delete = pure . Delete
-        replace = (pure .) . Replace
         (p, q, d) = (2, 2, 15)
         fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
@@ -38,11 +37,13 @@ rws compare getLabel as bs
           unmapped <- get
           let (k, _) = KdTree.nearest kdas kv
           case k `List.lookup` unmapped of
-            Nothing -> pure (negate 1, insert v)
-            Just (i, found) -> do
-              put (List.delete (k, (i, found)) unmapped)
-              pure (i, fromMaybe (replace found v) (compare found v))
-        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) diffs (second delete . snd <$> unmapped)
+            Nothing -> pure [ (negate 1, insert v) ]
+            Just (i, found) -> case compare found v of
+              Nothing -> pure [ (negate 1, insert v) ]
+              Just compared -> do
+                put (List.delete (k, (i, found)) unmapped)
+                pure [ (i, compared) ]
+        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) (join diffs) (second delete . snd <$> unmapped)
 
 -- | Extract the annotation for the before state of a diff node. This is returned in `Maybe` because e.g. an `Insert` patch does not have an annotation for the before state.
 firstAnnotation :: Diff leaf annotation -> Maybe annotation
