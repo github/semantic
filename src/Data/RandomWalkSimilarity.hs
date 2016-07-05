@@ -48,6 +48,7 @@ firstAnnotation diff = case runFree diff of
   Free (annotations :< _) -> Just (fst (runJoin annotations))
   Pure patch -> maybeFst (unPatch $ extract <$> patch)
 
+-- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
