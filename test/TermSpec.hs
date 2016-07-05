@@ -1,4 +1,3 @@
-{-# LANGUAGE DataKinds #-}
 module TermSpec where
 
 import Data.Text.Arbitrary ()
