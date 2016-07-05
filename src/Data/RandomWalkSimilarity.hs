@@ -51,9 +51,6 @@ firstAnnotation diff = case runFree diff of
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
-serialize :: Gram label -> [Maybe label]
-serialize gram = stem gram <> base gram
-
 pqGrams :: Int -> Int -> (annotation -> label) -> Cofree (Syntax leaf) annotation -> DList.DList (Gram (label, Maybe leaf))
 pqGrams p q getLabel = cata merge . setRootBase . setRootStem . hylo go project
   where go (annotation :< functor) = cofree (Gram [] [ Just (getLabel annotation, leafValue functor) ] :< (assignParent (Just (getLabel annotation, leafValue functor)) p <$> functor))
@@ -99,7 +96,7 @@ vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
 
 instance Hashable label => Hashable (Gram label) where
   hashWithSalt _ = hash
-  hash = hash . serialize
+  hash gram = hash (stem gram <> base gram)
 
 -- | Construct a generator for arbitrary `Gram`s of size `(p, q)`.
 gramWithPQ :: Arbitrary label => Int -> Int -> Gen (Gram label)
