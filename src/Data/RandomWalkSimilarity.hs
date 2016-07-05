@@ -98,6 +98,7 @@ instance Hashable label => Hashable (Gram label) where
   hashWithSalt _ = hash
   hash = hash . serialize
 
+-- | Construct a generator for arbitrary `Gram`s of size `(p, q)`.
 gramWithPQ :: Arbitrary label => Int -> Int -> Gen (Gram label)
 gramWithPQ p q = Gram <$> vectorOf p arbitrary <*> vectorOf q arbitrary
 
