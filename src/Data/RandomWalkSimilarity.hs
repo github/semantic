@@ -75,6 +75,7 @@ pqGrams p q getLabel = cata merge . setRootBase . setRootStem . hylo go project
         setRootBase term = let (a :< f) = runCofree term in cofree (setBase a (base a) :< f)
         setRootStem = foldr (\ p rest -> assignParent Nothing p . rest) identity [0..p]
 
+-- | A sliding-window fold over _n_ items of a list per iteration.
 windowed :: Int -> (a -> [a] -> b -> b) -> b -> [a] -> b
 windowed n f seed = para alg
   where alg xs = case xs of
