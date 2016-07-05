@@ -88,6 +88,7 @@ featureVector d bag = sumVectors $ unitDVector . hash <$> bag
         normalize vec = fmap (/ vmagnitude vec) vec
         sumVectors = DList.foldr (Vector.zipWith (+)) (Vector.replicate d 0)
 
+-- | The magnitude of a Euclidean vector, i.e. its distance from the origin.
 vmagnitude :: Vector.Vector Double -> Double
 vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
 
