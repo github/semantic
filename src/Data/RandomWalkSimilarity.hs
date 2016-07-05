@@ -54,7 +54,7 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 serialize :: Gram label -> [Maybe label]
 serialize gram = stem gram <> base gram
 
-pqGrams :: Int -> Int -> (annotation -> label) -> Cofree (Syntax leaf) annotation -> Bag (Gram (label, Maybe leaf))
+pqGrams :: Int -> Int -> (annotation -> label) -> Cofree (Syntax leaf) annotation -> DList.DList (Gram (label, Maybe leaf))
 pqGrams p q getLabel = cata merge . setRootBase . setRootStem . hylo go project
   where go (annotation :< functor) = cofree (Gram [] [ Just (getLabel annotation, leafValue functor) ] :< (assignParent (Just (getLabel annotation, leafValue functor)) p <$> functor))
         leafValue (Leaf s) = Just s
@@ -81,10 +81,8 @@ windowed n f seed = para alg
           Cons a (as, b) -> f a (take n $ a : as) b
           Nil -> seed
 
-type Bag = DList.DList
 
-
-featureVector :: Hashable label => Int -> Bag (Gram label) -> Vector.Vector Double
+featureVector :: Hashable label => Int -> DList.DList (Gram label) -> Vector.Vector Double
 featureVector d bag = sumVectors $ unitDVector . hash <$> bag
   where unitDVector hash = normalize . (`evalRand` mkQCGen hash) $ Prologue.sequence (Vector.replicate d getRandom)
         normalize vec = fmap (/ vmagnitude vec) vec
