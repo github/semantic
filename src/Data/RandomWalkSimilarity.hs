@@ -94,6 +94,8 @@ vmagnitude :: Vector.Vector Double -> Double
 vmagnitude vec = sqrtDouble (Vector.sum (fmap (** 2) vec))
 
 
+-- Instances
+
 instance Hashable label => Hashable (Gram label) where
   hashWithSalt _ = hash
   hash = hash . serialize
