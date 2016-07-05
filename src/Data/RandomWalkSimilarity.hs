@@ -16,6 +16,7 @@ import Patch
 import Prologue
 import Syntax
 import Term
+import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
 
 rws :: (Hashable label, Hashable leaf, Eq leaf, Ord annotation) => (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> (annotation -> label) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
@@ -100,3 +101,11 @@ nearestNeighbour children v = Just . snd $ minimumBy (compare `on` distance v . 
 instance Hashable label => Hashable (Gram label) where
   hashWithSalt _ = hash
   hash = hash . serialize
+
+gramWithPQ :: Arbitrary label => Int -> Int -> Gen (Gram label)
+gramWithPQ p q = Gram <$> vectorOf p arbitrary <*> vectorOf q arbitrary
+
+instance Arbitrary label => Arbitrary (Gram label) where
+  arbitrary = join $ gramWithPQ <$> arbitrary <*> arbitrary
+
+  shrink (Gram a b) = Gram <$> shrink a <*> shrink b

@@ -19,7 +19,6 @@ library
                      , Data.Bifunctor.Join.Arbitrary
                      , Data.Functor.Both
                      , Data.RandomWalkSimilarity
-                     , Data.RandomWalkSimilarity.Arbitrary
                      , Data.OrderedMap
                      , Data.Record
                      , Data.These.Arbitrary

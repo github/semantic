@@ -4,7 +4,6 @@ module Data.RandomWalkSimilarity.Spec where
 import Category
 import Data.DList as DList hiding (toList)
 import Data.RandomWalkSimilarity
-import Data.RandomWalkSimilarity.Arbitrary ()
 import qualified Data.Set as Set
 import Diff
 import Patch
