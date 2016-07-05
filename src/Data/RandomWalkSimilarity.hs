@@ -89,7 +89,7 @@ featureVector d bag = sumVectors $ unitDVector . hash <$> bag
         sumVectors = DList.foldr (Vector.zipWith (+)) (Vector.replicate d 0)
 
 vmagnitude :: Vector.Vector Double -> Double
-vmagnitude vec = sqrtDouble (Vector.sum (fmap (** 2) vec))
+vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
 
 
 -- Instances
