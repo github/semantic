@@ -25,6 +25,7 @@ diffSum patchCost diff = sum $ fmap patchCost diff
 diffCost :: Diff a annotation -> Integer
 diffCost = diffSum $ patchSum termSize
 
+-- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
 mergeMaybe :: (Patch (Term leaf annotation) -> Maybe (Term leaf annotation)) -> Diff leaf annotation -> Maybe (Term leaf annotation)
 mergeMaybe transform = cata algebra . fmap transform
   where algebra :: FreeF (CofreeF (Syntax leaf) (Both annotation)) (Maybe (Term leaf annotation)) (Maybe (Term leaf annotation)) -> Maybe (Term leaf annotation)
@@ -35,8 +36,10 @@ mergeMaybe transform = cata algebra . fmap transform
           Fixed i -> Fixed (catMaybes i)
           Keyed i -> Keyed (Map.fromList (Map.toList i >>= (\ (k, v) -> maybe [] (pure . (,) k) v)))
 
+-- | Recover the before state of a diff.
 beforeTerm :: Diff leaf annotation -> Maybe (Term leaf annotation)
 beforeTerm = mergeMaybe before
 
+-- | Recover the after state of a diff.
 afterTerm :: Diff leaf annotation -> Maybe (Term leaf annotation)
 afterTerm = mergeMaybe after
