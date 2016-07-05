@@ -93,10 +93,6 @@ featureVector d bag = sumVectors $ unitDVector . hash <$> bag
 vmagnitude :: Vector.Vector Double -> Double
 vmagnitude vec = sqrtDouble (Vector.sum (fmap (** 2) vec))
 
-nearestNeighbour :: [(Vector.Vector Double, a)] -> Vector.Vector Double -> Maybe a
-nearestNeighbour [] _ = Nothing
-nearestNeighbour children v = Just . snd $ minimumBy (compare `on` distance v . fst) children
-  where distance a b = vmagnitude $ Vector.zipWith (-) a b
 
 instance Hashable label => Hashable (Gram label) where
   hashWithSalt _ = hash
