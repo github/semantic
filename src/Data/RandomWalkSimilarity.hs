@@ -30,19 +30,19 @@ rws compare getLabel as bs
         delete = pure . Delete
         replace = (pure .) . Replace
         (p, q, d) = (2, 2, 15)
-        fas = zip [0..] (featurize <$> as)
-        fbs = zip [0..] (featurize <$> bs)
-        kdas = KdTree.build (Vector.toList . fst . snd) fas
-        featurize = featureVector d . pqGrams p q getLabel &&& identity
+        fas = zipWith featurize [0..] as
+        fbs = zipWith featurize [0..] bs
+        kdas = KdTree.build (Vector.toList . fst) fas
+        featurize index = featureVector d . pqGrams p q getLabel &&& (,) index
         findNearestNeighbourTo kv@(_, (_, v)) = do
           unmapped <- get
-          let (i, (k, _)) = KdTree.nearest kdas kv
-          case i `List.lookup` unmapped of
+          let (k, _) = KdTree.nearest kdas kv
+          case k `List.lookup` unmapped of
             Nothing -> pure (negate 1, insert v)
-            Just (k, found) -> do
-              put (List.delete (i, (k, found)) unmapped)
+            Just (i, found) -> do
+              put (List.delete (k, (i, found)) unmapped)
               pure (negate 1, fromMaybe (replace found v) (compare found v))
-        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) diffs (second (delete . snd) <$> unmapped)
+        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) diffs (second delete . snd <$> unmapped)
 
 -- | Extract the annotation for the before state of a diff node. This is returned in `Maybe` because e.g. an `Insert` patch does not have an annotation for the before state.
 firstAnnotation :: Diff leaf annotation -> Maybe annotation
