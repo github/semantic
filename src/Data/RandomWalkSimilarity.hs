@@ -20,29 +20,29 @@ import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an annotation, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: (Hashable label, Hashable leaf, Eq leaf, Ord annotation) => (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> (annotation -> label) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
+rws :: (Hashable label, Hashable leaf, Eq leaf, Eq annotation) => (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> (annotation -> label) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
 rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
-  | otherwise = uncurry deleteRemaining . (`runState` fas) $ traverse findNearestNeighbourTo fbs
+  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` fas) $ traverse findNearestNeighbourTo fbs
   where insert = pure . Insert
         delete = pure . Delete
         replace = (pure .) . Replace
         (p, q, d) = (2, 2, 15)
-        fas = featurize <$> as
-        fbs = featurize <$> bs
-        kdas = KdTree.build (Vector.toList . fst) fas
+        fas = zip [0..] (featurize <$> as)
+        fbs = zip [0..] (featurize <$> bs)
+        kdas = KdTree.build (Vector.toList . fst . snd) fas
         featurize = featureVector d . pqGrams p q getLabel &&& identity
-        findNearestNeighbourTo kv@(_, v) = do
+        findNearestNeighbourTo kv@(_, (_, v)) = do
           unmapped <- get
-          let (k, _) = KdTree.nearest kdas kv
-          case k `List.lookup` unmapped of
-            Nothing -> pure $! insert v
-            Just found -> do
-              put (List.delete (k, found) unmapped)
-              pure $! fromMaybe (replace found v) (compare found v)
-        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing firstAnnotation))) diffs (delete . snd <$> unmapped)
+          let (i, (k, _)) = KdTree.nearest kdas kv
+          case i `List.lookup` unmapped of
+            Nothing -> pure (negate 1, insert v)
+            Just (k, found) -> do
+              put (List.delete (i, (k, found)) unmapped)
+              pure (negate 1, fromMaybe (replace found v) (compare found v))
+        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) diffs (second (delete . snd) <$> unmapped)
 
 -- | Extract the annotation for the before state of a diff node. This is returned in `Maybe` because e.g. an `Insert` patch does not have an annotation for the before state.
 firstAnnotation :: Diff leaf annotation -> Maybe annotation
