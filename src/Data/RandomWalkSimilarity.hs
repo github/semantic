@@ -46,7 +46,10 @@ rws compare getLabel as bs
         deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) (join diffs) (second delete . snd <$> unmapped)
 
 longestIncreasingSubsequence :: Ord a => [a] -> [a]
-longestIncreasingSubsequence = maximumBy (comparing length) . fmap List.nub . filter isSorted . subsequences
+longestIncreasingSubsequence = longestOrderedSubsequenceBy (<)
+
+longestOrderedSubsequenceBy :: Eq a => (a -> a -> Bool) -> [a] -> [a]
+longestOrderedSubsequenceBy isOrd = maximumBy (comparing length) . fmap List.nub . filter (isSortedBy isOrd) . subsequences
 
 isSorted :: Ord a => [a] -> Bool
 isSorted = isSortedBy (<=)
