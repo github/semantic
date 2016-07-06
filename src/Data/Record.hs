@@ -1,7 +1,8 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
 module Data.Record where
 
 import Prologue
+import Test.QuickCheck
 
 -- | A type-safe, extensible record structure.
 -- |
@@ -50,3 +51,17 @@ instance (Eq h, Eq (Record t)) => Eq (Record (h ': t)) where
 
 instance Eq (Record '[]) where
   _ == _ = True
+
+
+instance (Ord h, Ord (Record t)) => Ord (Record (h ': t)) where
+  RCons h1 t1 `compare` RCons h2 t2 = let h = h1 `compare` h2 in
+    if h == EQ then t1 `compare` t2 else h
+
+instance Ord (Record '[]) where
+  _ `compare` _ = EQ
+
+
+instance Arbitrary fields => Arbitrary (Record '[fields]) where
+  arbitrary = RCons <$> arbitrary <*> pure RNil
+
+  shrink (RCons h t) = RCons <$> shrink h <*> pure t

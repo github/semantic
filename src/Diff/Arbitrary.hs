@@ -4,7 +4,6 @@ import Diff
 import Data.Bifunctor.Join
 import Data.Bifunctor.Join.Arbitrary ()
 import Data.Functor.Foldable (unfold)
-import qualified Data.List as List
 import qualified Data.OrderedMap as Map
 import Patch
 import Patch.Arbitrary ()
@@ -13,32 +12,25 @@ import Prologue
 import Term.Arbitrary
 import Test.QuickCheck hiding (Fixed)
 
-newtype ArbitraryDiff leaf annotation = ArbitraryDiff { unArbitraryDiff :: FreeF (CofreeF (Syntax leaf) (Join (,) annotation)) (Patch (ArbitraryTerm leaf annotation)) (ArbitraryDiff leaf annotation) }
+data ArbitraryDiff leaf annotation
+  = ArbitraryFree (Join (,) annotation) (Syntax leaf (ArbitraryDiff leaf annotation))
+  | ArbitraryPure (Patch (ArbitraryTerm leaf annotation))
   deriving (Show, Eq, Generic)
+
+unArbitraryDiff :: ArbitraryDiff leaf annotation -> FreeF (CofreeF (Syntax leaf) (Join (,) annotation)) (Patch (ArbitraryTerm leaf annotation)) (ArbitraryDiff leaf annotation)
+unArbitraryDiff (ArbitraryFree a s) = Free (a :< s)
+unArbitraryDiff (ArbitraryPure p) = Pure p
 
 toDiff :: ArbitraryDiff leaf annotation -> Diff leaf annotation
 toDiff = fmap (fmap toTerm) . unfold unArbitraryDiff
 
 diffOfSize :: (Arbitrary leaf, Arbitrary annotation) => Int -> Gen (ArbitraryDiff leaf annotation)
 diffOfSize n
-  | n <= 0 = (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize n
+  | n <= 0 = ArbitraryFree <$> arbitrary <*> syntaxOfSize diffOfSize n
   | otherwise = oneof
-    [ (ArbitraryDiff .) . (Free .) . (:<) <$> arbitrary <*> syntaxOfSize n
-    , ArbitraryDiff . Pure <$> patchOfSize n ]
-  where syntaxOfSize n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsOfSize n
-                       | otherwise = oneof $ branchGeneratorsOfSize n
-        branchGeneratorsOfSize n =
-          [ Indexed <$> childrenOfSize (pred n)
-          , Fixed <$> childrenOfSize (pred n)
-          , (Keyed .) . (Map.fromList .) . zip <$> infiniteListOf arbitrary <*> childrenOfSize (pred n)
-          ]
-        childrenOfSize n | n <= 0 = pure []
-        childrenOfSize n = do
-          m <- choose (1, n)
-          first <- diffOfSize m
-          rest <- childrenOfSize (n - m)
-          pure $! first : rest
-        patchOfSize 1 = oneof [ Insert <$> termOfSize 1
+    [ ArbitraryFree <$> arbitrary <*> syntaxOfSize diffOfSize n
+    , ArbitraryPure <$> patchOfSize n ]
+  where patchOfSize 1 = oneof [ Insert <$> termOfSize 1
                               , Delete <$> termOfSize 1 ]
         patchOfSize n = do
           m <- choose (1, n - 1)
@@ -58,27 +50,4 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
   arbitrary = sized $ \ n -> do
     m <- choose (0, n)
     diffOfSize m
-
-  shrink diff@(ArbitraryDiff annotated) = case annotated of
-    Free (annotation :< syntax) -> (subterms diff ++) . filter (/= diff) $
-      (ArbitraryDiff .) . (Free .) . (:<) <$> shrink annotation <*> case syntax of
-        Leaf a -> Leaf <$> shrink a
-        Indexed i -> Indexed <$> (List.subsequences i >>= recursivelyShrink)
-        Fixed f -> Fixed <$> (List.subsequences f >>= recursivelyShrink)
-        Keyed k -> Keyed . Map.fromList <$> (List.subsequences (Map.toList k) >>= recursivelyShrink)
-        FunctionCall i children -> FunctionCall <$> shrink i <*> (List.subsequences children >>= recursivelyShrink)
-        Function i params body -> Function <$> shrink i <*> shrink params <*> shrink body
-        MethodCall targetId methodId params -> MethodCall <$> shrink targetId <*> shrink methodId <*> shrink params
-        Assignment assignmentId value -> Assignment <$> shrink assignmentId <*> shrink value
-        Syntax.Args args -> Syntax.Args <$> (List.subsequences args >>= recursivelyShrink)
-        Syntax.MemberAccess memberId property -> Syntax.MemberAccess <$> shrink memberId <*> shrink property
-        Syntax.VarDecl decl -> Syntax.VarDecl <$> shrink decl
-        Syntax.VarAssignment varId value -> Syntax.VarAssignment <$> shrink varId <*> shrink value
-        Syntax.Switch switchExpr cases -> Syntax.Switch <$> shrink switchExpr <*> (List.subsequences cases >>= recursivelyShrink)
-        Syntax.Case expr statements -> Syntax.Case <$> shrink expr <*> shrink statements
-        Syntax.Ternary expr cases -> Syntax.Ternary <$> shrink expr <*> (List.subsequences cases >>= recursivelyShrink)
-        Syntax.MathAssignment i value -> Syntax.MathAssignment <$> shrink i <*> shrink value
-        Syntax.Operator syntaxes -> Syntax.Operator <$> (List.subsequences syntaxes >>= recursivelyShrink)
-        Syntax.SubscriptAccess i property -> Syntax.SubscriptAccess <$> shrink i <*> shrink property
-        Syntax.Object keyValues -> Syntax.Object <$> (List.subsequences keyValues >>= recursivelyShrink)
-    Pure patch -> ArbitraryDiff . Pure <$> shrink patch
+  shrink = genericShrink

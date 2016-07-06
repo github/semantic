@@ -1,23 +1,30 @@
+{-# LANGUAGE DataKinds #-}
 module InterpreterSpec where
 
-import Prologue
+import Category
 import Diff
 import Data.Record
-import qualified Interpreter as I
-import Range
-import Syntax
+import Interpreter
 import Patch
-import Info
-import Category
+import Prologue
+import Syntax
+import Term.Arbitrary
 import Test.Hspec
+import Test.Hspec.QuickCheck
 
 spec :: Spec
-spec = parallel $
-  describe "interpret" $
+spec = parallel $ do
+  describe "interpret" $ do
     it "returns a replacement when comparing two unicode equivalent terms" $
-      I.diffTerms (free . Free) ((==) `on` extract) diffCost (cofree ((range .: StringLiteral .: 0 .: 0 .: RNil) :< Leaf "t\776")) (cofree ((range2 .: StringLiteral .: 0 .: 0 .: RNil) :< Leaf "\7831")) `shouldBe`
-      free (Pure (Replace (cofree ((range .: StringLiteral .: 0 .: 0 .: RNil) :< Leaf "t\776")) (cofree ((range2 .: StringLiteral .: 0 .: 0 .: RNil) :< Leaf "\7831"))))
+      let termA = cofree $ (StringLiteral .: RNil) :< Leaf ("t\776" :: Text)
+          termB = cofree $ (StringLiteral .: RNil) :< Leaf "\7831" in
+          diffTerms (free . Free) ((==) `on` extract) diffCost termA termB `shouldBe` free (Pure (Replace termA termB))
 
-    where
-      range = Range 0 2
-      range2 = Range 0 1
+    prop "produces correct diffs" $
+      \ a b -> let diff = diffTerms (free . Free) ((==) `on` extract) diffCost (toTerm a) (toTerm b) :: Diff Text (Record '[Category]) in
+                   (beforeTerm diff, afterTerm diff) `shouldBe` (Just (toTerm a), Just (toTerm b))
+
+    prop "constructs zero-cost diffs of equal terms" $
+      \ a -> let term = toTerm a
+                 diff = diffTerms (free . Free) ((==) `on` extract) diffCost term term :: Diff Text (Record '[Category]) in
+                 diffCost diff `shouldBe` 0

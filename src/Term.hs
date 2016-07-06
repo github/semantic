@@ -1,5 +1,5 @@
-{-# LANGUAGE TypeFamilies, TypeSynonymInstances #-}
-{-# LANGUAGE Unsafe #-}
+{-# LANGUAGE TypeFamilies, TypeSynonymInstances, Unsafe #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 module Term where
 
 import Prologue

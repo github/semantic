@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, FlexibleContexts, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
 module Info where
 
 import Data.Record
@@ -7,9 +7,9 @@ import Category
 import Range
 
 newtype Size = Size { unSize :: Integer }
-  deriving (Eq, Num, Show)
+  deriving (Eq, Num, Ord, Show)
 newtype Cost = Cost { unCost :: Integer }
-  deriving (Eq, Num, Show)
+  deriving (Eq, Num, Ord, Show)
 
 type InfoFields = '[ Range, Category, Size, Cost ]
 

@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
 module SplitDiff where
 
 import Data.Record
