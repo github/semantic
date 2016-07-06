@@ -47,7 +47,11 @@ rws compare getLabel as bs
 
 longestIncreasingSubsequence :: Ord a => [a] -> [a]
 longestIncreasingSubsequence = maximumBy (comparing length) . fmap List.nub . filter isSorted . subsequences
-  where isSorted l = sort l == l
+
+isSorted :: Ord a => [a] -> Bool
+isSorted = para $ \ l -> case l of
+  Cons h (tail, tailIsSorted) -> tailIsSorted && (maybe True (h <=) (head tail))
+  Nil -> True
 
 -- | Extract the annotation for the before state of a diff node. This is returned in `Maybe` because e.g. an `Insert` patch does not have an annotation for the before state.
 firstAnnotation :: Diff leaf annotation -> Maybe annotation
