@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
 module Diffing where
 
 import Prologue hiding (fst, snd)

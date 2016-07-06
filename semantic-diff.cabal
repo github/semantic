@@ -18,6 +18,7 @@ library
                      , Category
                      , Data.Bifunctor.Join.Arbitrary
                      , Data.Functor.Both
+                     , Data.RandomWalkSimilarity
                      , Data.OrderedMap
                      , Data.Record
                      , Data.These.Arbitrary
@@ -55,8 +56,12 @@ library
                      , bytestring
                      , containers
                      , directory
+                     , dlist
                      , filepath
+                     , hashable
+                     , kdt
                      , mtl
+                     , MonadRandom
                      , pointed
                      , QuickCheck >= 2.8.1
                      , quickcheck-text
@@ -71,7 +76,7 @@ library
                      , comonad
                      , protolude
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
+  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -threaded -fprof-auto "-with-rtsopts=-N -p -s -h -i0.1" -j
 
 benchmark semantic-diff-bench
@@ -95,18 +100,20 @@ test-suite semantic-diff-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       AlignmentSpec
-                     , ArbitraryTerm
                      , CorpusSpec
+                     , Data.RandomWalkSimilarity.Spec
+                     , Diff.Spec
+                     , DiffSummarySpec
                      , InterpreterSpec
                      , OrderedMapSpec
                      , PatchOutputSpec
                      , TermSpec
-                     , DiffSummarySpec
   build-depends:       base
                      , bifunctors
                      , bytestring
                      , containers
                      , deepseq
+                     , dlist
                      , filepath
                      , Glob
                      , hspec >= 2.1.10

@@ -1,7 +1,6 @@
 module AlignmentSpec where
 
 import Alignment
-import ArbitraryTerm ()
 import Control.Arrow ((&&&))
 import Control.Monad.State
 import Data.Align hiding (align)
@@ -49,7 +48,7 @@ spec = parallel $ do
 
     prop "covers every input line" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        join <$> (traverse (modifyJoin (fromThese [] []) . fmap pure . fmap Prologue.fst) (alignBranch Prologue.snd children ranges)) `shouldBe` ranges
+        join <$> (traverse (modifyJoin (fromThese [] []) . fmap (pure . Prologue.fst)) (alignBranch Prologue.snd children ranges)) `shouldBe` ranges
 
     prop "covers every input child" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
@@ -194,7 +193,7 @@ spec = parallel $ do
                       (info 8 9 `branch` [ info 8 9 `leaf` "c" ]))
         ]
 
-  describe "numberedRows" $
+  describe "numberedRows" $ do
     prop "counts only non-empty values" $
       \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
 
@@ -237,9 +236,9 @@ keysOfAlignedChildren lines = lines >>= these identity identity (++) . runJoin .
 instance Arbitrary BranchElement where
   arbitrary = oneof [ key >>= \ key -> Child key <$> joinTheseOf (contents key)
                     , Margin <$> joinTheseOf margin ]
-    where key = listOf1 (elements (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9']))
+    where key = listOf1 (elements (['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']))
           contents key = wrap key <$> listOf (padding '*')
-          wrap key contents = "(" ++ key ++ contents ++ ")" :: String
+          wrap key contents = "(" <> key <> contents <> ")" :: String
           margin = listOf (padding '-')
           padding char = frequency [ (10, pure char)
                                    , (1, pure '\n') ]

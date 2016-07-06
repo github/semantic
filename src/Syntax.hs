@@ -1,8 +1,10 @@
 module Syntax where
 
 import Prologue
-import Data.OrderedMap
+import Data.OrderedMap as Map
+import Data.Text.Arbitrary ()
 import qualified Data.Text as T
+import Test.QuickCheck hiding (Fixed)
 
 -- | A node in an abstract syntax tree.
 data Syntax
@@ -17,4 +19,27 @@ data Syntax
   | Fixed [f]
   -- | A branch of child nodes indexed by some String identity. This is useful for identifying e.g. methods & properties in a class scope by their names. Note that comments can generally occur in these scopes as well; one strategy for dealing with this is to identify comments by their text in the source.
   | Keyed (OrderedMap T.Text f)
-  deriving (Functor, Show, Eq, Foldable, Traversable)
+  deriving (Eq, Foldable, Functor, Generic, Ord, Show, Traversable)
+
+
+-- Instances
+
+syntaxOfSize :: Arbitrary leaf => (Int -> Gen f) -> Int -> Gen (Syntax leaf f)
+syntaxOfSize recur n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsOfSize n
+                     | otherwise = oneof $ branchGeneratorsOfSize n
+  where branchGeneratorsOfSize n =
+          [ Indexed <$> childrenOfSize (pred n)
+          , Fixed <$> childrenOfSize (pred n)
+          , (Keyed .) . (Map.fromList .) . zip <$> infiniteListOf arbitrary <*> childrenOfSize (pred n)
+          ]
+        childrenOfSize n | n <= 0 = pure []
+        childrenOfSize n = do
+          m <- choose (1, n)
+          first <- recur m
+          rest <- childrenOfSize (n - m)
+          pure $! first : rest
+
+instance (Arbitrary leaf, Arbitrary f) => Arbitrary (Syntax leaf f) where
+  arbitrary = sized (syntaxOfSize (`resize` arbitrary) )
+
+  shrink = genericShrink
