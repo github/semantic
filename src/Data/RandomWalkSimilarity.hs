@@ -49,8 +49,11 @@ longestIncreasingSubsequence :: Ord a => [a] -> [a]
 longestIncreasingSubsequence = maximumBy (comparing length) . fmap List.nub . filter isSorted . subsequences
 
 isSorted :: Ord a => [a] -> Bool
-isSorted = para $ \ l -> case l of
-  Cons h (tail, tailIsSorted) -> tailIsSorted && (maybe True (h <=) (head tail))
+isSorted = isSortedBy (<=)
+
+isSortedBy :: (a -> a -> Bool) -> [a] -> Bool
+isSortedBy isOrd = para $ \ l -> case l of
+  Cons h (tail, tailIsSorted) -> tailIsSorted && (maybe True (isOrd h) (head tail))
   Nil -> True
 
 -- | Extract the annotation for the before state of a diff node. This is returned in `Maybe` because e.g. an `Insert` patch does not have an annotation for the before state.
