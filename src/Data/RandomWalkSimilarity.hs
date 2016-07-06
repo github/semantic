@@ -59,12 +59,6 @@ isSortedBy isOrd = para $ \ l -> case l of
   Cons h (tail, tailIsSorted) -> tailIsSorted && maybe True (isOrd h) (head tail)
   Nil -> True
 
--- | Extract the annotation for the before state of a diff node. This is returned in `Maybe` because e.g. an `Insert` patch does not have an annotation for the before state.
-firstAnnotation :: Diff leaf annotation -> Maybe annotation
-firstAnnotation diff = case runFree diff of
-  Free (annotations :< _) -> Just (fst (runJoin annotations))
-  Pure patch -> maybeFst (unPatch $ extract <$> patch)
-
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
