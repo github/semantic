@@ -45,6 +45,10 @@ rws compare getLabel as bs
                 pure [ (i, compared) ]
         deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) (join diffs) (second delete . snd <$> unmapped)
 
+longestIncreasingSubsequence :: Ord a => [a] -> [a]
+longestIncreasingSubsequence = maximumBy (comparing length) . fmap List.nub . filter isSorted . subsequences
+  where isSorted l = sort l == l
+
 -- | Extract the annotation for the before state of a diff node. This is returned in `Maybe` because e.g. an `Insert` patch does not have an annotation for the before state.
 firstAnnotation :: Diff leaf annotation -> Maybe annotation
 firstAnnotation diff = case runFree diff of
