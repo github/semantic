@@ -48,8 +48,8 @@ rws compare getLabel as bs
 longestIncreasingSubsequence :: Ord a => [a] -> [a]
 longestIncreasingSubsequence = longestOrderedSubsequenceBy (<)
 
-longestOrderedSubsequenceBy :: Eq a => (a -> a -> Bool) -> [a] -> [a]
-longestOrderedSubsequenceBy isOrd = maximumBy (comparing length) . fmap List.nub . filter (isSortedBy isOrd) . subsequences
+longestOrderedSubsequenceBy :: (a -> a -> Bool) -> [a] -> [a]
+longestOrderedSubsequenceBy isOrd = maximumBy (comparing length) . filter (isSortedBy isOrd) . subsequences
 
 isSorted :: Ord a => [a] -> Bool
 isSorted = isSortedBy (<=)
