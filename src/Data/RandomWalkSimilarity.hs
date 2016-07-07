@@ -44,9 +44,6 @@ rws compare getLabel as bs
               pure [ (i, compared) ]
         deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) (join diffs) ((termIndex &&& delete . term) <$> unmapped)
 
-toMaybe :: Bool -> Maybe ()
-toMaybe c = if c then Just () else Nothing
-
 data UnmappedTerm leaf annotation = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Term leaf annotation) }
   deriving Eq
 
