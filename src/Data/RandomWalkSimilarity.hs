@@ -3,7 +3,6 @@ module Data.RandomWalkSimilarity where
 import Control.Arrow ((&&&))
 import Control.Monad.Random
 import Control.Monad.State
-import Data.Bifunctor.Join
 import qualified Data.DList as DList
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
