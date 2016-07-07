@@ -44,6 +44,7 @@ rws compare getLabel as bs
               pure [ (i, compared) ]
         deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) (join diffs) ((termIndex &&& delete . term) <$> unmapped)
 
+-- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm leaf annotation = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Term leaf annotation) }
   deriving Eq
 
