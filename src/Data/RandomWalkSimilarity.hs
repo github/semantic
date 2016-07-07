@@ -31,14 +31,14 @@ rws compare getLabel as bs
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
         featurize index term = UnmappedTerm index (featureVector d (pqGrams p q getLabel term)) term
-        findNearestNeighbourTo kv@(UnmappedTerm i _ v) = do
+        findNearestNeighbourTo kv@(UnmappedTerm _ _ v) = do
           (_, unmapped) <- get
-          let (UnmappedTerm _ k _) = KdTree.nearest kdas kv
+          let (UnmappedTerm i k _) = KdTree.nearest kdas kv
           fromMaybe (pure [ (i, insert v) ]) $ do
-            UnmappedTerm j _ found <- find ((== k) . feature) unmapped
+            UnmappedTerm _ _ found <- find ((== k) . feature) unmapped
             compared <- compare found v
             pure $! do
-              put (j, List.delete (UnmappedTerm j k found) unmapped)
+              put (i, List.delete (UnmappedTerm i k found) unmapped)
               pure [ (i, compared) ]
         deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) (join diffs) ((,) (negate 1) . delete . term <$> unmapped)
 
