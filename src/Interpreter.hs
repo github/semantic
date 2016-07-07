@@ -81,7 +81,7 @@ run construct comparable cost algorithm = case runFree algorithm of
     recur (Case a' as') (Case b' bs') = annotate $ Case (diffTerms' a' b') (diffTerms' as' bs')
     recur (Object as') (Object bs') = annotate $ Object (zipWith (\a b -> runJoin $ diffTerms' <$> Join a <*> Join b) as' bs')
     recur (Leaf _) (Leaf _) = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
-    recur _ _ = error $ "Unimplemented Interpreter.run term comparison between a: " <> show a <> "\nb: " <> show b
+    recur _ _ = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
 
     diffThese = these (pure . Delete) (pure . Insert) (diffTerms construct comparable cost)
 
