@@ -34,13 +34,13 @@ rws compare getLabel as bs
         featurize index term = UnmappedTerm index (featureVector d (pqGrams p q getLabel term)) term
         findNearestNeighbourTo kv@(UnmappedTerm _ _ v) = do
           (previous, unmapped) <- get
-          let (UnmappedTerm i k _) = KdTree.nearest kdas kv
+          let (UnmappedTerm i _ _) = KdTree.nearest kdas kv
           fromMaybe (pure (negate 1, insert v)) $ do
-            UnmappedTerm _ _ found <- find ((== k) . feature) unmapped
+            found <- find ((== i) . termIndex) unmapped
             guard (i < previous)
-            compared <- compare found v
+            compared <- compare (term found) v
             pure $! do
-              put (i, List.delete (UnmappedTerm i k found) unmapped)
+              put (i, List.delete found unmapped)
               pure (i, compared)
         deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& delete . term) <$> unmapped)
 
