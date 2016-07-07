@@ -35,14 +35,14 @@ rws compare getLabel as bs
         findNearestNeighbourTo kv@(UnmappedTerm _ _ v) = do
           (previous, unmapped) <- get
           let (UnmappedTerm i k _) = KdTree.nearest kdas kv
-          fromMaybe (pure [ (negate 1, insert v) ]) $ do
+          fromMaybe (pure (negate 1, insert v)) $ do
             UnmappedTerm _ _ found <- find ((== k) . feature) unmapped
             guard (i < previous)
             compared <- compare found v
             pure $! do
               put (i, List.delete (UnmappedTerm i k found) unmapped)
-              pure [ (i, compared) ]
-        deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) (join diffs) ((termIndex &&& delete . term) <$> unmapped)
+              pure (i, compared)
+        deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& delete . term) <$> unmapped)
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm leaf annotation = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Term leaf annotation) }
