@@ -35,7 +35,7 @@ rws compare getLabel as bs
         findNearestNeighbourTo kv@(UnmappedTerm _ _ v) = do
           (_, unmapped) <- get
           let (UnmappedTerm i k _) = KdTree.nearest kdas kv
-          fromMaybe (pure [ (i, insert v) ]) $ do
+          fromMaybe (pure [ (negate 1, insert v) ]) $ do
             UnmappedTerm _ _ found <- find ((== k) . feature) unmapped
             compared <- compare found v
             pure $! do
