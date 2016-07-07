@@ -42,7 +42,7 @@ rws compare getLabel as bs
               pure [ (i, compared) ]
         deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) (join diffs) ((,) (negate 1) . delete . term <$> unmapped)
 
-data UnmappedTerm leaf annotation = UnmappedTerm { index :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Term leaf annotation) }
+data UnmappedTerm leaf annotation = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Term leaf annotation) }
   deriving Eq
 
 longestIncreasingSubsequence :: Ord a => [a] -> [a]
