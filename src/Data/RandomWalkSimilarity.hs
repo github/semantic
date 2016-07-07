@@ -47,20 +47,6 @@ rws compare getLabel as bs
 data UnmappedTerm leaf annotation = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Term leaf annotation) }
   deriving Eq
 
-longestIncreasingSubsequence :: Ord a => [a] -> [a]
-longestIncreasingSubsequence = longestOrderedSubsequenceBy (<)
-
-longestOrderedSubsequenceBy :: (a -> a -> Bool) -> [a] -> [a]
-longestOrderedSubsequenceBy isOrd = maximumBy (comparing length) . filter (isSortedBy isOrd) . subsequences
-
-isSorted :: Ord a => [a] -> Bool
-isSorted = isSortedBy (<=)
-
-isSortedBy :: (a -> a -> Bool) -> [a] -> Bool
-isSortedBy isOrd = para $ \ l -> case l of
-  Cons h (tail, tailIsSorted) -> tailIsSorted && maybe True (isOrd h) (head tail)
-  Nil -> True
-
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
