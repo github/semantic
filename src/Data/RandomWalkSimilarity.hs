@@ -1,6 +1,5 @@
 module Data.RandomWalkSimilarity where
 
-import Control.Arrow ((&&&))
 import Control.Monad.Random
 import Control.Monad.State
 import qualified Data.DList as DList
@@ -30,19 +29,19 @@ rws compare getLabel as bs
         (p, q, d) = (2, 2, 15)
         fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
-        kdas = KdTree.build (Vector.toList . fst) fas
-        featurize index = featureVector d . pqGrams p q getLabel &&& (,) index
-        findNearestNeighbourTo kv@(_, (i, v)) = do
+        kdas = KdTree.build (Vector.toList . feature) fas
+        featurize index term = UnmappedTerm index (featureVector d (pqGrams p q getLabel term)) term
+        findNearestNeighbourTo kv@(UnmappedTerm i _ v) = do
           unmapped <- get
-          let (k, _) = KdTree.nearest kdas kv
-          case k `List.lookup` unmapped of
+          let (UnmappedTerm _ k _) = KdTree.nearest kdas kv
+          case find ((== k) . feature) unmapped of
             Nothing -> pure [ (i, insert v) ]
-            Just (j, found) -> case compare found v of
+            Just (UnmappedTerm j _ found) -> case compare found v of
               Nothing -> pure [ (i, insert v) ]
               Just compared -> do
-                put (List.delete (k, (j, found)) unmapped)
+                put (List.delete (UnmappedTerm j k found) unmapped)
                 pure [ (i, compared) ]
-        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) (join diffs) ((,) (negate 1) . delete . snd . snd <$> unmapped)
+        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) (join diffs) ((,) (negate 1) . delete . term <$> unmapped)
 
 data UnmappedTerm leaf annotation = UnmappedTerm { index :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Term leaf annotation) }
   deriving Eq
