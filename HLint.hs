@@ -12,4 +12,6 @@ error "Avoid return" =
     where note = "return is obsolete as of GHC 7.10"
 
 error "use pure" = free . Pure ==> pure
+error "use wrap" = free . Free ==> wrap
+
 error "use extract" = headF . runCofree ==> extract
