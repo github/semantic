@@ -3,7 +3,6 @@ module Data.RandomWalkSimilarity where
 import Control.Arrow ((&&&))
 import Control.Monad.Random
 import Control.Monad.State
-import Data.Bifunctor.Join
 import qualified Data.DList as DList
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
@@ -20,35 +19,34 @@ import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an annotation, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: (Hashable label, Hashable leaf, Eq leaf, Ord annotation) => (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> (annotation -> label) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
+rws :: (Hashable label, Hashable leaf, Eq leaf, Eq annotation) => (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> (annotation -> label) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
 rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
-  | otherwise = uncurry deleteRemaining . (`runState` fas) $ traverse findNearestNeighbourTo fbs
+  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, fas)) $ traverse findNearestNeighbourTo fbs
   where insert = pure . Insert
         delete = pure . Delete
-        replace = (pure .) . Replace
         (p, q, d) = (2, 2, 15)
-        fas = featurize <$> as
-        fbs = featurize <$> bs
-        kdas = KdTree.build (Vector.toList . fst) fas
-        featurize = featureVector d . pqGrams p q getLabel &&& identity
-        findNearestNeighbourTo kv@(_, v) = do
-          unmapped <- get
-          let (k, _) = KdTree.nearest kdas kv
-          case k `List.lookup` unmapped of
-            Nothing -> pure $! insert v
-            Just found -> do
-              put (List.delete (k, found) unmapped)
-              pure $! fromMaybe (replace found v) (compare found v)
-        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing firstAnnotation))) diffs (delete . snd <$> unmapped)
+        fas = zipWith featurize [0..] as
+        fbs = zipWith featurize [0..] bs
+        kdas = KdTree.build (Vector.toList . feature) fas
+        featurize index term = UnmappedTerm index (featureVector d (pqGrams p q getLabel term)) term
+        findNearestNeighbourTo kv@(UnmappedTerm _ _ v) = do
+          (previous, unmapped) <- get
+          let (UnmappedTerm i _ _) = KdTree.nearest kdas kv
+          fromMaybe (pure (negate 1, insert v)) $ do
+            found <- find ((== i) . termIndex) unmapped
+            guard (i >= previous)
+            compared <- compare (term found) v
+            pure $! do
+              put (i, List.delete found unmapped)
+              pure (i, compared)
+        deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& delete . term) <$> unmapped)
 
--- | Extract the annotation for the before state of a diff node. This is returned in `Maybe` because e.g. an `Insert` patch does not have an annotation for the before state.
-firstAnnotation :: Diff leaf annotation -> Maybe annotation
-firstAnnotation diff = case runFree diff of
-  Free (annotations :< _) -> Just (fst (runJoin annotations))
-  Pure patch -> maybeFst (unPatch $ extract <$> patch)
+-- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
+data UnmappedTerm leaf annotation = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Term leaf annotation) }
+  deriving Eq
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
