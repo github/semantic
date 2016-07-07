@@ -23,7 +23,7 @@ rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
   | null bs = delete <$> as
-  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` fas) $ traverse findNearestNeighbourTo fbs
+  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, fas)) $ traverse findNearestNeighbourTo fbs
   where insert = pure . Insert
         delete = pure . Delete
         (p, q, d) = (2, 2, 15)
@@ -32,15 +32,15 @@ rws compare getLabel as bs
         kdas = KdTree.build (Vector.toList . feature) fas
         featurize index term = UnmappedTerm index (featureVector d (pqGrams p q getLabel term)) term
         findNearestNeighbourTo kv@(UnmappedTerm i _ v) = do
-          unmapped <- get
+          (_, unmapped) <- get
           let (UnmappedTerm _ k _) = KdTree.nearest kdas kv
           fromMaybe (pure [ (i, insert v) ]) $ do
             UnmappedTerm j _ found <- find ((== k) . feature) unmapped
             compared <- compare found v
             pure $! do
-              put (List.delete (UnmappedTerm j k found) unmapped)
+              put (j, List.delete (UnmappedTerm j k found) unmapped)
               pure [ (i, compared) ]
-        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) (join diffs) ((,) (negate 1) . delete . term <$> unmapped)
+        deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) (join diffs) ((,) (negate 1) . delete . term <$> unmapped)
 
 data UnmappedTerm leaf annotation = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Term leaf annotation) }
   deriving Eq
