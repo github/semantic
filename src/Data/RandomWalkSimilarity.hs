@@ -33,17 +33,17 @@ rws compare getLabel as bs
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . fst) fas
         featurize index = featureVector d . pqGrams p q getLabel &&& (,) index
-        findNearestNeighbourTo kv@(_, (_, v)) = do
+        findNearestNeighbourTo kv@(_, (i, v)) = do
           unmapped <- get
           let (k, _) = KdTree.nearest kdas kv
           case k `List.lookup` unmapped of
-            Nothing -> pure [ (negate 1, insert v) ]
-            Just (i, found) -> case compare found v of
-              Nothing -> pure [ (negate 1, insert v) ]
+            Nothing -> pure [ (i, insert v) ]
+            Just (j, found) -> case compare found v of
+              Nothing -> pure [ (i, insert v) ]
               Just compared -> do
-                put (List.delete (k, (i, found)) unmapped)
+                put (List.delete (k, (j, found)) unmapped)
                 pure [ (i, compared) ]
-        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) (join diffs) (second delete . snd <$> unmapped)
+        deleteRemaining diffs unmapped = foldl' (flip (List.insertBy (comparing fst))) (join diffs) ((,) (negate 1) . delete . snd . snd <$> unmapped)
 
 longestIncreasingSubsequence :: Ord a => [a] -> [a]
 longestIncreasingSubsequence = longestOrderedSubsequenceBy (<)
