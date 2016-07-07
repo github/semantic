@@ -1,5 +1,6 @@
 module Data.RandomWalkSimilarity where
 
+import Control.Arrow ((&&&))
 import Control.Monad.Random
 import Control.Monad.State
 import qualified Data.DList as DList
@@ -40,7 +41,7 @@ rws compare getLabel as bs
             pure $! do
               put (i, List.delete (UnmappedTerm i k found) unmapped)
               pure [ (i, compared) ]
-        deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) (join diffs) ((,) (negate 1) . delete . term <$> unmapped)
+        deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) (join diffs) ((termIndex &&& delete . term) <$> unmapped)
 
 data UnmappedTerm leaf annotation = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Term leaf annotation) }
   deriving Eq
