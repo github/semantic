@@ -91,7 +91,8 @@ diffFiles parser renderer sourceBlobs = do
   let textDiff = case areNullOids of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
-        (_, _) -> runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
+        (_, _) ->
+          runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
 
   pure $! renderer textDiff sourceBlobs
   where construct :: CofreeF (Syntax Text) (Both Info) (Diff Text Info) -> Diff Text Info

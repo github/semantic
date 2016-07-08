@@ -115,16 +115,16 @@ newtype Renderable a = Renderable a
 instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Range))) where
   toMarkup (Renderable (source, info, syntax)) = (! A.data_ (textValue (show . unSize $ size info))) . classifyMarkup (category info) $ case syntax of
     Leaf _ -> span . text . toText $ slice (characterRange info) source
-    Comment _ -> span . text . toText $ slice (characterRange info) source
-    Commented cs child -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (cs <> maybeToList child)
     Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
     Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements source (characterRange info) children
+    Comment _ -> span . text . toText $ slice (characterRange info) source
+    Commented cs child -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (cs <> maybeToList child)
     Syntax.FunctionCall identifier children -> dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [identifier])) <> (wrapIn dd <$> contentElements source (characterRange info) children)
     Syntax.Function identifier params expressions -> ul . mconcat $ wrapIn li <$>
       contentElements source (characterRange info) (catMaybes [identifier, params, Just expressions])
-    Syntax.MethodCall targetId methodId methodParams -> ul . mconcat $ wrapIn li <$>
-      contentElements source (characterRange info) [targetId, methodId, methodParams]
+    Syntax.MethodCall targetId methodId methodParams ->
+      dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [targetId])) <> (wrapIn dd <$> contentElements source (characterRange info) [methodId, methodParams])
     Syntax.Args children -> ul . mconcat $ wrapIn li <$>
       contentElements source (characterRange info) children
     Syntax.MemberAccess memberId property -> ul . mconcat $ wrapIn li <$>

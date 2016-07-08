@@ -62,8 +62,10 @@ termConstructor source info = cofree . construct
       x -> error $ "Expected a function declaration but got: " <> show x
 
     construct children | FunctionCall == category info = case runCofree <$> children of
-      [ (_ :< S.MemberAccess{..}), params@(_ :< S.Args{}) ] -> setCategory info MethodCall :< S.MethodCall memberId property (cofree params)
-      (x:xs) -> withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
+      [ (_ :< S.MemberAccess{..}), params@(_ :< S.Args{}) ] ->
+        setCategory info MethodCall :< S.MethodCall memberId property (cofree params)
+      (x:xs) ->
+        withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
 
     construct children | Ternary == category info = case children of
       (condition:cases) -> withDefaultInfo $ S.Ternary condition cases
@@ -91,7 +93,8 @@ termConstructor source info = cofree . construct
 
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
     construct children | isKeyed (category info) = withDefaultInfo . S.Keyed . Map.fromList $ assignKey <$> children
-    construct children = withDefaultInfo $ S.Indexed children
+    construct children =
+      withDefaultInfo $ S.Indexed children
 
     assignKey node = case runCofree node of
       info :< S.Fixed (key : _) | Pair == category info -> (getSubstring key, node)
