@@ -52,7 +52,7 @@ data Syntax
   | Object { keyValues :: [f] }
   | Pair (f, f)
   | Comment a
-  | CommentedSyntax [f] (Maybe f)
+  | Commented [f] (Maybe f)
   deriving (Eq, Foldable, Functor, Generic, Ord, Show, Traversable)
 
 -- Instances
