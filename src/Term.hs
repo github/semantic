@@ -39,6 +39,7 @@ zipTerms t1 t2 = annotate (zipUnwrap a b)
       (Just expr') -> Just $ Switch expr' (catMaybes $ zipWith zipTerms as' bs')
       _ -> Nothing
     zipUnwrap (Object as') (Object bs') | as' == bs' = Just . Object . catMaybes $ zipWith zipTerms as' bs'
+    zipUnwrap (Pair a1' a2') (Pair b1' b2') = Pair <$> zipTerms a1' b1' <*> zipTerms a2' b2'
     zipUnwrap (Fixed a') (Fixed b') = Just . Fixed . catMaybes $ zipWith zipTerms a' b'
     zipUnwrap (Keyed a') (Keyed b') | keys a' == keys b' = Just . Keyed . fromList . catMaybes $ zipUnwrapMaps a' b' <$> keys a'
     zipUnwrap _ _ = Nothing

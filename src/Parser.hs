@@ -85,8 +85,8 @@ termConstructor source info = cofree . construct
     construct children | Object == category info = withDefaultInfo . S.Object $ foldMap toTuple children
       where
         toTuple :: Term Text Info -> [Term Text Info]
-        toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair (key, value))]
-        toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair (key, value))]
+        toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
+        toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
         toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
 
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children

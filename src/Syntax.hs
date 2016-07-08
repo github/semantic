@@ -50,7 +50,7 @@ data Syntax
   | Switch { switchExpr :: f, cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: f }
   | Object { keyValues :: [f] }
-  | Pair (f, f)
+  | Pair f f
   | Comment a
   | Commented [f] (Maybe f)
   deriving (Eq, Foldable, Functor, Generic, Ord, Show, Traversable)

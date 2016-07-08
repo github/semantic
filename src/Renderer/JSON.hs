@@ -86,7 +86,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
   S.SubscriptAccess id property -> [ "subscriptId" .= id ] <> [ "property" .= property ]
   S.Object pairs -> childrenFields pairs
-  S.Pair (a, b) -> childrenFields [a, b]
+  S.Pair a b -> childrenFields [a, b]
   S.Comment _ -> []
   S.Commented comments child -> childrenFields (comments <> maybeToList child)
   where childrenFields c = [ "children" .= c ]

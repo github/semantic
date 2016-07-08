@@ -143,7 +143,7 @@ instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Ran
       dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [target])) <> (wrapIn dd <$> contentElements source (characterRange info) [property])
     Syntax.Operator syntaxes -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) syntaxes
     Syntax.Object children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
-    Syntax.Pair (a, b) -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) [a, b]
+    Syntax.Pair a b -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) [a, b]
 
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
