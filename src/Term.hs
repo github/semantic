@@ -3,6 +3,7 @@
 module Term where
 
 import Prologue
+import Data.Align
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.OrderedMap hiding (size)
@@ -40,4 +41,12 @@ alignCofreeWith :: Functor f => (f (Cofree f a1) -> f (Cofree f a2) -> Maybe (f 
 alignCofreeWith contrast terms = fromMaybe (pure terms) $ case terms of
   These t1 t2 -> let (a1 :< s1, a2 :< s2) = (runCofree t1, runCofree t2) in
     wrap . (These a1 a2 :<) . fmap (alignCofreeWith contrast) <$> contrast s1 s2
+  _ -> Nothing
+
+alignSyntax' :: Syntax leaf a1 -> Syntax leaf a2 -> Maybe (Syntax leaf (These a1 a2))
+alignSyntax' a b = case (a, b) of
+  (Leaf _, Leaf s2) -> Just (Leaf s2)
+  (Indexed a, Indexed b) -> Just (Indexed (align a b))
+  (Fixed a, Fixed b) -> Just (Fixed (align a b))
+  (Keyed a, Keyed b) -> Just (Keyed (align a b))
   _ -> Nothing
