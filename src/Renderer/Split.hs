@@ -115,6 +115,8 @@ newtype Renderable a = Renderable a
 instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Range))) where
   toMarkup (Renderable (source, info, syntax)) = (! A.data_ (textValue (show . unSize $ size info))) . classifyMarkup (category info) $ case syntax of
     Leaf _ -> span . text . toText $ slice (characterRange info) source
+    Comment _ -> span . text . toText $ slice (characterRange info) source
+    Commented cs child -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (cs <> maybeToList child)
     Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
     Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements source (characterRange info) children
@@ -141,6 +143,7 @@ instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Ran
       dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [target])) <> (wrapIn dd <$> contentElements source (characterRange info) [property])
     Syntax.Operator syntaxes -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) syntaxes
     Syntax.Object children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
+    Syntax.Pair (a, b) -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) [a, b]
 
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
