@@ -25,6 +25,7 @@ zipTerms t1 t2 = annotate (zipUnwrap a b)
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
     annotate = fmap (cofree . (both annotation1 annotation2 :<))
     zipUnwrap (Leaf _) (Leaf b') = Just $ Leaf b'
+    zipUnwrap (Comment _) (Comment b) = Just $ Comment b
     zipUnwrap (Indexed a') (Indexed b') = Just . Indexed . catMaybes $ zipWith zipTerms a' b'
     zipUnwrap (FunctionCall idA' a') (FunctionCall idB' b') = case (zipTerms idA' idB') of
       (Just id') ->  Just $ FunctionCall id' (catMaybes $ zipWith zipTerms a' b')
@@ -40,6 +41,7 @@ zipTerms t1 t2 = annotate (zipUnwrap a b)
       _ -> Nothing
     zipUnwrap (Object as') (Object bs') | as' == bs' = Just . Object . catMaybes $ zipWith zipTerms as' bs'
     zipUnwrap (Pair a1' a2') (Pair b1' b2') = Pair <$> zipTerms a1' b1' <*> zipTerms a2' b2'
+    zipUnwrap (Commented cs1 a) (Commented cs2 b) = Commented (catMaybes $ zipWith zipTerms cs1 cs2) <$> (zipTerms <$> a <*> b)
     zipUnwrap (Fixed a') (Fixed b') = Just . Fixed . catMaybes $ zipWith zipTerms a' b'
     zipUnwrap (Keyed a') (Keyed b') | keys a' == keys b' = Just . Keyed . fromList . catMaybes $ zipUnwrapMaps a' b' <$> keys a'
     zipUnwrap _ _ = Nothing
