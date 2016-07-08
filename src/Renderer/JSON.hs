@@ -19,7 +19,7 @@ import Range
 import Renderer
 import Source hiding (fromList)
 import SplitDiff
-import Syntax
+import Syntax as S
 import Term
 
 -- | Render a diff to a string representing its JSON.
@@ -71,16 +71,16 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   Indexed c -> childrenFields c
   Fixed c -> childrenFields c
   Keyed c -> childrenFields c
-  Syntax.FunctionCall identifier params -> [ "identifier" .= identifier ] <> [ "params" .= params ]
-  Syntax.Function identifier params c -> [ "identifier" .= identifier ] <> [ "params" .= params ] <> childrenFields c
-  Syntax.MethodCall targetId methodId args -> [ "targetIdentifier" .= targetId ] <> [ "methodId" .= methodId ] <> [ "args" .= args ]
-  Syntax.Args c -> childrenFields c
-  Syntax.Assignment assignmentId property -> [ "assignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
-  Syntax.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
-  Syntax.Switch expr cases -> [ "switchExpression" .= expr ] <> [ "cases" .= cases ]
-  Syntax.Case expr body -> [ "caseExpression" .= expr ] <> [ "caseStatement" .= body ]
-  Syntax.VarDecl decl -> [ "variableDeclaration" .= decl ]
-  Syntax.VarAssignment id value -> [ "varIdentifier" .= id ] <> [ "value" .= value ]
+  S.FunctionCall identifier params -> [ "identifier" .= identifier ] <> [ "params" .= params ]
+  S.Function identifier params c -> [ "identifier" .= identifier ] <> [ "params" .= params ] <> childrenFields c
+  S.MethodCall targetId methodId args -> [ "targetIdentifier" .= targetId ] <> [ "methodId" .= methodId ] <> [ "args" .= args ]
+  S.Args c -> childrenFields c
+  S.Assignment assignmentId property -> [ "assignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
+  S.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
+  S.Switch expr cases -> [ "switchExpression" .= expr ] <> [ "cases" .= cases ]
+  S.Case expr body -> [ "caseExpression" .= expr ] <> [ "caseStatement" .= body ]
+  S.VarDecl decl -> [ "variableDeclaration" .= decl ]
+  S.VarAssignment id value -> [ "varIdentifier" .= id ] <> [ "value" .= value ]
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: KeyValue kv => SplitPatch (Term leaf Info) -> [kv]
