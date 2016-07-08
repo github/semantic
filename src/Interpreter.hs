@@ -9,7 +9,6 @@ import Data.Hashable
 import Data.List ((\\))
 import qualified Data.List as List
 import Data.OrderedMap ((!))
-import Control.Arrow ((***))
 import qualified Data.OrderedMap as Map
 import Data.RandomWalkSimilarity
 import Data.Record
@@ -22,8 +21,6 @@ import Prologue hiding (lookup)
 import SES
 import Syntax
 import Term
-import Data.Align
-import Data.These
 
 -- | Returns whether two terms are comparable
 type Comparable leaf annotation = Term leaf annotation -> Term leaf annotation -> Bool
