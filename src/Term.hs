@@ -55,9 +55,7 @@ alignSyntax' a b = case (a, b) of
   _ -> Nothing
 
 alignF :: (Data (f a), Data (f b), Data (f (These a b)), Typeable a, Typeable b) => f a -> f b -> Maybe (f b)
-alignF a b = do
-  guard (toConstr a == toConstr b)
-  alignM a b
+alignF a b = alignM a b
   where alignM :: (Data a, Data b, Alternative m, Monad m) => a -> b -> m b
         alignM a b = gzipWithM go a b
           where go :: forall m a b. (Data a, Data b, Alternative m, Monad m) => a -> b -> m b
