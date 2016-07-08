@@ -34,11 +34,10 @@ diffTerms construct comparable cost a b = fromMaybe (pure $ Replace a b) $ const
 
 -- | Constructs an algorithm and runs it
 constructAndRun :: (Eq leaf, Hashable leaf, Ord (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Maybe (Diff leaf (Record fields))
-constructAndRun _ comparable _ a b | not $ comparable a b = Nothing
-
-constructAndRun construct _ _ a b | (() <$ a) == (() <$ b) = hylo construct runCofree <$> zipTerms a b
-
-constructAndRun construct comparable cost t1 t2 =
+constructAndRun construct comparable cost t1 t2
+  | not $ comparable t1 t2 = Nothing
+  | (() <$ t2) == (() <$ t2) = hylo construct runCofree <$> zipTerms t1 t2
+  | otherwise =
   run construct comparable cost $ algorithm a b where
     algorithm (Indexed a') (Indexed b') = wrap $! ByIndex a' b' (annotate . Indexed)
     algorithm (Keyed a') (Keyed b') = wrap $! ByKey a' b' (annotate . Keyed)
