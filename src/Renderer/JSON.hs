@@ -81,6 +81,14 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Case expr body -> [ "caseExpression" .= expr ] <> [ "caseStatement" .= body ]
   S.VarDecl decl -> [ "variableDeclaration" .= decl ]
   S.VarAssignment id value -> [ "varIdentifier" .= id ] <> [ "value" .= value ]
+  S.MathAssignment id value -> [ "mathIdentifier" .= id ] <> [ "value" .= value ]
+  S.Ternary expr cases -> [ "ternaryExpression" .= expr ] <> [ "cases" .= cases ]
+  S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
+  S.SubscriptAccess id property -> [ "subscriptId" .= id ] <> [ "property" .= property ]
+  S.Object pairs -> childrenFields pairs
+  S.Pair (a, b) -> childrenFields [a, b]
+  S.Comment _ -> []
+  S.Commented comments child -> childrenFields (comments <> maybeToList child)
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: KeyValue kv => SplitPatch (Term leaf Info) -> [kv]
