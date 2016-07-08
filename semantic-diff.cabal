@@ -66,6 +66,7 @@ library
                      , QuickCheck >= 2.8.1
                      , quickcheck-text
                      , semigroups
+                     , syb
                      , text >= 1.2.1.3
                      , text-icu
                      , these
