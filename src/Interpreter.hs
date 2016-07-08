@@ -77,6 +77,9 @@ run construct comparable cost algorithm = case runFree algorithm of
     recur (Switch a' as') (Switch b' bs') = annotate $ Switch (diffTerms' a' b') (alignWith (these (pure . Delete) (pure . Insert) diffTerms') as' bs')
     recur (Case a' as') (Case b' bs') = annotate $ Case (diffTerms' a' b') (diffTerms' as' bs')
     recur (Object as') (Object bs') = annotate $ Object (zipWith diffTerms' as' bs')
+    recur (Pair a1 a2) (Pair b1 b2) = annotate $ Pair (diffTerms' a1 b1) (diffTerms' a2 b2)
+    recur (Commented a1 a2) (Commented b1 b2) = annotate $ Commented (zipWith diffTerms' a1 b1) (diffTerms' <$> a2 <*> b2)
+    recur (Comment _) (Comment _) = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
     recur (Leaf _) (Leaf _) = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
     recur _ _ = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
 
