@@ -87,7 +87,7 @@ alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax 
     catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (expr <> body) bothRanges
   Fixed children -> catMaybes $ wrapInBranch Fixed <$> alignBranch getRange (join children) bothRanges
   Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> alignBranch (getRange . Prologue.snd) (Map.toList children >>= pairWithKey) bothRanges
-  Object children -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (children >>= pairWithTerm) bothRanges
+  Object children -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
   Ternary expr cases -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (expr <> join cases) bothRanges
   Operator cases -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join cases) bothRanges
   MathAssignment key value -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (key <> value) bothRanges

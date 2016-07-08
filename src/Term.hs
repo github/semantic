@@ -38,13 +38,11 @@ zipTerms t1 t2 = annotate (zipUnwrap a b)
     zipUnwrap (Switch a' as') (Switch b' bs') = case (zipTerms a' b') of
       (Just expr') -> Just $ Switch expr' (catMaybes $ zipWith zipTerms as' bs')
       _ -> Nothing
-    zipUnwrap (Object as') (Object bs') | (Prologue.fst <$> as') == (Prologue.fst <$> bs') = Just . Object . catMaybes $ zipUnwrapObjects as' bs' <$> (Prologue.fst <$> as')
+    zipUnwrap (Object as') (Object bs') | as' == bs' = Just . Object . catMaybes $ zipWith zipTerms as' bs'
     zipUnwrap (Fixed a') (Fixed b') = Just . Fixed . catMaybes $ zipWith zipTerms a' b'
     zipUnwrap (Keyed a') (Keyed b') | keys a' == keys b' = Just . Keyed . fromList . catMaybes $ zipUnwrapMaps a' b' <$> keys a'
     zipUnwrap _ _ = Nothing
     zipUnwrapMaps a' b' key = (,) key <$> zipTerms (a' ! key) (b' ! key)
-    zipUnwrapObjects :: (Eq a, Eq annotation) => [(Term a annotation, Term a annotation)] -> [(Term a annotation, Term a annotation)] -> Term a annotation -> Maybe (Term a (Both annotation), Term a (Both annotation))
-    zipUnwrapObjects a' b' key = (,) (fromJust $ zipTerms key key) <$> zipTerms (fromJust $ Prologue.lookup key a') (fromJust $ Prologue.lookup key b')
 
 -- | Return the node count of a term.
 termSize :: Term a annotation -> Integer

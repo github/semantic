@@ -49,9 +49,11 @@ data Syntax
   | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
   | Switch { switchExpr :: f, cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: f }
-  | Object { keyValues :: [(f, f)] }
+  | Object { keyValues :: [f] }
+  | Pair (f, f)
+  | Comment a
+  | CommentedSyntax [f] (Maybe f)
   deriving (Eq, Foldable, Functor, Generic, Ord, Show, Traversable)
-
 
 -- Instances
 
