@@ -6,6 +6,7 @@ import Prologue
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.OrderedMap hiding (size)
+import Data.These
 import Syntax
 
 -- | An annotated node (Syntax) in an abstract syntax tree.
@@ -34,3 +35,9 @@ zipTerms t1 t2 = annotate (zipUnwrap a b)
 termSize :: Term a annotation -> Integer
 termSize = cata size where
   size (_ :< syntax) = 1 + sum syntax
+
+alignCofreeWith :: Functor f => (These (f (Cofree f a1)) (f (Cofree f a2)) -> Maybe (f (These (Cofree f a1) (Cofree f a2)))) -> These (Cofree f a1) (Cofree f a2) -> Free (CofreeF f (These a1 a2)) (These (Cofree f a1) (Cofree f a2))
+alignCofreeWith contrast terms = case terms of
+  This t1 -> let (a1 :< s1) = runCofree t1 in wrap $! This a1 :< (alignCofreeWith contrast . This <$> s1)
+  That t2 -> let (a2 :< s2) = runCofree t2 in wrap $! That a2 :< (alignCofreeWith contrast . That <$> s2)
+  These t1 t2 -> let (a1 :< s1, a2 :< s2) = (runCofree t1, runCofree t2) in maybe (pure terms) (wrap . (These a1 a2 :<) . fmap (alignCofreeWith contrast)) (contrast (These s1 s2))
