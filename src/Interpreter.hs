@@ -40,10 +40,10 @@ constructAndRun construct _ _ a b | (() <$ a) == (() <$ b) = hylo construct runC
 
 constructAndRun construct comparable cost t1 t2 =
   run construct comparable cost $ algorithm a b where
-    algorithm (Indexed a') (Indexed b') = free . Free $ ByIndex a' b' (annotate . Indexed)
-    algorithm (Keyed a') (Keyed b') = free . Free $ ByKey a' b' (annotate . Keyed)
+    algorithm (Indexed a') (Indexed b') = wrap $! ByIndex a' b' (annotate . Indexed)
+    algorithm (Keyed a') (Keyed b') = wrap $! ByKey a' b' (annotate . Keyed)
     algorithm (Leaf a') (Leaf b') | a' == b' = annotate $ Leaf b'
-    algorithm a' b' = free . Free $ Recursive (cofree (annotation1 :< a')) (cofree (annotation2 :< b')) pure
+    algorithm a' b' = wrap $! Recursive (cofree (annotation1 :< a')) (cofree (annotation2 :< b')) pure
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
     annotate = pure . construct . (both annotation1 annotation2 :<)
 
