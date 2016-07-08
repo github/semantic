@@ -2,7 +2,7 @@
 module Renderer.Split where
 
 import Alignment
-import Category
+import Category as C
 import Data.Bifunctor.Join
 import Data.Foldable
 import Data.Functor.Both
@@ -41,31 +41,31 @@ styleName category = "category-" <> case category of
   BinaryOperator -> "binary-operator"
   Boolean -> "boolean"
   DictionaryLiteral -> "dictionary"
-  Category.Pair -> "pair"
+  C.Pair -> "pair"
   StringLiteral -> "string"
   SymbolLiteral -> "symbol"
   IntegerLiteral -> "integer"
   ArrayLiteral -> "array"
-  Category.FunctionCall -> "function_call"
-  Category.Function -> "function"
-  Category.MethodCall -> "method_call"
-  Category.Args -> "arguments"
-  Category.Assignment -> "assignment"
-  Category.MemberAccess -> "member_access"
-  Category.VarDecl -> "var_declaration"
-  Category.VarAssignment -> "var_assignment"
-  Category.Switch -> "switch"
-  Category.Case -> "case"
+  C.FunctionCall -> "function_call"
+  C.Function -> "function"
+  C.MethodCall -> "method_call"
+  C.Args -> "arguments"
+  C.Assignment -> "assignment"
+  C.MemberAccess -> "member_access"
+  C.VarDecl -> "var_declaration"
+  C.VarAssignment -> "var_assignment"
+  C.Switch -> "switch"
+  C.Case -> "case"
   TemplateString -> "template_string"
   Regex -> "regex"
   Identifier -> "identifier"
   Params -> "parameters"
   ExpressionStatements -> "expression_statements"
-  Category.MathAssignment -> "math_assignment"
-  Category.SubscriptAccess -> "subscript_access"
-  Category.Ternary -> "ternary"
-  Category.Operator -> "operator"
-  Category.Object -> "object"
+  C.MathAssignment -> "math_assignment"
+  C.SubscriptAccess -> "subscript_access"
+  C.Ternary -> "ternary"
+  C.Operator -> "operator"
+  C.Object -> "object"
   Other string -> string
 
 -- | Pick the class name for a split patch.
