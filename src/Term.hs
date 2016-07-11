@@ -90,6 +90,6 @@ instance (Traversable f, Applicative f, GAlign g) => GAlign (f :.: g) where
 instance GAlign ((,) a) where
   galign (_, a) (k, b) = Just (k, These a b)
 
-instance GAlign []
-instance GAlign (OrderedMap key)
+instance GAlign [] where galign a = Just . align a
+instance Eq key => GAlign (OrderedMap key) where galign a = Just . align a
 instance GAlign (Syntax a)
