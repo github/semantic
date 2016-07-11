@@ -94,3 +94,6 @@ galignDefault a b = to1 <$> galign (from1 a) (from1 b)
 
 instance GAlign [] where
   galign = galignDefault
+
+instance GAlign (OrderedMap key) where
+  galign = galignDefault
