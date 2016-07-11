@@ -78,6 +78,7 @@ instance (GAlign f, GAlign g) => GAlign (f :+: g) where
     where go a b = case (a, b) of
             (L1 a, L1 b) -> L1 (galignWith f a b)
             (R1 a, R1 b) -> R1 (galignWith f a b)
+            (a, b) -> f a b
 
 instance (GAlign f, GAlign g) => GAlign (f :*: g) where
   galignWith f (a1 :*: b1) (a2 :*: b2) = galignWith f a1 a2 :*: galignWith f b1 b2
