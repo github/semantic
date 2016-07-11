@@ -37,7 +37,7 @@ termSize = cata size where
   size (_ :< syntax) = 1 + sum syntax
 
 alignCofreeWith :: Functor f => (forall a b. f a -> f b -> Maybe (f (These a b))) -> (a -> b -> c) -> These (Cofree f a) (Cofree f b) -> Free (CofreeF f c) (These (Cofree f a) (Cofree f b))
-alignCofreeWith contrast combine = go
+alignCofreeWith compare combine = go
   where go terms = fromMaybe (pure terms) $ case terms of
-          These t1 t2 -> wrap . (combine (extract t1) (extract t2) :<) . fmap go <$> contrast (unwrap t1) (unwrap t2)
+          These t1 t2 -> wrap . (combine (extract t1) (extract t2) :<) . fmap go <$> compare (unwrap t1) (unwrap t2)
           _ -> Nothing
