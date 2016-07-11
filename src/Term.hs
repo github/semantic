@@ -1,4 +1,4 @@
-{-# LANGUAGE DefaultSignatures, ScopedTypeVariables, RankNTypes, TypeFamilies, TypeOperators, TypeSynonymInstances #-}
+{-# LANGUAGE RankNTypes, TypeFamilies #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Term where
 
