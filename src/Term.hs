@@ -76,11 +76,10 @@ instance GAlign f => GAlign (M1 i c f) where
   galign (M1 a) (M1 b) = M1 <$> galign a b
 
 instance (GAlign f, GAlign g) => GAlign (f :+: g) where
-  galign = go
-    where go a b = case (a, b) of
-            (L1 a, L1 b) -> L1 <$> galign a b
-            (R1 a, R1 b) -> R1 <$> galign a b
-            _ -> Nothing
+  galign a b = case (a, b) of
+    (L1 a, L1 b) -> L1 <$> galign a b
+    (R1 a, R1 b) -> R1 <$> galign a b
+    _ -> Nothing
 
 instance (GAlign f, GAlign g) => GAlign (f :*: g) where
   galign (a1 :*: b1) (a2 :*: b2) = (:*:) <$> galign a1 a2 <*> galign b1 b2
