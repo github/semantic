@@ -3,7 +3,6 @@
 module Term where
 
 import Prologue
-import Data.Align
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.OrderedMap hiding (size)
