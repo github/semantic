@@ -1,6 +1,7 @@
 {-# LANGUAGE DefaultSignatures, TypeOperators #-}
 module Data.Align.Generic where
 
+import Control.Monad
 import Data.Align
 import Data.These
 import GHC.Generics
@@ -17,7 +18,7 @@ class Functor f => GAlign f where
 
 -- Generically-derived instances
 
-instance GAlign (Syntax a)
+instance Eq a => GAlign (Syntax a)
 
 
 -- 'Data.Align.Align' instances
@@ -40,8 +41,8 @@ instance GAlign Par1 where
   galign (Par1 a) (Par1 b) = Just (Par1 (These a b))
 
 -- | 'GAlign' over constants.
-instance GAlign (K1 i c) where
-  galign (K1 _) (K1 b) = Just (K1 b)
+instance Eq c => GAlign (K1 i c) where
+  galign (K1 a) (K1 b) = guard (a == b) >> Just (K1 b)
 
 -- | 'GAlign' over applications over parameters.
 instance GAlign f => GAlign (Rec1 f) where
