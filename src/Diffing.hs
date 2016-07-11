@@ -58,7 +58,7 @@ breakDownLeavesByWord source = cata replaceIn
     replaceIn :: TermF T.Text Info (Term T.Text Info) -> Term T.Text Info
     replaceIn (info :< syntax) = let size' = 1 + sum (size . extract <$> syntax') in cofree $ setCost (setSize info size') (Cost (unSize size')) :< syntax'
       where syntax' = case (ranges, syntax) of
-              (_:_:_, Leaf _) -> Indexed (makeLeaf info <$> ranges)
+              (_:_:_, Leaf _) | category info /= Regex -> Indexed (makeLeaf info <$> ranges)
               _ -> syntax
             ranges = rangesAndWordsInSource (characterRange info)
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
