@@ -87,7 +87,7 @@ diffFiles parser renderer sourceBlobs = do
   terms <- sequence $ parser <$> sources
 
   let replaceLeaves = breakDownLeavesByWord <$> sources
-  let areNullOids = runBothWith (\a b -> (oid a == nullOid || length (source a) == 0, oid b == nullOid || length (source b) == 0)) sourceBlobs
+  let areNullOids = runBothWith (\a b -> (oid a == nullOid || null (source a), oid b == nullOid || null (source b))) sourceBlobs
   let textDiff = case areNullOids of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
