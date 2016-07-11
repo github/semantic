@@ -15,6 +15,12 @@ class Functor f => GAlign f where
   galign a b = to1 <$> galign (from1 a) (from1 b)
 
 
+-- Types with 'Data.Align.Align' instances can (and probably should) reuse them.
+
+instance GAlign [] where galign a = Just . align a
+instance Eq key => GAlign (OrderedMap key) where galign a = Just . align a
+
+
 -- Generics
 
 instance GAlign U1 where
@@ -44,6 +50,4 @@ instance (GAlign f, GAlign g) => GAlign (f :*: g) where
 instance (Traversable f, Applicative f, GAlign g) => GAlign (f :.: g) where
   galign (Comp1 a) (Comp1 b) = Comp1 <$> sequenceA (galign <$> a <*> b)
 
-instance GAlign [] where galign a = Just . align a
-instance Eq key => GAlign (OrderedMap key) where galign a = Just . align a
 instance GAlign (Syntax a)
