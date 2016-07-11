@@ -94,8 +94,5 @@ instance GAlign ((,) a) where
 galignDefault :: (Generic1 f, GAlign (Rep1 f)) => f a -> f b -> Maybe (f (These a b))
 galignDefault a b = to1 <$> galign (from1 a) (from1 b)
 
-instance GAlign [] where
-  galign = galignDefault
-
-instance GAlign (OrderedMap key) where
-  galign = galignDefault
+instance GAlign []
+instance GAlign (OrderedMap key)
