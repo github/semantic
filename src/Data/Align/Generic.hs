@@ -40,7 +40,7 @@ instance GAlign U1 where
 instance GAlign Par1 where
   galign (Par1 a) (Par1 b) = Just (Par1 (These a b))
 
--- | 'GAlign' over non-parameter fields.
+-- | 'GAlign' over non-parameter fields. Only equal values are aligned.
 instance Eq c => GAlign (K1 i c) where
   galign (K1 a) (K1 b) = guard (a == b) >> Just (K1 b)
 
