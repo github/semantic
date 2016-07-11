@@ -8,12 +8,13 @@ import Data.OrderedMap
 import Prologue
 import Syntax
 
--- Generics
-
 class Functor f => GAlign f where
   galign :: f a -> f b -> Maybe (f (These a b))
   default galign :: (Generic1 f, GAlign (Rep1 f)) => f a -> f b -> Maybe (f (These a b))
   galign a b = to1 <$> galign (from1 a) (from1 b)
+
+
+-- Generics
 
 instance GAlign U1 where
   galign _ _ = Just U1
