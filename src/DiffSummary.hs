@@ -51,7 +51,9 @@ toTermName term = case unwrap term of
   Syntax.Ternary expr _ -> toTermName expr
   Syntax.MathAssignment id _ -> toTermName id
   Syntax.Operator syntaxes -> mconcat $ toTermName <$> syntaxes
-  Syntax.Object kvs -> mconcat $ toTermName <$> kvs
+  Syntax.Object kvs -> "{" <> intercalate ", " (toTermName <$> kvs) <> "}"
+  Syntax.Pair a b -> toTermName a <> ": " <> toTermName b
+  Comment a -> toCategoryName a
 
 class HasCategory a where
   toCategoryName :: a -> Text
