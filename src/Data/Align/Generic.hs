@@ -17,8 +17,8 @@ class Functor f => GAlign f where
 
 -- Types with 'Data.Align.Align' instances can (and probably should) reuse them.
 
-instance GAlign [] where galign a = Just . align a
-instance Eq key => GAlign (OrderedMap key) where galign a = Just . align a
+instance GAlign [] where galign = galignAlign
+instance Eq key => GAlign (OrderedMap key) where galign = galignAlign
 
 galignAlign :: Align f => f a -> f b -> Maybe (f (These a b))
 galignAlign a = Just . align a
