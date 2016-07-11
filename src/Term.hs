@@ -92,3 +92,4 @@ instance GAlign ((,) a) where
 
 instance GAlign []
 instance GAlign (OrderedMap key)
+instance GAlign (Syntax a)
