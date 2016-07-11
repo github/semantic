@@ -17,12 +17,13 @@ module Data.OrderedMap (
 
 import Data.Align
 import Data.These
+import GHC.Generics
 import Prologue hiding (toList, empty)
 import Test.QuickCheck
 
 -- | An ordered map of keys and values.
 newtype OrderedMap key value = OrderedMap { toList :: [(key, value)] }
-  deriving (Eq, Foldable, Functor, Generic, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
 -- | Construct an ordered map from a list of pairs of keys and values.
 fromList :: [(key, value)] -> OrderedMap key value
