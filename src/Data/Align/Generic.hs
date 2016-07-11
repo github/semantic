@@ -20,6 +20,9 @@ class Functor f => GAlign f where
 instance GAlign [] where galign a = Just . align a
 instance Eq key => GAlign (OrderedMap key) where galign a = Just . align a
 
+galignAlign :: Align f => f a -> f b -> Maybe (f (These a b))
+galignAlign a = Just . align a
+
 
 -- Generics
 
