@@ -35,7 +35,7 @@ infixl 9 !
 
 -- | Look up a value in the map by key, erroring if it doesn't exist.
 (!) :: Eq key => OrderedMap key value -> key -> value
-map ! key = fromMaybe (error "no value found for key") $ Data.OrderedMap.lookup key map
+m ! key = fromMaybe (error "no value found for key") $ Data.OrderedMap.lookup key m
 
 -- | Look up a value in the map by key, returning Nothing if it doesn't exist.
 lookup :: Eq key => key -> OrderedMap key value -> Maybe value
@@ -51,7 +51,7 @@ empty = OrderedMap []
 
 -- | Combine `a` and `b`, picking the values from `a` when keys overlap.
 union :: Eq key => OrderedMap key value -> OrderedMap key value -> OrderedMap key value
-union a b = OrderedMap $ toList a ++ toList (difference b a)
+union a b = OrderedMap $ toList a <> toList (difference b a)
 
 -- | Union a list of ordered maps.
 unions :: Eq key => [OrderedMap key value] -> OrderedMap key value
