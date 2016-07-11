@@ -31,29 +31,37 @@ galignAlign a = Just . align a
 
 -- Generics
 
+-- | 'GAlign' over unit constructors.
 instance GAlign U1 where
   galign _ _ = Just U1
 
+-- | 'GAlign' over parameters.
 instance GAlign Par1 where
   galign (Par1 a) (Par1 b) = Just (Par1 (These a b))
 
+-- | 'GAlign' over constants.
 instance GAlign (K1 i c) where
   galign (K1 _) (K1 b) = Just (K1 b)
 
+-- | 'GAlign' over applications over parameters.
 instance GAlign f => GAlign (Rec1 f) where
   galign (Rec1 a) (Rec1 b) = Rec1 <$> galign a b
 
+-- | 'GAlign' over metainformation (constructor names, etc).
 instance GAlign f => GAlign (M1 i c f) where
   galign (M1 a) (M1 b) = M1 <$> galign a b
 
+-- | 'GAlign' over sums. Returns 'Nothing' for disjoint constructors.
 instance (GAlign f, GAlign g) => GAlign (f :+: g) where
   galign a b = case (a, b) of
     (L1 a, L1 b) -> L1 <$> galign a b
     (R1 a, R1 b) -> R1 <$> galign a b
     _ -> Nothing
 
+-- | 'GAlign' over products.
 instance (GAlign f, GAlign g) => GAlign (f :*: g) where
   galign (a1 :*: b1) (a2 :*: b2) = (:*:) <$> galign a1 a2 <*> galign b1 b2
 
+-- | 'GAlign' over type compositions.
 instance (Traversable f, Applicative f, GAlign g) => GAlign (f :.: g) where
   galign (Comp1 a) (Comp1 b) = Comp1 <$> sequenceA (galign <$> a <*> b)
