@@ -2,7 +2,7 @@ module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
 import Category
-import Data.Align
+import Data.Align.Generic
 import Data.Functor.Foldable
 import Data.Functor.Both
 import Data.Hashable
@@ -54,13 +54,7 @@ run construct comparable cost algorithm = case runFree algorithm of
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
     annotate = construct . (both annotation1 annotation2 :<)
 
-    recur (Indexed a') (Indexed b') = annotate . Indexed $ alignWith diffThese a' b'
-    recur (Fixed a') (Fixed b') = annotate . Fixed $ alignWith diffThese a' b'
-    recur (Keyed a') (Keyed b') | Map.keys a' == bKeys = annotate . Keyed . Map.fromList . fmap repack $ bKeys where
-      bKeys = Map.keys b'
-      repack key = (key, interpretInBoth key a' b')
-      interpretInBoth key x y = diffTerms construct comparable cost (x ! key) (y ! key)
-    recur _ _ = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
+    recur a b = maybe (pure (Replace t1 t2)) (annotate . fmap diffThese) (galign a b)
 
     diffThese = these (pure . Delete) (pure . Insert) (diffTerms construct comparable cost)
 
