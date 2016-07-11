@@ -83,6 +83,9 @@ instance (GAlign f, GAlign g) => GAlign (f :+: g) where
 instance (GAlign f, GAlign g) => GAlign (f :*: g) where
   galign (a1 :*: b1) (a2 :*: b2) = (:*:) <$> galign a1 a2 <*> galign b1 b2
 
+instance (Traversable f, Applicative f, GAlign g) => GAlign (f :.: g) where
+  galign (Comp1 a) (Comp1 b) = Comp1 <$> sequenceA (galign <$> a <*> b)
+
 instance GAlign ((,) a) where
   galign (_, a) (k, b) = Just (k, These a b)
 
