@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables, RankNTypes, TypeFamilies, TypeSynonymInstances #-}
+{-# LANGUAGE ScopedTypeVariables, RankNTypes, TypeFamilies, TypeOperators, TypeSynonymInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Term where
 
@@ -9,9 +9,7 @@ import Data.Functor.Both
 import Data.OrderedMap hiding (size)
 import Data.These
 import Syntax
-import Data.Data
-import Data.Generics.Twins
-import Unsafe.Coerce
+import GHC.Generics
 
 -- | An annotated node (Syntax) in an abstract syntax tree.
 type TermF a annotation = CofreeF (Syntax a) annotation
@@ -54,18 +52,37 @@ alignSyntax' a b = case (a, b) of
   (Keyed a, Keyed b) -> Just (Keyed (align a b))
   _ -> Nothing
 
-alignF :: (Data (f a), Data (f b), Data (f (These a b)), Typeable a, Typeable b) => f a -> f b -> Maybe (f b)
-alignF a b = alignM a b
-  where alignM :: (Data a, Data b, Alternative m, Monad m) => a -> b -> m b
-        alignM a b = gzipWithM go a b
-          where go :: forall m a b. (Data a, Data b, Alternative m, Monad m) => a -> b -> m b
-                go a b = do
-                  guard (toConstr a == toConstr b)
-                  fromConstrM (do
-                    b' <- guardCast b
-                    alignM a b') (toConstr b)
 
-        guardCast :: forall f a b. (Typeable a, Typeable b, Alternative f) => a -> f b
-        guardCast a =
-          guard (typeRep (Proxy :: Proxy a) == typeRep (Proxy :: Proxy b))
-          *> unsafeCoerce a
+-- Generics
+
+class GAlign f where
+  galign :: f a -> f b -> f (a, b)
+
+instance GAlign U1 where
+  galign _ _ = U1
+
+instance GAlign Par1 where
+  galign (Par1 a) (Par1 b) = Par1 (a, b)
+
+instance GAlign (K1 i c) where
+  galign (K1 _) (K1 b) = K1 b
+
+instance GAlign f => GAlign (Rec1 f) where
+  galign (Rec1 a) (Rec1 b) = Rec1 (galign a b)
+
+instance GAlign f => GAlign (M1 i c f) where
+  galign (M1 a) (M1 b) = M1 (galign a b)
+
+instance (GAlign f, GAlign g) => GAlign (f :+: g) where
+  galign (L1 a) (L1 b) = L1 (galign a b)
+  galign (R1 a) (R1 b) = R1 (galign a b)
+  -- galign _ _ = undefined
+
+instance (GAlign f, GAlign g) => GAlign (f :*: g) where
+  galign (a1 :*: b1) (a2 :*: b2) = galign a1 a2 :*: galign b1 b2
+
+galignDefault :: (Generic1 f, GAlign (Rep1 f)) => f a -> f b -> f (a, b)
+galignDefault a b = to1 (galign (from1 a) (from1 b))
+
+instance GAlign [] where
+  galign = galignDefault
