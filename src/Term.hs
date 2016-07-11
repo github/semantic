@@ -36,7 +36,7 @@ termSize :: Term a annotation -> Integer
 termSize = cata size where
   size (_ :< syntax) = 1 + sum syntax
 
-alignCofreeWith :: Functor f => (forall a b. f a -> f b -> Maybe (f (These a b))) -> These (Cofree f a1) (Cofree f a2) -> Free (CofreeF f (These a1 a2)) (These (Cofree f a1) (Cofree f a2))
+alignCofreeWith :: Functor f => (forall a b. f a -> f b -> Maybe (f (These a b))) -> These (Cofree f a) (Cofree f b) -> Free (CofreeF f (These a b)) (These (Cofree f a) (Cofree f b))
 alignCofreeWith contrast terms = fromMaybe (pure terms) $ case terms of
   These t1 t2 -> let (a1 :< s1, a2 :< s2) = (runCofree t1, runCofree t2) in
     wrap . (These a1 a2 :<) . fmap (alignCofreeWith contrast) <$> contrast s1 s2
