@@ -155,17 +155,7 @@ termToDiffInfo term = case runCofree term of
   -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
   -- to indicate where that value should be when constructing DiffInfos.
   (info :< Syntax.Operator _) -> [DiffInfo (toCategoryName info) "x"]
-  memberAccess@(info :< Syntax.MemberAccess{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree memberAccess) ]
-  subscriptAccess@(info :< Syntax.SubscriptAccess{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree subscriptAccess) ]
-  methodCall@(info :< Syntax.MethodCall{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree methodCall) ]
-  -- TODO: We should remove Args from Syntax since I don't think we shouldn ever
-  -- evaluate Args as a single toTermName Text - joshvera
-  args@(info :< Syntax.Args{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree args) ]
-  varDecl@(info :< Syntax.VarDecl{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree varDecl) ]
-  varAssignment@(info :< Syntax.VarAssignment{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree varAssignment) ]
-  switch@(info :< Syntax.Switch{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree switch) ]
-  caseExpr@(info :< Syntax.Case{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree caseExpr) ]
-  object@(info :< Syntax.Object{}) -> [ DiffInfo (toCategoryName info) (toTermName $ cofree object) ]
+  (info :< _) -> [ DiffInfo (toCategoryName info) (toTermName term) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
