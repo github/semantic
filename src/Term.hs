@@ -55,7 +55,7 @@ alignSyntax' a b = case (a, b) of
 
 -- Generics
 
-class GAlign f where
+class Functor f => GAlign f where
   galignWith :: (forall f a b. Functor f => f a -> f b -> f (These a b)) -> f a -> f b -> f (These a b)
 
 instance GAlign U1 where
