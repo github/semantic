@@ -1,4 +1,4 @@
-{-# LANGUAGE ScopedTypeVariables, RankNTypes, TypeFamilies, TypeOperators, TypeSynonymInstances #-}
+{-# LANGUAGE DefaultSignatures, ScopedTypeVariables, RankNTypes, TypeFamilies, TypeOperators, TypeSynonymInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Term where
 
@@ -57,6 +57,8 @@ alignSyntax' a b = case (a, b) of
 
 class Functor f => GAlign f where
   galign :: f a -> f b -> Maybe (f (These a b))
+  default galign :: (Generic1 f, GAlign (Rep1 f)) => f a -> f b -> Maybe (f (These a b))
+  galign a b = to1 <$> galign (from1 a) (from1 b)
 
 instance GAlign U1 where
   galign _ _ = Just U1
