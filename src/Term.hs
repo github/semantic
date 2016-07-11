@@ -83,6 +83,9 @@ instance (GAlign f, GAlign g) => GAlign (f :+: g) where
 instance (GAlign f, GAlign g) => GAlign (f :*: g) where
   galign (a1 :*: b1) (a2 :*: b2) = (:*:) <$> galign a1 a2 <*> galign b1 b2
 
+instance GAlign ((,) a) where
+  galign (_, a) (k, b) = Just (k, These a b)
+
 galignDefault :: (Generic1 f, GAlign (Rep1 f)) => f a -> f b -> Maybe (f (These a b))
 galignDefault a b = to1 <$> galign (from1 a) (from1 b)
 
