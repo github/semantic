@@ -42,9 +42,6 @@ instance (GAlign f, GAlign g) => GAlign (f :*: g) where
 instance (Traversable f, Applicative f, GAlign g) => GAlign (f :.: g) where
   galign (Comp1 a) (Comp1 b) = Comp1 <$> sequenceA (galign <$> a <*> b)
 
-instance GAlign ((,) a) where
-  galign (_, a) (k, b) = Just (k, These a b)
-
 instance GAlign [] where galign a = Just . align a
 instance Eq key => GAlign (OrderedMap key) where galign a = Just . align a
 instance GAlign (Syntax a)
