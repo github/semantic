@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 module Data.OrderedMap (
     OrderedMap
   , fromList
