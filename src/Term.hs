@@ -56,7 +56,7 @@ alignSyntax' a b = case (a, b) of
 -- Generics
 
 class GAlign f where
-  galignWith :: (forall f a b. f a -> f b -> Maybe (f (These a b))) -> f a -> f b -> f (These a b)
+  galignWith :: (forall f a b. Functor f => f a -> f b -> f (These a b)) -> f a -> f b -> f (These a b)
 
 instance GAlign U1 where
   galignWith _ _ _ = U1
@@ -82,7 +82,7 @@ instance (GAlign f, GAlign g) => GAlign (f :+: g) where
 instance (GAlign f, GAlign g) => GAlign (f :*: g) where
   galignWith f (a1 :*: b1) (a2 :*: b2) = galignWith f a1 a2 :*: galignWith f b1 b2
 
-galignWithDefault :: (Generic1 f, GAlign (Rep1 f)) => (forall f a b. f a -> f b -> Maybe (f (These a b))) -> f a -> f b -> f (These a b)
+galignWithDefault :: (Generic1 f, GAlign (Rep1 f)) => (forall f a b. Functor f => f a -> f b -> f (These a b)) -> f a -> f b -> f (These a b)
 galignWithDefault f a b = to1 (galignWith f (from1 a) (from1 b))
 
 instance GAlign [] where
