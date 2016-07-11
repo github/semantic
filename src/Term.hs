@@ -36,6 +36,7 @@ termSize :: Term a annotation -> Integer
 termSize = cata size where
   size (_ :< syntax) = 1 + sum syntax
 
+-- | Aligns (zips, retaining non-overlapping portions of the structure) a pair of terms.
 alignCofreeWith :: Functor f => (forall a b. f a -> f b -> Maybe (f (These a b))) -> (These (Cofree f a) (Cofree f b) -> contrasted) -> (a -> b -> combined) -> These (Cofree f a) (Cofree f b) -> Free (CofreeF f combined) contrasted
 alignCofreeWith compare contrast combine = go
   where go terms = fromMaybe (pure (contrast terms)) $ case terms of
