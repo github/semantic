@@ -8,6 +8,7 @@ import Data.OrderedMap
 import Prologue
 import Syntax
 
+-- | Functors which can be aligned (structure-unioning-ly zipped). The default implementation will operate generically over the constructors in the aligning type.
 class Functor f => GAlign f where
   galign :: f a -> f b -> Maybe (f (These a b))
   default galign :: (Generic1 f, GAlign (Rep1 f)) => f a -> f b -> Maybe (f (These a b))
