@@ -3,7 +3,6 @@ module Data.RandomWalkSimilarity.Spec where
 import Category
 import Data.DList as DList hiding (toList)
 import Data.RandomWalkSimilarity
-import qualified Data.Set as Set
 import Diff
 import Patch
 import Prologue
@@ -33,7 +32,5 @@ spec = parallel $ do
       \ (as, bs) -> let tas = toTerm <$> as
                         tbs = toTerm <$> bs
                         diff = free (Free (pure Program :< Indexed (rws compare identity tas tbs :: [Diff Text Category]))) in
-        (childrenOf <$> beforeTerm diff, childrenOf <$> afterTerm diff) `shouldBe` (Just (Set.fromList tas), Just (Set.fromList tbs))
+        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree (Program :< Indexed tas)), Just (cofree (Program :< Indexed tbs)))
 
-childrenOf :: (Ord leaf, Ord annotation) => Term leaf annotation -> Set.Set (Term leaf annotation)
-childrenOf = Set.fromList . toList . unwrap

@@ -3,6 +3,7 @@ module Syntax where
 import Prologue
 import Data.OrderedMap as Map
 import Data.Text.Arbitrary ()
+import GHC.Generics
 import qualified Data.Text as T
 import Test.QuickCheck hiding (Fixed)
 
@@ -53,7 +54,7 @@ data Syntax
   | Pair f f
   | Comment a
   | Commented [f] (Maybe f)
-  deriving (Eq, Foldable, Functor, Generic, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
 -- Instances
 
