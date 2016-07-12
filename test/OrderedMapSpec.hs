@@ -12,7 +12,7 @@ spec :: Spec
 spec = parallel $ do
   describe "difference" $ do
     it "should return those elements of a not in b" $
-      Map.difference a b `shouldBe` Map.fromList [ ("a", 1) ]
+      Map.difference a b `shouldBe` Map.fromList [ ("a", 1) :: (Text, Integer) ]
 
     it "is asymmetrical" $
       Map.difference a b `shouldNotBe` Map.difference b a
