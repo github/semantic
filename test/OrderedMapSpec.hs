@@ -52,5 +52,8 @@ spec = parallel $ do
     prop "has nil as a left-identity modulo That" $
       \ a -> align nil a `shouldBe` (That <$> a :: Map.OrderedMap Text (These Text Text))
 
+    prop "is at least as long as its longest input" $
+      \ a b -> length (align a b :: Map.OrderedMap Text (These Int Int)) `shouldSatisfy` (>= max (length a) (length b))
+
   where a = Map.fromList [ ("a", 1), ("b", 2), ("c", 3) ]
         b = Map.fromList [ ("b", -2), ("c", -3), ("d", -4) ]
