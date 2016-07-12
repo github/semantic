@@ -58,5 +58,8 @@ spec = parallel $ do
     prop "is no longer than the sum of its inputs’ lengths" $
       \ a b -> length (align a b :: Map.OrderedMap Int (These Int Int)) `shouldSatisfy` (<= length a + length b)
 
+    prop "is reflexive modulo These" $
+      \ a -> align a a `shouldBe` ((\ a -> These a a) <$> a :: Map.OrderedMap Int (These Int Int))
+
   where a = Map.fromList [ ("a", 1), ("b", 2), ("c", 3) ]
         b = Map.fromList [ ("b", -2), ("c", -3), ("d", -4) ]
