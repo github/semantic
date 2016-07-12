@@ -2,7 +2,7 @@ module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
 import Category
-import Data.Align
+import Data.Align.Generic
 import Data.Functor.Foldable
 import Data.Functor.Both
 import Data.Hashable
@@ -34,16 +34,15 @@ diffTerms construct comparable cost a b = fromMaybe (pure $ Replace a b) $ const
 
 -- | Constructs an algorithm and runs it
 constructAndRun :: (Eq leaf, Hashable leaf, Ord (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Maybe (Diff leaf (Record fields))
-constructAndRun _ comparable _ a b | not $ comparable a b = Nothing
-
-constructAndRun construct _ _ a b | (() <$ a) == (() <$ b) = hylo construct runCofree <$> zipTerms a b
-
-constructAndRun construct comparable cost t1 t2 =
+constructAndRun construct comparable cost t1 t2
+  | not $ comparable t1 t2 = Nothing
+  | (() <$ t1) == (() <$ t2) = hylo construct runCofree <$> zipTerms t1 t2
+  | otherwise =
   run construct comparable cost $ algorithm a b where
-    algorithm (Indexed a') (Indexed b') = free . Free $ ByIndex a' b' (annotate . Indexed)
-    algorithm (Keyed a') (Keyed b') = free . Free $ ByKey a' b' (annotate . Keyed)
+    algorithm (Indexed a') (Indexed b') = wrap $! ByIndex a' b' (annotate . Indexed)
+    algorithm (Keyed a') (Keyed b') = wrap $! ByKey a' b' (annotate . Keyed)
     algorithm (Leaf a') (Leaf b') | a' == b' = annotate $ Leaf b'
-    algorithm a' b' = free . Free $ Recursive (cofree (annotation1 :< a')) (cofree (annotation2 :< b')) pure
+    algorithm a' b' = wrap $! Recursive (cofree (annotation1 :< a')) (cofree (annotation2 :< b')) pure
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
     annotate = pure . construct . (both annotation1 annotation2 :<)
 
@@ -55,13 +54,7 @@ run construct comparable cost algorithm = case runFree algorithm of
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
     annotate = construct . (both annotation1 annotation2 :<)
 
-    recur (Indexed a') (Indexed b') = annotate . Indexed $ alignWith diffThese a' b'
-    recur (Fixed a') (Fixed b') = annotate . Fixed $ alignWith diffThese a' b'
-    recur (Keyed a') (Keyed b') | Map.keys a' == bKeys = annotate . Keyed . Map.fromList . fmap repack $ bKeys where
-      bKeys = Map.keys b'
-      repack key = (key, interpretInBoth key a' b')
-      interpretInBoth key x y = diffTerms construct comparable cost (x ! key) (y ! key)
-    recur _ _ = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
+    recur a b = maybe (pure (Replace t1 t2)) (annotate . fmap diffThese) (galign a b)
 
     diffThese = these (pure . Delete) (pure . Insert) (diffTerms construct comparable cost)
 
