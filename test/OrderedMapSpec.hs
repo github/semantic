@@ -47,16 +47,16 @@ spec = parallel $ do
 
   describe "align" $ do
     prop "has nil as a right-identity modulo This" $
-      \ a -> align a nil `shouldBe` (This <$> a :: Map.OrderedMap Text (These Text Text))
+      \ a -> align a nil `shouldBe` (This <$> a :: Map.OrderedMap Int (These Int Int))
 
     prop "has nil as a left-identity modulo That" $
-      \ a -> align nil a `shouldBe` (That <$> a :: Map.OrderedMap Text (These Text Text))
+      \ a -> align nil a `shouldBe` (That <$> a :: Map.OrderedMap Int (These Int Int))
 
     prop "is at least as long as its longest input" $
-      \ a b -> length (align a b :: Map.OrderedMap Text (These Int Int)) `shouldSatisfy` (>= max (length a) (length b))
+      \ a b -> length (align a b :: Map.OrderedMap Int (These Int Int)) `shouldSatisfy` (>= max (length a) (length b))
 
     prop "is no longer than the sum of its inputs’ lengths" $
-      \ a b -> length (align a b :: Map.OrderedMap Text (These Int Int)) `shouldSatisfy` (<= length a + length b)
+      \ a b -> length (align a b :: Map.OrderedMap Int (These Int Int)) `shouldSatisfy` (<= length a + length b)
 
   where a = Map.fromList [ ("a", 1), ("b", 2), ("c", 3) ]
         b = Map.fromList [ ("b", -2), ("c", -3), ("d", -4) ]
