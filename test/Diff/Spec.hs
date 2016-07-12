@@ -8,7 +8,6 @@ import Diff
 import Diff.Arbitrary
 import Interpreter
 import Prologue
-import Term
 import Term.Arbitrary
 import Test.Hspec
 import Test.Hspec.QuickCheck
@@ -20,8 +19,8 @@ spec = parallel $ do
     \ a b -> let diff = diffTerms wrap (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Category]))) in
       diff `shouldBe` diff
 
-  prop "equal terms produce identity diffs" . forAll (toTerm <$> arbitrary) $
-    \ a -> let term = a :: Term Text (Record '[Category]) in
+  prop "equal terms produce identity diffs" $
+    \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category])) in
       diffCost (diffTerms wrap (==) diffCost term term) `shouldBe` 0
 
   describe "beforeTerm" $ do
