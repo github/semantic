@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# OPTIONS_GHC -fno-warn-warnings-deprecations #-}
 module Data.OrderedMap (
     OrderedMap
   , fromList
@@ -14,12 +15,15 @@ module Data.OrderedMap (
   , difference
   ) where
 
+import Data.Align
+import Data.These
+import GHC.Generics
 import Prologue hiding (toList, empty)
 import Test.QuickCheck
 
 -- | An ordered map of keys and values.
 newtype OrderedMap key value = OrderedMap { toList :: [(key, value)] }
-  deriving (Eq, Foldable, Functor, Generic, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
 -- | Construct an ordered map from a list of pairs of keys and values.
 fromList :: [(key, value)] -> OrderedMap key value
@@ -33,7 +37,7 @@ infixl 9 !
 
 -- | Look up a value in the map by key, erroring if it doesn't exist.
 (!) :: Eq key => OrderedMap key value -> key -> value
-map ! key = fromMaybe (error "no value found for key") $ Data.OrderedMap.lookup key map
+m ! key = fromMaybe (error "no value found for key") $ Data.OrderedMap.lookup key m
 
 -- | Look up a value in the map by key, returning Nothing if it doesn't exist.
 lookup :: Eq key => key -> OrderedMap key value -> Maybe value
@@ -49,7 +53,7 @@ empty = OrderedMap []
 
 -- | Combine `a` and `b`, picking the values from `a` when keys overlap.
 union :: Eq key => OrderedMap key value -> OrderedMap key value -> OrderedMap key value
-union a b = OrderedMap $ toList a ++ toList (difference b a)
+union a b = OrderedMap $ toList a <> toList (difference b a)
 
 -- | Union a list of ordered maps.
 unions :: Eq key => [OrderedMap key value] -> OrderedMap key value
@@ -75,3 +79,7 @@ instance Eq key => Monoid (OrderedMap key value) where
 instance (Arbitrary key, Arbitrary value) => Arbitrary (OrderedMap key value) where
   arbitrary = fromList <$> arbitrary
   shrink = genericShrink
+
+instance Eq key => Align (OrderedMap key) where
+  nil = fromList []
+  align a b = intersectionWith These a b <> (This <$> difference a b) <> (That <$> difference b a)
