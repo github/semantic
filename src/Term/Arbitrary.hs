@@ -8,7 +8,7 @@ import Syntax
 import Term
 import Test.QuickCheck hiding (Fixed)
 
-data ArbitraryTerm leaf annotation = ArbitraryTerm annotation (Syntax leaf (ArbitraryTerm leaf annotation))
+data ArbitraryTerm leaf annotation = ArbitraryTerm { annotation :: annotation, syntax :: Syntax leaf (ArbitraryTerm leaf annotation)}
   deriving (Show, Eq, Generic)
 
 unArbitraryTerm :: ArbitraryTerm leaf annotation -> TermF leaf annotation (ArbitraryTerm leaf annotation)
