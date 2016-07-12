@@ -1,7 +1,6 @@
 module AlignmentSpec where
 
 import Alignment
-import ArbitraryTerm ()
 import Control.Arrow ((&&&))
 import Control.Monad.State
 import Data.Align hiding (align)
@@ -11,6 +10,7 @@ import Data.Bifunctor.Join.Arbitrary ()
 import Data.Functor.Both as Both
 import Data.List (nub)
 import Data.Monoid
+import Data.Record
 import Data.String
 import Data.Text.Arbitrary ()
 import Data.These
@@ -48,7 +48,7 @@ spec = parallel $ do
 
     prop "covers every input line" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
-        join <$> (traverse (modifyJoin (fromThese [] []) . fmap pure . fmap Prologue.fst) (alignBranch Prologue.snd children ranges)) `shouldBe` ranges
+        join <$> (traverse (modifyJoin (fromThese [] []) . fmap (pure . Prologue.fst)) (alignBranch Prologue.snd children ranges)) `shouldBe` ranges
 
     prop "covers every input child" $
       \ elements -> let (_, children, ranges) = toAlignBranchInputs elements in
@@ -193,7 +193,7 @@ spec = parallel $ do
                       (info 8 9 `branch` [ info 8 9 `leaf` "c" ]))
         ]
 
-  describe "numberedRows" $
+  describe "numberedRows" $ do
     prop "counts only non-empty values" $
       \ xs -> counts (numberedRows (xs :: [Join These Char])) `shouldBe` length . catMaybes <$> Join (unalign (runJoin <$> xs))
 
@@ -236,9 +236,9 @@ keysOfAlignedChildren lines = lines >>= these identity identity (++) . runJoin .
 instance Arbitrary BranchElement where
   arbitrary = oneof [ key >>= \ key -> Child key <$> joinTheseOf (contents key)
                     , Margin <$> joinTheseOf margin ]
-    where key = listOf1 (elements (['a'..'z'] ++ ['A'..'Z'] ++ ['0'..'9']))
+    where key = listOf1 (elements (['a'..'z'] <> ['A'..'Z'] <> ['0'..'9']))
           contents key = wrap key <$> listOf (padding '*')
-          wrap key contents = "(" ++ key ++ contents ++ ")" :: String
+          wrap key contents = "(" <> key <> contents <> ")" :: String
           margin = listOf (padding '-')
           padding char = frequency [ (10, pure char)
                                    , (1, pure '\n') ]
@@ -258,7 +258,7 @@ align :: Both (Source.Source Char) -> ConstructibleFree (Patch (Term String Info
 align sources = PrettyDiff sources . fmap (fmap (getRange &&& identity)) . alignDiff sources . deconstruct
 
 info :: Int -> Int -> Info
-info start end = Info (Range start end) StringLiteral 0 0
+info start end = Range start end .: StringLiteral .: 0 .: 0 .: RNil
 
 prettyDiff :: Both (Source.Source Char) -> [Join These (ConstructibleFree (SplitPatch (Term String Info)) Info)] -> PrettyDiff (SplitDiff String Info)
 prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& identity) . deconstruct))

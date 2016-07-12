@@ -4,6 +4,7 @@ import Prologue hiding (fst, snd)
 import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
 import Data.Functor.Foldable
+import Data.Record
 import qualified Data.Text as T
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
@@ -39,8 +40,8 @@ lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 
   where
     lines = actualLines input
     root children = let size = 1 + fromIntegral (length children) in
-      Info (Range 0 $ length input) (Other "program") size size :< Indexed children
-    leaf charIndex line = Info (Range charIndex $ charIndex + T.length line) (Other "program") 1 1 :< Leaf line
+      ((Range 0 $ length input) .: Other "program" .: size .: Cost (unSize size) .: RNil) :< Indexed children
+    leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Other "program" .: 1 .: 1 .: RNil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum ++ [ leaf charIndex (toText line) ]
       , charIndex + length line)
@@ -55,13 +56,13 @@ breakDownLeavesByWord :: Source Char -> Term T.Text Info -> Term T.Text Info
 breakDownLeavesByWord source = cata replaceIn
   where
     replaceIn :: TermF T.Text Info (Term T.Text Info) -> Term T.Text Info
-    replaceIn (info :< syntax) = let size' = 1 + sum (size . extract <$> syntax') in cofree $ info { size = size', cost = size' } :< syntax'
+    replaceIn (info :< syntax) = let size' = 1 + sum (size . extract <$> syntax') in cofree $ setCost (setSize info size') (Cost (unSize size')) :< syntax'
       where syntax' = case (ranges, syntax) of
               (_:_:_, Leaf _) -> Indexed (makeLeaf info <$> ranges)
               _ -> syntax
             ranges = rangesAndWordsInSource (characterRange info)
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
-    makeLeaf info (range, substring) = cofree $ info { characterRange = range } :< Leaf (T.pack substring)
+    makeLeaf info (range, substring) = cofree $ setCharacterRange info range :< Leaf (T.pack substring)
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
@@ -95,7 +96,6 @@ diffFiles parser renderer sourceBlobs = do
   pure $! renderer textDiff sourceBlobs
   where construct :: CofreeF (Syntax Text) (Both Info) (Diff Text Info) -> Diff Text Info
         construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
-        setCost info cost = info { cost = cost }
         sumCost = fmap getSum . foldMap (fmap Sum . getCost)
         getCost diff = case runFree diff of
           Free (info :< _) -> cost <$> info
@@ -104,6 +104,6 @@ diffFiles parser renderer sourceBlobs = do
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermSizes :: Diff a Info -> Integer
-diffCostWithCachedTermSizes diff = case runFree diff of
+diffCostWithCachedTermSizes diff = unCost $ case runFree diff of
   Free (info :< _) -> sum (cost <$> info)
   Pure patch -> sum (cost . extract <$> patch)

@@ -12,19 +12,19 @@ import Data.These
 import Prologue
 
 -- | An operation to replace, insert, or delete an item.
-data Patch a =
-  Replace a a
+data Patch a
+  = Replace a a
   | Insert a
   | Delete a
-  deriving (Eq, Foldable, Functor, Generic, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic, Ord, Show, Traversable)
 
 -- | Return the item from the after side of the patch.
 after :: Patch a -> Maybe a
-after = maybeFst . unPatch
+after = maybeSnd . unPatch
 
 -- | Return the item from the before side of the patch.
 before :: Patch a -> Maybe a
-before = maybeSnd . unPatch
+before = maybeFst . unPatch
 
 -- | Return both sides of a patch.
 unPatch :: Patch a -> These a a
