@@ -1,12 +1,8 @@
 module SES where
 
-import Control.Parallel.Strategies
-import Data.List ((!!))
 import qualified Data.Map as Map
-import qualified Data.Vector as Vector
 import Patch
 import Prologue
-import Unsafe
 
 
 -- | Edit constructor for two terms, if comparable. Otherwise returns Nothing.
@@ -17,9 +13,8 @@ type Cost edit = edit -> Integer
 
 -- | Find the shortest edit script (diff) between two terms given a function to compute the cost.
 ses :: Applicative edit => Compare term (edit (Patch term)) -> Cost (edit (Patch term)) -> [term] -> [term] -> [edit (Patch term)]
-ses = ses'
--- ses diffTerms cost as bs = fst <$> evalState diffState Map.empty where
---   diffState = diffAt diffTerms cost (0, 0) as bs
+ses diffTerms cost as bs = fst <$> evalState diffState Map.empty where
+  diffState = diffAt diffTerms cost (0, 0) as bs
 
 -- | Find the shortest edit script between two terms at a given vertex in the edit graph.
 diffAt :: Applicative edit => Compare term (edit (Patch term)) -> Cost (edit (Patch term)) -> (Integer, Integer) -> [term] -> [term] -> State (Map.Map (Integer, Integer) [(edit (Patch term), Integer)]) [(edit (Patch term), Integer)]
@@ -51,49 +46,6 @@ diffAt diffTerms cost (i, j) as bs
     recur = diffAt diffTerms cost
 
 
-ses' :: Applicative edit => Compare term (edit (Patch term)) -> Cost (edit (Patch term)) -> [term] -> [term] -> [edit (Patch term)]
-ses' diffTerms cost as bs = fst <$> diffAtMemo 0 0
-  where diffAtMemo = fix (memoize2d (length as') (length bs') . diffAt' diffTerms cost (index as') (index bs'))
-        index elements i = if i < length elements then Just (elements Vector.! i) else Nothing
-        as' = Vector.fromList as
-        bs' = Vector.fromList bs
-
-diffAt' :: Applicative edit => Compare term (edit (Patch term)) -> Cost (edit (Patch term)) -> (Int -> Maybe term) -> (Int -> Maybe term) -> (Int -> Int -> [(edit (Patch term), Integer)]) -> Int -> Int -> [(edit (Patch term), Integer)]
-diffAt' diffTerms cost as bs recur i j = case (as i, bs j) of
-  (Just a, Just b) -> do
-    let down = recur i (succ j)
-        right = recur (succ i) j in
-        best $ case diffTerms a b of
-          Just diff -> [ delete a down, insert b right, consWithCost cost diff (recur (succ i) (succ j)) ]
-          Nothing -> [ delete a down, insert b right ]
-  (_, Just b) -> insert b (recur i (succ j))
-  (Just a, _) ->  delete a (recur (succ i) j)
-  _ -> []
-  where
-    delete = consWithCost cost . pure . Delete
-    insert = consWithCost cost . pure . Insert
-    costOf [] = 0
-    costOf ((_, c) : _) = c
-    best = minimumBy (comparing costOf)
-
-memoize :: (Int -> a) -> (Int -> a)
-memoize f = (fmap f [0 ..] !!)
-
-memoizeEnum :: Enum a => (a -> b) -> a -> b
-memoizeEnum f = (fmap f [toEnum 0 ..] !!) . fromEnum
-
-memoize2d :: Int -> Int -> (Int -> Int -> a) -> (Int -> Int -> a)
-memoize2d width height f = outof (Vector.generate ((width + 1) * (height + 1)) (into f) Vector.!)
-  where into f i | width > 0 = if i < (width * height)
-                    then f (i `div` width) (i `mod` width)
-                    else f width height
-                 | otherwise = f 0 i
-        outof f i j = f (i * width + j)
-
-memoize2 :: ((Int, Int) -> a) -> ((Int, Int) -> a)
-memoize2 f = fromJust . (`lookup` memo)
-  where memo = zipWith (\ i j -> ((i, j), f (i, j))) [0 ..] [0 ..]
-
 -- | Prepend an edit script and the cumulative cost onto the edit script.
 consWithCost :: Cost edit -> edit -> [(edit, Integer)] -> [(edit, Integer)]
-consWithCost cost edit rest = (edit, (cost edit `using` rpar) + maybe 0 snd (fst <$> uncons rest)) : rest
+consWithCost cost edit rest = (edit, cost edit + maybe 0 snd (fst <$> uncons rest)) : rest

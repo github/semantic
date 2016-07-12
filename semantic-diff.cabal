@@ -61,7 +61,6 @@ library
                      , hashable
                      , kdt
                      , mtl
-                     , parallel
                      , MonadRandom
                      , pointed
                      , QuickCheck >= 2.8.1
