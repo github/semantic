@@ -2,14 +2,11 @@ module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
 import Category
+import Data.Align
 import Data.Align.Generic
 import Data.Functor.Foldable
 import Data.Functor.Both
 import Data.Hashable
-import Data.List ((\\))
-import qualified Data.List as List
-import Data.OrderedMap ((!))
-import qualified Data.OrderedMap as Map
 import Data.RandomWalkSimilarity
 import Data.Record
 import Data.These
@@ -58,15 +55,7 @@ run construct comparable cost algorithm = case runFree algorithm of
 
     diffThese = these (pure . Delete) (pure . Insert) (diffTerms construct comparable cost)
 
-  Free (ByKey a b f) -> run construct comparable cost $ f byKey where
-    byKey = Map.fromList $ toKeyValue <$> List.union aKeys bKeys
-    toKeyValue key | key `List.elem` deleted = (key, pure . Delete $ a ! key)
-    toKeyValue key | key `List.elem` inserted = (key, pure . Insert $ b ! key)
-    toKeyValue key = (key, diffTerms construct comparable cost (a ! key) (b ! key))
-    aKeys = Map.keys a
-    bKeys = Map.keys b
-    deleted = aKeys \\ bKeys
-    inserted = bKeys \\ aKeys
+  Free (ByKey a b f) -> run construct comparable cost $ f byKey where byKey = alignWith (these (pure . Delete) (pure . Insert) (diffTerms construct comparable cost)) a b
 
   Free (ByIndex a b f) -> run construct comparable cost . f $ ses (constructAndRun construct comparable cost) cost a b
 
