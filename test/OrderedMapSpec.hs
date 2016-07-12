@@ -1,8 +1,12 @@
 module OrderedMapSpec where
 
-import Prologue
+import Data.Align
 import qualified Data.OrderedMap as Map
+import Data.Text.Arbitrary
+import Data.These
+import Prologue
 import Test.Hspec
+import Test.Hspec.QuickCheck
 
 spec :: Spec
 spec = parallel $ do
@@ -40,6 +44,13 @@ spec = parallel $ do
 
     it "is ordered" $
       Map.keys (Map.union b a) `shouldBe` [ "b", "c", "d", "a" ]
+
+  describe "align" $ do
+    prop "has nil as a right-identity modulo This" $
+      \ a -> align a nil `shouldBe` (This <$> a :: Map.OrderedMap Text (These Text Text))
+
+    prop "has nil as a left-identity modulo That" $
+      \ a -> align nil a `shouldBe` (That <$> a :: Map.OrderedMap Text (These Text Text))
 
   where a = Map.fromList [ ("a", 1), ("b", 2), ("c", 3) ]
         b = Map.fromList [ ("b", -2), ("c", -3), ("d", -4) ]
