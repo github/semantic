@@ -15,6 +15,8 @@ module Data.OrderedMap (
   ) where
 
 import Data.Align
+import Data.List ((\\))
+import qualified Data.List as List
 import Data.These
 import GHC.Generics
 import Prologue hiding (toList, empty)
@@ -81,4 +83,11 @@ instance (Arbitrary key, Arbitrary value) => Arbitrary (OrderedMap key value) wh
 
 instance Eq key => Align (OrderedMap key) where
   nil = fromList []
-  align a b = intersectionWith These a b <> (This <$> difference a b) <> (That <$> difference b a)
+  align a b = OrderedMap $ toKeyValue <$> List.union aKeys bKeys
+    where toKeyValue key | key `List.elem` deleted = (key, This $ a ! key)
+          toKeyValue key | key `List.elem` inserted = (key, That $ b ! key)
+          toKeyValue key = (key, These (a ! key) (b ! key))
+          aKeys = keys a
+          bKeys = keys b
+          deleted = aKeys \\ bKeys
+          inserted = bKeys \\ aKeys
