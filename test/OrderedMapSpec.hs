@@ -15,7 +15,7 @@ spec = parallel $ do
 
   describe "union" $ do
     it "should return those elements in either a or b" $
-      Map.union a b `shouldBe` Map.fromList (Map.toList a ++ [ ("d", -4) ])
+      Map.union a b `shouldBe` Map.fromList (Map.toList a <> [ ("d", -4) ])
 
     it "is asymmetrical" $
       Map.union a b `shouldNotBe` Map.union b a
