@@ -13,7 +13,9 @@ import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.OrderedMap
 import Data.Record
-import Data.Text as Text (intercalate, unpack)
+import Data.Text as Text (intercalate)
+import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string)
+import qualified Text.PrettyPrint.Leijen.Text as P
 
 data DiffInfo = DiffInfo { categoryName :: Text, termName :: Text } deriving (Eq, Show)
 
@@ -102,19 +104,18 @@ instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf 
 data DiffSummary a = DiffSummary {
   patch :: Patch a,
   parentAnnotations :: [Category]
-} deriving (Eq, Functor)
+} deriving (Eq, Functor, Show)
 
-instance Show (DiffSummary DiffInfo) where
-  showsPrec _ DiffSummary{..} s = (++s) . unpack $ case patch of
-    (Insert diffInfo) -> "Added the " <> "'" <> termName diffInfo <> "' " <> categoryName diffInfo <> maybeParentContext parentAnnotations
-    (Delete diffInfo) -> "Deleted the " <> "'" <> termName diffInfo <> "' " <> categoryName diffInfo <> maybeParentContext parentAnnotations
-    (Replace t1 t2) ->
-      "Replaced the " <> "'" <> termName t1 <> "' " <> categoryName t1
-      <> " with the " <> "'" <> termName t2 <> "' " <> categoryName t2
-      <> maybeParentContext parentAnnotations
-    where maybeParentContext parentAnnotations = if null parentAnnotations
-            then ""
-            else " in the " <> intercalate "/" (toCategoryName <$> parentAnnotations) <> " context"
+instance P.Pretty (DiffSummary DiffInfo) where
+  pretty DiffSummary{..} = case patch of
+    Insert diffInfo -> "Added the" <+> squotes (toDoc $ termName diffInfo) <+> (toDoc $ categoryName diffInfo) P.<> maybeParentContext parentAnnotations
+    Delete diffInfo -> "Deleted the" <+> squotes (toDoc $ termName diffInfo) <+> (toDoc $ categoryName diffInfo) P.<> maybeParentContext parentAnnotations
+    Replace t1 t2 -> "Replaced the" <+> squotes (toDoc $ termName t1) <+> (toDoc $ categoryName t1) <+> "with the" <+> P.squotes (toDoc $ termName t2) <+> (toDoc $ categoryName t2) P.<> maybeParentContext parentAnnotations
+    where
+      maybeParentContext annotations = if null annotations
+        then ""
+        else space <> "in the" <+> (toDoc . intercalate "/" $ toCategoryName <$> annotations) <+> "context"
+      toDoc = string . toS
 
 diffSummary :: (HasCategory leaf, HasField fields Category) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffSummary = cata $ \case
