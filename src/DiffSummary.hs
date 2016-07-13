@@ -13,6 +13,8 @@ import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.OrderedMap
 import Data.Text as Text (intercalate)
+import Test.QuickCheck hiding (Fixed)
+import Patch.Arbitrary()
 import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string)
 import qualified Text.PrettyPrint.Leijen.Text as P
 
@@ -106,7 +108,11 @@ instance HasCategory leaf => HasCategory (Term leaf Info) where
 data DiffSummary a = DiffSummary {
   patch :: Patch a,
   parentAnnotations :: [Category]
-} deriving (Eq, Functor, Show)
+} deriving (Eq, Functor, Show, Generic)
+
+instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
+  arbitrary = DiffSummary <$> arbitrary <*> arbitrary
+  shrink = genericShrink
 
 instance P.Pretty (DiffSummary DiffInfo) where
   pretty DiffSummary{..} = case patch of

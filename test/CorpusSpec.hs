@@ -1,7 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module CorpusSpec where
 
-import System.IO
 import Data.String
 import Diffing
 import Renderer
@@ -20,6 +19,7 @@ import qualified Source as S
 import System.FilePath
 import System.FilePath.Glob
 import Test.Hspec
+import GHC.Show (Show(..))
 
 spec :: Spec
 spec = parallel $ do
@@ -76,7 +76,7 @@ testDiff renderer paths diff matcher = do
   case diff of
     Nothing -> matcher actual actual
     Just file -> do
-      expected <- Verbatim . T.pack <$> readFile file
+      expected <- Verbatim <$> readFile file
       matcher actual expected
   where parser = parserForFilepath (fst paths)
         sourceBlobs sources = pure S.SourceBlob <*> sources <*> pure mempty <*> paths <*> pure (Just S.defaultPlainBlob)

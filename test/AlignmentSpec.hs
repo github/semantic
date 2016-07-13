@@ -27,6 +27,7 @@ import Term
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
+import GHC.Show (Show(..))
 
 spec :: Spec
 spec = parallel $ do
