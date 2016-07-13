@@ -20,7 +20,6 @@ library
                      , Data.Bifunctor.Join.Arbitrary
                      , Data.Functor.Both
                      , Data.RandomWalkSimilarity
-                     , Data.OrderedMap
                      , Data.Record
                      , Data.These.Arbitrary
                      , Diff
@@ -106,7 +105,6 @@ test-suite semantic-diff-test
                      , Diff.Spec
                      , DiffSummarySpec
                      , InterpreterSpec
-                     , OrderedMapSpec
                      , PatchOutputSpec
                      , TermSpec
   build-depends:       base
