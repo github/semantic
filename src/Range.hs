@@ -71,6 +71,9 @@ maybeConcat = getOption . foldMap (Option . Just)
 unionRangesFrom :: Foldable f => Range -> f Range -> Range
 unionRangesFrom range = fromMaybe range . maybeConcat
 
+
+-- Instances
+
 instance Semigroup Range where
   a <> b = unionRange a b
 
