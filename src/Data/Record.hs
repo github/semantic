@@ -65,3 +65,8 @@ instance (Arbitrary field, Arbitrary (Record fields)) => Arbitrary (Record (fiel
   arbitrary = RCons <$> arbitrary <*> arbitrary
 
   shrink (RCons h t) = RCons <$> shrink h <*> shrink t
+
+instance Arbitrary (Record '[]) where
+  arbitrary = pure RNil
+
+  shrink _ = []
