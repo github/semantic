@@ -17,10 +17,6 @@ type Parser = Source Char -> IO (Term Text Info)
 -- | A function which constructs a term from a source string, annotation, and children.
 type Constructor = Source Char -> Info -> [Term Text Info] -> Term Text Info
 
--- | Categories that are treated as keyed nodes.
-keyedCategories :: Set.Set Category
-keyedCategories = Set.fromList [ DictionaryLiteral ]
-
 -- | Categories that are treated as fixed nodes.
 fixedCategories :: Set.Set Category
 fixedCategories = Set.fromList [ BinaryOperator, Pair ]
