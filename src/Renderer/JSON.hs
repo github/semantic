@@ -70,7 +70,6 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   Leaf _ -> []
   Indexed c -> childrenFields c
   Fixed c -> childrenFields c
-  Keyed c -> childrenFields c
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: KeyValue kv => SplitPatch (Term leaf Info) -> [kv]

@@ -5,7 +5,6 @@ module Diff where
 import Prologue
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both as Both
-import qualified Data.OrderedMap as Map
 import Patch
 import Syntax
 import Term
@@ -34,7 +33,6 @@ mergeMaybe transform = cata algebra . fmap transform
           Leaf s -> Leaf s
           Indexed i -> Indexed (catMaybes i)
           Fixed i -> Fixed (catMaybes i)
-          Keyed i -> Keyed (Map.fromList (Map.toList i >>= (\ (k, v) -> maybe [] (pure . (,) k) v)))
 
 -- | Recover the before state of a diff.
 beforeTerm :: Diff leaf annotation -> Maybe (Term leaf annotation)

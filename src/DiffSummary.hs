@@ -12,7 +12,6 @@ import Syntax
 import Category
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
-import Data.OrderedMap
 import Data.Text as Text (unpack)
 
 data DiffInfo = DiffInfo { categoryName :: String, termName :: Maybe String } deriving (Eq, Show)
@@ -20,7 +19,6 @@ data DiffInfo = DiffInfo { categoryName :: String, termName :: Maybe String } de
 maybeTermName :: HasCategory leaf => Term leaf Info -> Maybe String
 maybeTermName term = case runCofree term of
   (_ :< Leaf leaf) -> Just (toCategoryName leaf)
-  (_ :< Keyed children) -> Just (unpack . mconcat $ keys children)
   (_ :< Indexed children) -> toCategoryName . category <$> head (extract <$> children)
   (_ :< Fixed children) -> toCategoryName . category <$> head (extract <$> children)
 
@@ -74,7 +72,6 @@ diffSummary = cata diffSummary' where
   diffSummary' (Free (_ :< Leaf _)) = [] -- Skip leaves since they don't have any changes
   diffSummary' (Free (infos :< Indexed children)) = prependSummary (DiffInfo (toCategoryName . category $ snd infos) Nothing) <$> join children
   diffSummary' (Free (infos :< Fixed children)) = prependSummary (DiffInfo (toCategoryName . category $ snd infos) Nothing) <$> join children
-  diffSummary' (Free (infos :< Keyed children)) = prependSummary (DiffInfo (toCategoryName . category $ snd infos) Nothing) <$> join (Prologue.toList children)
   diffSummary' (Pure (Insert term)) = [DiffSummary (Insert (DiffInfo (toCategoryName term) (maybeTermName term))) []]
   diffSummary' (Pure (Delete term)) = [DiffSummary (Delete (DiffInfo (toCategoryName term) (maybeTermName term))) []]
   diffSummary' (Pure (Replace t1 t2)) = [DiffSummary (Replace (DiffInfo (toCategoryName t1) (maybeTermName t1)) (DiffInfo (toCategoryName t2) (maybeTermName t2))) []]
