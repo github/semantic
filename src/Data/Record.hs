@@ -61,7 +61,7 @@ instance Ord (Record '[]) where
   _ `compare` _ = EQ
 
 
-instance Arbitrary fields => Arbitrary (Record '[fields]) where
-  arbitrary = RCons <$> arbitrary <*> pure RNil
+instance (Arbitrary field, Arbitrary (Record fields)) => Arbitrary (Record (field ': fields)) where
+  arbitrary = RCons <$> arbitrary <*> arbitrary
 
-  shrink (RCons h t) = RCons <$> shrink h <*> pure t
+  shrink (RCons h t) = RCons <$> shrink h <*> shrink t
