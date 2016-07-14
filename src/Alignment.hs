@@ -23,7 +23,6 @@ import Diff
 import Info
 import Patch
 import Prologue hiding (fst, snd)
-import qualified Prologue
 import Range
 import Source hiding (break, fromList, uncons, (++))
 import SplitDiff
