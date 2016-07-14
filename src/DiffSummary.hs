@@ -6,9 +6,13 @@ import Prologue hiding (snd, intercalate)
 import Diff
 import Patch
 import Term
-import Info (category)
+import Info (category, Cost)
 import Syntax
 import Category
+import Interpreter (diffTerms)
+import Diffing
+import Data.Align
+import Data.These
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.Text as Text (intercalate)
@@ -17,13 +21,14 @@ import Patch.Arbitrary()
 import Data.Record
 import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string)
 import qualified Text.PrettyPrint.Leijen.Text as P
+import Data.Hashable
 
 data DiffInfo = DiffInfo { categoryName :: Text, termName :: Text } deriving (Eq, Show)
 
 toTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> Text
 toTermName term = case unwrap term of
-  Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
-  Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+  Syntax.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+  Syntax.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
   Syntax.Assignment identifier value -> toTermName identifier <> toTermName value
   Syntax.Function identifier _ _ -> (maybe "anonymous" toTermName identifier)
@@ -105,13 +110,19 @@ instance HasCategory Category where
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
 
+data Branch = Indexed | Fixed deriving (Show, Eq, Generic)
+instance Arbitrary Branch where
+  arbitrary = oneof [ pure DiffSummary.Indexed, pure DiffSummary.Fixed ]
+  shrink = genericShrink
+
 data DiffSummary a = DiffSummary {
   patch :: Patch a,
-  parentAnnotations :: [Category]
+  parentAnnotations :: [Category],
+  patchAnnotations :: [Patch Branch]
 } deriving (Eq, Functor, Show, Generic)
 
 instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
-  arbitrary = DiffSummary <$> arbitrary <*> arbitrary
+  arbitrary = DiffSummary <$> arbitrary <*> arbitrary <*> arbitrary
   shrink = genericShrink
 
 instance P.Pretty (DiffSummary DiffInfo) where
@@ -125,13 +136,13 @@ instance P.Pretty (DiffSummary DiffInfo) where
         else space <> "in the" <+> (toDoc . intercalate "/" $ toCategoryName <$> annotations) <+> "context"
       toDoc = string . toS
 
-diffSummary :: (HasCategory leaf, HasField fields Category) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffSummary :: (HasCategory leaf, HasField fields Category, Hashable leaf, Show (Record fields), Show leaf, Ord (Record fields), Eq leaf, HasField fields Cost) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffSummary = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
   Free (_ :< (Syntax.Comment _)) -> []
-  (Free (infos :< Indexed children)) -> prependSummary (category $ snd infos) <$> join children
-  (Free (infos :< Fixed children)) -> prependSummary (category $ snd infos) <$> join children
+  (Free (infos :< Syntax.Indexed children)) -> prependSummary (category $ snd infos) <$> join children
+  (Free (infos :< Syntax.Fixed children)) -> prependSummary (category $ snd infos) <$> join children
   (Free (infos :< Syntax.FunctionCall identifier children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList (identifier : children))
   (Free (infos :< Syntax.Function id ps body)) -> prependSummary (category $ snd infos) <$> (fromMaybe [] id) <> (fromMaybe [] ps) <> body
   (Free (infos :< Syntax.Assignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
@@ -149,15 +160,42 @@ diffSummary = cata $ \case
   Free (infos :< (Syntax.Object kvs)) -> prependSummary (category $ snd infos) <$> join kvs
   Free (infos :< (Syntax.Pair a b)) -> prependSummary (category $ snd infos) <$> a <> b
   Free (infos :< (Syntax.Commented cs leaf)) -> prependSummary (category $ snd infos) <$> join cs <> fromMaybe [] leaf
-  (Pure (Insert term)) -> (\info -> DiffSummary (Insert info) []) <$> termToDiffInfo term
-  (Pure (Delete term)) -> (\info -> DiffSummary (Delete info) []) <$> termToDiffInfo term
-  (Pure (Replace t1 t2)) -> (\(info1, info2) -> DiffSummary (Replace info1 info2) []) <$> zip (termToDiffInfo t1) (termToDiffInfo t2)
+  (Pure (Insert term)) -> (\info -> DiffSummary (Insert info) [] []) <$> termToDiffInfo term
+  (Pure (Insert term)) -> case unwrap term of
+    (Syntax.Indexed terms) ->
+      (\info -> DiffSummary (Insert info) [] [Delete DiffSummary.Indexed]) <$> (join $ termToDiffInfo <$> terms)
+    (Syntax.Fixed terms) ->
+      (\info -> DiffSummary (Insert info) [] [Delete DiffSummary.Fixed]) <$> (join $ termToDiffInfo <$> terms)
+  (Pure (Delete term)) -> case unwrap term of
+    (Syntax.Indexed terms) ->
+      (\info -> DiffSummary (Delete info) [] [Delete DiffSummary.Indexed]) <$> termToDiffInfo term
+    (Syntax.Fixed terms) ->
+      (\info -> DiffSummary (Delete info) [] [Delete DiffSummary.Fixed]) <$> termToDiffInfo term
+  (Pure (Replace t1 t2)) -> case (unwrap t1, unwrap t2) of
+    (Syntax.Indexed t1', Syntax.Indexed t2') ->
+      (\patch -> DiffSummary patch [] [Replace DiffSummary.Indexed DiffSummary.Indexed]) <$> join (alignWith summarizeThese t1' t2')
+    (Syntax.Indexed t1', Syntax.Fixed t2') ->
+      (\patch -> DiffSummary patch [] [Replace DiffSummary.Indexed DiffSummary.Fixed]) <$> join (alignWith summarizeThese t1' t2')
+    (Syntax.Fixed t1', Syntax.Indexed t2') ->
+      (\patch -> DiffSummary patch [] [Replace DiffSummary.Fixed DiffSummary.Indexed]) <$> join (alignWith summarizeThese t1' t2')
+    (Syntax.Fixed t1', Syntax.Fixed t2') ->
+      (\patch -> DiffSummary patch [] [Replace DiffSummary.Fixed DiffSummary.Fixed]) <$> join (alignWith summarizeThese t1' t2')
+    (_, _) ->
+      (\(info1, info2) -> DiffSummary (Replace info1 info2) [] []) <$> zip (termToDiffInfo t1) (termToDiffInfo t2)
+
+summarizeThese :: (HasCategory leaf, HasField fields Category, Hashable leaf, Show (Record fields), Show leaf, Ord (Record fields), Eq leaf, HasField fields Cost) => These (Term leaf (Record fields)) (Term leaf (Record fields)) -> [Patch DiffInfo]
+summarizeThese = these (sequence . Delete <$> termToDiffInfo) (sequence . Insert <$> termToDiffInfo) (\t1 t2 -> patch <$> summaries t1 t2)
+  where
+    summaries :: (HasCategory leaf, HasField fields Category, Hashable leaf, Show (Record fields), Show leaf, Ord (Record fields), Eq leaf, HasField fields Cost) => Term leaf (Record fields) -> Term leaf (Record fields) -> [DiffSummary DiffInfo]
+    summaries t1 t2 = diffSummary $ diffTerms construct compareCategoryEq diffCostWithCachedTermSizes t1 t2
 
 termToDiffInfo :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> [DiffInfo]
 termToDiffInfo term = case runCofree term of
   (_ :< Leaf _) -> [ DiffInfo (toCategoryName term) (toTermName term) ]
-  (info :< Indexed children) -> if null children then [ DiffInfo (toCategoryName (Categorizable info)) (toTermName term) ] else join $ termToDiffInfo <$> children
-  (info :< Fixed children) -> if null children then [ DiffInfo (toCategoryName (Categorizable info)) (toTermName term) ] else join $ termToDiffInfo <$> children
+  (info :< Syntax.Indexed children) -> if null children
+    then [ DiffInfo (toCategoryName (Categorizable info)) (toTermName term) ]
+    else join $ termToDiffInfo <$> children
+  (info :< Syntax.Fixed children) -> if null children then [ DiffInfo (toCategoryName (Categorizable info)) (toTermName term) ] else join $ termToDiffInfo <$> children
   (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName (Categorizable info)) (toTermName identifier) ]
   (info :< Syntax.Ternary ternaryCondition _) -> [ DiffInfo (toCategoryName (Categorizable info)) (toTermName ternaryCondition) ]
   (info :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName $ Categorizable info) (maybe "anonymous" toTermName identifier) ]

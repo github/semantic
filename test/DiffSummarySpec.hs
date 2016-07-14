@@ -30,24 +30,24 @@ testDiff :: Diff Text Info
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])
 
 testSummary :: DiffSummary DiffInfo
-testSummary = DiffSummary { patch = Insert (DiffInfo "string" "a"), parentAnnotations = [] }
+testSummary = DiffSummary { patch = Insert (DiffInfo "string" "a"), parentAnnotations = [], patchAnnotations = [] }
 
 replacementSummary :: DiffSummary DiffInfo
-replacementSummary = DiffSummary { patch = Replace (DiffInfo "string" "a") (DiffInfo "symbol" "b"), parentAnnotations = [ ArrayLiteral ] }
+replacementSummary = DiffSummary { patch = Replace (DiffInfo "string" "a") (DiffInfo "symbol" "b"), parentAnnotations = [ ArrayLiteral ], patchAnnotations = [] }
 
 spec :: Spec
 spec = parallel $ do
   describe "diffSummary" $ do
     it "outputs a diff summary" $ do
-      diffSummary testDiff `shouldBe` [ DiffSummary { patch = Insert (DiffInfo "string" "a"), parentAnnotations = [ ArrayLiteral ] } ]
+      diffSummary testDiff `shouldBe` [ DiffSummary { patch = Insert (DiffInfo "string" "a"), parentAnnotations = [ ArrayLiteral ], patchAnnotations = [] } ]
   describe "show" $ do
     it "should print adds" $
       show (pretty testSummary) `shouldBe` ("Added the 'a' string" :: Text)
     it "prints a replacement" $ do
       show (pretty replacementSummary) `shouldBe` ("Replaced the 'a' string with the 'b' symbol in the array context" :: Text)
-  prop "diff summaries of arbitrary diffs are identical" $
+  prop "patches in summaries match the patches in diffs" $
     \a -> let
-      diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category])))
+      diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Cost])))
       summaries = diffSummary diff
       patches = toList diff
       isIndexedOrFixed :: Patch (Term a annotation) -> Bool
@@ -59,22 +59,23 @@ spec = parallel $ do
         (Indexed _) -> True
         (Fixed _) -> True
         _ -> False
-      isBranchCategory syntax = case syntax of; (Insert info) -> termName info == "branch" || categoryName info `elem` ["Indexed", "Fixed"]; (Delete info) -> termName info == "branch" || categoryName info `elem` ["Indexed", "Fixed"]; (Replace i1 i2) -> termName i1 == "branch" || categoryName i1 `elem` ["Indexed", "Fixed"] || categoryName i1 `elem` ["Indexed", "Fixed"] || termName i2  == "branch";
+      isBranchNode :: DiffSummary DiffInfo -> Bool
+      isBranchNode summary = (not . null $ patchAnnotations summary) || (case patch summary of
+        (Insert diffInfo) -> termName diffInfo == "branch"
+        (Delete diffInfo) -> termName diffInfo == "branch"
+        (Replace i1 i2) -> termName i1 == "branch" || termName i2 == "branch")
       in
-        case (partition isBranchCategory (patch <$> summaries), partition isIndexedOrFixed patches) of
+        case (partition isBranchNode summaries, partition isIndexedOrFixed patches) of
           ((branchSummaries, otherSummaries), (branchPatches, otherPatches)) ->
-            (() <$ branchSummaries, () <$ otherSummaries) `shouldBe` (() <$ branchPatches, () <$ otherPatches)
+            ((() <$) . patch <$> branchSummaries, (() <$) . patch <$> otherSummaries) `shouldBe` ((() <$) <$> branchPatches, (() <$) <$> otherPatches)
 
+        -- ((() <$) <$> (patch <$> summaries)) `shouldBe` ((() <$) <$> patches)
+        -- [Insert (), Insert ()] == [ Insert () ]
+        -- explodePatch :: Patch (Syntax a) -> [Patch (Syntax a)]
+        -- explodePatch Indexed = explodePatch <$> children
+
+        -- Patches of branch nodes with children should have a summary for each child that is not a branch node
+        -- Patches of branch nodes with children that are branch nodes shoudl have a summary for each of those children or one summary per branch if the branches are empty
+-- let xs = ArbitraryPure (Insert (ArbitraryTerm {annotation = Category.Operator .: RNil, syntax = Indexed [ArbitraryTerm {annotation = Program .: RNil, syntax = Leaf ""}]}))
+-- let xs = ArbitraryPure (Delete (ArbitraryTerm {annotation = Category.Case .: RNil, syntax = Fixed [ArbitraryTerm {annotation = Category.FunctionCall .: RNil, syntax = Leaf ""}]})) :: ArbitraryDiff Text (Record '[Category])
           -- ((() <$) . patch <$> summaries) `shouldBe` ((() <$) <$> otherPatches)
-
-
-parsePrettyDiff :: Text -> Maybe [DiffSummary DiffInfo]
-parsePrettyDiff string = parseMaybe diffParser string
-
-parsePatch :: Parsec Text (Patch DiffInfo)
-parsePatch = (\x y z a -> case x of
-  "Added" -> Insert (DiffInfo (toS z) (toS a))
-  "Deleted" -> Delete (DiffInfo(toS z) (toS a))) <$> (string "Added" <|> string "Deleted") <*> (space *> string "the" <* space) <*> between (char '\'') (char '\'') (many printChar) <*> (space *> many printChar)
-
-diffParser :: Parsec Text [(DiffSummary DiffInfo)]
-diffParser = (DiffSummary <$> parsePatch <*> pure []) `sepBy` newline

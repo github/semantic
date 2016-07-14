@@ -92,19 +92,23 @@ diffFiles parser renderer sourceBlobs = do
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
         (_, _) ->
-          runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
+          runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
 
   pure $! renderer textDiff sourceBlobs
-  where construct :: CofreeF (Syntax Text) (Both Info) (Diff Text Info) -> Diff Text Info
-        construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
-        sumCost = fmap getSum . foldMap (fmap Sum . getCost)
+
+
+construct :: HasField fields Cost => CofreeF (Syntax leaf) (Both (Record fields)) (Diff leaf (Record fields)) -> Diff leaf (Record fields)
+construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
+  where sumCost = fmap getSum . foldMap (fmap Sum . getCost)
         getCost diff = case runFree diff of
           Free (info :< _) -> cost <$> info
           Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
-        shouldCompareTerms = (==) `on` category . extract
+
+compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Term leaf (Record fields) -> Bool
+compareCategoryEq = (==) `on` category . extract
 
 -- | The sum of the node count of the diff’s patches.
-diffCostWithCachedTermSizes :: Diff a Info -> Integer
+diffCostWithCachedTermSizes :: HasField fields Cost => Diff a (Record fields) -> Integer
 diffCostWithCachedTermSizes diff = unCost $ case runFree diff of
   Free (info :< _) -> sum (cost <$> info)
   Pure patch -> sum (cost . extract <$> patch)
