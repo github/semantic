@@ -44,7 +44,7 @@ hasChanges = or . (True <$)
 
 -- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
 alignDiff :: (Show leaf, Show (Record fields), HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [Join These (SplitDiff leaf (Record fields))]
-alignDiff sources diff = iter (alignSyntax (runBothWith ((Join .) . These)) (free . Free) getRange sources) (alignPatch sources <$> diff)
+alignDiff sources diff = iter (alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources) (alignPatch sources <$> diff)
 
 -- | Align the contents of a patch into a list of lines on the corresponding side(s) of the diff.
 alignPatch :: forall fields leaf. (Show leaf, Show (Record fields), HasField fields Range) => Both (Source Char) -> Patch (Term leaf (Record fields)) -> [Join These (SplitDiff leaf (Record fields))]
