@@ -7,6 +7,7 @@ import Test.Hspec
 import Diff
 import Info
 import Syntax
+import Term
 import Patch
 import Range
 import Category
@@ -17,6 +18,7 @@ import Interpreter
 import Diff.Arbitrary
 import Text.Megaparsec.Text
 import Text.Megaparsec
+import Data.List (partition)
 
 arrayInfo :: Info
 arrayInfo = rangeAt 0 .: ArrayLiteral .: 2 .: 0 .: RNil
@@ -46,8 +48,28 @@ spec = parallel $ do
   prop "diff summaries of arbitrary diffs are identical" $
     \a -> let
       diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category])))
-      summaries = diffSummary diff in
-        ((() <$) . patch <$> summaries) `shouldBe` ((() <$) <$> toList diff) 
+      summaries = diffSummary diff
+      patches = toList diff
+      isIndexedOrFixed :: Patch (Term a annotation) -> Bool
+      isIndexedOrFixed patch = case unwrap <$> patch of
+        (Insert syntax) -> isIndexedOrFixed' syntax
+        (Delete syntax) -> isIndexedOrFixed' syntax
+        (Replace s1 s2) -> isIndexedOrFixed' s1 || isIndexedOrFixed' s2
+      isIndexedOrFixed' = \case
+        (Indexed _) -> True
+        (Fixed _) -> True
+        _ -> False
+      isBranchCategory = \case
+        (Insert info) -> categoryName info `elem` ["Indexed", "Fixed"]
+        (Delete info) -> categoryName info `elem` ["Indexed", "Fixed"]
+        (Replace i1 i2) -> categoryName i1 `elem` ["Indexed", "Fixed"] || categoryName i2 `elem` ["Indexed", "Fixed"]
+      in
+      case (partition isIndexedOrFixed patches, partition isBranchCategory (patch <$> summaries)) of
+          ((branchPatches, otherPatches), (branchSummaries, otherSummaries)) ->
+            (() <$ branchPatches, () <$ otherPatches) `shouldBe` (() <$ branchSummaries, () <$ otherSummaries)
+
+          -- ((() <$) . patch <$> summaries) `shouldBe` ((() <$) <$> otherPatches)
+
 
 parsePrettyDiff :: Text -> Maybe [DiffSummary DiffInfo]
 parsePrettyDiff string = parseMaybe diffParser string
