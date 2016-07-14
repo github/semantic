@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 module Diffing where
 
 import Prologue hiding (fst, snd)
@@ -26,7 +27,7 @@ import TreeSitter
 import Text.Parser.TreeSitter.Language
 
 -- | Return a parser based on the file extension (including the ".").
-parserForType :: T.Text -> Parser
+parserForType :: T.Text -> Parser '[Range, Category, Size, Cost]
 parserForType mediaType = case languageForType mediaType of
   Just C -> treeSitterParser C ts_language_c
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
@@ -34,7 +35,7 @@ parserForType mediaType = case languageForType mediaType of
   _ -> lineByLineParser
 
 -- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Parser
+lineByLineParser :: Parser '[Range, Category, Size, Cost]
 lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
   (leaves, _) -> cofree <$> leaves
   where
@@ -48,7 +49,7 @@ lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 
     toText = T.pack . Source.toString
 
 -- | Return the parser that should be used for a given path.
-parserForFilepath :: FilePath -> Parser
+parserForFilepath :: FilePath -> Parser '[Range, Category, Size, Cost]
 parserForFilepath = parserForType . T.pack . takeExtension
 
 -- | Replace every string leaf with leaves of the words in the string.
@@ -81,7 +82,7 @@ readAndTranscodeFile path = do
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: Parser -> Renderer -> Both SourceBlob -> IO T.Text
+diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, HasField fields Size, Eq (Record fields)) => Parser fields -> Renderer -> Both SourceBlob -> IO T.Text
 diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sources

@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 module TreeSitter where
 
 import Prologue hiding (Constructor)
@@ -15,7 +16,7 @@ import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
-treeSitterParser :: Language -> Ptr TS.Language -> Parser
+treeSitterParser :: Language -> Ptr TS.Language -> Parser '[Range, Category, Size, Cost]
 treeSitterParser language grammar contents = do
   document <- ts_document_make
   ts_document_set_language document grammar
@@ -49,7 +50,7 @@ defaultCategoryForNodeName name = case name of
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
-documentToTerm :: Language -> Ptr Document -> Parser
+documentToTerm :: Language -> Ptr Document -> Parser '[Range, Category, Size, Cost]
 documentToTerm language document contents = alloca $ \ root -> do
   ts_document_root_node_p document root
   toTerm root
