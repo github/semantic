@@ -12,11 +12,12 @@ import Category
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.OrderedMap
+import Data.Record
 import Data.Text as Text (intercalate, unpack)
 
 data DiffInfo = DiffInfo { categoryName :: Text, termName :: Text } deriving (Eq, Show)
 
-toTermName :: HasCategory leaf => Term leaf Info -> Text
+toTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> Text
 toTermName term = case unwrap term of
   Fixed children -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
   Indexed children -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
