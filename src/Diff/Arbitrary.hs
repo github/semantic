@@ -4,7 +4,6 @@ import Diff
 import Data.Bifunctor.Join
 import Data.Bifunctor.Join.Arbitrary ()
 import Data.Functor.Foldable (unfold)
-import qualified Data.OrderedMap as Map
 import Patch
 import Patch.Arbitrary ()
 import Syntax

@@ -5,6 +5,7 @@ import Data.List (span)
 import Data.Semigroup
 import Data.String
 import Prologue
+import Test.QuickCheck
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: !Int, end :: !Int }
@@ -71,8 +72,16 @@ maybeConcat = getOption . foldMap (Option . Just)
 unionRangesFrom :: Foldable f => Range -> f Range -> Range
 unionRangesFrom range = fromMaybe range . maybeConcat
 
+
+-- Instances
+
 instance Semigroup Range where
   a <> b = unionRange a b
 
 instance Ord Range where
   a <= b = start a <= start b
+
+instance Arbitrary Range where
+  arbitrary = Range <$> arbitrary <*> arbitrary
+
+  shrink s = Range <$> shrink (start s) <*> shrink (end s)

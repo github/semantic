@@ -11,9 +11,10 @@ import Syntax
 import Category
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
-import Data.OrderedMap
 import Data.Record
-import Data.Text as Text (intercalate, unpack)
+import Data.Text as Text (intercalate)
+import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string)
+import qualified Text.PrettyPrint.Leijen.Text as P
 
 data DiffInfo = DiffInfo { categoryName :: Text, termName :: Text } deriving (Eq, Show)
 
@@ -21,7 +22,6 @@ toTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record 
 toTermName term = case unwrap term of
   Fixed children -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
   Indexed children -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
-  Keyed children -> mconcat $ keys children
   Leaf leaf -> toCategoryName leaf
   Syntax.Assignment identifier value -> toTermName identifier <> toTermName value
   Syntax.Function identifier _ _ -> (maybe "anonymous" toTermName identifier)
@@ -102,19 +102,18 @@ instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf 
 data DiffSummary a = DiffSummary {
   patch :: Patch a,
   parentAnnotations :: [Category]
-} deriving (Eq, Functor)
+} deriving (Eq, Functor, Show)
 
-instance Show (DiffSummary DiffInfo) where
-  showsPrec _ DiffSummary{..} s = (++s) . unpack $ case patch of
-    (Insert diffInfo) -> "Added the " <> "'" <> termName diffInfo <> "' " <> categoryName diffInfo <> maybeParentContext parentAnnotations
-    (Delete diffInfo) -> "Deleted the " <> "'" <> termName diffInfo <> "' " <> categoryName diffInfo <> maybeParentContext parentAnnotations
-    (Replace t1 t2) ->
-      "Replaced the " <> "'" <> termName t1 <> "' " <> categoryName t1
-      <> " with the " <> "'" <> termName t2 <> "' " <> categoryName t2
-      <> maybeParentContext parentAnnotations
-    where maybeParentContext parentAnnotations = if null parentAnnotations
-            then ""
-            else " in the " <> intercalate "/" (toCategoryName <$> parentAnnotations) <> " context"
+instance P.Pretty (DiffSummary DiffInfo) where
+  pretty DiffSummary{..} = case patch of
+    Insert diffInfo -> "Added the" <+> squotes (toDoc $ termName diffInfo) <+> (toDoc $ categoryName diffInfo) P.<> maybeParentContext parentAnnotations
+    Delete diffInfo -> "Deleted the" <+> squotes (toDoc $ termName diffInfo) <+> (toDoc $ categoryName diffInfo) P.<> maybeParentContext parentAnnotations
+    Replace t1 t2 -> "Replaced the" <+> squotes (toDoc $ termName t1) <+> (toDoc $ categoryName t1) <+> "with the" <+> P.squotes (toDoc $ termName t2) <+> (toDoc $ categoryName t2) P.<> maybeParentContext parentAnnotations
+    where
+      maybeParentContext annotations = if null annotations
+        then ""
+        else space <> "in the" <+> (toDoc . intercalate "/" $ toCategoryName <$> annotations) <+> "context"
+      toDoc = string . toS
 
 diffSummary :: (HasCategory leaf, HasField fields Category) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffSummary = cata $ \case
@@ -123,7 +122,6 @@ diffSummary = cata $ \case
   Free (_ :< (Syntax.Comment _)) -> []
   (Free (infos :< Indexed children)) -> prependSummary (category $ snd infos) <$> join children
   (Free (infos :< Fixed children)) -> prependSummary (category $ snd infos) <$> join children
-  (Free (infos :< Keyed children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList children)
   (Free (infos :< Syntax.FunctionCall identifier children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList (identifier : children))
   (Free (infos :< Syntax.Function id ps body)) -> prependSummary (category $ snd infos) <$> (fromMaybe [] id) <> (fromMaybe [] ps) <> body
   (Free (infos :< Syntax.Assignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
@@ -150,7 +148,6 @@ termToDiffInfo term = case runCofree term of
   (_ :< Leaf _) -> [ DiffInfo (toCategoryName term) (toTermName term) ]
   (_ :< Indexed children) -> join $ termToDiffInfo <$> children
   (_ :< Fixed children) -> join $ termToDiffInfo <$> children
-  (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
   (_ :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
   (_ :< Syntax.Ternary ternaryCondition _) -> [ DiffInfo (toCategoryName term) (toTermName ternaryCondition) ]
   (_ :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName term) (maybe "anonymous" toTermName identifier) ]

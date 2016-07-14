@@ -7,10 +7,6 @@ import Data.Align.Generic
 import Data.Functor.Foldable
 import Data.Functor.Both hiding (fst, snd)
 import Data.Hashable
-import Data.List ((\\))
-import qualified Data.List as List
-import Data.OrderedMap ((!))
-import qualified Data.OrderedMap as Map
 import Data.RandomWalkSimilarity
 import Data.Record
 import Data.These
@@ -37,10 +33,10 @@ diffTerms construct comparable cost a b = fromMaybe (pure $ Replace a b) $ const
 constructAndRun :: (Show leaf, Show (Record fields), Eq leaf, Hashable leaf, Ord (Record fields), HasField fields C.Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Maybe (Diff leaf (Record fields))
 constructAndRun construct comparable cost t1 t2
   | not $ comparable t1 t2 = Nothing
-  | (() <$ t1) == (() <$ t2) = hylo construct runCofree <$> zipTerms t1 t2
-  | otherwise = run construct comparable cost $ algorithm a b where
+  | (category <$> t1) == (category <$> t2) = hylo construct runCofree <$> zipTerms t1 t2
+  | otherwise =
+  run construct comparable cost $ algorithm a b where
     algorithm (Indexed a') (Indexed b') = wrap $! ByIndex a' b' (annotate . Indexed)
-    algorithm (Keyed a') (Keyed b') = wrap $! ByKey a' b' (annotate . Keyed)
     algorithm (Leaf a') (Leaf b') | a' == b' = annotate $ Leaf b'
     algorithm a' b' = wrap $! Recursive (cofree (annotation1 :< a')) (cofree (annotation2 :< b')) pure
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
@@ -56,15 +52,6 @@ run construct comparable cost algorithm = case runFree algorithm of
     diffTerms' = diffTerms construct comparable cost
     recur a b = maybe (pure (Replace t1 t2)) (annotate . fmap diffThese) (galign a b)
     diffThese = these (pure . Delete) (pure . Insert) (diffTerms construct comparable cost)
-  Free (ByKey a b f) -> run construct comparable cost $ f byKey where
-    byKey = Map.fromList $ toKeyValue <$> List.union aKeys bKeys
-    toKeyValue key | key `List.elem` deleted = (key, pure . Delete $ a ! key)
-    toKeyValue key | key `List.elem` inserted = (key, pure . Insert $ b ! key)
-    toKeyValue key = (key, diffTerms construct comparable cost (a ! key) (b ! key))
-    aKeys = Map.keys a
-    bKeys = Map.keys b
-    deleted = aKeys \\ bKeys
-    inserted = bKeys \\ aKeys
 
   Free (ByIndex a b f) -> run construct comparable cost . f $ ses (constructAndRun construct comparable cost) cost a b
 

@@ -17,7 +17,6 @@ import Data.Functor.Both as Both
 import Data.Functor.Foldable (hylo)
 import Data.List (partition)
 import Data.Maybe (fromJust)
-import qualified Data.OrderedMap as Map
 import Data.Record
 import Data.These
 import Diff
@@ -90,7 +89,6 @@ alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax 
     catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (expr <> body) bothRanges
   Fixed children ->
     catMaybes $ wrapInBranch Fixed <$> alignBranch getRange (join children) bothRanges
-  Keyed children -> catMaybes $ wrapInBranch (Keyed . Map.fromList) <$> alignBranch (getRange . Prologue.snd) (Map.toList children >>= pairWithKey) bothRanges
   Pair a b -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (a <> b) bothRanges
   Object children -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
   Commented cs expr -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join cs <> join (maybeToList expr)) bothRanges

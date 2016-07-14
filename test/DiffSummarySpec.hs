@@ -14,6 +14,7 @@ import Patch
 import Range
 import Category
 import DiffSummary
+import Text.PrettyPrint.Leijen.Text
 
 arrayInfo :: Info
 arrayInfo = rangeAt 0 .: ArrayLiteral .: 2 .: 0 .: RNil
@@ -42,6 +43,6 @@ spec = parallel $ do
 
   describe "show" $ do
     it "should print adds" $
-      show testSummary `shouldBe` ("Added the 'a' string" :: Text)
+      show (pretty testSummary) `shouldBe` ("Added the 'a' string" :: Text)
     it "prints a replacement" $ do
-      show replacementSummary `shouldBe` ("Replaced the 'a' string with the 'b' symbol in the array context" :: Text)
+      show (pretty replacementSummary) `shouldBe` ("Replaced the 'a' string with the 'b' symbol in the array context" :: Text)

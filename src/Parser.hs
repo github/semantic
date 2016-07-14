@@ -6,7 +6,6 @@ import Category
 import Info
 import qualified Syntax as S
 import Term
-import qualified Data.OrderedMap as Map
 import qualified Data.Set as Set
 import Source
 
@@ -18,17 +17,9 @@ type Parser = Source Char -> IO (Term Text Info)
 -- | A function which constructs a term from a source string, annotation, and children.
 type Constructor = Source Char -> Info -> [Term Text Info] -> Term Text Info
 
--- | Categories that are treated as keyed nodes.
-keyedCategories :: Set.Set Category
-keyedCategories = Set.fromList [ DictionaryLiteral ]
-
 -- | Categories that are treated as fixed nodes.
 fixedCategories :: Set.Set Category
 fixedCategories = Set.fromList [ BinaryOperator, Pair ]
-
--- | Should these categories be treated as keyed nodes?
-isKeyed :: Category -> Bool
-isKeyed = flip Set.member keyedCategories
 
 -- | Should these categories be treated as fixed nodes?
 isFixed :: Category -> Bool
@@ -92,7 +83,6 @@ termConstructor source info = cofree . construct
         toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
 
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
-    construct children | isKeyed (category info) = withDefaultInfo . S.Keyed . Map.fromList $ assignKey <$> children
     construct children =
       withDefaultInfo $ S.Indexed children
 

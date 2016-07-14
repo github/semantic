@@ -33,4 +33,3 @@ spec = parallel $ do
                         tbs = toTerm <$> bs
                         diff = free (Free (pure Program :< Indexed (rws compare identity tas tbs :: [Diff Text Category]))) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree (Program :< Indexed tas)), Just (cofree (Program :< Indexed tbs)))
-
