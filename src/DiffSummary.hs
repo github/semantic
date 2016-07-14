@@ -11,7 +11,6 @@ import Syntax
 import Category
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
-import Data.OrderedMap
 import Data.Record
 import Data.Text as Text (intercalate)
 import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string)
@@ -23,7 +22,6 @@ toTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record 
 toTermName term = case unwrap term of
   Fixed children -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
   Indexed children -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
-  Keyed children -> mconcat $ keys children
   Leaf leaf -> toCategoryName leaf
   Syntax.Assignment identifier value -> toTermName identifier <> toTermName value
   Syntax.Function identifier _ _ -> (maybe "anonymous" toTermName identifier)
@@ -124,7 +122,6 @@ diffSummary = cata $ \case
   Free (_ :< (Syntax.Comment _)) -> []
   (Free (infos :< Indexed children)) -> prependSummary (category $ snd infos) <$> join children
   (Free (infos :< Fixed children)) -> prependSummary (category $ snd infos) <$> join children
-  (Free (infos :< Keyed children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList children)
   (Free (infos :< Syntax.FunctionCall identifier children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList (identifier : children))
   (Free (infos :< Syntax.Function id ps body)) -> prependSummary (category $ snd infos) <$> (fromMaybe [] id) <> (fromMaybe [] ps) <> body
   (Free (infos :< Syntax.Assignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
@@ -151,7 +148,6 @@ termToDiffInfo term = case runCofree term of
   (_ :< Leaf _) -> [ DiffInfo (toCategoryName term) (toTermName term) ]
   (_ :< Indexed children) -> join $ termToDiffInfo <$> children
   (_ :< Fixed children) -> join $ termToDiffInfo <$> children
-  (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
   (_ :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
   (_ :< Syntax.Ternary ternaryCondition _) -> [ DiffInfo (toCategoryName term) (toTermName ternaryCondition) ]
   (_ :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName term) (maybe "anonymous" toTermName identifier) ]

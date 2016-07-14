@@ -117,7 +117,6 @@ instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Ran
     Leaf _ -> span . text . toText $ slice (characterRange info) source
     Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
-    Keyed children -> dl . mconcat $ wrapIn dd <$> contentElements source (characterRange info) children
     Comment _ -> span . text . toText $ slice (characterRange info) source
     Commented cs child -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (cs <> maybeToList child)
     Syntax.FunctionCall identifier children -> dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [identifier])) <> (wrapIn dd <$> contentElements source (characterRange info) children)

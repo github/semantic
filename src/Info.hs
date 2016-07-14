@@ -5,6 +5,7 @@ import Data.Record
 import Prologue
 import Category
 import Range
+import Test.QuickCheck
 
 newtype Size = Size { unSize :: Integer }
   deriving (Eq, Num, Ord, Show)
@@ -38,3 +39,16 @@ cost = getField
 
 setCost :: HasField fields Cost => Record fields -> Cost -> Record fields
 setCost = setField
+
+
+-- Instances
+
+instance Arbitrary Size where
+  arbitrary = Size <$> arbitrary
+
+  shrink = fmap Size . shrink . unSize
+
+instance Arbitrary Cost where
+  arbitrary = Cost <$> arbitrary
+
+  shrink = fmap Cost . shrink . unCost
