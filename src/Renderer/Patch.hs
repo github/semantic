@@ -14,12 +14,11 @@ import Data.String
 import Data.Text (pack)
 import Data.These
 import Diff
-import Info
 import Patch
 import Prologue hiding (fst, snd)
 import Range
 import Renderer
-import Source hiding ((<>), break)
+import Source hiding (break)
 import SplitDiff
 
 -- | Render a timed out file as a truncated diff.
