@@ -46,7 +46,7 @@ instance HasCategory Category where
     ArrayLiteral -> "array"
     Other s -> s
 
-instance HasCategory leaf => HasCategory (Term leaf Info) where
+instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
 
 data DiffSummary a = DiffSummary {
