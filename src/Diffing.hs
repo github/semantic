@@ -81,7 +81,7 @@ readAndTranscodeFile path = do
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, HasField fields Size, Eq (Record fields)) => Parser fields -> Renderer -> Both SourceBlob -> IO T.Text
+diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, HasField fields Size, Eq (Record fields)) => Parser fields -> Renderer (Record fields) -> Both SourceBlob -> IO T.Text
 diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sources
@@ -94,8 +94,7 @@ diffFiles parser renderer sourceBlobs = do
         (_, _) -> runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermCosts) $ replaceLeaves <*> terms
 
   pure $! renderer textDiff sourceBlobs
-  where construct :: CofreeF (Syntax Text) (Both Info) (Diff Text Info) -> Diff Text Info
-        construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
+  where construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
         sumCost = fmap getSum . foldMap (fmap Sum . getCost)
         getCost diff = case runFree diff of
           Free (info :< _) -> cost <$> info

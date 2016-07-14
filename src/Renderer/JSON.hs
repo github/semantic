@@ -23,7 +23,7 @@ import Syntax
 import Term
 
 -- | Render a diff to a string representing its JSON.
-json :: Renderer
+json :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
 json diff sources = toS . toLazyByteString . fromEncoding . pairs $ "rows" .= annotateRows (alignDiff (source <$> sources) diff) <> "oids" .= (oid <$> sources) <> "paths" .= (path <$> sources)
   where annotateRows = fmap (fmap NumberedLine) . numberedRows
 

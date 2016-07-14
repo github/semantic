@@ -7,7 +7,7 @@ import Info
 import Source
 
 -- | A function that will render a diff, given the two source files.
-type Renderer = Diff Text Info -> Both SourceBlob -> Text
+type Renderer annotation = Diff Text annotation -> Both SourceBlob -> Text
 
 data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath, outputPath :: FilePath }
  deriving (Show)
