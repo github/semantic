@@ -95,7 +95,7 @@ alignBranch getRange children ranges = case intersectingChildren of
   where (intersectingChildren, nonIntersectingChildren) = partition (or . intersects getRange headRanges) children
         (symmetricalChildren, asymmetricalChildren) = partition (isThese . runJoin) intersectingChildren
         intersectionsWithHeadRanges = fromThese True True . runJoin . intersects getRange headRanges
-        Just headRanges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
+        Just headRanges = Join <$> bisequenceL (runJoin (listToMaybe <$> Join (runBothWith These ranges)))
         (leftRange, rightRange) = splitThese headRanges
         alignAsymmetrically range advanceBy = let (line, remaining) = lineAndRemaining asymmetricalChildren range in
           line $ alignBranch getRange (remaining <> symmetricalChildren <> nonIntersectingChildren) (modifyJoin (advanceBy (drop 1)) ranges)
