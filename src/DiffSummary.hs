@@ -99,7 +99,7 @@ instance HasCategory Category where
     TemplateString -> "template string"
     Category.Object -> "object"
 
-instance HasCategory leaf => HasCategory (Term leaf Info) where
+instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
 
 data DiffSummary a = DiffSummary {
