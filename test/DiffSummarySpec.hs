@@ -14,7 +14,7 @@ import DiffSummary
 import Text.PrettyPrint.Leijen.Text (pretty)
 import Test.Hspec.QuickCheck
 import Interpreter
-import Term.Arbitrary
+import Diff.Arbitrary
 import Text.Megaparsec.Text
 import Text.Megaparsec
 
@@ -44,21 +44,18 @@ spec = parallel $ do
     it "prints a replacement" $ do
       show (pretty replacementSummary) `shouldBe` ("Replaced the 'a' string with the 'b' symbol in the array context" :: Text)
   prop "diff summaries of arbitrary diffs are identical" $
-    \a b -> let
-      diff = diffTerms wrap (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text Info))
-      prettyDiff = show . pretty $ diffSummary diff in
-        parsePrettyDiff prettyDiff `shouldBe` Just (diffSummary diff)
+    \a -> let
+      diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category])))
+      summaries = diffSummary diff in
+        ((() <$) . patch <$> summaries) `shouldBe` ((() <$) <$> toList diff) 
 
 parsePrettyDiff :: Text -> Maybe [DiffSummary DiffInfo]
 parsePrettyDiff string = parseMaybe diffParser string
 
-parsePatch :: Parsec Text (Patch Text)
-parsePatch = (\x y z -> case x of
-  "Added" -> Insert (toS z)
-  "Deleted" -> Delete (toS z)) <$> (string "Added" <|> string "Deleted") <*> (space *> string "the" <* space) <*> between (char '\'') (char '\'') (many printChar)
+parsePatch :: Parsec Text (Patch DiffInfo)
+parsePatch = (\x y z a -> case x of
+  "Added" -> Insert (DiffInfo (toS z) (toS a))
+  "Deleted" -> Delete (DiffInfo(toS z) (toS a))) <$> (string "Added" <|> string "Deleted") <*> (space *> string "the" <* space) <*> between (char '\'') (char '\'') (many printChar) <*> (space *> many printChar)
 
-diffParser :: Parsec Text (DiffSummary DiffInfo)
-diffParser = do
-  patch <- parsePatch
-  annotations <- _
-  pure $ DiffSummary patch annotations
+diffParser :: Parsec Text [(DiffSummary DiffInfo)]
+diffParser = (DiffSummary <$> parsePatch <*> pure []) `sepBy` newline
