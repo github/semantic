@@ -8,7 +8,6 @@ import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.These
 import Syntax
-import Unsafe
 
 -- | An annotated node (Syntax) in an abstract syntax tree.
 type TermF a annotation = CofreeF (Syntax a) annotation
