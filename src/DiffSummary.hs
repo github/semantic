@@ -145,7 +145,7 @@ diffSummary = cata $ \case
   (Pure (Delete term)) -> (\info -> DiffSummary (Delete info) []) <$> termToDiffInfo term
   (Pure (Replace t1 t2)) -> (\(info1, info2) -> DiffSummary (Replace info1 info2) []) <$> zip (termToDiffInfo t1) (termToDiffInfo t2)
 
-termToDiffInfo :: HasCategory leaf => Term leaf Info -> [DiffInfo]
+termToDiffInfo :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> [DiffInfo]
 termToDiffInfo term = case runCofree term of
   (_ :< Leaf _) -> [ DiffInfo (toCategoryName term) (toTermName term) ]
   (_ :< Indexed children) -> join $ termToDiffInfo <$> children
