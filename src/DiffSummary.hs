@@ -4,7 +4,7 @@ module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..)) where
 
 import Prologue hiding (snd, intercalate)
 import Diff
-import Info (Info, category)
+import Info (category)
 import Patch
 import Term
 import Syntax
