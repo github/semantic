@@ -16,9 +16,6 @@ import Source
 -- | and aren't pure.
 type Parser = Source Char -> IO (Term Text Info)
 
--- | A function which constructs a term from a source string, annotation, and children.
-type Constructor = Source Char -> Info -> [Term Text Info] -> Term Text Info
-
 -- | Categories that are treated as fixed nodes.
 fixedCategories :: Set.Set Category
 fixedCategories = Set.fromList [ BinaryOperator, Pair ]
