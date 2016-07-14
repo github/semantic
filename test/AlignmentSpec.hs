@@ -232,6 +232,9 @@ toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . travers
 keysOfAlignedChildren :: [Join These (Range, [(String, Range)])] -> [String]
 keysOfAlignedChildren lines = lines >>= these identity identity (++) . runJoin . fmap (fmap Prologue.fst . Prologue.snd)
 
+joinCrosswalk :: Bicrosswalk p => Align f => (a -> f b) -> Join p a -> f (Join p b)
+joinCrosswalk f = fmap Join . bicrosswalk f f . runJoin
+
 instance Arbitrary BranchElement where
   arbitrary = oneof [ key >>= \ key -> Child key <$> joinTheseOf (contents key)
                     , Margin <$> joinTheseOf margin ]
