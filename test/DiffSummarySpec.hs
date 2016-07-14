@@ -1,10 +1,14 @@
+{-# LANGUAGE DataKinds #-}
 module DiffSummarySpec where
 
 import Prologue
 import Data.Record
 import Test.Hspec
+import Test.Hspec.QuickCheck
 import Diff
 import Info
+import Interpreter
+import Term.Arbitrary
 import Syntax
 import Patch
 import Range
@@ -31,6 +35,11 @@ spec = parallel $ do
   describe "diffSummary" $ do
     it "outputs a diff summary" $ do
       diffSummary testDiff `shouldBe` [ DiffSummary { patch = Insert (DiffInfo "string" "a"), parentAnnotations = [ ArrayLiteral ] } ]
+
+    prop "equal terms produce identity diffs" $
+      \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category])) in
+        diffSummary (diffTerms wrap (==) diffCost term term) `shouldBe` []
+
   describe "show" $ do
     it "should print adds" $
       show testSummary `shouldBe` ("Added the 'a' string" :: Text)
