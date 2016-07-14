@@ -91,7 +91,7 @@ diffFiles parser renderer sourceBlobs = do
   let textDiff = case areNullOids of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
-        (_, _) -> runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermSizes) $ replaceLeaves <*> terms
+        (_, _) -> runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermCosts) $ replaceLeaves <*> terms
 
   pure $! renderer textDiff sourceBlobs
   where construct :: CofreeF (Syntax Text) (Both Info) (Diff Text Info) -> Diff Text Info
@@ -103,7 +103,7 @@ diffFiles parser renderer sourceBlobs = do
         shouldCompareTerms = (==) `on` category . extract
 
 -- | The sum of the node count of the diff’s patches.
-diffCostWithCachedTermSizes :: Diff a Info -> Integer
-diffCostWithCachedTermSizes diff = unCost $ case runFree diff of
+diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Integer
+diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Free (info :< _) -> sum (cost <$> info)
   Pure patch -> sum (cost . extract <$> patch)
