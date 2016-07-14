@@ -11,7 +11,6 @@ import Syntax
 import Category
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
-import Data.OrderedMap
 import Data.Text as Text (intercalate)
 import Test.QuickCheck hiding (Fixed)
 import Patch.Arbitrary()
@@ -23,9 +22,8 @@ data DiffInfo = DiffInfo { categoryName :: Text, termName :: Text } deriving (Eq
 
 toTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> Text
 toTermName term = case unwrap term of
-  Fixed children -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
-  Indexed children -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
-  Keyed children -> mconcat $ keys children
+  Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+  Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
   Syntax.Assignment identifier value -> toTermName identifier <> toTermName value
   Syntax.Function identifier _ _ -> (maybe "anonymous" toTermName identifier)
@@ -134,7 +132,6 @@ diffSummary = cata $ \case
   Free (_ :< (Syntax.Comment _)) -> []
   (Free (infos :< Indexed children)) -> prependSummary (category $ snd infos) <$> join children
   (Free (infos :< Fixed children)) -> prependSummary (category $ snd infos) <$> join children
-  (Free (infos :< Keyed children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList children)
   (Free (infos :< Syntax.FunctionCall identifier children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList (identifier : children))
   (Free (infos :< Syntax.Function id ps body)) -> prependSummary (category $ snd infos) <$> (fromMaybe [] id) <> (fromMaybe [] ps) <> body
   (Free (infos :< Syntax.Assignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
@@ -161,7 +158,6 @@ termToDiffInfo term = case runCofree term of
   (_ :< Leaf _) -> [ DiffInfo (toCategoryName term) (toTermName term) ]
   (info :< Indexed children) -> if null children then [ DiffInfo (toCategoryName (Categorizable info)) (toTermName term) ] else join $ termToDiffInfo <$> children
   (info :< Fixed children) -> if null children then [ DiffInfo (toCategoryName (Categorizable info)) (toTermName term) ] else join $ termToDiffInfo <$> children
-  (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
   (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName (Categorizable info)) (toTermName identifier) ]
   (info :< Syntax.Ternary ternaryCondition _) -> [ DiffInfo (toCategoryName (Categorizable info)) (toTermName ternaryCondition) ]
   (info :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName $ Categorizable info) (maybe "anonymous" toTermName identifier) ]

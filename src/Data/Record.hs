@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
 module Data.Record where
 
+import GHC.Show
 import Prologue
 import Test.QuickCheck
 import GHC.Show (Show(..))
@@ -41,10 +42,10 @@ instance {-# OVERLAPPABLE #-} HasField (field ': fields) field where
 
 
 instance (Show h, Show (Record t)) => Show (Record (h ': t)) where
-  showsPrec n (RCons h t) = showsPrec n h . (" : " <>) . showsPrec n t
+  showsPrec n (RCons h t) = showParen (n > 0) $ showsPrec 1 h . (" .: " <>) . shows t
 
 instance Show (Record '[]) where
-  showsPrec _ RNil = ("'[]" <>)
+  showsPrec n RNil = showParen (n > 0) ("RNil" <>)
 
 
 instance (Eq h, Eq (Record t)) => Eq (Record (h ': t)) where

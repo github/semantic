@@ -16,21 +16,21 @@ import Test.QuickCheck
 spec :: Spec
 spec = parallel $ do
   prop "equality is reflexive" $
-    \ a b -> let diff = diffTerms (free . Free) (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Category]))) in
+    \ a b -> let diff = diffTerms wrap (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Category]))) in
       diff `shouldBe` diff
 
   prop "equal terms produce identity diffs" $
     \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category])) in
-      diffCost (diffTerms (free . Free) (==) diffCost term term) `shouldBe` 0
+      diffCost (diffTerms wrap (==) diffCost term term) `shouldBe` 0
 
   describe "beforeTerm" $ do
     prop "recovers the before term" $
-      \ a b -> let diff = diffTerms (free . Free) (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Category]))) in
+      \ a b -> let diff = diffTerms wrap (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Category]))) in
         beforeTerm diff `shouldBe` Just (toTerm a)
 
   describe "afterTerm" $ do
     prop "recovers the after term" $
-      \ a b -> let diff = diffTerms (free . Free) (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Category]))) in
+      \ a b -> let diff = diffTerms wrap (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Category]))) in
         afterTerm diff `shouldBe` Just (toTerm b)
 
   describe "ArbitraryDiff" $ do

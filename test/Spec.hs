@@ -7,7 +7,6 @@ import qualified Data.RandomWalkSimilarity.Spec
 import qualified Diff.Spec
 import qualified DiffSummarySpec
 import qualified InterpreterSpec
-import qualified OrderedMapSpec
 import qualified PatchOutputSpec
 import qualified TermSpec
 import Test.Hspec
@@ -20,6 +19,5 @@ main = hspec . parallel $ do
   describe "Diff.Spec" Diff.Spec.spec
   describe "DiffSummary" DiffSummarySpec.spec
   describe "Interpreter" InterpreterSpec.spec
-  describe "OrderedMap" OrderedMapSpec.spec
   describe "PatchOutput" PatchOutputSpec.spec
   describe "Term" TermSpec.spec

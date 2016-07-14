@@ -55,18 +55,15 @@ spec = parallel $ do
         (Insert syntax) -> isIndexedOrFixed' syntax
         (Delete syntax) -> isIndexedOrFixed' syntax
         (Replace s1 s2) -> isIndexedOrFixed' s1 || isIndexedOrFixed' s2
-      isIndexedOrFixed' = \case
+      isIndexedOrFixed' syntax = case syntax of
         (Indexed _) -> True
         (Fixed _) -> True
         _ -> False
-      isBranchCategory = \case
-        (Insert info) -> categoryName info `elem` ["Indexed", "Fixed"]
-        (Delete info) -> categoryName info `elem` ["Indexed", "Fixed"]
-        (Replace i1 i2) -> categoryName i1 `elem` ["Indexed", "Fixed"] || categoryName i2 `elem` ["Indexed", "Fixed"]
+      isBranchCategory syntax = case syntax of; (Insert info) -> termName info == "branch" || categoryName info `elem` ["Indexed", "Fixed"]; (Delete info) -> termName info == "branch" || categoryName info `elem` ["Indexed", "Fixed"]; (Replace i1 i2) -> termName i1 == "branch" || categoryName i1 `elem` ["Indexed", "Fixed"] || categoryName i1 `elem` ["Indexed", "Fixed"] || termName i2  == "branch";
       in
-      case (partition isIndexedOrFixed patches, partition isBranchCategory (patch <$> summaries)) of
-          ((branchPatches, otherPatches), (branchSummaries, otherSummaries)) ->
-            (() <$ branchPatches, () <$ otherPatches) `shouldBe` (() <$ branchSummaries, () <$ otherSummaries)
+        case (partition isBranchCategory (patch <$> summaries), partition isIndexedOrFixed patches) of
+          ((branchSummaries, otherSummaries), (branchPatches, otherPatches)) ->
+            (() <$ branchSummaries, () <$ otherSummaries) `shouldBe` (() <$ branchPatches, () <$ otherPatches)
 
           -- ((() <$) . patch <$> summaries) `shouldBe` ((() <$) <$> otherPatches)
 
