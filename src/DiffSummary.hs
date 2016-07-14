@@ -116,7 +116,7 @@ instance Show (DiffSummary DiffInfo) where
             then ""
             else " in the " <> intercalate "/" (toCategoryName <$> parentAnnotations) <> " context"
 
-diffSummary :: HasCategory leaf => Diff leaf Info -> [DiffSummary DiffInfo]
+diffSummary :: (HasCategory leaf, HasField fields Category) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffSummary = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
