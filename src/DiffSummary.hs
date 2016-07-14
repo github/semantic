@@ -159,8 +159,8 @@ diffSummary = cata $ \case
 termToDiffInfo :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> [DiffInfo]
 termToDiffInfo term = case runCofree term of
   (_ :< Leaf _) -> [ DiffInfo (toCategoryName term) (toTermName term) ]
-  (_ :< Indexed children) -> join $ termToDiffInfo <$> children
-  (_ :< Fixed children) -> join $ termToDiffInfo <$> children
+  (info :< Indexed children) -> if null children then [ DiffInfo (toCategoryName (Categorizable info)) (toTermName term) ] else join $ termToDiffInfo <$> children
+  (info :< Fixed children) -> if null children then [ DiffInfo (toCategoryName (Categorizable info)) (toTermName term) ] else join $ termToDiffInfo <$> children
   (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
   (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName (Categorizable info)) (toTermName identifier) ]
   (info :< Syntax.Ternary ternaryCondition _) -> [ DiffInfo (toCategoryName (Categorizable info)) (toTermName ternaryCondition) ]
