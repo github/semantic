@@ -153,9 +153,3 @@ maybeThese (Just a) (Just b) = Just (These a b)
 maybeThese (Just a) _ = Just (This a)
 maybeThese _ (Just b) = Just (That b)
 maybeThese _ _ = Nothing
-
-
--- | Instances
-
-instance Bicrosswalk t => Crosswalk (Join t) where
-  crosswalk f = fmap Join . bicrosswalk f f . runJoin
