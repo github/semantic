@@ -1,9 +1,11 @@
 module Parser where
 
 import Prologue hiding (Constructor)
+import Data.Record
 import Data.Text (pack)
 import Category
 import Info
+import Range
 import Syntax
 import Term
 import qualified Data.Set as Set
@@ -27,11 +29,10 @@ isFixed = flip Set.member fixedCategories
 
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
-termConstructor :: Constructor
+termConstructor :: (HasField fields Category, HasField fields Range) => Source Char -> (Record fields) -> [Term Text (Record fields)] -> Term Text (Record fields)
 termConstructor source info children = cofree (info :< syntax)
   where
     syntax = construct children
-    construct :: [Term Text Info] -> Syntax Text (Term Text Info)
     construct [] = Leaf . pack . toString $ slice (characterRange info) source
     construct children | isFixed (category info) = Fixed children
     construct children = Indexed children
