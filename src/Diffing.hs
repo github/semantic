@@ -43,7 +43,7 @@ lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 
       ((Range 0 $ length input) .: Other "program" .: size .: Cost (unSize size) .: RNil) :< Indexed children
     leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Other "program" .: 1 .: 1 .: RNil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
-      (accum ++ [ leaf charIndex (toText line) ]
+      (accum <> [ leaf charIndex (toText line) ]
       , charIndex + length line)
     toText = T.pack . Source.toString
 
