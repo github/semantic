@@ -62,9 +62,6 @@ class HasCategory a where
 instance HasCategory Text where
   toCategoryName = identity
 
-instance HasCategory Info where
-  toCategoryName = toCategoryName . category
-
 instance HasCategory Category where
   toCategoryName = \case
     ArrayLiteral -> "array"
