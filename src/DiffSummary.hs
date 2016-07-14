@@ -12,11 +12,12 @@ import Syntax
 import Category
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
+import Data.Record
 import Data.Text as Text (unpack)
 
 data DiffInfo = DiffInfo { categoryName :: String, termName :: Maybe String } deriving (Eq, Show)
 
-maybeTermName :: HasCategory leaf => Term leaf Info -> Maybe String
+maybeTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> Maybe String
 maybeTermName term = case runCofree term of
   (_ :< Leaf leaf) -> Just (toCategoryName leaf)
   (_ :< Indexed children) -> toCategoryName . category <$> head (extract <$> children)
