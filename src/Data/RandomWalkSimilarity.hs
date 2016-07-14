@@ -8,7 +8,6 @@ import Data.Functor.Foldable as Foldable
 import Data.Hashable
 import qualified Data.KdTree.Static as KdTree
 import qualified Data.List as List
-import qualified Data.OrderedMap as Map
 import qualified Data.Vector as Vector
 import Diff
 import Patch
@@ -67,9 +66,7 @@ pqGrams p q getLabel = cata merge . setRootBase . setRootStem . hylo go project
           Leaf a -> Leaf a
           Indexed a -> Indexed $ windowed q setBases [] a
           Fixed a -> Fixed $ windowed q setBases [] a
-          Keyed a -> Keyed . Map.fromList $ windowed q setBasesKV [] (Map.toList a)
         setBases child siblings rest = let (gram :< further) = (runCofree child) in cofree (setBase gram (siblings >>= base . extract) :< further) : rest
-        setBasesKV (key, child) siblings rest = let (gram :< further) = (runCofree child) in (key, cofree (setBase gram (siblings >>= base . extract . snd) :< further)) : rest
         setBase gram newBase = gram { base = take q (newBase <> repeat Nothing) }
         setRootBase term = let (a :< f) = runCofree term in cofree (setBase a (base a) :< f)
         setRootStem = foldr (\ p rest -> assignParent Nothing p . rest) identity [0..p]

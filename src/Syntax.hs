@@ -1,10 +1,7 @@
 module Syntax where
 
 import Prologue
-import Data.OrderedMap as Map
-import Data.Text.Arbitrary ()
 import GHC.Generics
-import qualified Data.Text as T
 import Test.QuickCheck hiding (Fixed)
 
 -- | A node in an abstract syntax tree.
@@ -18,8 +15,6 @@ data Syntax
   | Indexed [f]
   -- | An ordered branch of child nodes, expected to be of fixed length in the grammar, e.g. a binary operator & its operands.
   | Fixed [f]
-  -- | A branch of child nodes indexed by some String identity. This is useful for identifying e.g. methods & properties in a class scope by their names. Note that comments can generally occur in these scopes as well; one strategy for dealing with this is to identify comments by their text in the source.
-  | Keyed (OrderedMap T.Text f)
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
 
@@ -31,7 +26,6 @@ syntaxOfSize recur n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsO
   where branchGeneratorsOfSize n =
           [ Indexed <$> childrenOfSize (pred n)
           , Fixed <$> childrenOfSize (pred n)
-          , (Keyed .) . (Map.fromList .) . zip <$> infiniteListOf arbitrary <*> childrenOfSize (pred n)
           ]
         childrenOfSize n | n <= 0 = pure []
         childrenOfSize n = do

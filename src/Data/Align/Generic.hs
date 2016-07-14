@@ -5,7 +5,6 @@ import Control.Monad
 import Data.Align
 import Data.These
 import GHC.Generics
-import Data.OrderedMap
 import Prologue
 import Syntax
 
@@ -24,7 +23,6 @@ instance Eq a => GAlign (Syntax a)
 -- 'Data.Align.Align' instances
 
 instance GAlign [] where galign = galignAlign
-instance Eq key => GAlign (OrderedMap key) where galign = galignAlign
 
 -- | Implements a function suitable for use as the definition of 'galign' for 'Align'able functors.
 galignAlign :: Align f => f a -> f b -> Maybe (f (These a b))

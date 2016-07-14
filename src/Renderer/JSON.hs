@@ -10,7 +10,6 @@ import Category
 import Data.Aeson hiding (json)
 import Data.Bifunctor.Join
 import Data.ByteString.Builder
-import Data.OrderedMap hiding (fromList)
 import qualified Data.Text as T
 import Data.These
 import Data.Vector hiding (toList)
@@ -51,9 +50,6 @@ instance ToJSON (SplitDiff leaf Info) where
   toEncoding splitDiff = case runFree splitDiff of
     (Free (info :< syntax)) -> pairs $ mconcat (termFields info syntax)
     (Pure patch)            -> pairs $ mconcat (patchFields patch)
-instance ToJSON value => ToJSON (OrderedMap T.Text value) where
-  toJSON kv = object $ uncurry (.=) <$> toList kv
-  toEncoding kv = pairs . mconcat $ uncurry (.=) <$> toList kv
 instance ToJSON (Term leaf Info) where
   toJSON term     | (info :< syntax) <- runCofree term = object (termFields info syntax)
   toEncoding term | (info :< syntax) <- runCofree term = pairs $ mconcat (termFields info syntax)
@@ -70,7 +66,6 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   Leaf _ -> []
   Indexed c -> childrenFields c
   Fixed c -> childrenFields c
-  Keyed c -> childrenFields c
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: KeyValue kv => SplitPatch (Term leaf Info) -> [kv]
