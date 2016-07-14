@@ -220,8 +220,8 @@ toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . travers
           put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
           pure []
         alignBranchElement element = case element of
-          Child key contents -> Child key <$> crosswalk lines contents
-          Margin contents -> Margin <$> crosswalk lines contents
+          Child key contents -> Child key <$> joinCrosswalk lines contents
+          Margin contents -> Margin <$> joinCrosswalk lines contents
           where lines = fmap toList . Source.actualLines . Source.fromList
         sources = foldMap Source.fromList <$> bothContents elements
         ranges = fmap (filter (\ (Range start end) -> start /= end)) $ Source.actualLineRanges <$> (totalRange <$> sources) <*> sources
@@ -248,10 +248,10 @@ instance Arbitrary BranchElement where
                                 , Join . That <$> g
                                 , (Join .) . These <$> g <*> g ]
 
-  shrink (Child key contents) = Child key <$> crosswalk shrinkContents contents
+  shrink (Child key contents) = Child key <$> joinCrosswalk shrinkContents contents
     where shrinkContents string = (++ suffix) . (prefix ++) <$> shrinkList (const []) (drop (length prefix) (take (length string - length suffix) string))
           (prefix, suffix) = ('(' : key, ")" :: String)
-  shrink (Margin contents) = Margin <$> crosswalk (shrinkList (const [])) contents
+  shrink (Margin contents) = Margin <$> joinCrosswalk (shrinkList (const [])) contents
 
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prologue.fst <$> numbered))
