@@ -154,17 +154,17 @@ termToDiffInfo term = case runCofree term of
   (_ :< Indexed children) -> join $ termToDiffInfo <$> children
   (_ :< Fixed children) -> join $ termToDiffInfo <$> children
   (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
-  (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
-  (info :< Syntax.Ternary ternaryCondition _) -> [ DiffInfo (toCategoryName info) (toTermName ternaryCondition) ]
-  (info :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous" toTermName identifier) ]
-  (info :< Syntax.Assignment identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
-  (info :< Syntax.MathAssignment identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
+  (_ :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
+  (_ :< Syntax.Ternary ternaryCondition _) -> [ DiffInfo (toCategoryName term) (toTermName ternaryCondition) ]
+  (_ :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName term) (maybe "anonymous" toTermName identifier) ]
+  (_ :< Syntax.Assignment identifier _) -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
+  (_ :< Syntax.MathAssignment identifier _) -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
   -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
   -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
   -- to indicate where that value should be when constructing DiffInfos.
-  (info :< Syntax.Operator _) -> [DiffInfo (toCategoryName info) "x"]
-  (info :< Commented cs leaf) -> join (termToDiffInfo <$> cs) <> maybe [] (\leaf -> [ DiffInfo (toCategoryName info) (toTermName leaf) ]) leaf
-  (info :< _) -> [ DiffInfo (toCategoryName info) (toTermName term) ]
+  (_ :< Syntax.Operator _) -> [DiffInfo (toCategoryName term) "x"]
+  (_ :< Commented cs leaf) -> join (termToDiffInfo <$> cs) <> maybe [] (\leaf -> [ DiffInfo (toCategoryName term) (toTermName leaf) ]) leaf
+  _ -> [ DiffInfo (toCategoryName term) (toTermName term) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
