@@ -5,7 +5,7 @@ import Prologue hiding (fst, snd)
 import Data.String
 import Data.Maybe (fromJust)
 import Diff
-import Info (Info, category)
+import Info (category)
 import Patch
 import Term
 import Syntax
