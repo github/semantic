@@ -4,7 +4,7 @@ module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..)) where
 
 import Prologue hiding (snd, intercalate)
 import Diff
-import Info (Info, category)
+import Info (category)
 import Patch
 import Term
 import Syntax
@@ -12,11 +12,12 @@ import Category
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.OrderedMap
+import Data.Record
 import Data.Text as Text (intercalate, unpack)
 
 data DiffInfo = DiffInfo { categoryName :: Text, termName :: Text } deriving (Eq, Show)
 
-toTermName :: HasCategory leaf => Term leaf Info -> Text
+toTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> Text
 toTermName term = case unwrap term of
   Fixed children -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
   Indexed children -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
@@ -61,9 +62,6 @@ class HasCategory a where
 instance HasCategory Text where
   toCategoryName = identity
 
-instance HasCategory Info where
-  toCategoryName = toCategoryName . category
-
 instance HasCategory Category where
   toCategoryName = \case
     ArrayLiteral -> "array"
@@ -98,7 +96,7 @@ instance HasCategory Category where
     TemplateString -> "template string"
     Category.Object -> "object"
 
-instance HasCategory leaf => HasCategory (Term leaf Info) where
+instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
 
 data DiffSummary a = DiffSummary {
@@ -118,7 +116,7 @@ instance Show (DiffSummary DiffInfo) where
             then ""
             else " in the " <> intercalate "/" (toCategoryName <$> parentAnnotations) <> " context"
 
-diffSummary :: HasCategory leaf => Diff leaf Info -> [DiffSummary DiffInfo]
+diffSummary :: (HasCategory leaf, HasField fields Category) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffSummary = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
@@ -147,23 +145,23 @@ diffSummary = cata $ \case
   (Pure (Delete term)) -> (\info -> DiffSummary (Delete info) []) <$> termToDiffInfo term
   (Pure (Replace t1 t2)) -> (\(info1, info2) -> DiffSummary (Replace info1 info2) []) <$> zip (termToDiffInfo t1) (termToDiffInfo t2)
 
-termToDiffInfo :: HasCategory leaf => Term leaf Info -> [DiffInfo]
+termToDiffInfo :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> [DiffInfo]
 termToDiffInfo term = case runCofree term of
   (_ :< Leaf _) -> [ DiffInfo (toCategoryName term) (toTermName term) ]
   (_ :< Indexed children) -> join $ termToDiffInfo <$> children
   (_ :< Fixed children) -> join $ termToDiffInfo <$> children
   (_ :< Keyed children) -> join $ termToDiffInfo <$> Prologue.toList children
-  (info :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
-  (info :< Syntax.Ternary ternaryCondition _) -> [ DiffInfo (toCategoryName info) (toTermName ternaryCondition) ]
-  (info :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName info) (maybe "anonymous" toTermName identifier) ]
-  (info :< Syntax.Assignment identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
-  (info :< Syntax.MathAssignment identifier _) -> [ DiffInfo (toCategoryName info) (toTermName identifier) ]
+  (_ :< Syntax.FunctionCall identifier _) -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
+  (_ :< Syntax.Ternary ternaryCondition _) -> [ DiffInfo (toCategoryName term) (toTermName ternaryCondition) ]
+  (_ :< Syntax.Function identifier _ _) -> [ DiffInfo (toCategoryName term) (maybe "anonymous" toTermName identifier) ]
+  (_ :< Syntax.Assignment identifier _) -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
+  (_ :< Syntax.MathAssignment identifier _) -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
   -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
   -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
   -- to indicate where that value should be when constructing DiffInfos.
-  (info :< Syntax.Operator _) -> [DiffInfo (toCategoryName info) "x"]
-  (info :< Commented cs leaf) -> join (termToDiffInfo <$> cs) <> maybe [] (\leaf -> [ DiffInfo (toCategoryName info) (toTermName leaf) ]) leaf
-  (info :< _) -> [ DiffInfo (toCategoryName info) (toTermName term) ]
+  (_ :< Syntax.Operator _) -> [DiffInfo (toCategoryName term) "x"]
+  (_ :< Commented cs leaf) -> join (termToDiffInfo <$> cs) <> maybe [] (\leaf -> [ DiffInfo (toCategoryName term) (toTermName leaf) ]) leaf
+  _ -> [ DiffInfo (toCategoryName term) (toTermName term) ]
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
