@@ -5,18 +5,19 @@ import Prologue hiding (fst, snd)
 import Data.String
 import Data.Maybe (fromJust)
 import Diff
-import Info (Info, category)
+import Info (category)
 import Patch
 import Term
 import Syntax
 import Category
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
+import Data.Record
 import Data.Text as Text (unpack)
 
 data DiffInfo = DiffInfo { categoryName :: String, termName :: Maybe String } deriving (Eq, Show)
 
-maybeTermName :: HasCategory leaf => Term leaf Info -> Maybe String
+maybeTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> Maybe String
 maybeTermName term = case runCofree term of
   (_ :< Leaf leaf) -> Just (toCategoryName leaf)
   (_ :< Indexed children) -> toCategoryName . category <$> head (extract <$> children)
@@ -45,7 +46,7 @@ instance HasCategory Category where
     ArrayLiteral -> "array"
     Other s -> s
 
-instance HasCategory leaf => HasCategory (Term leaf Info) where
+instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
 
 data DiffSummary a = DiffSummary {
@@ -66,9 +67,9 @@ instance Show (DiffSummary DiffInfo) where
             then ""
             else " in the " ++ intercalate "/" (categoryName <$> parentAnnotations) ++ " context"
 
-diffSummary :: HasCategory leaf => Diff leaf Info -> [DiffSummary DiffInfo]
+diffSummary :: (HasCategory leaf, HasField fields Category) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffSummary = cata diffSummary' where
-  diffSummary' :: HasCategory leaf => Base (Diff leaf Info) [DiffSummary DiffInfo] -> [DiffSummary DiffInfo]
+  diffSummary' :: (HasCategory leaf, HasField fields Category) => Base (Diff leaf (Record fields)) [DiffSummary DiffInfo] -> [DiffSummary DiffInfo]
   diffSummary' (Free (_ :< Leaf _)) = [] -- Skip leaves since they don't have any changes
   diffSummary' (Free (infos :< Indexed children)) = prependSummary (DiffInfo (toCategoryName . category $ snd infos) Nothing) <$> join children
   diffSummary' (Free (infos :< Fixed children)) = prependSummary (DiffInfo (toCategoryName . category $ snd infos) Nothing) <$> join children

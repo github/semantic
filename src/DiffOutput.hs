@@ -1,10 +1,14 @@
 module DiffOutput where
 
+import Category
 import Prologue
 import qualified Data.Text.IO as TextIO
 import Data.Functor.Both
+import Data.Record
 import Diffing
+import Info
 import Parser
+import Range
 import qualified Renderer.JSON as J
 import qualified Renderer.Patch as P
 import qualified Renderer.Summary as S
@@ -16,7 +20,7 @@ import System.FilePath
 import qualified System.IO as IO
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: Parser -> DiffArguments -> Both SourceBlob -> IO Text
+textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range, HasField fields Size) => Parser fields -> DiffArguments -> Both SourceBlob -> IO Text
 textDiff parser arguments sources = case format arguments of
   Split -> diffFiles parser split sources
   Patch -> diffFiles parser P.patch sources
@@ -32,7 +36,7 @@ truncatedDiff arguments sources = case format arguments of
   Summary -> pure ""
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
-printDiff :: Parser -> DiffArguments -> Both SourceBlob -> IO ()
+printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range, HasField fields Size) => Parser fields -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = case format arguments of
   Split -> put (output arguments) =<< diffFiles parser split sources
     where

@@ -12,10 +12,6 @@ newtype Size = Size { unSize :: Integer }
 newtype Cost = Cost { unCost :: Integer }
   deriving (Eq, Num, Ord, Show)
 
-type InfoFields = '[ Range, Category, Size, Cost ]
-
-type Info = Record InfoFields
-
 characterRange :: HasField fields Range => Record fields -> Range
 characterRange = getField
 
