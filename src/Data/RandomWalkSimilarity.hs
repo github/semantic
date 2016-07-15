@@ -53,20 +53,16 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 
 -- | Compute the bag of grams with stems of length _p_ and bases of length _q_, with labels computed from annotations, which summarize the entire subtree of a term.
 pqGrams :: Int -> Int -> (annotation -> label) -> Cofree (Syntax leaf) annotation -> DList.DList (Gram (label, Maybe leaf))
-pqGrams p q getLabel = cata merge . setRootBase . setRootStem . hylo go project
+pqGrams p q getLabel = uncurry DList.cons . cata merge . setRootBase . setRootStem . hylo go project
   where go (annotation :< functor) = cofree (Gram [] [ Just (getLabel annotation, leafValue functor) ] :< (assignParent (Just (getLabel annotation, leafValue functor)) p <$> functor))
         leafValue (Leaf s) = Just s
         leafValue _ = Nothing
-        merge (head :< tail) = DList.cons head (Prologue.fold tail)
+        merge (head :< tail) = let tail' = toList tail in (head, DList.fromList (windowed q setBases [] (fst <$> tail')) <> foldMap snd tail')
         assignParent parentLabel n tree
-          | n > 0 = let gram :< functor = runCofree tree in cofree $ prependParent parentLabel gram :< assignSiblings (assignParent parentLabel (pred n) <$> functor)
+          | n > 0 = let gram :< functor = runCofree tree in cofree $ prependParent parentLabel gram :< (assignParent parentLabel (pred n) <$> functor)
           | otherwise = tree
         prependParent parentLabel gram = gram { stem = parentLabel : stem gram }
-        assignSiblings functor = case functor of
-          Leaf a -> Leaf a
-          Indexed a -> Indexed $ windowed q setBases [] a
-          Fixed a -> Fixed $ windowed q setBases [] a
-        setBases child siblings rest = let (gram :< further) = (runCofree child) in cofree (setBase gram (siblings >>= base . extract) :< further) : rest
+        setBases gram siblings rest = setBase gram (siblings >>= base) : rest
         setBase gram newBase = gram { base = take q (newBase <> repeat Nothing) }
         setRootBase term = let (a :< f) = runCofree term in cofree (setBase a (base a) :< f)
         setRootStem = foldr (\ p rest -> assignParent Nothing p . rest) identity [0..p]
