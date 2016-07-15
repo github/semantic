@@ -49,7 +49,9 @@ lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 
 
 -- | Return the parser that should be used for a given path.
 parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Range, Category])
-parserForFilepath = parserForType . T.pack . takeExtension
+parserForFilepath path source = do
+   parsed <- parserForType (T.pack (takeExtension path)) source
+   pure $! breakDownLeavesByWord source parsed
 
 -- | Replace every string leaf with leaves of the words in the string.
 breakDownLeavesByWord :: HasField fields Range => Source Char -> Term T.Text (Record fields) -> Term T.Text (Record fields)
@@ -91,12 +93,11 @@ diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sources
 
-  let preprocessed = breakDownLeavesByWord <$> sources <*> terms
   let areNullOids = runJoin $ (== nullOid) . oid <$> sourceBlobs
   let textDiff = case areNullOids of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
-        _ -> runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermCosts) preprocessed
+        _ -> runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermCosts) terms
 
   pure $! renderer textDiff sourceBlobs
   where construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
