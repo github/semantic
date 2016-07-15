@@ -110,7 +110,7 @@ wrapIn f p = f p
 -- Instances
 
 instance (ToMarkup f, HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (CofreeF (Syntax leaf) (Record fields) (f, Range))) where
-  toMarkup (Renderable source (info :< syntax)) = (! A.data_ (stringValue (show (unCost (cost info))))) . classifyMarkup (category info) $ case syntax of
+  toMarkup (Renderable source (info :< syntax)) = classifyMarkup (category info) $ case syntax of
     Leaf _ -> span . string . toString $ slice (characterRange info) source
     _ -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (toList syntax)
 
