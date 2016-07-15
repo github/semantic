@@ -82,7 +82,7 @@ split diff blobs = TL.toStrict . renderHtml
     -- | Render a line with numbers as an HTML row.
     numberedLinesToMarkup numberedLines = tr $ runBothWith (<>) (renderLine <$> Join (fromThese Nothing Nothing (runJoin (Just <$> numberedLines))) <*> sources) <> string "\n"
 
-    renderLine (Just (number, line)) source = toMarkup $ Renderable (hasChanges line, number, Renderable (source, line))
+    renderLine (Just (number, line)) source = toMarkup $ Cell (hasChanges line) number (Renderable (source, line))
     renderLine _ _ =
       td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
       <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
@@ -90,6 +90,8 @@ split diff blobs = TL.toStrict . renderHtml
 
 -- | Something that can be rendered as markup.
 newtype Renderable a = Renderable a
+
+data Cell a = Cell { containsChanges :: !Bool, lineNumber :: !Int, getCell :: !a }
 
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
@@ -122,8 +124,8 @@ instance (HasField fields Category, HasField fields Cost, HasField fields Range)
     where toMarkupAndRange patch = let term@(info :< _) = runCofree $ getSplitTerm patch in
             ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue (show (unCost (cost info))))) . toMarkup $ Renderable (source, cofree term), characterRange info)
 
-instance ToMarkup a => ToMarkup (Renderable (Bool, Int, a)) where
-  toMarkup (Renderable (hasChanges, num, line)) =
+instance ToMarkup a => ToMarkup (Cell a) where
+  toMarkup (Cell hasChanges num line) =
     td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
     <> td (toMarkup line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
     <> string "\n"
