@@ -75,12 +75,6 @@ spec = parallel $ do
                in
                 length listOfLeaves `shouldBe` length listOfDiffLeaves
 
-          -- partitions arbitrary diff infos ([BranchInfo], [LeafInfo])
-          -- partitions arbitrary patches ([Fixed/Indexed], [Other])
-          -- Map [BranchInfo] -> [LeafInfo]
-          -- Map [Fixed/Indexed] -> [Children != Fixed/Indexed]
-          -- length [Children != Fixed/Indexed] == length [LeafInfo]
-
 isIndexedOrFixed :: Patch (Term a annotation) -> Bool
 isIndexedOrFixed patch = case unwrap <$> patch of
   (Insert syntax) -> isIndexedOrFixed' syntax
