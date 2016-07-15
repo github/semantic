@@ -120,9 +120,10 @@ instance (HasField fields Category, HasField fields Cost, HasField fields Range)
 instance (HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (SplitDiff leaf (Record fields))) where
   toMarkup (Renderable source diff) = Prologue.fst . iter (\ t -> (toMarkup $ Renderable source t, characterRange (headF t))) $ toMarkupAndRange <$> diff
     where toMarkupAndRange patch = let term@(info :< _) = runCofree $ getSplitTerm patch in
-            ((div ! patchAttribute patch ! costAttribute info) . toMarkup $ Renderable source (cofree term), characterRange info)
+            ((div ! patchAttribute patch `withCostAttribute` cost info) . toMarkup $ Renderable source (cofree term), characterRange info)
           patchAttribute patch = A.class_ (splitPatchToClassName patch)
-          costAttribute info = A.data_ (stringValue (show (unCost (cost info))))
+          withCostAttribute a (Cost c) | c > 0 = a ! A.data_ (stringValue (show c))
+                                       | otherwise = identity
 
 instance ToMarkup a => ToMarkup (Cell a) where
   toMarkup (Cell hasChanges num line) =
