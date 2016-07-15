@@ -40,9 +40,8 @@ lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 
   (leaves, _) -> cofree <$> leaves
   where
     lines = actualLines input
-    root children = let cost = 1 + fromIntegral (length children) in
-      ((Range 0 $ length input) .: Other "program" .: cost .: RNil) :< Indexed children
-    leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Other "program" .: 1 .: RNil) :< Leaf line
+    root children = ((Range 0 $ length input) .: Other "program" .: RNil) :< Indexed children
+    leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Other "program" .: RNil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum <> [ leaf charIndex (toText line) ]
       , charIndex + length line)
@@ -92,12 +91,12 @@ diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sources
 
-  let replaceLeaves = breakDownLeavesByWord <$> sources
+  let preprocessed = breakDownLeavesByWord <$> sources <*> terms
   let areNullOids = runJoin $ (== nullOid) . oid <$> sourceBlobs
   let textDiff = case areNullOids of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
-        (_, _) -> runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermCosts) $ replaceLeaves <*> terms
+        _ -> runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermCosts) preprocessed
 
   pure $! renderer textDiff sourceBlobs
   where construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
