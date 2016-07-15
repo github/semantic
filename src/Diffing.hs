@@ -101,6 +101,9 @@ diffFiles parser renderer sourceBlobs = do
           Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
         shouldCompareTerms = (==) `on` category . extract
 
+termCost :: (Prologue.Foldable f, Functor f) => Cofree f (Record a) -> Cost
+termCost = cata $ \ c -> 1 + sum (tailF c)
+
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Integer
 diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
