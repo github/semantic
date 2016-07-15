@@ -53,11 +53,9 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
 -- | Compute the bag of grams with stems of length _p_ and bases of length _q_, with labels computed from annotations, which summarize the entire subtree of a term.
-pqGrams :: Int -> Int -> (forall b. CofreeF (Syntax leaf) annotation b -> label) -> Cofree (Syntax leaf) annotation -> DList.DList (Gram (label, Maybe leaf))
+pqGrams :: Int -> Int -> (forall b. CofreeF (Syntax leaf) annotation b -> label) -> Cofree (Syntax leaf) annotation -> DList.DList (Gram label)
 pqGrams p q getLabel = uncurry DList.cons . cata merge . setRootBase . setRootStem . hylo go project
-  where go c = cofree (Gram [] [ Just (getLabel c, leafValue (tailF c)) ] :< (assignParent (Just (getLabel c, leafValue (tailF c))) p <$> tailF c))
-        leafValue (Leaf s) = Just s
-        leafValue _ = Nothing
+  where go c = cofree (Gram [] [ Just (getLabel c) ] :< (assignParent (Just (getLabel c)) p <$> tailF c))
         merge (head :< tail) = let tail' = toList tail in (head, DList.fromList (windowed q setBases [] (fst <$> tail')) <> foldMap snd tail')
         assignParent parentLabel n tree
           | n > 0 = let gram :< functor = runCofree tree in cofree $ prependParent parentLabel gram :< (assignParent parentLabel (pred n) <$> functor)
