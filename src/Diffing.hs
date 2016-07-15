@@ -77,6 +77,9 @@ readAndTranscodeFile path = do
   text <- B1.readFile path
   transcode text
 
+decorateTerm :: Functor f => (CofreeF f (Record fields) (Record (field ': fields)) -> field) -> Cofree f (Record fields) -> Cofree f (Record (field ': fields))
+decorateTerm decorator = cata $ \ c -> cofree ((decorator (extract <$> c) .: headF c) :< tailF c)
+
 -- | Given a parser and renderer, diff two sources and return the rendered
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
