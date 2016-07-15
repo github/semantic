@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 module DiffSummarySpec where
 
 import Prologue
@@ -5,20 +6,18 @@ import Data.Record
 import Data.String
 import Test.Hspec
 import Diff
-import Info
 import Syntax
 import Patch
-import Range
 import Category
 import DiffSummary
 
-arrayInfo :: Info
-arrayInfo = rangeAt 0 .: ArrayLiteral .: 2 .: 0 .: RNil
+arrayInfo :: Record '[Category]
+arrayInfo = ArrayLiteral .: RNil
 
-literalInfo :: Info
-literalInfo = rangeAt 1 .: StringLiteral .: 1 .: 0 .: RNil
+literalInfo :: Record '[Category]
+literalInfo = StringLiteral .: RNil
 
-testDiff :: Diff String Info
+testDiff :: Diff String (Record '[Category])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])
 
 testSummary :: DiffSummary DiffInfo
