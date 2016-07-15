@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
 
-module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..)) where
+module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..), annotatedSummaries) where
 
 import Prologue hiding (snd, intercalate)
 import Diff
@@ -15,7 +15,7 @@ import Data.Text as Text (intercalate)
 import Test.QuickCheck hiding (Fixed)
 import Patch.Arbitrary()
 import Data.Record
-import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string)
+import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty)
 import qualified Text.PrettyPrint.Leijen.Text as P
 import Data.Hashable
 
@@ -122,16 +122,28 @@ instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
   arbitrary = DiffSummary <$> arbitrary <*> arbitrary
   shrink = genericShrink
 
-instance P.Pretty (DiffSummary DiffInfo) where
-  pretty DiffSummary{..} = case patch of
-    Insert diffInfo -> "Added the" <+> squotes (toDoc $ termName diffInfo) <+> (toDoc $ categoryName diffInfo) P.<> maybeParentContext parentAnnotations
-    Delete diffInfo -> "Deleted the" <+> squotes (toDoc $ termName diffInfo) <+> (toDoc $ categoryName diffInfo) P.<> maybeParentContext parentAnnotations
-    Replace t1 t2 -> "Replaced the" <+> squotes (toDoc $ termName t1) <+> (toDoc $ categoryName t1) <+> "with the" <+> P.squotes (toDoc $ termName t2) <+> (toDoc $ categoryName t2) P.<> maybeParentContext parentAnnotations
-    where
-      maybeParentContext annotations = if null annotations
-        then ""
-        else space <> "in the" <+> (toDoc . intercalate "/" $ toCategoryName <$> annotations) <+> "context"
-      toDoc = string . toS
+instance P.Pretty DiffInfo where
+  pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
+  pretty BranchInfo{..} = mconcat $ punctuate (string "," <> space) (pretty <$> branches)
+
+annotatedSummaries :: DiffSummary DiffInfo -> [Text]
+annotatedSummaries DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotations) <$> summaries patch
+
+summaries :: Patch DiffInfo -> [P.Doc]
+summaries (Insert info) = (("Added" <+> "the") <+>) <$> toLeafInfos info
+summaries (Delete info) = (("Deleted" <+> "the") <+>) <$> toLeafInfos info
+summaries (Replace i1 i2) = zipWith (\a b -> "Replaced" <+> "the" <+> a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
+
+toLeafInfos :: DiffInfo -> [Doc]
+toLeafInfos LeafInfo{..} = [ squotes (toDoc termName) <+> (toDoc categoryName) ]
+toLeafInfos BranchInfo{..} = pretty <$> branches
+
+maybeParentContext :: [Category] -> Doc
+maybeParentContext annotations = if null annotations
+  then ""
+  else space <> "in the" <+> (toDoc . intercalate "/" $ toCategoryName <$> annotations) <+> "context"
+toDoc :: Text -> Doc
+toDoc = string . toS
 
 diffSummary :: (HasCategory leaf, HasField fields Category) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffSummary = cata $ \case

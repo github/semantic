@@ -4,8 +4,9 @@ import Prologue
 import Renderer
 import DiffSummary
 import Data.Aeson
-import Data.Text (pack)
-import Text.PrettyPrint.Leijen.Text (pretty)
 
 summary :: Renderer
-summary diff _ = toS . encode $ pack . show . pretty <$> diffSummary diff
+summary diff _ = toS . encode $ annotatedTexts
+  where summaries = diffSummary diff
+        annotatedTexts :: [Text]
+        annotatedTexts = join $ annotatedSummaries <$> summaries
