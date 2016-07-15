@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 module Data.RandomWalkSimilarity where
 
 import Control.Arrow ((&&&))
@@ -18,7 +19,7 @@ import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an annotation, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: (Hashable label, Hashable leaf, Eq leaf, Eq annotation) => (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> (annotation -> label) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
+rws :: (Hashable label, Hashable leaf, Eq leaf, Eq annotation) => (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> (forall b. CofreeF (Syntax leaf) annotation b -> label) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
 rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
@@ -52,9 +53,9 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
 -- | Compute the bag of grams with stems of length _p_ and bases of length _q_, with labels computed from annotations, which summarize the entire subtree of a term.
-pqGrams :: Int -> Int -> (annotation -> label) -> Cofree (Syntax leaf) annotation -> DList.DList (Gram (label, Maybe leaf))
+pqGrams :: Int -> Int -> (forall b. CofreeF (Syntax leaf) annotation b -> label) -> Cofree (Syntax leaf) annotation -> DList.DList (Gram (label, Maybe leaf))
 pqGrams p q getLabel = uncurry DList.cons . cata merge . setRootBase . setRootStem . hylo go project
-  where go (annotation :< functor) = cofree (Gram [] [ Just (getLabel annotation, leafValue functor) ] :< (assignParent (Just (getLabel annotation, leafValue functor)) p <$> functor))
+  where go c = cofree (Gram [] [ Just (getLabel c, leafValue (tailF c)) ] :< (assignParent (Just (getLabel c, leafValue (tailF c))) p <$> tailF c))
         leafValue (Leaf s) = Just s
         leafValue _ = Nothing
         merge (head :< tail) = let tail' = toList tail in (head, DList.fromList (windowed q setBases [] (fst <$> tail')) <> foldMap snd tail')
