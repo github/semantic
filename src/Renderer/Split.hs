@@ -112,8 +112,7 @@ wrapIn f p = f p
 instance (ToMarkup f, HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (CofreeF (Syntax leaf) (Record fields) (f, Range))) where
   toMarkup (Renderable source (info :< syntax)) = (! A.data_ (stringValue (show (unCost (cost info))))) . classifyMarkup (category info) $ case syntax of
     Leaf _ -> span . string . toString $ slice (characterRange info) source
-    Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
-    Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
+    _ -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (toList syntax)
 
 instance (HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (Term leaf (Record fields))) where
   toMarkup (Renderable source term) = Prologue.fst $ cata (\ t -> (toMarkup $ Renderable source t, characterRange (headF t))) term
