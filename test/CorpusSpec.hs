@@ -70,10 +70,10 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | Given file paths for A, B, and, optionally, a diff, return whether diffing
 -- | the files will produce the diff. If no diff is provided, then the result
 -- | is true, but the diff will still be calculated.
-testDiff :: Renderer (Record '[Range, Category, Cost]) -> Both FilePath -> Maybe FilePath -> (Verbatim -> Verbatim -> Expectation) -> Expectation
+testDiff :: Renderer (Record '[Cost, Range, Category]) -> Both FilePath -> Maybe FilePath -> (Verbatim -> Verbatim -> Expectation) -> Expectation
 testDiff renderer paths diff matcher = do
   sources <- sequence $ readAndTranscodeFile <$> paths
-  actual <- Verbatim <$> diffFiles parser renderer (sourceBlobs sources)
+  actual <- Verbatim <$> diffFiles (decorateParser termCost parser) renderer (sourceBlobs sources)
   case diff of
     Nothing -> matcher actual actual
     Just file -> do
