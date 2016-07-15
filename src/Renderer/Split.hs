@@ -1,4 +1,4 @@
-module Renderer.Split where
+module Renderer.Split (split) where
 
 import Data.String
 import Alignment
