@@ -91,12 +91,6 @@ split diff blobs = TL.toStrict . renderHtml
 -- | Something that can be rendered as markup.
 newtype Renderable a = Renderable a
 
-instance (ToMarkup f, HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (Source Char, Record fields, Syntax a (f, Range))) where
-  toMarkup (Renderable (source, info, syntax)) = (! A.data_ (stringValue (show (unCost (cost info))))) . classifyMarkup (category info) $ case syntax of
-    Leaf _ -> span . string . toString $ slice (characterRange info) source
-    Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
-    Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
-
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
   string (toString (slice (Range (start range) (max next (start range))) source)) : elements
@@ -110,6 +104,15 @@ wrapIn _ l@Blaze.CustomLeaf{} = l
 wrapIn _ l@Blaze.Content{} = l
 wrapIn _ l@Blaze.Comment{} = l
 wrapIn f p = f p
+
+
+-- Instances
+
+instance (ToMarkup f, HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (Source Char, Record fields, Syntax a (f, Range))) where
+  toMarkup (Renderable (source, info, syntax)) = (! A.data_ (stringValue (show (unCost (cost info))))) . classifyMarkup (category info) $ case syntax of
+    Leaf _ -> span . string . toString $ slice (characterRange info) source
+    Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
+    Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
 
 instance (HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (Source Char, Term a (Record fields))) where
   toMarkup (Renderable (source, term)) = Prologue.fst $ cata (\ (info :< syntax) -> (toMarkup $ Renderable (source, info, syntax), characterRange info)) term
