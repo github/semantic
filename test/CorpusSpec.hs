@@ -26,7 +26,7 @@ import Test.Hspec
 
 spec :: Spec
 spec = parallel $ do
-  describe "crashers crash" $ runTestsIn "test/crashers-todo/" $ \ a b -> a `deepseq` pure (a == b) `shouldThrow` anyException
+  describe "crashers crash" . runTestsIn "test/crashers-todo/" $ \ a b -> a `deepseq` pure (a == b) `shouldThrow` anyException
   describe "crashers should not crash" $ runTestsIn "test/crashers/" shouldBe
   describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" shouldNotBe
   describe "should produce the correct diff" $ runTestsIn "test/diffs/" shouldBe
@@ -40,7 +40,7 @@ spec = parallel $ do
     runTestsIn directory matcher = do
       paths <- runIO $ examples directory
       let tests = correctTests =<< paths
-      traverse_ (\ (formatName, renderer, paths, output) -> it (normalizeName (fst paths) ++ " (" ++ formatName ++ ")") $ testDiff renderer paths output matcher) tests
+      traverse_ (\ (formatName, renderer, paths, output) -> it (normalizeName (fst paths) <> " (" <> formatName <> ")") $ testDiff renderer paths output matcher) tests
 
     correctTests paths@(_, Nothing, Nothing, Nothing) = testsForPaths paths
     correctTests paths = List.filter (\(_, _, _, output) -> isJust output) $ testsForPaths paths
