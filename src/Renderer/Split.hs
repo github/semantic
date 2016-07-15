@@ -116,10 +116,10 @@ instance (ToMarkup f, HasField fields Category, HasField fields Cost, HasField f
     Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
 
 instance (HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (Term leaf (Record fields))) where
-  toMarkup (Renderable source term) = Prologue.fst $ cata (\ (info :< syntax) -> (toMarkup $ Renderable source (info :< syntax), characterRange info)) term
+  toMarkup (Renderable source term) = Prologue.fst $ cata (\ t -> (toMarkup $ Renderable source t, characterRange (headF t))) term
 
 instance (HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (SplitDiff leaf (Record fields))) where
-  toMarkup (Renderable source diff) = Prologue.fst . iter (\ (info :< syntax) -> (toMarkup $ Renderable source (info :< syntax), characterRange info)) $ toMarkupAndRange <$> diff
+  toMarkup (Renderable source diff) = Prologue.fst . iter (\ t -> (toMarkup $ Renderable source t, characterRange (headF t))) $ toMarkupAndRange <$> diff
     where toMarkupAndRange patch = let term@(info :< _) = runCofree $ getSplitTerm patch in
             ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue (show (unCost (cost info))))) . toMarkup $ Renderable source (cofree term), characterRange info)
 
