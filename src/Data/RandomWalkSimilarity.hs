@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, StandaloneDeriving, UndecidableInstances #-}
+{-# LANGUAGE RankNTypes #-}
 module Data.RandomWalkSimilarity where
 
 import Control.Arrow ((&&&))
@@ -44,9 +44,8 @@ rws compare getLabel as bs
         deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& delete . term) <$> unmapped)
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
-data UnmappedTerm f annotation = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Cofree f annotation) }
-
-deriving instance Eq (Cofree f annotation) => Eq (UnmappedTerm f annotation)
+data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
+  deriving Eq
 
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
