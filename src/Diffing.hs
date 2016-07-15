@@ -53,10 +53,10 @@ parserForFilepath :: FilePath -> Parser '[Range, Category, Cost]
 parserForFilepath = parserForType . T.pack . takeExtension
 
 -- | Replace every string leaf with leaves of the words in the string.
-breakDownLeavesByWord :: (HasField fields Cost, HasField fields Range) => Source Char -> Term T.Text (Record fields) -> Term T.Text (Record fields)
+breakDownLeavesByWord :: HasField fields Range => Source Char -> Term T.Text (Record fields) -> Term T.Text (Record fields)
 breakDownLeavesByWord source = cata replaceIn
   where
-    replaceIn (info :< syntax) = let cost' = 1 + sum (cost . extract <$> syntax') in cofree $ setCost info cost' :< syntax'
+    replaceIn (info :< syntax) = cofree $ info :< syntax'
       where syntax' = case (ranges, syntax) of
               (_:_:_, Leaf _) -> Indexed (makeLeaf info <$> ranges)
               _ -> syntax
