@@ -24,12 +24,6 @@ category = getField
 setCategory :: HasField fields Category => Record fields -> Category -> Record fields
 setCategory = setField
 
-size :: HasField fields Size => Record fields -> Size
-size = getField
-
-setSize :: HasField fields Size => Record fields -> Size -> Record fields
-setSize = setField
-
 cost :: HasField fields Cost => Record fields -> Cost
 cost = getField
 
