@@ -133,7 +133,7 @@ instance P.Pretty (DiffSummary DiffInfo) where
         else space <> "in the" <+> (toDoc . intercalate "/" $ toCategoryName <$> annotations) <+> "context"
       toDoc = string . toS
 
-diffSummary :: (HasCategory leaf, HasField fields Category, Hashable leaf, Show (Record fields), Show leaf, Ord (Record fields), Eq leaf, HasField fields Cost) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffSummary :: (HasCategory leaf, HasField fields Category) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffSummary = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
