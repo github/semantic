@@ -85,8 +85,8 @@ split diff blobs = TL.toStrict . renderHtml
       <> string "\n"
 
 -- | Something that can be rendered as markup.
-data Cell a = Cell { containsChanges :: !Bool, lineNumber :: !Int, getCell :: !a }
-data Renderable a = Renderable { source :: !(Source Char), contents :: !a }
+data Cell a = Cell !Bool !Int !a
+data Renderable a = Renderable !(Source Char) !a
 
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
