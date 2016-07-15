@@ -7,8 +7,6 @@ import Category
 import Range
 import Test.QuickCheck
 
-newtype Size = Size { unSize :: Integer }
-  deriving (Eq, Num, Ord, Show)
 newtype Cost = Cost { unCost :: Integer }
   deriving (Eq, Num, Ord, Show)
 
@@ -32,11 +30,6 @@ setCost = setField
 
 
 -- Instances
-
-instance Arbitrary Size where
-  arbitrary = Size <$> arbitrary
-
-  shrink = fmap Size . shrink . unSize
 
 instance Arbitrary Cost where
   arbitrary = Cost <$> arbitrary
