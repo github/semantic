@@ -1,25 +1,24 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE RankNTypes, StandaloneDeriving, UndecidableInstances #-}
 module Data.RandomWalkSimilarity where
 
 import Control.Arrow ((&&&))
 import Control.Monad.Random
 import Control.Monad.State
 import qualified Data.DList as DList
+import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
 import qualified Data.KdTree.Static as KdTree
 import qualified Data.List as List
 import qualified Data.Vector as Vector
-import Diff
 import Patch
 import Prologue
-import Syntax
-import Term
+import Term ()
 import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an annotation, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: (Hashable label, Eq leaf, Eq annotation) => (Term leaf annotation -> Term leaf annotation -> Maybe (Diff leaf annotation)) -> (forall b. CofreeF (Syntax leaf) annotation b -> label) -> [Term leaf annotation] -> [Term leaf annotation] -> [Diff leaf annotation]
+rws :: (Hashable label, Eq annotation, Prologue.Foldable f, Functor f, Eq (f (Cofree f annotation))) => (Cofree f annotation -> Cofree f annotation -> Maybe (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation)))) -> (forall b. CofreeF f annotation b -> label) -> [Cofree f annotation] -> [Cofree f annotation] -> [Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))]
 rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
@@ -45,8 +44,10 @@ rws compare getLabel as bs
         deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& delete . term) <$> unmapped)
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
-data UnmappedTerm leaf annotation = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Term leaf annotation) }
-  deriving Eq
+data UnmappedTerm f annotation = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Cofree f annotation) }
+
+deriving instance Eq (Cofree f annotation) => Eq (UnmappedTerm f annotation)
+
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
