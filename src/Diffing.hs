@@ -133,11 +133,9 @@ truncatedDiff arguments sources = case format arguments of
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
 printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range, HasField fields Size) => Parser fields -> DiffArguments -> Both SourceBlob -> IO ()
-printDiff parser arguments sources = put (output arguments) =<< case format arguments of
-  Split ->  diffFiles parser split sources
-  Patch -> diffFiles parser patch sources
-  JSON -> diffFiles parser json sources
-  Summary -> diffFiles parser summary sources
+printDiff parser arguments sources = do
+  rendered <- textDiff parser arguments sources
+  put (output arguments) rendered
   where
     put Nothing rendered = TextIO.putStr rendered
     put (Just path) rendered = do
