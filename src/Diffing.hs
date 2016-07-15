@@ -135,10 +135,9 @@ truncatedDiff arguments sources = case format arguments of
 printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range, HasField fields Size) => Parser fields -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
-  put (output arguments) rendered
-  where
-    put Nothing rendered = TextIO.putStr rendered
-    put (Just path) rendered = do
+  case (output arguments) of
+    Nothing -> TextIO.putStr rendered
+    Just path -> do
       isDir <- doesDirectoryExist path
       let outputPath = if isDir
           then path </> (takeFileName outputPath -<.> ".html")
