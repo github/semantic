@@ -15,12 +15,13 @@ import qualified Renderer.Summary as S
 import Renderer
 import Renderer.Split
 import Source
+import Syntax
 import System.Directory
 import System.FilePath
 import qualified System.IO as IO
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser fields -> DiffArguments -> Both SourceBlob -> IO Text
+textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Text
 textDiff parser arguments sources = case format arguments of
   Split -> diffFiles parser split sources
   Patch -> diffFiles parser P.patch sources
@@ -36,7 +37,7 @@ truncatedDiff arguments sources = case format arguments of
   Summary -> pure ""
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
-printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser fields -> DiffArguments -> Both SourceBlob -> IO ()
+printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = case format arguments of
   Split -> put (output arguments) =<< diffFiles parser split sources
     where

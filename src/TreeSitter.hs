@@ -10,13 +10,14 @@ import Language
 import Parser
 import Range
 import Source
+import Syntax
 import Foreign
 import Foreign.C.String
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
-treeSitterParser :: Language -> Ptr TS.Language -> Parser '[Range, Category, Cost]
+treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax Text) (Record '[Range, Category, Cost])
 treeSitterParser language grammar contents = do
   document <- ts_document_make
   ts_document_set_language document grammar
@@ -50,7 +51,7 @@ defaultCategoryForNodeName name = case name of
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
-documentToTerm :: Language -> Ptr Document -> Parser '[Range, Category, Cost]
+documentToTerm :: Language -> Ptr Document -> Parser (Syntax Text) (Record '[Range, Category, Cost])
 documentToTerm language document contents = alloca $ \ root -> do
   ts_document_root_node_p document root
   toTerm root

@@ -27,7 +27,7 @@ import TreeSitter
 import Text.Parser.TreeSitter.Language
 
 -- | Return a parser based on the file extension (including the ".").
-parserForType :: T.Text -> Parser '[Range, Category, Cost]
+parserForType :: T.Text -> Parser (Syntax Text) (Record '[Range, Category])
 parserForType mediaType = case languageForType mediaType of
   Just C -> treeSitterParser C ts_language_c
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
@@ -35,7 +35,7 @@ parserForType mediaType = case languageForType mediaType of
   _ -> lineByLineParser
 
 -- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Parser '[Range, Category, Cost]
+lineByLineParser :: Parser (Syntax Text) (Record '[Range, Category])
 lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
   (leaves, _) -> cofree <$> leaves
   where
@@ -49,7 +49,7 @@ lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 
     toText = T.pack . Source.toString
 
 -- | Return the parser that should be used for a given path.
-parserForFilepath :: FilePath -> Parser '[Range, Category, Cost]
+parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Range, Category])
 parserForFilepath = parserForType . T.pack . takeExtension
 
 -- | Replace every string leaf with leaves of the words in the string.
@@ -84,7 +84,7 @@ decorateTerm decorator = cata $ \ c -> cofree ((decorator (extract <$> c) .: hea
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser fields -> Renderer (Record fields) -> Both SourceBlob -> IO T.Text
+diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record fields) -> Both SourceBlob -> IO T.Text
 diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sources
