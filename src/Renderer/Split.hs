@@ -84,8 +84,10 @@ split diff blobs = TL.toStrict . renderHtml
       <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
       <> string "\n"
 
--- | Something that can be rendered as markup.
+-- | A cell in a table, characterized by whether it contains changes & its line number.
 data Cell a = Cell !Bool !Int !a
+
+-- | Something that can be rendered as markup with reference to some source.
 data Renderable a = Renderable !(Source Char) !a
 
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
