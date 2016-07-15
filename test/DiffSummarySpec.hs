@@ -39,9 +39,9 @@ spec = parallel $ do
       diffSummary testDiff `shouldBe` [ DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotations = [ ArrayLiteral ] } ]
   describe "show" $ do
     it "should print adds" $
-      show (pretty testSummary) `shouldBe` ("Added the 'a' string" :: Text)
+      annotatedSummaries testSummary `shouldBe` ["Added the 'a' string"]
     it "prints a replacement" $ do
-      show (pretty replacementSummary) `shouldBe` ("Replaced the 'a' string with the 'b' symbol in the array context" :: Text)
+      annotatedSummaries replacementSummary `shouldBe` ["Replaced the 'a' string with the 'b' symbol in the array context"]
   describe "DiffInfo" $ do
     prop "patches in summaries match the patches in diffs" $
       \a -> let
