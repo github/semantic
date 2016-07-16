@@ -80,13 +80,18 @@ isIndexedOrFixed patch = case unwrap <$> patch of
   (Insert syntax) -> isIndexedOrFixed' syntax
   (Delete syntax) -> isIndexedOrFixed' syntax
   (Replace s1 s2) -> isIndexedOrFixed' s1 || isIndexedOrFixed' s2
+
+isIndexedOrFixed' :: Syntax a f -> Bool
 isIndexedOrFixed' syntax = case syntax of
   (Indexed _) -> True
   (Fixed _) -> True
   _ -> False
+
+isBranchInfo :: DiffInfo -> Bool
 isBranchInfo info = case info of
   (BranchInfo _ _ _) -> True
   (LeafInfo _ _) -> False
+
 isBranchNode :: Patch DiffInfo -> Bool
 isBranchNode patch = case patch of
   (Insert diffInfo) -> isBranchInfo diffInfo
