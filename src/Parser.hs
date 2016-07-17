@@ -81,7 +81,9 @@ termConstructor source info = cofree . construct
         toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
         toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
         toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
+        toTuple _  = [cofree (extract child :< S.Error S.Comment c)]
 
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
+    construct children | isError (category info) = withDefualtInfo $ S.Error children
     construct children =
       withDefaultInfo $ S.Indexed children
