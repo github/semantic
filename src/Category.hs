@@ -3,6 +3,8 @@ module Category where
 import Prologue
 import Data.Hashable
 import Test.QuickCheck (oneof, Arbitrary, arbitrary, shrink)
+import Test.QuickCheck.Arbitrary
+import Data.Text (unpack)
 import Data.Text.Arbitrary()
 
 -- | A standardized category of AST node. Used to determine the semantics for
@@ -72,14 +74,18 @@ data Category
   | Other Text
   deriving (Eq, Generic, Ord, Show)
 
-
 -- Instances
 
 instance Hashable Category
 
+instance CoArbitrary Text where
+  coarbitrary = coarbitrary . unpack
+instance CoArbitrary Category where
+  coarbitrary = genericCoarbitrary
+
 instance Arbitrary Category where
   arbitrary = oneof [
-    pure Program
+      pure Program
     , pure Error
     , pure Boolean
     , pure BinaryOperator
