@@ -126,11 +126,12 @@ diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
 textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Text
-textDiff parser arguments sources = case format arguments of
-  Split -> diffFiles parser split sources
-  Patch -> diffFiles parser patch sources
-  JSON -> diffFiles parser json sources
-  Summary -> diffFiles parser summary sources
+textDiff parser arguments sources = diffFiles parser renderer sources
+  where renderer = case format arguments of
+          Split -> split
+          Patch -> patch
+          JSON -> json
+          Summary -> summary
 
 -- | Returns a truncated diff given diff arguments and two source blobs.
 truncatedDiff :: DiffArguments -> Both SourceBlob -> IO Text
