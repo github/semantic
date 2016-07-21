@@ -120,7 +120,7 @@ instance (HasField fields Category, HasField fields Range) => ToMarkup (Renderab
     where toMarkupAndRange patch = let term@(info :< _) = runCofree $ getSplitTerm patch in
             ((div ! patchAttribute patch `withCostAttribute` maybeCost info) . toMarkup $ Renderable source (cofree term), characterRange info)
           patchAttribute patch = A.class_ (splitPatchToClassName patch)
-          withCostAttribute a c | Just (Cost c) <- c, c > 0 = a ! A.data_ (stringValue (show c))
+          withCostAttribute a c | Just (Cost c) <- c, c > 0 = a ! A.data_ (toValue c)
                                 | otherwise = identity
 
 instance ToMarkup a => ToMarkup (Cell a) where
