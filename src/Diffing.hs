@@ -118,10 +118,10 @@ termCost :: (Prologue.Foldable f, Functor f) => CofreeF f (Record a) (Record (Co
 termCost c = 1 + sum (cost <$> tailF c)
 
 -- | The sum of the node count of the diff’s patches.
-diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Integer
-diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
-  Free (info :< _) -> sum (cost <$> info)
-  Pure patch -> sum (cost . extract <$> patch)
+diffCostWithCachedTermCosts :: Diff leaf (Record fields) -> Integer
+diffCostWithCachedTermCosts diff = maybe 0 (unCost . getSum) $ case runFree diff of
+  Free (info :< _) -> foldMap (fmap Sum . maybeCost) info
+  Pure patch -> foldMap (fmap Sum . maybeCost . extract) patch
 
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
