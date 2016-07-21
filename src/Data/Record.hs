@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators #-}
 module Data.Record where
 
 import GHC.Show
@@ -22,6 +22,11 @@ infixr 0 .:
 maybeGetField :: Typeable field => Record fields -> Maybe field
 maybeGetField (RCons h t) = cast h <|> maybeGetField t
 maybeGetField RNil = Nothing
+
+updateRCons :: forall h t field. (Typeable h, Typeable field) => Record (h ': t) -> field -> Record (h ': t)
+updateRCons (RCons h t) a = case eqT :: Maybe (h :~: field) of
+  Just Refl -> RCons a t
+  Nothing -> RCons h (updateField t a)
 
 
 -- Classes
