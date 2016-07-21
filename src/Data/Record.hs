@@ -19,6 +19,10 @@ infixr 0 .:
 (.:) :: Typeable h => h -> Record t -> Record (h ': t)
 (.:) = RCons
 
+maybeGetField :: Typeable field => Record fields -> Maybe field
+maybeGetField (RCons h t) = cast h <|> maybeGetField t
+maybeGetField RNil = Nothing
+
 
 -- Classes
 
