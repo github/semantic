@@ -122,8 +122,6 @@ instance (HasField fields Category, HasField fields Range) => ToMarkup (Renderab
           patchAttribute patch = A.class_ (splitPatchToClassName patch)
           withCostAttribute a c | Just (Cost c) <- c, c > 0 = a ! A.data_ (stringValue (show c))
                                 | otherwise = identity
-          maybeCost :: Record fields -> Maybe Cost
-          maybeCost = maybeGetField
 
 instance ToMarkup a => ToMarkup (Cell a) where
   toMarkup (Cell hasChanges num line) =
