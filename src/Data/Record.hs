@@ -23,6 +23,11 @@ maybeGetField :: Typeable field => Record fields -> Maybe field
 maybeGetField (RCons h t) = cast h <|> maybeGetField t
 maybeGetField RNil = Nothing
 
+updateField :: forall field fields. Typeable field => Record fields -> field -> Record fields
+updateField record a = case record of
+  RNil -> RNil
+  cons@(RCons _ _) -> updateRCons cons a
+
 updateRCons :: forall h t field. (Typeable h, Typeable field) => Record (h ': t) -> field -> Record (h ': t)
 updateRCons (RCons h t) a = case eqT :: Maybe (h :~: field) of
   Just Refl -> RCons a t
