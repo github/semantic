@@ -85,10 +85,10 @@ readAndTranscodeFile path = do
   text <- B1.readFile path
   transcode text
 
-decorateParser :: Functor f => (CofreeF f (Record fields) (Record (field ': fields)) -> field) -> Parser f (Record fields) -> Parser f (Record (field ': fields))
+decorateParser :: (Typeable field, Functor f) => (CofreeF f (Record fields) (Record (field ': fields)) -> field) -> Parser f (Record fields) -> Parser f (Record (field ': fields))
 decorateParser decorator = (fmap (decorateTerm decorator) .)
 
-decorateTerm :: Functor f => (CofreeF f (Record fields) (Record (field ': fields)) -> field) -> Cofree f (Record fields) -> Cofree f (Record (field ': fields))
+decorateTerm :: (Typeable field, Functor f) => (CofreeF f (Record fields) (Record (field ': fields)) -> field) -> Cofree f (Record fields) -> Cofree f (Record (field ': fields))
 decorateTerm decorator = cata $ \ c -> cofree ((decorator (extract <$> c) .: headF c) :< tailF c)
 
 -- | Given a parser and renderer, diff two sources and return the rendered
