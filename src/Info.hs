@@ -8,7 +8,7 @@ import Range
 import Test.QuickCheck
 
 newtype Cost = Cost { unCost :: Integer }
-  deriving (Eq, Num, Ord, Show)
+  deriving (Eq, Num, Ord, Show, Typeable)
 
 characterRange :: HasField fields Range => Record fields -> Range
 characterRange = getField

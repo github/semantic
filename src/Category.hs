@@ -30,7 +30,7 @@ data Category
   | ArrayLiteral
   -- | A non-standard category, which can be used for comparability.
   | Other String
-  deriving (Eq, Generic, Ord, Show)
+  deriving (Eq, Generic, Ord, Show, Typeable)
 
 
 -- Instances
