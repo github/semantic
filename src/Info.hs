@@ -25,6 +25,9 @@ setCategory = setField
 cost :: HasField fields Cost => Record fields -> Cost
 cost = getField
 
+maybeCost :: Record fields -> Maybe Cost
+maybeCost = maybeGetField
+
 setCost :: HasField fields Cost => Record fields -> Cost -> Record fields
 setCost = setField
 
