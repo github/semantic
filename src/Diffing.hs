@@ -107,11 +107,13 @@ diffFiles parser renderer sourceBlobs = do
         _ -> runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermCosts) terms
 
   pure $! renderer textDiff sourceBlobs
-  where construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
+  where construct (info :< syntax) = free (Free ((updateField <$> info <*> sumCost syntax) :< syntax))
         sumCost = fmap getSum . foldMap (fmap Sum . getCost)
-        getCost diff = case runFree diff of
-          Free (info :< _) -> cost <$> info
-          Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
+        getCost diff = fromMaybe 0 <$> case runFree diff of
+          Free (info :< _) -> maybeCost <$> info
+          Pure patch -> uncurry both (fromThese Nothing Nothing (unPatch (maybeCost . extract <$> patch)))
+        maybeCost :: Record fields -> Maybe Cost
+        maybeCost = maybeGetField
         shouldCompareTerms = (==) `on` category . extract
 
 termCost :: (Prologue.Foldable f, Functor f) => CofreeF f (Record a) (Record (Cost ': a)) -> Cost
