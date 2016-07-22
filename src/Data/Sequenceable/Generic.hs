@@ -32,3 +32,6 @@ instance GSequenceable f => GSequenceable (M1 i c f) where
 instance (GSequenceable f, GSequenceable g) => GSequenceable (f :+: g) where
   gsequenceAlt (L1 a) = L1 <$> gsequenceAlt a
   gsequenceAlt (R1 b) = R1 <$> gsequenceAlt b
+
+instance (GSequenceable f, GSequenceable g) => GSequenceable (f :*: g) where
+  gsequenceAlt (a :*: b) = (:*:) <$> gsequenceAlt a <*> gsequenceAlt b
