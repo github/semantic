@@ -2,7 +2,7 @@
 module Data.Functor.Both (Both,both, runBothWith, fst, snd, module X) where
 
 import Data.Bifunctor.Join as X
-import Prologue hiding (zipWith, fst, snd)
+import Prologue hiding (fst, snd)
 import qualified Prologue
 
 -- | A computation over both sides of a pair.
