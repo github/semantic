@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 module AlignmentSpec where
 
 import Alignment
@@ -14,7 +15,6 @@ import Data.Record
 import Data.String
 import Data.Text.Arbitrary ()
 import Data.These
-import Info
 import Patch
 import Prologue hiding (fst, snd)
 import qualified Prologue
@@ -22,7 +22,6 @@ import Range
 import qualified Source
 import SplitDiff
 import Syntax
-import Category
 import Term
 import Test.Hspec
 import Test.Hspec.QuickCheck
@@ -33,7 +32,7 @@ spec :: Spec
 spec = parallel $ do
   describe "alignBranch" $ do
     it "produces symmetrical context" $
-      alignBranch getRange ([] :: [Join These (SplitDiff String Info)]) (both [Range 0 2, Range 2 4] [Range 0 2, Range 2 4]) `shouldBe`
+      alignBranch getRange ([] :: [Join These (SplitDiff String (Record '[Range]))]) (both [Range 0 2, Range 2 4] [Range 0 2, Range 2 4]) `shouldBe`
         [ Join (These (Range 0 2, [])
                       (Range 0 2, []))
         , Join (These (Range 2 4, [])
@@ -41,7 +40,7 @@ spec = parallel $ do
         ]
 
     it "produces asymmetrical context" $
-      alignBranch getRange ([] :: [Join These (SplitDiff String Info)]) (both [Range 0 2, Range 2 4] [Range 0 1]) `shouldBe`
+      alignBranch getRange ([] :: [Join These (SplitDiff String (Record '[Range]))]) (both [Range 0 2, Range 2 4] [Range 0 1]) `shouldBe`
         [ Join (These (Range 0 2, [])
                       (Range 0 1, []))
         , Join (This  (Range 2 4, []))
@@ -222,8 +221,8 @@ toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . travers
           put $ (+) <$> prev <*> modifyJoin (fromThese 0 0) (length <$> contents)
           pure []
         alignBranchElement element = case element of
-          Child key contents -> Child key <$> crosswalk lines contents
-          Margin contents -> Margin <$> crosswalk lines contents
+          Child key contents -> Child key <$> joinCrosswalk lines contents
+          Margin contents -> Margin <$> joinCrosswalk lines contents
           where lines = fmap toList . Source.actualLines . Source.fromList
         sources = foldMap Source.fromList <$> bothContents elements
         ranges = fmap (filter (\ (Range start end) -> start /= end)) $ Source.actualLineRanges <$> (totalRange <$> sources) <*> sources
@@ -233,6 +232,9 @@ toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . travers
 
 keysOfAlignedChildren :: [Join These (Range, [(String, Range)])] -> [String]
 keysOfAlignedChildren lines = lines >>= these identity identity (++) . runJoin . fmap (fmap Prologue.fst . Prologue.snd)
+
+joinCrosswalk :: Bicrosswalk p => Align f => (a -> f b) -> Join p a -> f (Join p b)
+joinCrosswalk f = fmap Join . bicrosswalk f f . runJoin
 
 instance Arbitrary BranchElement where
   arbitrary = oneof [ key >>= \ key -> Child key <$> joinTheseOf (contents key)
@@ -247,21 +249,21 @@ instance Arbitrary BranchElement where
                                 , Join . That <$> g
                                 , (Join .) . These <$> g <*> g ]
 
-  shrink (Child key contents) = Child key <$> crosswalk shrinkContents contents
+  shrink (Child key contents) = Child key <$> joinCrosswalk shrinkContents contents
     where shrinkContents string = (++ suffix) . (prefix ++) <$> shrinkList (const []) (drop (length prefix) (take (length string - length suffix) string))
           (prefix, suffix) = ('(' : key, ")" :: String)
-  shrink (Margin contents) = Margin <$> crosswalk (shrinkList (const [])) contents
+  shrink (Margin contents) = Margin <$> joinCrosswalk (shrinkList (const [])) contents
 
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prologue.fst <$> numbered))
 
-align :: Both (Source.Source Char) -> ConstructibleFree (Patch (Term String Info)) (Both Info) -> PrettyDiff (SplitDiff String Info)
+align :: Both (Source.Source Char) -> ConstructibleFree (Patch (Term String (Record '[Range]))) (Both (Record '[Range])) -> PrettyDiff (SplitDiff String (Record '[Range]))
 align sources = PrettyDiff sources . fmap (fmap (getRange &&& identity)) . alignDiff sources . deconstruct
 
-info :: Int -> Int -> Info
-info start end = Range start end .: StringLiteral .: 0 .: 0 .: RNil
+info :: Int -> Int -> Record '[Range]
+info start end = Range start end .: RNil
 
-prettyDiff :: Both (Source.Source Char) -> [Join These (ConstructibleFree (SplitPatch (Term String Info)) Info)] -> PrettyDiff (SplitDiff String Info)
+prettyDiff :: Both (Source.Source Char) -> [Join These (ConstructibleFree (SplitPatch (Term String (Record '[Range]))) (Record '[Range]))] -> PrettyDiff (SplitDiff String (Record '[Range]))
 prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& identity) . deconstruct))
 
 data PrettyDiff a = PrettyDiff { unPrettySources :: Both (Source.Source Char), unPrettyLines :: [Join These (Range, a)] }
@@ -280,14 +282,14 @@ newtype ConstructibleFree patch annotation = ConstructibleFree { deconstruct :: 
 
 
 class PatchConstructible p where
-  insert :: Term String Info -> p
-  delete :: Term String Info -> p
+  insert :: Term String (Record '[Range]) -> p
+  delete :: Term String (Record '[Range]) -> p
 
-instance PatchConstructible (Patch (Term String Info)) where
+instance PatchConstructible (Patch (Term String (Record '[Range]))) where
   insert = Insert
   delete = Delete
 
-instance PatchConstructible (SplitPatch (Term String Info)) where
+instance PatchConstructible (SplitPatch (Term String (Record '[Range]))) where
   insert = SplitInsert
   delete = SplitDelete
 

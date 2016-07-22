@@ -4,26 +4,27 @@ module DiffSummarySpec where
 import Prologue
 import Data.Record
 import Test.Hspec
+import Test.Hspec.QuickCheck
 import Diff
-import Info
 import Syntax
 import Term
 import Patch
-import Range
 import Category
 import DiffSummary
 import Text.PrettyPrint.Leijen.Text (pretty)
 import Test.Hspec.QuickCheck
 import Diff.Arbitrary
 import Data.List (partition)
+import Term.Arbitrary
+import Interpreter
 
-arrayInfo :: Info
-arrayInfo = rangeAt 0 .: ArrayLiteral .: 2 .: 0 .: RNil
+arrayInfo :: Record '[Category]
+arrayInfo = ArrayLiteral .: RNil
 
-literalInfo :: Info
-literalInfo = rangeAt 1 .: StringLiteral .: 1 .: 0 .: RNil
+literalInfo :: Record '[Category]
+literalInfo = StringLiteral .: RNil
 
-testDiff :: Diff Text Info
+testDiff :: Diff Text (Record '[Category])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])
 
 testSummary :: DiffSummary DiffInfo
@@ -37,7 +38,12 @@ spec = parallel $ do
   describe "diffSummary" $ do
     it "outputs a diff summary" $ do
       diffSummary testDiff `shouldBe` [ DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotations = [ ArrayLiteral ] } ]
-  describe "show" $ do
+
+    prop "equal terms produce identity diffs" $
+      \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category])) in
+        diffSummary (diffTerms wrap (==) diffCost term term) `shouldBe` []
+
+  describe "annotatedSummaries" $ do
     it "should print adds" $
       annotatedSummaries testSummary `shouldBe` ["Added the 'a' string"]
     it "prints a replacement" $ do

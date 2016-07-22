@@ -174,21 +174,21 @@ diffSummary = cata $ \case
   (Pure (Replace t1 t2)) -> [ DiffSummary (Replace (termToDiffInfo t1) (termToDiffInfo t2)) [] ]
 
 termToDiffInfo :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> DiffInfo
-termToDiffInfo term = case runCofree term of
-  (_ :< Leaf _) -> LeafInfo (toCategoryName term) (toTermName term)
-  (info :< Syntax.Indexed children) -> BranchInfo (termToDiffInfo <$> children) (toCategoryName (Categorizable info)) BIndexed
-  (info :< Syntax.Fixed children) -> BranchInfo (termToDiffInfo <$> children) (toCategoryName (Categorizable info)) BFixed
-  (info :< Syntax.FunctionCall identifier _) -> LeafInfo (toCategoryName (Categorizable info)) (toTermName identifier)
-  (info :< Syntax.Ternary ternaryCondition _) -> LeafInfo (toCategoryName (Categorizable info)) (toTermName ternaryCondition)
-  (info :< Syntax.Function identifier _ _) -> LeafInfo (toCategoryName $ Categorizable info) (maybe "anonymous" toTermName identifier)
-  (info :< Syntax.Assignment identifier _) -> LeafInfo (toCategoryName $ Categorizable info) (toTermName identifier)
-  (info :< Syntax.MathAssignment identifier _) -> LeafInfo (toCategoryName $ Categorizable info) (toTermName identifier)
+termToDiffInfo term = case unwrap term of
+  Leaf _ -> LeafInfo (toCategoryName term) (toTermName term)
+  Syntax.Indexed children -> BranchInfo (termToDiffInfo <$> children) (toCategoryName term) BIndexed
+  Syntax.Fixed children -> BranchInfo (termToDiffInfo <$> children) (toCategoryName term) BFixed
+  Syntax.FunctionCall identifier _ -> LeafInfo (toCategoryName term) (toTermName identifier)
+  Syntax.Ternary ternaryCondition _ -> LeafInfo (toCategoryName term) (toTermName ternaryCondition)
+  Syntax.Function identifier _ _ -> LeafInfo (toCategoryName term) (maybe "anonymous" toTermName identifier)
+  Syntax.Assignment identifier _ -> LeafInfo (toCategoryName term) (toTermName identifier)
+  Syntax.MathAssignment identifier _ -> LeafInfo (toCategoryName term) (toTermName identifier)
   -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
   -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
   -- to indicate where that value should be when constructing DiffInfos.
-  (info :< Syntax.Operator _) -> LeafInfo (toCategoryName $ Categorizable info) "x"
-  (info :< Commented cs leaf) -> BranchInfo (termToDiffInfo <$> cs <> maybeToList leaf) (toCategoryName $ Categorizable info) BCommented
-  (info :< _) ->  LeafInfo (toCategoryName $ Categorizable info) (toTermName term)
+  Syntax.Operator _ -> LeafInfo (toCategoryName term) "x"
+  Commented cs leaf -> BranchInfo (termToDiffInfo <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
+  _ ->  LeafInfo (toCategoryName term) (toTermName term)
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }

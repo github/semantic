@@ -1,5 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
-module Renderer.Split where
+module Renderer.Split (split) where
 
 import Alignment
 import Category as C
@@ -7,6 +6,7 @@ import Data.Bifunctor.Join
 import Data.Foldable
 import Data.Functor.Both
 import Data.Functor.Foldable (cata)
+import Data.Record
 import qualified Data.Text.Lazy as TL
 import Data.These
 import Info
@@ -14,7 +14,7 @@ import Prologue hiding (div, head, fst, snd, link)
 import qualified Prologue
 import Range
 import Renderer
-import Source hiding ((++))
+import Source
 import SplitDiff
 import Syntax
 import Term
@@ -23,10 +23,6 @@ import Text.Blaze.Html.Renderer.Text
 import Text.Blaze.Html5 hiding (map)
 import qualified Text.Blaze.Html5.Attributes as A
 import qualified Text.Blaze.Internal as Blaze
-
--- | Return the first item in the Foldable, or Nothing if it's empty.
-maybeFirst :: Foldable f => f a -> Maybe a
-maybeFirst = foldr (const . Just) Nothing
 
 -- | Add the first category from a Foldable of categories as a class name as a
 -- | class name on the markup, prefixed by `category-`.
@@ -70,13 +66,13 @@ styleName category = "category-" <> case category of
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue
-splitPatchToClassName patch = stringValue $ "patch " ++ case patch of
+splitPatchToClassName patch = stringValue $ "patch " <> case patch of
   SplitInsert _ -> "insert"
   SplitDelete _ -> "delete"
   SplitReplace _ -> "replace"
 
 -- | Render a diff as an HTML split diff.
-split :: Renderer
+split :: (HasField fields Category, HasField fields Cost, HasField fields Range) => Renderer (Record fields)
 split diff blobs = TL.toStrict . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
@@ -99,50 +95,19 @@ split diff blobs = TL.toStrict . renderHtml
     columnWidth = max (20 + digits maxNumber * 8) 40
 
     -- | Render a line with numbers as an HTML row.
-    numberedLinesToMarkup :: Join These (Int, SplitDiff a Info) -> Markup
     numberedLinesToMarkup numberedLines = tr $ runBothWith (<>) (renderLine <$> Join (fromThese Nothing Nothing (runJoin (Just <$> numberedLines))) <*> sources) <> string "\n"
 
-    renderLine :: Maybe (Int, SplitDiff leaf Info) -> Source Char -> Markup
-    renderLine (Just (number, line)) source = toMarkup $ Renderable (hasChanges line, number, Renderable (source, line))
+    renderLine (Just (number, line)) source = toMarkup $ Cell (hasChanges line) number (Renderable source line)
     renderLine _ _ =
       td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
       <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
       <> string "\n"
 
--- | Something that can be rendered as markup.
-newtype Renderable a = Renderable a
+-- | A cell in a table, characterized by whether it contains changes & its line number.
+data Cell a = Cell !Bool !Int !a
 
-instance ToMarkup f => ToMarkup (Renderable (Source Char, Info, Syntax a (f, Range))) where
-  toMarkup (Renderable (source, info, syntax)) = (! A.data_ (textValue (show . unSize $ size info))) . classifyMarkup (category info) $ case syntax of
-    Leaf _ -> span . text . toText $ slice (characterRange info) source
-    Indexed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
-    Fixed children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
-    Comment _ -> span . text . toText $ slice (characterRange info) source
-    Commented cs child -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (cs <> maybeToList child)
-    Syntax.FunctionCall identifier children -> dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [identifier])) <> (wrapIn dd <$> contentElements source (characterRange info) children)
-    Syntax.Function identifier params expressions -> ul . mconcat $ wrapIn li <$>
-      contentElements source (characterRange info) (catMaybes [identifier, params, Just expressions])
-    Syntax.MethodCall targetId methodId methodParams ->
-      dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [targetId])) <> (wrapIn dd <$> contentElements source (characterRange info) [methodId, methodParams])
-    Syntax.Args children -> ul . mconcat $ wrapIn li <$>
-      contentElements source (characterRange info) children
-    Syntax.MemberAccess memberId property -> ul . mconcat $ wrapIn li <$>
-      contentElements source (characterRange info) [memberId, property]
-    Syntax.Assignment  memberId value -> ul . mconcat $ wrapIn li <$>
-      contentElements source (characterRange info) [memberId, value]
-    Syntax.VarDecl decl -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) [decl]
-    Syntax.VarAssignment varId value ->
-      dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [varId])) <> (wrapIn dd <$> contentElements source (characterRange info) [value])
-    Syntax.Switch expr cases -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (expr : cases)
-    Syntax.Case expr body -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) [expr, body]
-    Syntax.Ternary expr cases -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (expr : cases)
-    Syntax.MathAssignment id value ->
-      dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [id])) <> (wrapIn dd <$> contentElements source (characterRange info) [value])
-    Syntax.SubscriptAccess target property ->
-      dl . mconcat $ (wrapIn dt <$> (contentElements source (characterRange info) [target])) <> (wrapIn dd <$> contentElements source (characterRange info) [property])
-    Syntax.Operator syntaxes -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) syntaxes
-    Syntax.Object children -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) children
-    Syntax.Pair a b -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) [a, b]
+-- | Something that can be rendered as markup with reference to some source.
+data Renderable a = Renderable !(Source Char) !a
 
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
@@ -158,17 +123,27 @@ wrapIn _ l@Blaze.Content{} = l
 wrapIn _ l@Blaze.Comment{} = l
 wrapIn f p = f p
 
-instance ToMarkup (Renderable (Source Char, Term a Info)) where
-  toMarkup (Renderable (source, term)) = Prologue.fst $ cata (\ (info :< syntax) -> (toMarkup $ Renderable (source, info, syntax), characterRange info)) term
 
-instance ToMarkup (Renderable (Source Char, SplitDiff a Info)) where
-  toMarkup (Renderable (source, diff)) = Prologue.fst . iter (\ (info :< syntax) -> (toMarkup $ Renderable (source, info, syntax), characterRange info)) $ toMarkupAndRange <$> diff
-    where toMarkupAndRange :: SplitPatch (Term a Info) -> (Markup, Range)
-          toMarkupAndRange patch = let term@(info :< _) = runCofree $ getSplitTerm patch in
-            ((div ! A.class_ (splitPatchToClassName patch) ! A.data_ (stringValue (show (unSize (size info))))) . toMarkup $ Renderable (source, cofree term), characterRange info)
+-- Instances
 
-instance ToMarkup a => ToMarkup (Renderable (Bool, Int, a)) where
-  toMarkup (Renderable (hasChanges, num, line)) =
+instance (ToMarkup f, HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (CofreeF (Syntax leaf) (Record fields) (f, Range))) where
+  toMarkup (Renderable source (info :< syntax)) = classifyMarkup (category info) $ case syntax of
+    Leaf _ -> span . string . toString $ slice (characterRange info) source
+    _ -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (toList syntax)
+
+instance (HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (Term leaf (Record fields))) where
+  toMarkup (Renderable source term) = Prologue.fst $ cata (\ t -> (toMarkup $ Renderable source t, characterRange (headF t))) term
+
+instance (HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (SplitDiff leaf (Record fields))) where
+  toMarkup (Renderable source diff) = Prologue.fst . iter (\ t -> (toMarkup $ Renderable source t, characterRange (headF t))) $ toMarkupAndRange <$> diff
+    where toMarkupAndRange patch = let term@(info :< _) = runCofree $ getSplitTerm patch in
+            ((div ! patchAttribute patch `withCostAttribute` cost info) . toMarkup $ Renderable source (cofree term), characterRange info)
+          patchAttribute patch = A.class_ (splitPatchToClassName patch)
+          withCostAttribute a (Cost c) | c > 0 = a ! A.data_ (stringValue (show c))
+                                       | otherwise = identity
+
+instance ToMarkup a => ToMarkup (Cell a) where
+  toMarkup (Cell hasChanges num line) =
     td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
     <> td (toMarkup line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
     <> string "\n"

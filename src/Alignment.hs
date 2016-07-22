@@ -23,7 +23,6 @@ import Diff
 import Info
 import Patch
 import Prologue hiding (fst, snd)
-import qualified Prologue
 import Range
 import Source hiding (break, fromList, uncons, (++))
 import SplitDiff
@@ -43,11 +42,11 @@ hasChanges :: SplitDiff leaf annotation -> Bool
 hasChanges = or . (True <$)
 
 -- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
-alignDiff :: (Show leaf, Show (Record fields), HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [Join These (SplitDiff leaf (Record fields))]
-alignDiff sources diff = iter (alignSyntax (runBothWith ((Join .) . These)) (free . Free) getRange sources) (alignPatch sources <$> diff)
+alignDiff :: HasField fields Range => Both (Source Char) -> Diff leaf (Record fields) -> [Join These (SplitDiff leaf (Record fields))]
+alignDiff sources diff = iter (alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources) (alignPatch sources <$> diff)
 
 -- | Align the contents of a patch into a list of lines on the corresponding side(s) of the diff.
-alignPatch :: forall fields leaf. (Show leaf, Show (Record fields), HasField fields Range) => Both (Source Char) -> Patch (Term leaf (Record fields)) -> [Join These (SplitDiff leaf (Record fields))]
+alignPatch :: forall fields leaf. HasField fields Range => Both (Source Char) -> Patch (Term leaf (Record fields)) -> [Join These (SplitDiff leaf (Record fields))]
 alignPatch sources patch = case patch of
   Delete term -> fmap (pure . SplitDelete) <$> alignSyntax' this (fst sources) term
   Insert term -> fmap (pure . SplitInsert) <$> alignSyntax' that (snd sources) term
@@ -61,10 +60,10 @@ alignPatch sources patch = case patch of
         that = Join . That . runIdentity
 
 -- | The Applicative instance f is either Identity or Both. Identity is for Terms in Patches, Both is for Diffs in unchanged portions of the diff.
-alignSyntax :: (Applicative f, Show term, HasField fields Range) => (forall a. f a -> Join These a) -> (CofreeF (Syntax leaf) (Record fields) term -> term) -> (term -> Range) -> f (Source Char) -> CofreeF (Syntax leaf) (f (Record fields)) [Join These term] -> [Join These term]
+alignSyntax :: (Applicative f, HasField fields Range) => (forall a. f a -> Join These a) -> (CofreeF (Syntax leaf) (Record fields) term -> term) -> (term -> Range) -> f (Source Char) -> CofreeF (Syntax leaf) (f (Record fields)) [Join These term] -> [Join These term]
 alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax of
-  Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> sequenceL lineRanges
-  Comment a -> catMaybes $ wrapInBranch (const (Comment a)) . fmap (flip (,) []) <$> sequenceL lineRanges
+  Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> (Join <$> bisequenceL (runJoin lineRanges))
+  Comment a -> catMaybes $ wrapInBranch (const (Comment a)) . fmap (flip (,) []) <$> (Join <$> bisequenceL (runJoin lineRanges))
   Indexed children ->
     catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
   Syntax.Function id params body -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (fromMaybe [] id <> fromMaybe []  params <> body) bothRanges
@@ -99,10 +98,9 @@ alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax 
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
         lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
         wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (setCharacterRange info range :< constructor children)) <$> infos)
-        pairWithKey (key, values) = fmap ((,) key) <$> values
 
 -- | Given a function to get the range, a list of already-aligned children, and the lists of ranges spanned by a branch, return the aligned lines.
-alignBranch :: Show term => (term -> Range) -> [Join These term] -> Both [Range] -> [Join These (Range, [term])]
+alignBranch :: (term -> Range) -> [Join These term] -> Both [Range] -> [Join These (Range, [term])]
 -- There are no more ranges, so we’re done.
 alignBranch _ _ (Join ([], [])) = []
 -- There are no more children, so we can just zip the remaining ranges together.
@@ -127,7 +125,7 @@ alignBranch getRange children ranges = case intersectingChildren of
   where (intersectingChildren, nonIntersectingChildren) = partition (or . intersects getRange headRanges) children
         (symmetricalChildren, asymmetricalChildren) = partition (isThese . runJoin) intersectingChildren
         intersectionsWithHeadRanges = fromThese True True . runJoin . intersects getRange headRanges
-        Just headRanges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
+        Just headRanges = Join <$> bisequenceL (runJoin (listToMaybe <$> Join (runBothWith These ranges)))
         (leftRange, rightRange) = splitThese headRanges
         alignAsymmetrically range advanceBy = let (line, remaining) = lineAndRemaining asymmetricalChildren range in
           line $ alignBranch getRange (remaining <> symmetricalChildren <> nonIntersectingChildren) (modifyJoin (advanceBy (drop 1)) ranges)
@@ -185,9 +183,3 @@ maybeThese (Just a) (Just b) = Just (These a b)
 maybeThese (Just a) _ = Just (This a)
 maybeThese _ (Just b) = Just (That b)
 maybeThese _ _ = Nothing
-
-
--- | Instances
-
-instance Bicrosswalk t => Crosswalk (Join t) where
-  crosswalk f = fmap Join . bicrosswalk f f . runJoin
