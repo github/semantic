@@ -1,5 +1,6 @@
 module Data.Sequenceable where
 
+import Data.Sequenceable.Generic
 import Prologue
 
 -- Classes
@@ -10,6 +11,4 @@ class Functor t => Sequenceable t where
 
 -- Instances
 
-instance Sequenceable [] where
-  sequenceAlt (x:xs) = ((:) <$> x <|> pure identity) <*> sequenceAlt xs
-  sequenceAlt [] = pure []
+instance Sequenceable [] where sequenceAlt = gsequenceAlt
