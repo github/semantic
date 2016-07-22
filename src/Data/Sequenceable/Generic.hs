@@ -16,3 +16,6 @@ instance GSequenceable U1 where
 
 instance GSequenceable Par1 where
   gsequenceAlt (Par1 a) = Par1 <$> a
+
+instance GSequenceable (K1 i c) where
+  gsequenceAlt (K1 a) = pure (K1 a)
