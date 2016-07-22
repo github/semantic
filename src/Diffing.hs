@@ -114,6 +114,7 @@ diffFiles parser renderer sourceBlobs = do
           Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
         shouldCompareTerms = (==) `on` category . extract
 
+-- | Compute the cost of an unpacked term.
 termCost :: (Prologue.Foldable f, Functor f) => CofreeF f (Record a) (Record (Cost ': a)) -> Cost
 termCost c = 1 + sum (cost <$> tailF c)
 
