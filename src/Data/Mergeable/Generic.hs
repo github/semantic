@@ -9,6 +9,9 @@ import Prologue
 class GMergeable t where
   gmerge :: Alternative f => (a -> f b) -> t a -> f (t b)
 
+genericMerge :: (Generic1 t, GMergeable (Rep1 t), Alternative f) => (a -> f b) -> t a -> f (t b)
+genericMerge f = fmap to1 . gmerge f . from1
+
 genericSequenceAlt :: (Generic1 t, GMergeable (Rep1 t), Alternative f) => t (f a) -> f (t a)
 genericSequenceAlt = fmap to1 . gmerge identity . from1
 
