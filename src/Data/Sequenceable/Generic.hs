@@ -12,6 +12,9 @@ class GSequenceable t where
   default gsequenceAlt :: (Generic1 t, GSequenceable (Rep1 t), Alternative f) => t (f a) -> f (t a)
   gsequenceAlt = fmap to1 . gsequenceAlt . from1
 
+genericSequenceAlt :: (Generic1 t, GSequenceable (Rep1 t), Alternative f) => t (f a) -> f (t a)
+genericSequenceAlt = fmap to1 . gsequenceAlt . from1
+
 
 -- Instances
 
