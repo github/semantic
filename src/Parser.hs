@@ -84,9 +84,3 @@ termConstructor source info = cofree . construct
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
     construct children =
       withDefaultInfo $ S.Indexed children
-
-    assignKey node = case runCofree node of
-      info :< S.Fixed (key : _) | Pair == category info -> (getSubstring key, node)
-      _ -> (getSubstring node, node)
-
-    getSubstring term = pack . toString $ slice (characterRange (extract term)) source
