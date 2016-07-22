@@ -17,6 +17,7 @@ import Diff.Arbitrary
 import Data.List (partition)
 import Term.Arbitrary
 import Interpreter
+import Info
 
 arrayInfo :: Record '[Category]
 arrayInfo = ArrayLiteral .: RNil
