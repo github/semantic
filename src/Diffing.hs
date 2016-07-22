@@ -88,6 +88,7 @@ readAndTranscodeFile path = do
 decorateParser :: (Typeable field, Functor f) => (CofreeF f (Record fields) (Record (field ': fields)) -> field) -> Parser f (Record fields) -> Parser f (Record (field ': fields))
 decorateParser decorator = (fmap (decorateTerm decorator) .)
 
+-- | Decorate a 'Term' using a function to compute the annotation values at every node.
 decorateTerm :: (Typeable field, Functor f) => (CofreeF f (Record fields) (Record (field ': fields)) -> field) -> Cofree f (Record fields) -> Cofree f (Record (field ': fields))
 decorateTerm decorator = cata $ \ c -> cofree ((decorator (extract <$> c) .: headF c) :< tailF c)
 
