@@ -1,6 +1,7 @@
 {-# LANGUAGE DefaultSignatures, TypeOperators #-}
 module Data.Sequenceable.Generic where
 
+import Data.Sequenceable
 import GHC.Generics
 import Prologue
 
@@ -35,3 +36,5 @@ instance (GSequenceable f, GSequenceable g) => GSequenceable (f :+: g) where
 
 instance (GSequenceable f, GSequenceable g) => GSequenceable (f :*: g) where
   gsequenceAlt (a :*: b) = (:*:) <$> gsequenceAlt a <*> gsequenceAlt b
+
+instance GSequenceable [] where gsequenceAlt = sequenceAlt
