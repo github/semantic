@@ -21,8 +21,8 @@ library
                      , Data.Functor.Both
                      , Data.RandomWalkSimilarity
                      , Data.Record
-                     , Data.Sequenceable
-                     , Data.Sequenceable.Generic
+                     , Data.Mergeable
+                     , Data.Mergeable.Generic
                      , Data.These.Arbitrary
                      , Diff
                      , Diff.Arbitrary

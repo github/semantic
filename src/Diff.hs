@@ -5,7 +5,7 @@ module Diff where
 import Prologue
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both as Both
-import Data.Sequenceable
+import Data.Mergeable
 import Patch
 import Syntax
 import Term
