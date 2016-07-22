@@ -62,7 +62,7 @@ alignPatch sources patch = case patch of
 -- | The Applicative instance f is either Identity or Both. Identity is for Terms in Patches, Both is for Diffs in unchanged portions of the diff.
 alignSyntax :: (Applicative f, HasField fields Range) => (forall a. f a -> Join These a) -> (CofreeF (Syntax leaf) (Record fields) term -> term) -> (term -> Range) -> f (Source Char) -> CofreeF (Syntax leaf) (f (Record fields)) [Join These term] -> [Join These term]
 alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax of
-  Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> sequenceL lineRanges
+  Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> (Join <$> bisequenceL (runJoin lineRanges))
   Indexed children -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
   Fixed children -> catMaybes $ wrapInBranch Fixed <$> alignBranch getRange (join children) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
