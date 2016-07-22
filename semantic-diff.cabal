@@ -22,6 +22,7 @@ library
                      , Data.RandomWalkSimilarity
                      , Data.Record
                      , Data.Sequenceable
+                     , Data.Sequenceable.Generic
                      , Data.These.Arbitrary
                      , Diff
                      , Diff.Arbitrary
