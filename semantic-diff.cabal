@@ -21,6 +21,7 @@ library
                      , Data.Functor.Both
                      , Data.RandomWalkSimilarity
                      , Data.Record
+                     , Data.Sequenceable
                      , Data.These.Arbitrary
                      , Diff
                      , Diff.Arbitrary
