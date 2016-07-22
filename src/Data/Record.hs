@@ -25,15 +25,18 @@ infixr 0 .:
 (.:) :: Typeable h => h -> Record t -> Record (h ': t)
 (.:) = RCons
 
+-- | Return 'Just' a 'field', if it exists in a record. Otherwise, return 'Nothing'.
 maybeGetField :: Typeable field => Record fields -> Maybe field
 maybeGetField (RCons h t) = cast h <|> maybeGetField t
 maybeGetField RNil = Nothing
 
+-- | Update (replace the value of) 'field' in a record, if it exists. Otherwise, return the record unchanged.
 updateField :: forall field fields. Typeable field => Record fields -> field -> Record fields
 updateField record a = case record of
   RNil -> RNil
   cons@(RCons _ _) -> updateRCons cons a
 
+-- | Update (replace the value of) 'field' in a non-empty record, if it exists. Otherwise return the record unchanged.
 updateRCons :: forall h t field. Typeable field => Record (h ': t) -> field -> Record (h ': t)
 updateRCons (RCons h t) a = case eqT :: Maybe (h :~: field) of
   Just Refl -> RCons a t
