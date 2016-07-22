@@ -1,7 +1,8 @@
 module Syntax where
 
-import Prologue
+import Data.Sequenceable
 import GHC.Generics
+import Prologue
 import Test.QuickCheck hiding (Fixed)
 
 -- | A node in an abstract syntax tree.
@@ -38,3 +39,9 @@ instance (Arbitrary leaf, Arbitrary f) => Arbitrary (Syntax leaf f) where
   arbitrary = sized (syntaxOfSize (`resize` arbitrary) )
 
   shrink = genericShrink
+
+instance Sequenceable (Syntax leaf) where
+  sequenceAlt syntax = case syntax of
+    Leaf a -> pure (Leaf a)
+    Indexed i -> Indexed <$> sequenceAlt i
+    Fixed i -> Fixed <$> sequenceAlt i
