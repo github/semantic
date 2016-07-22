@@ -1,5 +1,11 @@
 {-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators #-}
-module Data.Record where
+module Data.Record
+( Record(RNil)
+, (.:)
+, HasField(..)
+, maybeGetField
+, updateField
+) where
 
 import GHC.Show
 import Prologue
