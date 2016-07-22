@@ -15,4 +15,4 @@ class Functor t => Mergeable t where
 
 -- Instances
 
-instance Mergeable [] where sequenceAlt = gsequenceAlt
+instance Mergeable [] where sequenceAlt = gmerge identity

@@ -7,36 +7,36 @@ import Prologue
 -- Classes
 
 class GMergeable t where
-  gsequenceAlt :: Alternative f => t (f a) -> f (t a)
+  gmerge :: Alternative f => (a -> f b) -> t a -> f (t b)
 
 genericSequenceAlt :: (Generic1 t, GMergeable (Rep1 t), Alternative f) => t (f a) -> f (t a)
-genericSequenceAlt = fmap to1 . gsequenceAlt . from1
+genericSequenceAlt = fmap to1 . gmerge identity . from1
 
 
 -- Instances
 
 instance GMergeable U1 where
-  gsequenceAlt _ = pure U1
+  gmerge _ _ = pure U1
 
 instance GMergeable Par1 where
-  gsequenceAlt (Par1 a) = Par1 <$> a
+  gmerge f (Par1 a) = Par1 <$> f a
 
 instance GMergeable (K1 i c) where
-  gsequenceAlt (K1 a) = pure (K1 a)
+  gmerge _ (K1 a) = pure (K1 a)
 
 instance GMergeable f => GMergeable (Rec1 f) where
-  gsequenceAlt (Rec1 a) = Rec1 <$> gsequenceAlt a
+  gmerge f (Rec1 a) = Rec1 <$> gmerge f a
 
 instance GMergeable f => GMergeable (M1 i c f) where
-  gsequenceAlt (M1 a) = M1 <$> gsequenceAlt a
+  gmerge f (M1 a) = M1 <$> gmerge f a
 
 instance (GMergeable f, GMergeable g) => GMergeable (f :+: g) where
-  gsequenceAlt (L1 a) = L1 <$> gsequenceAlt a
-  gsequenceAlt (R1 b) = R1 <$> gsequenceAlt b
+  gmerge f (L1 a) = L1 <$> gmerge f a
+  gmerge f (R1 b) = R1 <$> gmerge f b
 
 instance (GMergeable f, GMergeable g) => GMergeable (f :*: g) where
-  gsequenceAlt (a :*: b) = (:*:) <$> gsequenceAlt a <*> gsequenceAlt b
+  gmerge f (a :*: b) = (:*:) <$> gmerge f a <*> gmerge f b
 
 instance GMergeable [] where
-  gsequenceAlt (x:xs) = ((:) <$> x <|> pure identity) <*> gsequenceAlt xs
-  gsequenceAlt [] = pure []
+  gmerge f (x:xs) = ((:) <$> f x <|> pure identity) <*> gmerge f xs
+  gmerge _ [] = pure []
