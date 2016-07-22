@@ -1,6 +1,7 @@
 module Syntax where
 
 import Data.Sequenceable
+import Data.Sequenceable.Generic
 import GHC.Generics
 import Prologue
 import Test.QuickCheck hiding (Fixed)
@@ -45,3 +46,5 @@ instance Sequenceable (Syntax leaf) where
     Leaf a -> pure (Leaf a)
     Indexed i -> Indexed <$> sequenceAlt i
     Fixed i -> Fixed <$> sequenceAlt i
+
+instance GSequenceable (Syntax leaf)
