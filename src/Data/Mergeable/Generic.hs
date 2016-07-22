@@ -40,3 +40,7 @@ instance (GMergeable f, GMergeable g) => GMergeable (f :*: g) where
 instance GMergeable [] where
   gmerge f (x:xs) = ((:) <$> f x <|> pure identity) <*> gmerge f xs
   gmerge _ [] = pure []
+
+instance GMergeable Maybe where
+  gmerge f (Just a) = Just <$> f a
+  gmerge _ Nothing = empty

@@ -23,3 +23,5 @@ class Functor t => Mergeable t where
 -- Instances
 
 instance Mergeable [] where merge = gmerge
+
+instance Mergeable Maybe

@@ -1,9 +1,7 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
 module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..)) where
 
-import Prologue hiding (fst, snd)
-import Data.String
-import Data.Maybe (fromJust)
+import Prologue hiding (snd, intercalate)
 import Diff
 import Info (category)
 import Patch
@@ -13,69 +11,153 @@ import Category
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.Record
-import Data.Text as Text (unpack)
+import Data.Text as Text (intercalate)
+import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string)
+import qualified Text.PrettyPrint.Leijen.Text as P
 
-data DiffInfo = DiffInfo { categoryName :: String, termName :: Maybe String } deriving (Eq, Show)
+data DiffInfo = DiffInfo { categoryName :: Text, termName :: Text } deriving (Eq, Show)
 
-maybeTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> Maybe String
-maybeTermName term = case runCofree term of
-  (_ :< Leaf leaf) -> Just (toCategoryName leaf)
-  (_ :< Indexed children) -> toCategoryName . category <$> head (extract <$> children)
-  (_ :< Fixed children) -> toCategoryName . category <$> head (extract <$> children)
+toTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> Text
+toTermName term = case unwrap term of
+  Fixed children -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
+  Indexed children -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
+  Leaf leaf -> toCategoryName leaf
+  Syntax.Assignment identifier value -> toTermName identifier <> toTermName value
+  Syntax.Function identifier _ _ -> (maybe "anonymous" toTermName identifier)
+  Syntax.FunctionCall i _ -> toTermName i
+  Syntax.MemberAccess base property -> case (unwrap base, unwrap property) of
+    (Syntax.FunctionCall{}, Syntax.FunctionCall{}) -> toTermName base <> "()." <> toTermName property <> "()"
+    (Syntax.FunctionCall{}, _) -> toTermName base <> "()." <> toTermName property
+    (_, Syntax.FunctionCall{}) -> toTermName base <> "." <> toTermName property <> "()"
+    (_, _) -> toTermName base <> "." <> toTermName property
+  Syntax.MethodCall targetId methodId _ -> toTermName targetId <> sep <> toTermName methodId <> "()"
+    where sep = case unwrap targetId of
+            Syntax.FunctionCall{} -> "()."
+            _ -> "."
+  Syntax.SubscriptAccess base element -> case (unwrap base, unwrap element) of
+    (Syntax.FunctionCall{}, Syntax.FunctionCall{}) -> toTermName base <> "()." <> toTermName element <> "()"
+    (Syntax.FunctionCall{}, _) -> toTermName base <> "()." <> toTermName element
+    (_, Syntax.FunctionCall{}) -> toTermName base <> "[" <> toTermName element <> "()" <> "]"
+    (_, _) -> toTermName base <> "[" <> toTermName element <> "]"
+  Syntax.VarAssignment varId _ -> toTermName varId
+  Syntax.VarDecl decl -> toTermName decl
+  -- TODO: We should remove Args from Syntax since I don't think we should ever
+  -- evaluate Args as a single toTermName Text - joshvera
+  Syntax.Args args -> mconcat $ toTermName <$> args
+  -- TODO: We should remove Case from Syntax since I don't think we should ever
+  -- evaluate Case as a single toTermName Text - joshvera
+  Syntax.Case expr _ -> toTermName expr
+  Syntax.Switch expr _ -> toTermName expr
+  Syntax.Ternary expr _ -> toTermName expr
+  Syntax.MathAssignment id _ -> toTermName id
+  Syntax.Operator syntaxes -> mconcat $ toTermName <$> syntaxes
+  Syntax.Object kvs -> "{" <> intercalate ", " (toTermName <$> kvs) <> "}"
+  Syntax.Pair a b -> toTermName a <> ": " <> toTermName b
+  Comment a -> toCategoryName a
 
 class HasCategory a where
-  toCategoryName :: a -> String
-
-instance HasCategory String where
-  toCategoryName = identity
+  toCategoryName :: a -> Text
 
 instance HasCategory Text where
-  toCategoryName = unpack
+  toCategoryName = identity
 
 instance HasCategory Category where
-  toCategoryName category = case category of
-    Program -> "top level"
-    Error -> "error"
-    BinaryOperator -> "binary operator"
-    DictionaryLiteral -> "dictionary"
-    Pair -> "pair"
-    FunctionCall -> "function call"
-    StringLiteral -> "string"
-    IntegerLiteral -> "integer"
-    SymbolLiteral -> "symbol"
+  toCategoryName = \case
     ArrayLiteral -> "array"
+    BinaryOperator -> "binary operator"
+    Boolean -> "boolean"
+    DictionaryLiteral -> "dictionary"
+    Error -> "error"
+    ExpressionStatements -> "expression statements"
+    Category.Assignment -> "assignment"
+    Category.Function -> "function"
+    Category.FunctionCall -> "function call"
+    Category.MemberAccess -> "member access"
+    Category.MethodCall -> "method call"
+    Category.Args -> "arguments"
+    Category.VarAssignment -> "var assignment"
+    Category.VarDecl -> "variable"
+    Category.Switch -> "switch statement"
+    Category.Case -> "case statement"
+    Category.SubscriptAccess -> "subscript access"
+    Category.MathAssignment -> "math assignment"
+    Category.Ternary -> "ternary"
+    Category.Operator -> "operator"
+    Identifier -> "identifier"
+    IntegerLiteral -> "integer"
     Other s -> s
+    Category.Pair -> "pair"
+    Params -> "params"
+    Program -> "top level"
+    Regex -> "regex"
+    StringLiteral -> "string"
+    SymbolLiteral -> "symbol"
+    TemplateString -> "template string"
+    Category.Object -> "object"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
 
 data DiffSummary a = DiffSummary {
   patch :: Patch a,
-  parentAnnotations :: [a]
-} deriving (Eq, Functor)
+  parentAnnotations :: [Category]
+} deriving (Eq, Functor, Show)
 
-instance Show (DiffSummary DiffInfo) where
-  showsPrec _ DiffSummary{..} s = (++s) $ case patch of
-    (Insert termInfo) -> "Added the " ++ "'" ++ fromJust (termName termInfo) ++ "' " ++ categoryName termInfo
-      ++ maybeParentContext parentAnnotations
-    (Delete termInfo) -> "Deleted the " ++ "'" ++ fromJust (termName termInfo) ++ "' " ++ categoryName termInfo
-      ++ maybeParentContext parentAnnotations
-    (Replace t1 t2) -> "Replaced the " ++ "'" ++ fromJust (termName t1) ++ "' " ++ categoryName t1
-      ++ " with the " ++ "'" ++ fromJust (termName t2) ++ "' " ++ categoryName t2
-      ++ maybeParentContext parentAnnotations
-    where maybeParentContext parentAnnotations = if null parentAnnotations
-            then ""
-            else " in the " ++ intercalate "/" (categoryName <$> parentAnnotations) ++ " context"
+instance P.Pretty (DiffSummary DiffInfo) where
+  pretty DiffSummary{..} = case patch of
+    Insert diffInfo -> "Added the" <+> squotes (toDoc $ termName diffInfo) <+> (toDoc $ categoryName diffInfo) P.<> maybeParentContext parentAnnotations
+    Delete diffInfo -> "Deleted the" <+> squotes (toDoc $ termName diffInfo) <+> (toDoc $ categoryName diffInfo) P.<> maybeParentContext parentAnnotations
+    Replace t1 t2 -> "Replaced the" <+> squotes (toDoc $ termName t1) <+> (toDoc $ categoryName t1) <+> "with the" <+> P.squotes (toDoc $ termName t2) <+> (toDoc $ categoryName t2) P.<> maybeParentContext parentAnnotations
+    where
+      maybeParentContext annotations = if null annotations
+        then ""
+        else space <> "in the" <+> (toDoc . intercalate "/" $ toCategoryName <$> annotations) <+> "context"
+      toDoc = string . toS
 
 diffSummary :: (HasCategory leaf, HasField fields Category) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
-diffSummary = cata diffSummary' where
-  diffSummary' :: (HasCategory leaf, HasField fields Category) => Base (Diff leaf (Record fields)) [DiffSummary DiffInfo] -> [DiffSummary DiffInfo]
-  diffSummary' (Free (_ :< Leaf _)) = [] -- Skip leaves since they don't have any changes
-  diffSummary' (Free (infos :< Indexed children)) = prependSummary (DiffInfo (toCategoryName . category $ snd infos) Nothing) <$> join children
-  diffSummary' (Free (infos :< Fixed children)) = prependSummary (DiffInfo (toCategoryName . category $ snd infos) Nothing) <$> join children
-  diffSummary' (Pure (Insert term)) = [DiffSummary (Insert (DiffInfo (toCategoryName term) (maybeTermName term))) []]
-  diffSummary' (Pure (Delete term)) = [DiffSummary (Delete (DiffInfo (toCategoryName term) (maybeTermName term))) []]
-  diffSummary' (Pure (Replace t1 t2)) = [DiffSummary (Replace (DiffInfo (toCategoryName t1) (maybeTermName t1)) (DiffInfo (toCategoryName t2) (maybeTermName t2))) []]
+diffSummary = cata $ \case
+  -- Skip comments and leaves since they don't have any changes
+  (Free (_ :< Leaf _)) -> []
+  Free (_ :< (Syntax.Comment _)) -> []
+  (Free (infos :< Indexed children)) -> prependSummary (category $ snd infos) <$> join children
+  (Free (infos :< Fixed children)) -> prependSummary (category $ snd infos) <$> join children
+  (Free (infos :< Syntax.FunctionCall identifier children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList (identifier : children))
+  (Free (infos :< Syntax.Function id ps body)) -> prependSummary (category $ snd infos) <$> (fromMaybe [] id) <> (fromMaybe [] ps) <> body
+  (Free (infos :< Syntax.Assignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
+  (Free (infos :< Syntax.MemberAccess base property)) -> prependSummary (category $ snd infos) <$> base <> property
+  (Free (infos :< Syntax.SubscriptAccess base property)) -> prependSummary (category $ snd infos) <$> base <> property
+  (Free (infos :< Syntax.MethodCall targetId methodId ps)) -> prependSummary (category $ snd infos) <$> targetId <> methodId <> ps
+  (Free (infos :< Syntax.VarAssignment varId value)) -> prependSummary (category $ snd infos) <$> varId <> value
+  (Free (infos :< Syntax.VarDecl decl)) -> prependSummary (category $ snd infos) <$> decl
+  (Free (infos :< Syntax.Args args)) -> prependSummary (category $ snd infos) <$> join args
+  (Free (infos :< Syntax.Switch expr cases)) -> prependSummary (category $ snd infos) <$> expr <> join cases
+  (Free (infos :< Syntax.Case expr body)) -> prependSummary (category $ snd infos) <$> expr <> body
+  Free (infos :< (Syntax.Ternary expr cases)) -> prependSummary (category $ snd infos) <$> expr <> join cases
+  Free (infos :< (Syntax.MathAssignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
+  Free (infos :< (Syntax.Operator syntaxes)) -> prependSummary (category $ snd infos) <$> join syntaxes
+  Free (infos :< (Syntax.Object kvs)) -> prependSummary (category $ snd infos) <$> join kvs
+  Free (infos :< (Syntax.Pair a b)) -> prependSummary (category $ snd infos) <$> a <> b
+  Free (infos :< (Syntax.Commented cs leaf)) -> prependSummary (category $ snd infos) <$> join cs <> fromMaybe [] leaf
+  (Pure (Insert term)) -> (\info -> DiffSummary (Insert info) []) <$> termToDiffInfo term
+  (Pure (Delete term)) -> (\info -> DiffSummary (Delete info) []) <$> termToDiffInfo term
+  (Pure (Replace t1 t2)) -> (\(info1, info2) -> DiffSummary (Replace info1 info2) []) <$> zip (termToDiffInfo t1) (termToDiffInfo t2)
 
-prependSummary :: DiffInfo -> DiffSummary DiffInfo -> DiffSummary DiffInfo
+termToDiffInfo :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> [DiffInfo]
+termToDiffInfo term = case unwrap term of
+  Leaf _ -> [ DiffInfo (toCategoryName term) (toTermName term) ]
+  Indexed children -> join $ termToDiffInfo <$> children
+  Fixed children -> join $ termToDiffInfo <$> children
+  Syntax.FunctionCall identifier _ -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
+  Syntax.Ternary ternaryCondition _ -> [ DiffInfo (toCategoryName term) (toTermName ternaryCondition) ]
+  Syntax.Function identifier _ _ -> [ DiffInfo (toCategoryName term) (maybe "anonymous" toTermName identifier) ]
+  Syntax.Assignment identifier _ -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
+  Syntax.MathAssignment identifier _ -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
+  -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
+  -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
+  -- to indicate where that value should be when constructing DiffInfos.
+  Syntax.Operator _ -> [DiffInfo (toCategoryName term) "x"]
+  Commented cs leaf -> join (termToDiffInfo <$> cs) <> maybe [] (\leaf -> [ DiffInfo (toCategoryName term) (toTermName leaf) ]) leaf
+  _ -> [ DiffInfo (toCategoryName term) (toTermName term) ]
+
+prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }

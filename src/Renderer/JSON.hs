@@ -19,7 +19,7 @@ import Range
 import Renderer
 import Source hiding (fromList)
 import SplitDiff
-import Syntax
+import Syntax as S
 import Term
 
 -- | Render a diff to a string representing its JSON.
@@ -33,7 +33,7 @@ instance (HasField fields Category, HasField fields Range) => ToJSON (NumberedLi
   toJSON (NumberedLine (n, a)) = object (lineFields n a (getRange a))
   toEncoding (NumberedLine (n, a)) = pairs $ mconcat (lineFields n a (getRange a))
 instance ToJSON Category where
-  toJSON (Other s) = String $ T.pack s
+  toJSON (Other s) = String s
   toJSON s = String . T.pack $ show s
 instance ToJSON Range where
   toJSON (Range start end) = Array . fromList $ toJSON <$> [ start, end ]
@@ -67,6 +67,24 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   Leaf _ -> []
   Indexed c -> childrenFields c
   Fixed c -> childrenFields c
+  S.FunctionCall identifier params -> [ "identifier" .= identifier ] <> [ "params" .= params ]
+  S.Function identifier params c -> [ "identifier" .= identifier ] <> [ "params" .= params ] <> childrenFields c
+  S.MethodCall targetId methodId args -> [ "targetIdentifier" .= targetId ] <> [ "methodId" .= methodId ] <> [ "args" .= args ]
+  S.Args c -> childrenFields c
+  S.Assignment assignmentId property -> [ "assignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
+  S.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
+  S.Switch expr cases -> [ "switchExpression" .= expr ] <> [ "cases" .= cases ]
+  S.Case expr body -> [ "caseExpression" .= expr ] <> [ "caseStatement" .= body ]
+  S.VarDecl decl -> [ "variableDeclaration" .= decl ]
+  S.VarAssignment id value -> [ "varIdentifier" .= id ] <> [ "value" .= value ]
+  S.MathAssignment id value -> [ "mathIdentifier" .= id ] <> [ "value" .= value ]
+  S.Ternary expr cases -> [ "ternaryExpression" .= expr ] <> [ "cases" .= cases ]
+  S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
+  S.SubscriptAccess id property -> [ "subscriptId" .= id ] <> [ "property" .= property ]
+  S.Object pairs -> childrenFields pairs
+  S.Pair a b -> childrenFields [a, b]
+  S.Comment _ -> []
+  S.Commented comments child -> childrenFields (comments <> maybeToList child)
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: (KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (Term leaf (Record fields)) -> [kv]
