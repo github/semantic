@@ -13,3 +13,6 @@ class GSequenceable t where
 
 instance GSequenceable U1 where
   gsequenceAlt _ = pure U1
+
+instance GSequenceable Par1 where
+  gsequenceAlt (Par1 a) = Par1 <$> a
