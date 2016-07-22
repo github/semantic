@@ -1,7 +1,7 @@
+{-# LANGUAGE DeriveAnyClass #-}
 module Syntax where
 
 import Data.Sequenceable
-import Data.Sequenceable.Generic
 import GHC.Generics
 import Prologue
 import Test.QuickCheck hiding (Fixed)
@@ -17,7 +17,7 @@ data Syntax
   | Indexed [f]
   -- | An ordered branch of child nodes, expected to be of fixed length in the grammar, e.g. a binary operator & its operands.
   | Fixed [f]
-  deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Sequenceable, Show, Traversable)
 
 
 -- Instances
@@ -40,6 +40,3 @@ instance (Arbitrary leaf, Arbitrary f) => Arbitrary (Syntax leaf f) where
   arbitrary = sized (syntaxOfSize (`resize` arbitrary) )
 
   shrink = genericShrink
-
-instance Sequenceable (Syntax leaf) where
-  sequenceAlt = genericSequenceAlt
