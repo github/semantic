@@ -1,10 +1,10 @@
 module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
-import Category (Category)
+import Category
 import Data.Align.Generic
 import Data.Functor.Foldable
-import Data.Functor.Both hiding (fst, snd)
+import Data.Functor.Both
 import Data.Hashable
 import Data.RandomWalkSimilarity
 import Data.Record
@@ -48,7 +48,9 @@ run construct comparable cost algorithm = case runFree algorithm of
   Free (Recursive t1 t2 f) -> run construct comparable cost . f $ recur a b where
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
     annotate = construct . (both annotation1 annotation2 :<)
+
     recur a b = maybe (pure (Replace t1 t2)) (annotate . fmap diffThese) (galign a b)
+
     diffThese = these (pure . Delete) (pure . Insert) (diffTerms construct comparable cost)
 
   Free (ByIndex a b f) -> run construct comparable cost . f $ ses (constructAndRun construct comparable cost) cost a b

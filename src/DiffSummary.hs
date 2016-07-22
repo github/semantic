@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
-
 module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..)) where
 
 import Prologue hiding (snd, intercalate)

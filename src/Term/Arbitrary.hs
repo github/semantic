@@ -33,4 +33,5 @@ instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbit
   arbitrary = sized $ \ n -> do
     m <- choose (0, n)
     termOfSize m
+
   shrink = genericShrink
