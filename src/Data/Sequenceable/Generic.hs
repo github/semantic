@@ -1,3 +1,4 @@
+{-# LANGUAGE DefaultSignatures #-}
 module Data.Sequenceable.Generic where
 
 import GHC.Generics
@@ -7,6 +8,8 @@ import Prologue
 
 class GSequenceable t where
   gsequenceAlt :: Alternative f => t (f a) -> f (t a)
+  default gsequenceAlt :: (Generic1 t, GSequenceable (Rep1 t), Alternative f) => t (f a) -> f (t a)
+  gsequenceAlt = fmap to1 . gsequenceAlt . from1
 
 
 -- Instances
