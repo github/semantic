@@ -6,23 +6,21 @@ import Data.Record
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Diff
-import Info
-import Interpreter
-import Term.Arbitrary
 import Syntax
 import Patch
-import Range
 import Category
 import DiffSummary
 import Text.PrettyPrint.Leijen.Text
+import Term.Arbitrary
+import Interpreter
 
-arrayInfo :: Info
-arrayInfo = rangeAt 0 .: ArrayLiteral .: 2 .: 0 .: RNil
+arrayInfo :: Record '[Category]
+arrayInfo = ArrayLiteral .: RNil
 
-literalInfo :: Info
-literalInfo = rangeAt 1 .: StringLiteral .: 1 .: 0 .: RNil
+literalInfo :: Record '[Category]
+literalInfo = StringLiteral .: RNil
 
-testDiff :: Diff Text Info
+testDiff :: Diff Text (Record '[Category])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])
 
 testSummary :: DiffSummary DiffInfo

@@ -25,7 +25,6 @@ library
                      , Diff
                      , Diff.Arbitrary
                      , Diffing
-                     , DiffOutput
                      , Info
                      , Interpreter
                      , Language

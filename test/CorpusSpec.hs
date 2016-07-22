@@ -1,21 +1,24 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DataKinds, FlexibleContexts, GeneralizedNewtypeDeriving #-}
 module CorpusSpec where
 
 import System.IO
-import Data.String
 import Diffing
 import Renderer
 import qualified Renderer.JSON as J
 import qualified Renderer.Patch as P
 import qualified Renderer.Split as Split
 
+import Category
 import Control.DeepSeq
 import Data.Functor.Both
 import Data.List as List
 import Data.Map as Map
+import Data.Record
 import Data.Set as Set
 import qualified Data.Text as T
+import Info
 import Prologue hiding (fst, snd)
+import Range
 import qualified Source as S
 import System.FilePath
 import System.FilePath.Glob
@@ -39,10 +42,8 @@ spec = parallel $ do
       let tests = correctTests =<< paths
       traverse_ (\ (formatName, renderer, paths, output) -> it (normalizeName (fst paths) ++ " (" ++ formatName ++ ")") $ testDiff renderer paths output matcher) tests
 
-    correctTests :: (Both FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer, Both FilePath, Maybe FilePath)]
     correctTests paths@(_, Nothing, Nothing, Nothing) = testsForPaths paths
     correctTests paths = List.filter (\(_, _, _, output) -> isJust output) $ testsForPaths paths
-    testsForPaths :: (Both FilePath, Maybe FilePath, Maybe FilePath, Maybe FilePath) -> [(String, Renderer, Both FilePath, Maybe FilePath)]
     testsForPaths (paths, json, patch, split) = [ ("json", J.json, paths, json), ("patch", P.patch, paths, patch), ("split", Split.split, paths, split) ]
 
 -- | Return all the examples from the given directory. Examples are expected to
@@ -69,7 +70,7 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | Given file paths for A, B, and, optionally, a diff, return whether diffing
 -- | the files will produce the diff. If no diff is provided, then the result
 -- | is true, but the diff will still be calculated.
-testDiff :: Renderer -> Both FilePath -> Maybe FilePath -> (Verbatim -> Verbatim -> Expectation) -> Expectation
+testDiff :: Renderer (Record '[Range, Category, Cost]) -> Both FilePath -> Maybe FilePath -> (Verbatim -> Verbatim -> Expectation) -> Expectation
 testDiff renderer paths diff matcher = do
   sources <- sequence $ readAndTranscodeFile <$> paths
   actual <- Verbatim <$> diffFiles parser renderer (sourceBlobs sources)

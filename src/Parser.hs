@@ -1,9 +1,12 @@
+{-# LANGUAGE RankNTypes #-}
 module Parser where
 
 import Prologue hiding (Constructor)
+import Data.Record
 import Data.Text (pack)
 import Category
 import Info
+import Range
 import qualified Syntax as S
 import Term
 import qualified Data.Set as Set
@@ -12,10 +15,7 @@ import Source
 -- | A function that takes a source file and returns an annotated AST.
 -- | The return is in the IO monad because some of the parsers are written in C
 -- | and aren't pure.
-type Parser = Source Char -> IO (Term Text Info)
-
--- | A function which constructs a term from a source string, annotation, and children.
-type Constructor = Source Char -> Info -> [Term Text Info] -> Term Text Info
+type Parser fields = Source Char -> IO (Term Text (Record fields))
 
 -- | Categories that are treated as fixed nodes.
 fixedCategories :: Set.Set Category
@@ -27,11 +27,10 @@ isFixed = flip Set.member fixedCategories
 
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
-termConstructor :: Constructor
+termConstructor :: (Show (Record fields), HasField fields Category, HasField fields Range) => Source Char -> (Record fields) -> [Term Text (Record fields)] -> Term Text (Record fields)
 termConstructor source info = cofree . construct
   where
     withDefaultInfo syntax = (info :< syntax)
-    construct :: [Term Text Info] -> CofreeF (S.Syntax Text) Info (Term Text Info)
     construct [] = withDefaultInfo . S.Leaf . pack . toString $ slice (characterRange info) source
     construct children | Assignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.Assignment identifier value
@@ -66,7 +65,7 @@ termConstructor source info = cofree . construct
                          , [x, y] <- children = withDefaultInfo $ S.VarAssignment x y
     construct children | VarDecl == category info = withDefaultInfo . S.Indexed $ toVarDecl <$> children
       where
-        toVarDecl :: Term Text Info -> Term Text Info
+        toVarDecl :: (HasField fields Category) => Term Text (Record fields) -> Term Text (Record fields)
         toVarDecl child = cofree $ (setCategory (extract child) VarDecl :< S.VarDecl child)
 
     construct children | Switch == category info, (expr:_) <- children =
@@ -77,7 +76,7 @@ termConstructor source info = cofree . construct
 
     construct children | Object == category info = withDefaultInfo . S.Object $ foldMap toTuple children
       where
-        toTuple :: Term Text Info -> [Term Text Info]
+        toTuple :: Term Text (Record fields) -> [Term Text (Record fields)]
         toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
         toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
         toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
