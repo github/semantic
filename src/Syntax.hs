@@ -42,9 +42,6 @@ instance (Arbitrary leaf, Arbitrary f) => Arbitrary (Syntax leaf f) where
   shrink = genericShrink
 
 instance Sequenceable (Syntax leaf) where
-  sequenceAlt syntax = case syntax of
-    Leaf a -> pure (Leaf a)
-    Indexed i -> Indexed <$> sequenceAlt i
-    Fixed i -> Fixed <$> sequenceAlt i
+  sequenceAlt = gsequenceAlt
 
 instance GSequenceable (Syntax leaf)
