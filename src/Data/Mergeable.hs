@@ -13,8 +13,7 @@ class Functor t => Mergeable t where
   merge = genericMerge
 
   sequenceAlt :: Alternative f => t (f a) -> f (t a)
-  default sequenceAlt :: (Generic1 t, GMergeable (Rep1 t), Alternative f) => t (f a) -> f (t a)
-  sequenceAlt = genericSequenceAlt
+  sequenceAlt = merge identity
 
 
 -- Instances
