@@ -42,6 +42,4 @@ instance (Arbitrary leaf, Arbitrary f) => Arbitrary (Syntax leaf f) where
   shrink = genericShrink
 
 instance Sequenceable (Syntax leaf) where
-  sequenceAlt = gsequenceAlt
-
-instance GSequenceable (Syntax leaf)
+  sequenceAlt = genericSequenceAlt
