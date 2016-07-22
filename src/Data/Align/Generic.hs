@@ -23,6 +23,7 @@ instance Eq a => GAlign (Syntax a)
 -- 'Data.Align.Align' instances
 
 instance GAlign [] where galign = galignAlign
+instance GAlign Maybe where galign = galignAlign
 
 -- | Implements a function suitable for use as the definition of 'galign' for 'Align'able functors.
 galignAlign :: Align f => f a -> f b -> Maybe (f (These a b))

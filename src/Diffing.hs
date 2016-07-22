@@ -6,7 +6,6 @@ import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
 import Data.Functor.Foldable
 import Data.Record
-import qualified Data.Text as T
 import qualified Data.Text.IO as TextIO
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
@@ -32,9 +31,10 @@ import qualified System.IO as IO
 import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
+import qualified Data.Text as T
 
 -- | Return a parser based on the file extension (including the ".").
-parserForType :: T.Text -> Parser '[Range, Category, Cost]
+parserForType :: Text -> Parser '[Range, Category, Cost]
 parserForType mediaType = case languageForType mediaType of
   Just C -> treeSitterParser C ts_language_c
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
@@ -51,25 +51,24 @@ lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 
       ((Range 0 $ length input) .: Other "program" .: cost .: RNil) :< Indexed children
     leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Other "program" .: 1 .: RNil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
-      (accum <> [ leaf charIndex (toText line) ]
-      , charIndex + length line)
+      (accum <> [ leaf charIndex (toText line) ] , charIndex + length line)
     toText = T.pack . Source.toString
 
 -- | Return the parser that should be used for a given path.
 parserForFilepath :: FilePath -> Parser '[Range, Category, Cost]
-parserForFilepath = parserForType . T.pack . takeExtension
+parserForFilepath = parserForType . toS . takeExtension
 
 -- | Replace every string leaf with leaves of the words in the string.
-breakDownLeavesByWord :: (HasField fields Cost, HasField fields Range) => Source Char -> Term T.Text (Record fields) -> Term T.Text (Record fields)
+breakDownLeavesByWord :: (HasField fields Category, HasField fields Cost, HasField fields Range) => Source Char -> Term Text (Record fields) -> Term Text (Record fields)
 breakDownLeavesByWord source = cata replaceIn
   where
     replaceIn (info :< syntax) = let cost' = 1 + sum (cost . extract <$> syntax') in cofree $ setCost info cost' :< syntax'
       where syntax' = case (ranges, syntax) of
-              (_:_:_, Leaf _) -> Indexed (makeLeaf info <$> ranges)
+              (_:_:_, Leaf _) | category info /= Regex -> Indexed (makeLeaf info <$> ranges)
               _ -> syntax
             ranges = rangesAndWordsInSource (characterRange info)
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
-    makeLeaf info (range, substring) = cofree $ setCharacterRange info range :< Leaf (T.pack substring)
+    makeLeaf info (range, substring) = cofree $ setCharacterRange info range :< Leaf (toS substring)
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
@@ -88,17 +87,18 @@ readAndTranscodeFile path = do
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser fields -> Renderer (Record fields) -> Both SourceBlob -> IO T.Text
+diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser fields -> Renderer (Record fields) -> Both SourceBlob -> IO Text
 diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sources
 
   let replaceLeaves = breakDownLeavesByWord <$> sources
-  let areNullOids = runJoin $ (== nullOid) . oid <$> sourceBlobs
+  let areNullOids = runBothWith (\a b -> (oid a == nullOid || null (source a), oid b == nullOid || null (source b))) sourceBlobs
   let textDiff = case areNullOids of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
-        (_, _) -> runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermCosts) $ replaceLeaves <*> terms
+        (_, _) ->
+          runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermCosts) (replaceLeaves <*> terms)
 
   pure $! renderer textDiff sourceBlobs
   where construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
