@@ -95,7 +95,7 @@ decorateTerm decorator = cata $ \ c -> cofree ((decorator (extract <$> c) .: hea
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record fields) -> Both SourceBlob -> IO T.Text
+diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record fields) -> Both SourceBlob -> IO T.Text
 diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sources
@@ -125,7 +125,7 @@ diffCostWithCachedTermCosts diff = maybe 0 (unCost . getSum) $ case runFree diff
 
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Text
+textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Text
 textDiff parser arguments sources = diffFiles parser renderer sources
   where renderer = case format arguments of
           Split -> split
@@ -142,7 +142,7 @@ truncatedDiff arguments sources = case format arguments of
   Summary -> pure ""
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
-printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
+printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
   case (output arguments) of
