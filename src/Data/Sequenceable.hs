@@ -4,7 +4,7 @@ import Prologue
 
 -- Classes
 
-class Sequenceable t where
+class Functor t => Sequenceable t where
   sequenceAlt :: Alternative f => t (f a) -> f (t a)
 
 
