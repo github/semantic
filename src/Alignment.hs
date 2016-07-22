@@ -62,7 +62,7 @@ alignPatch sources patch = case patch of
 -- | The Applicative instance f is either Identity or Both. Identity is for Terms in Patches, Both is for Diffs in unchanged portions of the diff.
 alignSyntax :: (Applicative f, HasField fields Range) => (forall a. f a -> Join These a) -> (CofreeF (Syntax leaf) (Record fields) term -> term) -> (term -> Range) -> f (Source Char) -> CofreeF (Syntax leaf) (f (Record fields)) [Join These term] -> [Join These term]
 alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax of
-  Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> sequenceL lineRanges
+  Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> (Join <$> bisequenceL (runJoin lineRanges))
   Comment a -> catMaybes $ wrapInBranch (const (Comment a)) . fmap (flip (,) []) <$> sequenceL lineRanges
   Indexed children ->
     catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
@@ -125,7 +125,7 @@ alignBranch getRange children ranges = case intersectingChildren of
   where (intersectingChildren, nonIntersectingChildren) = partition (or . intersects getRange headRanges) children
         (symmetricalChildren, asymmetricalChildren) = partition (isThese . runJoin) intersectingChildren
         intersectionsWithHeadRanges = fromThese True True . runJoin . intersects getRange headRanges
-        Just headRanges = sequenceL (listToMaybe <$> Join (runBothWith These ranges))
+        Just headRanges = Join <$> bisequenceL (runJoin (listToMaybe <$> Join (runBothWith These ranges)))
         (leftRange, rightRange) = splitThese headRanges
         alignAsymmetrically range advanceBy = let (line, remaining) = lineAndRemaining asymmetricalChildren range in
           line $ alignBranch getRange (remaining <> symmetricalChildren <> nonIntersectingChildren) (modifyJoin (advanceBy (drop 1)) ranges)
@@ -183,9 +183,3 @@ maybeThese (Just a) (Just b) = Just (These a b)
 maybeThese (Just a) _ = Just (This a)
 maybeThese _ (Just b) = Just (That b)
 maybeThese _ _ = Nothing
-
-
--- | Instances
-
-instance Bicrosswalk t => Crosswalk (Join t) where
-  crosswalk f = fmap Join . bicrosswalk f f . runJoin
