@@ -85,6 +85,7 @@ readAndTranscodeFile path = do
   text <- B1.readFile path
   transcode text
 
+-- | Decorate the 'Term's produced by a 'Parser' using a function to compute the annotation values at every node.
 decorateParser :: (Typeable field, Functor f) => (CofreeF f (Record fields) (Record (field ': fields)) -> field) -> Parser f (Record fields) -> Parser f (Record (field ': fields))
 decorateParser decorator = (fmap (decorateTerm decorator) .)
 
