@@ -1,9 +1,10 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 module Parser where
 
 import Prologue hiding (Constructor)
 import Data.Record
 import Data.Text (pack)
-import Category
+import Category as C
 import Info
 import Range
 import qualified Syntax as S
@@ -26,10 +27,12 @@ isFixed = flip Set.member fixedCategories
 
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
-termConstructor :: (Show (Record fields), HasField fields Category, HasField fields Range) => Source Char -> (Record fields) -> [Term Text (Record fields)] -> Term Text (Record fields)
+termConstructor :: forall fields. (Show (Record fields), HasField fields Category, HasField fields Range) => Source Char -> (Record fields) -> [Term Text (Record fields)] -> Term Text (Record fields)
 termConstructor source info = cofree . construct
   where
     withDefaultInfo syntax = (info :< syntax)
+    withErrorInfo syntax = (setCategory info C.Error :< syntax)
+    construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [Term Text (Record fields)] -> CofreeF (S.Syntax Text) (Record fields) (Term Text (Record fields))
     construct [] = withDefaultInfo . S.Leaf . pack . toString $ slice (characterRange info) source
     construct children | Assignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.Assignment identifier value
@@ -37,6 +40,7 @@ termConstructor source info = cofree . construct
       (identifier:value:[]) -> withDefaultInfo $ S.MathAssignment identifier value
     construct children | MemberAccess == category info = case children of
       (base:property:[]) -> withDefaultInfo $ S.MemberAccess base property
+      children -> withErrorInfo $ S.Error children
     construct children | SubscriptAccess == category info = case children of
       (base:element:[]) -> withDefaultInfo $ S.SubscriptAccess base element
     construct children | Operator == category info = withDefaultInfo $ S.Operator children
