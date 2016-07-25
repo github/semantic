@@ -31,6 +31,8 @@ categoriesForLanguage :: Language -> Text -> Category
 categoriesForLanguage language name = case (language, name) of
   (JavaScript, "object") -> Object
   (JavaScript, "rel_op") -> BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
+  (JavaScript, "bool_op") -> BinaryOperator
+  (JavaScript, "expression_statement") -> ExpressionStatements
   (JavaScript, "this_expression") -> Identifier
   (JavaScript, "null") -> Identifier
   (JavaScript, "undefined") -> Identifier
