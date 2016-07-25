@@ -33,7 +33,7 @@ classifyMarkup category element = (element !) . A.class_ . textValue $ styleName
 styleName :: Category -> Text
 styleName category = "category-" <> case category of
   Program -> "program"
-  Error -> "error"
+  C.Error -> "error"
   BinaryOperator -> "binary-operator"
   Boolean -> "boolean"
   DictionaryLiteral -> "dictionary"
