@@ -108,7 +108,7 @@ instance HasCategory Category where
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
 
-data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
+data Branch = BIndexed | BFixed | BCommented | BError deriving (Show, Eq, Generic)
 instance Arbitrary Branch where
   arbitrary = oneof [ pure BIndexed, pure BFixed ]
   shrink = genericShrink
