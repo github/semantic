@@ -49,6 +49,7 @@ data Syntax
   | Pair f f
   | Comment a
   | Commented [f] (Maybe f)
+  | Error [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
 
