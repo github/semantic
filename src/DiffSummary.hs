@@ -7,7 +7,7 @@ import Prologue hiding (snd, intercalate)
 import Diff
 import Patch
 import Term
-import Info (category, Cost)
+import Info (category)
 import Syntax
 import Category
 import Data.Functor.Foldable as Foldable
@@ -18,7 +18,6 @@ import Patch.Arbitrary()
 import Data.Record
 import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty)
 import qualified Text.PrettyPrint.Leijen.Text as P
-import Data.Hashable
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
