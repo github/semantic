@@ -26,10 +26,9 @@ diffCost = diffSum $ patchSum termSize
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
 mergeMaybe :: (Patch (Term leaf annotation) -> Maybe (Term leaf annotation)) -> Diff leaf annotation -> Maybe (Term leaf annotation)
-mergeMaybe transform = cata algebra . fmap transform
-  where algebra :: FreeF (CofreeF (Syntax leaf) (Both annotation)) (Maybe (Term leaf annotation)) (Maybe (Term leaf annotation)) -> Maybe (Term leaf annotation)
-        algebra (Pure p) = p
-        algebra (Free (annotations :< syntax)) = Just . cofree $ Both.fst annotations :< case syntax of
+mergeMaybe transform = iter algebra . fmap transform
+  where algebra :: CofreeF (Syntax leaf) (Both annotation) (Maybe (Term leaf annotation)) -> Maybe (Term leaf annotation)
+        algebra (annotations :< syntax) = Just . cofree $ Both.fst annotations :< case syntax of
           Leaf s -> Leaf s
           Indexed i -> Indexed (catMaybes i)
           Fixed i -> Fixed (catMaybes i)

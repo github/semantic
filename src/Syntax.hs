@@ -51,6 +51,7 @@ data Syntax
   | Commented [f] (Maybe f)
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
+
 -- Instances
 
 syntaxOfSize :: Arbitrary leaf => (Int -> Gen f) -> Int -> Gen (Syntax leaf f)
