@@ -15,6 +15,40 @@ data Syntax
   | Indexed [f]
   -- | An ordered branch of child nodes, expected to be of fixed length in the grammar, e.g. a binary operator & its operands.
   | Fixed [f]
+  -- | A function call has an identifier where f is a (Leaf a) and a list of arguments.
+  | FunctionCall f [f]
+  -- | A ternary has a condition, a true case and a false case
+  | Ternary { ternaryCondition :: f, ternaryCases :: [f] }
+  -- | A function has a list of expressions.
+  | Function { id :: (Maybe f), params :: (Maybe f), expressions :: f }
+  -- | An assignment has an identifier where f can be a member access, and the value is another syntax element (function call, leaf, etc.)
+  | Assignment { assignmentId :: f, value :: f }
+  -- | A math assignment represents expressions whose operator classifies as mathy (e.g. += or *=).
+  | MathAssignment { mathAssignmentId :: f, value :: f }
+  -- | A member access contains a syntax, and another syntax that identifies a property or value in the first syntax.
+  -- | e.g. in Javascript x.y represents a member access syntax.
+  | MemberAccess { memberId :: f, property :: f }
+  -- | A method call consisting of its target, the method name, and the parameters passed to the method.
+  -- | e.g. in Javascript console.log('hello') represents a method call.
+  | MethodCall { targetId :: f, methodId :: f, methodParams :: f }
+  -- | The list of arguments to a method call.
+  -- | TODO: It might be worth removing this and using Fixed instead.
+  | Args [f]
+  -- | An operator can be applied to a list of syntaxes.
+  | Operator [f]
+  -- | A variable declaration. e.g. var foo;
+  | VarDecl f
+  -- | A variable assignment in a variable declaration. var foo = bar;
+  | VarAssignment { varId :: f, varValue :: f }
+  -- | A subscript access contains a syntax, and another syntax that indefies a property or value in the first syntax.
+  -- | e.g. in Javascript x["y"] represents a subscript access syntax.
+  | SubscriptAccess { subscriptId :: f, subscriptElement :: f }
+  | Switch { switchExpr :: f, cases :: [f] }
+  | Case { caseExpr :: f, caseStatements :: f }
+  | Object { keyValues :: [f] }
+  | Pair f f
+  | Comment a
+  | Commented [f] (Maybe f)
   deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
 
 

@@ -1,8 +1,7 @@
 module Renderer.Split (split) where
 
-import Data.String
 import Alignment
-import Category
+import Category as C
 import Data.Bifunctor.Join
 import Data.Foldable
 import Data.Functor.Both
@@ -28,21 +27,41 @@ import qualified Text.Blaze.Internal as Blaze
 -- | Add the first category from a Foldable of categories as a class name as a
 -- | class name on the markup, prefixed by `category-`.
 classifyMarkup :: Category -> Markup -> Markup
-classifyMarkup category element = (element !) . A.class_ . stringValue $ styleName category
+classifyMarkup category element = (element !) . A.class_ . textValue $ styleName category
 
 -- | Return the appropriate style name for the given category.
-styleName :: Category -> String
+styleName :: Category -> Text
 styleName category = "category-" <> case category of
   Program -> "program"
   Error -> "error"
   BinaryOperator -> "binary-operator"
+  Boolean -> "boolean"
   DictionaryLiteral -> "dictionary"
-  Pair -> "pair"
-  FunctionCall -> "function_call"
+  C.Pair -> "pair"
   StringLiteral -> "string"
   SymbolLiteral -> "symbol"
   IntegerLiteral -> "integer"
   ArrayLiteral -> "array"
+  C.FunctionCall -> "function_call"
+  C.Function -> "function"
+  C.MethodCall -> "method_call"
+  C.Args -> "arguments"
+  C.Assignment -> "assignment"
+  C.MemberAccess -> "member_access"
+  C.VarDecl -> "var_declaration"
+  C.VarAssignment -> "var_assignment"
+  C.Switch -> "switch"
+  C.Case -> "case"
+  TemplateString -> "template_string"
+  Regex -> "regex"
+  Identifier -> "identifier"
+  Params -> "parameters"
+  ExpressionStatements -> "expression_statements"
+  C.MathAssignment -> "math_assignment"
+  C.SubscriptAccess -> "subscript_access"
+  C.Ternary -> "ternary"
+  C.Operator -> "operator"
+  C.Object -> "object"
   Other string -> string
 
 -- | Pick the class name for a split patch.
@@ -92,10 +111,10 @@ data Renderable a = Renderable !(Source Char) !a
 
 contentElements :: (Foldable t, ToMarkup f) => Source Char -> Range -> t (f, Range) -> [Markup]
 contentElements source range children = let (elements, next) = foldr' (markupForContextAndChild source) ([], end range) children in
-  string (toString (slice (Range (start range) (max next (start range))) source)) : elements
+  text (toText (slice (Range (start range) (max next (start range))) source)) : elements
 
 markupForContextAndChild :: ToMarkup f => Source Char -> (f, Range) -> ([Markup], Int) -> ([Markup], Int)
-markupForContextAndChild source (child, range) (rows, next) = (toMarkup child : string (toString (slice (Range (end range) next) source)) : rows, start range)
+markupForContextAndChild source (child, range) (rows, next) = (toMarkup child : text (toText (slice (Range (end range) next) source)) : rows, start range)
 
 wrapIn :: (Markup -> Markup) -> Markup -> Markup
 wrapIn _ l@Blaze.Leaf{} = l

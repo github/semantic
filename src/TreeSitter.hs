@@ -3,20 +3,19 @@ module TreeSitter where
 
 import Prologue hiding (Constructor)
 import Data.Record
-import Data.String
 import Category
 import Language
 import Parser
 import Range
 import Source
-import Syntax
+import qualified Syntax
 import Foreign
 import Foreign.C.String
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
-treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax Text) (Record '[Range, Category])
+treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax.Syntax Text) (Record '[Range, Category])
 treeSitterParser language grammar contents = do
   document <- ts_document_make
   ts_document_set_language document grammar
@@ -28,16 +27,24 @@ treeSitterParser language grammar contents = do
     pure term)
 
 -- Given a language and a node name, return the correct categories.
-categoriesForLanguage :: Language -> String -> Category
+categoriesForLanguage :: Language -> Text -> Category
 categoriesForLanguage language name = case (language, name) of
-  (JavaScript, "object") -> DictionaryLiteral
+  (JavaScript, "object") -> Object
   (JavaScript, "rel_op") -> BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
+  (JavaScript, "this_expression") -> Identifier
+  (JavaScript, "null") -> Identifier
+  (JavaScript, "undefined") -> Identifier
+  (JavaScript, "arrow_function") -> Function
+  (JavaScript, "generator_function") -> Function
+  (JavaScript, "delete_op") -> Operator
+  (JavaScript, "type_op") -> Operator
+  (JavaScript, "void_op") -> Operator
 
-  (Ruby, "hash") -> DictionaryLiteral
+  (Ruby, "hash") -> Object
   _ -> defaultCategoryForNodeName name
 
 -- | Given a node name from TreeSitter, return the correct categories.
-defaultCategoryForNodeName :: String -> Category
+defaultCategoryForNodeName :: Text -> Category
 defaultCategoryForNodeName name = case name of
   "program" -> Program
   "ERROR" -> Error
@@ -47,10 +54,29 @@ defaultCategoryForNodeName name = case name of
   "integer" -> IntegerLiteral
   "symbol" -> SymbolLiteral
   "array" -> ArrayLiteral
+  "function" -> Function
+  "identifier" -> Identifier
+  "formal_parameters" -> Params
+  "arguments" -> Args
+  "statement_block" -> ExpressionStatements
+  "assignment" -> Assignment
+  "member_access" -> MemberAccess
+  "op" -> Operator
+  "subscript_access" -> SubscriptAccess
+  "regex" -> Regex
+  "template_string" -> TemplateString
+  "var_assignment" -> VarAssignment
+  "var_declaration" -> VarDecl
+  "switch_statement" -> Switch
+  "math_assignment" -> MathAssignment
+  "case" -> Case
+  "true" -> Boolean
+  "false" -> Boolean
+  "ternary" -> Ternary
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
-documentToTerm :: Language -> Ptr Document -> Parser (Syntax Text) (Record '[Range, Category])
+documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record '[Range, Category])
 documentToTerm language document contents = alloca $ \ root -> do
   ts_document_root_node_p document root
   toTerm root
@@ -62,7 +88,7 @@ documentToTerm language document contents = alloca $ \ root -> do
           -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
           range <- pure $! Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
 
-          let info = range .: (categoriesForLanguage language name) .: RNil
+          let info = range .: (categoriesForLanguage language (toS name)) .: RNil
           pure $! termConstructor contents info children
         getChild node n out = do
           _ <- ts_node_p_named_child node n out
