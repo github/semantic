@@ -16,6 +16,11 @@ spec = parallel $ do
   describe "Identity" $ sequenceAltLaws (Identity <$> arbitrary :: Gen (Identity Char))
   describe "Syntax" $ sequenceAltLaws (sized (syntaxOfSize (const arbitrary)) :: Gen (Syntax Char Char))
 
+mergeLaws :: (Mergeable f, Alternative g, Eq (g (f a)), Show (f a), Show (g (f a))) => Gen (f a) -> Gen (Blind (a -> g a)) -> Spec
+mergeLaws value function = describe "merge" $ do
+  prop "relationship with sequenceAlt" . forAll ((,) <$> value <*> function) $
+    \ (a, f) -> merge (getBlind f) a `shouldBe` sequenceAlt (fmap (getBlind f) a)
+
 sequenceAltLaws :: forall f a. (Arbitrary a, CoArbitrary a, Mergeable f, Eq (f a), Show (f a)) => Gen (f a) -> Spec
 sequenceAltLaws gen = do
   describe "Maybe" $ sequenceAltLaws' gen (arbitrary :: Gen (Blind (a -> Maybe a)))
