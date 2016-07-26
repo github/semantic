@@ -1,26 +1,31 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
-module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..)) where
+
+module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..), annotatedSummaries) where
 
 import Prologue hiding (snd, intercalate)
 import Diff
-import Info (category)
 import Patch
 import Term
+import Info (category)
 import Syntax
 import Category
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
-import Data.Record
 import Data.Text as Text (intercalate)
-import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string)
+import Test.QuickCheck hiding (Fixed)
+import Patch.Arbitrary()
+import Data.Record
+import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty)
 import qualified Text.PrettyPrint.Leijen.Text as P
 
-data DiffInfo = DiffInfo { categoryName :: Text, termName :: Text } deriving (Eq, Show)
+data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
+ | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
+ deriving (Eq, Show)
 
 toTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> Text
 toTermName term = case unwrap term of
-  Fixed children -> fromMaybe "EmptyFixedNode" $ (toCategoryName . category) . extract <$> head children
-  Indexed children -> fromMaybe "EmptyIndexedNode" $ (toCategoryName . category) . extract <$> head children
+  Syntax.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+  Syntax.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
   Syntax.Assignment identifier value -> toTermName identifier <> toTermName value
   Syntax.Function identifier _ _ -> (maybe "anonymous" toTermName identifier)
@@ -98,29 +103,50 @@ instance HasCategory Category where
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
 
+data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
+instance Arbitrary Branch where
+  arbitrary = oneof [ pure BIndexed, pure BFixed ]
+  shrink = genericShrink
+
 data DiffSummary a = DiffSummary {
   patch :: Patch a,
   parentAnnotations :: [Category]
-} deriving (Eq, Functor, Show)
+} deriving (Eq, Functor, Show, Generic)
 
-instance P.Pretty (DiffSummary DiffInfo) where
-  pretty DiffSummary{..} = case patch of
-    Insert diffInfo -> "Added the" <+> squotes (toDoc $ termName diffInfo) <+> (toDoc $ categoryName diffInfo) P.<> maybeParentContext parentAnnotations
-    Delete diffInfo -> "Deleted the" <+> squotes (toDoc $ termName diffInfo) <+> (toDoc $ categoryName diffInfo) P.<> maybeParentContext parentAnnotations
-    Replace t1 t2 -> "Replaced the" <+> squotes (toDoc $ termName t1) <+> (toDoc $ categoryName t1) <+> "with the" <+> P.squotes (toDoc $ termName t2) <+> (toDoc $ categoryName t2) P.<> maybeParentContext parentAnnotations
-    where
-      maybeParentContext annotations = if null annotations
-        then ""
-        else space <> "in the" <+> (toDoc . intercalate "/" $ toCategoryName <$> annotations) <+> "context"
-      toDoc = string . toS
+instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
+  arbitrary = DiffSummary <$> arbitrary <*> arbitrary
+  shrink = genericShrink
+
+instance P.Pretty DiffInfo where
+  pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
+  pretty BranchInfo{..} = mconcat $ punctuate (string "," <> space) (pretty <$> branches)
+
+annotatedSummaries :: DiffSummary DiffInfo -> [Text]
+annotatedSummaries DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotations) <$> summaries patch
+
+summaries :: Patch DiffInfo -> [P.Doc]
+summaries (Insert info) = (("Added" <+> "the") <+>) <$> toLeafInfos info
+summaries (Delete info) = (("Deleted" <+> "the") <+>) <$> toLeafInfos info
+summaries (Replace i1 i2) = zipWith (\a b -> "Replaced" <+> "the" <+> a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
+
+toLeafInfos :: DiffInfo -> [Doc]
+toLeafInfos LeafInfo{..} = [ squotes (toDoc termName) <+> (toDoc categoryName) ]
+toLeafInfos BranchInfo{..} = pretty <$> branches
+
+maybeParentContext :: [Category] -> Doc
+maybeParentContext annotations = if null annotations
+  then ""
+  else space <> "in the" <+> (toDoc . intercalate "/" $ toCategoryName <$> annotations) <+> "context"
+toDoc :: Text -> Doc
+toDoc = string . toS
 
 diffSummary :: (HasCategory leaf, HasField fields Category) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffSummary = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
   Free (_ :< (Syntax.Comment _)) -> []
-  (Free (infos :< Indexed children)) -> prependSummary (category $ snd infos) <$> join children
-  (Free (infos :< Fixed children)) -> prependSummary (category $ snd infos) <$> join children
+  (Free (infos :< Syntax.Indexed children)) -> prependSummary (category $ snd infos) <$> join children
+  (Free (infos :< Syntax.Fixed children)) -> prependSummary (category $ snd infos) <$> join children
   (Free (infos :< Syntax.FunctionCall identifier children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList (identifier : children))
   (Free (infos :< Syntax.Function id ps body)) -> prependSummary (category $ snd infos) <$> (fromMaybe [] id) <> (fromMaybe [] ps) <> body
   (Free (infos :< Syntax.Assignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
@@ -138,26 +164,26 @@ diffSummary = cata $ \case
   Free (infos :< (Syntax.Object kvs)) -> prependSummary (category $ snd infos) <$> join kvs
   Free (infos :< (Syntax.Pair a b)) -> prependSummary (category $ snd infos) <$> a <> b
   Free (infos :< (Syntax.Commented cs leaf)) -> prependSummary (category $ snd infos) <$> join cs <> fromMaybe [] leaf
-  (Pure (Insert term)) -> (\info -> DiffSummary (Insert info) []) <$> termToDiffInfo term
-  (Pure (Delete term)) -> (\info -> DiffSummary (Delete info) []) <$> termToDiffInfo term
-  (Pure (Replace t1 t2)) -> (\(info1, info2) -> DiffSummary (Replace info1 info2) []) <$> zip (termToDiffInfo t1) (termToDiffInfo t2)
+  (Pure (Insert term)) -> [ DiffSummary (Insert $ termToDiffInfo term) [] ]
+  (Pure (Delete term)) -> [ DiffSummary (Delete $ termToDiffInfo term) [] ]
+  (Pure (Replace t1 t2)) -> [ DiffSummary (Replace (termToDiffInfo t1) (termToDiffInfo t2)) [] ]
 
-termToDiffInfo :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> [DiffInfo]
+termToDiffInfo :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> DiffInfo
 termToDiffInfo term = case unwrap term of
-  Leaf _ -> [ DiffInfo (toCategoryName term) (toTermName term) ]
-  Indexed children -> join $ termToDiffInfo <$> children
-  Fixed children -> join $ termToDiffInfo <$> children
-  Syntax.FunctionCall identifier _ -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
-  Syntax.Ternary ternaryCondition _ -> [ DiffInfo (toCategoryName term) (toTermName ternaryCondition) ]
-  Syntax.Function identifier _ _ -> [ DiffInfo (toCategoryName term) (maybe "anonymous" toTermName identifier) ]
-  Syntax.Assignment identifier _ -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
-  Syntax.MathAssignment identifier _ -> [ DiffInfo (toCategoryName term) (toTermName identifier) ]
+  Leaf _ -> LeafInfo (toCategoryName term) (toTermName term)
+  Syntax.Indexed children -> BranchInfo (termToDiffInfo <$> children) (toCategoryName term) BIndexed
+  Syntax.Fixed children -> BranchInfo (termToDiffInfo <$> children) (toCategoryName term) BFixed
+  Syntax.FunctionCall identifier _ -> LeafInfo (toCategoryName term) (toTermName identifier)
+  Syntax.Ternary ternaryCondition _ -> LeafInfo (toCategoryName term) (toTermName ternaryCondition)
+  Syntax.Function identifier _ _ -> LeafInfo (toCategoryName term) (maybe "anonymous" toTermName identifier)
+  Syntax.Assignment identifier _ -> LeafInfo (toCategoryName term) (toTermName identifier)
+  Syntax.MathAssignment identifier _ -> LeafInfo (toCategoryName term) (toTermName identifier)
   -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
   -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
   -- to indicate where that value should be when constructing DiffInfos.
-  Syntax.Operator _ -> [DiffInfo (toCategoryName term) "x"]
-  Commented cs leaf -> join (termToDiffInfo <$> cs) <> maybe [] (\leaf -> [ DiffInfo (toCategoryName term) (toTermName leaf) ]) leaf
-  _ -> [ DiffInfo (toCategoryName term) (toTermName term) ]
+  Syntax.Operator _ -> LeafInfo (toCategoryName term) "x"
+  Commented cs leaf -> BranchInfo (termToDiffInfo <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
+  _ ->  LeafInfo (toCategoryName term) (toTermName term)
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }

@@ -98,15 +98,18 @@ diffFiles parser renderer sourceBlobs = do
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
         (_, _) ->
-          runBothWith (diffTerms construct shouldCompareTerms diffCostWithCachedTermCosts) (replaceLeaves <*> terms)
+          runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts) (replaceLeaves <*> terms)
 
   pure $! renderer textDiff sourceBlobs
+
   where construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
         sumCost = fmap getSum . foldMap (fmap Sum . getCost)
         getCost diff = case runFree diff of
           Free (info :< _) -> cost <$> info
           Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
-        shouldCompareTerms = (==) `on` category . extract
+
+compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Term leaf (Record fields) -> Bool
+compareCategoryEq = (==) `on` category . extract
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Integer
