@@ -1,6 +1,7 @@
 {-# LANGUAGE DefaultSignatures #-}
 module Data.Mergeable where
 
+import Data.Functor.Identity
 import Data.Mergeable.Generic
 import GHC.Generics
 import Prologue
@@ -21,3 +22,5 @@ class Functor t => Mergeable t where
 instance Mergeable [] where merge = gmerge
 
 instance Mergeable Maybe
+
+instance Mergeable Identity where merge f = fmap Identity . f . runIdentity
