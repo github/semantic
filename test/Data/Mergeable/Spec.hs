@@ -49,4 +49,5 @@ sequenceAltLaws value function = do
 
 withAlternativeInstances :: forall f a. (Arbitrary a, CoArbitrary a, Eq (f a), Show (f a)) => (forall g. (Alternative g, Eq (g (f a)), Show (g (f a))) => Gen (f a) -> Gen (Blind (a -> g a)) -> Spec) -> Gen (f a) -> Spec
 withAlternativeInstances laws gen = do
+  describe "[]" $ laws gen (scale (`div` 25) (arbitrary :: Gen (Blind (a -> [a]))))
   describe "Maybe" $ laws gen (arbitrary :: Gen (Blind (a -> Maybe a)))
