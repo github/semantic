@@ -64,37 +64,8 @@ alignSyntax :: (Applicative f, HasField fields Range) => (forall a. f a -> Join 
 alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = catMaybes $ case syntax of
   Leaf s -> wrapInBranch (const (Leaf s)) <$> alignBranch getRange [] bothRanges
   Comment a -> wrapInBranch (const (Comment a)) <$> alignBranch getRange [] bothRanges
-  Indexed children ->
-    wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
-  Syntax.Function id params body -> wrapInBranch Indexed <$> alignBranch getRange (fromMaybe [] id <> fromMaybe []  params <> body) bothRanges
-  -- Align FunctionCalls like Indexed nodes by appending identifier to its children.
-  Syntax.FunctionCall identifier children ->
-    wrapInBranch Indexed <$> alignBranch getRange (join (identifier : children)) bothRanges
-  Syntax.Assignment assignmentId value ->
-    wrapInBranch Indexed <$> alignBranch getRange (assignmentId <> value) bothRanges
-  Syntax.MemberAccess memberId property ->
-    wrapInBranch Indexed <$> alignBranch getRange (memberId <> property) bothRanges
-  Syntax.MethodCall targetId methodId args ->
-    wrapInBranch Indexed <$> alignBranch getRange (targetId <> methodId <> args) bothRanges
-  Syntax.Args children ->
-    wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
-  Syntax.VarDecl decl ->
-    wrapInBranch Indexed <$> alignBranch getRange decl bothRanges
-  Syntax.VarAssignment id value ->
-    wrapInBranch Indexed <$> alignBranch getRange (id <> value) bothRanges
-  Switch expr cases ->
-    wrapInBranch Indexed <$> alignBranch getRange (expr <> join cases) bothRanges
-  Case expr body ->
-    wrapInBranch Indexed <$> alignBranch getRange (expr <> body) bothRanges
-  Fixed children ->
-    wrapInBranch Fixed <$> alignBranch getRange (join children) bothRanges
-  Pair a b -> wrapInBranch Indexed <$> alignBranch getRange (a <> b) bothRanges
-  Object children -> wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
-  Commented cs expr -> wrapInBranch Indexed <$> alignBranch getRange (join cs <> join (maybeToList expr)) bothRanges
-  Ternary expr cases -> wrapInBranch Indexed <$> alignBranch getRange (expr <> join cases) bothRanges
-  Operator cases -> wrapInBranch Indexed <$> alignBranch getRange (join cases) bothRanges
-  MathAssignment key value -> wrapInBranch Indexed <$> alignBranch getRange (key <> value) bothRanges
-  SubscriptAccess key value -> wrapInBranch Indexed <$> alignBranch getRange (key <> value) bothRanges
+  Fixed children -> wrapInBranch Fixed <$> alignBranch getRange (join children) bothRanges
+  _ -> wrapInBranch Indexed <$> alignBranch getRange (join (toList syntax)) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
         lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
         wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (setCharacterRange info range :< constructor children)) <$> infos)
