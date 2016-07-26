@@ -12,6 +12,7 @@ spec :: Spec
 spec = do
   describe "[]" $ sequenceAltLaws (arbitrary :: Gen [Char])
   describe "Maybe" $ sequenceAltLaws (arbitrary :: Gen (Maybe Char))
+  describe "Identity" $ sequenceAltLaws (Identity <$> arbitrary :: Gen (Identity Char))
 
 sequenceAltLaws :: forall f a. (Arbitrary a, CoArbitrary a, Mergeable f, Eq (f a), Show (f a)) => Gen (f a) -> Spec
 sequenceAltLaws gen = do
