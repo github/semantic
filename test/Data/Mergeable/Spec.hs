@@ -10,7 +10,7 @@ import Test.Hspec.QuickCheck
 import Test.QuickCheck
 
 spec :: Spec
-spec = do
+spec = parallel $ do
   describe "[]" $ sequenceAltLaws (arbitrary :: Gen [Char])
   describe "Maybe" $ sequenceAltLaws (arbitrary :: Gen (Maybe Char))
   describe "Identity" $ sequenceAltLaws (Identity <$> arbitrary :: Gen (Identity Char))
