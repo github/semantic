@@ -31,7 +31,7 @@ spec = parallel $ do
 mergeLaws :: forall f g a. (Mergeable f, Alternative g, Eq (g (f a)), Show (f a), Show (g (f a))) => Gen (f a) -> Gen (Blind (a -> g a)) -> Spec
 mergeLaws value function = describe "merge" $ do
   prop "identity" . forAll value $
-    \ a -> merge pure a `shouldBe` (pure a :: g (f a))
+    \ a -> merge pure a `shouldNotBe` (empty :: g (f a))
 
   let pair = (,) <$> value <*> function
   prop "relationship with sequenceAlt" . forAll pair $
@@ -41,7 +41,7 @@ sequenceAltLaws :: forall f g a. (Mergeable f, Alternative g, Eq (g (f a)), Show
 sequenceAltLaws value function = do
   describe "sequenceAlt" $ do
     prop "identity" . forAll value $
-      \ a -> sequenceAlt (pure <$> a) `shouldBe` (pure a :: g (f a))
+      \ a -> sequenceAlt (pure <$> a) `shouldNotBe` (empty :: g (f a))
 
     prop "relationship with merge" . forAll (Blind <$> (fmap . getBlind <$> function <*> value) :: Gen (Blind (f (g a)))) $
       \ a -> sequenceAlt (getBlind a) `shouldBe` merge identity (getBlind a)
