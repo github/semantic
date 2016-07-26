@@ -15,10 +15,6 @@ class Functor t => Mergeable t where
   sequenceAlt :: Alternative f => t (f a) -> f (t a)
   sequenceAlt = merge identity
 
-{-# RULES
-"merge identity" merge identity = sequenceAlt
-  #-}
-
 
 -- Instances
 
