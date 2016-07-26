@@ -83,7 +83,7 @@ spec = parallel $ do
                 length listOfLeaves `shouldBe` length listOfDiffLeaves
 
 isIndexedOrFixed :: Patch (Term a annotation) -> Bool
-isIndexedOrFixed = any isIndexedOrFixed'
+isIndexedOrFixed = any (isIndexedOrFixed' . unwrap)
 
 isIndexedOrFixed' :: Syntax a f -> Bool
 isIndexedOrFixed' syntax = case syntax of
