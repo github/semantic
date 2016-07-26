@@ -66,6 +66,8 @@ alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax 
   Comment a -> catMaybes $ wrapInBranch (const (Comment a)) . fmap (flip (,) []) <$> (Join <$> bisequenceL (runJoin lineRanges))
   Indexed children ->
     catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
+  Syntax.Error children ->
+    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
   Syntax.Function id params body -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (fromMaybe [] id <> fromMaybe []  params <> body) bothRanges
   -- Align FunctionCalls like Indexed nodes by appending identifier to its children.
   Syntax.FunctionCall identifier children ->
