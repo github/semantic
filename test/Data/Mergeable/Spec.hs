@@ -35,7 +35,7 @@ sequenceAltLaws value function = do
     prop "identity" . forAll value $
       \ a -> sequenceAlt (pure <$> a) `shouldBe` (pure a :: g (f a))
 
-    prop "relationship with merge" . forAll (((\ (v, f) -> Blind (fmap (getBlind f) v)) <$> ((,) <$> value <*> function)) :: Gen (Blind (f (g a)))) $
+    prop "relationship with merge" . forAll (Blind <$> (fmap . getBlind <$> function <*> value) :: Gen (Blind (f (g a)))) $
       \ a -> sequenceAlt (getBlind a) `shouldBe` merge identity (getBlind a)
 
 
