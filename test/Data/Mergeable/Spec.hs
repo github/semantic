@@ -20,7 +20,9 @@ spec = parallel $ do
   describe "Identity" $ do
     withAlternativeInstances sequenceAltLaws (Identity <$> arbitrary :: Gen (Identity Char))
     withAlternativeInstances mergeLaws (Identity <$> arbitrary :: Gen (Identity Char))
-  describe "Syntax" $ withAlternativeInstances sequenceAltLaws (sized (syntaxOfSize (const arbitrary)) :: Gen (Syntax Char Char))
+  describe "Syntax" $ do
+    withAlternativeInstances sequenceAltLaws (sized (syntaxOfSize (const arbitrary)) :: Gen (Syntax Char Char))
+    withAlternativeInstances mergeLaws (sized (syntaxOfSize (const arbitrary)) :: Gen (Syntax Char Char))
 
 mergeLaws :: forall f g a. (Mergeable f, Alternative g, Eq (g (f a)), Show (f a), Show (g (f a))) => Gen (f a) -> Gen (Blind (a -> g a)) -> Spec
 mergeLaws value function = describe "merge" $ do
