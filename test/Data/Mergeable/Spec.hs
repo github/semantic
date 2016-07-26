@@ -17,7 +17,9 @@ spec = parallel $ do
   describe "Maybe" $ do
     withAlternativeInstances sequenceAltLaws (arbitrary :: Gen (Maybe Char))
     withAlternativeInstances mergeLaws (arbitrary :: Gen (Maybe Char))
-  describe "Identity" $ withAlternativeInstances sequenceAltLaws (Identity <$> arbitrary :: Gen (Identity Char))
+  describe "Identity" $ do
+    withAlternativeInstances sequenceAltLaws (Identity <$> arbitrary :: Gen (Identity Char))
+    withAlternativeInstances mergeLaws (Identity <$> arbitrary :: Gen (Identity Char))
   describe "Syntax" $ withAlternativeInstances sequenceAltLaws (sized (syntaxOfSize (const arbitrary)) :: Gen (Syntax Char Char))
 
 mergeLaws :: forall f g a. (Mergeable f, Alternative g, Eq (g (f a)), Show (f a), Show (g (f a))) => Gen (f a) -> Gen (Blind (a -> g a)) -> Spec
