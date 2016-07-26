@@ -43,4 +43,4 @@ instance GMergeable [] where
 
 instance GMergeable Maybe where
   gmerge f (Just a) = Just <$> f a
-  gmerge _ Nothing = empty
+  gmerge _ Nothing = pure empty
