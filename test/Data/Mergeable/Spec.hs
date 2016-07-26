@@ -22,7 +22,7 @@ sequenceAltLaws' :: forall f g a. (Arbitrary a, CoArbitrary a, Mergeable f, Alte
 sequenceAltLaws' value function = do
   describe "sequenceAlt" $ do
     prop "identity" . forAll value $
-      \ a -> sequenceAlt (fmap Just a) `shouldBe` Just a
+      \ a -> sequenceAlt (pure <$> a) `shouldBe` (pure a :: g (f a))
 
     prop "relationship with merge" . forAll ((,) <$> value <*> function) $
       \ (a, f) -> sequenceAlt (getBlind f <$> a) `shouldBe` merge (getBlind f) a
