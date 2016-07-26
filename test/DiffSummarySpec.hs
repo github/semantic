@@ -72,7 +72,7 @@ spec = parallel $ do
         extractDiffLeaves term = case unwrap term of
           (Indexed children) -> join $ extractDiffLeaves <$> children
           (Fixed children) -> join $ extractDiffLeaves <$> children
-          Commented children leaf -> join $ extractDiffLeaves <$> children <> maybeToList leaf
+          Commented children leaf -> children <> maybeToList leaf >>= extractDiffLeaves
           _ -> [ term ]
         in
           case (partition isBranchNode diffInfoPatches, partition isIndexedOrFixed syntaxPatches) of
