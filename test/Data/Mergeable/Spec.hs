@@ -10,6 +10,7 @@ import Test.QuickCheck
 spec :: Spec
 spec = do
   describe "[]" $ sequenceAltLaws (arbitrary :: Gen [Char])
+  describe "Maybe" $ sequenceAltLaws (arbitrary :: Gen (Maybe Char))
 
 sequenceAltLaws :: (Mergeable f, Eq (f a), Show (f a)) => Gen (f a) -> Spec
 sequenceAltLaws gen = do
