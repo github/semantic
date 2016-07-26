@@ -5,13 +5,14 @@ import Data.Mergeable
 import Prologue
 import Test.Hspec
 import Test.Hspec.QuickCheck
+import Test.QuickCheck
 
 spec :: Spec
 spec = do
-  sequenceAltLaws
+  sequenceAltLaws (arbitrary :: Gen [Char])
 
-sequenceAltLaws :: Spec
-sequenceAltLaws = do
+sequenceAltLaws :: (Mergeable f, Eq (f a), Show (f a)) => Gen (f a) -> Spec
+sequenceAltLaws gen = do
   describe "sequenceAlt" $ do
-    prop "identity" $
-      \ a -> sequenceAlt (fmap Just a) `shouldBe` Just (a :: [Char])
+    prop "identity" . forAll gen $
+      \ a -> sequenceAlt (fmap Just a) `shouldBe` Just a
