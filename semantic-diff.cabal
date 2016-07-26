@@ -103,6 +103,7 @@ test-suite semantic-diff-test
   main-is:             Spec.hs
   other-modules:       AlignmentSpec
                      , CorpusSpec
+                     , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
                      , Diff.Spec
                      , DiffSummarySpec
