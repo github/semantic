@@ -16,9 +16,13 @@ spec = do
 
 sequenceAltLaws :: forall f a. (Arbitrary a, CoArbitrary a, Mergeable f, Eq (f a), Show (f a)) => Gen (f a) -> Spec
 sequenceAltLaws gen = do
+  describe "Maybe" $ sequenceAltLaws' gen (arbitrary :: Gen (Blind (a -> Maybe a)))
+
+sequenceAltLaws' :: forall f g a. (Arbitrary a, CoArbitrary a, Mergeable f, Alternative g, Eq (f a), Eq (g (f a)), Show (f a), Show (g (f a))) => Gen (f a) -> Gen (Blind (a -> g a)) -> Spec
+sequenceAltLaws' value function = do
   describe "sequenceAlt" $ do
-    prop "identity" . forAll gen $
+    prop "identity" . forAll value $
       \ a -> sequenceAlt (fmap Just a) `shouldBe` Just a
 
-    prop "relationship with merge" . forAll ((,) <$> gen <*> (arbitrary :: Gen (Blind (a -> Maybe a)))) $
+    prop "relationship with merge" . forAll ((,) <$> value <*> function) $
       \ (a, f) -> sequenceAlt (getBlind f <$> a) `shouldBe` merge (getBlind f) a
