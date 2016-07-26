@@ -14,7 +14,9 @@ spec = parallel $ do
   describe "[]" $ do
     withAlternativeInstances sequenceAltLaws (arbitrary :: Gen [Char])
     withAlternativeInstances mergeLaws (arbitrary :: Gen [Char])
-  describe "Maybe" $ withAlternativeInstances sequenceAltLaws (arbitrary :: Gen (Maybe Char))
+  describe "Maybe" $ do
+    withAlternativeInstances sequenceAltLaws (arbitrary :: Gen (Maybe Char))
+    withAlternativeInstances mergeLaws (arbitrary :: Gen (Maybe Char))
   describe "Identity" $ withAlternativeInstances sequenceAltLaws (Identity <$> arbitrary :: Gen (Identity Char))
   describe "Syntax" $ withAlternativeInstances sequenceAltLaws (sized (syntaxOfSize (const arbitrary)) :: Gen (Syntax Char Char))
 
