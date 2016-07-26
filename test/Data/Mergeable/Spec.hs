@@ -12,8 +12,9 @@ import Test.QuickCheck
 spec :: Spec
 spec = parallel $ do
   describe "[]" $ do
-    withAlternativeInstances sequenceAltLaws (arbitrary :: Gen [Char])
-    withAlternativeInstances mergeLaws (arbitrary :: Gen [Char])
+    let gen = scale (`div` 25) arbitrary :: Gen [Char]
+    withAlternativeInstances sequenceAltLaws gen
+    withAlternativeInstances mergeLaws gen
   describe "Maybe" $ do
     withAlternativeInstances sequenceAltLaws (arbitrary :: Gen (Maybe Char))
     withAlternativeInstances mergeLaws (arbitrary :: Gen (Maybe Char))
