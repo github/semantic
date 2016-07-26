@@ -10,7 +10,5 @@ import DiffSummary
 import Text.PrettyPrint.Leijen.Text (pretty)
 
 summary :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
-summary diff _ = toS . encode $ annotatedTexts
+summary diff _ = toS . encode $ summaries >>= annotatedSummaries
   where summaries = diffSummary diff
-        annotatedTexts :: [Text]
-        annotatedTexts = join $ annotatedSummaries <$> summaries

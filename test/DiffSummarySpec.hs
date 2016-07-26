@@ -78,7 +78,7 @@ spec = parallel $ do
           case (partition isBranchNode diffInfoPatches, partition isIndexedOrFixed syntaxPatches) of
             ((branchPatches, _), (diffPatches, _)) ->
               let listOfLeaves = foldMap extractLeaves (join $ toList <$> branchPatches)
-                  listOfDiffLeaves = foldMap extractDiffLeaves (join $ toList <$> diffPatches)
+                  listOfDiffLeaves = foldMap extractDiffLeaves (diffPatches >>= toList)
                in
                 length listOfLeaves `shouldBe` length listOfDiffLeaves
 
