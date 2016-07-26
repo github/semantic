@@ -89,5 +89,7 @@ termConstructor source info = cofree . construct
         toTuple child = pure child
 
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
+    construct children | C.Error == category info =
+      withDefaultInfo $ S.Error children
     construct children =
       withDefaultInfo $ S.Indexed children
