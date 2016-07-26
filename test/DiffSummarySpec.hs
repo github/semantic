@@ -100,4 +100,4 @@ isBranchInfo info = case info of
   (LeafInfo _ _) -> False
 
 isBranchNode :: Patch DiffInfo -> Bool
-isBranchNode patch = any isBranchInfo
+isBranchNode = any isBranchInfo
