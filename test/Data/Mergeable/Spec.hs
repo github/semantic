@@ -4,6 +4,7 @@ module Data.Mergeable.Spec where
 import Data.Functor.Identity
 import Data.Mergeable
 import Prologue
+import Syntax
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
@@ -13,6 +14,7 @@ spec = do
   describe "[]" $ sequenceAltLaws (arbitrary :: Gen [Char])
   describe "Maybe" $ sequenceAltLaws (arbitrary :: Gen (Maybe Char))
   describe "Identity" $ sequenceAltLaws (Identity <$> arbitrary :: Gen (Identity Char))
+  describe "Syntax" $ sequenceAltLaws (sized (syntaxOfSize (const arbitrary)) :: Gen (Syntax Char Char))
 
 sequenceAltLaws :: forall f a. (Arbitrary a, CoArbitrary a, Mergeable f, Eq (f a), Show (f a)) => Gen (f a) -> Spec
 sequenceAltLaws gen = do
