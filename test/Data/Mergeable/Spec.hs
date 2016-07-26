@@ -1,3 +1,4 @@
+{-# LANGUAGE ScopedTypeVariables #-}
 module Data.Mergeable.Spec where
 
 import Data.Functor.Identity
@@ -12,8 +13,11 @@ spec = do
   describe "[]" $ sequenceAltLaws (arbitrary :: Gen [Char])
   describe "Maybe" $ sequenceAltLaws (arbitrary :: Gen (Maybe Char))
 
-sequenceAltLaws :: (Mergeable f, Eq (f a), Show (f a)) => Gen (f a) -> Spec
+sequenceAltLaws :: forall f a. (Arbitrary a, CoArbitrary a, Mergeable f, Eq (f a), Show (f a)) => Gen (f a) -> Spec
 sequenceAltLaws gen = do
   describe "sequenceAlt" $ do
     prop "identity" . forAll gen $
       \ a -> sequenceAlt (fmap Just a) `shouldBe` Just a
+
+    prop "relationship with merge" . forAll ((,) <$> gen <*> (arbitrary :: Gen (Blind (a -> Maybe a)))) $
+      \ (a, f) -> sequenceAlt (getBlind f <$> a) `shouldBe` merge (getBlind f) a
