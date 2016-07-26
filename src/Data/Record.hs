@@ -4,6 +4,7 @@ module Data.Record where
 import GHC.Show
 import Prologue
 import Test.QuickCheck
+import GHC.Show (Show(..))
 
 -- | A type-safe, extensible record structure.
 -- |
