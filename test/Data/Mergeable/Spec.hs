@@ -11,7 +11,9 @@ import Test.QuickCheck
 
 spec :: Spec
 spec = parallel $ do
-  describe "[]" $ sequenceAltLaws (arbitrary :: Gen [Char])
+  describe "[]" $ do
+    sequenceAltLaws (arbitrary :: Gen [Char])
+    mergeLaws (arbitrary :: Gen [Char]) (arbitrary :: Gen (Blind (Char -> Maybe Char)))
   describe "Maybe" $ sequenceAltLaws (arbitrary :: Gen (Maybe Char))
   describe "Identity" $ sequenceAltLaws (Identity <$> arbitrary :: Gen (Identity Char))
   describe "Syntax" $ sequenceAltLaws (sized (syntaxOfSize (const arbitrary)) :: Gen (Syntax Char Char))
