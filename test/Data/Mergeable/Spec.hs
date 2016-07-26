@@ -23,10 +23,6 @@ mergeLaws value function = describe "merge" $ do
   prop "relationship with sequenceAlt" . forAll ((,) <$> value <*> function) $
     \ (a, f) -> merge (getBlind f) a `shouldBe` sequenceAlt (fmap (getBlind f) a)
 
-withAlternativeInstances :: forall f a. (Arbitrary a, CoArbitrary a, Mergeable f, Eq (f a), Show (f a)) => (forall g. (Alternative g, Eq (g (f a)), Show (g (f a))) => Gen (f a) -> Gen (Blind (a -> g a)) -> Spec) -> Gen (f a) -> Spec
-withAlternativeInstances laws gen = do
-  describe "Maybe" $ laws gen (arbitrary :: Gen (Blind (a -> Maybe a)))
-
 sequenceAltLaws :: forall f g a. (Arbitrary a, CoArbitrary a, Mergeable f, Alternative g, Eq (f a), Eq (g (f a)), Show (f a), Show (g (f a))) => Gen (f a) -> Gen (Blind (a -> g a)) -> Spec
 sequenceAltLaws value function = do
   describe "sequenceAlt" $ do
@@ -35,3 +31,8 @@ sequenceAltLaws value function = do
 
     prop "relationship with merge" . forAll ((,) <$> value <*> function) $
       \ (a, f) -> sequenceAlt (getBlind f <$> a) `shouldBe` merge (getBlind f) a
+
+
+withAlternativeInstances :: forall f a. (Arbitrary a, CoArbitrary a, Mergeable f, Eq (f a), Show (f a)) => (forall g. (Alternative g, Eq (g (f a)), Show (g (f a))) => Gen (f a) -> Gen (Blind (a -> g a)) -> Spec) -> Gen (f a) -> Spec
+withAlternativeInstances laws gen = do
+  describe "Maybe" $ laws gen (arbitrary :: Gen (Blind (a -> Maybe a)))
