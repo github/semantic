@@ -31,38 +31,41 @@ termConstructor :: forall fields. (Show (Record fields), HasField fields Categor
 termConstructor source info = cofree . construct
   where
     withDefaultInfo syntax = (info :< syntax)
-    withErrorInfo syntax = (setCategory info C.Error :< syntax)
     construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [Term Text (Record fields)] -> CofreeF (S.Syntax Text) (Record fields) (Term Text (Record fields))
     construct [] = withDefaultInfo . S.Leaf . pack . toString $ slice (characterRange info) source
     construct children | Assignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.Assignment identifier value
+      children -> withDefaultInfo $ S.Error children
     construct children | MathAssignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.MathAssignment identifier value
+      children -> withDefaultInfo $ S.Error children
     construct children | MemberAccess == category info = case children of
       (base:property:[]) -> withDefaultInfo $ S.MemberAccess base property
-      children -> withErrorInfo $ S.Error children
+      children -> withDefaultInfo $ S.Error children
     construct children | SubscriptAccess == category info = case children of
       (base:element:[]) -> withDefaultInfo $ S.SubscriptAccess base element
+      _ -> withDefaultInfo $ S.Error children
     construct children | Operator == category info = withDefaultInfo $ S.Operator children
-    construct children | Function == category info = withDefaultInfo $ case children of
-      (body:[]) -> S.Function Nothing Nothing body
+    construct children | Function == category info = case children of
+      (body:[]) -> withDefaultInfo $ S.Function Nothing Nothing body
       (params:body:[]) | (info :< _) <- runCofree params, Params == category info ->
-        S.Function Nothing (Just params) body
+        withDefaultInfo $ S.Function Nothing (Just params) body
       (id:body:[]) | (info :< _) <- runCofree id, Identifier == category info ->
-        S.Function (Just id) Nothing body
+        withDefaultInfo $ S.Function (Just id) Nothing body
       (id:params:body:[]) | (info :< _) <- runCofree id, Identifier == category info ->
-        S.Function (Just id) (Just params) body
-      x -> error $ "Expected a function declaration but got: " <> show x
+        withDefaultInfo $ S.Function (Just id) (Just params) body
+      _ -> withDefaultInfo $ S.Error children
 
     construct children | FunctionCall == category info = case runCofree <$> children of
       [ (_ :< S.MemberAccess{..}), params@(_ :< S.Args{}) ] ->
         setCategory info MethodCall :< S.MethodCall memberId property (cofree params)
       (x:xs) ->
         withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
+      _ -> withDefaultInfo $ S.Error children
 
     construct children | Ternary == category info = case children of
       (condition:cases) -> withDefaultInfo $ S.Ternary condition cases
-
+      _ -> withDefaultInfo $ S.Error children
     construct children | Args == category info = withDefaultInfo $ S.Args children
     construct children | VarAssignment == category info
                          , [x, y] <- children = withDefaultInfo $ S.VarAssignment x y
@@ -83,6 +86,7 @@ termConstructor source info = cofree . construct
         toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
         toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
         toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
+        toTuple child = pure child
 
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
     construct children =
