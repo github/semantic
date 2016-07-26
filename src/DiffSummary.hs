@@ -190,7 +190,7 @@ termToDiffInfo term = case unwrap term of
   S.Operator _ -> LeafInfo (toCategoryName term) "x"
   Commented cs leaf -> BranchInfo (termToDiffInfo <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
   S.Error children -> BranchInfo (termToDiffInfo <$> children) (toCategoryName term) BError
-  _ ->  LeafInfo (toCategoryName term) (toTermName term)
+  _ -> LeafInfo (toCategoryName term) (toTermName term)
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }
