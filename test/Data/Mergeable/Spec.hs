@@ -33,6 +33,6 @@ sequenceAltLaws value function = do
       \ (a, f) -> sequenceAlt (getBlind f <$> a) `shouldBe` merge (getBlind f) a
 
 
-withAlternativeInstances :: forall f a. (Arbitrary a, CoArbitrary a, Mergeable f, Eq (f a), Show (f a)) => (forall g. (Alternative g, Eq (g (f a)), Show (g (f a))) => Gen (f a) -> Gen (Blind (a -> g a)) -> Spec) -> Gen (f a) -> Spec
+withAlternativeInstances :: forall f a. (Arbitrary a, CoArbitrary a, Eq (f a), Show (f a)) => (forall g. (Alternative g, Eq (g (f a)), Show (g (f a))) => Gen (f a) -> Gen (Blind (a -> g a)) -> Spec) -> Gen (f a) -> Spec
 withAlternativeInstances laws gen = do
   describe "Maybe" $ laws gen (arbitrary :: Gen (Blind (a -> Maybe a)))
