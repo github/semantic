@@ -67,10 +67,6 @@ class HasCategory a where
 instance HasCategory Text where
   toCategoryName = identity
 
-newtype Categorizable a = Categorizable a
-instance (HasField fields Category) => HasCategory (Categorizable (Record fields)) where
-  toCategoryName (Categorizable a)= toCategoryName $ category a
-
 instance HasCategory Category where
   toCategoryName = \case
     ArrayLiteral -> "array"

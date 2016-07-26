@@ -72,13 +72,13 @@ spec = parallel $ do
         extractDiffLeaves term = case unwrap term of
           (Indexed children) -> join $ extractDiffLeaves <$> children
           (Fixed children) -> join $ extractDiffLeaves <$> children
-          Commented children leaf -> join $ extractDiffLeaves <$> children <> maybeToList leaf
+          Commented children leaf -> children <> maybeToList leaf >>= extractDiffLeaves
           _ -> [ term ]
         in
           case (partition isBranchNode diffInfoPatches, partition isIndexedOrFixed syntaxPatches) of
             ((branchPatches, _), (diffPatches, _)) ->
               let listOfLeaves = foldMap extractLeaves (join $ toList <$> branchPatches)
-                  listOfDiffLeaves = foldMap extractDiffLeaves (join $ toList <$> diffPatches)
+                  listOfDiffLeaves = foldMap extractDiffLeaves (diffPatches >>= toList)
                in
                 length listOfLeaves `shouldBe` length listOfDiffLeaves
 
@@ -100,7 +100,4 @@ isBranchInfo info = case info of
   (LeafInfo _ _) -> False
 
 isBranchNode :: Patch DiffInfo -> Bool
-isBranchNode patch = case patch of
-  (Insert diffInfo) -> isBranchInfo diffInfo
-  (Delete diffInfo) -> isBranchInfo diffInfo
-  (Replace i1 i2) -> isBranchInfo i1 || isBranchInfo i2
+isBranchNode patch = any isBranchInfo
