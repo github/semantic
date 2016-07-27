@@ -15,7 +15,7 @@ import Prologue
 -- For example, we can use 'merge' to select one side or the other of a diff node in 'Syntax', while correctly handling the fact that some patches don’t have any content for that side:
 --
 -- @
--- let before = iter (\ (a :< s) -> sequenceAlt (cofree . (fst a :<)) syntax) . fmap (maybeFst . unPatch)
+-- let before = iter (\ (a :< s) -> cofree . (fst a :<) <$> sequenceAlt syntax) . fmap (maybeFst . unPatch)
 -- @
 class Functor t => Mergeable t where
   -- | Merge a functor by mapping its elements into an 'Alternative' functor, combining them, and pushing the 'Mergeable' functor inside.
