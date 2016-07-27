@@ -101,8 +101,7 @@ decorateTerm decorator = cata $ \ c -> cofree ((decorator (extract <$> c) .: hea
 -- | with respect to other IO actions.
 diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record fields) -> Both SourceBlob -> IO Text
 diffFiles parser renderer sourceBlobs = do
-  let sources = source <$> sourceBlobs
-  terms <- traverse parser sources
+  terms <- traverse (parser . source) sourceBlobs
 
   let areNullOids = runJoin $ (== nullOid) . oid <$> sourceBlobs
   let textDiff = case areNullOids of
