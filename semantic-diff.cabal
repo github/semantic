@@ -40,6 +40,7 @@ library
                      , Renderer.Summary
                      , SES
                      , Source
+                     , SourceSpan
                      , SplitDiff
                      , Syntax
                      , Term
