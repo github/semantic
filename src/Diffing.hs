@@ -122,8 +122,8 @@ compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Te
 compareCategoryEq = (==) `on` category . extract
 
 -- | Term decorator computing the cost of an unpacked term.
-termCost :: (Prologue.Foldable f, Functor f) => TermDecorator f a Cost
-termCost c = 1 + sum (cost <$> tailF c)
+termCostDecorator :: (Prologue.Foldable f, Functor f) => TermDecorator f a Cost
+termCostDecorator c = 1 + sum (cost <$> tailF c)
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Integer
