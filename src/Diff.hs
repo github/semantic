@@ -5,6 +5,7 @@ module Diff where
 import Prologue
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both as Both
+import Data.Mergeable
 import Patch
 import Syntax
 import Term
@@ -28,10 +29,7 @@ diffCost = diffSum $ patchSum termSize
 mergeMaybe :: (Patch (Term leaf annotation) -> Maybe (Term leaf annotation)) -> Diff leaf annotation -> Maybe (Term leaf annotation)
 mergeMaybe transform = iter algebra . fmap transform
   where algebra :: CofreeF (Syntax leaf) (Both annotation) (Maybe (Term leaf annotation)) -> Maybe (Term leaf annotation)
-        algebra (annotations :< syntax) = Just . cofree $ Both.fst annotations :< case syntax of
-          Leaf s -> Leaf s
-          Indexed i -> Indexed (catMaybes i)
-          Fixed i -> Fixed (catMaybes i)
+        algebra (annotations :< syntax) = cofree . (Both.fst annotations :<) <$> sequenceAlt syntax
 
 -- | Recover the before state of a diff.
 beforeTerm :: Diff leaf annotation -> Maybe (Term leaf annotation)
