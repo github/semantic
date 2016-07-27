@@ -39,7 +39,7 @@ rws compare getLabel as bs
         fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
-        featurize index term = UnmappedTerm index (featureVector d (pqGrams p q getLabel term)) term
+        featurize index term = UnmappedTerm index (featureVector d (pqGrams getLabel p q term)) term
         findNearestNeighbourTo kv@(UnmappedTerm _ _ v) = do
           (previous, unmapped) <- get
           let (UnmappedTerm i _ _) = KdTree.nearest kdas kv
@@ -62,8 +62,8 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
 -- | Compute the bag of grams with stems of length _p_ and bases of length _q_, with labels computed from annotations, which summarize the entire subtree of a term.
-pqGrams :: (Prologue.Foldable f, Functor f) => Int -> Int -> (forall b. CofreeF f annotation b -> label) -> Cofree f annotation -> DList.DList (Gram label)
-pqGrams p q getLabel = uncurry DList.cons . cata merge . setRootBase . setRootStem . cata go
+pqGrams :: (Prologue.Foldable f, Functor f) => (forall b. CofreeF f annotation b -> label) -> Int -> Int -> Cofree f annotation -> DList.DList (Gram label)
+pqGrams getLabel p q = uncurry DList.cons . cata merge . setRootBase . setRootStem . cata go
   where go c = cofree (Gram [] [ Just (getLabel c) ] :< (assignParent (Just (getLabel c)) p <$> tailF c))
         merge (head :< tail) = let tail' = toList tail in (head, DList.fromList (windowed q setBases [] (fst <$> tail')) <> foldMap snd tail')
         assignParent parentLabel n tree
