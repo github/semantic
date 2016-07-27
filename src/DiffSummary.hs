@@ -6,7 +6,7 @@ import Prologue hiding (snd, intercalate)
 import Diff
 import Patch
 import Term
-import Info (category)
+import Info (category, sourceSpan)
 import Syntax as S
 import Category as C
 import Data.Functor.Foldable as Foldable
@@ -17,10 +17,11 @@ import Patch.Arbitrary()
 import Data.Record
 import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty)
 import qualified Text.PrettyPrint.Leijen.Text as P
+import SourceSpan
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
- | ErrorInfo { branches :: [ DiffInfo ], categoryName :: Text }
+ | ErrorInfo { errorSpan :: SourceSpan, categoryName :: Text }
  deriving (Eq, Show)
 
 toTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> Text
@@ -121,7 +122,7 @@ instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
   pretty BranchInfo{..} = mconcat $ punctuate (string "," <> space) (pretty <$> branches)
-  pretty ErrorInfo{..} = (mconcat $ punctuate (string "," <> space) (pretty <$> branches)) <+> (string $ toSL categoryName) <+> "syntax error"
+  pretty ErrorInfo{..} = "Syntax error at" <+> (string . toSL $ displaySourceSpan errorSpan)
 
 annotatedSummaries :: DiffSummary DiffInfo -> [Text]
 annotatedSummaries DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotations) <$> summaries patch
@@ -143,7 +144,7 @@ maybeParentContext annotations = if null annotations
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-diffSummary :: (HasCategory leaf, HasField fields Category) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields SourceSpan) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffSummary = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
@@ -172,7 +173,7 @@ diffSummary = cata $ \case
   (Pure (Delete term)) -> [ DiffSummary (Delete $ termToDiffInfo term) [] ]
   (Pure (Replace t1 t2)) -> [ DiffSummary (Replace (termToDiffInfo t1) (termToDiffInfo t2)) [] ]
 
-termToDiffInfo :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> DiffInfo
+termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields SourceSpan) => Term leaf (Record fields) -> DiffInfo
 termToDiffInfo term = case unwrap term of
   Leaf _ -> LeafInfo (toCategoryName term) (toTermName term)
   S.Indexed children -> BranchInfo (termToDiffInfo <$> children) (toCategoryName term) BIndexed
@@ -187,7 +188,7 @@ termToDiffInfo term = case unwrap term of
   -- to indicate where that value should be when constructing DiffInfos.
   S.Operator _ -> LeafInfo (toCategoryName term) "x"
   Commented cs leaf -> BranchInfo (termToDiffInfo <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
-  S.Error children -> ErrorInfo (termToDiffInfo <$> children) (toCategoryName term)
+  S.Error children -> ErrorInfo (sourceSpan (extract term)) (toCategoryName term)
   _ -> LeafInfo (toCategoryName term) (toTermName term)
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
