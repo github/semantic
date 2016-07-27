@@ -20,6 +20,7 @@ import qualified Text.PrettyPrint.Leijen.Text as P
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
+ | ErrorInfo { branches :: [ DiffInfo ], categoryName :: Text }
  deriving (Eq, Show)
 
 toTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> Text
@@ -103,7 +104,7 @@ instance HasCategory Category where
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
 
-data Branch = BIndexed | BFixed | BCommented | BError deriving (Show, Eq, Generic)
+data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
 instance Arbitrary Branch where
   arbitrary = oneof [ pure BIndexed, pure BFixed ]
   shrink = genericShrink
@@ -120,6 +121,7 @@ instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
   pretty BranchInfo{..} = mconcat $ punctuate (string "," <> space) (pretty <$> branches)
+  pretty ErrorInfo{..} = (mconcat $ punctuate (string "," <> space) (pretty <$> branches)) <+> (string $ toSL categoryName) <+> "syntax error"
 
 annotatedSummaries :: DiffSummary DiffInfo -> [Text]
 annotatedSummaries DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotations) <$> summaries patch
@@ -130,8 +132,9 @@ summaries (Delete info) = (("Deleted" <+> "the") <+>) <$> toLeafInfos info
 summaries (Replace i1 i2) = zipWith (\a b -> "Replaced" <+> "the" <+> a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
 
 toLeafInfos :: DiffInfo -> [Doc]
-toLeafInfos LeafInfo{..} = [ squotes (toDoc termName) <+> (toDoc categoryName) ]
+toLeafInfos LeafInfo{..} = pure $ squotes (toDoc termName) <+> (toDoc categoryName)
 toLeafInfos BranchInfo{..} = pretty <$> branches
+toLeafInfos err@ErrorInfo{} = pure $ pretty err
 
 maybeParentContext :: [Category] -> Doc
 maybeParentContext annotations = if null annotations
@@ -184,7 +187,7 @@ termToDiffInfo term = case unwrap term of
   -- to indicate where that value should be when constructing DiffInfos.
   S.Operator _ -> LeafInfo (toCategoryName term) "x"
   Commented cs leaf -> BranchInfo (termToDiffInfo <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
-  S.Error children -> BranchInfo (termToDiffInfo <$> children) (toCategoryName term) BError
+  S.Error children -> ErrorInfo (termToDiffInfo <$> children) (toCategoryName term)
   _ -> LeafInfo (toCategoryName term) (toTermName term)
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
