@@ -1,10 +1,12 @@
-{-# LANGUAGE DataKinds, TypeOperators #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 module Diffing where
 
 import Prologue hiding (fst, snd)
 import qualified Data.ByteString.Char8 as B1
+import qualified Data.DList as DList
 import Data.Functor.Both
 import Data.Functor.Foldable
+import Data.RandomWalkSimilarity
 import Data.Record
 import qualified Data.Text.IO as TextIO
 import qualified Data.Text.ICU.Detect as Detect
@@ -123,6 +125,9 @@ compareCategoryEq = (==) `on` category . extract
 -- | Term decorator computing the cost of an unpacked term.
 termCostDecorator :: (Prologue.Foldable f, Functor f) => TermDecorator f a Cost
 termCostDecorator c = 1 + sum (cost <$> tailF c)
+
+pqGramDecorator :: (Prologue.Foldable f, Functor f) => (forall b. CofreeF f (Record a) b -> label) -> TermDecorator f a (DList.DList (Gram label))
+pqGramDecorator getLabel (a :< s) = empty
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Integer
