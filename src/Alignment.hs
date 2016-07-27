@@ -61,42 +61,11 @@ alignPatch sources patch = case patch of
 
 -- | The Applicative instance f is either Identity or Both. Identity is for Terms in Patches, Both is for Diffs in unchanged portions of the diff.
 alignSyntax :: (Applicative f, HasField fields Range) => (forall a. f a -> Join These a) -> (CofreeF (Syntax leaf) (Record fields) term -> term) -> (term -> Range) -> f (Source Char) -> CofreeF (Syntax leaf) (f (Record fields)) [Join These term] -> [Join These term]
-alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = case syntax of
-  Leaf s -> catMaybes $ wrapInBranch (const (Leaf s)) . fmap (flip (,) []) <$> (Join <$> bisequenceL (runJoin lineRanges))
-  Comment a -> catMaybes $ wrapInBranch (const (Comment a)) . fmap (flip (,) []) <$> (Join <$> bisequenceL (runJoin lineRanges))
-  Indexed children ->
-    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
-  Syntax.Error children ->
-    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
-  Syntax.Function id params body -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (fromMaybe [] id <> fromMaybe []  params <> body) bothRanges
-  -- Align FunctionCalls like Indexed nodes by appending identifier to its children.
-  Syntax.FunctionCall identifier children ->
-    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join (identifier : children)) bothRanges
-  Syntax.Assignment assignmentId value ->
-    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (assignmentId <> value) bothRanges
-  Syntax.MemberAccess memberId property ->
-    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (memberId <> property) bothRanges
-  Syntax.MethodCall targetId methodId args ->
-    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (targetId <> methodId <> args) bothRanges
-  Syntax.Args children ->
-    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
-  Syntax.VarDecl decl ->
-    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange decl bothRanges
-  Syntax.VarAssignment id value ->
-    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (id <> value) bothRanges
-  Switch expr cases ->
-    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (expr <> join cases) bothRanges
-  Case expr body ->
-    catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (expr <> body) bothRanges
-  Fixed children ->
-    catMaybes $ wrapInBranch Fixed <$> alignBranch getRange (join children) bothRanges
-  Pair a b -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (a <> b) bothRanges
-  Object children -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join children) bothRanges
-  Commented cs expr -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join cs <> join (maybeToList expr)) bothRanges
-  Ternary expr cases -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (expr <> join cases) bothRanges
-  Operator cases -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (join cases) bothRanges
-  MathAssignment key value -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (key <> value) bothRanges
-  SubscriptAccess key value -> catMaybes $ wrapInBranch Indexed <$> alignBranch getRange (key <> value) bothRanges
+alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = catMaybes $ case syntax of
+  Leaf s -> wrapInBranch (const (Leaf s)) <$> alignBranch getRange [] bothRanges
+  Comment a -> wrapInBranch (const (Comment a)) <$> alignBranch getRange [] bothRanges
+  Fixed children -> wrapInBranch Fixed <$> alignBranch getRange (join children) bothRanges
+  _ -> wrapInBranch Indexed <$> alignBranch getRange (join (toList syntax)) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
         lineRanges = toJoinThese $ actualLineRanges <$> (characterRange <$> infos) <*> sources
         wrapInBranch constructor = applyThese $ toJoinThese ((\ info (range, children) -> toNode (setCharacterRange info range :< constructor children)) <$> infos)
