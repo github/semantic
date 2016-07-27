@@ -122,7 +122,7 @@ instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
   pretty BranchInfo{..} = mconcat $ punctuate (string "," <> space) (pretty <$> branches)
-  pretty ErrorInfo{..} = "Syntax error at" <+> (string . toSL $ displaySourceSpan errorSpan)
+  pretty ErrorInfo{..} = "syntax error at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)
 
 annotatedSummaries :: DiffSummary DiffInfo -> [Text]
 annotatedSummaries DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotations) <$> summaries patch
