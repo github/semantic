@@ -188,7 +188,7 @@ termToDiffInfo term = case unwrap term of
   -- to indicate where that value should be when constructing DiffInfos.
   S.Operator _ -> LeafInfo (toCategoryName term) "x"
   Commented cs leaf -> BranchInfo (termToDiffInfo <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
-  S.Error children -> ErrorInfo (sourceSpan (extract term)) (toCategoryName term)
+  S.Error _ -> ErrorInfo (sourceSpan (extract term)) (toCategoryName term)
   _ -> LeafInfo (toCategoryName term) (toTermName term)
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo

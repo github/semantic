@@ -6,6 +6,8 @@ module SourceSpan where
 import Prologue
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
+import Test.QuickCheck
+import Data.Text.Arbitrary()
 
 -- |
 -- Source position information
@@ -19,7 +21,7 @@ data SourcePos = SourcePos
     -- Column number
     --
   , column :: !Int
-  } deriving (Show, Read, Eq, Ord)
+  } deriving (Show, Read, Eq, Ord, Generic)
 
 displaySourcePos :: SourcePos -> Text
 displaySourcePos sp =
@@ -46,7 +48,7 @@ data SourceSpan = SourceSpan
     -- End of the span
     --
   , spanEnd :: !SourcePos
-  } deriving (Show, Read, Eq, Ord)
+  } deriving (Show, Read, Eq, Ord, Generic)
 
 displayStartEndPos :: SourceSpan -> Text
 displayStartEndPos sp =
@@ -69,3 +71,11 @@ instance A.FromJSON SourceSpan where
       o .: "name"  <*>
       o .: "start" <*>
       o .: "end"
+
+instance Arbitrary SourcePos where
+  arbitrary = SourcePos <$> arbitrary <*> arbitrary
+  shrink = genericShrink
+
+instance Arbitrary SourceSpan where
+  arbitrary = SourceSpan <$> arbitrary <*> arbitrary <*> arbitrary
+  shrink = genericShrink
