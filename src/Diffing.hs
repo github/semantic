@@ -118,7 +118,7 @@ diffFiles parser renderer sourceBlobs = do
 compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Term leaf (Record fields) -> Bool
 compareCategoryEq = (==) `on` category . extract
 
--- | Compute the cost of an unpacked term.
+-- | Term decorator computing the cost of an unpacked term.
 termCost :: (Prologue.Foldable f, Functor f) => CofreeF f (Record a) (Record (Cost ': a)) -> Cost
 termCost c = 1 + sum (cost <$> tailF c)
 
