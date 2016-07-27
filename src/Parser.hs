@@ -15,7 +15,7 @@ import Source
 -- | A function that takes a source file and returns an annotated AST.
 -- | The return is in the IO monad because some of the parsers are written in C
 -- | and aren't pure.
-type Parser fields = Source Char -> IO (Term Text (Record fields))
+type Parser fields = SourceBlob -> IO (Term Text (Record fields))
 
 -- | Categories that are treated as fixed nodes.
 fixedCategories :: Set.Set Category

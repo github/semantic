@@ -32,9 +32,10 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
+import SourceSpan
 
 -- | Return a parser based on the file extension (including the ".").
-parserForType :: Text -> Parser '[Range, Category, Cost]
+parserForType :: Text -> Parser '[Range, Category, Cost, SourceSpan]
 parserForType mediaType = case languageForType mediaType of
   Just C -> treeSitterParser C ts_language_c
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
@@ -42,20 +43,22 @@ parserForType mediaType = case languageForType mediaType of
   _ -> lineByLineParser
 
 -- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Parser '[Range, Category, Cost]
-lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
+lineByLineParser :: Parser '[Range, Category, Cost, SourceSpan]
+lineByLineParser blob = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
   (leaves, _) -> cofree <$> leaves
   where
+    input = source blob
     lines = actualLines input
+    rootSpan = SourceSpan (toS $ path blob) (SourcePos 0 0) (SourcePos (length lines) (maybe 0 length $ lastMay lines))
     root children = let cost = 1 + fromIntegral (length children) in
-      ((Range 0 $ length input) .: Other "program" .: cost .: RNil) :< Indexed children
-    leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Other "program" .: 1 .: RNil) :< Leaf line
+      ((Range 0 $ length input) .: Other "program" .: cost .: rootSpan.: RNil) :< Indexed children
+    leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Other "program" .: 1 .: rootSpan .: RNil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum <> [ leaf charIndex (toText line) ] , charIndex + length line)
     toText = T.pack . Source.toString
 
 -- | Return the parser that should be used for a given path.
-parserForFilepath :: FilePath -> Parser '[Range, Category, Cost]
+parserForFilepath :: FilePath -> Parser '[Range, Category, Cost, SourceSpan]
 parserForFilepath = parserForType . toS . takeExtension
 
 -- | Replace every string leaf with leaves of the words in the string.
@@ -90,7 +93,7 @@ readAndTranscodeFile path = do
 diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser fields -> Renderer (Record fields) -> Both SourceBlob -> IO Text
 diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
-  terms <- sequence $ parser <$> sources
+  terms <- sequence $ parser <$> sourceBlobs
 
   let replaceLeaves = breakDownLeavesByWord <$> sources
   let areNullOids = runBothWith (\a b -> (oid a == nullOid || null (source a), oid b == nullOid || null (source b))) sourceBlobs

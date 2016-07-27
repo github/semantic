@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
-module Info where
+module Info (SourceSpan, sourceSpan, setSourceSpan, characterRange, setCharacterRange, category, setCategory, Cost(..), cost, setCost) where
 
 import Data.Record
 import Prologue
