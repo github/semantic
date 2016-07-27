@@ -84,6 +84,7 @@ readAndTranscodeFile path = do
   text <- B1.readFile path
   transcode text
 
+-- | A function computing a value to decorate terms with. This can be used to cache synthesized attributes on terms.
 type TermDecorator f fields field = CofreeF f (Record fields) (Record (field ': fields)) -> field
 
 -- | Decorate the 'Term's produced by a 'Parser' using a function to compute the annotation values at every node.
