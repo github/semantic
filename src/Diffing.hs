@@ -84,12 +84,14 @@ readAndTranscodeFile path = do
   text <- B1.readFile path
   transcode text
 
+type TermDecorator f fields field = CofreeF f (Record fields) (Record (field ': fields)) -> field
+
 -- | Decorate the 'Term's produced by a 'Parser' using a function to compute the annotation values at every node.
-decorateParser :: (Typeable field, Functor f) => (CofreeF f (Record fields) (Record (field ': fields)) -> field) -> Parser f (Record fields) -> Parser f (Record (field ': fields))
+decorateParser :: (Typeable field, Functor f) => TermDecorator f fields field -> Parser f (Record fields) -> Parser f (Record (field ': fields))
 decorateParser decorator = (fmap (decorateTerm decorator) .)
 
 -- | Decorate a 'Term' using a function to compute the annotation values at every node.
-decorateTerm :: (Typeable field, Functor f) => (CofreeF f (Record fields) (Record (field ': fields)) -> field) -> Cofree f (Record fields) -> Cofree f (Record (field ': fields))
+decorateTerm :: (Typeable field, Functor f) => TermDecorator f fields field -> Cofree f (Record fields) -> Cofree f (Record (field ': fields))
 decorateTerm decorator = cata $ \ c -> cofree ((decorator (extract <$> c) .: headF c) :< tailF c)
 
 -- | Given a parser and renderer, diff two sources and return the rendered
@@ -119,7 +121,7 @@ compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Te
 compareCategoryEq = (==) `on` category . extract
 
 -- | Term decorator computing the cost of an unpacked term.
-termCost :: (Prologue.Foldable f, Functor f) => CofreeF f (Record a) (Record (Cost ': a)) -> Cost
+termCost :: (Prologue.Foldable f, Functor f) => TermDecorator f a Cost
 termCost c = 1 + sum (cost <$> tailF c)
 
 -- | The sum of the node count of the diff’s patches.
