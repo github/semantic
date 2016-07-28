@@ -55,7 +55,7 @@ data Syntax
   -- | A term preceded or followed by any number of comments.
   | Commented [f] (Maybe f)
   | For { forDecl :: f, forValue :: f, forBody :: f }
-  | DoWhile { doWhileExpr :: f, doWhileBody :: f }
+  | DoWhile { doWhileBody :: f, doWhileExpr :: f }
   | While { whileExpr :: f, whileBody :: f }
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
