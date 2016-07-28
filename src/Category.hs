@@ -2,8 +2,7 @@ module Category where
 
 import Prologue
 import Data.Hashable
-import Test.QuickCheck (oneof, Arbitrary, arbitrary, shrink)
-import Test.QuickCheck.Arbitrary
+import Test.QuickCheck hiding (Args)
 import Data.Text (unpack)
 import Data.Text.Arbitrary()
 
@@ -62,6 +61,8 @@ data Category
   | VarDecl
   -- | A switch expression.
   | Switch
+  -- | A for expression.
+  | For
   -- | A ternary expression.
   | Ternary
   -- | A case expression.
