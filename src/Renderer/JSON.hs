@@ -73,6 +73,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Args c -> childrenFields c
   S.Assignment assignmentId property -> [ "assignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
   S.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
+  S.For expr value body -> [ "forClause" .= expr ] <> [ "forValue" .= value ] <> [ "forBody" .= body ]
   S.Switch expr cases -> [ "switchExpression" .= expr ] <> [ "cases" .= cases ]
   S.Case expr body -> [ "caseExpression" .= expr ] <> [ "caseStatement" .= body ]
   S.VarDecl decl -> [ "variableDeclaration" .= decl ]
