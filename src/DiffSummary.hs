@@ -53,6 +53,7 @@ toTermName term = case unwrap term of
   -- evaluate Case as a single toTermName Text - joshvera
   Syntax.Case expr _ -> toTermName expr
   Syntax.Switch expr _ -> toTermName expr
+  Syntax.For expr value _ -> toTermName expr <> " in " <> toTermName value
   Syntax.Ternary expr _ -> toTermName expr
   Syntax.MathAssignment id _ -> toTermName id
   Syntax.Operator syntaxes -> mconcat $ toTermName <$> syntaxes
@@ -98,6 +99,7 @@ instance HasCategory Category where
     StringLiteral -> "string"
     SymbolLiteral -> "symbol"
     TemplateString -> "template string"
+    Category.For -> "for statement"
     Category.Object -> "object"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
