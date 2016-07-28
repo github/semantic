@@ -53,7 +53,7 @@ toTermName term = case unwrap term of
   -- evaluate Case as a single toTermName Text - joshvera
   Syntax.Case expr _ -> toTermName expr
   Syntax.Switch expr _ -> toTermName expr
-  Syntax.For expr value _ -> toTermName expr <> " in " <> toTermName value
+  Syntax.For exprs _ -> mconcat $ toTermName <$> exprs
   Syntax.While expr _ -> toTermName expr
   Syntax.DoWhile _ expr -> toTermName expr
   Syntax.Ternary expr _ -> toTermName expr
