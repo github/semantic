@@ -55,7 +55,7 @@ toTermName term = case unwrap term of
   Syntax.Switch expr _ -> toTermName expr
   Syntax.For expr value _ -> toTermName expr <> " in " <> toTermName value
   Syntax.While expr _ -> toTermName expr
-  Syntax.DoWhile expr _ -> toTermName expr
+  Syntax.DoWhile _ expr -> toTermName expr
   Syntax.Ternary expr _ -> toTermName expr
   Syntax.MathAssignment id _ -> toTermName id
   Syntax.Operator syntaxes -> mconcat $ toTermName <$> syntaxes
