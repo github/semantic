@@ -58,6 +58,7 @@ toTermName term = case unwrap term of
   Syntax.Operator syntaxes -> mconcat $ toTermName <$> syntaxes
   Syntax.Object kvs -> "{" <> intercalate ", " (toTermName <$> kvs) <> "}"
   Syntax.Pair a b -> toTermName a <> ": " <> toTermName b
+  Syntax.Return expr -> maybe "empty" toTermName expr
   Comment a -> toCategoryName a
 
 class HasCategory a where
@@ -99,6 +100,7 @@ instance HasCategory Category where
     SymbolLiteral -> "symbol"
     TemplateString -> "template string"
     Category.Object -> "object"
+    Category.Return -> "return statement"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
@@ -163,6 +165,7 @@ diffSummary = cata $ \case
   Free (infos :< (Syntax.Operator syntaxes)) -> prependSummary (category $ snd infos) <$> join syntaxes
   Free (infos :< (Syntax.Object kvs)) -> prependSummary (category $ snd infos) <$> join kvs
   Free (infos :< (Syntax.Pair a b)) -> prependSummary (category $ snd infos) <$> a <> b
+  Free (infos :< (Syntax.Return expr)) -> prependSummary (category $ snd infos) <$> fromMaybe [] expr
   Free (infos :< (Syntax.Commented cs leaf)) -> prependSummary (category $ snd infos) <$> join cs <> fromMaybe [] leaf
   (Pure (Insert term)) -> [ DiffSummary (Insert $ termToDiffInfo term) [] ]
   (Pure (Delete term)) -> [ DiffSummary (Delete $ termToDiffInfo term) [] ]
