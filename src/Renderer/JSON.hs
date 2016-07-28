@@ -73,7 +73,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Args c -> childrenFields c
   S.Assignment assignmentId property -> [ "assignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
   S.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
-  S.For expr value body -> [ "forDeclaration" .= expr ] <> [ "forValue" .= value ] <> [ "forBody" .= body ]
+  S.For exprs body -> [ "forExpressions" .= exprs ] <> [ "forBody" .= body ]
   S.While expr body -> [ "whileExpr" .= expr ]  <> [ "whileBody" .= body ]
   S.DoWhile expr body -> [ "doWhileExpr" .= expr ]  <> [ "doWhileBody" .= body ]
   S.Switch expr cases -> [ "switchExpression" .= expr ] <> [ "cases" .= cases ]
