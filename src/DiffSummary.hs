@@ -158,6 +158,7 @@ diffSummary = cata $ \case
   (Free (infos :< Syntax.VarAssignment varId value)) -> prependSummary (category $ snd infos) <$> varId <> value
   (Free (infos :< Syntax.VarDecl decl)) -> prependSummary (category $ snd infos) <$> decl
   (Free (infos :< Syntax.Args args)) -> prependSummary (category $ snd infos) <$> join args
+  (Free (infos :< Syntax.For expr value body)) -> prependSummary (category $ snd infos) <$> expr <> value <> body
   (Free (infos :< Syntax.Switch expr cases)) -> prependSummary (category $ snd infos) <$> expr <> join cases
   (Free (infos :< Syntax.Case expr body)) -> prependSummary (category $ snd infos) <$> expr <> body
   Free (infos :< (Syntax.Ternary expr cases)) -> prependSummary (category $ snd infos) <$> expr <> join cases
