@@ -83,5 +83,9 @@ termConstructor source info = cofree . construct
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
     construct children | For == (category info), [clause, value, body] <- children =
       withDefaultInfo $ S.For clause value body
+    construct children | While == (category info), [expr, body] <- children =
+      withDefaultInfo $ S.While expr body
+    construct children | DoWhile == (category info), [expr, body] <- children =
+      withDefaultInfo $ S.DoWhile expr body
     construct children =
       withDefaultInfo $ S.Indexed children

@@ -63,6 +63,10 @@ data Category
   | Switch
   -- | A for expression.
   | For
+  -- | A while expression.
+  | While
+  -- | A do/while expression.
+  | DoWhile
   -- | A ternary expression.
   | Ternary
   -- | A case expression.
@@ -111,6 +115,9 @@ instance Arbitrary Category where
     , pure SubscriptAccess
     , pure VarAssignment
     , pure VarDecl
+    , pure For
+    , pure DoWhile
+    , pure While
     , pure Switch
     , pure Ternary
     , pure Case

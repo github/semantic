@@ -54,6 +54,8 @@ toTermName term = case unwrap term of
   Syntax.Case expr _ -> toTermName expr
   Syntax.Switch expr _ -> toTermName expr
   Syntax.For expr value _ -> toTermName expr <> " in " <> toTermName value
+  Syntax.While expr _ -> toTermName expr
+  Syntax.DoWhile expr _ -> toTermName expr
   Syntax.Ternary expr _ -> toTermName expr
   Syntax.MathAssignment id _ -> toTermName id
   Syntax.Operator syntaxes -> mconcat $ toTermName <$> syntaxes
@@ -100,6 +102,8 @@ instance HasCategory Category where
     SymbolLiteral -> "symbol"
     TemplateString -> "template string"
     Category.For -> "for statement"
+    Category.While -> "while statement"
+    Category.DoWhile -> "do/while statement"
     Category.Object -> "object"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
@@ -159,6 +163,8 @@ diffSummary = cata $ \case
   (Free (infos :< Syntax.VarDecl decl)) -> prependSummary (category $ snd infos) <$> decl
   (Free (infos :< Syntax.Args args)) -> prependSummary (category $ snd infos) <$> join args
   (Free (infos :< Syntax.For expr value body)) -> prependSummary (category $ snd infos) <$> expr <> value <> body
+  (Free (infos :< Syntax.While expr body)) -> prependSummary (category $ snd infos) <$> expr <> body
+  (Free (infos :< Syntax.DoWhile expr body)) -> prependSummary (category $ snd infos) <$> expr <> body
   (Free (infos :< Syntax.Switch expr cases)) -> prependSummary (category $ snd infos) <$> expr <> join cases
   (Free (infos :< Syntax.Case expr body)) -> prependSummary (category $ snd infos) <$> expr <> body
   Free (infos :< (Syntax.Ternary expr cases)) -> prependSummary (category $ snd infos) <$> expr <> join cases

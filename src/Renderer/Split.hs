@@ -63,6 +63,8 @@ styleName category = "category-" <> case category of
   C.Operator -> "operator"
   C.Object -> "object"
   C.For -> "for"
+  C.While -> "while"
+  C.DoWhile -> "do_while"
   Other string -> string
 
 -- | Pick the class name for a split patch.

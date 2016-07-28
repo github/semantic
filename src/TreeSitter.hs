@@ -76,6 +76,8 @@ defaultCategoryForNodeName name = case name of
   "false" -> Boolean
   "ternary" -> Ternary
   "for_statement" -> For
+  "while_statement" -> While
+  "do_statement" -> DoWhile
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
