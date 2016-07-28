@@ -30,7 +30,11 @@ termConstructor :: (Show (Record fields), HasField fields Category, HasField fie
 termConstructor source info = cofree . construct
   where
     withDefaultInfo syntax = (info :< syntax)
-    construct [] = withDefaultInfo . S.Leaf . pack . toString $ slice (characterRange info) source
+    construct [] = case category info of
+      Return -> withDefaultInfo $ S.Return Nothing -- Map empty return statements to Return Nothing
+      _ -> withDefaultInfo . S.Leaf . pack . toString $ slice (characterRange info) source
+    construct children | Return == category info =
+      withDefaultInfo $ S.Return (listToMaybe children)
     construct children | Assignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.Assignment identifier value
     construct children | MathAssignment == category info = case children of
@@ -81,7 +85,5 @@ termConstructor source info = cofree . construct
         toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
 
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
-    construct children | Return == category info =
-      withDefaultInfo $ S.Return (listToMaybe children)
     construct children =
       withDefaultInfo $ S.Indexed children
