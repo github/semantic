@@ -90,6 +90,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Comment _ -> []
   S.Commented comments child -> childrenFields (comments <> maybeToList child)
   S.Error sourceSpan c -> [ "sourceSpan" .= sourceSpan ] <> childrenFields c
+  S.Try body catch finally -> [ "tryBody" .= body ] <> [ "tryCatch" .= catch ] <> [ "tryFinally" .= finally ]
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: (KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (Term leaf (Record fields)) -> [kv]
