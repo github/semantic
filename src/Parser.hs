@@ -101,5 +101,7 @@ termConstructor source sourceSpan info = cofree . construct
       withDefaultInfo $ S.While expr body
     construct children | DoWhile == (category info), [expr, body] <- children =
       withDefaultInfo $ S.DoWhile expr body
+    construct children | ArrayLiteral == category info =
+      withDefaultInfo $ S.Array children
     construct children =
       withDefaultInfo $ S.Indexed children
