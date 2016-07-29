@@ -7,7 +7,7 @@ module Renderer.JSON (
 import Prologue hiding (toList)
 import Alignment
 import Category
-import Data.Aeson hiding (json)
+import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
 import Data.ByteString.Builder
 import Data.Record
@@ -36,13 +36,13 @@ instance ToJSON Category where
   toJSON (Other s) = String s
   toJSON s = String . T.pack $ show s
 instance ToJSON Range where
-  toJSON (Range start end) = Array . fromList $ toJSON <$> [ start, end ]
+  toJSON (Range start end) = A.Array . fromList $ toJSON <$> [ start, end ]
   toEncoding (Range start end) = foldable [ start,  end ]
 instance ToJSON a => ToJSON (Join These a) where
-  toJSON (Join vs) = Array . fromList $ toJSON <$> these pure pure (\ a b -> [ a, b ]) vs
+  toJSON (Join vs) = A.Array . fromList $ toJSON <$> these pure pure (\ a b -> [ a, b ]) vs
   toEncoding = foldable
 instance ToJSON a => ToJSON (Join (,) a) where
-  toJSON (Join (a, b)) = Array . fromList $ toJSON <$> [ a, b ]
+  toJSON (Join (a, b)) = A.Array . fromList $ toJSON <$> [ a, b ]
   toEncoding = foldable
 instance (HasField fields Category, HasField fields Range) => ToJSON (SplitDiff leaf (Record fields)) where
   toJSON splitDiff = case runFree splitDiff of
