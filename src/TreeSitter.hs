@@ -44,6 +44,7 @@ categoriesForLanguage language name = case (language, name) of
   (JavaScript, "void_op") -> Operator
   (JavaScript, "for_in_statement") -> For
   (JavaScript, "for_of_statement") -> For
+  (JavaScript, "class")  -> Class
 
   (Ruby, "hash") -> Object
   _ -> defaultCategoryForNodeName name
