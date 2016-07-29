@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
 
-module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..), annotatedSummaries) where
+module DiffSummary (DiffSummary(..), diffSummaries, DiffInfo(..), annotatedSummaries) where
 
 import Prologue hiding (snd, intercalate)
 import Diff
@@ -159,8 +159,8 @@ maybeParentContext annotations = if null annotations
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
-diffSummary sources = cata $ \case
+diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffSummaries sources = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
   Free (_ :< (S.Comment _)) -> []
