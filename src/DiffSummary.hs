@@ -68,6 +68,7 @@ toTermName source term = case unwrap term of
           forClauseRanges = characterRange . extract <$> exprs
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
+  S.Throw expr -> toTermName' expr
   Comment a -> toCategoryName a
   where toTermName' = toTermName source
 
@@ -114,6 +115,7 @@ instance HasCategory Category where
     C.DoWhile -> "do/while statement"
     C.Object -> "object"
     C.Return -> "return statement"
+    C.Throw -> "throw statement"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
@@ -186,6 +188,7 @@ diffSummary sources = cata $ \case
   (Free (infos :< S.For exprs body)) -> annotateWithCategory infos <$> join exprs <> body
   (Free (infos :< S.While expr body)) -> annotateWithCategory infos <$> expr <> body
   (Free (infos :< S.DoWhile expr body)) -> annotateWithCategory infos <$> expr <> body
+  (Free (infos :< S.Throw expr)) -> annotateWithCategory infos <$> expr
   (Pure (Insert term)) -> [ DiffSummary (Insert $ termToDiffInfo afterSource term) [] ]
   (Pure (Delete term)) -> [ DiffSummary (Delete $ termToDiffInfo beforeSource term) [] ]
   (Pure (Replace t1 t2)) -> [ DiffSummary (Replace (termToDiffInfo beforeSource t1) (termToDiffInfo afterSource t2)) [] ]
