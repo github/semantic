@@ -11,6 +11,7 @@ import qualified Syntax as S
 import Term
 import qualified Data.Set as Set
 import Source
+import SourceSpan
 
 -- | A function that takes a source file and returns an annotated AST.
 -- | The return is in the IO monad because some of the parsers are written in C

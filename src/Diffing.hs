@@ -32,10 +32,9 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
-import SourceSpan
 
 -- | Return a parser based on the file extension (including the ".").
-parserForType :: Text -> Parser '[Range, Category, Cost, SourceSpan]
+parserForType :: Text -> Parser '[Range, Category, Cost]
 parserForType mediaType = case languageForType mediaType of
   Just C -> treeSitterParser C ts_language_c
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
@@ -43,22 +42,21 @@ parserForType mediaType = case languageForType mediaType of
   _ -> lineByLineParser
 
 -- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Parser '[Range, Category, Cost, SourceSpan]
+lineByLineParser :: Parser '[Range, Category, Cost]
 lineByLineParser blob = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
   (leaves, _) -> cofree <$> leaves
   where
     input = source blob
     lines = actualLines input
-    rootSpan = SourceSpan (toS $ path blob) (SourcePos 0 0) (SourcePos (length lines) (maybe 0 length $ lastMay lines))
     root children = let cost = 1 + fromIntegral (length children) in
-      ((Range 0 $ length input) .: Other "program" .: cost .: rootSpan.: RNil) :< Indexed children
-    leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Other "program" .: 1 .: rootSpan .: RNil) :< Leaf line
+      ((Range 0 $ length input) .: Other "program" .: cost .: RNil) :< Indexed children
+    leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Other "program" .: 1 .: RNil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum <> [ leaf charIndex (toText line) ] , charIndex + length line)
     toText = T.pack . Source.toString
 
 -- | Return the parser that should be used for a given path.
-parserForFilepath :: FilePath -> Parser '[Range, Category, Cost, SourceSpan]
+parserForFilepath :: FilePath -> Parser '[Range, Category, Cost]
 parserForFilepath = parserForType . toS . takeExtension
 
 -- | Replace every string leaf with leaves of the words in the string.
@@ -122,7 +120,7 @@ diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
 
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range, HasField fields SourceSpan) => Parser fields -> DiffArguments -> Both SourceBlob -> IO Text
+textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser fields -> DiffArguments -> Both SourceBlob -> IO Text
 textDiff parser arguments sources = case format arguments of
   Split -> diffFiles parser split sources
   Patch -> diffFiles parser patch sources
@@ -138,7 +136,7 @@ truncatedDiff arguments sources = case format arguments of
   Summary -> pure ""
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
-printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range, HasField fields SourceSpan) => Parser fields -> DiffArguments -> Both SourceBlob -> IO ()
+printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser fields -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
   case (output arguments) of

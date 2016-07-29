@@ -157,7 +157,7 @@ maybeParentContext annotations = if null annotations
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields SourceSpan, HasField fields Range) => Both SourceBlob -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both SourceBlob -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffSummary blobs = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
@@ -194,7 +194,7 @@ diffSummary blobs = cata $ \case
     annotateWithCategory infos = prependSummary (category $ snd infos)
 
 
-termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields SourceSpan, HasField fields Range) => Source Char -> Term leaf (Record fields) -> DiffInfo
+termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
   Leaf _ -> LeafInfo (toCategoryName term) (toTermName' term)
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed

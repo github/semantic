@@ -1,21 +1,14 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
-module Info (SourceSpan, sourceSpan, setSourceSpan, characterRange, setCharacterRange, category, setCategory, Cost(..), cost, setCost) where
+module Info (characterRange, setCharacterRange, category, setCategory, Cost(..), cost, setCost) where
 
 import Data.Record
 import Prologue
 import Category
 import Range
-import SourceSpan
 import Test.QuickCheck
 
 newtype Cost = Cost { unCost :: Integer }
   deriving (Eq, Num, Ord, Show)
-
-sourceSpan :: HasField fields SourceSpan => Record fields -> SourceSpan
-sourceSpan = getField
-
-setSourceSpan :: HasField fields SourceSpan => Record fields -> SourceSpan -> Record fields
-setSourceSpan = setField
 
 characterRange :: HasField fields Range => Record fields -> Range
 characterRange = getField

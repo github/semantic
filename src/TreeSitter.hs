@@ -16,7 +16,7 @@ import qualified Text.Parser.TreeSitter as TS
 import SourceSpan
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
-treeSitterParser :: Language -> Ptr TS.Language -> Parser '[Range, Category, Cost, SourceSpan]
+treeSitterParser :: Language -> Ptr TS.Language -> Parser '[Range, Category, Cost]
 treeSitterParser language grammar blob = do
   document <- ts_document_make
   ts_document_set_language document grammar
@@ -85,7 +85,7 @@ defaultCategoryForNodeName name = case name of
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
-documentToTerm :: Language -> Ptr Document -> Parser '[Range, Category, Cost, SourceSpan]
+documentToTerm :: Language -> Ptr Document -> Parser '[Range, Category, Cost]
 documentToTerm language document blob = alloca $ \ root -> do
   ts_document_root_node_p document root
   toTerm root
@@ -102,7 +102,7 @@ documentToTerm language document blob = alloca $ \ root -> do
             , spanEnd = SourcePos (fromIntegral $ ts_node_p_end_point_row node) (fromIntegral $ ts_node_p_end_point_column node) }
 
           let cost' = 1 + sum (cost . extract <$> children)
-          let info = range .: (categoriesForLanguage language (toS name)) .: cost' .: sourceSpan .: RNil
+          let info = range .: (categoriesForLanguage language (toS name)) .: cost' .: RNil
           pure $! termConstructor (source blob) sourceSpan info children
         getChild node n out = do
           _ <- ts_node_p_named_child node n out

@@ -18,15 +18,14 @@ import Data.List (partition)
 import Term.Arbitrary
 import Interpreter
 import Info
-import SourceSpan
 
-arrayInfo :: Record '[Category, SourceSpan]
-arrayInfo = ArrayLiteral .: SourceSpan "test.js" (SourcePos 0 0) (SourcePos 0 3) .: RNil
+arrayInfo :: Record '[Category]
+arrayInfo = ArrayLiteral .: RNil
 
-literalInfo :: Record '[Category, SourceSpan]
-literalInfo = StringLiteral .: SourceSpan "test.js" (SourcePos 0 0) (SourcePos 0 1) .: RNil
+literalInfo :: Record '[Category]
+literalInfo = StringLiteral .: RNil
 
-testDiff :: Diff Text (Record '[Category, SourceSpan])
+testDiff :: Diff Text (Record '[Category])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])
 
 testSummary :: DiffSummary DiffInfo
@@ -42,7 +41,7 @@ spec = parallel $ do
       diffSummary testDiff `shouldBe` [ DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotations = [ ArrayLiteral ] } ]
 
     prop "equal terms produce identity diffs" $
-      \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category, SourceSpan])) in
+      \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category])) in
         diffSummary (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
   describe "annotatedSummaries" $ do
@@ -53,7 +52,7 @@ spec = parallel $ do
   describe "DiffInfo" $ do
     prop "patches in summaries match the patches in diffs" $
       \a -> let
-        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Cost, SourceSpan])))
+        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Cost])))
         summaries = diffSummary diff
         patches = toList diff
         in
@@ -62,14 +61,14 @@ spec = parallel $ do
               (() <$ branchPatches, () <$ otherPatches) `shouldBe` (() <$ branchDiffPatches, () <$ otherDiffPatches)
     prop "generates one LeafInfo for each child in an arbitrary branch patch" $
       \a -> let
-        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, SourceSpan])))
+        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category])))
         diffInfoPatches = patch <$> diffSummary diff
         syntaxPatches = toList diff
         extractLeaves :: DiffInfo -> [DiffInfo]
         extractLeaves (BranchInfo children _ _) = join $ extractLeaves <$> children
         extractLeaves leaf = [ leaf ]
 
-        extractDiffLeaves :: Term Text (Record '[Category, SourceSpan]) -> [ Term Text (Record '[Category, SourceSpan]) ]
+        extractDiffLeaves :: Term Text (Record '[Category]) -> [ Term Text (Record '[Category]) ]
         extractDiffLeaves term = case unwrap term of
           (Indexed children) -> join $ extractDiffLeaves <$> children
           (Fixed children) -> join $ extractDiffLeaves <$> children
