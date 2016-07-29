@@ -69,6 +69,11 @@ data Syntax
 
 -- Instances
 
+instance (Arbitrary leaf, Arbitrary f) => Arbitrary (Syntax leaf f) where
+  arbitrary = sized (syntaxOfSize (`resize` arbitrary) )
+
+  shrink = genericShrink
+
 syntaxOfSize :: Arbitrary leaf => (Int -> Gen f) -> Int -> Gen (Syntax leaf f)
 syntaxOfSize recur n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsOfSize n
                      | otherwise = oneof $ branchGeneratorsOfSize n
@@ -82,8 +87,3 @@ syntaxOfSize recur n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsO
           first <- recur m
           rest <- childrenOfSize (n - m)
           pure $! first : rest
-
-instance (Arbitrary leaf, Arbitrary f) => Arbitrary (Syntax leaf f) where
-  arbitrary = sized (syntaxOfSize (`resize` arbitrary) )
-
-  shrink = genericShrink
