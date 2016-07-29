@@ -40,7 +40,6 @@ styleName category = "category-" <> case category of
   StringLiteral -> "string"
   SymbolLiteral -> "symbol"
   IntegerLiteral -> "integer"
-  ArrayLiteral -> "array"
   C.FunctionCall -> "function_call"
   C.Function -> "function"
   C.MethodCall -> "method_call"
@@ -65,6 +64,7 @@ styleName category = "category-" <> case category of
   C.While -> "while"
   C.DoWhile -> "do_while"
   C.Return -> "return_statement"
+  C.ArrayLiteral -> "array"
   Other string -> string
 
 -- | Pick the class name for a split patch.
