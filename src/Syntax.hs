@@ -60,8 +60,10 @@ data Syntax
   | DoWhile { doWhileBody :: f, doWhileExpr :: f }
   | While { whileExpr :: f, whileBody :: f }
   | Return (Maybe f)
+  -- | A class with an identifier, superclass, and a list of definitions.
   | Class f (Maybe f) [f]
-  | MethodDefinition f (Maybe f) f
+  -- | A method definition with an identifier, params, and a body.
+  | MethodDefinition f [f] [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 
