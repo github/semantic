@@ -1,7 +1,9 @@
+{-# LANGUAGE DeriveAnyClass #-}
 module Syntax where
 
-import Prologue
+import Data.Mergeable
 import GHC.Generics
+import Prologue
 import Test.QuickCheck hiding (Fixed)
 
 -- | A node in an abstract syntax tree.
@@ -49,7 +51,7 @@ data Syntax
   | Pair f f
   | Comment a
   | Commented [f] (Maybe f)
-  deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 
 -- Instances
