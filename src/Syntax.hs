@@ -61,6 +61,7 @@ data Syntax
   | While { whileExpr :: f, whileBody :: f }
   | Return (Maybe f)
   | Class f (Maybe f) [f]
+  | MethodDefinition f (Maybe f) f
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 
