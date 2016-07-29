@@ -77,6 +77,12 @@ data Category
   | Object
   -- | A return statement.
   | Return
+  -- | A try statement.
+  | Try
+  -- | A catch statement.
+  | Catch
+  -- | A finally statement.
+  | Finally
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Generic, Ord, Show)
