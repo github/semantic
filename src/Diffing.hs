@@ -12,7 +12,6 @@ import qualified Data.Text.ICU.Convert as Convert
 import Data.These
 import Diff
 import Info
-import Category
 import Interpreter
 import Language
 import Parser

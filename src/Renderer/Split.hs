@@ -12,7 +12,6 @@ import Data.These
 import Info
 import Prologue hiding (div, head, fst, snd, link)
 import qualified Prologue
-import Range
 import Renderer
 import Source
 import SplitDiff

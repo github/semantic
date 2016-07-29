@@ -6,7 +6,6 @@ import Data.Record
 import Data.Text (pack)
 import Category as C
 import Info
-import Range
 import qualified Syntax as S
 import Term
 import qualified Data.Set as Set
