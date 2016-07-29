@@ -36,6 +36,7 @@ testSummary = DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnota
 replacementSummary :: DiffSummary DiffInfo
 replacementSummary = DiffSummary { patch = Replace (LeafInfo "string" "a") (LeafInfo "symbol" "b"), parentAnnotations = [ ArrayLiteral ] }
 
+sources :: Both (Source Char)
 sources = both (fromText "[]") (fromText "[a]")
 
 spec :: Spec
