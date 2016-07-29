@@ -82,6 +82,9 @@ defaultCategoryForNodeName name = case name of
   "while_statement" -> While
   "do_statement" -> DoWhile
   "return_statement" -> Return
+  "try_statement" -> Try
+  "catch" -> Catch
+  "finally" -> Finally
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
