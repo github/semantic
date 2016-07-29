@@ -25,47 +25,48 @@ data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | ErrorInfo { errorSpan :: SourceSpan, categoryName :: Text }
  deriving (Eq, Show)
 
-toTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> Text
-toTermName term = case unwrap term of
+toTermName :: (HasCategory leaf, HasField fields Category) => Source Char -> Term leaf (Record fields) -> Text
+toTermName source term = case unwrap term of
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
-  S.Assignment identifier value -> toTermName identifier <> toTermName value
-  S.Function identifier _ _ -> (maybe "anonymous" toTermName identifier)
-  S.FunctionCall i _ -> toTermName i
+  S.Assignment identifier value -> toTermName' identifier <> toTermName' value
+  S.Function identifier _ _ -> (maybe "anonymous" toTermName' identifier)
+  S.FunctionCall i _ -> toTermName' i
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
-    (S.FunctionCall{}, S.FunctionCall{}) -> toTermName base <> "()." <> toTermName property <> "()"
-    (S.FunctionCall{}, _) -> toTermName base <> "()." <> toTermName property
-    (_, S.FunctionCall{}) -> toTermName base <> "." <> toTermName property <> "()"
-    (_, _) -> toTermName base <> "." <> toTermName property
-  S.MethodCall targetId methodId _ -> toTermName targetId <> sep <> toTermName methodId <> "()"
+    (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' property <> "()"
+    (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' property
+    (_, S.FunctionCall{}) -> toTermName' base <> "." <> toTermName' property <> "()"
+    (_, _) -> toTermName' base <> "." <> toTermName' property
+  S.MethodCall targetId methodId _ -> toTermName' targetId <> sep <> toTermName' methodId <> "()"
     where sep = case unwrap targetId of
             S.FunctionCall{} -> "()."
             _ -> "."
   S.SubscriptAccess base element -> case (unwrap base, unwrap element) of
-    (S.FunctionCall{}, S.FunctionCall{}) -> toTermName base <> "()." <> toTermName element <> "()"
-    (S.FunctionCall{}, _) -> toTermName base <> "()." <> toTermName element
-    (_, S.FunctionCall{}) -> toTermName base <> "[" <> toTermName element <> "()" <> "]"
-    (_, _) -> toTermName base <> "[" <> toTermName element <> "]"
-  S.VarAssignment varId _ -> toTermName varId
-  S.VarDecl decl -> toTermName decl
+    (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' element <> "()"
+    (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName element
+    (_, S.FunctionCall{}) -> toTermName' base <> "[" <> toTermName' element <> "()" <> "]"
+    (_, _) -> toTermName' base <> "[" <> toTermName' element <> "]"
+  S.VarAssignment varId _ -> toTermName' varId
+  S.VarDecl decl -> toTermName' decl
   -- TODO: We should remove Args from Syntax since I don't think we should ever
   -- evaluate Args as a single toTermName Text - joshvera
-  S.Args args -> mconcat $ toTermName <$> args
+  S.Args args -> mconcat $ toTermName' <$> args
   -- TODO: We should remove Case from Syntax since I don't think we should ever
   -- evaluate Case as a single toTermName Text - joshvera
-  S.Case expr _ -> toTermName expr
-  S.Switch expr _ -> toTermName expr
-  S.Ternary expr _ -> toTermName expr
-  S.MathAssignment id _ -> toTermName id
-  S.Operator syntaxes -> mconcat $ toTermName <$> syntaxes
-  S.Object kvs -> "{" <> intercalate ", " (toTermName <$> kvs) <> "}"
-  S.Pair a b -> toTermName a <> ": " <> toTermName b
-  S.Return expr -> maybe "empty" toTermName expr
-  S.For exprs _ -> mconcat $ toTermName <$> exprs
-  S.While expr _ -> toTermName expr
-  S.DoWhile _ expr -> toTermName expr
+  S.Case expr _ -> toTermName' expr
+  S.Switch expr _ -> toTermName' expr
+  S.Ternary expr _ -> toTermName' expr
+  S.MathAssignment id _ -> toTermName' id
+  S.Operator syntaxes -> mconcat $ toTermName' <$> syntaxes
+  S.Object kvs -> "{" <> intercalate ", " (toTermName' <$> kvs) <> "}"
+  S.Pair a b -> toTermName' a <> ": " <> toTermName' b
+  S.Return expr -> maybe "empty" toTermName' expr
+  S.For exprs _ -> mconcat $ toTermName' <$> exprs
+  S.While expr _ -> toTermName' expr
+  S.DoWhile _ expr -> toTermName' expr
   Comment a -> toCategoryName a
+  where toTermName' = toTermName source
 
 class HasCategory a where
   toCategoryName :: a -> Text
