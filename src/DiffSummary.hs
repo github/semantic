@@ -157,8 +157,8 @@ maybeParentContext annotations = if null annotations
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both SourceBlob -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
-diffSummary blobs = cata $ \case
+diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffSummary sources = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
   Free (_ :< (S.Comment _)) -> []
@@ -190,7 +190,7 @@ diffSummary blobs = cata $ \case
   (Pure (Delete term)) -> [ DiffSummary (Delete $ termToDiffInfo beforeSource term) [] ]
   (Pure (Replace t1 t2)) -> [ DiffSummary (Replace (termToDiffInfo beforeSource t1) (termToDiffInfo afterSource t2)) [] ]
   where
-    (beforeSource, afterSource) = runJoin $ source <$> blobs
+    (beforeSource, afterSource) = runJoin sources
     annotateWithCategory infos = prependSummary (category $ snd infos)
 
 

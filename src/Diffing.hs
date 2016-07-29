@@ -33,6 +33,32 @@ import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
 
+-- | Given a parser and renderer, diff two sources and return the rendered
+-- | result.
+-- | Returns the rendered result strictly, so it's always fully evaluated
+-- | with respect to other IO actions.
+diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser fields -> Renderer (Record fields) -> Both SourceBlob -> IO Text
+diffFiles parser renderer sourceBlobs = do
+  let sources = source <$> sourceBlobs
+  terms <- sequence $ parser <$> sourceBlobs
+
+  let replaceLeaves = breakDownLeavesByWord <$> sources
+  let areNullOids = runBothWith (\a b -> (oid a == nullOid || null (source a), oid b == nullOid || null (source b))) sourceBlobs
+  let textDiff = case areNullOids of
+        (True, False) -> pure $ Insert (snd terms)
+        (False, True) -> pure $ Delete (fst terms)
+        (_, _) ->
+          runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts) (replaceLeaves <*> terms)
+
+  pure $! renderer sourceBlobs textDiff
+
+  where construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
+        sumCost = fmap getSum . foldMap (fmap Sum . getCost)
+        getCost diff = case runFree diff of
+          Free (info :< _) -> cost <$> info
+          Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
+
+
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser '[Range, Category, Cost]
 parserForType mediaType = case languageForType mediaType of
@@ -84,31 +110,6 @@ readAndTranscodeFile path = do
   text <- B1.readFile path
   transcode text
 
--- | Given a parser and renderer, diff two sources and return the rendered
--- | result.
--- | Returns the rendered result strictly, so it's always fully evaluated
--- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser fields -> Renderer (Record fields) -> Both SourceBlob -> IO Text
-diffFiles parser renderer sourceBlobs = do
-  let sources = source <$> sourceBlobs
-  terms <- sequence $ parser <$> sourceBlobs
-
-  let replaceLeaves = breakDownLeavesByWord <$> sources
-  let areNullOids = runBothWith (\a b -> (oid a == nullOid || null (source a), oid b == nullOid || null (source b))) sourceBlobs
-  let textDiff = case areNullOids of
-        (True, False) -> pure $ Insert (snd terms)
-        (False, True) -> pure $ Delete (fst terms)
-        (_, _) ->
-          runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts) (replaceLeaves <*> terms)
-
-  pure $! renderer sourceBlobs textDiff
-
-  where construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
-        sumCost = fmap getSum . foldMap (fmap Sum . getCost)
-        getCost diff = case runFree diff of
-          Free (info :< _) -> cost <$> info
-          Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
-
 compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Term leaf (Record fields) -> Bool
 compareCategoryEq = (==) `on` category . extract
 
@@ -117,7 +118,6 @@ diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields)
 diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Free (info :< _) -> sum (cost <$> info)
   Pure patch -> sum (cost . extract <$> patch)
-
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
 textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser fields -> DiffArguments -> Both SourceBlob -> IO Text
