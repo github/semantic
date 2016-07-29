@@ -101,5 +101,12 @@ termConstructor source sourceSpan info = cofree . construct
       withDefaultInfo $ S.While expr body
     construct children | DoWhile == (category info), [expr, body] <- children =
       withDefaultInfo $ S.DoWhile expr body
+    construct children | Class == category info = case children of
+      [identifier, superclass, classBody] | S.Indexed definitions <- unwrap classBody ->
+        withDefaultInfo $ S.Class identifier (Just superclass) definitions
+      [identifier, classBody] | S.Indexed definitions <- unwrap classBody ->
+        withDefaultInfo $ S.Class identifier Nothing definitions
+      _ ->
+        withDefaultInfo $ S.Error sourceSpan children
     construct children =
       withDefaultInfo $ S.Indexed children
