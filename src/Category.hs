@@ -70,6 +70,8 @@ data Category
   | Operator
   -- | An object/dictionary/hash literal.
   | Object
+  -- | A return statement.
+  | Return
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Generic, Ord, Show)
