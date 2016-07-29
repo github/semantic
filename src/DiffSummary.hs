@@ -6,7 +6,7 @@ import Prologue hiding (snd, intercalate)
 import Diff
 import Patch
 import Term
-import Info (category, sourceSpan, characterRange)
+import Info (category, characterRange)
 import Range
 import Syntax as S
 import Category as C
@@ -182,7 +182,7 @@ diffSummary blobs = cata $ \case
   Free (infos :< (S.Return expr)) -> annotateWithCategory infos <$> fromMaybe [] expr
   Free (infos :< (S.Pair a b)) -> annotateWithCategory infos <$> a <> b
   Free (infos :< (S.Commented cs leaf)) -> annotateWithCategory infos <$> join cs <> fromMaybe [] leaf
-  Free (infos :< (S.Error children)) -> annotateWithCategory infos <$> join children
+  Free (infos :< (S.Error _ children)) -> annotateWithCategory infos <$> join children
   (Free (infos :< S.For exprs body)) -> annotateWithCategory infos <$> join exprs <> body
   (Free (infos :< S.While expr body)) -> annotateWithCategory infos <$> expr <> body
   (Free (infos :< S.DoWhile expr body)) -> annotateWithCategory infos <$> expr <> body
@@ -209,7 +209,7 @@ termToDiffInfo blob term = case unwrap term of
   -- to indicate where that value should be when constructing DiffInfos.
   S.Operator _ -> LeafInfo (toCategoryName term) "x"
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
-  S.Error _ -> ErrorInfo (sourceSpan (extract term)) (toCategoryName term)
+  S.Error sourceSpan _ -> ErrorInfo sourceSpan (toCategoryName term)
   _ -> LeafInfo (toCategoryName term) (toTermName' term)
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob

@@ -27,8 +27,8 @@ isFixed = flip Set.member fixedCategories
 
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
-termConstructor :: forall fields. (Show (Record fields), HasField fields Category, HasField fields Range) => Source Char -> (Record fields) -> [Term Text (Record fields)] -> Term Text (Record fields)
-termConstructor source info = cofree . construct
+termConstructor :: forall fields. (Show (Record fields), HasField fields Category, HasField fields Range) => Source Char -> SourceSpan -> (Record fields) -> [Term Text (Record fields)] -> Term Text (Record fields)
+termConstructor source sourceSpan info = cofree . construct
   where
     withDefaultInfo syntax = (info :< syntax)
     construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [Term Text (Record fields)] -> CofreeF (S.Syntax Text) (Record fields) (Term Text (Record fields))
@@ -39,16 +39,16 @@ termConstructor source info = cofree . construct
       withDefaultInfo $ S.Return (listToMaybe children)
     construct children | Assignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.Assignment identifier value
-      children -> withDefaultInfo $ S.Error children
+      children -> withDefaultInfo $ S.Error sourceSpan children
     construct children | MathAssignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.MathAssignment identifier value
-      children -> withDefaultInfo $ S.Error children
+      children -> withDefaultInfo $ S.Error sourceSpan children
     construct children | MemberAccess == category info = case children of
       (base:property:[]) -> withDefaultInfo $ S.MemberAccess base property
-      children -> withDefaultInfo $ S.Error children
+      children -> withDefaultInfo $ S.Error sourceSpan children
     construct children | SubscriptAccess == category info = case children of
       (base:element:[]) -> withDefaultInfo $ S.SubscriptAccess base element
-      _ -> withDefaultInfo $ S.Error children
+      _ -> withDefaultInfo $ S.Error sourceSpan children
     construct children | Operator == category info = withDefaultInfo $ S.Operator children
     construct children | Function == category info = case children of
       (body:[]) -> withDefaultInfo $ S.Function Nothing Nothing body
@@ -58,18 +58,18 @@ termConstructor source info = cofree . construct
         withDefaultInfo $ S.Function (Just id) Nothing body
       (id:params:body:[]) | (info :< _) <- runCofree id, Identifier == category info ->
         withDefaultInfo $ S.Function (Just id) (Just params) body
-      _ -> withDefaultInfo $ S.Error children
+      _ -> withDefaultInfo $ S.Error sourceSpan children
 
     construct children | FunctionCall == category info = case runCofree <$> children of
       [ (_ :< S.MemberAccess{..}), params@(_ :< S.Args{}) ] ->
         setCategory info MethodCall :< S.MethodCall memberId property (cofree params)
       (x:xs) ->
         withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
-      _ -> withDefaultInfo $ S.Error children
+      _ -> withDefaultInfo $ S.Error sourceSpan children
 
     construct children | Ternary == category info = case children of
       (condition:cases) -> withDefaultInfo $ S.Ternary condition cases
-      _ -> withDefaultInfo $ S.Error children
+      _ -> withDefaultInfo $ S.Error sourceSpan children
     construct children | Args == category info = withDefaultInfo $ S.Args children
     construct children | VarAssignment == category info
                          , [x, y] <- children = withDefaultInfo $ S.VarAssignment x y
@@ -94,7 +94,7 @@ termConstructor source info = cofree . construct
 
     construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
     construct children | C.Error == category info =
-      withDefaultInfo $ S.Error children
+      withDefaultInfo $ S.Error sourceSpan children
     construct children | For == (category info), Just (exprs, body) <- unsnoc children =
       withDefaultInfo $ S.For exprs body
     construct children | While == (category info), [expr, body] <- children =
