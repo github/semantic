@@ -108,6 +108,6 @@ termConstructor source sourceSpan info = cofree . construct
       [body, catch, finally] | Catch <- category (extract catch),
                                Finally <- category (extract finally) ->
         withDefaultInfo $ S.Try body (Just catch) (Just finally)
-      _ -> S.Error sourceSpan children
+      _ -> withDefaultInfo $ S.Error sourceSpan children
     construct children =
       withDefaultInfo $ S.Indexed children
