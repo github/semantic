@@ -60,6 +60,7 @@ data Syntax
   | DoWhile { doWhileBody :: f, doWhileExpr :: f }
   | While { whileExpr :: f, whileBody :: f }
   | Return (Maybe f)
+  | Try f (Maybe f) (Maybe f)
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 
