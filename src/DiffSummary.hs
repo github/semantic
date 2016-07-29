@@ -188,7 +188,7 @@ diffSummary sources = cata $ \case
   (Free (infos :< S.For exprs body)) -> annotateWithCategory infos <$> join exprs <> body
   (Free (infos :< S.While expr body)) -> annotateWithCategory infos <$> expr <> body
   (Free (infos :< S.DoWhile expr body)) -> annotateWithCategory infos <$> expr <> body
-  (Free (infos :< S.Class identifier superclass definitions)) -> annotateWithCategory infos <$> identifier <> superclass <> join definitions
+  (Free (infos :< S.Class identifier superclass definitions)) -> annotateWithCategory infos <$> identifier <> fromMaybe [] superclass <> join definitions
   (Pure (Insert term)) -> [ DiffSummary (Insert $ termToDiffInfo afterSource term) [] ]
   (Pure (Delete term)) -> [ DiffSummary (Delete $ termToDiffInfo beforeSource term) [] ]
   (Pure (Replace t1 t2)) -> [ DiffSummary (Replace (termToDiffInfo beforeSource t1) (termToDiffInfo afterSource t2)) [] ]
