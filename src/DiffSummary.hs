@@ -68,6 +68,7 @@ toTermName source term = case unwrap term of
           forClauseRanges = characterRange . extract <$> exprs
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
+  S.Class identifier _ _ -> toTermName' identifier
   Comment a -> toCategoryName a
   where toTermName' = toTermName source
 
