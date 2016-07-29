@@ -15,7 +15,6 @@ import qualified Data.Text as T
 import Data.These
 import Data.Vector hiding (toList)
 import Info
-import Range
 import Renderer
 import Source hiding (fromList)
 import SplitDiff
