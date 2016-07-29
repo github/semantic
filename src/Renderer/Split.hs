@@ -62,6 +62,9 @@ styleName category = "category-" <> case category of
   C.Ternary -> "ternary"
   C.Operator -> "operator"
   C.Object -> "object"
+  C.For -> "for"
+  C.While -> "while"
+  C.DoWhile -> "do_while"
   C.Return -> "return_statement"
   Other string -> string
 

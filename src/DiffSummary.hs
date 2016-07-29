@@ -61,6 +61,9 @@ toTermName term = case unwrap term of
   S.Object kvs -> "{" <> intercalate ", " (toTermName <$> kvs) <> "}"
   S.Pair a b -> toTermName a <> ": " <> toTermName b
   S.Return expr -> maybe "empty" toTermName expr
+  S.For exprs _ -> mconcat $ toTermName <$> exprs
+  S.While expr _ -> toTermName expr
+  S.DoWhile _ expr -> toTermName expr
   Comment a -> toCategoryName a
 
 class HasCategory a where
@@ -101,6 +104,9 @@ instance HasCategory Category where
     StringLiteral -> "string"
     SymbolLiteral -> "symbol"
     TemplateString -> "template string"
+    C.For -> "for statement"
+    C.While -> "while statement"
+    C.DoWhile -> "do/while statement"
     C.Object -> "object"
     C.Return -> "return statement"
 
@@ -172,6 +178,9 @@ diffSummary = cata $ \case
   Free (infos :< (S.Pair a b)) -> prependSummary (category $ snd infos) <$> a <> b
   Free (infos :< (S.Commented cs leaf)) -> prependSummary (category $ snd infos) <$> join cs <> fromMaybe [] leaf
   Free (infos :< (S.Error children)) -> prependSummary (category $ snd infos) <$> join children
+  (Free (infos :< S.For exprs body)) -> prependSummary (category $ snd infos) <$> join exprs <> body
+  (Free (infos :< S.While expr body)) -> prependSummary (category $ snd infos) <$> expr <> body
+  (Free (infos :< S.DoWhile expr body)) -> prependSummary (category $ snd infos) <$> expr <> body
   (Pure (Insert term)) -> [ DiffSummary (Insert $ termToDiffInfo term) [] ]
   (Pure (Delete term)) -> [ DiffSummary (Delete $ termToDiffInfo term) [] ]
   (Pure (Replace t1 t2)) -> [ DiffSummary (Replace (termToDiffInfo t1) (termToDiffInfo t2)) [] ]

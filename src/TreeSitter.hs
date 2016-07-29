@@ -42,6 +42,8 @@ categoriesForLanguage language name = case (language, name) of
   (JavaScript, "delete_op") -> Operator
   (JavaScript, "type_op") -> Operator
   (JavaScript, "void_op") -> Operator
+  (JavaScript, "for_in_statement") -> For
+  (JavaScript, "for_of_statement") -> For
 
   (Ruby, "hash") -> Object
   _ -> defaultCategoryForNodeName name
@@ -76,6 +78,9 @@ defaultCategoryForNodeName name = case name of
   "true" -> Boolean
   "false" -> Boolean
   "ternary" -> Ternary
+  "for_statement" -> For
+  "while_statement" -> While
+  "do_statement" -> DoWhile
   "return_statement" -> Return
   _ -> Other name
 

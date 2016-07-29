@@ -48,10 +48,16 @@ data Syntax
   | Switch { switchExpr :: f, cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: f }
   | Object { keyValues :: [f] }
+  -- | A pair in an Object. e.g. foo: bar or foo => bar
   | Pair f f
+  -- | A comment.
   | Comment a
+  -- | A term preceded or followed by any number of comments.
   | Commented [f] (Maybe f)
   | Error [f]
+  | For [f] f
+  | DoWhile { doWhileBody :: f, doWhileExpr :: f }
+  | While { whileExpr :: f, whileBody :: f }
   | Return (Maybe f)
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
