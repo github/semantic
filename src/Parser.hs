@@ -101,5 +101,13 @@ termConstructor source sourceSpan info = cofree . construct
       withDefaultInfo $ S.While expr body
     construct children | DoWhile == (category info), [expr, body] <- children =
       withDefaultInfo $ S.DoWhile expr body
+    construct children | Try == category info = case children of
+      [body] -> withDefaultInfo $ S.Try body Nothing Nothing
+      [body, catch] | Catch <- category (extract catch) -> withDefaultInfo $ S.Try body (Just catch) Nothing
+      [body, finally] | Finally <- category (extract finally) -> withDefaultInfo $ S.Try body Nothing (Just finally)
+      [body, catch, finally] | Catch <- category (extract catch),
+                               Finally <- category (extract finally) ->
+        withDefaultInfo $ S.Try body (Just catch) (Just finally)
+      _ -> S.Error sourceSpan children
     construct children =
       withDefaultInfo $ S.Indexed children
