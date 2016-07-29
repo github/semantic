@@ -76,6 +76,7 @@ defaultCategoryForNodeName name = case name of
   "true" -> Boolean
   "false" -> Boolean
   "ternary" -> Ternary
+  "return_statement" -> Return
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.

@@ -60,6 +60,7 @@ toTermName term = case unwrap term of
   S.Operator syntaxes -> mconcat $ toTermName <$> syntaxes
   S.Object kvs -> "{" <> intercalate ", " (toTermName <$> kvs) <> "}"
   S.Pair a b -> toTermName a <> ": " <> toTermName b
+  S.Return expr -> maybe "empty" toTermName expr
   Comment a -> toCategoryName a
 
 class HasCategory a where
@@ -100,7 +101,12 @@ instance HasCategory Category where
     StringLiteral -> "string"
     SymbolLiteral -> "symbol"
     TemplateString -> "template string"
+<<<<<<< HEAD
     C.Object -> "object"
+=======
+    Category.Object -> "object"
+    Category.Return -> "return statement"
+>>>>>>> origin/master
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
@@ -148,6 +154,7 @@ diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields Sour
 diffSummary = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
+<<<<<<< HEAD
   Free (_ :< (S.Comment _)) -> []
   (Free (infos :< S.Indexed children)) -> prependSummary (category $ snd infos) <$> join children
   (Free (infos :< S.Fixed children)) -> prependSummary (category $ snd infos) <$> join children
@@ -169,6 +176,29 @@ diffSummary = cata $ \case
   Free (infos :< (S.Pair a b)) -> prependSummary (category $ snd infos) <$> a <> b
   Free (infos :< (S.Commented cs leaf)) -> prependSummary (category $ snd infos) <$> join cs <> fromMaybe [] leaf
   Free (infos :< (S.Error children)) -> prependSummary (category $ snd infos) <$> join children
+=======
+  Free (_ :< (Syntax.Comment _)) -> []
+  (Free (infos :< Syntax.Indexed children)) -> prependSummary (category $ snd infos) <$> join children
+  (Free (infos :< Syntax.Fixed children)) -> prependSummary (category $ snd infos) <$> join children
+  (Free (infos :< Syntax.FunctionCall identifier children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList (identifier : children))
+  (Free (infos :< Syntax.Function id ps body)) -> prependSummary (category $ snd infos) <$> (fromMaybe [] id) <> (fromMaybe [] ps) <> body
+  (Free (infos :< Syntax.Assignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
+  (Free (infos :< Syntax.MemberAccess base property)) -> prependSummary (category $ snd infos) <$> base <> property
+  (Free (infos :< Syntax.SubscriptAccess base property)) -> prependSummary (category $ snd infos) <$> base <> property
+  (Free (infos :< Syntax.MethodCall targetId methodId ps)) -> prependSummary (category $ snd infos) <$> targetId <> methodId <> ps
+  (Free (infos :< Syntax.VarAssignment varId value)) -> prependSummary (category $ snd infos) <$> varId <> value
+  (Free (infos :< Syntax.VarDecl decl)) -> prependSummary (category $ snd infos) <$> decl
+  (Free (infos :< Syntax.Args args)) -> prependSummary (category $ snd infos) <$> join args
+  (Free (infos :< Syntax.Switch expr cases)) -> prependSummary (category $ snd infos) <$> expr <> join cases
+  (Free (infos :< Syntax.Case expr body)) -> prependSummary (category $ snd infos) <$> expr <> body
+  Free (infos :< (Syntax.Ternary expr cases)) -> prependSummary (category $ snd infos) <$> expr <> join cases
+  Free (infos :< (Syntax.MathAssignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
+  Free (infos :< (Syntax.Operator syntaxes)) -> prependSummary (category $ snd infos) <$> join syntaxes
+  Free (infos :< (Syntax.Object kvs)) -> prependSummary (category $ snd infos) <$> join kvs
+  Free (infos :< (Syntax.Pair a b)) -> prependSummary (category $ snd infos) <$> a <> b
+  Free (infos :< (Syntax.Return expr)) -> prependSummary (category $ snd infos) <$> fromMaybe [] expr
+  Free (infos :< (Syntax.Commented cs leaf)) -> prependSummary (category $ snd infos) <$> join cs <> fromMaybe [] leaf
+>>>>>>> origin/master
   (Pure (Insert term)) -> [ DiffSummary (Insert $ termToDiffInfo term) [] ]
   (Pure (Delete term)) -> [ DiffSummary (Delete $ termToDiffInfo term) [] ]
   (Pure (Replace t1 t2)) -> [ DiffSummary (Replace (termToDiffInfo t1) (termToDiffInfo t2)) [] ]

@@ -62,6 +62,7 @@ styleName category = "category-" <> case category of
   C.Ternary -> "ternary"
   C.Operator -> "operator"
   C.Object -> "object"
+  C.Return -> "return_statement"
   Other string -> string
 
 -- | Pick the class name for a split patch.

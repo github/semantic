@@ -52,6 +52,7 @@ data Syntax
   | Comment a
   | Commented [f] (Maybe f)
   | Error [f]
+  | Return (Maybe f)
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 
