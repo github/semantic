@@ -6,7 +6,8 @@ import Prologue hiding (snd, intercalate)
 import Diff
 import Patch
 import Term
-import Info (category, sourceSpan)
+import Info (category, sourceSpan, characterRange)
+import Range
 import Syntax as S
 import Category as C
 import Data.Functor.Foldable as Foldable
@@ -25,7 +26,7 @@ data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | ErrorInfo { errorSpan :: SourceSpan, categoryName :: Text }
  deriving (Eq, Show)
 
-toTermName :: (HasCategory leaf, HasField fields Category) => Source Char -> Term leaf (Record fields) -> Text
+toTermName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
 toTermName source term = case unwrap term of
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
@@ -62,7 +63,9 @@ toTermName source term = case unwrap term of
   S.Object kvs -> "{" <> intercalate ", " (toTermName' <$> kvs) <> "}"
   S.Pair a b -> toTermName' a <> ": " <> toTermName' b
   S.Return expr -> maybe "empty" toTermName' expr
-  S.For exprs _ -> mconcat $ toTermName' <$> exprs
+  S.For exprs _ -> toText $ Source.slice (unionRangesFrom forRange forClauseRanges) source
+    where forRange = characterRange $ extract term
+          forClauseRanges = characterRange . extract <$> exprs
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
   Comment a -> toCategoryName a
@@ -154,7 +157,7 @@ maybeParentContext annotations = if null annotations
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields SourceSpan) => Both SourceBlob -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields SourceSpan, HasField fields Range) => Both SourceBlob -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffSummary blobs = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
@@ -191,7 +194,7 @@ diffSummary blobs = cata $ \case
     annotateWithCategory infos = prependSummary (category $ snd infos)
 
 
-termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields SourceSpan) => Source Char -> Term leaf (Record fields) -> DiffInfo
+termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields SourceSpan, HasField fields Range) => Source Char -> Term leaf (Record fields) -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
   Leaf _ -> LeafInfo (toCategoryName term) (toTermName' term)
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
