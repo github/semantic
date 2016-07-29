@@ -5,6 +5,7 @@ import Data.Mergeable
 import GHC.Generics
 import Prologue
 import Test.QuickCheck hiding (Fixed)
+import SourceSpan
 
 -- | A node in an abstract syntax tree.
 data Syntax
@@ -54,7 +55,7 @@ data Syntax
   | Comment a
   -- | A term preceded or followed by any number of comments.
   | Commented [f] (Maybe f)
-  | Error [f]
+  | Error SourceSpan [f]
   | For [f] f
   | DoWhile { doWhileBody :: f, doWhileExpr :: f }
   | While { whileExpr :: f, whileBody :: f }
