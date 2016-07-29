@@ -77,7 +77,7 @@ splitPatchToClassName patch = stringValue $ "patch " <> case patch of
 
 -- | Render a diff as an HTML split diff.
 split :: (HasField fields Category, HasField fields Cost, HasField fields Range) => Renderer (Record fields)
-split diff blobs = TL.toStrict . renderHtml
+split blobs diff = TL.toStrict . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body

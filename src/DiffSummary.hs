@@ -18,6 +18,7 @@ import Data.Record
 import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty)
 import qualified Text.PrettyPrint.Leijen.Text as P
 import SourceSpan
+import Source
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
@@ -152,8 +153,8 @@ maybeParentContext annotations = if null annotations
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields SourceSpan) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
-diffSummary = cata $ \case
+diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields SourceSpan) => Both SourceBlob -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffSummary blobs = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
   Free (_ :< (S.Comment _)) -> []

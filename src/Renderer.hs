@@ -6,7 +6,7 @@ import Diff
 import Source
 
 -- | A function that will render a diff, given the two source blobs.
-type Renderer annotation = Diff Text annotation -> Both SourceBlob -> Text
+type Renderer annotation = Both SourceBlob -> Diff Text annotation -> Text
 
 data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath, outputPath :: FilePath }
  deriving (Show)
