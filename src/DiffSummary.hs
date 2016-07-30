@@ -117,6 +117,7 @@ instance HasCategory Category where
     C.Object -> "object"
     C.Return -> "return statement"
     C.Class -> "class"
+    C.Method -> "method"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
