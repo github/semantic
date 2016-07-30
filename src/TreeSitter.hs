@@ -7,7 +7,6 @@ import Category
 import Info
 import Language
 import Parser
-import Range
 import Source
 import Foreign
 import Foreign.C.String
