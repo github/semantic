@@ -115,6 +115,7 @@ instance HasCategory Category where
     C.DoWhile -> "do/while statement"
     C.Object -> "object"
     C.Return -> "return statement"
+    C.Constructor -> "constructor"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
