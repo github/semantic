@@ -86,7 +86,8 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.SubscriptAccess id property -> [ "subscriptId" .= id ] <> [ "property" .= property ]
   S.Object pairs -> childrenFields pairs
   S.Pair a b -> childrenFields [a, b]
-  S.Return expr -> [ "returnExpr" .= expr ]
+  S.Return expr -> [ "returnExpression" .= expr ]
+  S.Constructor expr -> [ "constructorExpression" .= expr ]
   S.Comment _ -> []
   S.Commented comments child -> childrenFields (comments <> maybeToList child)
   S.Error sourceSpan c -> [ "sourceSpan" .= sourceSpan ] <> childrenFields c
