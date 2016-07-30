@@ -65,6 +65,7 @@ styleName category = "category-" <> case category of
   C.While -> "while"
   C.DoWhile -> "do_while"
   C.Return -> "return_statement"
+  C.Constructor -> "constructor"
   Other string -> string
 
 -- | Pick the class name for a split patch.
