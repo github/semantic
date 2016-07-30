@@ -77,6 +77,8 @@ data Category
   | Object
   -- | A return statement.
   | Return
+  -- | A constructor statement, e.g. new Foo;
+  | Constructor
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Generic, Ord, Show)
