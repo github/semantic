@@ -7,8 +7,8 @@ import Data.Aeson
 import Data.Record
 import Range
 import DiffSummary
-import Text.PrettyPrint.Leijen.Text (pretty)
+import Source
 
 summary :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
-summary diff _ = toS . encode $ summaries >>= annotatedSummaries
-  where summaries = diffSummary diff
+summary blobs diff = toS . encode $ summaries >>= annotatedSummaries
+  where summaries = diffSummary (source <$> blobs) diff

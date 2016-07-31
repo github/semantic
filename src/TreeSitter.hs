@@ -13,16 +13,17 @@ import Foreign
 import Foreign.C.String
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
+import SourceSpan
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
 treeSitterParser :: Language -> Ptr TS.Language -> Parser '[Range, Category, Cost]
-treeSitterParser language grammar contents = do
+treeSitterParser language grammar blob = do
   document <- ts_document_make
   ts_document_set_language document grammar
-  withCString (toString contents) (\source -> do
+  withCString (toString $ source blob) (\source -> do
     ts_document_set_input_string document source
     ts_document_parse document
-    term <- documentToTerm language document contents
+    term <- documentToTerm language document blob
     ts_document_free document
     pure term)
 
@@ -31,6 +32,8 @@ categoriesForLanguage :: Language -> Text -> Category
 categoriesForLanguage language name = case (language, name) of
   (JavaScript, "object") -> Object
   (JavaScript, "rel_op") -> BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
+  (JavaScript, "bool_op") -> BinaryOperator
+  (JavaScript, "expression_statement") -> ExpressionStatements
   (JavaScript, "this_expression") -> Identifier
   (JavaScript, "null") -> Identifier
   (JavaScript, "undefined") -> Identifier
@@ -83,7 +86,7 @@ defaultCategoryForNodeName name = case name of
 
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Language -> Ptr Document -> Parser '[Range, Category, Cost]
-documentToTerm language document contents = alloca $ \ root -> do
+documentToTerm language document blob = alloca $ \ root -> do
   ts_document_root_node_p document root
   toTerm root
   where toTerm node = do
@@ -94,9 +97,13 @@ documentToTerm language document contents = alloca $ \ root -> do
           -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
           range <- pure $! Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
 
+          sourceSpan <- pure $! SourceSpan { spanName = toS (path blob)
+            , spanStart = SourcePos (fromIntegral $ ts_node_p_start_point_row node) (fromIntegral $ ts_node_p_start_point_column node)
+            , spanEnd = SourcePos (fromIntegral $ ts_node_p_end_point_row node) (fromIntegral $ ts_node_p_end_point_column node) }
+
           let cost' = 1 + sum (cost . extract <$> children)
           let info = range .: (categoriesForLanguage language (toS name)) .: cost' .: RNil
-          pure $! termConstructor contents info children
+          pure $! termConstructor (source blob) sourceSpan info children
         getChild node n out = do
           _ <- ts_node_p_named_child node n out
           toTerm out

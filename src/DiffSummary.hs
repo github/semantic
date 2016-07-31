@@ -6,9 +6,10 @@ import Prologue hiding (snd, intercalate)
 import Diff
 import Patch
 import Term
-import Info (category)
-import Syntax
-import Category
+import Info (category, characterRange)
+import Range
+import Syntax as S
+import Category as C
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
 import Data.Text as Text (intercalate)
@@ -17,52 +18,58 @@ import Patch.Arbitrary()
 import Data.Record
 import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty)
 import qualified Text.PrettyPrint.Leijen.Text as P
+import SourceSpan
+import Source
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
+ | ErrorInfo { errorSpan :: SourceSpan, categoryName :: Text }
  deriving (Eq, Show)
 
-toTermName :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> Text
-toTermName term = case unwrap term of
-  Syntax.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
-  Syntax.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+toTermName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
+toTermName source term = case unwrap term of
+  S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
+  S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
-  Syntax.Assignment identifier value -> toTermName identifier <> toTermName value
-  Syntax.Function identifier _ _ -> (maybe "anonymous" toTermName identifier)
-  Syntax.FunctionCall i _ -> toTermName i
-  Syntax.MemberAccess base property -> case (unwrap base, unwrap property) of
-    (Syntax.FunctionCall{}, Syntax.FunctionCall{}) -> toTermName base <> "()." <> toTermName property <> "()"
-    (Syntax.FunctionCall{}, _) -> toTermName base <> "()." <> toTermName property
-    (_, Syntax.FunctionCall{}) -> toTermName base <> "." <> toTermName property <> "()"
-    (_, _) -> toTermName base <> "." <> toTermName property
-  Syntax.MethodCall targetId methodId _ -> toTermName targetId <> sep <> toTermName methodId <> "()"
+  S.Assignment identifier value -> toTermName' identifier <> toTermName' value
+  S.Function identifier _ _ -> (maybe "anonymous" toTermName' identifier)
+  S.FunctionCall i _ -> toTermName' i
+  S.MemberAccess base property -> case (unwrap base, unwrap property) of
+    (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' property <> "()"
+    (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' property
+    (_, S.FunctionCall{}) -> toTermName' base <> "." <> toTermName' property <> "()"
+    (_, _) -> toTermName' base <> "." <> toTermName' property
+  S.MethodCall targetId methodId _ -> toTermName' targetId <> sep <> toTermName' methodId <> "()"
     where sep = case unwrap targetId of
-            Syntax.FunctionCall{} -> "()."
+            S.FunctionCall{} -> "()."
             _ -> "."
-  Syntax.SubscriptAccess base element -> case (unwrap base, unwrap element) of
-    (Syntax.FunctionCall{}, Syntax.FunctionCall{}) -> toTermName base <> "()." <> toTermName element <> "()"
-    (Syntax.FunctionCall{}, _) -> toTermName base <> "()." <> toTermName element
-    (_, Syntax.FunctionCall{}) -> toTermName base <> "[" <> toTermName element <> "()" <> "]"
-    (_, _) -> toTermName base <> "[" <> toTermName element <> "]"
-  Syntax.VarAssignment varId _ -> toTermName varId
-  Syntax.VarDecl decl -> toTermName decl
+  S.SubscriptAccess base element -> case (unwrap base, unwrap element) of
+    (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' element <> "()"
+    (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' element
+    (_, S.FunctionCall{}) -> toTermName' base <> "[" <> toTermName' element <> "()" <> "]"
+    (_, _) -> toTermName' base <> "[" <> toTermName' element <> "]"
+  S.VarAssignment varId _ -> toTermName' varId
+  S.VarDecl decl -> toTermName' decl
   -- TODO: We should remove Args from Syntax since I don't think we should ever
   -- evaluate Args as a single toTermName Text - joshvera
-  Syntax.Args args -> mconcat $ toTermName <$> args
+  S.Args args -> mconcat $ toTermName' <$> args
   -- TODO: We should remove Case from Syntax since I don't think we should ever
   -- evaluate Case as a single toTermName Text - joshvera
-  Syntax.Case expr _ -> toTermName expr
-  Syntax.Switch expr _ -> toTermName expr
-  Syntax.For exprs _ -> mconcat $ toTermName <$> exprs
-  Syntax.While expr _ -> toTermName expr
-  Syntax.DoWhile _ expr -> toTermName expr
-  Syntax.Ternary expr _ -> toTermName expr
-  Syntax.MathAssignment id _ -> toTermName id
-  Syntax.Operator syntaxes -> mconcat $ toTermName <$> syntaxes
-  Syntax.Object kvs -> "{" <> intercalate ", " (toTermName <$> kvs) <> "}"
-  Syntax.Pair a b -> toTermName a <> ": " <> toTermName b
-  Syntax.Return expr -> maybe "empty" toTermName expr
+  S.Case expr _ -> toTermName' expr
+  S.Switch expr _ -> toTermName' expr
+  S.Ternary expr _ -> toTermName' expr
+  S.MathAssignment id _ -> toTermName' id
+  S.Operator syntaxes -> mconcat $ toTermName' <$> syntaxes
+  S.Object kvs -> "{" <> intercalate ", " (toTermName' <$> kvs) <> "}"
+  S.Pair a b -> toTermName' a <> ": " <> toTermName' b
+  S.Return expr -> maybe "empty" toTermName' expr
+  S.For exprs _ -> toText $ Source.slice (unionRangesFrom forRange forClauseRanges) source
+    where forRange = characterRange $ extract term
+          forClauseRanges = characterRange . extract <$> exprs
+  S.While expr _ -> toTermName' expr
+  S.DoWhile _ expr -> toTermName' expr
   Comment a -> toCategoryName a
+  where toTermName' = toTermName source
 
 class HasCategory a where
   toCategoryName :: a -> Text
@@ -76,37 +83,37 @@ instance HasCategory Category where
     BinaryOperator -> "binary operator"
     Boolean -> "boolean"
     DictionaryLiteral -> "dictionary"
-    Error -> "error"
+    C.Error -> "error"
     ExpressionStatements -> "expression statements"
-    Category.Assignment -> "assignment"
-    Category.Function -> "function"
-    Category.FunctionCall -> "function call"
-    Category.MemberAccess -> "member access"
-    Category.MethodCall -> "method call"
-    Category.Args -> "arguments"
-    Category.VarAssignment -> "var assignment"
-    Category.VarDecl -> "variable"
-    Category.Switch -> "switch statement"
-    Category.Case -> "case statement"
-    Category.SubscriptAccess -> "subscript access"
-    Category.MathAssignment -> "math assignment"
-    Category.Ternary -> "ternary"
-    Category.Operator -> "operator"
+    C.Assignment -> "assignment"
+    C.Function -> "function"
+    C.FunctionCall -> "function call"
+    C.MemberAccess -> "member access"
+    C.MethodCall -> "method call"
+    C.Args -> "arguments"
+    C.VarAssignment -> "var assignment"
+    C.VarDecl -> "variable"
+    C.Switch -> "switch statement"
+    C.Case -> "case statement"
+    C.SubscriptAccess -> "subscript access"
+    C.MathAssignment -> "math assignment"
+    C.Ternary -> "ternary"
+    C.Operator -> "operator"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
     Other s -> s
-    Category.Pair -> "pair"
+    C.Pair -> "pair"
     Params -> "params"
     Program -> "top level"
     Regex -> "regex"
     StringLiteral -> "string"
     SymbolLiteral -> "symbol"
     TemplateString -> "template string"
-    Category.For -> "for statement"
-    Category.While -> "while statement"
-    Category.DoWhile -> "do/while statement"
-    Category.Object -> "object"
-    Category.Return -> "return statement"
+    C.For -> "for statement"
+    C.While -> "while statement"
+    C.DoWhile -> "do/while statement"
+    C.Object -> "object"
+    C.Return -> "return statement"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
@@ -128,6 +135,7 @@ instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
   pretty BranchInfo{..} = mconcat $ punctuate (string "," <> space) (pretty <$> branches)
+  pretty ErrorInfo{..} = "syntax error at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)
 
 annotatedSummaries :: DiffSummary DiffInfo -> [Text]
 annotatedSummaries DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotations) <$> summaries patch
@@ -138,8 +146,9 @@ summaries (Delete info) = (("Deleted" <+> "the") <+>) <$> toLeafInfos info
 summaries (Replace i1 i2) = zipWith (\a b -> "Replaced" <+> "the" <+> a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
 
 toLeafInfos :: DiffInfo -> [Doc]
-toLeafInfos LeafInfo{..} = [ squotes (toDoc termName) <+> (toDoc categoryName) ]
+toLeafInfos LeafInfo{..} = pure $ squotes (toDoc termName) <+> (toDoc categoryName)
 toLeafInfos BranchInfo{..} = pretty <$> branches
+toLeafInfos err@ErrorInfo{} = pure $ pretty err
 
 maybeParentContext :: [Category] -> Doc
 maybeParentContext annotations = if null annotations
@@ -148,54 +157,62 @@ maybeParentContext annotations = if null annotations
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-diffSummary :: (HasCategory leaf, HasField fields Category) => Diff leaf (Record fields) -> [DiffSummary DiffInfo]
-diffSummary = cata $ \case
+diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffSummary sources = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
-  Free (_ :< (Syntax.Comment _)) -> []
-  (Free (infos :< Syntax.Indexed children)) -> prependSummary (category $ snd infos) <$> join children
-  (Free (infos :< Syntax.Fixed children)) -> prependSummary (category $ snd infos) <$> join children
-  (Free (infos :< Syntax.FunctionCall identifier children)) -> prependSummary (category $ snd infos) <$> join (Prologue.toList (identifier : children))
-  (Free (infos :< Syntax.Function id ps body)) -> prependSummary (category $ snd infos) <$> (fromMaybe [] id) <> (fromMaybe [] ps) <> body
-  (Free (infos :< Syntax.Assignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
-  (Free (infos :< Syntax.MemberAccess base property)) -> prependSummary (category $ snd infos) <$> base <> property
-  (Free (infos :< Syntax.SubscriptAccess base property)) -> prependSummary (category $ snd infos) <$> base <> property
-  (Free (infos :< Syntax.MethodCall targetId methodId ps)) -> prependSummary (category $ snd infos) <$> targetId <> methodId <> ps
-  (Free (infos :< Syntax.VarAssignment varId value)) -> prependSummary (category $ snd infos) <$> varId <> value
-  (Free (infos :< Syntax.VarDecl decl)) -> prependSummary (category $ snd infos) <$> decl
-  (Free (infos :< Syntax.Args args)) -> prependSummary (category $ snd infos) <$> join args
-  (Free (infos :< Syntax.For exprs body)) -> prependSummary (category $ snd infos) <$> join exprs <> body
-  (Free (infos :< Syntax.While expr body)) -> prependSummary (category $ snd infos) <$> expr <> body
-  (Free (infos :< Syntax.DoWhile expr body)) -> prependSummary (category $ snd infos) <$> expr <> body
-  (Free (infos :< Syntax.Switch expr cases)) -> prependSummary (category $ snd infos) <$> expr <> join cases
-  (Free (infos :< Syntax.Case expr body)) -> prependSummary (category $ snd infos) <$> expr <> body
-  Free (infos :< (Syntax.Ternary expr cases)) -> prependSummary (category $ snd infos) <$> expr <> join cases
-  Free (infos :< (Syntax.MathAssignment id value)) -> prependSummary (category $ snd infos) <$> id <> value
-  Free (infos :< (Syntax.Operator syntaxes)) -> prependSummary (category $ snd infos) <$> join syntaxes
-  Free (infos :< (Syntax.Object kvs)) -> prependSummary (category $ snd infos) <$> join kvs
-  Free (infos :< (Syntax.Pair a b)) -> prependSummary (category $ snd infos) <$> a <> b
-  Free (infos :< (Syntax.Return expr)) -> prependSummary (category $ snd infos) <$> fromMaybe [] expr
-  Free (infos :< (Syntax.Commented cs leaf)) -> prependSummary (category $ snd infos) <$> join cs <> fromMaybe [] leaf
-  (Pure (Insert term)) -> [ DiffSummary (Insert $ termToDiffInfo term) [] ]
-  (Pure (Delete term)) -> [ DiffSummary (Delete $ termToDiffInfo term) [] ]
-  (Pure (Replace t1 t2)) -> [ DiffSummary (Replace (termToDiffInfo t1) (termToDiffInfo t2)) [] ]
+  Free (_ :< (S.Comment _)) -> []
+  (Free (infos :< S.Indexed children)) -> annotateWithCategory infos <$> join children
+  (Free (infos :< S.Fixed children)) -> annotateWithCategory infos <$> join children
+  (Free (infos :< S.FunctionCall identifier children)) -> annotateWithCategory infos <$> join (Prologue.toList (identifier : children))
+  (Free (infos :< S.Function id ps body)) -> annotateWithCategory infos <$> (fromMaybe [] id) <> (fromMaybe [] ps) <> body
+  (Free (infos :< S.Assignment id value)) -> annotateWithCategory infos <$> id <> value
+  (Free (infos :< S.MemberAccess base property)) -> annotateWithCategory infos <$> base <> property
+  (Free (infos :< S.SubscriptAccess base property)) -> annotateWithCategory infos <$> base <> property
+  (Free (infos :< S.MethodCall targetId methodId ps)) -> annotateWithCategory infos <$> targetId <> methodId <> ps
+  (Free (infos :< S.VarAssignment varId value)) -> annotateWithCategory infos <$> varId <> value
+  (Free (infos :< S.VarDecl decl)) -> annotateWithCategory infos <$> decl
+  (Free (infos :< S.Args args)) -> annotateWithCategory infos <$> join args
+  (Free (infos :< S.Switch expr cases)) -> annotateWithCategory infos <$> expr <> join cases
+  (Free (infos :< S.Case expr body)) -> annotateWithCategory infos <$> expr <> body
+  Free (infos :< (S.Ternary expr cases)) -> annotateWithCategory infos <$> expr <> join cases
+  Free (infos :< (S.MathAssignment id value)) -> annotateWithCategory infos <$> id <> value
+  Free (infos :< (S.Operator syntaxes)) -> annotateWithCategory infos <$> join syntaxes
+  Free (infos :< (S.Object kvs)) -> annotateWithCategory infos <$> join kvs
+  Free (infos :< (S.Return expr)) -> annotateWithCategory infos <$> fromMaybe [] expr
+  Free (infos :< (S.Pair a b)) -> annotateWithCategory infos <$> a <> b
+  Free (infos :< (S.Commented cs leaf)) -> annotateWithCategory infos <$> join cs <> fromMaybe [] leaf
+  Free (infos :< (S.Error _ children)) -> annotateWithCategory infos <$> join children
+  (Free (infos :< S.For exprs body)) -> annotateWithCategory infos <$> join exprs <> body
+  (Free (infos :< S.While expr body)) -> annotateWithCategory infos <$> expr <> body
+  (Free (infos :< S.DoWhile expr body)) -> annotateWithCategory infos <$> expr <> body
+  (Pure (Insert term)) -> [ DiffSummary (Insert $ termToDiffInfo afterSource term) [] ]
+  (Pure (Delete term)) -> [ DiffSummary (Delete $ termToDiffInfo beforeSource term) [] ]
+  (Pure (Replace t1 t2)) -> [ DiffSummary (Replace (termToDiffInfo beforeSource t1) (termToDiffInfo afterSource t2)) [] ]
+  where
+    (beforeSource, afterSource) = runJoin sources
+    annotateWithCategory infos = prependSummary (category $ snd infos)
 
-termToDiffInfo :: (HasCategory leaf, HasField fields Category) => Term leaf (Record fields) -> DiffInfo
-termToDiffInfo term = case unwrap term of
-  Leaf _ -> LeafInfo (toCategoryName term) (toTermName term)
-  Syntax.Indexed children -> BranchInfo (termToDiffInfo <$> children) (toCategoryName term) BIndexed
-  Syntax.Fixed children -> BranchInfo (termToDiffInfo <$> children) (toCategoryName term) BFixed
-  Syntax.FunctionCall identifier _ -> LeafInfo (toCategoryName term) (toTermName identifier)
-  Syntax.Ternary ternaryCondition _ -> LeafInfo (toCategoryName term) (toTermName ternaryCondition)
-  Syntax.Function identifier _ _ -> LeafInfo (toCategoryName term) (maybe "anonymous" toTermName identifier)
-  Syntax.Assignment identifier _ -> LeafInfo (toCategoryName term) (toTermName identifier)
-  Syntax.MathAssignment identifier _ -> LeafInfo (toCategoryName term) (toTermName identifier)
+
+termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> DiffInfo
+termToDiffInfo blob term = case unwrap term of
+  Leaf _ -> LeafInfo (toCategoryName term) (toTermName' term)
+  S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
+  S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
+  S.FunctionCall identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
+  S.Ternary ternaryCondition _ -> LeafInfo (toCategoryName term) (toTermName' ternaryCondition)
+  S.Function identifier _ _ -> LeafInfo (toCategoryName term) (maybe "anonymous" toTermName' identifier)
+  S.Assignment identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
+  S.MathAssignment identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
   -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
   -- to indicate where that value should be when constructing DiffInfos.
-  Syntax.Operator _ -> LeafInfo (toCategoryName term) "x"
-  Commented cs leaf -> BranchInfo (termToDiffInfo <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
-  _ ->  LeafInfo (toCategoryName term) (toTermName term)
+  S.Operator _ -> LeafInfo (toCategoryName term) "x"
+  Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
+  S.Error sourceSpan _ -> ErrorInfo sourceSpan (toCategoryName term)
+  _ -> LeafInfo (toCategoryName term) (toTermName' term)
+  where toTermName' = toTermName blob
+        termToDiffInfo' = termToDiffInfo blob
 
 prependSummary :: Category -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary annotation summary = summary { parentAnnotations = annotation : parentAnnotations summary }

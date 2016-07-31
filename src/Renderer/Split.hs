@@ -12,7 +12,6 @@ import Data.These
 import Info
 import Prologue hiding (div, head, fst, snd, link)
 import qualified Prologue
-import Range
 import Renderer
 import Source
 import SplitDiff
@@ -33,7 +32,7 @@ classifyMarkup category element = (element !) . A.class_ . textValue $ styleName
 styleName :: Category -> Text
 styleName category = "category-" <> case category of
   Program -> "program"
-  Error -> "error"
+  C.Error -> "error"
   BinaryOperator -> "binary-operator"
   Boolean -> "boolean"
   DictionaryLiteral -> "dictionary"
@@ -77,7 +76,7 @@ splitPatchToClassName patch = stringValue $ "patch " <> case patch of
 
 -- | Render a diff as an HTML split diff.
 split :: (HasField fields Category, HasField fields Cost, HasField fields Range) => Renderer (Record fields)
-split diff blobs = TL.toStrict . renderHtml
+split blobs diff = TL.toStrict . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body

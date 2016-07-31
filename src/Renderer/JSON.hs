@@ -24,7 +24,7 @@ import Term
 
 -- | Render a diff to a string representing its JSON.
 json :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
-json diff sources = toS . toLazyByteString . fromEncoding . pairs $ "rows" .= annotateRows (alignDiff (source <$> sources) diff) <> "oids" .= (oid <$> sources) <> "paths" .= (path <$> sources)
+json blobs diff = toS . toLazyByteString . fromEncoding . pairs $ "rows" .= annotateRows (alignDiff (source <$> blobs) diff) <> "oids" .= (oid <$> blobs) <> "paths" .= (path <$> blobs)
   where annotateRows = fmap (fmap NumberedLine) . numberedRows
 
 newtype NumberedLine a = NumberedLine (Int, a)
@@ -89,6 +89,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Return expr -> [ "returnExpr" .= expr ]
   S.Comment _ -> []
   S.Commented comments child -> childrenFields (comments <> maybeToList child)
+  S.Error sourceSpan c -> [ "sourceSpan" .= sourceSpan ] <> childrenFields c
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: (KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (Term leaf (Record fields)) -> [kv]
