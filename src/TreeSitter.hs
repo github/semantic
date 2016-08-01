@@ -47,6 +47,8 @@ categoriesForLanguage language name = case (language, name) of
   (JavaScript, "for_in_statement") -> For
   (JavaScript, "for_of_statement") -> For
   (JavaScript, "class")  -> Class
+  (JavaScript, "catch") -> Catch
+  (JavaScript, "finally") -> Finally
 
   (Ruby, "hash") -> Object
   _ -> defaultCategoryForNodeName name
@@ -85,6 +87,7 @@ defaultCategoryForNodeName name = case name of
   "while_statement" -> While
   "do_statement" -> DoWhile
   "return_statement" -> Return
+  "try_statement" -> Try
   "method_definition" -> Method
   _ -> Other name
 

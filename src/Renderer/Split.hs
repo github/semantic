@@ -64,6 +64,9 @@ styleName category = "category-" <> case category of
   C.While -> "while"
   C.DoWhile -> "do_while"
   C.Return -> "return_statement"
+  C.Try -> "try_statement"
+  C.Catch -> "catch_statement"
+  C.Finally -> "finally_statement"
   ArrayLiteral -> "array"
   C.Class -> "class_statement"
   Other string -> string

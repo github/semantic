@@ -77,6 +77,12 @@ data Category
   | Object
   -- | A return statement.
   | Return
+  -- | A try statement.
+  | Try
+  -- | A catch statement.
+  | Catch
+  -- | A finally statement.
+  | Finally
   -- | A class declaration.
   | Class
   -- | A class method declaration.
