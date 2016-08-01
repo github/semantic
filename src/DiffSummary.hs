@@ -59,7 +59,7 @@ toTermName source term = case unwrap term of
   S.Switch expr _ -> toTermName' expr
   S.Ternary expr _ -> toTermName' expr
   S.MathAssignment id _ -> toTermName' id
-  S.Operator exprs -> termNameFromChildren term exprs
+  S.Operator _ -> termNameFromSource term
   S.Object kvs -> "{" <> intercalate ", " (toTermName' <$> kvs) <> "}"
   S.Pair a b -> toTermName' a <> ": " <> toTermName' b
   S.Return expr -> maybe "empty" toTermName' expr
@@ -68,8 +68,10 @@ toTermName source term = case unwrap term of
   S.DoWhile _ expr -> toTermName' expr
   Comment a -> toCategoryName a
   where toTermName' = toTermName source
-        termNameFromChildren term cs = toText $ Source.slice (unionRangesFrom (range term) (range <$> cs)) source
-        range term = (characterRange $ extract term)
+        termNameFromChildren term cs = termNameFromRange (unionRangesFrom (range term) (range <$> cs))
+        termNameFromSource term = termNameFromRange (range term)
+        termNameFromRange range = toText $ Source.slice range source
+        range = characterRange . extract
 
 class HasCategory a where
   toCategoryName :: a -> Text
