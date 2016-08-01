@@ -46,6 +46,7 @@ categoriesForLanguage language name = case (language, name) of
   (JavaScript, "void_op") -> Operator -- void operator, e.g. void 2.
   (JavaScript, "for_in_statement") -> For
   (JavaScript, "for_of_statement") -> For
+  (JavaScript, "new_expression") -> Constructor
   (JavaScript, "class")  -> Class
   (JavaScript, "catch") -> Catch
   (JavaScript, "finally") -> Finally

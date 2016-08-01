@@ -66,6 +66,7 @@ toTermName source term = case unwrap term of
   S.For exprs _ -> termNameFromChildren term exprs
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
+  S.Constructor expr -> toTermName' expr
   S.Try expr _ _ -> toText $ Source.slice (characterRange $ extract expr) source
   S.Array _ -> toText $ Source.slice (characterRange $ extract term) source
   S.Class identifier _ _ -> toTermName' identifier
@@ -120,6 +121,7 @@ instance HasCategory Category where
     C.DoWhile -> "do/while statement"
     C.Object -> "object"
     C.Return -> "return statement"
+    C.Constructor -> "constructor"
     C.Catch -> "catch statement"
     C.Try -> "try statement"
     C.Finally -> "finally statement"
@@ -197,6 +199,7 @@ diffSummaries sources = cata $ \case
   (Free (infos :< S.For exprs body)) -> annotateWithCategory infos <$> join exprs <> body
   (Free (infos :< S.While expr body)) -> annotateWithCategory infos <$> expr <> body
   (Free (infos :< S.DoWhile expr body)) -> annotateWithCategory infos <$> expr <> body
+  (Free (infos :< S.Constructor expr)) -> annotateWithCategory infos <$> expr
   (Free (infos :< S.Try expr catch finally)) -> annotateWithCategory infos <$> expr <> fromMaybe [] catch <> fromMaybe [] finally
   (Free (infos :< S.Array children)) -> annotateWithCategory infos <$> join children
   (Free (infos :< S.Class identifier superclass definitions)) -> annotateWithCategory infos <$> identifier <> fromMaybe [] superclass <> join definitions

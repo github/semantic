@@ -60,6 +60,7 @@ data Syntax
   | DoWhile { doWhileBody :: f, doWhileExpr :: f }
   | While { whileExpr :: f, whileBody :: f }
   | Return (Maybe f)
+  | Constructor f
   | Try f (Maybe f) (Maybe f)
   -- | An array literal with list of children.
   | Array [f]

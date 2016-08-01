@@ -77,6 +77,8 @@ data Category
   | Object
   -- | A return statement.
   | Return
+  -- | A constructor statement, e.g. new Foo;
+  | Constructor
   -- | A try statement.
   | Try
   -- | A catch statement.

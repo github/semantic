@@ -97,6 +97,8 @@ termConstructor source sourceSpan info = cofree . construct
       withDefaultInfo $ S.While expr body
     construct children | DoWhile == (category info), [expr, body] <- children =
       withDefaultInfo $ S.DoWhile expr body
+    construct children | Constructor == category info, [expr] <- children =
+      withDefaultInfo $ S.Constructor expr
     construct children | Try == category info = case children of
       [body] -> withDefaultInfo $ S.Try body Nothing Nothing
       [body, catch] | Catch <- category (extract catch) -> withDefaultInfo $ S.Try body (Just catch) Nothing
