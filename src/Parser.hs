@@ -91,12 +91,14 @@ termConstructor source sourceSpan info = cofree . construct
     construct children | Pair == (category info) = withDefaultInfo $ S.Fixed children
     construct children | C.Error == category info =
       withDefaultInfo $ S.Error sourceSpan children
-    construct children | For == (category info), Just (exprs, body) <- unsnoc children =
+    construct children | For == category info, Just (exprs, body) <- unsnoc children =
       withDefaultInfo $ S.For exprs body
-    construct children | While == (category info), [expr, body] <- children =
+    construct children | While == category info, [expr, body] <- children =
       withDefaultInfo $ S.While expr body
-    construct children | DoWhile == (category info), [expr, body] <- children =
+    construct children | DoWhile == category info, [expr, body] <- children =
       withDefaultInfo $ S.DoWhile expr body
+    construct children | Throw == category info, [expr] <- children =
+      withDefaultInfo $ S.Throw expr
     construct children | Constructor == category info, [expr] <- children =
       withDefaultInfo $ S.Constructor expr
     construct children | Try == category info = case children of

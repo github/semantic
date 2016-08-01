@@ -90,6 +90,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Comment _ -> []
   S.Commented comments child -> childrenFields (comments <> maybeToList child)
   S.Error sourceSpan c -> [ "sourceSpan" .= sourceSpan ] <> childrenFields c
+  S.Throw c -> [ "throwExpression" .= c ]
   S.Try body catch finally -> [ "tryBody" .= body ] <> [ "tryCatch" .= catch ] <> [ "tryFinally" .= finally ]
   S.Array c -> childrenFields c
   S.Class identifier superclass definitions -> [ "classIdentifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]

@@ -88,6 +88,7 @@ defaultCategoryForNodeName name = case name of
   "while_statement" -> While
   "do_statement" -> DoWhile
   "return_statement" -> Return
+  "throw_statement" -> Throw
   "try_statement" -> Try
   "method_definition" -> Method
   _ -> Other name

@@ -66,6 +66,7 @@ toTermName source term = case unwrap term of
   S.For exprs _ -> termNameFromChildren term exprs
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
+  S.Throw expr -> toText $ Source.slice (characterRange $ extract expr) source
   S.Constructor expr -> toTermName' expr
   S.Try expr _ _ -> toText $ Source.slice (characterRange $ extract expr) source
   S.Array _ -> toText $ Source.slice (characterRange $ extract term) source
@@ -121,6 +122,7 @@ instance HasCategory Category where
     C.DoWhile -> "do/while statement"
     C.Object -> "object"
     C.Return -> "return statement"
+    C.Throw -> "throw statement"
     C.Constructor -> "constructor"
     C.Catch -> "catch statement"
     C.Try -> "try statement"
@@ -199,6 +201,7 @@ diffSummaries sources = cata $ \case
   (Free (infos :< S.For exprs body)) -> annotateWithCategory infos <$> join exprs <> body
   (Free (infos :< S.While expr body)) -> annotateWithCategory infos <$> expr <> body
   (Free (infos :< S.DoWhile expr body)) -> annotateWithCategory infos <$> expr <> body
+  (Free (infos :< S.Throw expr)) -> annotateWithCategory infos <$> expr
   (Free (infos :< S.Constructor expr)) -> annotateWithCategory infos <$> expr
   (Free (infos :< S.Try expr catch finally)) -> annotateWithCategory infos <$> expr <> fromMaybe [] catch <> fromMaybe [] finally
   (Free (infos :< S.Array children)) -> annotateWithCategory infos <$> join children
