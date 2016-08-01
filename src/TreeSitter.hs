@@ -7,7 +7,6 @@ import Category
 import Info
 import Language
 import Parser
-import Range
 import Source
 import Foreign
 import Foreign.C.String
@@ -47,6 +46,7 @@ categoriesForLanguage language name = case (language, name) of
   (JavaScript, "void_op") -> Operator -- void operator, e.g. void 2.
   (JavaScript, "for_in_statement") -> For
   (JavaScript, "for_of_statement") -> For
+  (JavaScript, "class")  -> Class
 
   (Ruby, "hash") -> Object
   _ -> defaultCategoryForNodeName name
@@ -85,6 +85,7 @@ defaultCategoryForNodeName name = case name of
   "while_statement" -> While
   "do_statement" -> DoWhile
   "return_statement" -> Return
+  "method_definition" -> Method
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
