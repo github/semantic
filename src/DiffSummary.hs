@@ -66,6 +66,7 @@ toTermName source term = case unwrap term of
   S.For exprs _ -> termNameFromChildren term exprs
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
+  S.Array _ -> toText $ Source.slice (characterRange $ extract term) source
   S.Class identifier _ _ -> toTermName' identifier
   S.Method identifier _ _ -> toTermName' identifier
   Comment a -> toCategoryName a
@@ -192,6 +193,7 @@ diffSummaries sources = cata $ \case
   (Free (infos :< S.For exprs body)) -> annotateWithCategory infos <$> join exprs <> body
   (Free (infos :< S.While expr body)) -> annotateWithCategory infos <$> expr <> body
   (Free (infos :< S.DoWhile expr body)) -> annotateWithCategory infos <$> expr <> body
+  (Free (infos :< S.Array children)) -> annotateWithCategory infos <$> join children
   (Free (infos :< S.Class identifier superclass definitions)) -> annotateWithCategory infos <$> identifier <> fromMaybe [] superclass <> join definitions
   (Free (infos :< S.Method identifier params definitions)) -> annotateWithCategory infos <$> identifier <> join params <> join definitions
   (Pure (Insert term)) -> [ DiffSummary (Insert $ termToDiffInfo afterSource term) [] ]

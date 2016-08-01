@@ -97,6 +97,8 @@ termConstructor source sourceSpan info = cofree . construct
       withDefaultInfo $ S.While expr body
     construct children | DoWhile == (category info), [expr, body] <- children =
       withDefaultInfo $ S.DoWhile expr body
+    construct children | ArrayLiteral == category info =
+      withDefaultInfo $ S.Array children
     construct children | Method == category info = case children of
       [identifier, params, exprs] |
         Params == category (extract params),
