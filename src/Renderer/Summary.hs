@@ -11,4 +11,4 @@ import Source
 
 summary :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
 summary blobs diff = toS . encode $ summaries >>= annotatedSummaries
-  where summaries = diffSummary (source <$> blobs) diff
+  where summaries = diffSummaries (source <$> blobs) diff
