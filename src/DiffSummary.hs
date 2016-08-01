@@ -207,7 +207,6 @@ termToDiffInfo blob term = case unwrap term of
   -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
   -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
   -- to indicate where that value should be when constructing DiffInfos.
-  S.Operator _ -> LeafInfo (toCategoryName term) "x"
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
   S.Error sourceSpan _ -> ErrorInfo sourceSpan (toCategoryName term)
   _ -> LeafInfo (toCategoryName term) (toTermName' term)
