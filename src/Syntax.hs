@@ -61,10 +61,23 @@ data Syntax
   | While { whileExpr :: f, whileBody :: f }
   | Return (Maybe f)
   | Throw f
+  | Constructor f
+  | Try f (Maybe f) (Maybe f)
+  -- | An array literal with list of children.
+  | Array [f]
+  -- | A class with an identifier, superclass, and a list of definitions.
+  | Class f (Maybe f) [f]
+  -- | A method definition with an identifier, params, and a list of expressions.
+  | Method f [f] [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 
 -- Instances
+
+instance (Arbitrary leaf, Arbitrary f) => Arbitrary (Syntax leaf f) where
+  arbitrary = sized (syntaxOfSize (`resize` arbitrary) )
+
+  shrink = genericShrink
 
 syntaxOfSize :: Arbitrary leaf => (Int -> Gen f) -> Int -> Gen (Syntax leaf f)
 syntaxOfSize recur n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsOfSize n
@@ -79,8 +92,3 @@ syntaxOfSize recur n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsO
           first <- recur m
           rest <- childrenOfSize (n - m)
           pure $! first : rest
-
-instance (Arbitrary leaf, Arbitrary f) => Arbitrary (Syntax leaf f) where
-  arbitrary = sized (syntaxOfSize (`resize` arbitrary) )
-
-  shrink = genericShrink

@@ -41,13 +41,13 @@ sources = both (fromText "[]") (fromText "[a]")
 
 spec :: Spec
 spec = parallel $ do
-  describe "diffSummary" $ do
+  describe "diffSummaries" $ do
     it "outputs a diff summary" $ do
-      diffSummary sources testDiff `shouldBe` [ DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotations = [ ArrayLiteral ] } ]
+      diffSummaries sources testDiff `shouldBe` [ DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotations = [ ArrayLiteral ] } ]
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category, Range])) in
-        diffSummary sources (diffTerms wrap (==) diffCost term term) `shouldBe` []
+        diffSummaries sources (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
   describe "annotatedSummaries" $ do
     it "should print adds" $
@@ -58,7 +58,7 @@ spec = parallel $ do
     prop "patches in summaries match the patches in diffs" $
       \a -> let
         diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Cost, Range])))
-        summaries = diffSummary sources diff
+        summaries = diffSummaries sources diff
         patches = toList diff
         in
           case (partition isBranchNode (patch <$> summaries), partition isIndexedOrFixed patches) of
@@ -67,7 +67,7 @@ spec = parallel $ do
     prop "generates one LeafInfo for each child in an arbitrary branch patch" $
       \a -> let
         diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Range])))
-        diffInfoPatches = patch <$> diffSummary sources diff
+        diffInfoPatches = patch <$> diffSummaries sources diff
         syntaxPatches = toList diff
         extractLeaves :: DiffInfo -> [DiffInfo]
         extractLeaves (BranchInfo children _ _) = join $ extractLeaves <$> children

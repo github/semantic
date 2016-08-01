@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
 
-module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..), annotatedSummaries) where
+module DiffSummary (DiffSummary(..), diffSummaries, DiffInfo(..), annotatedSummaries) where
 
 import Prologue hiding (snd, intercalate)
 import Diff
@@ -59,18 +59,25 @@ toTermName source term = case unwrap term of
   S.Switch expr _ -> toTermName' expr
   S.Ternary expr _ -> toTermName' expr
   S.MathAssignment id _ -> toTermName' id
-  S.Operator syntaxes -> mconcat $ toTermName' <$> syntaxes
+  S.Operator _ -> termNameFromSource term
   S.Object kvs -> "{" <> intercalate ", " (toTermName' <$> kvs) <> "}"
   S.Pair a b -> toTermName' a <> ": " <> toTermName' b
   S.Return expr -> maybe "empty" toTermName' expr
-  S.For exprs _ -> toText $ Source.slice (unionRangesFrom forRange forClauseRanges) source
-    where forRange = characterRange $ extract term
-          forClauseRanges = characterRange . extract <$> exprs
+  S.For exprs _ -> termNameFromChildren term exprs
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
   S.Throw expr -> toText $ Source.slice (characterRange $ extract expr) source
+  S.Constructor expr -> toTermName' expr
+  S.Try expr _ _ -> toText $ Source.slice (characterRange $ extract expr) source
+  S.Array _ -> toText $ Source.slice (characterRange $ extract term) source
+  S.Class identifier _ _ -> toTermName' identifier
+  S.Method identifier _ _ -> toTermName' identifier
   Comment a -> toCategoryName a
   where toTermName' = toTermName source
+        termNameFromChildren term cs = termNameFromRange (unionRangesFrom (range term) (range <$> cs))
+        termNameFromSource term = termNameFromRange (range term)
+        termNameFromRange range = toText $ Source.slice range source
+        range = characterRange . extract
 
 class HasCategory a where
   toCategoryName :: a -> Text
@@ -116,6 +123,12 @@ instance HasCategory Category where
     C.Object -> "object"
     C.Return -> "return statement"
     C.Throw -> "throw statement"
+    C.Constructor -> "constructor"
+    C.Catch -> "catch statement"
+    C.Try -> "try statement"
+    C.Finally -> "finally statement"
+    C.Class -> "class"
+    C.Method -> "method"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
@@ -159,8 +172,8 @@ maybeParentContext annotations = if null annotations
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
-diffSummary sources = cata $ \case
+diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffSummaries sources = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
   Free (_ :< (S.Comment _)) -> []
@@ -189,6 +202,11 @@ diffSummary sources = cata $ \case
   (Free (infos :< S.While expr body)) -> annotateWithCategory infos <$> expr <> body
   (Free (infos :< S.DoWhile expr body)) -> annotateWithCategory infos <$> expr <> body
   (Free (infos :< S.Throw expr)) -> annotateWithCategory infos <$> expr
+  (Free (infos :< S.Constructor expr)) -> annotateWithCategory infos <$> expr
+  (Free (infos :< S.Try expr catch finally)) -> annotateWithCategory infos <$> expr <> fromMaybe [] catch <> fromMaybe [] finally
+  (Free (infos :< S.Array children)) -> annotateWithCategory infos <$> join children
+  (Free (infos :< S.Class identifier superclass definitions)) -> annotateWithCategory infos <$> identifier <> fromMaybe [] superclass <> join definitions
+  (Free (infos :< S.Method identifier params definitions)) -> annotateWithCategory infos <$> identifier <> join params <> join definitions
   (Pure (Insert term)) -> [ DiffSummary (Insert $ termToDiffInfo afterSource term) [] ]
   (Pure (Delete term)) -> [ DiffSummary (Delete $ termToDiffInfo beforeSource term) [] ]
   (Pure (Replace t1 t2)) -> [ DiffSummary (Replace (termToDiffInfo beforeSource t1) (termToDiffInfo afterSource t2)) [] ]
@@ -210,7 +228,6 @@ termToDiffInfo blob term = case unwrap term of
   -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
   -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
   -- to indicate where that value should be when constructing DiffInfos.
-  S.Operator _ -> LeafInfo (toCategoryName term) "x"
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
   S.Error sourceSpan _ -> ErrorInfo sourceSpan (toCategoryName term)
   _ -> LeafInfo (toCategoryName term) (toTermName' term)

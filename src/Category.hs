@@ -79,6 +79,18 @@ data Category
   | Return
   -- | A throw statement.
   | Throw
+  -- | A constructor statement, e.g. new Foo;
+  | Constructor
+  -- | A try statement.
+  | Try
+  -- | A catch statement.
+  | Catch
+  -- | A finally statement.
+  | Finally
+  -- | A class declaration.
+  | Class
+  -- | A class method declaration.
+  | Method
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Generic, Ord, Show)
