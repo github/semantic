@@ -17,13 +17,9 @@ import SourceSpan
 -- | and aren't pure.
 type Parser fields = SourceBlob -> IO (Term Text (Record fields))
 
--- | Categories that are treated as fixed nodes.
-fixedCategories :: Set.Set Category
-fixedCategories = Set.fromList [ BinaryOperator, Pair ]
-
--- | Should these categories be treated as fixed nodes?
-isFixed :: Category -> Bool
-isFixed = flip Set.member fixedCategories
+-- | Whether a category is an Operator Category
+isOperator :: Category -> Bool
+isOperator = flip Set.member (Set.fromList [ Operator, BinaryOperator ])
 
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
@@ -49,7 +45,7 @@ termConstructor source sourceSpan info = cofree . construct
     construct children | SubscriptAccess == category info = case children of
       (base:element:[]) -> withDefaultInfo $ S.SubscriptAccess base element
       _ -> withDefaultInfo $ S.Error sourceSpan children
-    construct children | Operator == category info = withDefaultInfo $ S.Operator children
+    construct children | isOperator (category info) = withDefaultInfo $ S.Operator children
     construct children | Function == category info = case children of
       (body:[]) -> withDefaultInfo $ S.Function Nothing Nothing body
       (params:body:[]) | (info :< _) <- runCofree params, Params == category info ->
@@ -92,7 +88,7 @@ termConstructor source sourceSpan info = cofree . construct
         toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
         toTuple child = pure child
 
-    construct children | isFixed (category info) = withDefaultInfo $ S.Fixed children
+    construct children | Pair == (category info) = withDefaultInfo $ S.Fixed children
     construct children | C.Error == category info =
       withDefaultInfo $ S.Error sourceSpan children
     construct children | For == (category info), Just (exprs, body) <- unsnoc children =
