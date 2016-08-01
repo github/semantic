@@ -83,6 +83,10 @@ data Category
   | Catch
   -- | A finally statement.
   | Finally
+  -- | A class declaration.
+  | Class
+  -- | A class method declaration.
+  | Method
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Generic, Ord, Show)

@@ -7,7 +7,6 @@ import Category
 import Info
 import Language
 import Parser
-import Range
 import Source
 import Foreign
 import Foreign.C.String
@@ -31,19 +30,25 @@ treeSitterParser language grammar blob = do
 categoriesForLanguage :: Language -> Text -> Category
 categoriesForLanguage language name = case (language, name) of
   (JavaScript, "object") -> Object
-  (JavaScript, "rel_op") -> BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
-  (JavaScript, "bool_op") -> BinaryOperator
   (JavaScript, "expression_statement") -> ExpressionStatements
   (JavaScript, "this_expression") -> Identifier
   (JavaScript, "null") -> Identifier
   (JavaScript, "undefined") -> Identifier
   (JavaScript, "arrow_function") -> Function
   (JavaScript, "generator_function") -> Function
-  (JavaScript, "delete_op") -> Operator
-  (JavaScript, "type_op") -> Operator
-  (JavaScript, "void_op") -> Operator
+  (JavaScript, "math_op") -> BinaryOperator -- bitwise operator, e.g. +, -, *, /.
+  (JavaScript, "bool_op") -> BinaryOperator -- boolean operator, e.g. ||, &&.
+  (JavaScript, "bitwise_op") -> BinaryOperator -- bitwise operator, e.g. ^, &, etc.
+  (JavaScript, "rel_op") -> BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=.
+  (JavaScript, "comma_op") -> Operator -- comma operator, e.g. expr1, expr2.
+  (JavaScript, "delete_op") -> Operator -- delete operator, e.g. delete x[2].
+  (JavaScript, "type_op") -> Operator -- type operator, e.g. typeof Object.
+  (JavaScript, "void_op") -> Operator -- void operator, e.g. void 2.
   (JavaScript, "for_in_statement") -> For
   (JavaScript, "for_of_statement") -> For
+  (JavaScript, "class")  -> Class
+  (JavaScript, "catch") -> Catch
+  (JavaScript, "finally") -> Finally
 
   (Ruby, "hash") -> Object
   _ -> defaultCategoryForNodeName name
@@ -83,8 +88,7 @@ defaultCategoryForNodeName name = case name of
   "do_statement" -> DoWhile
   "return_statement" -> Return
   "try_statement" -> Try
-  "catch" -> Catch
-  "finally" -> Finally
+  "method_definition" -> Method
   _ -> Other name
 
 -- | Return a parser for a tree sitter language & document.
