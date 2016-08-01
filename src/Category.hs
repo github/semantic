@@ -77,6 +77,10 @@ data Category
   | Object
   -- | A return statement.
   | Return
+  -- | A class declaration.
+  | Class
+  -- | A class method declaration.
+  | Method
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Generic, Ord, Show)

@@ -99,5 +99,34 @@ termConstructor source sourceSpan info = cofree . construct
       withDefaultInfo $ S.DoWhile expr body
     construct children | ArrayLiteral == category info =
       withDefaultInfo $ S.Array children
+    construct children | Method == category info = case children of
+      [identifier, params, exprs] |
+        Params == category (extract params),
+        S.Indexed params' <- unwrap params,
+        exprs' <- expressionStatements exprs ->
+          withDefaultInfo $ S.Method identifier params' exprs'
+      [identifier, exprs] | exprs' <- expressionStatements exprs ->
+        withDefaultInfo $ S.Method identifier mempty exprs'
+      _ ->
+        withDefaultInfo $ S.Error sourceSpan children
+    construct children | Class == category info = case children of
+      [identifier, superclass, definitions] | definitions' <- methodDefinitions definitions ->
+        withDefaultInfo $ S.Class identifier (Just superclass) definitions'
+      [identifier, definitions] | definitions' <- methodDefinitions definitions ->
+        withDefaultInfo $ S.Class identifier Nothing definitions'
+      _ ->
+        withDefaultInfo $ S.Error sourceSpan children
     construct children =
       withDefaultInfo $ S.Indexed children
+
+expressionStatements :: HasField fields Category => Term Text (Record fields) -> [Term Text (Record fields)]
+expressionStatements exprs |
+  Other "statement_block" == category (extract exprs),
+  S.Indexed exprs' <- unwrap exprs = exprs'
+expressionStatements _ = mempty
+
+methodDefinitions :: HasField fields Category => Term Text (Record fields) -> [Term Text (Record fields)]
+methodDefinitions definitions |
+  Other "class_body" == category (extract definitions),
+  S.Indexed definitions' <- unwrap definitions = definitions'
+methodDefinitions _ = mempty

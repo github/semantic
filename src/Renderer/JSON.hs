@@ -15,7 +15,6 @@ import qualified Data.Text as T
 import Data.These
 import Data.Vector hiding (toList)
 import Info
-import Range
 import Renderer
 import Source hiding (fromList)
 import SplitDiff
@@ -91,6 +90,8 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Commented comments child -> childrenFields (comments <> maybeToList child)
   S.Error sourceSpan c -> [ "sourceSpan" .= sourceSpan ] <> childrenFields c
   S.Array c -> childrenFields c
+  S.Class identifier superclass definitions -> [ "classIdentifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]
+  S.Method identifier params definitions -> [ "methodIdentifier" .= identifier ] <> [ "params" .= params ] <> [ "definitions" .= definitions ]
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: (KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (Term leaf (Record fields)) -> [kv]

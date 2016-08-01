@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
 
-module DiffSummary (DiffSummary(..), diffSummary, DiffInfo(..), annotatedSummaries) where
+module DiffSummary (DiffSummary(..), diffSummaries, DiffInfo(..), annotatedSummaries) where
 
 import Prologue hiding (snd, intercalate)
 import Diff
@@ -67,6 +67,8 @@ toTermName source term = case unwrap term of
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
   S.Array _ -> toText $ Source.slice (characterRange $ extract term) source
+  S.Class identifier _ _ -> toTermName' identifier
+  S.Method identifier _ _ -> toTermName' identifier
   Comment a -> toCategoryName a
   where toTermName' = toTermName source
         termNameFromChildren term cs = termNameFromRange (unionRangesFrom (range term) (range <$> cs))
@@ -117,6 +119,8 @@ instance HasCategory Category where
     C.DoWhile -> "do/while statement"
     C.Object -> "object"
     C.Return -> "return statement"
+    C.Class -> "class"
+    C.Method -> "method"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
@@ -160,8 +164,8 @@ maybeParentContext annotations = if null annotations
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-diffSummary :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
-diffSummary sources = cata $ \case
+diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffSummaries sources = cata $ \case
   -- Skip comments and leaves since they don't have any changes
   (Free (_ :< Leaf _)) -> []
   Free (_ :< (S.Comment _)) -> []
@@ -189,7 +193,12 @@ diffSummary sources = cata $ \case
   (Free (infos :< S.For exprs body)) -> annotateWithCategory infos <$> join exprs <> body
   (Free (infos :< S.While expr body)) -> annotateWithCategory infos <$> expr <> body
   (Free (infos :< S.DoWhile expr body)) -> annotateWithCategory infos <$> expr <> body
+<<<<<<< HEAD
   (Free (infos :< S.Array children)) -> annotateWithCategory infos <$> join children
+=======
+  (Free (infos :< S.Class identifier superclass definitions)) -> annotateWithCategory infos <$> identifier <> fromMaybe [] superclass <> join definitions
+  (Free (infos :< S.Method identifier params definitions)) -> annotateWithCategory infos <$> identifier <> join params <> join definitions
+>>>>>>> origin/master
   (Pure (Insert term)) -> [ DiffSummary (Insert $ termToDiffInfo afterSource term) [] ]
   (Pure (Delete term)) -> [ DiffSummary (Delete $ termToDiffInfo beforeSource term) [] ]
   (Pure (Replace t1 t2)) -> [ DiffSummary (Replace (termToDiffInfo beforeSource t1) (termToDiffInfo afterSource t2)) [] ]
