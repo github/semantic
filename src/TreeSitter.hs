@@ -31,17 +31,18 @@ treeSitterParser language grammar blob = do
 categoriesForLanguage :: Language -> Text -> Category
 categoriesForLanguage language name = case (language, name) of
   (JavaScript, "object") -> Object
-  (JavaScript, "rel_op") -> BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
-  (JavaScript, "bool_op") -> BinaryOperator
   (JavaScript, "expression_statement") -> ExpressionStatements
   (JavaScript, "this_expression") -> Identifier
   (JavaScript, "null") -> Identifier
   (JavaScript, "undefined") -> Identifier
   (JavaScript, "arrow_function") -> Function
   (JavaScript, "generator_function") -> Function
+  (JavaScript, "rel_op") -> BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=
+  (JavaScript, "bool_op") -> BinaryOperator
   (JavaScript, "delete_op") -> Operator
   (JavaScript, "type_op") -> Operator
   (JavaScript, "void_op") -> Operator
+  (JavaScript, "comma_op") -> Operator
   (JavaScript, "for_in_statement") -> For
   (JavaScript, "for_of_statement") -> For
 
