@@ -6,6 +6,7 @@ import Data.Record
 import Category
 import Language
 import Parser
+import Range
 import Source
 import qualified Syntax
 import Foreign
