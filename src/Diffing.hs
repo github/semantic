@@ -127,8 +127,8 @@ compareCategoryEq = (==) `on` category . extract
 termCostDecorator :: (Prologue.Foldable f, Functor f) => TermDecorator f a Cost
 termCostDecorator c = 1 + sum (cost <$> tailF c)
 
-pqGramDecorator :: (Prologue.Foldable f, Functor f) => (forall b. CofreeF f (Record a) b -> label) -> Int -> Int -> TermDecorator f a (DList.DList (Gram label))
-pqGramDecorator getLabel p q (a :< s) = empty
+pqGramDecorator :: (Prologue.Foldable f, Functor f) => (forall b. CofreeF f (Record a) b -> label) -> Int -> Int -> TermDecorator f a (Gram label, DList.DList (Gram label))
+pqGramDecorator getLabel p q (a :< s) = (Gram [] [], empty)
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Integer
