@@ -40,7 +40,6 @@ import qualified Data.Text as T
 -- | with respect to other IO actions.
 diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record fields) -> Both SourceBlob -> IO Text
 diffFiles parser renderer sourceBlobs = do
-  let sources = source <$> sourceBlobs
   terms <- traverse parser sourceBlobs
 
   let areNullOids = runBothWith (\a b -> (oid a == nullOid || null (source a), oid b == nullOid || null (source b))) sourceBlobs
