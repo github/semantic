@@ -4,10 +4,8 @@ module Diffing where
 import qualified Prologue
 import Prologue hiding (fst, snd)
 import qualified Data.ByteString.Char8 as B1
-import qualified Data.DList as DList
 import Data.Functor.Both
 import Data.Functor.Foldable
-import Data.RandomWalkSimilarity
 import Data.Record
 import qualified Data.Text.IO as TextIO
 import qualified Data.Text.ICU.Detect as Detect
@@ -128,13 +126,6 @@ compareCategoryEq = (==) `on` category . extract
 termCostDecorator :: (Prologue.Foldable f, Functor f) => TermDecorator f a Cost
 termCostDecorator c = 1 + sum (cost <$> tailF c)
 
-pqGramDecorator :: (Prologue.Foldable f, Functor f) => (forall b. CofreeF f (Record a) b -> label) -> Int -> Int -> TermDecorator f a (Gram label, DList.DList (Gram label))
-pqGramDecorator getLabel p q c@(a :< s) = (Gram [] [ Just label ], foldMap (childGrams label) s)
-  where childGrams :: HasField fields (Gram label, DList.DList (Gram label)) => label -> Record fields -> DList.DList (Gram label)
-        childGrams label record = let (child, grandchildren) = getField record in
-          DList.singleton (prependParent label child) <> grandchildren
-        prependParent label gram = gram { stem = Just label : stem gram }
-        label = getLabel c
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Integer

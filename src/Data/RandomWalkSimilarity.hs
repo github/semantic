@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 module Data.RandomWalkSimilarity
 ( rws
 , pqGrams
@@ -15,6 +15,7 @@ import Data.Functor.Foldable as Foldable
 import Data.Hashable
 import qualified Data.KdTree.Static as KdTree
 import qualified Data.List as List
+import Data.Record
 import qualified Data.Vector as Vector
 import Patch
 import Prologue
@@ -79,6 +80,17 @@ pqGrams getLabel p q = uncurry DList.cons . cata merge . setRootBase . setRootSt
         setBase gram newBase = gram { base = take q (newBase <> repeat Nothing) }
         setRootBase term = let (a :< f) = runCofree term in cofree (setBase a (base a) :< f)
         setRootStem = foldr (\ p rest -> assignParent Nothing p . rest) identity [0..p]
+
+type TermDecorator f fields field = CofreeF f (Record fields) (Record (field ': fields)) -> field
+
+pqGramDecorator :: (Prologue.Foldable f, Functor f) => (forall b. CofreeF f (Record a) b -> label) -> Int -> Int -> TermDecorator f a (Gram label, DList.DList (Gram label))
+pqGramDecorator getLabel p q c@(a :< s) = (Gram [] [ Just label ], foldMap (childGrams label) s)
+  where childGrams :: HasField fields (Gram label, DList.DList (Gram label)) => label -> Record fields -> DList.DList (Gram label)
+        childGrams label record = let (child, grandchildren) = getField record in
+          DList.singleton (prependParent label child) <> grandchildren
+        prependParent label gram = gram { stem = Just label : stem gram }
+        label = getLabel c
+
 
 -- | A sliding-window fold over _n_ items of a list per iteration.
 windowed :: Int -> (a -> [a] -> b -> b) -> b -> [a] -> b
