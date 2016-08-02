@@ -2,7 +2,6 @@ module Prologue
 ( module X
 , lookup
 , traceShowId
-, FilePath
 ) where
 
 import Protolude as X
