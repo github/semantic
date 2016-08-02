@@ -1,5 +1,10 @@
 {-# LANGUAGE RankNTypes #-}
-module Data.RandomWalkSimilarity where
+module Data.RandomWalkSimilarity
+( rws
+, pqGrams
+, featureVector
+, Gram(..)
+) where
 
 import Control.Arrow ((&&&))
 import Control.Monad.Random
