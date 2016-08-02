@@ -14,7 +14,6 @@ import qualified Data.Text.ICU.Convert as Convert
 import Data.These
 import Diff
 import Info
-import Category
 import Interpreter
 import Language
 import Parser
@@ -35,6 +34,30 @@ import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
 
+-- | Given a parser and renderer, diff two sources and return the rendered
+-- | result.
+-- | Returns the rendered result strictly, so it's always fully evaluated
+-- | with respect to other IO actions.
+diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record fields) -> Both SourceBlob -> IO Text
+diffFiles parser renderer sourceBlobs = do
+  let sources = source <$> sourceBlobs
+  terms <- traverse (parser . source) sourceBlobs
+
+  let areNullOids = runBothWith (\a b -> (oid a == nullOid || null (source a), oid b == nullOid || null (source b))) sourceBlobs
+  let textDiff = case areNullOids of
+        (True, False) -> pure $ Insert (snd terms)
+        (False, True) -> pure $ Delete (fst terms)
+        (_, _) ->
+          runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts) terms
+
+  pure $! renderer textDiff sourceBlobs
+
+  where construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
+        sumCost = fmap getSum . foldMap (fmap Sum . getCost)
+        getCost diff = case runFree diff of
+          Free (info :< _) -> cost <$> info
+          Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
+
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
 parserForType mediaType = case languageForType mediaType of
@@ -45,9 +68,10 @@ parserForType mediaType = case languageForType mediaType of
 
 -- | A fallback parser that treats a file simply as rows of strings.
 lineByLineParser :: Parser (Syntax Text) (Record '[Range, Category])
-lineByLineParser input = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
+lineByLineParser blob = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
   (leaves, _) -> cofree <$> leaves
   where
+    input = source blob
     lines = actualLines input
     root children = ((Range 0 $ length input) .: Other "program" .: RNil) :< Indexed children
     leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Other "program" .: RNil) :< Leaf line
@@ -97,28 +121,6 @@ decorateParser decorator = (fmap (decorateTerm decorator) .)
 decorateTerm :: (Typeable field, Functor f) => TermDecorator f fields field -> Cofree f (Record fields) -> Cofree f (Record (field ': fields))
 decorateTerm decorator = cata $ \ c -> cofree ((decorator (extract <$> c) .: headF c) :< tailF c)
 
--- | Given a parser and renderer, diff two sources and return the rendered
--- | result.
--- | Returns the rendered result strictly, so it's always fully evaluated
--- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record fields) -> Both SourceBlob -> IO Text
-diffFiles parser renderer sourceBlobs = do
-  terms <- traverse (parser . source) sourceBlobs
-
-  let areNullOids = runJoin $ (== nullOid) . oid <$> sourceBlobs
-  let textDiff = case areNullOids of
-        (True, False) -> pure $ Insert (snd terms)
-        (False, True) -> pure $ Delete (fst terms)
-        _ -> runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts) terms
-
-  pure $! renderer textDiff sourceBlobs
-
-  where construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
-        sumCost = fmap getSum . foldMap (fmap Sum . getCost)
-        getCost diff = case runFree diff of
-          Free (info :< _) -> cost <$> info
-          Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
-
 compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Term leaf (Record fields) -> Bool
 compareCategoryEq = (==) `on` category . extract
 
@@ -134,7 +136,6 @@ diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields)
 diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Free (info :< _) -> sum (cost <$> info)
   Pure patch -> sum (cost . extract <$> patch)
-
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
 textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Text

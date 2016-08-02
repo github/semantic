@@ -2,8 +2,7 @@ module Category where
 
 import Prologue
 import Data.Hashable
-import Test.QuickCheck (oneof, Arbitrary, arbitrary, shrink)
-import Test.QuickCheck.Arbitrary
+import Test.QuickCheck hiding (Args)
 import Data.Text (unpack)
 import Data.Text.Arbitrary()
 
@@ -62,6 +61,12 @@ data Category
   | VarDecl
   -- | A switch expression.
   | Switch
+  -- | A for expression.
+  | For
+  -- | A while expression.
+  | While
+  -- | A do/while expression.
+  | DoWhile
   -- | A ternary expression.
   | Ternary
   -- | A case expression.
@@ -70,6 +75,22 @@ data Category
   | Operator
   -- | An object/dictionary/hash literal.
   | Object
+  -- | A return statement.
+  | Return
+  -- | A throw statement.
+  | Throw
+  -- | A constructor statement, e.g. new Foo;
+  | Constructor
+  -- | A try statement.
+  | Try
+  -- | A catch statement.
+  | Catch
+  -- | A finally statement.
+  | Finally
+  -- | A class declaration.
+  | Class
+  -- | A class method declaration.
+  | Method
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Generic, Ord, Show, Typeable)
@@ -110,6 +131,9 @@ instance Arbitrary Category where
     , pure SubscriptAccess
     , pure VarAssignment
     , pure VarDecl
+    , pure For
+    , pure DoWhile
+    , pure While
     , pure Switch
     , pure Ternary
     , pure Case

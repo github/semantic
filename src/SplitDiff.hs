@@ -2,7 +2,6 @@ module SplitDiff where
 
 import Data.Record
 import Info
-import Range
 import Prologue
 import Syntax
 import Term (Term)
