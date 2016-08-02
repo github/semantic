@@ -81,9 +81,9 @@ lineByLineParser blob = pure . cofree . root $ case foldl' annotateLeaves ([], 0
 
 -- | Return the parser that should be used for a given path.
 parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Range, Category])
-parserForFilepath path source = do
-   parsed <- parserForType (toS (takeExtension path)) source
-   pure $! breakDownLeavesByWord source parsed
+parserForFilepath path blob = do
+   parsed <- parserForType (toS (takeExtension path)) blob
+   pure $! breakDownLeavesByWord (source blob) parsed
 
 -- | Replace every string leaf with leaves of the words in the string.
 breakDownLeavesByWord :: (HasField fields Category, HasField fields Range) => Source Char -> Term Text (Record fields) -> Term Text (Record fields)
