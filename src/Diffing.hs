@@ -50,7 +50,7 @@ diffFiles parser renderer sourceBlobs = do
         (_, _) ->
           runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts) terms
 
-  pure $! renderer textDiff sourceBlobs
+  pure $! renderer sourceBlobs textDiff
 
   where construct (info :< syntax) = free (Free ((setCost <$> info <*> sumCost syntax) :< syntax))
         sumCost = fmap getSum . foldMap (fmap Sum . getCost)
