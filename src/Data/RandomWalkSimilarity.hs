@@ -76,7 +76,7 @@ pqGrams getLabel p q = uncurry DList.cons . cata merge . setRootBase . setRootSt
           | n > 0 = let gram :< functor = runCofree tree in cofree $ prependParent parentLabel gram :< (assignParent parentLabel (pred n) <$> functor)
           | otherwise = tree
         prependParent parentLabel gram = gram { stem = parentLabel : stem gram }
-        setBases gram siblings rest = setBase gram (siblings >>= base) : rest
+        setBases gram siblings rest = setBase gram (foldMap base siblings) : rest
         setBase gram newBase = gram { base = take q (newBase <> repeat Nothing) }
         setRootBase term = let (a :< f) = runCofree term in cofree (setBase a (base a) :< f)
         setRootStem = foldr (\ p rest -> assignParent Nothing p . rest) identity [0..p]
