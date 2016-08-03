@@ -11,6 +11,7 @@ import Data.RandomWalkSimilarity
 import Data.Record
 import Data.These
 import Diff
+import qualified Control.Monad.Free.Church as F
 import Info
 import Patch
 import Prologue hiding (lookup)
@@ -45,7 +46,7 @@ constructAndRun construct comparable cost t1 t2
 
 -- | Runs the diff algorithm
 run :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Algorithm (Term leaf (Record fields)) (Diff leaf (Record fields)) (Diff leaf (Record fields)) -> Maybe (Diff leaf (Record fields))
-run construct comparable cost algorithm = (`iter` fmap Just algorithm) $ \case
+run construct comparable cost algorithm = (`F.iter` fmap Just algorithm) $ \case
   Recursive t1 t2 f -> f $ recur a b where
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
     annotate = construct . (both annotation1 annotation2 :<)
@@ -67,7 +68,7 @@ runAlgorithm :: (Functor f, GAlign f, Eq a, Eq annotation, Eq (f (Cofree f annot
   (forall b. CofreeF f annotation b -> label) ->
   Algorithm (Cofree f annotation) (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) a ->
   a
-runAlgorithm recur cost getLabel = iter $ \case
+runAlgorithm recur cost getLabel = F.iter $ \case
   Recursive a b f -> f (maybe (pure (Replace a b)) (wrap . (both (extract a) (extract b) :<) . fmap (these (pure . Delete) (pure . Insert) ((fromMaybe (pure (Replace a b)) .) . recur))) (galign (unwrap a) (unwrap b)))
   ByIndex as bs f -> f (ses recur cost as bs)
   ByRandomWalkSimilarity as bs f -> f (rws recur getLabel as bs)

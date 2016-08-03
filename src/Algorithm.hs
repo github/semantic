@@ -1,5 +1,6 @@
 module Algorithm where
 
+import Control.Monad.Free.Church
 import Diff
 import Prologue
 import Term
@@ -17,7 +18,7 @@ data AlgorithmF
   deriving Functor
 
 -- | A lazily-produced AST for diffing.
-type Algorithm term diff = Free (AlgorithmF term diff)
+type Algorithm term diff = F (AlgorithmF term diff)
 
 recursively :: Term leaf annotation -> Term leaf annotation -> Algorithm (Term leaf annotation) (Diff leaf annotation) (Diff leaf annotation)
 recursively a b = wrap (Recursive a b pure)
