@@ -38,7 +38,7 @@ constructAndRun construct comparable cost t1 t2
       diffs <- byIndex a' b'
       annotate (Indexed diffs)
     algorithm (Leaf a') (Leaf b') | a' == b' = annotate $ Leaf b'
-    algorithm a' b' = wrap $! Recursive (cofree (annotation1 :< a')) (cofree (annotation2 :< b')) pure
+    algorithm _ _ = recursively t1 t2
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
     annotate = pure . construct . (both annotation1 annotation2 :<)
 
