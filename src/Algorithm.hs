@@ -24,3 +24,6 @@ recursively a b = wrap (Recursive a b pure)
 
 byIndex :: [Term leaf annotation] -> [Term leaf annotation] -> Algorithm leaf annotation [Diff leaf annotation]
 byIndex a b = wrap (ByIndex a b pure)
+
+bySimilarity :: [Term leaf annotation] -> [Term leaf annotation] -> Algorithm leaf annotation [Diff leaf annotation]
+bySimilarity a b = wrap (ByRandomWalkSimilarity a b pure)
