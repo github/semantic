@@ -44,9 +44,8 @@ constructAndRun construct comparable cost t1 t2
 
 -- | Runs the diff algorithm
 run :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Algorithm (Term leaf (Record fields)) (Diff leaf (Record fields)) (Diff leaf (Record fields)) -> Maybe (Diff leaf (Record fields))
-run construct comparable cost algorithm = case runFree algorithm of
-  Pure diff -> Just diff
-  Free (Recursive t1 t2 f) -> run construct comparable cost . f $ recur a b where
+run construct comparable cost algorithm = (`iter` fmap Just algorithm) $ \case
+  Recursive t1 t2 f -> f $ recur a b where
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
     annotate = construct . (both annotation1 annotation2 :<)
 
@@ -54,9 +53,9 @@ run construct comparable cost algorithm = case runFree algorithm of
 
     diffThese = these (pure . Delete) (pure . Insert) (diffTerms construct comparable cost)
 
-  Free (ByIndex a b f) -> run construct comparable cost . f $ ses (constructAndRun construct comparable cost) cost a b
+  ByIndex a b f -> f $ ses (constructAndRun construct comparable cost) cost a b
 
-  Free (ByRandomWalkSimilarity a b f) -> run construct comparable cost . f $ rws (constructAndRun construct comparable cost) getLabel a b
+  ByRandomWalkSimilarity a b f -> f $ rws (constructAndRun construct comparable cost) getLabel a b
     where getLabel (h :< t) = (category h, case t of
             Leaf s -> Just s
             _ -> Nothing)
