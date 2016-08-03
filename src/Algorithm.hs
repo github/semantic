@@ -19,3 +19,6 @@ data AlgorithmF
 
 -- | A lazily-produced AST for diffing.
 type Algorithm a annotation = Free (AlgorithmF a annotation)
+
+recursively :: Term leaf annotation -> Term leaf annotation -> Algorithm leaf annotation (Diff leaf annotation)
+recursively a b = wrap (Recursive a b pure)
