@@ -11,7 +11,6 @@ import Data.Record
 import Data.These
 import Diff
 import Info
-import Operation
 import Patch
 import Prologue hiding (lookup)
 import SES
