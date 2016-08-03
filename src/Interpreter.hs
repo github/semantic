@@ -34,7 +34,9 @@ constructAndRun construct comparable cost t1 t2
   | (category <$> t1) == (category <$> t2) = hylo construct runCofree <$> zipTerms t1 t2
   | otherwise =
   run construct comparable cost $ algorithm a b where
-    algorithm (Indexed a') (Indexed b') = wrap $! ByIndex a' b' (annotate . Indexed)
+    algorithm (Indexed a') (Indexed b') = do
+      diffs <- byIndex a' b'
+      annotate (Indexed diffs)
     algorithm (Leaf a') (Leaf b') | a' == b' = annotate $ Leaf b'
     algorithm a' b' = wrap $! Recursive (cofree (annotation1 :< a')) (cofree (annotation2 :< b')) pure
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
