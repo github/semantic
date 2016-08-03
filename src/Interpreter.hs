@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
@@ -59,3 +60,14 @@ run construct comparable cost algorithm = (`iter` fmap Just algorithm) $ \case
     where getLabel (h :< t) = (category h, case t of
             Leaf s -> Just s
             _ -> Nothing)
+
+runAlgorithm :: (Functor f, GAlign f, Eq a, Eq annotation, Eq (f (Cofree f annotation)), Prologue.Foldable f, Hashable label) =>
+  (Cofree f annotation -> Cofree f annotation -> Maybe (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation)))) ->
+  SES.Cost (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) ->
+  (forall b. CofreeF f annotation b -> label) ->
+  Algorithm (Cofree f annotation) (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) a ->
+  a
+runAlgorithm recur cost getLabel = iter $ \case
+  Recursive a b f -> f (maybe (pure (Replace a b)) (wrap . (both (extract a) (extract b) :<) . fmap (these (pure . Delete) (pure . Insert) ((fromMaybe (pure (Replace a b)) .) . recur))) (galign (unwrap a) (unwrap b)))
+  ByIndex as bs f -> f (ses recur cost as bs)
+  ByRandomWalkSimilarity as bs f -> f (rws recur getLabel as bs)
