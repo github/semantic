@@ -43,7 +43,7 @@ constructAndRun construct comparable cost t1 t2
     annotate = pure . construct . (both annotation1 annotation2 :<)
 
 -- | Runs the diff algorithm
-run :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Algorithm leaf (Record fields) (Diff leaf (Record fields)) -> Maybe (Diff leaf (Record fields))
+run :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Algorithm (Term leaf (Record fields)) (Diff leaf (Record fields)) (Diff leaf (Record fields)) -> Maybe (Diff leaf (Record fields))
 run construct comparable cost algorithm = case runFree algorithm of
   Pure diff -> Just diff
   Free (Recursive t1 t2 f) -> run construct comparable cost . f $ recur a b where
