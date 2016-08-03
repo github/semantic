@@ -21,3 +21,6 @@ type Algorithm a annotation = Free (AlgorithmF a annotation)
 
 recursively :: Term leaf annotation -> Term leaf annotation -> Algorithm leaf annotation (Diff leaf annotation)
 recursively a b = wrap (Recursive a b pure)
+
+byIndex :: [Term leaf annotation] -> [Term leaf annotation] -> Algorithm leaf annotation [Diff leaf annotation]
+byIndex a b = wrap (ByIndex a b pure)
