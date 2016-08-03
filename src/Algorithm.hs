@@ -11,7 +11,6 @@ data AlgorithmF
   f -- ^ The type representing another level of the diffing algorithm. Often Algorithm.
   -- | Recursively diff two terms and pass the result to the continuation.
   = Recursive (Term a annotation) (Term a annotation) (Diff a annotation -> f)
-  -- | Diff two dictionaries and pass the result to the continuation.
   -- | Diff two arrays and pass the result to the continuation.
   | ByIndex [Term a annotation] [Term a annotation] ([Diff a annotation] -> f)
   | ByRandomWalkSimilarity [Term a annotation] [Term a annotation] ([Diff a annotation] -> f)
