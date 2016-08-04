@@ -25,13 +25,13 @@ type Comparable leaf annotation = Term leaf annotation -> Term leaf annotation -
 type DiffConstructor leaf annotation = CofreeF (Syntax leaf) (Both annotation) (Diff leaf annotation) -> Diff leaf annotation
 
 -- | Diff two terms recursively, given functions characterizing the diffing.
-diffTerms :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) =>
-  DiffConstructor leaf (Record fields) -> -- ^ A function to wrap up & possibly annotate every produced diff.
-  Comparable leaf (Record fields) -> -- ^ A function to determine whether or not two terms should even be compared.
-  SES.Cost (Diff leaf (Record fields)) -> -- ^ A function to compute the cost of a given diff node.
-  Term leaf (Record fields) -> -- ^ A term representing the old state.
-  Term leaf (Record fields) -> -- ^ A term representing the new state.
-  Diff leaf (Record fields)
+diffTerms :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category)
+  => DiffConstructor leaf (Record fields) -- ^ A function to wrap up & possibly annotate every produced diff.
+  -> Comparable leaf (Record fields) -- ^ A function to determine whether or not two terms should even be compared.
+  -> SES.Cost (Diff leaf (Record fields)) -- ^ A function to compute the cost of a given diff node.
+  -> Term leaf (Record fields) -- ^ A term representing the old state.
+  -> Term leaf (Record fields) -- ^ A term representing the new state.
+  -> Diff leaf (Record fields)
 diffTerms construct comparable cost a b = fromMaybe (replacing a b) $ diffComparableTerms construct comparable cost a b
 
 diffComparableTerms :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Maybe (Diff leaf (Record fields))
