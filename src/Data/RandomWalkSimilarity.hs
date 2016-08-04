@@ -100,7 +100,9 @@ decorateTermWithPGram p = futu coalgebra . (,) []
 decorateTermWithBagOfPQGrams :: (Typeable label, Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (DList.DList (Gram label) ': fields))
 decorateTermWithBagOfPQGrams q = fmap (\ (RCons (first, rest) t) -> DList.cons first rest .: t) . cata algebra
   where algebra :: (Prologue.Foldable f, Functor f) => CofreeF f (Record (Gram label ': fields)) (Cofree f (Record ((Gram label, DList.DList (Gram label)) ': fields))) -> Cofree f (Record ((Gram label, DList.DList (Gram label)) ': fields))
-        algebra (RCons gram rest :< functor) = cofree (((gram, DList.fromList (windowed q (\ gram siblings rest -> gram { base = take q (foldMap base siblings <> repeat Nothing) } : rest) [] (fst . getGrams . extract <$> toList functor)) <> foldMap (snd . getGrams . extract) functor) .: rest) :< functor)
+        algebra (RCons gram rest :< functor) = cofree (((gram, DList.fromList (windowed q setBases [] (fst . getGrams . extract <$> toList functor)) <> foldMap (snd . getGrams . extract) functor) .: rest) :< functor)
+        setBases :: Gram label -> [Gram label] -> [Gram label] -> [Gram label]
+        setBases gram siblings rest = gram { base = take q (foldMap base siblings <> repeat Nothing) } : rest
         getGrams :: HasField fields (Gram label, DList.DList (Gram label)) => Record fields -> (Gram label, DList.DList (Gram label))
         getGrams = getField
 
