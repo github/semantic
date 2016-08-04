@@ -63,6 +63,7 @@ toTermName source term = case unwrap term of
   S.Object kvs -> "{" <> intercalate ", " (toTermName' <$> kvs) <> "}"
   S.Pair a b -> toTermName' a <> ": " <> toTermName' b
   S.Return expr -> maybe "empty" toTermName' expr
+  S.Error span _ -> displayStartEndPos span
   S.For exprs _ -> termNameFromChildren term exprs
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
