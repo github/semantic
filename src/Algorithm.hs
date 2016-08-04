@@ -12,7 +12,7 @@ data AlgorithmF
   = Recursive term term (diff -> f)
   -- | Diff two arrays and pass the result to the continuation.
   | ByIndex [term] [term] ([diff] -> f)
-  | ByRandomWalkSimilarity [term] [term] ([diff] -> f)
+  | BySimilarity [term] [term] ([diff] -> f)
   deriving Functor
 
 -- | A lazily-produced AST for diffing.
@@ -25,4 +25,4 @@ byIndex :: [term] -> [term] -> Algorithm term diff [diff]
 byIndex a b = wrap (ByIndex a b pure)
 
 bySimilarity :: [term] -> [term] -> Algorithm term diff [diff]
-bySimilarity a b = wrap (ByRandomWalkSimilarity a b pure)
+bySimilarity a b = wrap (BySimilarity a b pure)

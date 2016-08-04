@@ -77,4 +77,4 @@ runAlgorithm construct recur cost getLabel = F.iter $ \case
     aligned <- galign (unwrap a) (unwrap b)
     traverse (these (Just . deleting) (Just . inserting) recur) aligned)
   ByIndex as bs f -> f (ses recur cost as bs)
-  ByRandomWalkSimilarity as bs f -> f (rws recur getLabel as bs)
+  BySimilarity as bs f -> f (rws recur getLabel as bs)
