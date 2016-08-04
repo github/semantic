@@ -58,7 +58,9 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
 -- | Runs the diff algorithm
 run :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Algorithm (Term leaf (Record fields)) (Diff leaf (Record fields)) (Diff leaf (Record fields)) -> Maybe (Diff leaf (Record fields))
 run construct comparable cost = runAlgorithm construct recur cost getLabel . fmap Just
-  where recur = constructAndRun construct comparable cost
+  where recur a b = do
+          guard (comparable a b)
+          constructAndRun construct comparable cost a b
         getLabel (h :< t) = (category h, case t of
           Leaf s -> Just s
           _ -> Nothing)
