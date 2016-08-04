@@ -26,12 +26,10 @@ rws :: (Hashable label, Eq annotation, Prologue.Foldable f, Functor f, Eq (f (Co
   -> [Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))]
 rws compare getLabel as bs
   | null as, null bs = []
-  | null as = insert <$> bs
-  | null bs = delete <$> as
+  | null as = inserting <$> bs
+  | null bs = deleting <$> as
   | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, fas)) $ traverse findNearestNeighbourTo fbs
-  where insert = pure . Insert
-        delete = pure . Delete
-        (p, q, d) = (2, 2, 15)
+  where (p, q, d) = (2, 2, 15)
         fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
@@ -39,14 +37,14 @@ rws compare getLabel as bs
         findNearestNeighbourTo kv@(UnmappedTerm _ _ v) = do
           (previous, unmapped) <- get
           let (UnmappedTerm i _ _) = KdTree.nearest kdas kv
-          fromMaybe (pure (negate 1, insert v)) $ do
+          fromMaybe (pure (negate 1, inserting v)) $ do
             found <- find ((== i) . termIndex) unmapped
             guard (i >= previous)
             compared <- compare (term found) v
             pure $! do
               put (i, List.delete found unmapped)
               pure (i, compared)
-        deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& delete . term) <$> unmapped)
+        deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmapped)
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
