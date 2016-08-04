@@ -30,11 +30,11 @@ diffTerms :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Catego
 diffTerms construct comparable cost a b = fromMaybe (replacing a b) $ diffComparableTerms construct comparable cost a b
 
 diffComparableTerms :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Maybe (Diff leaf (Record fields))
-diffComparableTerms construct comparable cost a b
-  | (category <$> a) == (category <$> b) = hylo construct runCofree <$> zipTerms a b
-  | comparable a b = runAlgorithm construct recur cost getLabel (Just <$> algorithmWithTerms construct a b)
-  | otherwise = Nothing
-  where recur a b = diffComparableTerms construct comparable cost a b
+diffComparableTerms construct comparable cost = recur
+  where recur a b
+          | (category <$> a) == (category <$> b) = hylo construct runCofree <$> zipTerms a b
+          | comparable a b = runAlgorithm construct recur cost getLabel (Just <$> algorithmWithTerms construct a b)
+          | otherwise = Nothing
         getLabel (h :< t) = (category h, case t of
           Leaf s -> Just s
           _ -> Nothing)
