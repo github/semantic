@@ -123,6 +123,9 @@ decorateTermWithPQGram p q = futu coalgebra . (,) []
 decorateTermWithBagsOfPQGrams :: (Prologue.Foldable f, Functor f) => Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (DList.DList (Gram label) ': fields))
 decorateTermWithBagsOfPQGrams = cata $ \ (RCons gram rest :< functor) -> cofree ((DList.cons gram (foldMap (getField . extract) functor) .: rest) :< functor)
 
+decorateTermWithFeatureVector :: (Hashable label, Functor f) => Int -> Cofree f (Record (DList.DList (Gram label) ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
+decorateTermWithFeatureVector d = fmap $ \ (RCons grams rest) -> featureVector d grams .: rest
+
 -- | The magnitude of a Euclidean vector, i.e. its distance from the origin.
 vmagnitude :: Vector.Vector Double -> Double
 vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
