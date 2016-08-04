@@ -8,9 +8,10 @@ import Test.QuickCheck hiding (Fixed)
 import SourceSpan
 
 -- | A node in an abstract syntax tree.
-data Syntax
-  a -- ^ The type of leaves in the syntax tree, typically String, but possibly some datatype representing different leaves more precisely.
-  f -- ^ The type representing another level of the tree, e.g. the children of branches. Often Cofree or Fix or similar.
+--
+-- 'a' is the type of leaves in the syntax tree, typically 'Text', but possibly some datatype representing different leaves more precisely.
+-- 'f' is the type representing another level of the tree, e.g. the children of branches. Often 'Cofree', 'Free' or similar.
+data Syntax a f
   -- | A terminal syntax node, e.g. an identifier, or atomic literal.
   = Leaf a
   -- | An ordered branch of child nodes, expected to be variadic in the grammar, e.g. a list of statements or uncurried function parameters.
