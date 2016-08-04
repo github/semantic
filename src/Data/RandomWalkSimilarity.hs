@@ -18,16 +18,12 @@ import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: (Hashable label, Eq annotation, Prologue.Foldable f, Functor f, Eq (f (Cofree f annotation))) =>
-  -- | A function which comapres a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
-  (Cofree f annotation -> Cofree f annotation -> Maybe (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation)))) ->
-  -- | A function to compute a label for an unpacked term.
-  (forall b. CofreeF f annotation b -> label) ->
-  -- | The old list of terms.
-  [Cofree f annotation] ->
-  -- | The new list of terms.
-  [Cofree f annotation] ->
-  [Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))]
+rws :: (Hashable label, Eq annotation, Prologue.Foldable f, Functor f, Eq (f (Cofree f annotation)))
+  => (Cofree f annotation -> Cofree f annotation -> Maybe (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation)))) -- ^ A function which comapres a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
+  -> (forall b. CofreeF f annotation b -> label) -- ^ A function to compute a label for an unpacked term.
+  -> [Cofree f annotation] -- ^ The list of old terms.
+  -> [Cofree f annotation] -- ^ The list of new terms.
+  -> [Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))]
 rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
