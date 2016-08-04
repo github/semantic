@@ -2,7 +2,6 @@
 module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
-import Category
 import Data.Align.Generic
 import Data.Functor.Foldable
 import Data.Functor.Both
