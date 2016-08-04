@@ -15,7 +15,7 @@ import Info
 import Patch
 import Prologue hiding (lookup)
 import SES
-import Syntax
+import Syntax as S
 import Term
 
 -- | Returns whether two terms are comparable
@@ -41,6 +41,9 @@ diffComparableTerms construct comparable cost = recur
 algorithmWithTerms :: (TermF leaf (Both a) diff -> diff) -> Term leaf a -> Term leaf a -> Algorithm (Term leaf a) diff diff
 algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) -> byIndex Indexed a b
+  (S.Switch exprA casesA, S.Switch exprB casesB) -> do
+    expr <- recursively exprA exprB
+    byIndex (S.Switch expr) casesA casesB
   (Commented commentsA a, Commented commentsB b) -> do
     wrapped <- sequenceA (recursively <$> a <*> b)
     byIndex (`Commented` wrapped) commentsA commentsB
