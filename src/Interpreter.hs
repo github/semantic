@@ -41,6 +41,9 @@ diffComparableTerms construct comparable cost = recur
 algorithmWithTerms :: (TermF leaf (Both a) diff -> diff) -> Term leaf a -> Term leaf a -> Algorithm (Term leaf a) diff diff
 algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) -> byIndex Indexed a b
+  (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) -> do
+    identifier <- recursively identifierA identifierB
+    byIndex (S.FunctionCall identifier) argsA argsB
   (S.Switch exprA casesA, S.Switch exprB casesB) -> do
     expr <- recursively exprA exprB
     byIndex (S.Switch expr) casesA casesB
