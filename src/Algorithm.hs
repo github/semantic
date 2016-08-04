@@ -12,6 +12,7 @@ data AlgorithmF
   = Recursive term term (diff -> f)
   -- | Diff two lists by each element’s position, and pass the resulting list of diffs to the continuation.
   | ByIndex [term] [term] ([diff] -> f)
+  -- | Diff two lists by each element’s similarity and pass the resulting list of diffs to the continuation.
   | BySimilarity [term] [term] ([diff] -> f)
   deriving Functor
 
