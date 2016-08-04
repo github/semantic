@@ -67,10 +67,10 @@ toTermName source term = case unwrap term of
   S.For exprs _ -> termNameFromChildren term exprs
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
-  S.Throw expr -> toText $ Source.slice (characterRange $ extract expr) source
+  S.Throw expr -> termNameFromSource expr
   S.Constructor expr -> toTermName' expr
-  S.Try expr _ _ -> toText $ Source.slice (characterRange $ extract expr) source
-  S.Array _ -> toText $ Source.slice (characterRange $ extract term) source
+  S.Try expr _ _ -> termNameFromSource expr
+  S.Array _ -> termNameFromSource term
   S.Class identifier _ _ -> toTermName' identifier
   S.Method identifier _ _ -> toTermName' identifier
   Comment a -> toCategoryName a
