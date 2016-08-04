@@ -11,9 +11,8 @@ import SourceSpan
 data Syntax
   a -- ^ The type of leaves in the syntax tree, typically String, but possibly some datatype representing different leaves more precisely.
   f -- ^ The type representing another level of the tree, e.g. the children of branches. Often Cofree or Fix or similar.
-  =
   -- | A terminal syntax node, e.g. an identifier, or atomic literal.
-  Leaf a
+  = Leaf a
   -- | An ordered branch of child nodes, expected to be variadic in the grammar, e.g. a list of statements or uncurried function parameters.
   | Indexed [f]
   -- | An ordered branch of child nodes, expected to be of fixed length in the grammar, e.g. a binary operator & its operands.
