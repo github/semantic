@@ -44,6 +44,15 @@ constructAndRun construct comparable cost t1 t2
     (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
     annotate = pure . construct . (both annotation1 annotation2 :<)
 
+algorithmWithTerms :: Eq leaf => Term leaf (Record fields) -> Term leaf (Record fields) -> Algorithm (Term leaf (Record fields)) (Diff leaf (Record fields)) (Diff leaf (Record fields))
+algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
+  (Indexed a, Indexed b) -> do
+    diffs <- byIndex a b
+    annotate (Indexed diffs)
+  (Leaf a, Leaf b) | a == b -> annotate (Leaf b)
+  _ -> recursively t1 t2
+  where annotate = pure . wrap . (both (extract t1) (extract t2) :<)
+
 -- | Runs the diff algorithm
 run :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Algorithm (Term leaf (Record fields)) (Diff leaf (Record fields)) (Diff leaf (Record fields)) -> Maybe (Diff leaf (Record fields))
 run construct comparable cost algorithm = (`F.iter` fmap Just algorithm) $ \case
