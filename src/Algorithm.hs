@@ -4,10 +4,11 @@ import Control.Monad.Free.Church
 import Prologue
 
 -- | A single step in a diffing algorithm.
-data AlgorithmF
-  term -- ^ The type of terms.
-  diff -- ^ The type of diffs.
-  f -- ^ The type representing another level of the diffing algorithm. Often Algorithm.
+--
+-- 'term' is the type of terms.
+-- 'diff' is the type of diffs.
+-- 'f' represents the continuation after diffing. Often 'Algorithm'.
+data AlgorithmF term diff f
   -- | Recursively diff two terms and pass the result to the continuation.
   = Recursive term term (diff -> f)
   -- | Diff two lists by each element’s position, and pass the resulting list of diffs to the continuation.
