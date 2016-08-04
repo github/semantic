@@ -3,7 +3,6 @@ module Category where
 import Prologue
 import Data.Hashable
 import Test.QuickCheck hiding (Args)
-import Data.Text (unpack)
 import Data.Text.Arbitrary()
 
 -- | A standardized category of AST node. Used to determine the semantics for
@@ -98,11 +97,6 @@ data Category
 -- Instances
 
 instance Hashable Category
-
-instance CoArbitrary Text where
-  coarbitrary = coarbitrary . unpack
-instance CoArbitrary Category where
-  coarbitrary = genericCoarbitrary
 
 instance Arbitrary Category where
   arbitrary = oneof [

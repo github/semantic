@@ -71,6 +71,7 @@ styleName category = "category-" <> case category of
   C.Finally -> "finally_statement"
   ArrayLiteral -> "array"
   C.Class -> "class_statement"
+  C.Method -> "method"
   Other string -> string
 
 -- | Pick the class name for a split patch.
