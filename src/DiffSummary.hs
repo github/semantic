@@ -64,7 +64,7 @@ toTermName source term = case unwrap term of
   S.Pair a b -> toTermName' a <> ": " <> toTermName' b
   S.Return expr -> maybe "empty" toTermName' expr
   S.Error span _ -> displayStartEndPos span
-  S.For exprs _ -> termNameFromChildren term exprs
+  S.For _ _ -> termNameFromChildren term
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
   S.Throw expr -> termNameFromSource expr
@@ -74,9 +74,9 @@ toTermName source term = case unwrap term of
   S.Class identifier _ _ -> toTermName' identifier
   S.Method identifier _ _ -> toTermName' identifier
   Comment a -> toCategoryName a
-  S.Commented comments wrapped -> termNameFromChildren term (comments <> maybeToList wrapped)
+  S.Commented _ _ -> termNameFromChildren term
   where toTermName' = toTermName source
-        termNameFromChildren term cs = termNameFromRange (unionRangesFrom (range term) (range <$> cs))
+        termNameFromChildren term = termNameFromRange (unionRangesFrom (range term) (range <$> toList (unwrap term)))
         termNameFromSource term = termNameFromRange (range term)
         termNameFromRange range = toText $ Source.slice range source
         range = characterRange . extract
