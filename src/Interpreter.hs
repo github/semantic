@@ -44,6 +44,7 @@ algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
   (S.Switch exprA casesA, S.Switch exprB casesB) -> do
     expr <- recursively exprA exprB
     byIndex (S.Switch expr) casesA casesB
+  (S.Object a, S.Object b) -> byIndex S.Object a b
   (Commented commentsA a, Commented commentsB b) -> do
     wrapped <- sequenceA (recursively <$> a <*> b)
     byIndex (`Commented` wrapped) commentsA commentsB
