@@ -16,7 +16,7 @@ data AlgorithmF
   | BySimilarity [term] [term] ([diff] -> f)
   deriving Functor
 
--- | A lazily-produced AST for diffing.
+-- | The free monad for 'AlgorithmF'. This enables us to construct diff values using do-notation. We use the Church-encoded free monad 'F' for efficiency.
 type Algorithm term diff = F (AlgorithmF term diff)
 
 
