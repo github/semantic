@@ -60,7 +60,7 @@ run construct comparable cost = runAlgorithm construct (constructAndRun construc
           Leaf s -> Just s
           _ -> Nothing)
 
-runAlgorithm :: (Functor f, GAlign f, Eq a, Eq annotation, Eq (f (Cofree f annotation)), Prologue.Foldable f, Hashable label) =>
+runAlgorithm :: (Functor f, GAlign f, Eq a, Eq annotation, Eq (f (Cofree f annotation)), Prologue.Foldable f, Traversable f, Hashable label) =>
   (CofreeF f (Both annotation) (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) -> Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) ->
   (Cofree f annotation -> Cofree f annotation -> Maybe (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation)))) ->
   SES.Cost (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) ->
@@ -68,6 +68,8 @@ runAlgorithm :: (Functor f, GAlign f, Eq a, Eq annotation, Eq (f (Cofree f annot
   Algorithm (Cofree f annotation) (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) a ->
   a
 runAlgorithm construct recur cost getLabel = F.iter $ \case
-  Recursive a b f -> f (maybe (replacing a b) (construct . (both (extract a) (extract b) :<) . fmap (these (pure . Delete) (pure . Insert) ((fromMaybe (replacing a b) .) . recur))) (galign (unwrap a) (unwrap b)))
+  Recursive a b f -> f (maybe (replacing a b) (construct . (both (extract a) (extract b) :<)) $ do
+    aligned <- galign (unwrap a) (unwrap b)
+    traverse (these (Just . deleting) (Just . inserting) recur) aligned)
   ByIndex as bs f -> f (ses recur cost as bs)
   ByRandomWalkSimilarity as bs f -> f (rws recur getLabel as bs)
