@@ -73,6 +73,7 @@ toTermName source term = case unwrap term of
   S.Class identifier _ _ -> toTermName' identifier
   S.Method identifier _ _ -> toTermName' identifier
   Comment a -> toCategoryName a
+  S.Commented _ wrapped -> maybe "anonymous" toTermName' wrapped
   where toTermName' = toTermName source
         termNameFromChildren term cs = termNameFromRange (unionRangesFrom (range term) (range <$> cs))
         termNameFromSource term = termNameFromRange (range term)
