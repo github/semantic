@@ -71,13 +71,14 @@ algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
   where annotate = pure . construct . (both (extract t1) (extract t2) :<)
         byIndex constructor a b = Algorithm.byIndex a b >>= annotate . constructor
 
-runAlgorithm :: (Functor f, GAlign f, Eq a, Eq annotation, Eq (f (Cofree f annotation)), Prologue.Foldable f, Traversable f, Hashable label) =>
-  (CofreeF f (Both annotation) (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) -> Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) ->
-  (Cofree f annotation -> Cofree f annotation -> Maybe (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation)))) ->
-  SES.Cost (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) ->
-  (forall b. CofreeF f annotation b -> label) ->
-  Algorithm (Cofree f annotation) (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) a ->
-  a
+-- | Run an algorithm, given functions characterizing the evaluation.
+runAlgorithm :: (Functor f, GAlign f, Eq a, Eq annotation, Eq (f (Cofree f annotation)), Prologue.Foldable f, Traversable f, Hashable label)
+  => (CofreeF f (Both annotation) (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) -> Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) -- ^ A function to wrap up & possibly annotate every produced diff.
+  -> (Cofree f annotation -> Cofree f annotation -> Maybe (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation)))) -- ^ A function to diff two subterms recursively, if they are comparable, or else return 'Nothing'.
+  -> SES.Cost (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) -- ^ A function to compute the cost of a given diff node.
+  -> (forall b. CofreeF f annotation b -> label) -- ^ A function to compute a label for a given term.
+  -> Algorithm (Cofree f annotation) (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) a -- ^ The algorithm to run.
+  -> a
 runAlgorithm construct recur cost getLabel = F.iter $ \case
   Recursive a b f -> f (maybe (replacing a b) (construct . (both (extract a) (extract b) :<)) $ do
     aligned <- galign (unwrap a) (unwrap b)
