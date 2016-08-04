@@ -112,8 +112,7 @@ featureVectorDecorator :: (Prologue.Foldable f, Functor f) => (forall b. CofreeF
 featureVectorDecorator getLabel p q d (a :< s) = Vector.replicate d 0
 
 decorateTermWithLabel :: (Typeable label, Functor f) => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (label ': fields))
-decorateTermWithLabel getLabel = cata $ \ c@(h :< t) ->
-  cofree ((getLabel c .: h) :< t)
+decorateTermWithLabel getLabel = cata $ \ c -> cofree ((getLabel c .: headF c) :< tailF c)
 
 decorateTermWithPQGram :: (Typeable label, Functor f) => (forall b. CofreeF f (Record (label ': fields)) b -> label) -> Int -> Int -> Cofree f (Record (label ': fields)) -> Cofree f (Record (Gram label ': fields))
 decorateTermWithPQGram getLabel p q = futu coalgebra . (,) []
