@@ -108,9 +108,6 @@ featureVector d bag = sumVectors $ unitDVector . hash <$> bag
         normalize vec = fmap (/ vmagnitude vec) vec
         sumVectors = DList.foldr (Vector.zipWith (+)) (Vector.replicate d 0)
 
-featureVectorDecorator :: (Prologue.Foldable f, Functor f) => (forall b. CofreeF f (Record a) b -> label) -> Int -> Int -> Int -> TermDecorator f a (Vector.Vector Double)
-featureVectorDecorator getLabel p q d (a :< s) = Vector.replicate d 0
-
 decorateTermWithLabel :: (Typeable label, Functor f) => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (label ': fields))
 decorateTermWithLabel getLabel = cata $ \ c -> cofree ((getLabel c .: headF c) :< tailF c)
 
