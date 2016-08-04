@@ -35,20 +35,6 @@ diffComparableTerms construct comparable cost a b
   | comparable a b = run construct comparable cost (algorithmWithTerms construct a b)
   | otherwise = Nothing
 
--- | Constructs an algorithm and runs it
-constructAndRun :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Maybe (Diff leaf (Record fields))
-constructAndRun construct comparable cost t1 t2
-  | (category <$> t1) == (category <$> t2) = hylo construct runCofree <$> zipTerms t1 t2
-  | comparable t1 t2 = run construct comparable cost $ algorithm (unwrap t1) (unwrap t2)
-  | otherwise = Nothing
-  where algorithm a b = case (a, b) of
-          (Indexed a', Indexed b') -> do
-            diffs <- byIndex a' b'
-            annotate (Indexed diffs)
-          (Leaf a', Leaf b') | a' == b' -> annotate $ Leaf b'
-          _ -> recursively t1 t2
-        annotate = pure . construct . (both (extract t1) (extract t2) :<)
-
 algorithmWithTerms :: Eq leaf => DiffConstructor leaf (Record fields) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Algorithm (Term leaf (Record fields)) (Diff leaf (Record fields)) (Diff leaf (Record fields))
 algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) -> do
