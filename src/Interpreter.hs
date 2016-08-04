@@ -32,7 +32,7 @@ diffTerms construct comparable cost a b = fromMaybe (replacing a b) $ diffCompar
 diffComparableTerms :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Maybe (Diff leaf (Record fields))
 diffComparableTerms construct comparable cost a b
   | (category <$> a) == (category <$> b) = hylo construct runCofree <$> zipTerms a b
-  | comparable a b = run construct comparable cost (algorithmWithTerms a b)
+  | comparable a b = run construct comparable cost (algorithmWithTerms construct a b)
   | otherwise = Nothing
 
 -- | Constructs an algorithm and runs it
@@ -49,14 +49,14 @@ constructAndRun construct comparable cost t1 t2
           _ -> recursively t1 t2
         annotate = pure . construct . (both (extract t1) (extract t2) :<)
 
-algorithmWithTerms :: Eq leaf => Term leaf (Record fields) -> Term leaf (Record fields) -> Algorithm (Term leaf (Record fields)) (Diff leaf (Record fields)) (Diff leaf (Record fields))
-algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
+algorithmWithTerms :: Eq leaf => DiffConstructor leaf (Record fields) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Algorithm (Term leaf (Record fields)) (Diff leaf (Record fields)) (Diff leaf (Record fields))
+algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) -> do
     diffs <- byIndex a b
     annotate (Indexed diffs)
   (Leaf a, Leaf b) | a == b -> annotate (Leaf b)
   _ -> recursively t1 t2
-  where annotate = pure . wrap . (both (extract t1) (extract t2) :<)
+  where annotate = pure . construct . (both (extract t1) (extract t2) :<)
 
 -- | Runs the diff algorithm
 run :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Algorithm (Term leaf (Record fields)) (Diff leaf (Record fields)) (Diff leaf (Record fields)) -> Maybe (Diff leaf (Record fields))
