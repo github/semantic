@@ -103,8 +103,8 @@ featureVector d bag = sumVectors $ unitDVector . hash <$> bag
 decorateTermWithLabel :: (Typeable label, Functor f) => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (label ': fields))
 decorateTermWithLabel getLabel = cata $ \ c -> cofree ((getLabel c .: headF c) :< tailF c)
 
-decorateTermWithPQGram :: (Typeable label, Functor f) => Int -> Int -> Cofree f (Record (label ': fields)) -> Cofree f (Record (Gram label ': fields))
-decorateTermWithPQGram p q = futu coalgebra . (,) []
+decorateTermWithPGram :: (Typeable label, Functor f) => Int -> Cofree f (Record (label ': fields)) -> Cofree f (Record (Gram label ': fields))
+decorateTermWithPGram p = futu coalgebra . (,) []
   where coalgebra :: Functor f => ([Maybe label], Cofree f (Record (label ': fields))) -> CofreeF f (Record (Gram label ': fields)) (Free.Free (CofreeF f (Record (Gram label ': fields))) ([Maybe label], Cofree f (Record (label ': fields))))
         coalgebra (parentLabels, c) = case extract c of
           RCons label rest -> (Gram (take p (parentLabels <> repeat Nothing)) (pure (Just label)) .: rest) :< fmap (pure . (,) (take p (Just label : parentLabels))) (unwrap c)
