@@ -42,6 +42,9 @@ diffComparableTerms construct comparable cost = recur
 algorithmWithTerms :: (TermF leaf (Both a) diff -> diff) -> Term leaf a -> Term leaf a -> Algorithm (Term leaf a) diff diff
 algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) -> byIndex Indexed a b
+  (Commented commentsA a, Commented commentsB b) -> do
+    wrapped <- sequenceA (recursively <$> a <*> b)
+    byIndex (`Commented` wrapped) commentsA commentsB
   (Array a, Array b) -> byIndex Array a b
   _ -> recursively t1 t2
   where annotate = pure . construct . (both (extract t1) (extract t2) :<)
