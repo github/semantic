@@ -48,6 +48,10 @@ algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
     wrapped <- sequenceA (recursively <$> a <*> b)
     byIndex (`Commented` wrapped) commentsA commentsB
   (Array a, Array b) -> byIndex Array a b
+  (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) -> do
+    identifier <- recursively identifierA identifierB
+    params <- sequenceA (recursively <$> paramsA <*> paramsB)
+    byIndex (S.Class identifier params) expressionsA expressionsB
   _ -> recursively t1 t2
   where annotate = pure . construct . (both (extract t1) (extract t2) :<)
         byIndex constructor a b = Algorithm.byIndex a b >>= annotate . constructor
