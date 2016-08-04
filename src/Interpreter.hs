@@ -27,9 +27,7 @@ type DiffConstructor leaf annotation = CofreeF (Syntax leaf) (Both annotation) (
 
 -- | Diff two terms, given a function that determines whether two terms can be compared and a cost function.
 diffTerms :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Diff leaf (Record fields)
-diffTerms construct comparable cost a b
-  | not (comparable a b) = replacing a b
-  | otherwise = fromMaybe (replacing a b) $ run construct comparable cost (algorithmWithTerms a b)
+diffTerms construct comparable cost a b = fromMaybe (replacing a b) $ diffComparableTerms construct comparable cost a b
 
 diffComparableTerms :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Maybe (Diff leaf (Record fields))
 diffComparableTerms construct comparable cost a b
