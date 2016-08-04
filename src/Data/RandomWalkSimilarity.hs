@@ -72,8 +72,6 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 pqGrams :: (Prologue.Foldable f, Functor f, Typeable label) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> DList.DList (Gram label)
 pqGrams getLabel p q = getField . extract . decorateTermWithBagOfPQGrams q . decorateTermWithPGram p . decorateTermWithLabel getLabel
 
-type TermDecorator f fields field = CofreeF f (Record fields) (Record (field ': fields)) -> field
-
 
 -- | A sliding-window fold over _n_ items of a list per iteration.
 windowed :: Int -> (a -> [a] -> b -> b) -> b -> [a] -> b
