@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, RankNTypes, TypeOperators #-}
 module Data.RandomWalkSimilarity
 ( rws
 , pqGrams
@@ -7,6 +7,7 @@ module Data.RandomWalkSimilarity
 ) where
 
 import Control.Arrow ((&&&))
+import qualified Control.Monad.Free as Free (Free)
 import Control.Monad.Random
 import Control.Monad.State
 import qualified Data.DList as DList
@@ -114,6 +115,11 @@ decorateTermWithLabel :: (Typeable label, Functor f) => (forall b. CofreeF f (Re
 decorateTermWithLabel getLabel = cata $ \ c@(h :< t) ->
   cofree ((getLabel c .: h) :< t)
 
+decorateTermWithPQGram :: (Typeable label, Functor f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Gram label ': fields))
+decorateTermWithPQGram getLabel p q d = futu coalgebra . (,) [] . decorateTermWithLabel getLabel
+  where coalgebra :: Functor f => ([Maybe label], Cofree f (Record (label ': fields))) -> CofreeF f (Record (Gram label ': fields)) (Free.Free (CofreeF f (Record (Gram label ': fields))) ([Maybe label], Cofree f (Record (label ': fields))))
+        coalgebra (parentLabels, c) = case extract c of
+          RCons label rest -> (Gram (take p (parentLabels <> repeat Nothing)) (pure (Just label)) .: rest) :< fmap (pure . (,) (take p (Just label : parentLabels))) (unwrap c)
 
 -- | The magnitude of a Euclidean vector, i.e. its distance from the origin.
 vmagnitude :: Vector.Vector Double -> Double
