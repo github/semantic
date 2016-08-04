@@ -34,6 +34,7 @@ diffTerms :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Catego
   -> Diff leaf (Record fields)
 diffTerms construct comparable cost a b = fromMaybe (replacing a b) $ diffComparableTerms construct comparable cost a b
 
+-- | Diff two terms recursively, given functions characterizing the diffing. If the terms are incomparable, returns 'Nothing'.
 diffComparableTerms :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Term leaf (Record fields) -> Term leaf (Record fields) -> Maybe (Diff leaf (Record fields))
 diffComparableTerms construct comparable cost = recur
   where recur a b
