@@ -10,7 +10,7 @@ data AlgorithmF
   f -- ^ The type representing another level of the diffing algorithm. Often Algorithm.
   -- | Recursively diff two terms and pass the result to the continuation.
   = Recursive term term (diff -> f)
-  -- | Diff two arrays and pass the result to the continuation.
+  -- | Diff two lists by each element’s position, and pass the resulting list of diffs to the continuation.
   | ByIndex [term] [term] ([diff] -> f)
   | BySimilarity [term] [term] ([diff] -> f)
   deriving Functor
