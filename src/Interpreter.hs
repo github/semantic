@@ -35,7 +35,7 @@ diffComparableTerms construct comparable cost a b
   | comparable a b = run construct comparable cost (algorithmWithTerms construct a b)
   | otherwise = Nothing
 
-algorithmWithTerms :: Eq leaf => DiffConstructor leaf a -> Term leaf a -> Term leaf a -> Algorithm (Term leaf a) (Diff leaf a) (Diff leaf a)
+algorithmWithTerms :: Eq leaf => (TermF leaf (Both a) diff -> diff) -> Term leaf a -> Term leaf a -> Algorithm (Term leaf a) diff diff
 algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) -> do
     diffs <- byIndex a b
