@@ -19,6 +19,9 @@ data AlgorithmF
 -- | A lazily-produced AST for diffing.
 type Algorithm term diff = F (AlgorithmF term diff)
 
+
+-- DSL
+
 -- | Constructs a 'Recursive' diff of two terms.
 recursively :: term -> term -> Algorithm term diff diff
 recursively a b = wrap (Recursive a b pure)
