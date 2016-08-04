@@ -25,16 +25,16 @@ import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: (Hashable label, Eq annotation, Prologue.Foldable f, Functor f, Eq (f (Cofree f annotation))) =>
+rws :: (Hashable label, Eq (Record fields), Prologue.Foldable f, Functor f, Eq (f (Cofree f (Record fields))), Typeable label) =>
   -- | A function which comapres a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
-  (Cofree f annotation -> Cofree f annotation -> Maybe (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation)))) ->
+  (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) ->
   -- | A function to compute a label for an unpacked term.
-  (forall b. CofreeF f annotation b -> label) ->
+  (forall b. CofreeF f (Record fields) b -> label) ->
   -- | The old list of terms.
-  [Cofree f annotation] ->
+  [Cofree f (Record fields)] ->
   -- | The new list of terms.
-  [Cofree f annotation] ->
-  [Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))]
+  [Cofree f (Record fields)] ->
+  [Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))]
 rws compare getLabel as bs
   | null as, null bs = []
   | null as = insert <$> bs
@@ -69,18 +69,8 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
 -- | Compute the bag of grams with stems of length _p_ and bases of length _q_, with labels computed from annotations, which summarize the entire subtree of a term.
-pqGrams :: (Prologue.Foldable f, Functor f) => (forall b. CofreeF f annotation b -> label) -> Int -> Int -> Cofree f annotation -> DList.DList (Gram label)
-pqGrams getLabel p q = uncurry DList.cons . cata merge . setRootBase . setRootStem . cata go
-  where go c = cofree (Gram [] [ Just (getLabel c) ] :< (assignParent (Just (getLabel c)) p <$> tailF c))
-        merge (head :< tail) = let tail' = toList tail in (head, DList.fromList (windowed q setBases [] (fst <$> tail')) <> foldMap snd tail')
-        assignParent parentLabel n tree
-          | n > 0 = let gram :< functor = runCofree tree in cofree $ prependParent parentLabel gram :< (assignParent parentLabel (pred n) <$> functor)
-          | otherwise = tree
-        prependParent parentLabel gram = gram { stem = parentLabel : stem gram }
-        setBases gram siblings rest = setBase gram (foldMap base siblings) : rest
-        setBase gram newBase = gram { base = take q (newBase <> repeat Nothing) }
-        setRootBase term = let (a :< f) = runCofree term in cofree (setBase a (base a) :< f)
-        setRootStem = foldr (\ p rest -> assignParent Nothing p . rest) identity [0..p]
+pqGrams :: (Prologue.Foldable f, Functor f, Typeable label) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> DList.DList (Gram label)
+pqGrams getLabel p q = getField . extract . decorateTermWithBagOfPQGrams q . decorateTermWithPGram p . decorateTermWithLabel getLabel
 
 type TermDecorator f fields field = CofreeF f (Record fields) (Record (field ': fields)) -> field
 

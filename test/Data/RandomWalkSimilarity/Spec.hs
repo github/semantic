@@ -1,8 +1,10 @@
+{-# LANGUAGE DataKinds #-}
 module Data.RandomWalkSimilarity.Spec where
 
 import Category
 import Data.DList as DList hiding (toList)
 import Data.RandomWalkSimilarity
+import Data.Record
 import Diff
 import Patch
 import Prologue
@@ -17,10 +19,10 @@ spec :: Spec
 spec = parallel $ do
   describe "pqGrams" $ do
     prop "produces grams with stems of the specified length" . forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
-      \ (term, p, q) -> pqGrams headF p q (toTerm term :: Term Text Text) `shouldSatisfy` all ((== p) . length . stem)
+      \ (term, p, q) -> pqGrams headF p q (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== p) . length . stem)
 
     prop "produces grams with bases of the specified length" . forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
-      \ (term, p, q) -> pqGrams headF p q (toTerm term :: Term Text Text) `shouldSatisfy` all ((== q) . length . base)
+      \ (term, p, q) -> pqGrams headF p q (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== q) . length . base)
 
   describe "featureVector" $ do
     prop "produces a vector of the specified dimension" . forAll (arbitrary `suchThat` ((> 0) . Prologue.snd)) $
@@ -31,5 +33,5 @@ spec = parallel $ do
     prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
       \ (as, bs) -> let tas = toTerm <$> as
                         tbs = toTerm <$> bs
-                        diff = free (Free (pure Program :< Indexed (rws compare headF tas tbs :: [Diff Text Category]))) in
-        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree (Program :< Indexed tas)), Just (cofree (Program :< Indexed tbs)))
+                        diff = free (Free (pure (Program .: RNil) :< Indexed (rws compare (rhead . headF) tas tbs :: [Diff Text (Record '[Category])]))) in
+        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ((Program .: RNil) :< Indexed tas)), Just (cofree ((Program .: RNil) :< Indexed tbs)))
