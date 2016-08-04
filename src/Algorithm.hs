@@ -19,11 +19,14 @@ data AlgorithmF
 -- | A lazily-produced AST for diffing.
 type Algorithm term diff = F (AlgorithmF term diff)
 
+-- | Constructs a 'Recursive' diff of two terms.
 recursively :: term -> term -> Algorithm term diff diff
 recursively a b = wrap (Recursive a b pure)
 
+-- | Constructs a 'ByIndex' diff of two lists of terms.
 byIndex :: [term] -> [term] -> Algorithm term diff [diff]
 byIndex a b = wrap (ByIndex a b pure)
 
+-- | Constructs a 'BySimilarity' diff of two lists of terms.
 bySimilarity :: [term] -> [term] -> Algorithm term diff [diff]
 bySimilarity a b = wrap (BySimilarity a b pure)
