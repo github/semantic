@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, ScopedTypeVariables, TypeOperators #-}
 module Data.Record
-( Record(RNil)
+( Record(..)
 , (.:)
 , HasField(..)
 , maybeGetField

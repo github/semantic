@@ -110,6 +110,10 @@ featureVector d bag = sumVectors $ unitDVector . hash <$> bag
 featureVectorDecorator :: (Prologue.Foldable f, Functor f) => (forall b. CofreeF f (Record a) b -> label) -> Int -> Int -> Int -> TermDecorator f a (Vector.Vector Double)
 featureVectorDecorator getLabel p q d (a :< s) = Vector.replicate d 0
 
+decorateTermWithLabel :: (Typeable label, Functor f) => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (label ': fields))
+decorateTermWithLabel getLabel = cata $ \ c@(h :< t) ->
+  cofree ((getLabel c .: h) :< t)
+
 
 -- | The magnitude of a Euclidean vector, i.e. its distance from the origin.
 vmagnitude :: Vector.Vector Double -> Double
