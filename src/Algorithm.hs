@@ -1,9 +1,7 @@
 module Algorithm where
 
 import Control.Monad.Free.Church
-import Diff
 import Prologue
-import Term
 
 -- | A single step in a diffing algorithm.
 data AlgorithmF
@@ -20,11 +18,11 @@ data AlgorithmF
 -- | A lazily-produced AST for diffing.
 type Algorithm term diff = F (AlgorithmF term diff)
 
-recursively :: Term leaf annotation -> Term leaf annotation -> Algorithm (Term leaf annotation) (Diff leaf annotation) (Diff leaf annotation)
+recursively :: term -> term -> Algorithm term diff diff
 recursively a b = wrap (Recursive a b pure)
 
-byIndex :: [Term leaf annotation] -> [Term leaf annotation] -> Algorithm (Term leaf annotation) (Diff leaf annotation) [Diff leaf annotation]
+byIndex :: [term] -> [term] -> Algorithm term diff [diff]
 byIndex a b = wrap (ByIndex a b pure)
 
-bySimilarity :: [Term leaf annotation] -> [Term leaf annotation] -> Algorithm (Term leaf annotation) (Diff leaf annotation) [Diff leaf annotation]
+bySimilarity :: [term] -> [term] -> Algorithm term diff [diff]
 bySimilarity a b = wrap (ByRandomWalkSimilarity a b pure)
