@@ -55,21 +55,10 @@ algorithmWithTerms t1 t2 = case (unwrap t1, unwrap t2) of
 
 -- | Runs the diff algorithm
 run :: (Eq leaf, Hashable leaf, Eq (Record fields), HasField fields Category) => DiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (Diff leaf (Record fields)) -> Algorithm (Term leaf (Record fields)) (Diff leaf (Record fields)) (Diff leaf (Record fields)) -> Maybe (Diff leaf (Record fields))
-run construct comparable cost algorithm = (`F.iter` fmap Just algorithm) $ \case
-  Recursive t1 t2 f -> f $ recur a b where
-    (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
-    annotate = construct . (both annotation1 annotation2 :<)
-
-    recur a b = maybe (pure (Replace t1 t2)) (annotate . fmap diffThese) (galign a b)
-
-    diffThese = these (pure . Delete) (pure . Insert) (diffTerms construct comparable cost)
-
-  ByIndex a b f -> f $ ses (constructAndRun construct comparable cost) cost a b
-
-  ByRandomWalkSimilarity a b f -> f $ rws (constructAndRun construct comparable cost) getLabel a b
-    where getLabel (h :< t) = (category h, case t of
-            Leaf s -> Just s
-            _ -> Nothing)
+run construct comparable cost = runAlgorithm construct (constructAndRun construct comparable cost) cost getLabel . fmap Just
+  where getLabel (h :< t) = (category h, case t of
+          Leaf s -> Just s
+          _ -> Nothing)
 
 runAlgorithm :: (Functor f, GAlign f, Eq a, Eq annotation, Eq (f (Cofree f annotation)), Prologue.Foldable f, Hashable label) =>
   (CofreeF f (Both annotation) (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) -> Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) ->
