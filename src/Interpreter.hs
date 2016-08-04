@@ -71,4 +71,3 @@ runAlgorithm construct recur cost getLabel = F.iter $ \case
   Recursive a b f -> f (maybe (replacing a b) (construct . (both (extract a) (extract b) :<) . fmap (these (pure . Delete) (pure . Insert) ((fromMaybe (replacing a b) .) . recur))) (galign (unwrap a) (unwrap b)))
   ByIndex as bs f -> f (ses recur cost as bs)
   ByRandomWalkSimilarity as bs f -> f (rws recur getLabel as bs)
-  where replacing = (pure .) . Replace
