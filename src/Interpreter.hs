@@ -68,6 +68,7 @@ runAlgorithm :: (Functor f, GAlign f, Eq a, Eq annotation, Eq (f (Cofree f annot
   Algorithm (Cofree f annotation) (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))) a ->
   a
 runAlgorithm construct recur cost getLabel = F.iter $ \case
-  Recursive a b f -> f (maybe (pure (Replace a b)) (construct . (both (extract a) (extract b) :<) . fmap (these (pure . Delete) (pure . Insert) ((fromMaybe (pure (Replace a b)) .) . recur))) (galign (unwrap a) (unwrap b)))
+  Recursive a b f -> f (maybe (replacing a b) (construct . (both (extract a) (extract b) :<) . fmap (these (pure . Delete) (pure . Insert) ((fromMaybe (replacing a b) .) . recur))) (galign (unwrap a) (unwrap b)))
   ByIndex as bs f -> f (ses recur cost as bs)
   ByRandomWalkSimilarity as bs f -> f (rws recur getLabel as bs)
+  where replacing = (pure .) . Replace
