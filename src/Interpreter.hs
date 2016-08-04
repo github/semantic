@@ -44,6 +44,7 @@ diffComparableTerms construct comparable cost = recur
           Leaf s -> Just s
           _ -> Nothing)
 
+-- | Construct an algorithm to diff a pair of terms.
 algorithmWithTerms :: (TermF leaf (Both a) diff -> diff) -> Term leaf a -> Term leaf a -> Algorithm (Term leaf a) diff diff
 algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) -> byIndex Indexed a b
