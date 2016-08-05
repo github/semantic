@@ -14,13 +14,13 @@ import Test.QuickCheck
 -- | This is heavily inspired by Aaron Levin’s [Extensible Effects in the van Laarhoven Free Monad](http://aaronlevin.ca/post/136494428283/extensible-effects-in-the-van-laarhoven-free-monad).
 data Record :: [*] -> * where
   RNil :: Record '[]
-  RCons :: Typeable h => h -> Record t -> Record (h ': t)
+  RCons :: h -> Record t -> Record (h ': t)
   deriving Typeable
 
 infixr 0 .:
 
 -- | Infix synonym for `RCons`: `a .: b .: RNil == RCons a (RCons b RNil)`.
-(.:) :: Typeable h => h -> Record t -> Record (h ': t)
+(.:) :: h -> Record t -> Record (h ': t)
 (.:) = RCons
 
 
@@ -67,7 +67,7 @@ instance Ord (Record '[]) where
   _ `compare` _ = EQ
 
 
-instance (Typeable field, Arbitrary field, Arbitrary (Record fields)) => Arbitrary (Record (field ': fields)) where
+instance (Arbitrary field, Arbitrary (Record fields)) => Arbitrary (Record (field ': fields)) where
   arbitrary = RCons <$> arbitrary <*> arbitrary
 
   shrink (RCons h t) = RCons <$> shrink h <*> shrink t
