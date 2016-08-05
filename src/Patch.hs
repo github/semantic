@@ -1,5 +1,8 @@
 module Patch
 ( Patch(..)
+, replacing
+, inserting
+, deleting
 , after
 , before
 , unPatch
@@ -17,6 +20,22 @@ data Patch a
   | Insert a
   | Delete a
   deriving (Eq, Foldable, Functor, Generic, Ord, Show, Traversable)
+
+
+-- DSL
+
+-- | Constructs the replacement of one value by another in an Applicative context.
+replacing :: Applicative f => a -> a -> f (Patch a)
+replacing = (pure .) . Replace
+
+-- | Constructs the insertion of a value in an Applicative context.
+inserting :: Applicative f => a -> f (Patch a)
+inserting = pure . Insert
+
+-- | Constructs the deletion of a value in an Applicative context.
+deleting :: Applicative f => a -> f (Patch a)
+deleting = pure . Delete
+
 
 -- | Return the item from the after side of the patch.
 after :: Patch a -> Maybe a

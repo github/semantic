@@ -30,7 +30,6 @@ library
                      , Info
                      , Interpreter
                      , Language
-                     , Operation
                      , Parser
                      , Patch
                      , Patch.Arbitrary

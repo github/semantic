@@ -26,36 +26,31 @@ import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: (Eq (Record fields), Prologue.Foldable f, Functor f, Eq (f (Cofree f (Record fields))), HasField fields (Vector.Vector Double)) =>
-  -- | A function which comapres a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
-  (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) ->
-  -- | The old list of terms.
-  [Cofree f (Record fields)] ->
-  -- | The new list of terms.
-  [Cofree f (Record fields)] ->
-  [Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))]
+rws :: (Eq (Record fields), Prologue.Foldable f, Functor f, Eq (f (Cofree f (Record fields))), HasField fields (Vector.Vector Double))
+  => (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function which comapres a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
+  -> [Cofree f (Record fields)] -- ^ The list of old terms.
+  -> [Cofree f (Record fields)] -- ^ The list of new terms.
+  -> [Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))]
 rws compare as bs
   | null as, null bs = []
-  | null as = insert <$> bs
-  | null bs = delete <$> as
+  | null as = inserting <$> bs
+  | null bs = deleting <$> as
   | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, fas)) $ traverse findNearestNeighbourTo fbs
-  where insert = pure . Insert
-        delete = pure . Delete
-        fas = zipWith featurize [0..] as
+  where fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
         featurize index term = UnmappedTerm index (getField (extract term)) term
         findNearestNeighbourTo kv@(UnmappedTerm _ _ v) = do
           (previous, unmapped) <- get
           let (UnmappedTerm i _ _) = KdTree.nearest kdas kv
-          fromMaybe (pure (negate 1, insert v)) $ do
+          fromMaybe (pure (negate 1, inserting v)) $ do
             found <- find ((== i) . termIndex) unmapped
             guard (i >= previous)
             compared <- compare (term found) v
             pure $! do
               put (i, List.delete found unmapped)
               pure (i, compared)
-        deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& delete . term) <$> unmapped)
+        deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmapped)
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }

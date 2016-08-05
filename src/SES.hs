@@ -38,8 +38,8 @@ diffAt diffTerms cost (i, j) as bs
   | null bs = pure $ foldr delete [] as
   | otherwise = pure []
   where
-    delete = consWithCost cost . pure . Delete
-    insert = consWithCost cost . pure . Insert
+    delete = consWithCost cost . deleting
+    insert = consWithCost cost . inserting
     costOf [] = 0
     costOf ((_, c) : _) = c
     best = minimumBy (comparing costOf)
