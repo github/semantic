@@ -114,6 +114,7 @@ featureVectorDecorator getLabel p q d
   . decorateTermWithPGram p
   . decorateTermWithLabel getLabel
 
+-- | Pads a list of Alternative values to exactly n elements.
 padToSize :: Alternative f => Int -> [f a] -> [f a]
 padToSize n list = take n (list <> repeat empty)
 
