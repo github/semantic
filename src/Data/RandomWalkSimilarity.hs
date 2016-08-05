@@ -93,7 +93,7 @@ decorateTermWithPGram :: Functor f => Int -> Cofree f (Record (label ': fields))
 decorateTermWithPGram p = ana coalgebra . (,) []
   where coalgebra :: Functor f => ([Maybe label], Cofree f (Record (label ': fields))) -> CofreeF f (Record (Gram label ': fields)) ([Maybe label], Cofree f (Record (label ': fields)))
         coalgebra (parentLabels, c) = case extract c of
-          RCons label rest -> (Gram (padToSize p parentLabels) (pure (Just label)) .: rest) :< fmap ((,) (take p (Just label : parentLabels))) (unwrap c)
+          RCons label rest -> (Gram (padToSize p parentLabels) (pure (Just label)) .: rest) :< fmap ((,) (padToSize p (Just label : parentLabels))) (unwrap c)
 
 decorateTermWithBagOfPQGrams :: (Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (DList.DList (Gram label) ': fields))
 decorateTermWithBagOfPQGrams q = fmap (\ (RCons (first, rest) t) -> DList.cons (first { base = padToSize q (base first) }) rest .: t) . cata algebra
