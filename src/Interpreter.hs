@@ -69,7 +69,7 @@ algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
     annotate $! S.Method identifier params expressions
   _ -> recursively t1 t2
   where annotate = pure . construct . (both (extract t1) (extract t2) :<)
-        byIndex constructor a b = Algorithm.byIndex a b >>= annotate . constructor
+        byIndex constructor a b = Algorithm.bySimilarity a b >>= annotate . constructor
 
 -- | Run an algorithm, given functions characterizing the evaluation.
 runAlgorithm :: (Functor f, GAlign f, Eq a, Eq (Record fields), Eq (f (Cofree f (Record fields))), Prologue.Foldable f, Traversable f, HasField fields (Vector.Vector Double))
