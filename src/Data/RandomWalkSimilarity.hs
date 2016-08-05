@@ -9,7 +9,6 @@ module Data.RandomWalkSimilarity
 
 import Control.Applicative
 import Control.Arrow ((&&&))
-import qualified Control.Monad.Free as Free (Free)
 import Control.Monad.Random
 import Control.Monad.State
 import qualified Data.DList as DList
@@ -91,10 +90,10 @@ decorateTermWithLabel :: Functor f => (forall b. CofreeF f (Record fields) b -> 
 decorateTermWithLabel getLabel = cata $ \ c -> cofree ((getLabel c .: headF c) :< tailF c)
 
 decorateTermWithPGram :: Functor f => Int -> Cofree f (Record (label ': fields)) -> Cofree f (Record (Gram label ': fields))
-decorateTermWithPGram p = futu coalgebra . (,) []
-  where coalgebra :: Functor f => ([Maybe label], Cofree f (Record (label ': fields))) -> CofreeF f (Record (Gram label ': fields)) (Free.Free (CofreeF f (Record (Gram label ': fields))) ([Maybe label], Cofree f (Record (label ': fields))))
+decorateTermWithPGram p = ana coalgebra . (,) []
+  where coalgebra :: Functor f => ([Maybe label], Cofree f (Record (label ': fields))) -> CofreeF f (Record (Gram label ': fields)) ([Maybe label], Cofree f (Record (label ': fields)))
         coalgebra (parentLabels, c) = case extract c of
-          RCons label rest -> (Gram (padToSize p parentLabels) (pure (Just label)) .: rest) :< fmap (pure . (,) (take p (Just label : parentLabels))) (unwrap c)
+          RCons label rest -> (Gram (padToSize p parentLabels) (pure (Just label)) .: rest) :< fmap ((,) (take p (Just label : parentLabels))) (unwrap c)
 
 decorateTermWithBagOfPQGrams :: (Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (DList.DList (Gram label) ': fields))
 decorateTermWithBagOfPQGrams q = fmap (\ (RCons (first, rest) t) -> DList.cons (first { base = padToSize q (base first) }) rest .: t) . cata algebra
