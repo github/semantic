@@ -94,7 +94,6 @@ data Category
   | Other Text
   deriving (Eq, Generic, Ord, Show)
 
-
 -- Instances
 
 instance Hashable Category
