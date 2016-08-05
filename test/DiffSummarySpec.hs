@@ -101,7 +101,7 @@ isIndexedOrFixed' syntax = case syntax of
 isBranchInfo :: DiffInfo -> Bool
 isBranchInfo info = case info of
   (BranchInfo _ _ _) -> True
-  (LeafInfo _ _) -> False
+  _ -> False
 
 isBranchNode :: Patch DiffInfo -> Bool
 isBranchNode = any isBranchInfo
