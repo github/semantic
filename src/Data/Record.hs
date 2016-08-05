@@ -2,7 +2,6 @@
 module Data.Record
 ( Record(..)
 , (.:)
-, rhead
 , HasField(..)
 , maybeGetField
 , updateField
@@ -25,11 +24,6 @@ infixr 0 .:
 -- | Infix synonym for `RCons`: `a .: b .: RNil == RCons a (RCons b RNil)`.
 (.:) :: Typeable h => h -> Record t -> Record (h ': t)
 (.:) = RCons
-
--- | Get the first element of a non-empty record.
-rhead :: Record (head ': tail) -> head
-rhead (RCons head _) = head
-
 
 -- | Return 'Just' a 'field', if it exists in a record. Otherwise, return 'Nothing'.
 maybeGetField :: Typeable field => Record fields -> Maybe field
