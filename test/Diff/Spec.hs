@@ -40,5 +40,5 @@ spec = parallel $ do
 
 
 instance Arbitrary a => Arbitrary (Vector.Vector a) where
-  arbitrary = Vector.fromList <$> arbitrary
+  arbitrary = Vector.fromList <$> listOf1 arbitrary
   shrink a = Vector.fromList <$> shrink (Vector.toList a)
