@@ -63,7 +63,7 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 
 -- | Compute the bag of grams with stems of length _p_ and bases of length _q_, with labels computed from annotations, which summarize the entire subtree of a term.
 pqGrams :: (Prologue.Foldable f, Functor f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> DList.DList (Gram label)
-pqGrams getLabel p q = getField . extract . decorateTermWithBagOfPQGrams q . decorateTermWithPGram p . decorateTermWithLabel getLabel
+pqGrams getLabel p q = foldMap (pure . getField) . decorateTermWithPQGram q . decorateTermWithPGram p . decorateTermWithLabel getLabel
 
 
 -- | A sliding-window fold over _n_ items of a list per iteration.
@@ -93,24 +93,30 @@ decorateTermWithPGram p = ana coalgebra . (,) []
           RCons label rest -> (Gram (padToSize p parentLabels) (pure (Just label)) .: rest) :< fmap ((,) (padToSize p (Just label : parentLabels))) (unwrap c)
 
 -- | Replaces p,1-grams in a term’s annotations with corresponding bags of p,q-grams.
-decorateTermWithBagOfPQGrams :: (Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (DList.DList (Gram label) ': fields))
-decorateTermWithBagOfPQGrams q = fmap (\ (RCons (first, rest) t) -> DList.cons (first { base = padToSize q (base first) }) rest .: t) . cata algebra
-  where algebra :: (Prologue.Foldable f, Functor f) => CofreeF f (Record (Gram label ': fields)) (Cofree f (Record ((Gram label, DList.DList (Gram label)) ': fields))) -> Cofree f (Record ((Gram label, DList.DList (Gram label)) ': fields))
-        algebra (RCons gram rest :< functor) = cofree (((gram, DList.fromList (windowed q setBases [] (fst . getGrams . extract <$> toList functor)) <> foldMap (snd . getGrams . extract) functor) .: rest) :< functor)
+decorateTermWithPQGram :: (Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (Gram label ': fields))
+decorateTermWithPQGram q = cata algebra
+  where algebra :: (Prologue.Foldable f, Functor f) => CofreeF f (Record (Gram label ': fields)) (Cofree f (Record (Gram label ': fields))) -> Cofree f (Record (Gram label ': fields))
+        algebra (RCons gram rest :< functor) = cofree ((gram .: rest) :< functor)
+        -- (gram, DList.fromList (windowed q setBases [] (fst . getGrams . extract <$> toList functor)) <> foldMap (snd . getGrams . extract) functor)
         setBases :: Gram label -> [Gram label] -> [Gram label] -> [Gram label]
         setBases gram siblings rest = gram { base = padToSize q (foldMap base siblings) } : rest
         getGrams :: HasField fields (Gram label, DList.DList (Gram label)) => Record fields -> (Gram label, DList.DList (Gram label))
         getGrams = getField
 
 -- | Replaces bags of p,q-grams in a term’s annotations with corresponding feature vectors.
-decorateTermWithFeatureVector :: (Hashable label, Functor f) => Int -> Cofree f (Record (DList.DList (Gram label) ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
-decorateTermWithFeatureVector d = fmap $ \ (RCons grams rest) -> featureVector d grams .: rest
+decorateTermWithFeatureVector :: (Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Vector.Vector Double ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
+decorateTermWithFeatureVector d = cata $ \ (RCons gram rest :< functor) -> cofree (RCons (foldr (\ each into -> Vector.zipWith (+) (getField (extract each)) into) (Vector.replicate d 0) functor) rest :< functor)
+
+decorateTermWithUnitVector :: (Hashable label, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
+decorateTermWithUnitVector d = fmap $ \ (RCons gram rest) -> normalize ((`evalRand` mkQCGen (hash gram)) (sequenceA (Vector.replicate d getRandom))) .: rest
+  where normalize vec = fmap (/ vmagnitude vec) vec
 
 -- | Annotates a term with a feature vector at each node.
 featureVectorDecorator :: (Hashable label, Functor f, Prologue.Foldable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
 featureVectorDecorator getLabel p q d
   = decorateTermWithFeatureVector d
-  . decorateTermWithBagOfPQGrams q
+  . decorateTermWithUnitVector d
+  . decorateTermWithPQGram q
   . decorateTermWithPGram p
   . decorateTermWithLabel getLabel
 
