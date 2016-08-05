@@ -86,15 +86,18 @@ featureVector d bag = sumVectors $ unitDVector . hash <$> bag
         normalize vec = fmap (/ vmagnitude vec) vec
         sumVectors = DList.foldr (Vector.zipWith (+)) (Vector.replicate d 0)
 
+-- | Annotates a term with a label at each node.
 decorateTermWithLabel :: Functor f => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (label ': fields))
 decorateTermWithLabel getLabel = cata $ \ c -> cofree ((getLabel c .: headF c) :< tailF c)
 
+-- | Replaces labels in a term’s annotations with corresponding p,1-grams.
 decorateTermWithPGram :: Functor f => Int -> Cofree f (Record (label ': fields)) -> Cofree f (Record (Gram label ': fields))
 decorateTermWithPGram p = ana coalgebra . (,) []
   where coalgebra :: Functor f => ([Maybe label], Cofree f (Record (label ': fields))) -> CofreeF f (Record (Gram label ': fields)) ([Maybe label], Cofree f (Record (label ': fields)))
         coalgebra (parentLabels, c) = case extract c of
           RCons label rest -> (Gram (padToSize p parentLabels) (pure (Just label)) .: rest) :< fmap ((,) (padToSize p (Just label : parentLabels))) (unwrap c)
 
+-- | Replaces p,1-grams in a term’s annotations with corresponding bags of p,q-grams.
 decorateTermWithBagOfPQGrams :: (Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (DList.DList (Gram label) ': fields))
 decorateTermWithBagOfPQGrams q = fmap (\ (RCons (first, rest) t) -> DList.cons (first { base = padToSize q (base first) }) rest .: t) . cata algebra
   where algebra :: (Prologue.Foldable f, Functor f) => CofreeF f (Record (Gram label ': fields)) (Cofree f (Record ((Gram label, DList.DList (Gram label)) ': fields))) -> Cofree f (Record ((Gram label, DList.DList (Gram label)) ': fields))
@@ -104,9 +107,11 @@ decorateTermWithBagOfPQGrams q = fmap (\ (RCons (first, rest) t) -> DList.cons (
         getGrams :: HasField fields (Gram label, DList.DList (Gram label)) => Record fields -> (Gram label, DList.DList (Gram label))
         getGrams = getField
 
+-- | Replaces bags of p,q-grams in a term’s annotations with corresponding feature vectors.
 decorateTermWithFeatureVector :: (Hashable label, Functor f) => Int -> Cofree f (Record (DList.DList (Gram label) ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
 decorateTermWithFeatureVector d = fmap $ \ (RCons grams rest) -> featureVector d grams .: rest
 
+-- | Annotates a term with a feature vector at each node.
 featureVectorDecorator :: (Hashable label, Functor f, Prologue.Foldable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
 featureVectorDecorator getLabel p q d
   = decorateTermWithFeatureVector d
