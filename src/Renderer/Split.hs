@@ -12,7 +12,6 @@ import Data.These
 import Info
 import Prologue hiding (div, head, fst, snd, link)
 import qualified Prologue
-import Range
 import Renderer
 import Source
 import SplitDiff
@@ -33,7 +32,7 @@ classifyMarkup category element = (element !) . A.class_ . textValue $ styleName
 styleName :: Category -> Text
 styleName category = "category-" <> case category of
   Program -> "program"
-  Error -> "error"
+  C.Error -> "error"
   BinaryOperator -> "binary-operator"
   Boolean -> "boolean"
   DictionaryLiteral -> "dictionary"
@@ -41,7 +40,6 @@ styleName category = "category-" <> case category of
   StringLiteral -> "string"
   SymbolLiteral -> "symbol"
   IntegerLiteral -> "integer"
-  ArrayLiteral -> "array"
   C.FunctionCall -> "function_call"
   C.Function -> "function"
   C.MethodCall -> "method_call"
@@ -62,6 +60,18 @@ styleName category = "category-" <> case category of
   C.Ternary -> "ternary"
   C.Operator -> "operator"
   C.Object -> "object"
+  C.For -> "for"
+  C.While -> "while"
+  C.DoWhile -> "do_while"
+  C.Return -> "return_statement"
+  C.Throw -> "throw_statement"
+  C.Constructor -> "constructor"
+  C.Try -> "try_statement"
+  C.Catch -> "catch_statement"
+  C.Finally -> "finally_statement"
+  ArrayLiteral -> "array"
+  C.Class -> "class_statement"
+  C.Method -> "method"
   Other string -> string
 
 -- | Pick the class name for a split patch.
@@ -73,7 +83,7 @@ splitPatchToClassName patch = stringValue $ "patch " <> case patch of
 
 -- | Render a diff as an HTML split diff.
 split :: (HasField fields Category, HasField fields Cost, HasField fields Range) => Renderer (Record fields)
-split diff blobs = TL.toStrict . renderHtml
+split blobs diff = TL.toStrict . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body

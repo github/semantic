@@ -2,7 +2,7 @@ module Category where
 
 import Prologue
 import Data.Hashable
-import Test.QuickCheck
+import Test.QuickCheck hiding (Args)
 import Data.Text.Arbitrary()
 
 -- | A standardized category of AST node. Used to determine the semantics for
@@ -60,6 +60,12 @@ data Category
   | VarDecl
   -- | A switch expression.
   | Switch
+  -- | A for expression.
+  | For
+  -- | A while expression.
+  | While
+  -- | A do/while expression.
+  | DoWhile
   -- | A ternary expression.
   | Ternary
   -- | A case expression.
@@ -68,27 +74,65 @@ data Category
   | Operator
   -- | An object/dictionary/hash literal.
   | Object
+  -- | A return statement.
+  | Return
+  -- | A throw statement.
+  | Throw
+  -- | A constructor statement, e.g. new Foo;
+  | Constructor
+  -- | A try statement.
+  | Try
+  -- | A catch statement.
+  | Catch
+  -- | A finally statement.
+  | Finally
+  -- | A class declaration.
+  | Class
+  -- | A class method declaration.
+  | Method
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Generic, Ord, Show)
-
 
 -- Instances
 
 instance Hashable Category
 
 instance Arbitrary Category where
-  arbitrary = oneof
-    [ pure Program
+  arbitrary = oneof [
+      pure Program
     , pure Error
+    , pure Boolean
     , pure BinaryOperator
     , pure DictionaryLiteral
     , pure Pair
     , pure FunctionCall
+    , pure Function
+    , pure Identifier
+    , pure Params
+    , pure ExpressionStatements
+    , pure MethodCall
+    , pure Args
     , pure StringLiteral
     , pure IntegerLiteral
+    , pure Regex
     , pure SymbolLiteral
+    , pure TemplateString
     , pure ArrayLiteral
+    , pure Assignment
+    , pure MathAssignment
+    , pure MemberAccess
+    , pure SubscriptAccess
+    , pure VarAssignment
+    , pure VarDecl
+    , pure For
+    , pure DoWhile
+    , pure While
+    , pure Switch
+    , pure Ternary
+    , pure Case
+    , pure Operator
+    , pure Object
     , Other <$> arbitrary
     ]
 

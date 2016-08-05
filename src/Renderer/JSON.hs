@@ -7,7 +7,7 @@ module Renderer.JSON (
 import Prologue hiding (toList)
 import Alignment
 import Category
-import Data.Aeson hiding (json)
+import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
 import Data.ByteString.Builder
 import Data.Record
@@ -15,7 +15,6 @@ import qualified Data.Text as T
 import Data.These
 import Data.Vector hiding (toList)
 import Info
-import Range
 import Renderer
 import Source hiding (fromList)
 import SplitDiff
@@ -24,7 +23,7 @@ import Term
 
 -- | Render a diff to a string representing its JSON.
 json :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
-json diff sources = toS . toLazyByteString . fromEncoding . pairs $ "rows" .= annotateRows (alignDiff (source <$> sources) diff) <> "oids" .= (oid <$> sources) <> "paths" .= (path <$> sources)
+json blobs diff = toS . toLazyByteString . fromEncoding . pairs $ "rows" .= annotateRows (alignDiff (source <$> blobs) diff) <> "oids" .= (oid <$> blobs) <> "paths" .= (path <$> blobs)
   where annotateRows = fmap (fmap NumberedLine) . numberedRows
 
 newtype NumberedLine a = NumberedLine (Int, a)
@@ -36,13 +35,13 @@ instance ToJSON Category where
   toJSON (Other s) = String s
   toJSON s = String . T.pack $ show s
 instance ToJSON Range where
-  toJSON (Range start end) = Array . fromList $ toJSON <$> [ start, end ]
+  toJSON (Range start end) = A.Array . fromList $ toJSON <$> [ start, end ]
   toEncoding (Range start end) = foldable [ start,  end ]
 instance ToJSON a => ToJSON (Join These a) where
-  toJSON (Join vs) = Array . fromList $ toJSON <$> these pure pure (\ a b -> [ a, b ]) vs
+  toJSON (Join vs) = A.Array . fromList $ toJSON <$> these pure pure (\ a b -> [ a, b ]) vs
   toEncoding = foldable
 instance ToJSON a => ToJSON (Join (,) a) where
-  toJSON (Join (a, b)) = Array . fromList $ toJSON <$> [ a, b ]
+  toJSON (Join (a, b)) = A.Array . fromList $ toJSON <$> [ a, b ]
   toEncoding = foldable
 instance (HasField fields Category, HasField fields Range) => ToJSON (SplitDiff leaf (Record fields)) where
   toJSON splitDiff = case runFree splitDiff of
@@ -73,6 +72,9 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Args c -> childrenFields c
   S.Assignment assignmentId property -> [ "assignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
   S.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
+  S.For exprs body -> [ "forExpressions" .= exprs ] <> [ "forBody" .= body ]
+  S.While expr body -> [ "whileExpr" .= expr ]  <> [ "whileBody" .= body ]
+  S.DoWhile expr body -> [ "doWhileExpr" .= expr ]  <> [ "doWhileBody" .= body ]
   S.Switch expr cases -> [ "switchExpression" .= expr ] <> [ "cases" .= cases ]
   S.Case expr body -> [ "caseExpression" .= expr ] <> [ "caseStatement" .= body ]
   S.VarDecl decl -> [ "variableDeclaration" .= decl ]
@@ -83,8 +85,16 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.SubscriptAccess id property -> [ "subscriptId" .= id ] <> [ "property" .= property ]
   S.Object pairs -> childrenFields pairs
   S.Pair a b -> childrenFields [a, b]
+  S.Return expr -> [ "returnExpression" .= expr ]
+  S.Constructor expr -> [ "constructorExpression" .= expr ]
   S.Comment _ -> []
   S.Commented comments child -> childrenFields (comments <> maybeToList child)
+  S.Error sourceSpan c -> [ "sourceSpan" .= sourceSpan ] <> childrenFields c
+  S.Throw c -> [ "throwExpression" .= c ]
+  S.Try body catch finally -> [ "tryBody" .= body ] <> [ "tryCatch" .= catch ] <> [ "tryFinally" .= finally ]
+  S.Array c -> childrenFields c
+  S.Class identifier superclass definitions -> [ "classIdentifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]
+  S.Method identifier params definitions -> [ "methodIdentifier" .= identifier ] <> [ "params" .= params ] <> [ "definitions" .= definitions ]
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: (KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (Term leaf (Record fields)) -> [kv]

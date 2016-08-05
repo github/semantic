@@ -1,16 +1,19 @@
+{-# LANGUAGE DeriveAnyClass #-}
 module Syntax where
 
-import Prologue
+import Data.Mergeable
 import GHC.Generics
+import Prologue
 import Test.QuickCheck hiding (Fixed)
+import SourceSpan
 
 -- | A node in an abstract syntax tree.
-data Syntax
-  a -- ^ The type of leaves in the syntax tree, typically String, but possibly some datatype representing different leaves more precisely.
-  f -- ^ The type representing another level of the tree, e.g. the children of branches. Often Cofree or Fix or similar.
-  =
+--
+-- 'a' is the type of leaves in the syntax tree, typically 'Text', but possibly some datatype representing different leaves more precisely.
+-- 'f' is the type representing another level of the tree, e.g. the children of branches. Often 'Cofree', 'Free' or similar.
+data Syntax a f
   -- | A terminal syntax node, e.g. an identifier, or atomic literal.
-  Leaf a
+  = Leaf a
   -- | An ordered branch of child nodes, expected to be variadic in the grammar, e.g. a list of statements or uncurried function parameters.
   | Indexed [f]
   -- | An ordered branch of child nodes, expected to be of fixed length in the grammar, e.g. a binary operator & its operands.
@@ -46,13 +49,35 @@ data Syntax
   | Switch { switchExpr :: f, cases :: [f] }
   | Case { caseExpr :: f, caseStatements :: f }
   | Object { keyValues :: [f] }
+  -- | A pair in an Object. e.g. foo: bar or foo => bar
   | Pair f f
+  -- | A comment.
   | Comment a
+  -- | A term preceded or followed by any number of comments.
   | Commented [f] (Maybe f)
-  deriving (Eq, Foldable, Functor, Generic, Generic1, Ord, Show, Traversable)
+  | Error SourceSpan [f]
+  | For [f] f
+  | DoWhile { doWhileBody :: f, doWhileExpr :: f }
+  | While { whileExpr :: f, whileBody :: f }
+  | Return (Maybe f)
+  | Throw f
+  | Constructor f
+  | Try f (Maybe f) (Maybe f)
+  -- | An array literal with list of children.
+  | Array [f]
+  -- | A class with an identifier, superclass, and a list of definitions.
+  | Class f (Maybe f) [f]
+  -- | A method definition with an identifier, params, and a list of expressions.
+  | Method f [f] [f]
+  deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 
 -- Instances
+
+instance (Arbitrary leaf, Arbitrary f) => Arbitrary (Syntax leaf f) where
+  arbitrary = sized (syntaxOfSize (`resize` arbitrary) )
+
+  shrink = genericShrink
 
 syntaxOfSize :: Arbitrary leaf => (Int -> Gen f) -> Int -> Gen (Syntax leaf f)
 syntaxOfSize recur n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsOfSize n
@@ -67,8 +92,3 @@ syntaxOfSize recur n | n <= 1 = oneof $ (Leaf <$> arbitrary) : branchGeneratorsO
           first <- recur m
           rest <- childrenOfSize (n - m)
           pure $! first : rest
-
-instance (Arbitrary leaf, Arbitrary f) => Arbitrary (Syntax leaf f) where
-  arbitrary = sized (syntaxOfSize (`resize` arbitrary) )
-
-  shrink = genericShrink
