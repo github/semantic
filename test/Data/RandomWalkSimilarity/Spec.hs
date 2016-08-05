@@ -5,7 +5,7 @@ import Category
 import Data.DList as DList hiding (toList)
 import Data.RandomWalkSimilarity
 import Data.Record
-import qualified Data.Vector as Vector
+import qualified Data.Vector.Arbitrary as Vector
 import Diff
 import Patch
 import Prologue
@@ -36,8 +36,3 @@ spec = parallel $ do
                         tbs = toTerm <$> bs
                         diff = free (Free (pure (Program .: Vector.singleton 0 .: RNil) :< Indexed (rws compare tas tbs :: [Diff Text (Record '[Category, Vector.Vector Double])]))) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ((Program .: Vector.singleton 0 .: RNil) :< Indexed tas)), Just (cofree ((Program .: Vector.singleton 0 .: RNil) :< Indexed tbs)))
-
-
-instance Arbitrary a => Arbitrary (Vector.Vector a) where
-  arbitrary = Vector.fromList <$> listOf1 arbitrary
-  shrink a = Vector.fromList <$> shrink (Vector.toList a)

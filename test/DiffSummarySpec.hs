@@ -3,7 +3,7 @@ module DiffSummarySpec where
 
 import Prologue
 import Data.Record
-import qualified Data.Vector as Vector
+import qualified Data.Vector.Arbitrary as Vector
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Diff
@@ -105,7 +105,3 @@ isBranchInfo info = case info of
 
 isBranchNode :: Patch DiffInfo -> Bool
 isBranchNode = any isBranchInfo
-
-instance Arbitrary a => Arbitrary (Vector.Vector a) where
-  arbitrary = Vector.fromList <$> listOf1 arbitrary
-  shrink a = Vector.fromList <$> shrink (Vector.toList a)

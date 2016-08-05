@@ -4,7 +4,7 @@ module InterpreterSpec where
 import Category
 import Diff
 import Data.Record
-import qualified Data.Vector as Vector
+import qualified Data.Vector.Arbitrary as Vector
 import Interpreter
 import Patch
 import Prologue
@@ -30,8 +30,3 @@ spec = parallel $ do
       \ a -> let term = toTerm a
                  diff = diffTerms wrap ((==) `on` extract) diffCost term term :: Diff Text (Record '[Category, Vector.Vector Double]) in
                  diffCost diff `shouldBe` 0
-
-
-instance Arbitrary a => Arbitrary (Vector.Vector a) where
-  arbitrary = Vector.fromList <$> listOf1 arbitrary
-  shrink a = Vector.fromList <$> shrink (Vector.toList a)

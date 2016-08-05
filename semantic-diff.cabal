@@ -107,6 +107,7 @@ test-suite semantic-diff-test
                      , CorpusSpec
                      , Data.Mergeable.Spec
                      , Data.RandomWalkSimilarity.Spec
+                     , Data.Vector.Arbitrary
                      , Diff.Spec
                      , DiffSummarySpec
                      , InterpreterSpec

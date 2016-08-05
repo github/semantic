@@ -4,7 +4,7 @@ module Diff.Spec where
 import Category
 import Data.Record
 import Data.Text.Arbitrary ()
-import qualified Data.Vector as Vector
+import qualified Data.Vector.Arbitrary as Vector
 import Diff
 import Diff.Arbitrary
 import Interpreter
@@ -37,8 +37,3 @@ spec = parallel $ do
   describe "ArbitraryDiff" $ do
     prop "generates diffs of a specific size" . forAll ((arbitrary >>= \ n -> (,) n <$> diffOfSize n) `suchThat` ((> 0) . fst)) $
       \ (n, diff) -> arbitraryDiffSize (diff :: ArbitraryDiff Text ()) `shouldBe` n
-
-
-instance Arbitrary a => Arbitrary (Vector.Vector a) where
-  arbitrary = Vector.fromList <$> listOf1 arbitrary
-  shrink a = Vector.fromList <$> shrink (Vector.toList a)
