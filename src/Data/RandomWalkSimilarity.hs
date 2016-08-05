@@ -104,8 +104,8 @@ decorateTermWithPQGram q = cata algebra
         getGrams = getField
 
 -- | Replaces bags of p,q-grams in a term’s annotations with corresponding feature vectors.
-decorateTermWithFeatureVector :: (Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Vector.Vector Double ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
-decorateTermWithFeatureVector d = cata $ \ (RCons unitVector rest :< functor) -> cofree (RCons (foldr (\ each into -> Vector.zipWith (+) (getField (extract each)) into) unitVector functor) rest :< functor)
+decorateTermWithFeatureVector :: (Prologue.Foldable f, Functor f) => Cofree f (Record (Vector.Vector Double ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
+decorateTermWithFeatureVector = cata $ \ (RCons unitVector rest :< functor) -> cofree (RCons (foldr (\ each into -> Vector.zipWith (+) (getField (extract each)) into) unitVector functor) rest :< functor)
 
 decorateTermWithUnitVector :: (Hashable label, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
 decorateTermWithUnitVector d = fmap $ \ (RCons gram rest) -> normalize ((`evalRand` mkQCGen (hash gram)) (sequenceA (Vector.replicate d getRandom))) .: rest
@@ -114,7 +114,7 @@ decorateTermWithUnitVector d = fmap $ \ (RCons gram rest) -> normalize ((`evalRa
 -- | Annotates a term with a feature vector at each node.
 featureVectorDecorator :: (Hashable label, Functor f, Prologue.Foldable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
 featureVectorDecorator getLabel p q d
-  = decorateTermWithFeatureVector d
+  = decorateTermWithFeatureVector
   . decorateTermWithUnitVector d
   . decorateTermWithPQGram q
   . decorateTermWithPGram p
