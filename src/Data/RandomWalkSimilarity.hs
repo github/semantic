@@ -44,7 +44,6 @@ rws compare getLabel as bs
   | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, fas)) $ traverse findNearestNeighbourTo fbs
   where insert = pure . Insert
         delete = pure . Delete
-        (p, q, d) = (2, 2, 15)
         fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
