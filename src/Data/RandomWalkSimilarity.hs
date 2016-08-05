@@ -68,7 +68,7 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
 -- | Compute the bag of grams with stems of length _p_ and bases of length _q_, with labels computed from annotations, which summarize the entire subtree of a term.
-pqGrams :: (Prologue.Foldable f, Functor f, Typeable label) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> DList.DList (Gram label)
+pqGrams :: (Prologue.Foldable f, Functor f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> DList.DList (Gram label)
 pqGrams getLabel p q = getField . extract . decorateTermWithBagOfPQGrams q . decorateTermWithPGram p . decorateTermWithLabel getLabel
 
 
