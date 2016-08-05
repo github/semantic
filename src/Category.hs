@@ -92,7 +92,8 @@ data Category
   | Method
   -- | A non-standard category, which can be used for comparability.
   | Other Text
-  deriving (Eq, Generic, Ord, Show, Typeable)
+  deriving (Eq, Generic, Ord, Show)
+
 
 -- Instances
 

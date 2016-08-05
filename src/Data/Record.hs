@@ -15,7 +15,6 @@ import Test.QuickCheck
 data Record :: [*] -> * where
   RNil :: Record '[]
   RCons :: h -> Record t -> Record (h ': t)
-  deriving Typeable
 
 infixr 0 .:
 
