@@ -87,16 +87,16 @@ featureVector d bag = sumVectors $ unitDVector . hash <$> bag
         normalize vec = fmap (/ vmagnitude vec) vec
         sumVectors = DList.foldr (Vector.zipWith (+)) (Vector.replicate d 0)
 
-decorateTermWithLabel :: (Typeable label, Functor f) => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (label ': fields))
+decorateTermWithLabel :: Functor f => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (label ': fields))
 decorateTermWithLabel getLabel = cata $ \ c -> cofree ((getLabel c .: headF c) :< tailF c)
 
-decorateTermWithPGram :: (Typeable label, Functor f) => Int -> Cofree f (Record (label ': fields)) -> Cofree f (Record (Gram label ': fields))
+decorateTermWithPGram :: Functor f => Int -> Cofree f (Record (label ': fields)) -> Cofree f (Record (Gram label ': fields))
 decorateTermWithPGram p = futu coalgebra . (,) []
   where coalgebra :: Functor f => ([Maybe label], Cofree f (Record (label ': fields))) -> CofreeF f (Record (Gram label ': fields)) (Free.Free (CofreeF f (Record (Gram label ': fields))) ([Maybe label], Cofree f (Record (label ': fields))))
         coalgebra (parentLabels, c) = case extract c of
           RCons label rest -> (Gram (padToSize p parentLabels) (pure (Just label)) .: rest) :< fmap (pure . (,) (take p (Just label : parentLabels))) (unwrap c)
 
-decorateTermWithBagOfPQGrams :: (Typeable label, Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (DList.DList (Gram label) ': fields))
+decorateTermWithBagOfPQGrams :: (Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (DList.DList (Gram label) ': fields))
 decorateTermWithBagOfPQGrams q = fmap (\ (RCons (first, rest) t) -> DList.cons (first { base = padToSize q (base first) }) rest .: t) . cata algebra
   where algebra :: (Prologue.Foldable f, Functor f) => CofreeF f (Record (Gram label ': fields)) (Cofree f (Record ((Gram label, DList.DList (Gram label)) ': fields))) -> Cofree f (Record ((Gram label, DList.DList (Gram label)) ': fields))
         algebra (RCons gram rest :< functor) = cofree (((gram, DList.fromList (windowed q setBases [] (fst . getGrams . extract <$> toList functor)) <> foldMap (snd . getGrams . extract) functor) .: rest) :< functor)
@@ -108,7 +108,7 @@ decorateTermWithBagOfPQGrams q = fmap (\ (RCons (first, rest) t) -> DList.cons (
 decorateTermWithFeatureVector :: (Hashable label, Functor f) => Int -> Cofree f (Record (DList.DList (Gram label) ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
 decorateTermWithFeatureVector d = fmap $ \ (RCons grams rest) -> featureVector d grams .: rest
 
-featureVectorDecorator :: (Typeable label, Hashable label, Functor f, Prologue.Foldable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
+featureVectorDecorator :: (Hashable label, Functor f, Prologue.Foldable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
 featureVectorDecorator getLabel p q d
   = decorateTermWithFeatureVector d
   . decorateTermWithBagOfPQGrams q
