@@ -34,7 +34,7 @@ spec = parallel $ do
     prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
       \ (as, bs) -> let tas = toTerm <$> as
                         tbs = toTerm <$> bs
-                        diff = free (Free (pure (Program .: Vector.singleton 0 .: RNil) :< Indexed (rws compare (rhead . headF) tas tbs :: [Diff Text (Record '[Category, Vector.Vector Double])]))) in
+                        diff = free (Free (pure (Program .: Vector.singleton 0 .: RNil) :< Indexed (rws compare tas tbs :: [Diff Text (Record '[Category, Vector.Vector Double])]))) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ((Program .: Vector.singleton 0 .: RNil) :< Indexed tas)), Just (cofree ((Program .: Vector.singleton 0 .: RNil) :< Indexed tbs)))
 
 
