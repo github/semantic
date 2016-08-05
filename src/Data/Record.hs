@@ -34,7 +34,7 @@ updateField record a = case record of
   RNil -> RNil
   cons@(RCons _ _) -> updateRCons cons a
 
-updateRCons :: forall h t field. Typeable field => Record (h ': t) -> field -> Record (h ': t)
+updateRCons :: forall h t field. (Typeable h, Typeable field) => Record (h ': t) -> field -> Record (h ': t)
 updateRCons (RCons h t) a = case eqT :: Maybe (h :~: field) of
   Just Refl -> RCons a t
   Nothing -> RCons h (updateField t a)
