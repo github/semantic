@@ -1,9 +1,5 @@
 {-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
-module Data.Record
-( Record(..)
-, (.:)
-, HasField(..)
-) where
+module Data.Record where
 
 import GHC.Show
 import Prologue
