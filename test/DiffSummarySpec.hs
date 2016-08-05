@@ -3,6 +3,7 @@ module DiffSummarySpec where
 
 import Prologue
 import Data.Record
+import qualified Data.Vector as Vector
 import Test.Hspec
 import Test.Hspec.QuickCheck
 import Diff
@@ -20,14 +21,15 @@ import Interpreter
 import Info
 import Source
 import Data.Functor.Both
+import Test.QuickCheck hiding (Fixed)
 
-arrayInfo :: Record '[Category, Range]
-arrayInfo = ArrayLiteral .: Range 0 3 .: RNil
+arrayInfo :: Record '[Category, Range, Vector.Vector Double]
+arrayInfo = ArrayLiteral .: Range 0 3 .: Vector.singleton 0 .: RNil
 
-literalInfo :: Record '[Category, Range]
-literalInfo = StringLiteral .: Range 1 2 .: RNil
+literalInfo :: Record '[Category, Range, Vector.Vector Double]
+literalInfo = StringLiteral .: Range 1 2 .: Vector.singleton 0 .: RNil
 
-testDiff :: Diff Text (Record '[Category, Range])
+testDiff :: Diff Text (Record '[Category, Range, Vector.Vector Double])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])
 
 testSummary :: DiffSummary DiffInfo
@@ -46,7 +48,7 @@ spec = parallel $ do
       diffSummaries sources testDiff `shouldBe` [ DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotations = [ ArrayLiteral ] } ]
 
     prop "equal terms produce identity diffs" $
-      \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category, Range])) in
+      \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category, Range, Vector.Vector Double])) in
         diffSummaries sources (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
   describe "annotatedSummaries" $ do
@@ -103,3 +105,7 @@ isBranchInfo info = case info of
 
 isBranchNode :: Patch DiffInfo -> Bool
 isBranchNode = any isBranchInfo
+
+instance Arbitrary a => Arbitrary (Vector.Vector a) where
+  arbitrary = Vector.fromList <$> arbitrary
+  shrink a = Vector.fromList <$> shrink (Vector.toList a)

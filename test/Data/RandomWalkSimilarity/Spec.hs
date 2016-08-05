@@ -5,6 +5,7 @@ import Category
 import Data.DList as DList hiding (toList)
 import Data.RandomWalkSimilarity
 import Data.Record
+import qualified Data.Vector as Vector
 import Diff
 import Patch
 import Prologue
@@ -33,5 +34,10 @@ spec = parallel $ do
     prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
       \ (as, bs) -> let tas = toTerm <$> as
                         tbs = toTerm <$> bs
-                        diff = free (Free (pure (Program .: RNil) :< Indexed (rws compare (rhead . headF) tas tbs :: [Diff Text (Record '[Category])]))) in
-        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ((Program .: RNil) :< Indexed tas)), Just (cofree ((Program .: RNil) :< Indexed tbs)))
+                        diff = free (Free (pure (Program .: Vector.singleton 0 .: RNil) :< Indexed (rws compare (rhead . headF) tas tbs :: [Diff Text (Record '[Category, Vector.Vector Double])]))) in
+        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ((Program .: Vector.singleton 0 .: RNil) :< Indexed tas)), Just (cofree ((Program .: Vector.singleton 0 .: RNil) :< Indexed tbs)))
+
+
+instance Arbitrary a => Arbitrary (Vector.Vector a) where
+  arbitrary = Vector.fromList <$> arbitrary
+  shrink a = Vector.fromList <$> shrink (Vector.toList a)
