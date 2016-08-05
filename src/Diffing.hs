@@ -6,11 +6,13 @@ import Prologue hiding (fst, snd)
 import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
 import Data.Functor.Foldable
+import Data.RandomWalkSimilarity
 import Data.Record
 import qualified Data.Text.IO as TextIO
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
 import Data.These
+import qualified Data.Vector as Vector
 import Diff
 import Info
 import Interpreter
@@ -37,9 +39,9 @@ import qualified Data.Text as T
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record fields) -> Both SourceBlob -> IO Text
+diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record (Vector.Vector Double ': fields)) -> Both SourceBlob -> IO Text
 diffFiles parser renderer sourceBlobs = do
-  terms <- traverse parser sourceBlobs
+  terms <- traverse (fmap (featureVectorDecorator getLabel p q d) . parser) sourceBlobs
 
   let areNullOids = runBothWith (\a b -> (oid a == nullOid || null (source a), oid b == nullOid || null (source b))) sourceBlobs
   let textDiff = case areNullOids of
@@ -55,6 +57,10 @@ diffFiles parser renderer sourceBlobs = do
         getCost diff = case runFree diff of
           Free (info :< _) -> cost <$> info
           Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
+        getLabel (h :< t) = (category h, case t of
+          Leaf s -> Just s
+          _ -> Nothing)
+        (p, q, d) = (2, 2, 15)
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])

@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds, FlexibleContexts, GeneralizedNewtypeDeriving #-}
 module CorpusSpec where
 
+import qualified Data.Vector as Vector
 import Diffing
 import Renderer
 import qualified Renderer.JSON as J
@@ -69,7 +70,7 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | Given file paths for A, B, and, optionally, a diff, return whether diffing
 -- | the files will produce the diff. If no diff is provided, then the result
 -- | is true, but the diff will still be calculated.
-testDiff :: Renderer (Record '[Cost, Range, Category]) -> Both FilePath -> Maybe FilePath -> (Verbatim -> Verbatim -> Expectation) -> Expectation
+testDiff :: Renderer (Record '[Vector.Vector Double, Cost, Range, Category]) -> Both FilePath -> Maybe FilePath -> (Verbatim -> Verbatim -> Expectation) -> Expectation
 testDiff renderer paths diff matcher = do
   sources <- sequence $ readAndTranscodeFile <$> paths
   actual <- Verbatim <$> diffFiles (decorateParser termCostDecorator parser) renderer (sourceBlobs sources)
