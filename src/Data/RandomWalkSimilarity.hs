@@ -3,6 +3,7 @@ module Data.RandomWalkSimilarity
 ( rws
 , pqGrams
 , featureVector
+, featureVectorDecorator
 , Gram(..)
 ) where
 
@@ -109,6 +110,13 @@ decorateTermWithBagOfPQGrams q = fmap (\ (RCons (first, rest) t) -> DList.cons (
 
 decorateTermWithFeatureVector :: (Hashable label, Functor f) => Int -> Cofree f (Record (DList.DList (Gram label) ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
 decorateTermWithFeatureVector d = fmap $ \ (RCons grams rest) -> featureVector d grams .: rest
+
+featureVectorDecorator :: (Typeable label, Hashable label, Functor f, Prologue.Foldable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
+featureVectorDecorator getLabel p q d
+  = decorateTermWithFeatureVector d
+  . decorateTermWithBagOfPQGrams q
+  . decorateTermWithPGram p
+  . decorateTermWithLabel getLabel
 
 padToSize :: Alternative f => Int -> [f a] -> [f a]
 padToSize n list = take n (list <> repeat empty)
