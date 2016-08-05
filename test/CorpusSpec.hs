@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, FlexibleContexts, GeneralizedNewtypeDeriving #-}
 module CorpusSpec where
 
-import Data.String
 import Diffing
 import Renderer
 import qualified Renderer.JSON as J
@@ -18,7 +17,6 @@ import Data.Set as Set
 import qualified Data.Text as T
 import Info
 import Prologue hiding (fst, snd)
-import Range
 import qualified Source as S
 import System.FilePath
 import System.FilePath.Glob
