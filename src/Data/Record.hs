@@ -3,7 +3,6 @@ module Data.Record
 ( Record(..)
 , (.:)
 , HasField(..)
-, maybeGetField
 ) where
 
 import GHC.Show
@@ -23,10 +22,6 @@ infixr 0 .:
 -- | Infix synonym for `RCons`: `a .: b .: RNil == RCons a (RCons b RNil)`.
 (.:) :: Typeable h => h -> Record t -> Record (h ': t)
 (.:) = RCons
-
-maybeGetField :: Typeable field => Record fields -> Maybe field
-maybeGetField (RCons h t) = cast h <|> maybeGetField t
-maybeGetField RNil = Nothing
 
 
 -- Classes
