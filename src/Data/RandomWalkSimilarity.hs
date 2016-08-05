@@ -6,6 +6,7 @@ module Data.RandomWalkSimilarity
 , Gram(..)
 ) where
 
+import Control.Applicative
 import Control.Arrow ((&&&))
 import qualified Control.Monad.Free as Free (Free)
 import Control.Monad.Random
@@ -95,19 +96,22 @@ decorateTermWithPGram :: (Typeable label, Functor f) => Int -> Cofree f (Record 
 decorateTermWithPGram p = futu coalgebra . (,) []
   where coalgebra :: Functor f => ([Maybe label], Cofree f (Record (label ': fields))) -> CofreeF f (Record (Gram label ': fields)) (Free.Free (CofreeF f (Record (Gram label ': fields))) ([Maybe label], Cofree f (Record (label ': fields))))
         coalgebra (parentLabels, c) = case extract c of
-          RCons label rest -> (Gram (take p (parentLabels <> repeat Nothing)) (pure (Just label)) .: rest) :< fmap (pure . (,) (take p (Just label : parentLabels))) (unwrap c)
+          RCons label rest -> (Gram (padToSize p parentLabels) (pure (Just label)) .: rest) :< fmap (pure . (,) (take p (Just label : parentLabels))) (unwrap c)
 
 decorateTermWithBagOfPQGrams :: (Typeable label, Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (DList.DList (Gram label) ': fields))
 decorateTermWithBagOfPQGrams q = fmap (\ (RCons (first, rest) t) -> DList.cons first rest .: t) . cata algebra
   where algebra :: (Prologue.Foldable f, Functor f) => CofreeF f (Record (Gram label ': fields)) (Cofree f (Record ((Gram label, DList.DList (Gram label)) ': fields))) -> Cofree f (Record ((Gram label, DList.DList (Gram label)) ': fields))
         algebra (RCons gram rest :< functor) = cofree (((gram, DList.fromList (windowed q setBases [] (fst . getGrams . extract <$> toList functor)) <> foldMap (snd . getGrams . extract) functor) .: rest) :< functor)
         setBases :: Gram label -> [Gram label] -> [Gram label] -> [Gram label]
-        setBases gram siblings rest = gram { base = take q (foldMap base siblings <> repeat Nothing) } : rest
+        setBases gram siblings rest = gram { base = padToSize q (foldMap base siblings) } : rest
         getGrams :: HasField fields (Gram label, DList.DList (Gram label)) => Record fields -> (Gram label, DList.DList (Gram label))
         getGrams = getField
 
 decorateTermWithFeatureVector :: (Hashable label, Functor f) => Int -> Cofree f (Record (DList.DList (Gram label) ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
 decorateTermWithFeatureVector d = fmap $ \ (RCons grams rest) -> featureVector d grams .: rest
+
+padToSize :: Alternative f => Int -> [f a] -> [f a]
+padToSize n list = take n (list <> repeat empty)
 
 -- | The magnitude of a Euclidean vector, i.e. its distance from the origin.
 vmagnitude :: Vector.Vector Double -> Double
