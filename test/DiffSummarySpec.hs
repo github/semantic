@@ -12,8 +12,6 @@ import Term
 import Patch
 import Category
 import DiffSummary
-import Text.PrettyPrint.Leijen.Text (pretty)
-import Test.Hspec.QuickCheck
 import Diff.Arbitrary
 import Data.List (partition)
 import Term.Arbitrary
@@ -21,7 +19,6 @@ import Interpreter
 import Info
 import Source
 import Data.Functor.Both
-import Test.QuickCheck hiding (Fixed)
 
 arrayInfo :: Record '[Category, Range, Vector.Vector Double]
 arrayInfo = ArrayLiteral .: Range 0 3 .: Vector.singleton 0 .: RNil
