@@ -48,7 +48,7 @@ rws compare getLabel as bs
         fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
-        featurize index term = UnmappedTerm index (featureVector d (pqGrams getLabel p q term)) term
+        featurize index term = UnmappedTerm index (getField (extract term)) term
         findNearestNeighbourTo kv@(UnmappedTerm _ _ v) = do
           (previous, unmapped) <- get
           let (UnmappedTerm i _ _) = KdTree.nearest kdas kv
