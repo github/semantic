@@ -66,14 +66,6 @@ pqGrams :: Traversable f => (forall b. CofreeF f (Record fields) b -> label) -> 
 pqGrams getLabel p q = foldMap (pure . getField) . decorateTermWithPQGram q . decorateTermWithPGram p . decorateTermWithLabel getLabel
 
 
--- | A sliding-window fold over _n_ items of a list per iteration.
-windowed :: Int -> (a -> [a] -> b -> b) -> b -> [a] -> b
-windowed n f seed = para alg
-  where alg xs = case xs of
-          Cons a (as, b) -> f a (take n $ a : as) b
-          Nil -> seed
-
-
 -- | Compute a vector with the specified number of dimensions, as an approximation of a bag of `Gram`s summarizing a tree.
 featureVector :: Hashable label => Int -> DList.DList (Gram label) -> Vector.Vector Double
 featureVector d bag = sumVectors $ unitDVector . hash <$> bag
