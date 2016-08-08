@@ -4,6 +4,7 @@ module Data.RandomWalkSimilarity
 , pqGrams
 , featureVector
 , featureVectorDecorator
+, unitVectorDecorator
 , Gram(..)
 ) where
 
@@ -106,6 +107,14 @@ featureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF 
 featureVectorDecorator getLabel p q d
   = decorateTermWithFeatureVector
   . decorateTermWithUnitVector d
+  . decorateTermWithPQGram q
+  . decorateTermWithPGram p
+  . decorateTermWithLabel getLabel
+
+-- | Annotate a term with a unit vector at each node.
+unitVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
+unitVectorDecorator getLabel p q d
+  = decorateTermWithUnitVector d
   . decorateTermWithPQGram q
   . decorateTermWithPGram p
   . decorateTermWithLabel getLabel
