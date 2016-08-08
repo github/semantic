@@ -88,8 +88,10 @@ decorateTermWithPGram p = ana coalgebra . (,) []
 decorateTermWithPQGram :: Traversable f => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (Gram label ': fields))
 decorateTermWithPQGram q = cata algebra
   where algebra :: Traversable f => CofreeF f (Record (Gram label ': fields)) (Cofree f (Record (Gram label ': fields))) -> Cofree f (Record (Gram label ': fields))
-        algebra (RCons gram rest :< functor) = cofree ((gram .: rest) :< functor)
-        -- (gram, DList.fromList (windowed q setBases [] (fst . getGrams . extract <$> toList functor)) <> foldMap (snd . getGrams . extract) functor)
+        algebra (RCons gram rest :< functor) = cofree ((gram .: rest) :< (`evalState` (foldMap (base . rhead . extract) functor)) (for functor $ \ a -> case runCofree a of
+          RCons gram rest :< functor -> do labels <- get
+                                           put (drop 1 labels)
+                                           pure $! cofree ((gram { base = padToSize q labels } .: rest) :< functor)))
 
 -- | Replaces bags of p,q-grams in a term’s annotations with corresponding feature vectors.
 decorateTermWithFeatureVector :: (Prologue.Foldable f, Functor f) => Cofree f (Record (Vector.Vector Double ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
