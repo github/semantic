@@ -83,7 +83,7 @@ showLine source line | Just line <- line = Just . toString . (`slice` source) $ 
 
 -- | Returns the header given two source blobs and a hunk.
 header :: Both SourceBlob -> String
-header blobs = intercalate "\n" [filepathHeader, fileModeHeader, beforeFilepath, afterFilepath] <> "\n"
+header blobs = intercalate "\n" ([filepathHeader, fileModeHeader] <> maybeFilepaths) <> "\n"
   where filepathHeader = "diff --git a/" <> pathA <> " b/" <> pathB
         fileModeHeader = case (modeA, modeB) of
           (Nothing, Just mode) -> intercalate "\n" [ "new file mode " <> modeToDigits mode, blobOidHeader ]
@@ -100,8 +100,10 @@ header blobs = intercalate "\n" [filepathHeader, fileModeHeader, beforeFilepath,
         modeHeader ty maybeMode path = case maybeMode of
            Just _ -> ty <> "/" <> path
            Nothing -> "/dev/null"
+        maybeFilepaths = if (nullOid == oidA && null (snd sources)) || (nullOid == oidB && null (fst sources)) then [] else [ beforeFilepath, afterFilepath ]
         beforeFilepath = "--- " <> modeHeader "a" modeA pathA
         afterFilepath = "+++ " <> modeHeader "b" modeB pathB
+        sources = source <$> blobs
         (pathA, pathB) = runJoin $ path <$> blobs
         (oidA, oidB) = runJoin $ oid <$> blobs
         (modeA, modeB) = runJoin $ blobKind <$> blobs
