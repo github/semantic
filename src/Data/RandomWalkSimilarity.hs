@@ -42,7 +42,7 @@ rws compare as bs
         featurize index term = UnmappedTerm index (getField (extract term)) term
         findNearestNeighbourTo kv@(UnmappedTerm _ _ v) = do
           (previous, unmapped) <- get
-          let (UnmappedTerm i _ _) = KdTree.nearest kdas kv
+          let UnmappedTerm i _ _ = KdTree.nearest kdas kv
           fromMaybe (pure (negate 1, inserting v)) $ do
             found <- find ((== i) . termIndex) unmapped
             guard (i >= previous)
