@@ -9,6 +9,7 @@ module Patch
 , patchSum
 , maybeFst
 , maybeSnd
+, mapPatch
 ) where
 
 import Data.These
@@ -50,6 +51,11 @@ unPatch :: Patch a -> These a a
 unPatch (Replace a b) = These a b
 unPatch (Insert b) = That b
 unPatch (Delete a) = This a
+
+mapPatch :: (a -> b) -> (a -> b) -> Patch a -> Patch b
+mapPatch f _ (Delete  a  ) = Delete  (f a)
+mapPatch _ g (Insert    b) = Insert  (g b)
+mapPatch f g (Replace a b) = Replace (f a) (g b)
 
 -- | Calculate the cost of the patch given a function to compute the cost of a item.
 patchSum :: (a -> Integer) -> Patch a -> Integer

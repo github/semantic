@@ -31,10 +31,10 @@ testDiff :: Diff Text (Record '[Category, Range])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])
 
 testSummary :: DiffSummary DiffInfo
-testSummary = DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotations = [] }
+testSummary = DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotation = Nothing }
 
 replacementSummary :: DiffSummary DiffInfo
-replacementSummary = DiffSummary { patch = Replace (LeafInfo "string" "a") (LeafInfo "symbol" "b"), parentAnnotations = [ ArrayLiteral ] }
+replacementSummary = DiffSummary { patch = Replace (LeafInfo "string" "a") (LeafInfo "symbol" "b"), parentAnnotation = Just (Info.FunctionCall, "foo") }
 
 sources :: Both (Source Char)
 sources = both (fromText "[]") (fromText "[a]")
@@ -43,7 +43,7 @@ spec :: Spec
 spec = parallel $ do
   describe "diffSummaries" $ do
     it "outputs a diff summary" $ do
-      diffSummaries sources testDiff `shouldBe` [ DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotations = [ ArrayLiteral ] } ]
+      diffSummaries sources testDiff `shouldBe` [ DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotation = Nothing } ]
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category, Range])) in
@@ -53,7 +53,7 @@ spec = parallel $ do
     it "should print adds" $
       annotatedSummaries testSummary `shouldBe` ["Added the 'a' string"]
     it "prints a replacement" $ do
-      annotatedSummaries replacementSummary `shouldBe` ["Replaced the 'a' string with the 'b' symbol in the array context"]
+      annotatedSummaries replacementSummary `shouldBe` ["Replaced the 'a' string with the 'b' symbol in the foo function call"]
   describe "DiffInfo" $ do
     prop "patches in summaries match the patches in diffs" $
       \a -> let
