@@ -23,7 +23,7 @@ import Source
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
- | ErrorInfo { errorSpan :: SourceSpan, categoryName :: Text }
+ | ErrorInfo { errorSpan :: SourceSpan, termName :: Text }
  deriving (Eq, Show)
 
 toTermName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
@@ -152,7 +152,7 @@ instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
   pretty BranchInfo{..} = mconcat $ punctuate (string "," <> space) (pretty <$> branches)
-  pretty ErrorInfo{..} = "syntax error at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)
+  pretty ErrorInfo{..} = squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)
 
 annotatedSummaries :: DiffSummary DiffInfo -> [Text]
 annotatedSummaries DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotations) <$> summaries patch
@@ -231,7 +231,7 @@ termToDiffInfo blob term = case unwrap term of
   -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
   -- to indicate where that value should be when constructing DiffInfos.
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
-  S.Error sourceSpan _ -> ErrorInfo sourceSpan (toCategoryName term)
+  S.Error sourceSpan _ -> ErrorInfo sourceSpan (toTermName' term)
   _ -> LeafInfo (toCategoryName term) (toTermName' term)
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob
