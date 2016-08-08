@@ -62,7 +62,7 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
 -- | Compute the bag of grams with stems of length _p_ and bases of length _q_, with labels computed from annotations, which summarize the entire subtree of a term.
-pqGrams :: (Prologue.Foldable f, Functor f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> DList.DList (Gram label)
+pqGrams :: Traversable f => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> DList.DList (Gram label)
 pqGrams getLabel p q = foldMap (pure . getField) . decorateTermWithPQGram q . decorateTermWithPGram p . decorateTermWithLabel getLabel
 
 
@@ -93,9 +93,9 @@ decorateTermWithPGram p = ana coalgebra . (,) []
           RCons label rest -> (Gram (padToSize p parentLabels) (pure (Just label)) .: rest) :< fmap ((,) (padToSize p (Just label : parentLabels))) (unwrap c)
 
 -- | Replaces p,1-grams in a term’s annotations with corresponding bags of p,q-grams.
-decorateTermWithPQGram :: (Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (Gram label ': fields))
+decorateTermWithPQGram :: Traversable f => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (Gram label ': fields))
 decorateTermWithPQGram q = cata algebra
-  where algebra :: (Prologue.Foldable f, Functor f) => CofreeF f (Record (Gram label ': fields)) (Cofree f (Record (Gram label ': fields))) -> Cofree f (Record (Gram label ': fields))
+  where algebra :: Traversable f => CofreeF f (Record (Gram label ': fields)) (Cofree f (Record (Gram label ': fields))) -> Cofree f (Record (Gram label ': fields))
         algebra (RCons gram rest :< functor) = cofree ((gram .: rest) :< functor)
         -- (gram, DList.fromList (windowed q setBases [] (fst . getGrams . extract <$> toList functor)) <> foldMap (snd . getGrams . extract) functor)
         setBases :: Gram label -> [Gram label] -> [Gram label] -> [Gram label]
@@ -112,7 +112,7 @@ decorateTermWithUnitVector d = fmap $ \ (RCons gram rest) -> normalize ((`evalRa
   where normalize vec = fmap (/ vmagnitude vec) vec
 
 -- | Annotates a term with a feature vector at each node.
-featureVectorDecorator :: (Hashable label, Functor f, Prologue.Foldable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
+featureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
 featureVectorDecorator getLabel p q d
   = decorateTermWithFeatureVector
   . decorateTermWithUnitVector d
