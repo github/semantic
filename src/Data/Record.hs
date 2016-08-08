@@ -18,6 +18,10 @@ infixr 0 .:
 (.:) :: h -> Record t -> Record (h ': t)
 (.:) = RCons
 
+-- | Get the first element of a non-empty record.
+rhead :: Record (head ': tail) -> head
+rhead (RCons head _) = head
+
 
 -- Classes
 
