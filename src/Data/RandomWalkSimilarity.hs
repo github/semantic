@@ -98,8 +98,6 @@ decorateTermWithPQGram q = cata algebra
   where algebra :: Traversable f => CofreeF f (Record (Gram label ': fields)) (Cofree f (Record (Gram label ': fields))) -> Cofree f (Record (Gram label ': fields))
         algebra (RCons gram rest :< functor) = cofree ((gram .: rest) :< functor)
         -- (gram, DList.fromList (windowed q setBases [] (fst . getGrams . extract <$> toList functor)) <> foldMap (snd . getGrams . extract) functor)
-        setBases :: Gram label -> [Gram label] -> [Gram label] -> [Gram label]
-        setBases gram siblings rest = gram { base = padToSize q (foldMap base siblings) } : rest
         getGrams :: HasField fields (Gram label, DList.DList (Gram label)) => Record fields -> (Gram label, DList.DList (Gram label))
         getGrams = getField
 
