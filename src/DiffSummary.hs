@@ -142,7 +142,21 @@ termToDiffInfo blob term = case unwrap term of
         termToDiffInfo' = termToDiffInfo blob
 
 prependSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> Term leaf (Record fields) -> DiffSummary DiffInfo -> DiffSummary DiffInfo
-prependSummary source term summary = summary { parentAnnotations = (category $ extract term, toTermName source term) : parentAnnotations summary }
+prependSummary source term summary = if hasIdentifier term
+  then summary { parentAnnotations = (category $ extract term, toTermName source term) : parentAnnotations summary }
+  else summary
+  where hasIdentifier term = case unwrap term of
+          S.FunctionCall{} -> True
+          S.Function id _ _ -> isJust id
+          S.Assignment{} -> True
+          S.MathAssignment{} -> True
+          S.MemberAccess{} -> True
+          S.MethodCall{} -> True
+          S.VarAssignment{} -> True
+          S.SubscriptAccess{} -> True
+          S.Class{} -> True
+          S.Method{} -> True
+          _ -> False
 
 -- The user-facing category name of 'a'.
 class HasCategory a where
