@@ -44,12 +44,8 @@ diffSummaries sources = para $ \diff ->
       annotateWithCategory children = maybeToList (prependSummary (Both.snd sources) <$> (afterTerm diff')) <*> (children >>= snd) in
   case diff of
     -- Skip comments and leaves since they don't have any changes
-    Free (_ :< Leaf _) -> []
-    Free (_ :< (S.Comment _)) -> []
     (Free (_ :< syntax)) -> annotateWithCategory (toList syntax)
-    (Pure (Insert term)) -> [ DiffSummary (Insert $ termToDiffInfo afterSource term) [] ]
-    (Pure (Delete term)) -> [ DiffSummary (Delete $ termToDiffInfo beforeSource term) [] ]
-    (Pure (Replace t1 t2)) -> [ DiffSummary (Replace (termToDiffInfo beforeSource t1) (termToDiffInfo afterSource t2)) [] ]
+    (Pure patch) -> [ DiffSummary (mapPatch (termToDiffInfo beforeSource) (termToDiffInfo afterSource) patch) [] ]
   where
     (beforeSource, afterSource) = runJoin sources
 
@@ -122,7 +118,7 @@ toTermName source term = case unwrap term of
 maybeParentContext :: [(Category, Text)] -> Doc
 maybeParentContext annotations = case annotations of
   [] -> ""
-  (annotation:xs) -> space <> "in the" <+> (toDoc $ snd annotation) <+> toDoc (toCategoryName $ fst annotation)
+  (annotation:_) -> space <> "in the" <+> (toDoc $ snd annotation) <+> toDoc (toCategoryName $ fst annotation)
 toDoc :: Text -> Doc
 toDoc = string . toS
 
