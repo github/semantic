@@ -31,11 +31,11 @@ data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
 
 data DiffSummary a = DiffSummary {
   patch :: Patch a,
-  parentAnnotations :: [(Category, Text)]
+  parentAnnotation :: Maybe (Category, Text)
 } deriving (Eq, Functor, Show, Generic)
 
 annotatedSummaries :: DiffSummary DiffInfo -> [Text]
-annotatedSummaries DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotations) <$> summaries patch
+annotatedSummaries DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotation) <$> summaries patch
 
 diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffSummaries sources = para $ \diff ->
@@ -45,7 +45,7 @@ diffSummaries sources = para $ \diff ->
   case diff of
     -- Skip comments and leaves since they don't have any changes
     (Free (_ :< syntax)) -> annotateWithCategory (toList syntax)
-    (Pure patch) -> [ DiffSummary (mapPatch (termToDiffInfo beforeSource) (termToDiffInfo afterSource) patch) [] ]
+    (Pure patch) -> [ DiffSummary (mapPatch (termToDiffInfo beforeSource) (termToDiffInfo afterSource) patch) Nothing ]
   where
     (beforeSource, afterSource) = runJoin sources
 
@@ -115,10 +115,10 @@ toTermName source term = case unwrap term of
         termNameFromRange range = toText $ Source.slice range source
         range = characterRange . extract
 
-maybeParentContext :: [(Category, Text)] -> Doc
-maybeParentContext annotations = case annotations of
-  [] -> ""
-  (annotation:_) -> space <> "in the" <+> (toDoc $ snd annotation) <+> toDoc (toCategoryName $ fst annotation)
+maybeParentContext :: Maybe (Category, Text) -> Doc
+maybeParentContext = maybe "" (\annotation ->
+  space <> "in the" <+> (toDoc $ snd annotation) <+> toDoc (toCategoryName $ fst annotation))
+  
 toDoc :: Text -> Doc
 toDoc = string . toS
 
@@ -142,8 +142,8 @@ termToDiffInfo blob term = case unwrap term of
         termToDiffInfo' = termToDiffInfo blob
 
 prependSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> Term leaf (Record fields) -> DiffSummary DiffInfo -> DiffSummary DiffInfo
-prependSummary source term summary = if hasIdentifier term
-  then summary { parentAnnotations = parentAnnotations summary <> [(category $ extract term, toTermName source term)]  }
+prependSummary source term summary = if (isNothing $ parentAnnotation summary) && hasIdentifier term
+  then summary { parentAnnotation = Just (category $ extract term, toTermName source term) }
   else summary
   where hasIdentifier term = case unwrap term of
           S.FunctionCall{} -> True
