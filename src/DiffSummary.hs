@@ -24,7 +24,7 @@ import Source
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
- | ErrorInfo { errorSpan :: SourceSpan, categoryName :: Text }
+ | ErrorInfo { errorSpan :: SourceSpan, termName :: Text }
  deriving (Eq, Show)
 
 data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
@@ -97,7 +97,7 @@ toTermName source term = case unwrap term of
   S.Object kvs -> "{" <> intercalate ", " (toTermName' <$> kvs) <> "}"
   S.Pair a b -> toTermName' a <> ": " <> toTermName' b
   S.Return expr -> maybe "empty" toTermName' expr
-  S.Error span _ -> displayStartEndPos span
+  S.Error _ _ -> termNameFromSource term
   S.For _ _ -> termNameFromChildren term
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
@@ -118,7 +118,7 @@ toTermName source term = case unwrap term of
 maybeParentContext :: Maybe (Category, Text) -> Doc
 maybeParentContext = maybe "" (\annotation ->
   space <> "in the" <+> (toDoc $ snd annotation) <+> toDoc (toCategoryName $ fst annotation))
-  
+
 toDoc :: Text -> Doc
 toDoc = string . toS
 
@@ -136,7 +136,7 @@ termToDiffInfo blob term = case unwrap term of
   -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
   -- to indicate where that value should be when constructing DiffInfos.
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
-  S.Error sourceSpan _ -> ErrorInfo sourceSpan (toCategoryName term)
+  S.Error sourceSpan _ -> ErrorInfo sourceSpan (toTermName' term)
   _ -> LeafInfo (toCategoryName term) (toTermName' term)
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob
@@ -226,4 +226,4 @@ instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
   pretty BranchInfo{..} = mconcat $ punctuate (string "," <> space) (pretty <$> branches)
-  pretty ErrorInfo{..} = "syntax error at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)
+  pretty ErrorInfo{..} = squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)
