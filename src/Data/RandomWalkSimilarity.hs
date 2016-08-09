@@ -93,7 +93,7 @@ decorateTermWithPQGram p q = cata algebra . decorateTermWithPGram p
                                            put (drop 1 labels)
                                            pure $! cofree ((gram { base = padToSize q labels } .: rest) :< functor)))
 
--- | Replaces bags of p,q-grams in a term’s annotations with corresponding feature vectors.
+-- | Replaces a p,q-gram at the head of a term’s annotation with corresponding feature vectors.
 decorateTermWithFeatureVector :: (Hashable label, Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
 decorateTermWithFeatureVector d = cata $ \ (RCons gram rest :< functor) ->
     cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor)
