@@ -84,19 +84,17 @@ decorateTermWithPGram p = ana coalgebra . (,) []
 
 -- | Replaces labels in a term’s annotations with corresponding p,q-grams.
 decorateTermWithPQGram :: Traversable f => Int -> Int -> Cofree f (Record (label ': fields)) -> Cofree f (Record (Gram label ': fields))
-decorateTermWithPQGram p q = cata algebra . decorateTermWithPGram p
-  where algebra :: Traversable f => CofreeF f (Record (Gram label ': fields)) (Cofree f (Record (Gram label ': fields))) -> Cofree f (Record (Gram label ': fields))
-        algebra (RCons gram rest :< functor) = cofree ((setBase gram (base gram) .: rest) :< (`evalState` (siblingLabels functor)) (for functor assignSiblings))
-        assignSiblings :: Cofree f (Record (Gram label ': fields)) -> State [Maybe label] (Cofree f (Record (Gram label ': fields)))
-        assignSiblings a = case runCofree a of
+decorateTermWithPQGram p q = cata algebra
+  where algebra :: Traversable f => CofreeF f (Record (label ': fields)) (Cofree f (Record (Gram label ': fields))) -> Cofree f (Record (Gram label ': fields))
+        algebra (RCons label rest :< functor) = cofree ((Gram (padToSize p []) (padToSize q (pure (Just label))) .: rest) :< (`evalState` (siblingLabels functor)) (for functor (assignLabels label)))
+        assignLabels :: label -> Cofree f (Record (Gram label ': fields)) -> State [Maybe label] (Cofree f (Record (Gram label ': fields)))
+        assignLabels label a = case runCofree a of
           RCons gram rest :< functor -> do
             labels <- get
             put (drop 1 labels)
-            pure $! cofree ((setBase gram labels .: rest) :< functor)
+            pure $! cofree ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } .: rest) :< functor)
         siblingLabels :: Traversable f => f (Cofree f (Record (Gram label ': fields))) -> [Maybe label]
         siblingLabels = foldMap (base . rhead . extract)
-        setBase :: Gram label -> [Maybe label] -> Gram label
-        setBase gram labels = gram { base = padToSize q labels }
 
 -- | Replaces a p,q-gram at the head of a term’s annotation with corresponding feature vectors.
 decorateTermWithFeatureVector :: (Hashable label, Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
