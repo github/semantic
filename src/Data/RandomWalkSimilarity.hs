@@ -71,10 +71,6 @@ featureVector :: Hashable label => Int -> DList.DList (Gram label) -> Vector.Vec
 featureVector d bag = sumVectors $ unitVector d . hash <$> bag
   where sumVectors = DList.foldr (Vector.zipWith (+)) (Vector.replicate d 0)
 
--- | Annotates a term with a label at each node.
-labelDecorator :: Functor f => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (label ': fields))
-labelDecorator getLabel = cata $ \ c -> cofree ((getLabel c .: headF c) :< tailF c)
-
 -- | Replaces labels in a term’s annotations with corresponding p,q-grams.
 pqGramDecorator :: Traversable f => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Gram label ': fields))
 pqGramDecorator getLabel p q = cata algebra
