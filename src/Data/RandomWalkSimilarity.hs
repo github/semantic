@@ -98,6 +98,7 @@ decorateTermWithFeatureVector :: (Hashable label, Prologue.Foldable f, Functor f
 decorateTermWithFeatureVector d = cata $ \ (RCons gram rest :< functor) ->
     cofree (RCons (foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor) rest :< functor)
 
+-- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> Vector.Vector Double
 unitVector d hash = normalize ((`evalRand` mkQCGen hash) (sequenceA (Vector.replicate d getRandom)))
   where normalize vec = fmap (/ vmagnitude vec) vec
