@@ -63,7 +63,7 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 
 -- | Compute the bag of grams with stems of length _p_ and bases of length _q_, with labels computed from annotations, which summarize the entire subtree of a term.
 pqGrams :: Traversable f => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> DList.DList (Gram label)
-pqGrams getLabel p q = foldMap (pure . getField) . decorateTermWithPQGram getLabel p q
+pqGrams getLabel p q = foldMap (pure . getField) . pqGramDecorator getLabel p q
 
 
 -- | Compute a vector with the specified number of dimensions, as an approximation of a bag of `Gram`s summarizing a tree.
@@ -76,8 +76,8 @@ labelDecorator :: Functor f => (forall b. CofreeF f (Record fields) b -> label) 
 labelDecorator getLabel = cata $ \ c -> cofree ((getLabel c .: headF c) :< tailF c)
 
 -- | Replaces labels in a term’s annotations with corresponding p,q-grams.
-decorateTermWithPQGram :: Traversable f => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Gram label ': fields))
-decorateTermWithPQGram getLabel p q = cata algebra
+pqGramDecorator :: Traversable f => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Gram label ': fields))
+pqGramDecorator getLabel p q = cata algebra
   where algebra (rest :< functor) = let label = getLabel (rest :< functor) in cofree ((Gram (padToSize p []) (padToSize q (pure (Just label))) .: rest) :< (`evalState` (siblingLabels functor)) (for functor (assignLabels label)))
         assignLabels :: label -> Cofree f (Record (Gram label ': fields)) -> State [Maybe label] (Cofree f (Record (Gram label ': fields)))
         assignLabels label a = case runCofree a of
@@ -103,7 +103,7 @@ unitVector d hash = normalize ((`evalRand` mkQCGen hash) (sequenceA (Vector.repl
 featureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
 featureVectorDecorator getLabel p q d
   = decorateTermWithFeatureVector d
-  . decorateTermWithPQGram getLabel p q
+  . pqGramDecorator getLabel p q
 
 -- | Pads a list of Alternative values to exactly n elements.
 padToSize :: Alternative f => Int -> [f a] -> [f a]
