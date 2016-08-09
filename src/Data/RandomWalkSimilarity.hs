@@ -94,8 +94,11 @@ decorateTermWithPQGram q = cata algebra
                                            pure $! cofree ((gram { base = padToSize q labels } .: rest) :< functor)))
 
 -- | Replaces bags of p,q-grams in a term’s annotations with corresponding feature vectors.
-decorateTermWithFeatureVector :: (Prologue.Foldable f, Functor f) => Cofree f (Record (Vector.Vector Double ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
-decorateTermWithFeatureVector = cata $ \ (RCons unitVector rest :< functor) -> cofree (RCons (foldr (Vector.zipWith (+) . getField . extract) unitVector functor) rest :< functor)
+decorateTermWithFeatureVector :: (Hashable label, Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
+decorateTermWithFeatureVector d = cata $ \ (RCons gram rest :< functor) ->
+  let unitVector = normalize ((`evalRand` mkQCGen (hash gram)) (sequenceA (Vector.replicate d getRandom))) in
+    cofree (RCons (foldr (Vector.zipWith (+) . getField . extract) unitVector functor) rest :< functor)
+  where normalize vec = fmap (/ vmagnitude vec) vec
 
 decorateTermWithUnitVector :: (Hashable label, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
 decorateTermWithUnitVector d = fmap $ \ (RCons gram rest) -> normalize ((`evalRand` mkQCGen (hash gram)) (sequenceA (Vector.replicate d getRandom))) .: rest
@@ -104,8 +107,7 @@ decorateTermWithUnitVector d = fmap $ \ (RCons gram rest) -> normalize ((`evalRa
 -- | Annotates a term with a feature vector at each node.
 featureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
 featureVectorDecorator getLabel p q d
-  = decorateTermWithFeatureVector
-  . decorateTermWithUnitVector d
+  = decorateTermWithFeatureVector d
   . decorateTermWithPQGram q
   . decorateTermWithPGram p
   . decorateTermWithLabel getLabel
