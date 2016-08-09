@@ -83,6 +83,7 @@ pqGramDecorator getLabel p q = cata algebra
             pure $! cofree ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } .: rest) :< functor)
         siblingLabels :: Traversable f => f (Cofree f (Record (Gram label ': fields))) -> [Maybe label]
         siblingLabels = foldMap (base . rhead . extract)
+        padToSize n list = take n (list <> repeat empty)
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> Vector.Vector Double
@@ -96,10 +97,6 @@ featureVectorDecorator getLabel p q d
   = cata (\ (RCons gram rest :< functor) ->
       cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor))
   . pqGramDecorator getLabel p q
-
--- | Pads a list of Alternative values to exactly n elements.
-padToSize :: Alternative f => Int -> [f a] -> [f a]
-padToSize n list = take n (list <> repeat empty)
 
 
 -- Instances
