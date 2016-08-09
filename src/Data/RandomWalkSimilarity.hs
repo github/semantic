@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, TypeOperators #-}
 module Data.RandomWalkSimilarity
 ( rws
-, pqGrams
 , featureVector
 , pqGramDecorator
 , featureVectorDecorator
@@ -61,11 +60,6 @@ data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
-
--- | Compute the bag of grams with stems of length _p_ and bases of length _q_, with labels computed from annotations, which summarize the entire subtree of a term.
-pqGrams :: Traversable f => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> DList.DList (Gram label)
-pqGrams getLabel p q = foldMap (pure . getField) . pqGramDecorator getLabel p q
-
 
 -- | Compute a vector with the specified number of dimensions, as an approximation of a bag of `Gram`s summarizing a tree.
 featureVector :: Hashable label => Int -> DList.DList (Gram label) -> Vector.Vector Double
