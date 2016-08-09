@@ -86,10 +86,13 @@ decorateTermWithPGram p = ana coalgebra . (,) []
 decorateTermWithPQGram :: Traversable f => Int -> Int -> Cofree f (Record (label ': fields)) -> Cofree f (Record (Gram label ': fields))
 decorateTermWithPQGram p q = cata algebra . decorateTermWithPGram p
   where algebra :: Traversable f => CofreeF f (Record (Gram label ': fields)) (Cofree f (Record (Gram label ': fields))) -> Cofree f (Record (Gram label ': fields))
-        algebra (RCons gram rest :< functor) = cofree ((setBase gram (base gram) .: rest) :< (`evalState` (siblingLabels functor)) (for functor $ \ a -> case runCofree a of
-          RCons gram rest :< functor -> do labels <- get
-                                           put (drop 1 labels)
-                                           pure $! cofree ((setBase gram labels .: rest) :< functor)))
+        algebra (RCons gram rest :< functor) = cofree ((setBase gram (base gram) .: rest) :< (`evalState` (siblingLabels functor)) (for functor assignSiblings))
+        assignSiblings :: Cofree f (Record (Gram label ': fields)) -> State [Maybe label] (Cofree f (Record (Gram label ': fields)))
+        assignSiblings a = case runCofree a of
+          RCons gram rest :< functor -> do
+            labels <- get
+            put (drop 1 labels)
+            pure $! cofree ((setBase gram labels .: rest) :< functor)
         siblingLabels :: Traversable f => f (Cofree f (Record (Gram label ': fields))) -> [Maybe label]
         siblingLabels = foldMap (base . rhead . extract)
         setBase :: Gram label -> [Maybe label] -> Gram label
