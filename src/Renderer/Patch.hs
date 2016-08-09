@@ -104,7 +104,10 @@ header blobs = intercalate "\n" ([filepathHeader, fileModeHeader] <> maybeFilepa
         beforeFilepath = "--- " <> modeHeader "a" modeA pathA
         afterFilepath = "+++ " <> modeHeader "b" modeB pathB
         sources = source <$> blobs
-        (pathA, pathB) = runJoin $ path <$> blobs
+        (pathA, pathB) = case runJoin $ path <$> blobs of
+          ("", path) -> (path, path)
+          (path, "") -> (path, path)
+          paths -> paths
         (oidA, oidB) = runJoin $ oid <$> blobs
         (modeA, modeB) = runJoin $ blobKind <$> blobs
 
