@@ -2,7 +2,6 @@
 module Data.RandomWalkSimilarity.Spec where
 
 import Category
-import Data.DList as DList hiding (toList)
 import Data.RandomWalkSimilarity
 import Data.Record
 import qualified Data.Vector.Arbitrary as Vector
@@ -25,9 +24,9 @@ spec = parallel $ do
     prop "produces grams with bases of the specified width" . forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
       \ (term, p, q) -> pqGramDecorator (rhead . headF) p q (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== q) . length . base . rhead)
 
-  describe "featureVector" $ do
-    prop "produces a vector of the specified dimension" . forAll (arbitrary `suchThat` ((> 0) . Prologue.snd)) $
-      \ (grams, d) -> length (featureVector d (fromList (grams :: [Gram Text]))) `shouldBe` d
+  describe "featureVectorDecorator" $ do
+    prop "produces a vector of the specified dimension" $
+      \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively d)) . length . rhead)
 
   describe "rws" $ do
     let compare a b = if extract a == extract b then Just (pure (Replace a b)) else Nothing
