@@ -20,10 +20,10 @@ spec :: Spec
 spec = parallel $ do
   describe "pqGrams" $ do
     prop "produces grams with stems of the specified length" . forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
-      \ (term, p, q) -> pqGrams headF p q (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== p) . length . stem)
+      \ (term, p, q) -> pqGrams (rhead . headF) p q (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== p) . length . stem)
 
     prop "produces grams with bases of the specified width" . forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
-      \ (term, p, q) -> pqGrams headF p q (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== q) . length . base)
+      \ (term, p, q) -> pqGrams (rhead . headF) p q (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== q) . length . base)
 
   describe "featureVector" $ do
     prop "produces a vector of the specified dimension" . forAll (arbitrary `suchThat` ((> 0) . Prologue.snd)) $
