@@ -84,7 +84,7 @@ decorateTermWithPGram p = ana coalgebra . (,) []
         coalgebra (parentLabels, c) = case extract c of
           RCons label rest -> (Gram (padToSize p parentLabels) (pure (Just label)) .: rest) :< fmap ((,) (padToSize p (Just label : parentLabels))) (unwrap c)
 
--- | Replaces p,1-grams in a term’s annotations with corresponding bags of p,q-grams.
+-- | Replaces labels in a term’s annotations with corresponding bags of p,q-grams.
 decorateTermWithPQGram :: Traversable f => Int -> Int -> Cofree f (Record (label ': fields)) -> Cofree f (Record (Gram label ': fields))
 decorateTermWithPQGram p q = cata algebra . decorateTermWithPGram p
   where algebra :: Traversable f => CofreeF f (Record (Gram label ': fields)) (Cofree f (Record (Gram label ': fields))) -> Cofree f (Record (Gram label ': fields))
