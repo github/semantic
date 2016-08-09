@@ -63,7 +63,7 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 
 -- | Compute the bag of grams with stems of length _p_ and bases of length _q_, with labels computed from annotations, which summarize the entire subtree of a term.
 pqGrams :: Traversable f => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> DList.DList (Gram label)
-pqGrams getLabel p q = foldMap (pure . getField) . decorateTermWithPQGram p q . decorateTermWithLabel getLabel
+pqGrams getLabel p q = foldMap (pure . getField) . decorateTermWithPQGram p q . labelDecorator getLabel
 
 
 -- | Compute a vector with the specified number of dimensions, as an approximation of a bag of `Gram`s summarizing a tree.
@@ -72,8 +72,8 @@ featureVector d bag = sumVectors $ unitVector d . hash <$> bag
   where sumVectors = DList.foldr (Vector.zipWith (+)) (Vector.replicate d 0)
 
 -- | Annotates a term with a label at each node.
-decorateTermWithLabel :: Functor f => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (label ': fields))
-decorateTermWithLabel getLabel = cata $ \ c -> cofree ((getLabel c .: headF c) :< tailF c)
+labelDecorator :: Functor f => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (label ': fields))
+labelDecorator getLabel = cata $ \ c -> cofree ((getLabel c .: headF c) :< tailF c)
 
 -- | Replaces labels in a term’s annotations with corresponding p,q-grams.
 decorateTermWithPQGram :: Traversable f => Int -> Int -> Cofree f (Record (label ': fields)) -> Cofree f (Record (Gram label ': fields))
@@ -105,7 +105,7 @@ featureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF 
 featureVectorDecorator getLabel p q d
   = decorateTermWithFeatureVector d
   . decorateTermWithPQGram p q
-  . decorateTermWithLabel getLabel
+  . labelDecorator getLabel
 
 -- | Pads a list of Alternative values to exactly n elements.
 padToSize :: Alternative f => Int -> [f a] -> [f a]
