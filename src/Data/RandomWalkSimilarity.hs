@@ -107,6 +107,7 @@ decorateTermWithFeatureVector d = cata $ \ (RCons gram rest :< functor) ->
 unitVector :: Int -> Int -> Vector.Vector Double
 unitVector d hash = normalize ((`evalRand` mkQCGen hash) (sequenceA (Vector.replicate d getRandom)))
   where normalize vec = fmap (/ vmagnitude vec) vec
+        vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
 
 -- | Annotates a term with a feature vector at each node.
 featureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
@@ -118,10 +119,6 @@ featureVectorDecorator getLabel p q d
 -- | Pads a list of Alternative values to exactly n elements.
 padToSize :: Alternative f => Int -> [f a] -> [f a]
 padToSize n list = take n (list <> repeat empty)
-
--- | The magnitude of a Euclidean vector, i.e. its distance from the origin.
-vmagnitude :: Vector.Vector Double -> Double
-vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
 
 
 -- Instances
