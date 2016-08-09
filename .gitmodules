@@ -16,6 +16,6 @@
 [submodule "test/repos/backbone"]
 	path = test/repos/backbone
 	url = https://github.com/jashkenas/backbone
-[submodule "tools/semantic-git-diff/test/corpus/javascript"]
-	path = tools/semantic-git-diff/test/corpus/javascript
-	url = ./tools/semantic-git-diff/test/corpus/javascript/.git
+[submodule "tools/semantic-git-diff/test/corpus/repos/javascript"]
+	path = tools/semantic-git-diff/test/corpus/repos/javascript
+	url = ./tools/semantic-git-diff/test/corpus/repos/javascript/.git/
