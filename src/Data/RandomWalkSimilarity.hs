@@ -75,13 +75,6 @@ featureVector d bag = sumVectors $ unitVector d . hash <$> bag
 decorateTermWithLabel :: Functor f => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (label ': fields))
 decorateTermWithLabel getLabel = cata $ \ c -> cofree ((getLabel c .: headF c) :< tailF c)
 
--- | Replaces labels in a term’s annotations with corresponding p,1-grams.
-decorateTermWithPGram :: Functor f => Int -> Cofree f (Record (label ': fields)) -> Cofree f (Record (Gram label ': fields))
-decorateTermWithPGram p = ana coalgebra . (,) []
-  where coalgebra :: Functor f => ([Maybe label], Cofree f (Record (label ': fields))) -> CofreeF f (Record (Gram label ': fields)) ([Maybe label], Cofree f (Record (label ': fields)))
-        coalgebra (parentLabels, c) = case extract c of
-          RCons label rest -> (Gram (padToSize p parentLabels) (pure (Just label)) .: rest) :< fmap ((,) (padToSize p (Just label : parentLabels))) (unwrap c)
-
 -- | Replaces labels in a term’s annotations with corresponding p,q-grams.
 decorateTermWithPQGram :: Traversable f => Int -> Int -> Cofree f (Record (label ': fields)) -> Cofree f (Record (Gram label ': fields))
 decorateTermWithPQGram p q = cata algebra
