@@ -36,3 +36,6 @@ spec = parallel $ do
                         tbs = toTerm <$> bs
                         diff = free (Free (pure (Program .: Vector.singleton 0 .: RNil) :< Indexed (rws compare tas tbs :: [Diff Text (Record '[Category, Vector.Vector Double])]))) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ((Program .: Vector.singleton 0 .: RNil) :< Indexed tas)), Just (cofree ((Program .: Vector.singleton 0 .: RNil) :< Indexed tbs)))
+
+positively :: Int -> Int
+positively = succ . abs
