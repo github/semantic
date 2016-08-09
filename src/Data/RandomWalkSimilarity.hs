@@ -68,10 +68,8 @@ pqGrams getLabel p q = foldMap (pure . getField) . decorateTermWithPQGram p q . 
 
 -- | Compute a vector with the specified number of dimensions, as an approximation of a bag of `Gram`s summarizing a tree.
 featureVector :: Hashable label => Int -> DList.DList (Gram label) -> Vector.Vector Double
-featureVector d bag = sumVectors $ unitDVector . hash <$> bag
-  where unitDVector hash = normalize . (`evalRand` mkQCGen hash) $ Prologue.sequence (Vector.replicate d getRandom)
-        normalize vec = fmap (/ vmagnitude vec) vec
-        sumVectors = DList.foldr (Vector.zipWith (+)) (Vector.replicate d 0)
+featureVector d bag = sumVectors $ unitVector d . hash <$> bag
+  where sumVectors = DList.foldr (Vector.zipWith (+)) (Vector.replicate d 0)
 
 -- | Annotates a term with a label at each node.
 decorateTermWithLabel :: Functor f => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (label ': fields))
