@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, TypeOperators #-}
 module Data.RandomWalkSimilarity
 ( rws
-, featureVector
 , pqGramDecorator
 , featureVectorDecorator
 , Gram(..)
@@ -11,7 +10,6 @@ import Control.Applicative
 import Control.Arrow ((&&&))
 import Control.Monad.Random
 import Control.Monad.State
-import qualified Data.DList as DList
 import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
@@ -60,11 +58,6 @@ data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
-
--- | Compute a vector with the specified number of dimensions, as an approximation of a bag of `Gram`s summarizing a tree.
-featureVector :: Hashable label => Int -> DList.DList (Gram label) -> Vector.Vector Double
-featureVector d bag = sumVectors $ unitVector d . hash <$> bag
-  where sumVectors = DList.foldr (Vector.zipWith (+)) (Vector.replicate d 0)
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
 pqGramDecorator :: Traversable f => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Gram label ': fields))
