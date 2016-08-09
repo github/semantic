@@ -121,30 +121,38 @@ diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Pure patch -> sum (cost . extract <$> patch)
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser fields -> DiffArguments -> Both SourceBlob -> IO Text
-textDiff parser arguments sources = case format arguments of
-  Split -> diffFiles parser split sources
-  Patch -> diffFiles parser patch sources
-  JSON -> diffFiles parser json sources
-  Summary -> diffFiles parser summary sources
+textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser fields -> DiffArguments -> Both SourceBlob -> IO Output
+textDiff parser arguments = diffFiles parser renderer
+  where
+    renderer = case format arguments of
+      Split -> split
+      Patch -> patch
+      JSON -> json
+      Summary -> summary
 
 -- | Returns a truncated diff given diff arguments and two source blobs.
-truncatedDiff :: DiffArguments -> Both SourceBlob -> IO Text
-truncatedDiff arguments sources = case format arguments of
-  Split -> pure ""
-  Patch -> pure $ truncatePatch arguments sources
-  JSON -> pure "{}"
-  Summary -> pure ""
+truncatedDiff :: DiffArguments -> Both SourceBlob -> IO Output
+truncatedDiff arguments sources = pure $ case format arguments of
+  Split -> SplitOutput mempty
+  Patch -> PatchOutput (truncatePatch arguments sources)
+  JSON -> JSONOutput mempty
+  Summary -> SummaryOutput mempty
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
 printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser fields -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
-  case (output arguments) of
-    Nothing -> TextIO.putStr rendered
+  let renderedText = case rendered of
+                       SplitOutput text -> text
+                       PatchOutput text -> text
+                       JSONOutput series -> toS . encodingToLazyByteString $ pairs series
+                       SummaryOutput summaries -> toS . encodingToLazyByteString $ pairs summaries
+
+  case output arguments of
+    Nothing -> TextIO.putStr renderedText
     Just path -> do
       isDir <- doesDirectoryExist path
       let outputPath = if isDir
           then path </> (takeFileName outputPath -<.> ".html")
           else path
-      IO.withFile outputPath IO.WriteMode (`TextIO.hPutStr` rendered)
+      IO.withFile outputPath IO.WriteMode (`TextIO.hPutStr` renderedText)
