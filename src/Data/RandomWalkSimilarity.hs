@@ -96,7 +96,7 @@ decorateTermWithPQGram q = cata algebra
 -- | Replaces bags of p,q-grams in a term’s annotations with corresponding feature vectors.
 decorateTermWithFeatureVector :: (Hashable label, Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
 decorateTermWithFeatureVector d = cata $ \ (RCons gram rest :< functor) ->
-    cofree (RCons (foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor) rest :< functor)
+    cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor)
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> Vector.Vector Double
