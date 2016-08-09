@@ -38,7 +38,7 @@ import Data.Aeson.Encoding (encodingToLazyByteString)
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser fields -> Renderer (Record fields) -> Both SourceBlob -> IO Text
+diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser fields -> Renderer (Record fields) -> Both SourceBlob -> IO Output
 diffFiles parser renderer sourceBlobs = do
   let sources = source <$> sourceBlobs
   terms <- sequence $ parser <$> sourceBlobs
@@ -76,8 +76,8 @@ lineByLineParser blob = pure . cofree . root $ case foldl' annotateLeaves ([], 0
     input = source blob
     lines = actualLines input
     root children = let cost = 1 + fromIntegral (length children) in
-      ((Range 0 $ length input) .: Other "program" .: cost .: RNil) :< Indexed children
-    leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Other "program" .: 1 .: RNil) :< Leaf line
+      (Range 0 (length input) .: Other "program" .: cost .: RNil) :< Indexed children
+    leaf charIndex line = (Range charIndex (charIndex + T.length line) .: Other "program" .: 1 .: RNil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum <> [ leaf charIndex (toText line) ] , charIndex + length line)
     toText = T.pack . Source.toString
