@@ -84,11 +84,6 @@ pqGramDecorator getLabel p q = cata algebra
         siblingLabels :: Traversable f => f (Cofree f (Record (Gram label ': fields))) -> [Maybe label]
         siblingLabels = foldMap (base . rhead . extract)
 
--- | Replaces a p,q-gram at the head of a term’s annotation with corresponding feature vectors.
-decorateTermWithFeatureVector :: (Hashable label, Prologue.Foldable f, Functor f) => Int -> Cofree f (Record (Gram label ': fields)) -> Cofree f (Record (Vector.Vector Double ': fields))
-decorateTermWithFeatureVector d = cata $ \ (RCons gram rest :< functor) ->
-    cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor)
-
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> Vector.Vector Double
 unitVector d hash = normalize ((`evalRand` mkQCGen hash) (sequenceA (Vector.replicate d getRandom)))
@@ -98,7 +93,8 @@ unitVector d hash = normalize ((`evalRand` mkQCGen hash) (sequenceA (Vector.repl
 -- | Annotates a term with a feature vector at each node.
 featureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
 featureVectorDecorator getLabel p q d
-  = decorateTermWithFeatureVector d
+  = cata (\ (RCons gram rest :< functor) ->
+      cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor))
   . pqGramDecorator getLabel p q
 
 -- | Pads a list of Alternative values to exactly n elements.
