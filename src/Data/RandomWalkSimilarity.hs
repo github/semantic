@@ -3,6 +3,7 @@ module Data.RandomWalkSimilarity
 ( rws
 , pqGrams
 , featureVector
+, pqGramDecorator
 , featureVectorDecorator
 , Gram(..)
 ) where
