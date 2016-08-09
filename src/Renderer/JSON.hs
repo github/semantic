@@ -9,7 +9,6 @@ import Alignment
 import Category
 import Data.Aeson as A hiding (json)
 import Data.Bifunctor.Join
-import Data.ByteString.Builder
 import Data.Record
 import qualified Data.Text as T
 import Data.These
@@ -23,7 +22,7 @@ import Term
 
 -- | Render a diff to a string representing its JSON.
 json :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
-json blobs diff = toS . toLazyByteString . fromEncoding . pairs $ "rows" .= annotateRows (alignDiff (source <$> blobs) diff) <> "oids" .= (oid <$> blobs) <> "paths" .= (path <$> blobs)
+json blobs diff = JSONOutput $ "rows" .= annotateRows (alignDiff (source <$> blobs) diff) <> "oids" .= (oid <$> blobs) <> "paths" .= (path <$> blobs)
   where annotateRows = fmap (fmap NumberedLine) . numberedRows
 
 newtype NumberedLine a = NumberedLine (Int, a)

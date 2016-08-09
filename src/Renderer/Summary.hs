@@ -3,12 +3,12 @@ module Renderer.Summary where
 import Category
 import Prologue
 import Renderer
-import Data.Aeson
 import Data.Record
 import Range
 import DiffSummary
 import Source
+import Data.Aeson
 
 summary :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
-summary blobs diff = toS . encode $ summaries >>= annotatedSummaries
+summary blobs diff = SummaryOutput $ "summaries" .= (summaries >>= annotatedSummaries)
   where summaries = diffSummaries (source <$> blobs) diff
