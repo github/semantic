@@ -1,5 +1,5 @@
 diff --git a/test/diffs/multiple-hunks.A.js b/test/diffs/multiple-hunks.B.js
-index .. 100644
+index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000000 100644
 --- a/test/diffs/multiple-hunks.A.js
 +++ b/test/diffs/multiple-hunks.B.js
 @@ -1,5 +1,5 @@

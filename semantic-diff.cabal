@@ -129,6 +129,7 @@ test-suite semantic-diff-test
                      , free
                      , recursion-schemes >= 4.1
                      , wl-pprint-text
+                     , protolude
   if os(darwin)
     ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j
   else

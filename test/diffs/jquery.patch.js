@@ -1,5 +1,5 @@
 diff --git a/test/diffs/jquery.A.js b/test/diffs/jquery.B.js
-index .. 100644
+index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000000 100644
 --- a/test/diffs/jquery.A.js
 +++ b/test/diffs/jquery.B.js
 @@ -3,7 +3,7 @@
