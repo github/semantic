@@ -60,7 +60,12 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
-pqGramDecorator :: Traversable f => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Gram label ': fields))
+pqGramDecorator :: Traversable f
+  => (forall b. CofreeF f (Record fields) b -> label)
+  -> Int
+  -> Int
+  -> Cofree f (Record fields)
+  -> Cofree f (Record (Gram label ': fields))
 pqGramDecorator getLabel p q = cata algebra
   where algebra term = let label = getLabel term in
           cofree ((Gram (padToSize p []) (padToSize q (pure (Just label))) .: headF term) :< (`evalState` (siblingLabels (tailF term))) (for (tailF term) (assignLabels label)))
