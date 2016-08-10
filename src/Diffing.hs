@@ -77,8 +77,8 @@ lineByLineParser blob = pure . cofree . root $ case foldl' annotateLeaves ([], 0
   where
     input = source blob
     lines = actualLines input
-    root children = ((Range 0 $ length input) .: Other "program" .: RNil) :< Indexed children
-    leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Other "program" .: RNil) :< Leaf line
+    root children = ((Range 0 $ length input) .: Program .: RNil) :< Indexed children
+    leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Program .: RNil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum <> [ leaf charIndex (toText line) ] , charIndex + length line)
     toText = T.pack . Source.toString
