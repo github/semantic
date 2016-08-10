@@ -12,10 +12,10 @@ import qualified Data.Set as Set
 import Source
 import SourceSpan
 
--- | A function that takes a source file and returns an annotated AST.
+-- | A function that takes a source blob and returns an annotated AST.
 -- | The return is in the IO monad because some of the parsers are written in C
 -- | and aren't pure.
-type Parser fields = SourceBlob -> IO (Term Text (Record fields))
+type Parser f a = SourceBlob -> IO (Cofree f a)
 
 -- | Whether a category is an Operator Category
 isOperator :: Category -> Bool

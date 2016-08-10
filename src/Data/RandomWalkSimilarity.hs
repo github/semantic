@@ -1,15 +1,21 @@
-{-# LANGUAGE RankNTypes #-}
-module Data.RandomWalkSimilarity where
+{-# LANGUAGE DataKinds, GADTs, RankNTypes, TypeOperators #-}
+module Data.RandomWalkSimilarity
+( rws
+, pqGramDecorator
+, featureVectorDecorator
+, Gram(..)
+) where
 
+import Control.Applicative
 import Control.Arrow ((&&&))
 import Control.Monad.Random
 import Control.Monad.State
-import qualified Data.DList as DList
 import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
 import qualified Data.KdTree.Static as KdTree
 import qualified Data.List as List
+import Data.Record
 import qualified Data.Vector as Vector
 import Patch
 import Prologue
@@ -18,25 +24,23 @@ import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: (Hashable label, Eq annotation, Prologue.Foldable f, Functor f, Eq (f (Cofree f annotation)))
-  => (Cofree f annotation -> Cofree f annotation -> Maybe (Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation)))) -- ^ A function which comapres a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
-  -> (forall b. CofreeF f annotation b -> label) -- ^ A function to compute a label for an unpacked term.
-  -> [Cofree f annotation] -- ^ The list of old terms.
-  -> [Cofree f annotation] -- ^ The list of new terms.
-  -> [Free (CofreeF f (Both annotation)) (Patch (Cofree f annotation))]
-rws compare getLabel as bs
+rws :: (Eq (Record fields), Prologue.Foldable f, Functor f, Eq (f (Cofree f (Record fields))), HasField fields (Vector.Vector Double))
+  => (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
+  -> [Cofree f (Record fields)] -- ^ The list of old terms.
+  -> [Cofree f (Record fields)] -- ^ The list of new terms.
+  -> [Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))] -- ^ The resulting list of similarity-matched diffs.
+rws compare as bs
   | null as, null bs = []
   | null as = inserting <$> bs
   | null bs = deleting <$> as
   | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, fas)) $ traverse findNearestNeighbourTo fbs
-  where (p, q, d) = (2, 2, 15)
-        fas = zipWith featurize [0..] as
+  where fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
-        featurize index term = UnmappedTerm index (featureVector d (pqGrams p q getLabel term)) term
+        featurize index term = UnmappedTerm index (getField (extract term)) term
         findNearestNeighbourTo kv@(UnmappedTerm _ _ v) = do
           (previous, unmapped) <- get
-          let (UnmappedTerm i _ _) = KdTree.nearest kdas kv
+          let UnmappedTerm i _ _ = KdTree.nearest kdas kv
           fromMaybe (pure (negate 1, inserting v)) $ do
             found <- find ((== i) . termIndex) unmapped
             guard (i >= previous)
@@ -55,38 +59,40 @@ data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
--- | Compute the bag of grams with stems of length _p_ and bases of length _q_, with labels computed from annotations, which summarize the entire subtree of a term.
-pqGrams :: (Prologue.Foldable f, Functor f) => Int -> Int -> (forall b. CofreeF f annotation b -> label) -> Cofree f annotation -> DList.DList (Gram label)
-pqGrams p q getLabel = uncurry DList.cons . cata merge . setRootBase . setRootStem . cata go
-  where go c = cofree (Gram [] [ Just (getLabel c) ] :< (assignParent (Just (getLabel c)) p <$> tailF c))
-        merge (head :< tail) = let tail' = toList tail in (head, DList.fromList (windowed q setBases [] (fst <$> tail')) <> foldMap snd tail')
-        assignParent parentLabel n tree
-          | n > 0 = let gram :< functor = runCofree tree in cofree $ prependParent parentLabel gram :< (assignParent parentLabel (pred n) <$> functor)
-          | otherwise = tree
-        prependParent parentLabel gram = gram { stem = parentLabel : stem gram }
-        setBases gram siblings rest = setBase gram (siblings >>= base) : rest
-        setBase gram newBase = gram { base = take q (newBase <> repeat Nothing) }
-        setRootBase term = let (a :< f) = runCofree term in cofree (setBase a (base a) :< f)
-        setRootStem = foldr (\ p rest -> assignParent Nothing p . rest) identity [0..p]
+-- | Annotates a term with the corresponding p,q-gram at each node.
+pqGramDecorator :: Traversable f
+  => (forall b. CofreeF f (Record fields) b -> label) -- ^ A function computing the label from an arbitrary unpacked term. This function can use the annotation and functor’s constructor, but not any recursive values inside the functor (since they’re held parametric in 'b').
+  -> Int -- ^ 'p'; the desired stem length for the grams.
+  -> Int -- ^ 'q'; the desired base length for the grams.
+  -> Cofree f (Record fields) -- ^ The term to decorate.
+  -> Cofree f (Record (Gram label ': fields)) -- ^ The decorated term.
+pqGramDecorator getLabel p q = cata algebra
+  where algebra term = let label = getLabel term in
+          cofree ((gram label .: headF term) :< assignParentAndSiblingLabels (tailF term) label)
+        gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
+        assignParentAndSiblingLabels functor label = (`evalState` (siblingLabels functor)) (for functor (assignLabels label))
+        assignLabels :: label -> Cofree f (Record (Gram label ': fields)) -> State [Maybe label] (Cofree f (Record (Gram label ': fields)))
+        assignLabels label a = case runCofree a of
+          RCons gram rest :< functor -> do
+            labels <- get
+            put (drop 1 labels)
+            pure $! cofree ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } .: rest) :< functor)
+        siblingLabels :: Traversable f => f (Cofree f (Record (Gram label ': fields))) -> [Maybe label]
+        siblingLabels = foldMap (base . rhead . extract)
+        padToSize n list = take n (list <> repeat empty)
 
--- | A sliding-window fold over _n_ items of a list per iteration.
-windowed :: Int -> (a -> [a] -> b -> b) -> b -> [a] -> b
-windowed n f seed = para alg
-  where alg xs = case xs of
-          Cons a (as, b) -> f a (take n $ a : as) b
-          Nil -> seed
+-- | Computes a unit vector of the specified dimension from a hash.
+unitVector :: Int -> Int -> Vector.Vector Double
+unitVector d hash = normalize ((`evalRand` mkQCGen hash) (sequenceA (Vector.replicate d getRandom)))
+  where normalize vec = fmap (/ vmagnitude vec) vec
+        vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
 
-
--- | Compute a vector with the specified number of dimensions, as an approximation of a bag of `Gram`s summarizing a tree.
-featureVector :: Hashable label => Int -> DList.DList (Gram label) -> Vector.Vector Double
-featureVector d bag = sumVectors $ unitDVector . hash <$> bag
-  where unitDVector hash = normalize . (`evalRand` mkQCGen hash) $ Prologue.sequence (Vector.replicate d getRandom)
-        normalize vec = fmap (/ vmagnitude vec) vec
-        sumVectors = DList.foldr (Vector.zipWith (+)) (Vector.replicate d 0)
-
--- | The magnitude of a Euclidean vector, i.e. its distance from the origin.
-vmagnitude :: Vector.Vector Double -> Double
-vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
+-- | Annotates a term with a feature vector at each node.
+featureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
+featureVectorDecorator getLabel p q d
+  = cata (\ (RCons gram rest :< functor) ->
+      cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor))
+  . pqGramDecorator getLabel p q
 
 
 -- Instances
