@@ -28,7 +28,7 @@ rws :: (Eq (Record fields), Prologue.Foldable f, Functor f, Eq (f (Cofree f (Rec
   => (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
   -> [Cofree f (Record fields)] -- ^ The list of old terms.
   -> [Cofree f (Record fields)] -- ^ The list of new terms.
-  -> [Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))]
+  -> [Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))] -- ^ The resulting list of similarity-matched diffs.
 rws compare as bs
   | null as, null bs = []
   | null as = inserting <$> bs
