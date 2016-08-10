@@ -18,11 +18,11 @@ import Test.QuickCheck
 spec :: Spec
 spec = parallel $ do
   describe "pqGramDecorator" $ do
-    prop "produces grams with stems of the specified length" . forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
-      \ (term, p, q) -> pqGramDecorator (rhead . headF) p q (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== p) . length . stem . rhead)
+    prop "produces grams with stems of the specified length" $
+      \ (term, p, q) -> pqGramDecorator (rhead . headF) (positively p) (positively q) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively p)) . length . stem . rhead)
 
-    prop "produces grams with bases of the specified width" . forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
-      \ (term, p, q) -> pqGramDecorator (rhead . headF) p q (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== q) . length . base . rhead)
+    prop "produces grams with bases of the specified width" $
+      \ (term, p, q) -> pqGramDecorator (rhead . headF) (positively p) (positively q) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively q)) . length . base . rhead)
 
   describe "featureVectorDecorator" $ do
     prop "produces a vector of the specified dimension" $
