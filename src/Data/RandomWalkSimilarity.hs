@@ -61,11 +61,11 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
 pqGramDecorator :: Traversable f
-  => (forall b. CofreeF f (Record fields) b -> label)
-  -> Int
-  -> Int
-  -> Cofree f (Record fields)
-  -> Cofree f (Record (Gram label ': fields))
+  => (forall b. CofreeF f (Record fields) b -> label) -- ^ A function computing the label from an arbitrary unpacked term. This function can use the annotation and functor’s constructor, but not any recursive values inside the functor (since they’re held parametric in 'b').
+  -> Int -- ^ 'p'; the desired stem length for the grams.
+  -> Int -- ^ 'q'; the desired base length for the grams.
+  -> Cofree f (Record fields) -- ^ The term to decorate.
+  -> Cofree f (Record (Gram label ': fields)) -- ^ The decorated term.
 pqGramDecorator getLabel p q = cata algebra
   where algebra term = let label = getLabel term in
           cofree ((Gram (padToSize p []) (padToSize q (pure (Just label))) .: headF term) :< (`evalState` (siblingLabels (tailF term))) (for (tailF term) (assignLabels label)))
