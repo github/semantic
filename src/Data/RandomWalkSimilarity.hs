@@ -68,7 +68,8 @@ pqGramDecorator :: Traversable f
   -> Cofree f (Record (Gram label ': fields)) -- ^ The decorated term.
 pqGramDecorator getLabel p q = cata algebra
   where algebra term = let label = getLabel term in
-          cofree ((Gram (padToSize p []) (padToSize q (pure (Just label))) .: headF term) :< (`evalState` (siblingLabels (tailF term))) (for (tailF term) (assignLabels label)))
+          cofree ((gram label .: headF term) :< (`evalState` (siblingLabels (tailF term))) (for (tailF term) (assignLabels label)))
+        gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
         assignLabels :: label -> Cofree f (Record (Gram label ': fields)) -> State [Maybe label] (Cofree f (Record (Gram label ': fields)))
         assignLabels label a = case runCofree a of
           RCons gram rest :< functor -> do
