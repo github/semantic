@@ -1,25 +1,24 @@
 {-# LANGUAGE DataKinds #-}
 module DiffSummarySpec where
 
-import Prologue
+import Category
+import Data.Functor.Both
+import Data.List (partition)
+import Data.RandomWalkSimilarity
 import Data.Record
-import Test.Hspec
-import Test.Hspec.QuickCheck
 import Diff
+import Diff.Arbitrary
+import DiffSummary
+import Info
+import Interpreter
+import Patch
+import Prologue
+import Source
 import Syntax
 import Term
-import Patch
-import Category
-import DiffSummary
-import Text.PrettyPrint.Leijen.Text (pretty)
-import Test.Hspec.QuickCheck
-import Diff.Arbitrary
-import Data.List (partition)
 import Term.Arbitrary
-import Interpreter
-import Info
-import Source
-import Data.Functor.Both
+import Test.Hspec
+import Test.Hspec.QuickCheck
 
 arrayInfo :: Record '[Category, Range]
 arrayInfo = ArrayLiteral .: Range 0 3 .: RNil
@@ -46,7 +45,7 @@ spec = parallel $ do
       diffSummaries sources testDiff `shouldBe` [ DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotation = Nothing } ]
 
     prop "equal terms produce identity diffs" $
-      \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category, Range])) in
+      \ a -> let term = featureVectorDecorator (category . headF) 2 2 15 (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range]))) in
         diffSummaries sources (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
   describe "annotatedSummaries" $ do
@@ -99,7 +98,7 @@ isIndexedOrFixed' syntax = case syntax of
 isBranchInfo :: DiffInfo -> Bool
 isBranchInfo info = case info of
   (BranchInfo _ _ _) -> True
-  (LeafInfo _ _) -> False
+  _ -> False
 
 isBranchNode :: Patch DiffInfo -> Bool
 isBranchNode = any isBranchInfo

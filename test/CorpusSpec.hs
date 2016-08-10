@@ -1,30 +1,30 @@
 {-# LANGUAGE DataKinds, FlexibleContexts, GeneralizedNewtypeDeriving #-}
 module CorpusSpec where
 
-import Unsafe (unsafeFromJust)
+import Category
+import Control.DeepSeq
+import Data.Functor.Both
+import Data.List (union)
+import Data.Record
+import qualified Data.Text as T
+import qualified Data.Vector as Vector
 import Diffing
+import GHC.Show (Show(..))
+import Info
+import Prologue hiding (fst, snd, lookup)
 import Renderer
 import qualified Renderer.JSON as J
 import qualified Renderer.Patch as P
 import qualified Renderer.Split as Split
-
-import Category
-import Control.DeepSeq
-import Data.Functor.Both
-import Data.Record
-import Data.List (union)
-import qualified Data.Text as T
-import Info
-import Prologue hiding (fst, snd, lookup)
 import qualified Source as S
 import System.FilePath
 import System.FilePath.Glob
 import Test.Hspec
-import GHC.Show (Show(..))
+import Unsafe (unsafeFromJust)
 
 spec :: Spec
 spec = parallel $ do
-  describe "crashers crash" $ runTestsIn "test/crashers-todo/" $ \ a b -> a `deepseq` pure (a == b) `shouldThrow` anyException
+  describe "crashers crash" . runTestsIn "test/crashers-todo/" $ \ a b -> a `deepseq` pure (a == b) `shouldThrow` anyException
   describe "crashers should not crash" $ runTestsIn "test/crashers/" shouldBe
   describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" shouldNotBe
   describe "should produce the correct diff" $ runTestsIn "test/diffs/" shouldBe
@@ -45,6 +45,7 @@ spec = parallel $ do
     correctTests paths = filter (\(_, _, _, output) -> isJust output) $ testsForPaths paths
     testsForPaths (aPath, bPath, json, patch, split) = [ ("json", J.json, paths, json), ("patch", P.patch, paths, patch), ("split", Split.split, paths, split) ]
       where paths = both aPath bPath
+
 -- | Return all the examples from the given directory. Examples are expected to
 -- | have the form "foo.A.js", "foo.B.js", "foo.patch.js". Diffs are not
 -- | required as the test may be verifying that the inputs don't crash.
@@ -72,7 +73,7 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | Given file paths for A, B, and, optionally, a diff, return whether diffing
 -- | the files will produce the diff. If no diff is provided, then the result
 -- | is true, but the diff will still be calculated.
-testDiff :: Renderer (Record '[Range, Category, Cost]) -> Both (Maybe FilePath) -> Maybe FilePath -> (Maybe Verbatim -> Maybe Verbatim -> Expectation) -> Expectation
+testDiff :: Renderer (Record '[Vector.Vector Double, Cost, Range, Category]) -> Both (Maybe FilePath) -> Maybe FilePath -> (Maybe Verbatim -> Maybe Verbatim -> Expectation) -> Expectation
 testDiff renderer paths diff matcher = do
   sources <- traverse (traverse readAndTranscodeFile) paths
   actual <- fmap Verbatim <$> traverse (diffFiles' sources) parser
