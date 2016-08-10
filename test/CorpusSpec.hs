@@ -73,7 +73,7 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 testDiff :: Renderer (Record '[Vector.Vector Double, Cost, Range, Category]) -> Both FilePath -> Maybe FilePath -> (Verbatim -> Verbatim -> Expectation) -> Expectation
 testDiff renderer paths diff matcher = do
   sources <- sequence $ readAndTranscodeFile <$> paths
-  actual <- Verbatim <$> diffFiles (decorateParser termCostDecorator parser) renderer (sourceBlobs sources)
+  actual <- Verbatim <$> diffFiles parser renderer (sourceBlobs sources)
   case diff of
     Nothing -> matcher actual actual
     Just file -> do

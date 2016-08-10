@@ -84,8 +84,8 @@ lineByLineParser blob = pure . cofree . root $ case foldl' annotateLeaves ([], 0
     toText = T.pack . Source.toString
 
 -- | Return the parser that should be used for a given path.
-parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Range, Category])
-parserForFilepath path blob = do
+parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category])
+parserForFilepath path blob = decorateTerm termCostDecorator <$> do
    parsed <- parserForType (toS (takeExtension path)) blob
    pure $! breakDownLeavesByWord (source blob) parsed
 
