@@ -1,32 +1,32 @@
 {-# LANGUAGE DataKinds #-}
 module DiffSummarySpec where
 
-import Prologue
+import Category
+import Data.Functor.Both
+import Data.List (partition)
+import Data.RandomWalkSimilarity
 import Data.Record
-import qualified Data.Vector.Arbitrary as Vector
-import Test.Hspec
-import Test.Hspec.QuickCheck
 import Diff
+import Diff.Arbitrary
+import DiffSummary
+import Info
+import Interpreter
+import Patch
+import Prologue
+import Source
 import Syntax
 import Term
-import Patch
-import Category
-import DiffSummary
-import Diff.Arbitrary
-import Data.List (partition)
 import Term.Arbitrary
-import Interpreter
-import Info
-import Source
-import Data.Functor.Both
+import Test.Hspec
+import Test.Hspec.QuickCheck
 
-arrayInfo :: Record '[Category, Range, Vector.Vector Double]
-arrayInfo = ArrayLiteral .: Range 0 3 .: Vector.singleton 0 .: RNil
+arrayInfo :: Record '[Category, Range]
+arrayInfo = ArrayLiteral .: Range 0 3 .: RNil
 
-literalInfo :: Record '[Category, Range, Vector.Vector Double]
-literalInfo = StringLiteral .: Range 1 2 .: Vector.singleton 0 .: RNil
+literalInfo :: Record '[Category, Range]
+literalInfo = StringLiteral .: Range 1 2 .: RNil
 
-testDiff :: Diff Text (Record '[Category, Range, Vector.Vector Double])
+testDiff :: Diff Text (Record '[Category, Range])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])
 
 testSummary :: DiffSummary DiffInfo
@@ -45,7 +45,7 @@ spec = parallel $ do
       diffSummaries sources testDiff `shouldBe` [ DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotation = Nothing } ]
 
     prop "equal terms produce identity diffs" $
-      \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Category, Range, Vector.Vector Double])) in
+      \ a -> let term = featureVectorDecorator (category . headF) 2 2 15 (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range]))) in
         diffSummaries sources (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
   describe "annotatedSummaries" $ do
