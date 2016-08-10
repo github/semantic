@@ -118,17 +118,19 @@ test-suite semantic-diff-test
                      , deepseq
                      , dlist
                      , filepath
+                     , free
                      , Glob
                      , hspec >= 2.1.10
                      , mtl
                      , QuickCheck >= 2.8.1
                      , quickcheck-text
+                     , recursion-schemes >= 4.1
                      , semantic-diff
                      , text >= 1.2.1.3
                      , these
-                     , free
-                     , recursion-schemes >= 4.1
+                     , vector
                      , wl-pprint-text
+                     , protolude
   if os(darwin)
     ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j
   else

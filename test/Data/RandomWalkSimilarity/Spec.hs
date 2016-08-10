@@ -1,9 +1,10 @@
+{-# LANGUAGE DataKinds #-}
 module Data.RandomWalkSimilarity.Spec where
 
-import Category
-import Data.DList as DList hiding (toList)
 import Data.RandomWalkSimilarity
+import Data.Record
 import Diff
+import Info
 import Patch
 import Prologue
 import Syntax
@@ -15,21 +16,22 @@ import Test.QuickCheck
 
 spec :: Spec
 spec = parallel $ do
-  describe "pqGrams" $ do
-    prop "produces grams with stems of the specified length" . forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
-      \ (term, p, q) -> pqGrams p q headF (toTerm term :: Term Text Text) `shouldSatisfy` all ((== p) . length . stem)
+  let positively = succ . abs
+  describe "pqGramDecorator" $ do
+    prop "produces grams with stems of the specified length" $
+      \ (term, p, q) -> pqGramDecorator (rhead . headF) (positively p) (positively q) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively p)) . length . stem . rhead)
 
-    prop "produces grams with bases of the specified length" . forAll (arbitrary `suchThat` (\ (_, p, q) -> p > 0 && q > 0)) $
-      \ (term, p, q) -> pqGrams p q headF (toTerm term :: Term Text Text) `shouldSatisfy` all ((== q) . length . base)
+    prop "produces grams with bases of the specified width" $
+      \ (term, p, q) -> pqGramDecorator (rhead . headF) (positively p) (positively q) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively q)) . length . base . rhead)
 
-  describe "featureVector" $ do
-    prop "produces a vector of the specified dimension" . forAll (arbitrary `suchThat` ((> 0) . Prologue.snd)) $
-      \ (grams, d) -> length (featureVector d (fromList (grams :: [Gram Text]))) `shouldBe` d
+  describe "featureVectorDecorator" $ do
+    prop "produces a vector of the specified dimension" $
+      \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively d)) . length . rhead)
 
   describe "rws" $ do
     let compare a b = if extract a == extract b then Just (pure (Replace a b)) else Nothing
     prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
-      \ (as, bs) -> let tas = toTerm <$> as
-                        tbs = toTerm <$> bs
-                        diff = free (Free (pure Program :< Indexed (rws compare headF tas tbs :: [Diff Text Category]))) in
-        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree (Program :< Indexed tas)), Just (cofree (Program :< Indexed tbs)))
+      \ (as, bs) -> let tas = featureVectorDecorator (category . headF) 2 2 15 . toTerm <$> (as :: [ArbitraryTerm Text (Record '[Category])])
+                        tbs = featureVectorDecorator (category . headF) 2 2 15 . toTerm <$> (bs :: [ArbitraryTerm Text (Record '[Category])])
+                        diff = free (Free (pure (pure 0 .: Program .: RNil) :< Indexed (rws compare tas tbs))) in
+        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ((pure 0 .: Program .: RNil) :< Indexed tas)), Just (cofree ((pure 0 .: Program .: RNil) :< Indexed tbs)))
