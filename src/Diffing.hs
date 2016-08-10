@@ -125,13 +125,12 @@ decorateParser decorator = (fmap (decorateTerm decorator) .)
 decorateTerm :: Functor f => TermDecorator f fields field -> Cofree f (Record fields) -> Cofree f (Record (field ': fields))
 decorateTerm decorator = cata $ \ c -> cofree ((decorator (extract <$> c) .: headF c) :< tailF c)
 
-compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Term leaf (Record fields) -> Bool
-compareCategoryEq = (==) `on` category . extract
-
 -- | Term decorator computing the cost of an unpacked term.
 termCostDecorator :: (Prologue.Foldable f, Functor f) => TermDecorator f a Cost
 termCostDecorator c = 1 + sum (cost <$> tailF c)
 
+compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Term leaf (Record fields) -> Bool
+compareCategoryEq = (==) `on` category . extract
 
 -- | The sum of the node count of the diff’s patches.
 diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Integer
