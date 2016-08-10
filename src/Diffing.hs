@@ -129,6 +129,7 @@ decorateTerm decorator = cata $ \ c -> cofree ((decorator (extract <$> c) .: hea
 termCostDecorator :: (Prologue.Foldable f, Functor f) => TermDecorator f a Cost
 termCostDecorator c = 1 + sum (cost <$> tailF c)
 
+-- | Determine whether two terms are comparable based on the equality of their categories.
 compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Term leaf (Record fields) -> Bool
 compareCategoryEq = (==) `on` category . extract
 
