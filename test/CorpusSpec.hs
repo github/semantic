@@ -58,7 +58,7 @@ examples directory = do
 
   let lookupName name = (lookupNormalized name as, lookupNormalized name bs, lookupNormalized name jsons, lookupNormalized name patches, lookupNormalized name splits)
 
-  let keys = normalizeName <$> as `union` normalizeName <$> bs
+  let keys = (normalizeName <$> as) `union` (normalizeName <$> bs)
   pure $ lookupName <$> keys
   where
     lookupNormalized name = find $ (== name) . normalizeName
