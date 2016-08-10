@@ -39,7 +39,7 @@ spec = parallel $ do
       paths <- runIO $ examples directory
       let tests = correctTests =<< paths
       traverse_ (\ (formatName, renderer, paths, output) ->
-        it (maybe "/dev/null" normalizeName (fst paths) ++ " (" ++ formatName ++ ")") $ testDiff renderer paths output matcher) tests
+        it (maybe "/dev/null" normalizeName (uncurry (<|>) (runJoin paths)) ++ " (" ++ formatName ++ ")") $ testDiff renderer paths output matcher) tests
 
     correctTests paths@(_, _, Nothing, Nothing, Nothing) = testsForPaths paths
     correctTests paths = filter (\(_, _, _, output) -> isJust output) $ testsForPaths paths
@@ -59,7 +59,7 @@ examples directory = do
 
   let lookupName name = (lookupNormalized name as, lookupNormalized name bs, lookupNormalized name jsons, lookupNormalized name patches, lookupNormalized name splits)
 
-  let keys = normalizeName <$> union as bs
+  let keys = (normalizeName <$> as) `union` (normalizeName <$> bs)
   pure $ lookupName <$> keys
   where
     lookupNormalized name = find $ (== name) . normalizeName
