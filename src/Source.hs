@@ -30,6 +30,11 @@ modeToDigits (SymlinkBlob mode) = showOct mode ""
 defaultPlainBlob :: SourceKind
 defaultPlainBlob = PlainBlob 0o100644
 
+emptySourceBlob :: FilePath -> SourceBlob
+emptySourceBlob filepath = SourceBlob (Source.fromList "")  Source.nullOid filepath Nothing
+
+sourceBlob :: Source Char -> FilePath -> SourceBlob
+sourceBlob source filepath = SourceBlob source Source.nullOid filepath (Just defaultPlainBlob)
 
 -- | Map blobs with Nothing blobKind to empty blobs.
 idOrEmptySourceBlob :: SourceBlob -> SourceBlob

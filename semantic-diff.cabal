@@ -130,6 +130,7 @@ test-suite semantic-diff-test
                      , these
                      , vector
                      , wl-pprint-text
+                     , protolude
   if os(darwin)
     ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j
   else
