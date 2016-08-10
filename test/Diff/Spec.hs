@@ -2,11 +2,12 @@
 module Diff.Spec where
 
 import Category
+import Data.RandomWalkSimilarity
 import Data.Record
 import Data.Text.Arbitrary ()
-import qualified Data.Vector.Arbitrary as Vector
 import Diff
 import Diff.Arbitrary
+import Info
 import Interpreter
 import Prologue
 import Term.Arbitrary
@@ -16,23 +17,24 @@ import Test.QuickCheck
 
 spec :: Spec
 spec = parallel $ do
+  let toTerm' = featureVectorDecorator (category . headF) 2 2 15 . toTerm
   prop "equality is reflexive" $
-    \ a b -> let diff = diffTerms wrap (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Vector.Vector Double, Category]))) in
+    \ a b -> let diff = diffTerms wrap (==) diffCost (toTerm' a) (toTerm' (b :: ArbitraryTerm Text (Record '[Category]))) in
       diff `shouldBe` diff
 
   prop "equal terms produce identity diffs" $
-    \ a -> let term = toTerm (a :: ArbitraryTerm Text (Record '[Vector.Vector Double, Category])) in
+    \ a -> let term = toTerm' (a :: ArbitraryTerm Text (Record '[Category])) in
       diffCost (diffTerms wrap (==) diffCost term term) `shouldBe` 0
 
   describe "beforeTerm" $ do
     prop "recovers the before term" $
-      \ a b -> let diff = diffTerms wrap (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Vector.Vector Double, Category]))) in
-        beforeTerm diff `shouldBe` Just (toTerm a)
+      \ a b -> let diff = diffTerms wrap (==) diffCost (toTerm' a) (toTerm' (b :: ArbitraryTerm Text (Record '[Category]))) in
+        beforeTerm diff `shouldBe` Just (toTerm' a)
 
   describe "afterTerm" $ do
     prop "recovers the after term" $
-      \ a b -> let diff = diffTerms wrap (==) diffCost (toTerm a) (toTerm (b :: ArbitraryTerm Text (Record '[Vector.Vector Double, Category]))) in
-        afterTerm diff `shouldBe` Just (toTerm b)
+      \ a b -> let diff = diffTerms wrap (==) diffCost (toTerm' a) (toTerm' (b :: ArbitraryTerm Text (Record '[Category]))) in
+        afterTerm diff `shouldBe` Just (toTerm' b)
 
   describe "ArbitraryDiff" $ do
     prop "generates diffs of a specific size" . forAll ((arbitrary >>= \ n -> (,) n <$> diffOfSize n) `suchThat` ((> 0) . fst)) $
