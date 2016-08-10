@@ -31,7 +31,7 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
-import Data.Aeson (encode, pairs)
+import Data.Aeson (pairs)
 import Data.Aeson.Encoding (encodingToLazyByteString)
 
 -- | Given a parser and renderer, diff two sources and return the rendered
