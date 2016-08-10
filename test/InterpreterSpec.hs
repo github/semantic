@@ -2,9 +2,10 @@
 module InterpreterSpec where
 
 import Category
-import Diff
+import Data.RandomWalkSimilarity
 import Data.Record
-import qualified Data.Vector.Arbitrary as Vector
+import Diff
+import Info
 import Interpreter
 import Patch
 import Prologue
@@ -16,16 +17,17 @@ import Test.Hspec.QuickCheck
 spec :: Spec
 spec = parallel $ do
   describe "interpret" $ do
+    let decorate = featureVectorDecorator (category . headF) 2 2 15
     it "returns a replacement when comparing two unicode equivalent terms" $
-      let termA = cofree $ (StringLiteral .: Vector.singleton (0 :: Double) .: RNil) :< Leaf ("t\776" :: Text)
-          termB = cofree $ (StringLiteral .: Vector.singleton (0 :: Double) .: RNil) :< Leaf "\7831" in
+      let termA = decorate . cofree $ (StringLiteral .: RNil) :< Leaf ("t\776" :: Text)
+          termB = decorate . cofree $ (StringLiteral .: RNil) :< Leaf "\7831" in
           diffTerms wrap ((==) `on` extract) diffCost termA termB `shouldBe` free (Pure (Replace termA termB))
 
     prop "produces correct diffs" $
-      \ a b -> let diff = diffTerms wrap ((==) `on` extract) diffCost (toTerm a) (toTerm b) :: Diff Text (Record '[Category, Vector.Vector Double]) in
-                   (beforeTerm diff, afterTerm diff) `shouldBe` (Just (toTerm a), Just (toTerm b))
+      \ a b -> let diff = diffTerms wrap ((==) `on` extract) diffCost (decorate (toTerm a)) (decorate (toTerm (b :: ArbitraryTerm Text (Record '[Category])))) in
+                   (beforeTerm diff, afterTerm diff) `shouldBe` (Just (decorate (toTerm a)), Just (decorate (toTerm b)))
 
     prop "constructs zero-cost diffs of equal terms" $
-      \ a -> let term = toTerm a
-                 diff = diffTerms wrap ((==) `on` extract) diffCost term term :: Diff Text (Record '[Category, Vector.Vector Double]) in
+      \ a -> let term = decorate (toTerm (a :: ArbitraryTerm Text (Record '[Category])))
+                 diff = diffTerms wrap ((==) `on` extract) diffCost term term in
                  diffCost diff `shouldBe` 0
