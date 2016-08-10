@@ -113,7 +113,6 @@ documentToTerm language document blob = alloca $ \ root -> do
 
           let info = range .: (categoriesForLanguage language (toS name)) .: RNil
           pure $! termConstructor (source blob) sourceSpan info children
-
         getChild node n out = do
           _ <- ts_node_p_named_child node n out
           toTerm out

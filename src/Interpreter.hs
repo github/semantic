@@ -24,7 +24,6 @@ type Comparable leaf annotation = Term leaf annotation -> Term leaf annotation -
 -- | Constructs a diff from the CofreeF containing its annotation and syntax. This function has the opportunity to, for example, cache properties in the annotation.
 type DiffConstructor leaf annotation = CofreeF (Syntax leaf) (Both annotation) (Diff leaf annotation) -> Diff leaf annotation
 
-
 -- | Diff two terms recursively, given functions characterizing the diffing.
 diffTerms :: (Eq leaf, Eq (Record fields), HasField fields Category, HasField fields (Vector.Vector Double))
   => DiffConstructor leaf (Record fields) -- ^ A function to wrap up & possibly annotate every produced diff.
