@@ -16,6 +16,7 @@ import Test.QuickCheck
 
 spec :: Spec
 spec = parallel $ do
+  let positively = succ . abs
   describe "pqGramDecorator" $ do
     prop "produces grams with stems of the specified length" $
       \ (term, p, q) -> pqGramDecorator (rhead . headF) (positively p) (positively q) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively p)) . length . stem . rhead)
@@ -34,6 +35,3 @@ spec = parallel $ do
                         tbs = featureVectorDecorator (category . headF) 2 2 15 . toTerm <$> (bs :: [ArbitraryTerm Text (Record '[Category])])
                         diff = free (Free (pure (pure 0 .: Program .: RNil) :< Indexed (rws compare tas tbs))) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ((pure 0 .: Program .: RNil) :< Indexed tas)), Just (cofree ((pure 0 .: Program .: RNil) :< Indexed tbs)))
-
-positively :: Int -> Int
-positively = succ . abs
