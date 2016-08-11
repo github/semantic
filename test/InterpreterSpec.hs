@@ -42,3 +42,8 @@ spec = parallel $ do
       \ a b c -> let (a', b') = (toTerm' c a, toTerm' c (b :: ArbitraryTerm Text (Record '[Category])))
                      root = cofree . ((pure 0 .: Program .: RNil) :<) . Indexed in
         stripDiff (diffTerms wrap compare diffCost (root [ a', b' ]) (root [ a' ])) `shouldBe` reverse' (stripDiff (diffTerms wrap compare diffCost (root [ b', a' ]) (root [ a' ])))
+
+    prop "produces unbiased insertions" $
+      \ a b c -> let (a', b') = (toTerm' c a, toTerm' c (b :: ArbitraryTerm Text (Record '[Category])))
+                     root = cofree . ((pure 0 .: Program .: RNil) :<) . Indexed in
+        stripDiff (diffTerms wrap compare diffCost (root [ a' ]) (root [ a', b' ])) `shouldBe` reverse' (stripDiff (diffTerms wrap compare diffCost (root [ a' ]) (root [ b', a' ])))
