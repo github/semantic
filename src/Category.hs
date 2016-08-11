@@ -60,6 +60,8 @@ data Category
   | VarDecl
   -- | A switch expression.
   | Switch
+  -- | A if/else expression.
+  | If
   -- | A for expression.
   | For
   -- | A while expression.

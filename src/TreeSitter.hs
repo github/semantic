@@ -51,6 +51,7 @@ categoriesForLanguage language name = case (language, name) of
   (JavaScript, "class")  -> Class
   (JavaScript, "catch") -> Catch
   (JavaScript, "finally") -> Finally
+  (JavaScript, "if_statement") -> If
 
   (Ruby, "hash") -> Object
   _ -> defaultCategoryForNodeName name
