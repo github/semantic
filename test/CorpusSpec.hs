@@ -24,7 +24,8 @@ import Unsafe (unsafeFromJust)
 
 spec :: Spec
 spec = parallel $ do
-  describe "crashers crash" . runTestsIn "test/crashers-todo/" $ \ a b -> a `deepseq` pure (a == b) `shouldThrow` anyException
+  describe "crashers crash" . runTestsIn "test/crashers-todo/" $ \ a b ->
+    a `deepseq` pure (a == b) `shouldThrow` anyException
   describe "crashers should not crash" $ runTestsIn "test/crashers/" shouldBe
   describe "todos are incorrect" $ runTestsIn "test/diffs-todo/" shouldNotBe
   describe "should produce the correct diff" $ runTestsIn "test/diffs/" shouldBe
@@ -76,7 +77,7 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 testDiff :: Renderer (Record '[Vector.Vector Double, Cost, Range, Category]) -> Both (Maybe FilePath) -> Maybe FilePath -> (Maybe Verbatim -> Maybe Verbatim -> Expectation) -> Expectation
 testDiff renderer paths diff matcher = do
   sources <- traverse (traverse readAndTranscodeFile) paths
-  actual <- fmap Verbatim <$> traverse (diffFiles' sources) parser
+  actual <- fmap Verbatim <$> traverse ((pure . concatOutputs . pure) <=< diffFiles' sources) parser
   case diff of
     Nothing -> matcher actual actual
     Just file -> do
