@@ -3,6 +3,7 @@ module Data.RandomWalkSimilarity
 ( rws
 , pqGramDecorator
 , featureVectorDecorator
+, stripDiff
 , Gram(..)
 ) where
 
@@ -93,6 +94,12 @@ featureVectorDecorator getLabel p q d
   = cata (\ (RCons gram rest :< functor) ->
       cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor))
   . pqGramDecorator getLabel p q
+
+stripTerm :: Functor f => Cofree f (Record (h ': t)) -> Cofree f (Record t)
+stripTerm = fmap rtail
+
+stripDiff :: Functor f => Free (CofreeF f (Record (h ': t))) (Patch (Cofree f (Record (h ': t)))) -> Free (CofreeF f (Record t)) (Patch (Cofree f (Record t)))
+stripDiff = iter (\ (h :< f) -> wrap (rtail h :< f)) . fmap (pure . fmap stripTerm)
 
 
 -- Instances
