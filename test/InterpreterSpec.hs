@@ -38,12 +38,11 @@ spec = parallel $ do
           Free c -> wrap c
           Pure a -> pure a
     let toTerm' c (ArbitraryTerm r f) = decorate (toTerm (ArbitraryTerm (setCategory r c) f))
+    let root = cofree . ((pure 0 .: Program .: RNil) :<) . Indexed
     prop "produces unbiased deletions" $
-      \ a b c -> let (a', b') = (toTerm' c a, toTerm' c (b :: ArbitraryTerm Text (Record '[Category])))
-                     root = cofree . ((pure 0 .: Program .: RNil) :<) . Indexed in
+      \ a b c -> let (a', b') = (toTerm' c a, toTerm' c (b :: ArbitraryTerm Text (Record '[Category]))) in
         stripDiff (diffTerms wrap compare diffCost (root [ a', b' ]) (root [ a' ])) `shouldBe` reverse' (stripDiff (diffTerms wrap compare diffCost (root [ b', a' ]) (root [ a' ])))
 
     prop "produces unbiased insertions" $
-      \ a b c -> let (a', b') = (toTerm' c a, toTerm' c (b :: ArbitraryTerm Text (Record '[Category])))
-                     root = cofree . ((pure 0 .: Program .: RNil) :<) . Indexed in
+      \ a b c -> let (a', b') = (toTerm' c a, toTerm' c (b :: ArbitraryTerm Text (Record '[Category]))) in
         stripDiff (diffTerms wrap compare diffCost (root [ a' ]) (root [ a', b' ])) `shouldBe` reverse' (stripDiff (diffTerms wrap compare diffCost (root [ a' ]) (root [ b', a' ])))
