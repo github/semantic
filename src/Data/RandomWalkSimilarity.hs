@@ -4,6 +4,7 @@ module Data.RandomWalkSimilarity
 , pqGramDecorator
 , featureVectorDecorator
 , stripDiff
+, stripTerm
 , Gram(..)
 ) where
 
