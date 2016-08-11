@@ -24,7 +24,7 @@ spec = parallel $ do
     it "returns a replacement when comparing two unicode equivalent terms" $
       let termA = cofree $ (StringLiteral .: RNil) :< Leaf ("t\776" :: Text)
           termB = cofree $ (StringLiteral .: RNil) :< Leaf "\7831" in
-          stripDiff (diffTerms wrap compare diffCost (decorate termA) (decorate termB)) `shouldBe` free (Pure (Replace termA termB))
+          stripDiff (diffTerms wrap compare diffCost (decorate termA) (decorate termB)) `shouldBe` replacing termA termB
 
     prop "produces correct diffs" $
       \ a b -> let diff = stripDiff $ diffTerms wrap compare diffCost (decorate (toTerm a)) (decorate (toTerm (b :: ArbitraryTerm Text (Record '[Category])))) in
