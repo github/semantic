@@ -35,6 +35,6 @@ spec = parallel $ do
 
     prop "produces unbiased deletions" $
       \ a b -> let (a', b') = (decorate (toTerm a), decorate (toTerm (b :: ArbitraryTerm Text (Record '[Category]))))
-                   termA = cofree $ (pure 0 .: Program .: RNil) :< Indexed [ a', b' ]
-                   termB = cofree $ (pure 0 .: Program .: RNil) :< Indexed [ a' ] in
-        diffTerms wrap ((==) `on` extract) diffCost termA termB `shouldBe` free (Free (pure (pure 0 .: Program .: RNil) :< Indexed [ cata wrap (fmap pure a'), deleting b' ]))
+                   two a b = cofree $ (pure 0 .: Program .: RNil) :< Indexed [ a, b ]
+                   one a = cofree $ (pure 0 .: Program .: RNil) :< Indexed [ a ] in
+        diffTerms wrap ((==) `on` extract) diffCost (two a' b') (one a') `shouldBe` free (Free (pure (pure 0 .: Program .: RNil) :< Indexed [ cata wrap (fmap pure a'), deleting b' ]))
