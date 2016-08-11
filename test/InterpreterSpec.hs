@@ -25,8 +25,8 @@ spec = parallel $ do
           diffTerms wrap compare diffCost termA termB `shouldBe` free (Pure (Replace termA termB))
 
     prop "produces correct diffs" $
-      \ a b -> let diff = diffTerms wrap compare diffCost (decorate (toTerm a)) (decorate (toTerm (b :: ArbitraryTerm Text (Record '[Category])))) in
-                   (beforeTerm diff, afterTerm diff) `shouldBe` (Just (decorate (toTerm a)), Just (decorate (toTerm b)))
+      \ a b -> let diff = stripDiff $ diffTerms wrap compare diffCost (decorate (toTerm a)) (decorate (toTerm (b :: ArbitraryTerm Text (Record '[Category])))) in
+                   (beforeTerm diff, afterTerm diff) `shouldBe` (Just (toTerm a), Just (toTerm b))
 
     prop "constructs zero-cost diffs of equal terms" $
       \ a -> let term = decorate (toTerm (a :: ArbitraryTerm Text (Record '[Category])))
