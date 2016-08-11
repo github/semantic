@@ -34,12 +34,14 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
+import Data.Aeson (pairs)
+import Data.Aeson.Encoding (encodingToLazyByteString)
 
 -- | Given a parser and renderer, diff two sources and return the rendered
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record (Vector.Vector Double ': fields)) -> Both SourceBlob -> IO Text
+diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record (Vector.Vector Double ': fields)) -> Both SourceBlob -> IO Output
 diffFiles parser renderer sourceBlobs = do
   terms <- traverse (fmap (featureVectorDecorator getLabel p q d) . parser) sourceBlobs
 
@@ -136,7 +138,7 @@ diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Pure patch -> sum (cost . extract <$> patch)
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Text
+textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
 textDiff parser arguments = diffFiles parser $ case format arguments of
   Split -> split
   Patch -> patch
@@ -144,22 +146,28 @@ textDiff parser arguments = diffFiles parser $ case format arguments of
   Summary -> summary
 
 -- | Returns a truncated diff given diff arguments and two source blobs.
-truncatedDiff :: DiffArguments -> Both SourceBlob -> IO Text
-truncatedDiff arguments sources = case format arguments of
-  Split -> pure ""
-  Patch -> pure $ truncatePatch arguments sources
-  JSON -> pure "{}"
-  Summary -> pure ""
+truncatedDiff :: DiffArguments -> Both SourceBlob -> IO Output
+truncatedDiff arguments sources = pure $ case format arguments of
+  Split -> SplitOutput mempty
+  Patch -> PatchOutput (truncatePatch arguments sources)
+  JSON -> JSONOutput mempty
+  Summary -> SummaryOutput mempty
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
 printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
-  case (output arguments) of
-    Nothing -> TextIO.putStr rendered
+  let renderedText = case rendered of
+                       SplitOutput text -> text
+                       PatchOutput text -> text
+                       JSONOutput series -> toS . encodingToLazyByteString $ pairs series
+                       SummaryOutput summaries -> toS . encodingToLazyByteString $ pairs summaries
+
+  case output arguments of
+    Nothing -> TextIO.putStr renderedText
     Just path -> do
       isDir <- doesDirectoryExist path
       let outputPath = if isDir
           then path </> (takeFileName outputPath -<.> ".html")
           else path
-      IO.withFile outputPath IO.WriteMode (`TextIO.hPutStr` rendered)
+      IO.withFile outputPath IO.WriteMode (`TextIO.hPutStr` renderedText)
