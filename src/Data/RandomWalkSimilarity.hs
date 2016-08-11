@@ -98,8 +98,8 @@ featureVectorDecorator getLabel p q d
 stripTerm :: Functor f => Cofree f (Record (h ': t)) -> Cofree f (Record t)
 stripTerm = fmap rtail
 
-stripDiff :: Functor f => Free (CofreeF f (Record (h ': t))) (Patch (Cofree f (Record (h ': t)))) -> Free (CofreeF f (Record t)) (Patch (Cofree f (Record t)))
-stripDiff = iter (\ (h :< f) -> wrap (rtail h :< f)) . fmap (pure . fmap stripTerm)
+stripDiff :: (Functor f, Functor g) => Free (CofreeF f (g (Record (h ': t)))) (Patch (Cofree f (Record (h ': t)))) -> Free (CofreeF f (g (Record t))) (Patch (Cofree f (Record t)))
+stripDiff = iter (\ (h :< f) -> wrap (fmap rtail h :< f)) . fmap (pure . fmap stripTerm)
 
 
 -- Instances
