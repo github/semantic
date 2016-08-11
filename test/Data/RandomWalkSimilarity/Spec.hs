@@ -38,13 +38,10 @@ spec = parallel $ do
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ((pure 0 .: Program .: RNil) :< Indexed tas)), Just (cofree ((pure 0 .: Program .: RNil) :< Indexed tbs)))
 
     let toTerm'' c (ArbitraryTerm r f) = toTerm' (ArbitraryTerm (setCategory r c) f)
-    let strip diff = free $ case runFree diff of
-          Free (h :< t) -> Free (fmap rtail h :< fmap strip t)
-          Pure a -> Pure (fmap (fmap rtail) a)
     prop "produces unbiased deletions" $
       \ a b c -> let (a', b') = (toTerm'' c a, toTerm'' c (b :: ArbitraryTerm Text (Record '[Category]))) in
-        fmap strip (rws compare [ a', b' ] [ a' ]) `shouldBe` fmap strip (reverse (rws compare [ b', a' ] [ a' ]))
+        fmap stripDiff (rws compare [ a', b' ] [ a' ]) `shouldBe` fmap stripDiff (reverse (rws compare [ b', a' ] [ a' ]))
 
     prop "produces unbiased insertions" $
       \ a b c -> let (a', b') = (toTerm'' c a, toTerm'' c (b :: ArbitraryTerm Text (Record '[Category]))) in
-        fmap strip (rws compare [ a' ] [ a', b' ]) `shouldBe` fmap strip (reverse (rws compare [ a' ] [ b', a' ]))
+        fmap stripDiff (rws compare [ a' ] [ a', b' ]) `shouldBe` fmap stripDiff (reverse (rws compare [ a' ] [ b', a' ]))
