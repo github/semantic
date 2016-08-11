@@ -34,8 +34,8 @@ spec = parallel $ do
     prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
       \ (as, bs) -> let tas = toTerm' <$> (as :: [ArbitraryTerm Text (Record '[Category])])
                         tbs = toTerm' <$> (bs :: [ArbitraryTerm Text (Record '[Category])])
-                        diff = free (Free (pure (pure 0 .: Program .: RNil) :< Indexed (rws compare tas tbs))) in
-        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ((pure 0 .: Program .: RNil) :< Indexed tas)), Just (cofree ((pure 0 .: Program .: RNil) :< Indexed tbs)))
+                        diff = free (Free (pure (Program .: RNil) :< Indexed (stripDiff <$> rws compare tas tbs))) in
+        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ((Program .: RNil) :< Indexed (stripTerm <$> tas))), Just (cofree ((Program .: RNil) :< Indexed (stripTerm <$> tbs))))
 
     let toTerm'' c (ArbitraryTerm r f) = toTerm' (ArbitraryTerm (setCategory r c) f)
     prop "produces unbiased deletions" $
