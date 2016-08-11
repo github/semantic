@@ -40,4 +40,4 @@ spec = parallel $ do
     prop "produces unbiased deletions" $
       \ a b -> let (a', b') = (decorate (toTerm a), decorate (toTerm (b :: ArbitraryTerm Text (Record '[Category]))))
                    root = cofree . ((pure 0 .: Program .: RNil) :<) . Indexed in
-        diffTerms wrap compare diffCost (root [ a', b' ]) (root [ a' ]) `shouldBe` reverse' (diffTerms wrap compare diffCost (root [ b', a' ]) (root [ a' ]))
+        stripDiff (diffTerms wrap compare diffCost (root [ a', b' ]) (root [ a' ])) `shouldBe` reverse' (stripDiff (diffTerms wrap compare diffCost (root [ b', a' ]) (root [ a' ])))
