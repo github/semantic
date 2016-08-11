@@ -2,7 +2,6 @@
 module InterpreterSpec where
 
 import Category
-import Data.Functor.Foldable
 import Data.RandomWalkSimilarity
 import Data.Record
 import Diff
@@ -34,8 +33,12 @@ spec = parallel $ do
                  diff = diffTerms wrap compare diffCost term term in
                  diffCost diff `shouldBe` 0
 
+    let reverse' diff = case runFree diff of
+          Free (h :< Indexed children) -> wrap (h :< Indexed (reverse children))
+          Free c -> wrap c
+          Pure a -> pure a
     prop "produces unbiased deletions" $
       \ a b -> let (a', b') = (decorate (toTerm a), decorate (toTerm (b :: ArbitraryTerm Text (Record '[Category]))))
                    two a b = cofree $ (pure 0 .: Program .: RNil) :< Indexed [ a, b ]
                    one a = cofree $ (pure 0 .: Program .: RNil) :< Indexed [ a ] in
-        diffTerms wrap compare diffCost (two a' b') (one a') `shouldBe` free (Free (pure (pure 0 .: Program .: RNil) :< Indexed [ cata wrap (fmap pure a'), deleting b' ]))
+        diffTerms wrap compare diffCost (two a' b') (one a') `shouldBe` reverse' (diffTerms wrap compare diffCost (two b' a') (one a'))
