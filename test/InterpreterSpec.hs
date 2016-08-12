@@ -3,6 +3,7 @@ module InterpreterSpec where
 
 import Category
 import Data.Align.Generic
+import Data.Functor.Foldable
 import Data.RandomWalkSimilarity
 import Data.Record
 import Diff
@@ -48,3 +49,7 @@ spec = parallel $ do
     prop "produces unbiased insertions" . forAll (arbitrary `suchThat` \ (a, b, _) -> isNothing ((galign `on` syntax) a b)) $
       \ (a, b, c) -> let (a', b') = (toTerm' c a, toTerm' c (b :: ArbitraryTerm Text (Record '[Category]))) in
         stripDiff (diffTerms wrap compare diffCost (root [ a' ]) (root [ a', b' ])) `shouldBe` reverse' (stripDiff (diffTerms wrap compare diffCost (root [ a' ]) (root [ b', a' ])))
+
+    it "produces unbiased insertions within branches" $
+      let term s = decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf s) ])) in
+      stripDiff (diffTerms wrap compare diffCost (root [ term "b" ]) (root [ term "a", term "b" ])) `shouldBe` wrap (pure (Program .: RNil) :< Indexed [ inserting (stripTerm (term "a")), cata wrap (fmap pure (stripTerm (term "b"))) ])
