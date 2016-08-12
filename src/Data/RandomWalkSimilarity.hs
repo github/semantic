@@ -50,7 +50,7 @@ rws compare as bs
             pure $! do
               put (i, List.delete found unmappedA, List.delete kv unmappedB)
               pure (i, compared)
-        deleteRemaining diffs (_, unmappedA, unmappedB) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
+        deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
