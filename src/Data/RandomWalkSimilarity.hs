@@ -39,10 +39,12 @@ rws compare as bs
   where fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
+        kdbs = KdTree.build (Vector.toList . feature) fbs
         featurize index term = UnmappedTerm index (getField (extract term)) term
         findNearestNeighbourTo kv@(UnmappedTerm _ _ b) = do
           (previous, unmappedA, unmappedB) <- get
-          let UnmappedTerm i _ a = KdTree.nearest kdas kv
+          let kva@(UnmappedTerm i _ a) = KdTree.nearest kdas kv
+          let UnmappedTerm j' _ _ = KdTree.nearest kdbs kva
           fromMaybe (pure (negate 1, inserting b)) $ do
             guard (i >= previous)
             found <- find ((== i) . termIndex) unmappedA
