@@ -72,6 +72,7 @@ styleName category = "category-" <> case category of
   ArrayLiteral -> "array"
   C.Class -> "class_statement"
   C.Method -> "method"
+  C.If -> "if_statement"
   Other string -> string
 
 -- | Pick the class name for a split patch.
@@ -83,7 +84,7 @@ splitPatchToClassName patch = stringValue $ "patch " <> case patch of
 
 -- | Render a diff as an HTML split diff.
 split :: (HasField fields Category, HasField fields Cost, HasField fields Range) => Renderer (Record fields)
-split blobs diff = SplitOutput $ TL.toStrict . renderHtml
+split blobs diff = SplitOutput . TL.toStrict . renderHtml
   . docTypeHtml
     . ((head $ link ! A.rel "stylesheet" ! A.href "style.css") <>)
     . body

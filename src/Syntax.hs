@@ -69,6 +69,7 @@ data Syntax a f
   | Class f (Maybe f) [f]
   -- | A method definition with an identifier, params, and a list of expressions.
   | Method f [f] [f]
+  | If f f (Maybe f)
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 
