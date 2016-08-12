@@ -98,6 +98,7 @@ toTermName source term = case unwrap term of
   S.Pair a b -> toTermName' a <> ": " <> toTermName' b
   S.Return expr -> maybe "empty" toTermName' expr
   S.Error _ _ -> termNameFromSource term
+  S.If expr _ _ -> termNameFromSource expr
   S.For _ _ -> termNameFromChildren term
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
@@ -211,6 +212,7 @@ instance HasCategory Category where
     C.Finally -> "finally statement"
     C.Class -> "class"
     C.Method -> "method"
+    C.If -> "if statement"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
