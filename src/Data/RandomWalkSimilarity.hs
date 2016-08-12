@@ -52,8 +52,7 @@ rws compare as bs
             pure $! do
               put (i, List.delete foundA unmappedA, List.delete foundB unmappedB)
               pure (i, compared)
-        nearestUnmapped unmapped tree key = let UnmappedTerm i _ _ = KdTree.nearest tree key in
-          find ((== i) . termIndex) unmapped
+        nearestUnmapped unmapped tree key = find ((== termIndex (KdTree.nearest tree key)) . termIndex) unmapped
         insertion previous unmappedA unmappedB kv@(UnmappedTerm _ _ b) = do
           put (previous, unmappedA, List.delete kv unmappedB)
           pure (negate 1, inserting b)
