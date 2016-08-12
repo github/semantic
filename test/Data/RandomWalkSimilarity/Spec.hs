@@ -1,6 +1,7 @@
 {-# LANGUAGE DataKinds #-}
 module Data.RandomWalkSimilarity.Spec where
 
+import Data.Align.Generic
 import Data.RandomWalkSimilarity
 import Data.Record
 import Diff
@@ -39,10 +40,10 @@ spec = parallel $ do
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
 
     let toTerm'' c (ArbitraryTerm r f) = toTerm' (ArbitraryTerm (setCategory r c) f)
-    prop "produces unbiased deletions" $
-      \ a b c -> let (a', b') = (toTerm'' c a, toTerm'' c (b :: ArbitraryTerm Text (Record '[Category]))) in
+    prop "produces unbiased deletions" . forAll (arbitrary `suchThat` \ (a, b, _) -> isNothing ((galign `on` syntax) a b)) $
+      \ (a, b, c) -> let (a', b') = (toTerm'' c a, toTerm'' c (b :: ArbitraryTerm Text (Record '[Category]))) in
         fmap stripDiff (rws compare [ a', b' ] [ a' ]) `shouldBe` fmap stripDiff (reverse (rws compare [ b', a' ] [ a' ]))
 
-    prop "produces unbiased insertions" $
-      \ a b c -> let (a', b') = (toTerm'' c a, toTerm'' c (b :: ArbitraryTerm Text (Record '[Category]))) in
+    prop "produces unbiased insertions" . forAll (arbitrary `suchThat` \ (a, b, _) -> isNothing ((galign `on` syntax) a b)) $
+      \ (a, b, c) -> let (a', b') = (toTerm'' c a, toTerm'' c (b :: ArbitraryTerm Text (Record '[Category]))) in
         fmap stripDiff (rws compare [ a' ] [ a', b' ]) `shouldBe` fmap stripDiff (reverse (rws compare [ a' ] [ b', a' ]))
