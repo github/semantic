@@ -44,8 +44,8 @@ rws compare as bs
           (previous, unmappedA, unmappedB) <- get
           let UnmappedTerm i _ a = KdTree.nearest kdas kv
           fromMaybe (pure (negate 1, inserting b)) $ do
-            found <- find ((== i) . termIndex) unmappedA
             guard (i >= previous)
+            found <- find ((== i) . termIndex) unmappedA
             compared <- compare a b
             pure $! do
               put (i, List.delete found unmappedA, List.delete kv unmappedB)
