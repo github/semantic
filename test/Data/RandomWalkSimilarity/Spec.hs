@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds #-}
 module Data.RandomWalkSimilarity.Spec where
 
-import Data.Align.Generic
 import Data.RandomWalkSimilarity
 import Data.Record
 import Diff
