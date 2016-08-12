@@ -38,13 +38,11 @@ spec = parallel $ do
                         diff = free (Free (pure (Program .: RNil) :< Indexed (stripDiff <$> rws compare tas tbs))) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
 
-    -- let toTerm'' c (ArbitraryTerm r f) = toTerm' (ArbitraryTerm (setCategory r c) f)
+    let toTerm'' c (ArbitraryTerm r f) = toTerm' (ArbitraryTerm (setCategory r c) f)
     prop "produces unbiased deletions" $
-      pendingWith "rws is biased in favour of earlier elements"
-      -- \ a b c -> let (a', b') = (toTerm'' c a, toTerm'' c (b :: ArbitraryTerm Text (Record '[Category]))) in
-      --   fmap stripDiff (rws compare [ a', b' ] [ a' ]) `shouldBe` fmap stripDiff (reverse (rws compare [ b', a' ] [ a' ]))
+      \ a b c -> let (a', b') = (toTerm'' c a, toTerm'' c (b :: ArbitraryTerm Text (Record '[Category]))) in
+        fmap stripDiff (rws compare [ a', b' ] [ a' ]) `shouldBe` fmap stripDiff (reverse (rws compare [ b', a' ] [ a' ]))
 
     prop "produces unbiased insertions" $
-      pendingWith "rws is biased in favour of earlier elements"
-      -- \ a b c -> let (a', b') = (toTerm'' c a, toTerm'' c (b :: ArbitraryTerm Text (Record '[Category]))) in
-      --   fmap stripDiff (rws compare [ a' ] [ a', b' ]) `shouldBe` fmap stripDiff (reverse (rws compare [ a' ] [ b', a' ]))
+      \ a b c -> let (a', b') = (toTerm'' c a, toTerm'' c (b :: ArbitraryTerm Text (Record '[Category]))) in
+        fmap stripDiff (rws compare [ a' ] [ a', b' ]) `shouldBe` fmap stripDiff (reverse (rws compare [ a' ] [ b', a' ]))
