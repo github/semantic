@@ -43,16 +43,17 @@ rws compare as bs
         featurize index term = UnmappedTerm index (getField (extract term)) term
         findNearestNeighbourTo kv@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
-          let kva@(UnmappedTerm i _ a) = KdTree.nearest kdas kv
-          let UnmappedTerm j' _ _ = KdTree.nearest kdbs kva
           fromMaybe (insertion previous unmappedA unmappedB kv) $ do
+            found@(UnmappedTerm i _ a) <- nearestUnmapped unmappedA kdas kv
+            let UnmappedTerm j' _ _ = KdTree.nearest kdbs found
             guard (j == j')
             guard (i >= previous)
-            found <- find ((== i) . termIndex) unmappedA
             compared <- compare a b
             pure $! do
               put (i, List.delete found unmappedA, List.delete kv unmappedB)
               pure (i, compared)
+        nearestUnmapped unmapped tree key = let UnmappedTerm i _ _ = KdTree.nearest tree key in
+          find ((== i) . termIndex) unmapped
         insertion previous unmappedA unmappedB kv@(UnmappedTerm _ _ b) = do
           put (previous, unmappedA, List.delete kv unmappedB)
           pure (negate 1, inserting b)
