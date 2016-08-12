@@ -41,16 +41,16 @@ rws compare as bs
         kdas = KdTree.build (Vector.toList . feature) fas
         featurize index term = UnmappedTerm index (getField (extract term)) term
         findNearestNeighbourTo kv@(UnmappedTerm _ _ b) = do
-          (previous, unmapped) <- get
+          (previous, unmappedA) <- get
           let UnmappedTerm i _ a = KdTree.nearest kdas kv
           fromMaybe (pure (negate 1, inserting b)) $ do
-            found <- find ((== i) . termIndex) unmapped
+            found <- find ((== i) . termIndex) unmappedA
             guard (i >= previous)
             compared <- compare a b
             pure $! do
-              put (i, List.delete found unmapped)
+              put (i, List.delete found unmappedA)
               pure (i, compared)
-        deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmapped)
+        deleteRemaining diffs (_, unmappedA) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
