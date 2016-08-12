@@ -40,15 +40,7 @@ spec = parallel $ do
                         diff = wrap (pure (Program .: RNil) :< Indexed (stripDiff <$> rws compare tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
 
-    let toTerm'' c (ArbitraryTerm r f) = toTerm' (ArbitraryTerm (setCategory r c) f)
-    it "produces unbiased deletions" $
-      let (a, b) = (decorate (cofree ((StringLiteral .: RNil) :< Leaf "a")), decorate (cofree ((StringLiteral .: RNil) :< Leaf "b"))) in
-      fmap stripDiff (rws compare [ a, b ] [ b ]) `shouldBe` fmap stripDiff [ deleting a, replacing b b ]
-
-    prop "produces unbiased deletions" . forAll (arbitrary `suchThat` \ (a, b, _) -> isNothing ((galign `on` syntax) a b)) $
-      \ (a, b, c) -> let (a', b') = (toTerm'' c a, toTerm'' c (b :: ArbitraryTerm Text (Record '[Category]))) in
-        fmap stripDiff (rws compare [ a', b' ] [ a' ]) `shouldBe` fmap stripDiff (reverse (rws compare [ b', a' ] [ a' ]))
-
-    prop "produces unbiased insertions" . forAll (arbitrary `suchThat` \ (a, b, _) -> isNothing ((galign `on` syntax) a b)) $
-      \ (a, b, c) -> let (a', b') = (toTerm'' c a, toTerm'' c (b :: ArbitraryTerm Text (Record '[Category]))) in
-        fmap stripDiff (rws compare [ a' ] [ a', b' ]) `shouldBe` fmap stripDiff (reverse (rws compare [ a' ] [ b', a' ]))
+    it "produces unbiased insertions within branches" $
+      pendingWith "Currently fails due to https://github.com/github/semantic-diff/issues/683"
+      -- let (a, b) = (decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "a") ])), decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "b") ]))) in
+      -- fmap stripDiff (rws compare [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, replacing b b ]
