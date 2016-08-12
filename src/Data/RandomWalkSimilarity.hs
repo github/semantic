@@ -44,13 +44,13 @@ rws compare as bs
         findNearestNeighbourTo kv@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
           fromMaybe (insertion previous unmappedA unmappedB kv) $ do
-            found@(UnmappedTerm i _ a) <- nearestUnmapped unmappedA kdas kv
-            let UnmappedTerm j' _ _ = KdTree.nearest kdbs found
+            foundA@(UnmappedTerm i _ a) <- nearestUnmapped unmappedA kdas kv
+            let UnmappedTerm j' _ _ = KdTree.nearest kdbs foundA
             guard (j == j')
             guard (i >= previous)
             compared <- compare a b
             pure $! do
-              put (i, List.delete found unmappedA, List.delete kv unmappedB)
+              put (i, List.delete foundA unmappedA, List.delete kv unmappedB)
               pure (i, compared)
         nearestUnmapped unmapped tree key = let UnmappedTerm i _ _ = KdTree.nearest tree key in
           find ((== i) . termIndex) unmapped
