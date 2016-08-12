@@ -48,7 +48,7 @@ rws compare as bs
             guard (i >= previous)
             compared <- compare a b
             pure $! do
-              put (i, List.delete found unmappedA, unmappedB)
+              put (i, List.delete found unmappedA, List.delete kv unmappedB)
               pure (i, compared)
         deleteRemaining diffs (_, unmappedA, unmappedB) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
 
