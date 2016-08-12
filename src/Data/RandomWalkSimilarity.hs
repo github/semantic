@@ -35,22 +35,22 @@ rws compare as bs
   | null as, null bs = []
   | null as = inserting <$> bs
   | null bs = deleting <$> as
-  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, fas)) $ traverse findNearestNeighbourTo fbs
+  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, fas, fbs)) $ traverse findNearestNeighbourTo fbs
   where fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
         featurize index term = UnmappedTerm index (getField (extract term)) term
         findNearestNeighbourTo kv@(UnmappedTerm _ _ b) = do
-          (previous, unmappedA) <- get
+          (previous, unmappedA, unmappedB) <- get
           let UnmappedTerm i _ a = KdTree.nearest kdas kv
           fromMaybe (pure (negate 1, inserting b)) $ do
             found <- find ((== i) . termIndex) unmappedA
             guard (i >= previous)
             compared <- compare a b
             pure $! do
-              put (i, List.delete found unmappedA)
+              put (i, List.delete found unmappedA, unmappedB)
               pure (i, compared)
-        deleteRemaining diffs (_, unmappedA) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
+        deleteRemaining diffs (_, unmappedA, unmappedB) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
