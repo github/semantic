@@ -63,12 +63,12 @@ algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
     branch (S.Class identifier params) expressionsA expressionsB
   (S.Method identifierA paramsA expressionsA, S.Method identifierB paramsB expressionsB) -> do
     identifier <- recursively identifierA identifierB
-    params <- bySimilarity paramsA paramsB
-    expressions <- bySimilarity expressionsA expressionsB
+    params <- byIndex paramsA paramsB
+    expressions <- byIndex expressionsA expressionsB
     annotate $! S.Method identifier params expressions
   _ -> recursively t1 t2
   where annotate = pure . construct . (both (extract t1) (extract t2) :<)
-        branch constructor a b = bySimilarity a b >>= annotate . constructor
+        branch constructor a b = byIndex a b >>= annotate . constructor
 
 -- | Run an algorithm, given functions characterizing the evaluation.
 runAlgorithm :: (Functor f, GAlign f, Eq a, Eq (Record fields), Eq (f (Cofree f (Record fields))), Prologue.Foldable f, Traversable f, HasField fields (Vector.Vector Double))
