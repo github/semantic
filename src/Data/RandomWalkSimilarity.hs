@@ -45,7 +45,7 @@ rws compare as bs
           (previous, unmappedA, unmappedB) <- get
           let kva@(UnmappedTerm i _ a) = KdTree.nearest kdas kv
           let UnmappedTerm j' _ _ = KdTree.nearest kdbs kva
-          fromMaybe (pure (negate 1, inserting b)) $ do
+          fromMaybe (insertion previous unmappedA unmappedB kv) $ do
             guard (j == j')
             guard (i >= previous)
             found <- find ((== i) . termIndex) unmappedA
@@ -53,6 +53,9 @@ rws compare as bs
             pure $! do
               put (i, List.delete found unmappedA, List.delete kv unmappedB)
               pure (i, compared)
+        insertion previous unmappedA unmappedB kv@(UnmappedTerm _ _ b) = do
+          put (previous, unmappedA, List.delete kv unmappedB)
+          pure (negate 1, inserting b)
         deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
