@@ -31,7 +31,8 @@ spec = parallel $ do
 
   describe "rws" $ do
     let compare a b = if ((==) `on` category . extract) a b then Just (replacing a b) else Nothing
-    let toTerm' = featureVectorDecorator (category . headF) 2 2 15 . toTerm
+    let decorate = featureVectorDecorator (category . headF) 2 2 15
+    let toTerm' = decorate . toTerm
     prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
       \ (as, bs) -> let tas = toTerm' <$> (as :: [ArbitraryTerm Text (Record '[Category])])
                         tbs = toTerm' <$> (bs :: [ArbitraryTerm Text (Record '[Category])])
@@ -40,6 +41,10 @@ spec = parallel $ do
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
 
     let toTerm'' c (ArbitraryTerm r f) = toTerm' (ArbitraryTerm (setCategory r c) f)
+    it "produces unbiased deletions" $
+      let (a, b) = (decorate (cofree ((StringLiteral .: RNil) :< Leaf "a")), decorate (cofree ((StringLiteral .: RNil) :< Leaf "b"))) in
+      fmap stripDiff (rws compare [ a, b ] [ b ]) `shouldBe` fmap stripDiff [ deleting a, replacing b b ]
+
     prop "produces unbiased deletions" . forAll (arbitrary `suchThat` \ (a, b, _) -> isNothing ((galign `on` syntax) a b)) $
       \ (a, b, c) -> let (a', b') = (toTerm'' c a, toTerm'' c (b :: ArbitraryTerm Text (Record '[Category]))) in
         fmap stripDiff (rws compare [ a', b' ] [ a' ]) `shouldBe` fmap stripDiff (reverse (rws compare [ b', a' ] [ a' ]))
