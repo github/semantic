@@ -29,9 +29,17 @@ spec = parallel $ do
       \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively d)) . length . rhead)
 
   describe "rws" $ do
-    let compare a b = if extract a == extract b then Just (pure (Replace a b)) else Nothing
+    let compare a b = if ((==) `on` category . extract) a b then Just (replacing a b) else Nothing
+    let decorate = featureVectorDecorator (category . headF) 2 2 15
+    let toTerm' = decorate . toTerm
     prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
-      \ (as, bs) -> let tas = featureVectorDecorator (category . headF) 2 2 15 . toTerm <$> (as :: [ArbitraryTerm Text (Record '[Category])])
-                        tbs = featureVectorDecorator (category . headF) 2 2 15 . toTerm <$> (bs :: [ArbitraryTerm Text (Record '[Category])])
-                        diff = free (Free (pure (pure 0 .: Program .: RNil) :< Indexed (rws compare tas tbs))) in
-        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (cofree ((pure 0 .: Program .: RNil) :< Indexed tas)), Just (cofree ((pure 0 .: Program .: RNil) :< Indexed tbs)))
+      \ (as, bs) -> let tas = toTerm' <$> (as :: [ArbitraryTerm Text (Record '[Category])])
+                        tbs = toTerm' <$> (bs :: [ArbitraryTerm Text (Record '[Category])])
+                        root = cofree . ((Program .: RNil) :<) . Indexed
+                        diff = free (Free (pure (Program .: RNil) :< Indexed (stripDiff <$> rws compare tas tbs))) in
+        (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
+
+    it "produces unbiased insertions within branches" $
+      pendingWith "Currently fails due to https://github.com/github/semantic-diff/issues/683"
+      -- let (a, b) = (decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "a") ])), decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "b") ]))) in
+      -- fmap stripDiff (rws compare [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, replacing b b ]

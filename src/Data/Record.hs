@@ -22,6 +22,10 @@ infixr 0 .:
 rhead :: Record (head ': tail) -> head
 rhead (RCons head _) = head
 
+-- | Get the first element of a non-empty record.
+rtail :: Record (head ': tail) -> Record tail
+rtail (RCons _ tail) = tail
+
 
 -- Classes
 
