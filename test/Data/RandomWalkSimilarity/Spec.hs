@@ -29,7 +29,7 @@ spec = parallel $ do
       \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively d)) . length . rhead)
 
   describe "rws" $ do
-    let compare a b = if ((==) `on` category . extract) a b then Just (pure (Replace a b)) else Nothing
+    let compare a b = if ((==) `on` category . extract) a b then Just (replacing a b) else Nothing
     let toTerm' = featureVectorDecorator (category . headF) 2 2 15 . toTerm
     prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
       \ (as, bs) -> let tas = toTerm' <$> (as :: [ArbitraryTerm Text (Record '[Category])])
