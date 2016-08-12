@@ -45,30 +45,30 @@ diffComparableTerms construct comparable cost = recur
 -- | Construct an algorithm to diff a pair of terms.
 algorithmWithTerms :: (TermF leaf (Both a) diff -> diff) -> Term leaf a -> Term leaf a -> Algorithm (Term leaf a) diff diff
 algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
-  (Indexed a, Indexed b) -> byIndex Indexed a b
+  (Indexed a, Indexed b) -> branch Indexed a b
   (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) -> do
     identifier <- recursively identifierA identifierB
-    byIndex (S.FunctionCall identifier) argsA argsB
+    branch (S.FunctionCall identifier) argsA argsB
   (S.Switch exprA casesA, S.Switch exprB casesB) -> do
     expr <- recursively exprA exprB
-    byIndex (S.Switch expr) casesA casesB
-  (S.Object a, S.Object b) -> byIndex S.Object a b
+    branch (S.Switch expr) casesA casesB
+  (S.Object a, S.Object b) -> branch S.Object a b
   (Commented commentsA a, Commented commentsB b) -> do
     wrapped <- sequenceA (recursively <$> a <*> b)
-    byIndex (`Commented` wrapped) commentsA commentsB
-  (Array a, Array b) -> byIndex Array a b
+    branch (`Commented` wrapped) commentsA commentsB
+  (Array a, Array b) -> branch Array a b
   (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) -> do
     identifier <- recursively identifierA identifierB
     params <- sequenceA (recursively <$> paramsA <*> paramsB)
-    byIndex (S.Class identifier params) expressionsA expressionsB
+    branch (S.Class identifier params) expressionsA expressionsB
   (S.Method identifierA paramsA expressionsA, S.Method identifierB paramsB expressionsB) -> do
     identifier <- recursively identifierA identifierB
-    params <- Algorithm.byIndex paramsA paramsB
-    expressions <- Algorithm.byIndex expressionsA expressionsB
+    params <- byIndex paramsA paramsB
+    expressions <- byIndex expressionsA expressionsB
     annotate $! S.Method identifier params expressions
   _ -> recursively t1 t2
   where annotate = pure . construct . (both (extract t1) (extract t2) :<)
-        byIndex constructor a b = Algorithm.byIndex a b >>= annotate . constructor
+        branch constructor a b = byIndex a b >>= annotate . constructor
 
 -- | Run an algorithm, given functions characterizing the evaluation.
 runAlgorithm :: (Functor f, GAlign f, Eq a, Eq (Record fields), Eq (f (Cofree f (Record fields))), Prologue.Foldable f, Traversable f, HasField fields (Vector.Vector Double))
