@@ -40,6 +40,8 @@ data Category
   | IntegerLiteral
   -- | A regex literal.
   | Regex
+  -- | A return statement.
+  | Return
   -- | A symbol literal.
   | SymbolLiteral
   -- | A template string literal.
@@ -76,8 +78,6 @@ data Category
   | Operator
   -- | An object/dictionary/hash literal.
   | Object
-  -- | A return statement.
-  | Return
   -- | A throw statement.
   | Throw
   -- | A constructor statement, e.g. new Foo;
@@ -118,6 +118,7 @@ instance Arbitrary Category where
     , pure StringLiteral
     , pure IntegerLiteral
     , pure Regex
+    , pure Return
     , pure SymbolLiteral
     , pure TemplateString
     , pure ArrayLiteral
@@ -135,6 +136,13 @@ instance Arbitrary Category where
     , pure Case
     , pure Operator
     , pure Object
+    , pure Throw
+    , pure Constructor
+    , pure Try
+    , pure Catch
+    , pure Finally
+    , pure Class
+    , pure Method
     , Other <$> arbitrary
     ]
 
