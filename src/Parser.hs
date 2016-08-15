@@ -122,8 +122,8 @@ termConstructor source sourceSpan info = cofree . construct
         S.Indexed params' <- unwrap params,
         exprs' <- expressionStatements exprs ->
           withDefaultInfo $ S.Method identifier params' exprs'
-      [identifier, exprs] | exprs' <- expressionStatements exprs ->
-        withDefaultInfo $ S.Method identifier mempty exprs'
+      [identifier, exprs] ->
+        withDefaultInfo $ S.Method identifier mempty (toList (unwrap exprs))
       _ ->
         withDefaultInfo $ S.Error sourceSpan children
     construct children | Class == category info = case children of
