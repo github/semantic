@@ -135,12 +135,6 @@ termConstructor source sourceSpan info = cofree . construct
     construct children =
       withDefaultInfo $ S.Indexed children
 
-expressionStatements :: HasField fields Category => Term Text (Record fields) -> [Term Text (Record fields)]
-expressionStatements exprs |
-  Other "statement_block" == category (extract exprs),
-  S.Indexed exprs' <- unwrap exprs = exprs'
-expressionStatements _ = mempty
-
 methodDefinitions :: HasField fields Category => Term Text (Record fields) -> [Term Text (Record fields)]
 methodDefinitions definitions |
   Other "class_body" == category (extract definitions),
