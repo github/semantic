@@ -1,0 +1,13 @@
+For statements
+For-in statements
+while statements
+do statements
+return statements
+let statements Not in ES2016
+Verify generator functions map to Function
+Throw statements
+Try/Catch/Finally statements
+Arrays
+Objects with method definitions
+Classes
+Constructor calls
