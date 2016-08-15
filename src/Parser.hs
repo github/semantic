@@ -27,6 +27,7 @@ termConstructor :: forall fields. (Show (Record fields), HasField fields Categor
 termConstructor source sourceSpan info = cofree . construct
   where
     withDefaultInfo syntax = (info :< syntax)
+    errorWith = (seq sourceSpan) . withDefaultInfo . S.Error sourceSpan
     construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [Term Text (Record fields)] -> CofreeF (S.Syntax Text) (Record fields) (Term Text (Record fields))
     construct [] = case category info of
       Return -> withDefaultInfo $ S.Return Nothing -- Map empty return statements to Return Nothing
