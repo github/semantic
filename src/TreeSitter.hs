@@ -107,14 +107,15 @@ documentToTerm language document blob = alloca $ \ root -> do
           name <- peekCString name
           count <- ts_node_p_named_child_count node
           children <- traverse (alloca . getChild node) $ take (fromIntegral count) [0..]
-          -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
-          range <- pure $! Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
+
+          let range = Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
 
           let sourceSpan = SourceSpan { spanName = toS (path blob)
             , spanStart = SourcePos (fromIntegral $ ts_node_p_start_point_row node) (fromIntegral $ ts_node_p_start_point_column node)
             , spanEnd = SourcePos (fromIntegral $ ts_node_p_end_point_row node) (fromIntegral $ ts_node_p_end_point_column node) }
 
-          let info = range .: (categoriesForLanguage language (toS name)) .: RNil
+          -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
+          let info = range `seq` range .: (categoriesForLanguage language (toS name)) .: RNil
           pure $! termConstructor (source blob) sourceSpan info children
         {-# INLINE toTerm #-}
         getChild node n out = do
