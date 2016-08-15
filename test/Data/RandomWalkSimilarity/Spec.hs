@@ -36,10 +36,9 @@ spec = parallel $ do
       \ (as, bs) -> let tas = toTerm' <$> (as :: [ArbitraryTerm Text (Record '[Category])])
                         tbs = toTerm' <$> (bs :: [ArbitraryTerm Text (Record '[Category])])
                         root = cofree . ((Program .: RNil) :<) . Indexed
-                        diff = free (Free (pure (Program .: RNil) :< Indexed (stripDiff <$> rws compare tas tbs))) in
+                        diff = wrap (pure (Program .: RNil) :< Indexed (stripDiff <$> rws compare tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
-      pendingWith "Currently fails due to https://github.com/github/semantic-diff/issues/683"
-      -- let (a, b) = (decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "a") ])), decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "b") ]))) in
-      -- fmap stripDiff (rws compare [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, replacing b b ]
+      let (a, b) = (decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "a") ])), decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "b") ]))) in
+      fmap stripDiff (rws compare [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, replacing b b ]
