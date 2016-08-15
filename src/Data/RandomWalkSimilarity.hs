@@ -102,9 +102,11 @@ featureVectorDecorator getLabel p q d
       cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor))
   . pqGramDecorator getLabel p q
 
+-- | Strips the head annotation off a term annotated with non-empty records.
 stripTerm :: Functor f => Cofree f (Record (h ': t)) -> Cofree f (Record t)
 stripTerm = fmap rtail
 
+-- | Strips the head annotation off a diff annotated with non-empty records.
 stripDiff :: (Functor f, Functor g) => Free (CofreeF f (g (Record (h ': t)))) (Patch (Cofree f (Record (h ': t)))) -> Free (CofreeF f (g (Record t))) (Patch (Cofree f (Record t)))
 stripDiff = iter (\ (h :< f) -> wrap (fmap rtail h :< f)) . fmap (pure . fmap stripTerm)
 
