@@ -9,7 +9,7 @@ import Info
 import qualified Syntax as S
 import Term
 import qualified Data.Set as Set
-import Source
+import Source hiding (uncons)
 import SourceSpan
 
 -- | A function that takes a source blob and returns an annotated AST.
@@ -91,6 +91,11 @@ termConstructor source sourceSpan info = cofree . construct
     construct children | Pair == (category info) = withDefaultInfo $ S.Fixed children
     construct children | C.Error == category info =
       withDefaultInfo $ S.Error sourceSpan children
+    construct children | If == category info, Just (expr, clauses) <- uncons children =
+      withDefaultInfo $ case clauses of
+        [clause1, clause2] -> S.If expr clause1 (Just clause2)
+        [clause] -> S.If expr clause Nothing
+        _ -> S.Error sourceSpan children
     construct children | For == category info, Just (exprs, body) <- unsnoc children =
       withDefaultInfo $ S.For exprs body
     construct children | While == category info, [expr, body] <- children =

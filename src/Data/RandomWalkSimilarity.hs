@@ -3,6 +3,8 @@ module Data.RandomWalkSimilarity
 ( rws
 , pqGramDecorator
 , featureVectorDecorator
+, stripDiff
+, stripTerm
 , Gram(..)
 ) where
 
@@ -33,22 +35,28 @@ rws compare as bs
   | null as, null bs = []
   | null as = inserting <$> bs
   | null bs = deleting <$> as
-  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, fas)) $ traverse findNearestNeighbourTo fbs
+  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, fas, fbs)) $ traverse findNearestNeighbourTo fbs
   where fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
+        kdbs = KdTree.build (Vector.toList . feature) fbs
         featurize index term = UnmappedTerm index (getField (extract term)) term
-        findNearestNeighbourTo kv@(UnmappedTerm _ _ v) = do
-          (previous, unmapped) <- get
-          let UnmappedTerm i _ _ = KdTree.nearest kdas kv
-          fromMaybe (pure (negate 1, inserting v)) $ do
-            found <- find ((== i) . termIndex) unmapped
+        findNearestNeighbourTo kv@(UnmappedTerm j _ b) = do
+          (previous, unmappedA, unmappedB) <- get
+          fromMaybe (insertion previous unmappedA unmappedB kv) $ do
+            foundA@(UnmappedTerm i _ a) <- nearestUnmapped unmappedA kdas kv
+            foundB@(UnmappedTerm j' _ _) <- nearestUnmapped unmappedB kdbs foundA
+            guard (j == j')
             guard (i >= previous)
-            compared <- compare (term found) v
+            compared <- compare a b
             pure $! do
-              put (i, List.delete found unmapped)
+              put (i, List.delete foundA unmappedA, List.delete foundB unmappedB)
               pure (i, compared)
-        deleteRemaining diffs (_, unmapped) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmapped)
+        nearestUnmapped unmapped tree key = find ((== termIndex (KdTree.nearest tree key)) . termIndex) unmapped
+        insertion previous unmappedA unmappedB kv@(UnmappedTerm _ _ b) = do
+          put (previous, unmappedA, List.delete kv unmappedB)
+          pure (negate 1, inserting b)
+        deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
@@ -93,6 +101,14 @@ featureVectorDecorator getLabel p q d
   = cata (\ (RCons gram rest :< functor) ->
       cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor))
   . pqGramDecorator getLabel p q
+
+-- | Strips the head annotation off a term annotated with non-empty records.
+stripTerm :: Functor f => Cofree f (Record (h ': t)) -> Cofree f (Record t)
+stripTerm = fmap rtail
+
+-- | Strips the head annotation off a diff annotated with non-empty records.
+stripDiff :: (Functor f, Functor g) => Free (CofreeF f (g (Record (h ': t)))) (Patch (Cofree f (Record (h ': t)))) -> Free (CofreeF f (g (Record t))) (Patch (Cofree f (Record t)))
+stripDiff = iter (\ (h :< f) -> wrap (fmap rtail h :< f)) . fmap (pure . fmap stripTerm)
 
 
 -- Instances
