@@ -134,9 +134,3 @@ termConstructor source sourceSpan info = cofree . construct
         withDefaultInfo $ S.Error sourceSpan children
     construct children =
       withDefaultInfo $ S.Indexed children
-
-methodDefinitions :: HasField fields Category => Term Text (Record fields) -> [Term Text (Record fields)]
-methodDefinitions definitions |
-  Other "class_body" == category (extract definitions),
-  S.Indexed definitions' <- unwrap definitions = definitions'
-methodDefinitions _ = mempty
