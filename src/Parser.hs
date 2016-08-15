@@ -126,8 +126,8 @@ termConstructor source sourceSpan info = cofree . construct
       _ ->
         withDefaultInfo $ S.Error sourceSpan children
     construct children | Class == category info = case children of
-      [identifier, superclass, definitions] | definitions' <- methodDefinitions definitions ->
-        withDefaultInfo $ S.Class identifier (Just superclass) definitions'
+      [identifier, superclass, definitions] ->
+        withDefaultInfo $ S.Class identifier (Just superclass) (toList (unwrap definitions))
       [identifier, definitions] ->
         withDefaultInfo $ S.Class identifier Nothing (toList (unwrap definitions))
       _ ->
