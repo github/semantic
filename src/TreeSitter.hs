@@ -55,6 +55,7 @@ categoriesForLanguage language name = case (language, name) of
 
   (Ruby, "hash") -> Object
   _ -> defaultCategoryForNodeName name
+{-# INLINE categoriesForLanguage #-}
 
 -- | Given a node name from TreeSitter, return the correct categories.
 defaultCategoryForNodeName :: Text -> Category
@@ -94,6 +95,7 @@ defaultCategoryForNodeName name = case name of
   "try_statement" -> Try
   "method_definition" -> Method
   _ -> Other name
+{-# INLINE defaultCategoryForNodeName #-}
 
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record '[Range, Category])
@@ -114,6 +116,8 @@ documentToTerm language document blob = alloca $ \ root -> do
 
           let info = range .: (categoriesForLanguage language (toS name)) .: RNil
           pure $! termConstructor (source blob) sourceSpan info children
+        {-# INLINE toTerm #-}
         getChild node n out = do
           _ <- ts_node_p_named_child node n out
           toTerm out
+        {-# INLINE getChild #-}
