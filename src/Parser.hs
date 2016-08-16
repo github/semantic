@@ -24,7 +24,12 @@ isOperator = flip Set.member (Set.fromList [ Operator, BinaryOperator ])
 -- | Construct a term given source, the span covered, the annotation for the term, and its children.
 --
 -- This is typically called during parsing, building terms up leaf-to-root.
-termConstructor :: forall fields. (Show (Record fields), HasField fields Category, HasField fields Range) => Source Char -> IO SourceSpan -> Record fields -> [Term Text (Record fields)] -> IO (Term Text (Record fields))
+termConstructor :: forall fields. (Show (Record fields), HasField fields Category, HasField fields Range)
+  => Source Char
+  -> IO SourceSpan
+  -> Record fields
+  -> [Term Text (Record fields)]
+  -> IO (Term Text (Record fields))
 termConstructor source sourceSpan info = fmap cofree . construct
   where
     withDefaultInfo syntax = pure (info :< syntax)
