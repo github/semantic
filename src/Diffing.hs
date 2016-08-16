@@ -8,6 +8,7 @@ import Data.Functor.Both
 import Data.Functor.Foldable
 import Data.RandomWalkSimilarity
 import Data.Record
+import qualified Data.Set as Set
 import qualified Data.Text.IO as TextIO
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
@@ -34,6 +35,7 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
+import Category
 import Data.Aeson (pairs)
 import Data.Aeson.Encoding (encodingToLazyByteString)
 
@@ -97,11 +99,15 @@ breakDownLeavesByWord source = cata replaceIn
   where
     replaceIn (info :< syntax) = cofree $ info :< syntax'
       where syntax' = case (ranges, syntax) of
-              (_:_:_, Leaf _) | category info /= Regex -> Indexed (makeLeaf info <$> ranges)
+              (_:_:_, Leaf _) | Set.notMember (category info) preserveSyntax -> Indexed (makeLeaf info <$> ranges)
               _ -> syntax
             ranges = rangesAndWordsInSource (characterRange info)
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
     makeLeaf info (range, substring) = cofree $ setCharacterRange info range :< Leaf (toS substring)
+    -- Some Category constructors should retain their original structure, and not be sliced
+    -- into words. This Set represents those Category constructors for which we want to
+    -- preserve the original Syntax.
+    preserveSyntax = Set.fromList [Regex, Category.Comment]
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
