@@ -41,7 +41,7 @@ categoriesForLanguage language name = case (language, name) of
   (JavaScript, "bool_op") -> BinaryOperator -- boolean operator, e.g. ||, &&.
   (JavaScript, "bitwise_op") -> BinaryOperator -- bitwise operator, e.g. ^, &, etc.
   (JavaScript, "rel_op") -> BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=.
-  (JavaScript, "comma_op") -> Operator -- comma operator, e.g. expr1, expr2.
+  (JavaScript, "comma_op") -> CommaOperator -- comma operator, e.g. expr1, expr2.
   (JavaScript, "delete_op") -> Operator -- delete operator, e.g. delete x[2].
   (JavaScript, "type_op") -> Operator -- type operator, e.g. typeof Object.
   (JavaScript, "void_op") -> Operator -- void operator, e.g. void 2.

@@ -76,6 +76,8 @@ data Category
   | Case
   -- | An expression with an operator.
   | Operator
+  -- | An comma operator expression
+  | CommaOperator
   -- | An object/dictionary/hash literal.
   | Object
   -- | A throw statement.
