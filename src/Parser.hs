@@ -21,13 +21,22 @@ type Parser f a = SourceBlob -> IO (Cofree f a)
 isOperator :: Category -> Bool
 isOperator = flip Set.member (Set.fromList [ Operator, BinaryOperator ])
 
--- | Given a function that maps production names to sets of categories, produce
--- | a Constructor.
-termConstructor :: forall fields. (Show (Record fields), HasField fields Category, HasField fields Range) => Source Char -> SourceSpan -> (Record fields) -> [Term Text (Record fields)] -> Term Text (Record fields)
-termConstructor source sourceSpan info = cofree . construct
+-- | Construct a term given source, the span covered, the annotation for the term, and its children.
+--
+-- This is typically called during parsing, building terms up leaf-to-root.
+termConstructor :: forall fields. (Show (Record fields), HasField fields Category, HasField fields Range)
+  => Source Char -- ^ The source that the term occurs within.
+  -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
+  -> Record fields -- ^ The annotation for the term.
+  -> [Term Text (Record fields)] -- ^ The child nodes of the term.
+  -> IO (Term Text (Record fields)) -- ^ The resulting term, in IO.
+termConstructor source sourceSpan info = fmap cofree . construct
   where
-    withDefaultInfo syntax = (info :< syntax)
-    construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [Term Text (Record fields)] -> CofreeF (S.Syntax Text) (Record fields) (Term Text (Record fields))
+    withDefaultInfo syntax = pure (info :< syntax)
+    errorWith children = do
+      sourceSpan' <- sourceSpan
+      withDefaultInfo (S.Error sourceSpan' children)
+    construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [Term Text (Record fields)] -> IO (CofreeF (S.Syntax Text) (Record fields) (Term Text (Record fields)))
     construct [] = case category info of
       Return -> withDefaultInfo $ S.Return Nothing -- Map empty return statements to Return Nothing
       _ -> withDefaultInfo . S.Leaf . pack . toString $ slice (characterRange info) source
@@ -35,16 +44,16 @@ termConstructor source sourceSpan info = cofree . construct
       withDefaultInfo $ S.Return (listToMaybe children)
     construct children | Assignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.Assignment identifier value
-      children -> withDefaultInfo $ S.Error sourceSpan children
+      children -> errorWith children
     construct children | MathAssignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.MathAssignment identifier value
-      children -> withDefaultInfo $ S.Error sourceSpan children
+      children -> errorWith children
     construct children | MemberAccess == category info = case children of
       (base:property:[]) -> withDefaultInfo $ S.MemberAccess base property
-      children -> withDefaultInfo $ S.Error sourceSpan children
+      children -> errorWith children
     construct children | SubscriptAccess == category info = case children of
       (base:element:[]) -> withDefaultInfo $ S.SubscriptAccess base element
-      _ -> withDefaultInfo $ S.Error sourceSpan children
+      _ -> errorWith children
     construct children | isOperator (category info) = withDefaultInfo $ S.Operator children
     construct children | Function == category info = case children of
       (body:[]) -> withDefaultInfo $ S.Function Nothing Nothing body
@@ -54,18 +63,18 @@ termConstructor source sourceSpan info = cofree . construct
         withDefaultInfo $ S.Function (Just id) Nothing body
       (id:params:body:[]) | (info :< _) <- runCofree id, Identifier == category info ->
         withDefaultInfo $ S.Function (Just id) (Just params) body
-      _ -> withDefaultInfo $ S.Error sourceSpan children
+      _ -> errorWith children
 
     construct children | FunctionCall == category info = case runCofree <$> children of
       [ (_ :< S.MemberAccess{..}), params@(_ :< S.Args{}) ] ->
-        setCategory info MethodCall :< S.MethodCall memberId property (cofree params)
+        pure $! setCategory info MethodCall :< S.MethodCall memberId property (cofree params)
       (x:xs) ->
         withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
-      _ -> withDefaultInfo $ S.Error sourceSpan children
+      _ -> errorWith children
 
     construct children | Ternary == category info = case children of
       (condition:cases) -> withDefaultInfo $ S.Ternary condition cases
-      _ -> withDefaultInfo $ S.Error sourceSpan children
+      _ -> errorWith children
     construct children | Args == category info = withDefaultInfo $ S.Args children
     construct children | VarAssignment == category info
                          , [x, y] <- children = withDefaultInfo $ S.VarAssignment x y
@@ -90,12 +99,12 @@ termConstructor source sourceSpan info = cofree . construct
 
     construct children | Pair == (category info) = withDefaultInfo $ S.Fixed children
     construct children | C.Error == category info =
-      withDefaultInfo $ S.Error sourceSpan children
+      errorWith children
     construct children | If == category info, Just (expr, clauses) <- uncons children =
-      withDefaultInfo $ case clauses of
-        [clause1, clause2] -> S.If expr clause1 (Just clause2)
-        [clause] -> S.If expr clause Nothing
-        _ -> S.Error sourceSpan children
+      case clauses of
+        [clause1, clause2] -> withDefaultInfo $ S.If expr clause1 (Just clause2)
+        [clause] -> withDefaultInfo $ S.If expr clause Nothing
+        _ -> errorWith children
     construct children | For == category info, Just (exprs, body) <- unsnoc children =
       withDefaultInfo $ S.For exprs body
     construct children | While == category info, [expr, body] <- children =
@@ -113,7 +122,7 @@ termConstructor source sourceSpan info = cofree . construct
       [body, catch, finally] | Catch <- category (extract catch),
                                Finally <- category (extract finally) ->
         withDefaultInfo $ S.Try body (Just catch) (Just finally)
-      _ -> withDefaultInfo $ S.Error sourceSpan children
+      _ -> errorWith children
     construct children | ArrayLiteral == category info =
       withDefaultInfo $ S.Array children
     construct children | Method == category info = case children of
@@ -123,14 +132,12 @@ termConstructor source sourceSpan info = cofree . construct
           withDefaultInfo $ S.Method identifier params' (toList (unwrap exprs))
       [identifier, exprs] ->
         withDefaultInfo $ S.Method identifier mempty (toList (unwrap exprs))
-      _ ->
-        withDefaultInfo $ S.Error sourceSpan children
+      _ -> errorWith children
     construct children | Class == category info = case children of
       [identifier, superclass, definitions] ->
         withDefaultInfo $ S.Class identifier (Just superclass) (toList (unwrap definitions))
       [identifier, definitions] ->
         withDefaultInfo $ S.Class identifier Nothing (toList (unwrap definitions))
-      _ ->
-        withDefaultInfo $ S.Error sourceSpan children
+      _ -> errorWith children
     construct children =
       withDefaultInfo $ S.Indexed children
