@@ -92,6 +92,8 @@ data Category
   | Class
   -- | A class method declaration.
   | Method
+  -- | A comment.
+  | Comment
   -- | A non-standard category, which can be used for comparability.
   | Other Text
   deriving (Eq, Generic, Ord, Show)
