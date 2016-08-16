@@ -25,11 +25,11 @@ isOperator = flip Set.member (Set.fromList [ Operator, BinaryOperator ])
 --
 -- This is typically called during parsing, building terms up leaf-to-root.
 termConstructor :: forall fields. (Show (Record fields), HasField fields Category, HasField fields Range)
-  => Source Char
-  -> IO SourceSpan
-  -> Record fields
-  -> [Term Text (Record fields)]
-  -> IO (Term Text (Record fields))
+  => Source Char -- ^ The source that the term occurs within.
+  -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
+  -> Record fields -- ^ The annotation for the term.
+  -> [Term Text (Record fields)] -- ^ The child nodes of the term.
+  -> IO (Term Text (Record fields)) -- ^ The resulting term, in IO.
 termConstructor source sourceSpan info = fmap cofree . construct
   where
     withDefaultInfo syntax = pure (info :< syntax)
