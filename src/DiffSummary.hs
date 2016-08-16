@@ -108,7 +108,7 @@ toTermName source term = case unwrap term of
   S.Array _ -> termNameFromSource term
   S.Class identifier _ _ -> toTermName' identifier
   S.Method identifier _ _ -> toTermName' identifier
-  Comment a -> toCategoryName a
+  S.Comment a -> toCategoryName a
   S.Commented _ _ -> termNameFromChildren term
   where toTermName' = toTermName source
         termNameFromChildren term = termNameFromRange (unionRangesFrom (range term) (range <$> toList (unwrap term)))
@@ -174,6 +174,7 @@ instance HasCategory Category where
     BinaryOperator -> "binary operator"
     Boolean -> "boolean"
     DictionaryLiteral -> "dictionary"
+    C.Comment -> "comment"
     C.Error -> "error"
     ExpressionStatements -> "expression statements"
     C.Assignment -> "assignment"

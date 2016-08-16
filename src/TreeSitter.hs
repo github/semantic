@@ -95,6 +95,7 @@ defaultCategoryForNodeName name = case name of
   "throw_statement" -> Throw
   "try_statement" -> Try
   "method_definition" -> Method
+  "comment" -> Comment
   _ -> Other name
 {-# INLINE defaultCategoryForNodeName #-}
 
