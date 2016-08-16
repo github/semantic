@@ -24,14 +24,14 @@ isOperator = flip Set.member (Set.fromList [ Operator, BinaryOperator ])
 -- | Construct a term given source, the span covered, the annotation for the term, and its children.
 --
 -- This is typically called during parsing, building terms up leaf-to-root.
-termConstructor :: forall fields m. (Show (Record fields), HasField fields Category, HasField fields Range, Monad m) => Source Char -> m SourceSpan -> Record fields -> [Term Text (Record fields)] -> m (Term Text (Record fields))
+termConstructor :: forall fields. (Show (Record fields), HasField fields Category, HasField fields Range) => Source Char -> IO SourceSpan -> Record fields -> [Term Text (Record fields)] -> IO (Term Text (Record fields))
 termConstructor source sourceSpan info = fmap cofree . construct
   where
     withDefaultInfo syntax = pure (info :< syntax)
     errorWith children = do
       sourceSpan' <- sourceSpan
       withDefaultInfo (S.Error sourceSpan' children)
-    construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [Term Text (Record fields)] -> m (CofreeF (S.Syntax Text) (Record fields) (Term Text (Record fields)))
+    construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [Term Text (Record fields)] -> IO (CofreeF (S.Syntax Text) (Record fields) (Term Text (Record fields)))
     construct [] = case category info of
       Return -> withDefaultInfo $ S.Return Nothing -- Map empty return statements to Return Nothing
       _ -> withDefaultInfo . S.Leaf . pack . toString $ slice (characterRange info) source
