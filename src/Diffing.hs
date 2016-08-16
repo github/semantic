@@ -104,6 +104,9 @@ breakDownLeavesByWord source = cata replaceIn
             ranges = rangesAndWordsInSource (characterRange info)
     rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
     makeLeaf info (range, substring) = cofree $ setCharacterRange info range :< Leaf (toS substring)
+    -- Some Category constructors should retain their original structure, and not be sliced
+    -- into words. This Set represents those Category constructors for which we want to
+    -- preserve the original Syntax.
     preserveSyntax = Set.fromList [Regex, Category.Comment]
 
 -- | Transcode a file to a unicode source.
