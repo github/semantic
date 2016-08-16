@@ -23,7 +23,7 @@ isOperator = flip Set.member (Set.fromList [ Operator, BinaryOperator ])
 
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
-termConstructor :: forall fields. (Show (Record fields), HasField fields Category, HasField fields Range) => Source Char -> SourceSpan -> (Record fields) -> [Term Text (Record fields)] -> Term Text (Record fields)
+termConstructor :: forall fields. (Show (Record fields), HasField fields Category, HasField fields Range) => Source Char -> SourceSpan -> Record fields -> [Term Text (Record fields)] -> Term Text (Record fields)
 termConstructor source sourceSpan info = cofree . construct
   where
     withDefaultInfo syntax = (info :< syntax)
