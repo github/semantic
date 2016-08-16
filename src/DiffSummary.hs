@@ -57,7 +57,7 @@ summaries (Replace i1 i2) = zipWith (\a b -> "Replaced" <+> "the" <+> a <+> "wit
 
 toLeafInfos :: DiffInfo -> [Doc]
 toLeafInfos LeafInfo{..} = pure $ squotes (toDoc termName) <+> (toDoc categoryName)
-toLeafInfos BranchInfo{..} = pretty <$> branches
+toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure $ pretty err
 
 toTermName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
