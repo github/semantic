@@ -23,12 +23,14 @@ isOperator = flip Set.member (Set.fromList [ Operator, BinaryOperator ])
 
 -- | Given a function that maps production names to sets of categories, produce
 -- | a Constructor.
-termConstructor :: forall fields m. (Show (Record fields), HasField fields Category, HasField fields Range, Monad m) => Source Char -> SourceSpan -> Record fields -> [Term Text (Record fields)] -> m (Term Text (Record fields))
-termConstructor source sourceSpan info terms = pure $! cofree (construct terms)
+termConstructor :: forall fields m. (Show (Record fields), HasField fields Category, HasField fields Range, Monad m) => Source Char -> m SourceSpan -> Record fields -> [Term Text (Record fields)] -> m (Term Text (Record fields))
+termConstructor source sourceSpan info = fmap cofree . construct
   where
-    withDefaultInfo syntax = (info :< syntax)
-    errorWith = (seq sourceSpan) . withDefaultInfo . S.Error sourceSpan
-    construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [Term Text (Record fields)] -> CofreeF (S.Syntax Text) (Record fields) (Term Text (Record fields))
+    withDefaultInfo syntax = pure (info :< syntax)
+    errorWith children = do
+      sourceSpan' <- sourceSpan
+      withDefaultInfo (S.Error sourceSpan' children)
+    construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [Term Text (Record fields)] -> m (CofreeF (S.Syntax Text) (Record fields) (Term Text (Record fields)))
     construct [] = case category info of
       Return -> withDefaultInfo $ S.Return Nothing -- Map empty return statements to Return Nothing
       _ -> withDefaultInfo . S.Leaf . pack . toString $ slice (characterRange info) source
@@ -59,7 +61,7 @@ termConstructor source sourceSpan info terms = pure $! cofree (construct terms)
 
     construct children | FunctionCall == category info = case runCofree <$> children of
       [ (_ :< S.MemberAccess{..}), params@(_ :< S.Args{}) ] ->
-        setCategory info MethodCall :< S.MethodCall memberId property (cofree params)
+        pure $! setCategory info MethodCall :< S.MethodCall memberId property (cofree params)
       (x:xs) ->
         withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
       _ -> errorWith children
