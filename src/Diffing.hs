@@ -34,6 +34,7 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
+import Category
 import Data.Aeson (pairs)
 import Data.Aeson.Encoding (encodingToLazyByteString)
 
@@ -97,6 +98,7 @@ breakDownLeavesByWord source = cata replaceIn
   where
     replaceIn (info :< syntax) = cofree $ info :< syntax'
       where syntax' = case (ranges, syntax) of
+              (_:_:_, Leaf _) | category info == Category.Comment -> syntax
               (_:_:_, Leaf _) | category info /= Regex -> Indexed (makeLeaf info <$> ranges)
               _ -> syntax
             ranges = rangesAndWordsInSource (characterRange info)
