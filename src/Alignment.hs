@@ -63,7 +63,7 @@ alignPatch sources patch = case patch of
 alignSyntax :: (Applicative f, HasField fields Range) => (forall a. f a -> Join These a) -> (CofreeF (Syntax leaf) (Record fields) term -> term) -> (term -> Range) -> f (Source Char) -> CofreeF (Syntax leaf) (f (Record fields)) [Join These term] -> [Join These term]
 alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = catMaybes $ case syntax of
   Leaf s -> wrapInBranch (const (Leaf s)) <$> alignBranch getRange [] bothRanges
-  Comment a -> wrapInBranch (const (Comment a)) <$> alignBranch getRange [] bothRanges
+  Syntax.Comment a -> wrapInBranch (const (Syntax.Comment a)) <$> alignBranch getRange [] bothRanges
   Fixed children -> wrapInBranch Fixed <$> alignBranch getRange (join children) bothRanges
   _ -> wrapInBranch Indexed <$> alignBranch getRange (join (toList syntax)) bothRanges
   where bothRanges = modifyJoin (fromThese [] []) lineRanges
