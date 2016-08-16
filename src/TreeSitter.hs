@@ -118,6 +118,6 @@ documentToTerm language document blob = alloca $ \ root -> do
           -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
           -- We don’t evaluate `sourceSpan` eagerly so that terms which don’t use it don’t pay the toll for it. This places the onus for evaluating it on the termConstructor function.
           let info = range `seq` range .: categoriesForLanguage language (toS name) .: RNil
-          pure $! termConstructor (source blob) sourceSpan info children
+          termConstructor (source blob) sourceSpan info children
         getChild node n out = ts_node_p_named_child node n out >> toTerm out
         {-# INLINE getChild #-}
