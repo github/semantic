@@ -21,8 +21,9 @@ type Parser f a = SourceBlob -> IO (Cofree f a)
 isOperator :: Category -> Bool
 isOperator = flip Set.member (Set.fromList [ Operator, BinaryOperator ])
 
--- | Given a function that maps production names to sets of categories, produce
--- | a Constructor.
+-- | Construct a term given source, the span covered, the annotation for the term, and its children.
+--
+-- This is typically called during parsing, building terms up leaf-to-root.
 termConstructor :: forall fields m. (Show (Record fields), HasField fields Category, HasField fields Range, Monad m) => Source Char -> m SourceSpan -> Record fields -> [Term Text (Record fields)] -> m (Term Text (Record fields))
 termConstructor source sourceSpan info = fmap cofree . construct
   where
