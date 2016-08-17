@@ -24,6 +24,8 @@ import Prologue
 import Term ()
 import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
+import Data.List (intersectBy)
+import Term (termSize)
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
 rws :: (Eq (Record fields), Prologue.Foldable f, Functor f, Eq (f (Cofree f (Record fields))), HasField fields (Vector.Vector Double))
@@ -52,11 +54,23 @@ rws compare as bs
             pure $! do
               put (i, List.delete foundA unmappedA, List.delete foundB unmappedB)
               pure (i, compared)
-        nearestUnmapped unmapped tree key = find ((== termIndex (KdTree.nearest tree key)) . termIndex) unmapped
+        -- we get k different things
+        -- we need the nearest unmapped one which is not a false positive
+        -- so filter the k things to the list of unmapped things, and then take the smallest of those by constant-time edit distance approximation
+        -- later on maybe find a better k, filter during k-nearest lookup, etc.
+        nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (constantTimeEditDistance key) (intersectBy ((==) `on` termIndex) unmapped (KdTree.kNearest tree 2 key)))
+
+        constantTimeEditDistance key a = fromMaybe (maxBound :: Int) $ diffCostOfMaybes . cutoff 10 <$> compare (term key) (term a)
+
+        -- ((== termIndex ) . termIndex)
         insertion previous unmappedA unmappedB kv@(UnmappedTerm _ _ b) = do
           put (previous, unmappedA, List.delete kv unmappedB)
           pure (negate 1, inserting b)
         deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
+
+diffCostOfMaybes :: (Prologue.Foldable f, Functor f) => Free (CofreeF f (Both annotation)) (Maybe (Patch (Cofree f annotation))) -> Int
+diffCostOfMaybes = diffSum $ patchSum termSize
+  where diffSum patchCost diff = sum $ fmap (maybe 0 patchCost) diff
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
