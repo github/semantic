@@ -62,7 +62,6 @@ rws compare as bs
 
         constantTimeEditDistance key a = fromMaybe (maxBound :: Int) $ diffCostOfMaybes . cutoff 10 <$> compare (term key) (term a)
 
-        -- ((== termIndex ) . termIndex)
         insertion previous unmappedA unmappedB kv@(UnmappedTerm _ _ b) = do
           put (previous, unmappedA, List.delete kv unmappedB)
           pure (negate 1, inserting b)
