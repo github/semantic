@@ -18,6 +18,8 @@ data Category
   | BitwiseOperator
   -- | An operator with 2 operands.
   | BinaryOperator
+  -- | A relational operator (e.g. < or >=)
+  | RelationalOperator
   -- | A literal key-value data structure.
   | DictionaryLiteral
   -- | A pair, e.g. of a key & value
