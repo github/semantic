@@ -14,6 +14,8 @@ data Category
   | Error
   -- | A boolean expression.
   | Boolean
+  -- | A bitwise operator.
+  | BitwiseOperator
   -- | An operator with 2 operands.
   | BinaryOperator
   -- | A literal key-value data structure.
