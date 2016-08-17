@@ -24,10 +24,12 @@ concatOutputs l = T.intercalate "\n" (toText <$> l)
 toSeries :: Output -> Series
 toSeries (JSONOutput series) = series
 toSeries (SummaryOutput series) = series
+toSeries _ = mempty
 
 toText :: Output -> Text
 toText (SplitOutput text) = text
 toText (PatchOutput text) = text
+toText _ = mempty
 
 
 -- | The available types of diff rendering.
