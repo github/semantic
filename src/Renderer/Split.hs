@@ -74,6 +74,7 @@ styleName category = "category-" <> case category of
   C.Class -> "class_statement"
   C.Method -> "method"
   C.If -> "if_statement"
+  C.CommaOperator -> "comma_operator"
   Other string -> string
 
 -- | Pick the class name for a split patch.
