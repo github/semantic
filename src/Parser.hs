@@ -69,7 +69,7 @@ termConstructor source sourceSpan info = fmap cofree . construct
       _ -> errorWith children
 
     construct children | FunctionCall == category info = case runCofree <$> children of
-      [ (_ :< S.MemberAccess{..}), params@(_ :< S.Args args) ] ->
+      [ (_ :< S.MemberAccess{..}), (_ :< S.Args args) ] ->
         pure $! setCategory info MethodCall :< S.MethodCall memberId property args
       [ (_ :< S.MemberAccess{..}) ] ->
         pure $! setCategory info MethodCall :< S.MethodCall memberId property []
