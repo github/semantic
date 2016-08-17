@@ -34,6 +34,8 @@ styleName category = "category-" <> case category of
   Program -> "program"
   C.Error -> "error"
   BinaryOperator -> "binary-operator"
+  BitwiseOperator -> "bitwise-operator"
+  C.CommaOperator -> "comma-operator"
   Boolean -> "boolean"
   DictionaryLiteral -> "dictionary"
   C.Pair -> "pair"
