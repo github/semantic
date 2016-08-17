@@ -56,7 +56,7 @@ termConstructor source sourceSpan info = fmap cofree . construct
       _ -> errorWith children
     construct children | isOperator (category info) = withDefaultInfo $ S.Operator children
     construct children | CommaOperator == category info = withDefaultInfo $ case children of
-      [child, rest] | S.Indexed f <- unwrap rest -> S.Indexed $ child : toList f
+      [child, rest] | S.Indexed cs <- unwrap rest -> S.Indexed $ child : toList cs
       _ -> S.Indexed children
     construct children | Function == category info = case children of
       (body:[]) -> withDefaultInfo $ S.Function Nothing Nothing body
