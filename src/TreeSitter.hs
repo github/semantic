@@ -40,7 +40,6 @@ categoriesForLanguage language name = case (language, name) of
   (JavaScript, "generator_function") -> Function
   (JavaScript, "math_op") -> BinaryOperator -- bitwise operator, e.g. +, -, *, /.
   (JavaScript, "bool_op") -> BinaryOperator -- boolean operator, e.g. ||, &&.
-  (JavaScript, "rel_op") -> BinaryOperator -- relational operator, e.g. >, <, <=, >=, ==, !=.
   (JavaScript, "comma_op") -> CommaOperator -- comma operator, e.g. expr1, expr2.
   (JavaScript, "delete_op") -> Operator -- delete operator, e.g. delete x[2].
   (JavaScript, "type_op") -> Operator -- type operator, e.g. typeof Object.
@@ -96,6 +95,7 @@ defaultCategoryForNodeName name = case name of
   "method_definition" -> Method
   "comment" -> Comment
   "bitwise_op" -> BitwiseOperator
+  "rel_op" -> RelationalOperator
   _ -> Other name
 {-# INLINE defaultCategoryForNodeName #-}
 
