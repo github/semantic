@@ -172,6 +172,7 @@ instance HasCategory Category where
   toCategoryName = \case
     ArrayLiteral -> "array"
     BinaryOperator -> "binary operator"
+    BitwiseOperator -> "bitwise operator"
     Boolean -> "boolean"
     DictionaryLiteral -> "dictionary"
     C.Comment -> "comment"
