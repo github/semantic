@@ -77,10 +77,7 @@ rws compare as bs
 
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
 constantTimeEditDistance :: (Prologue.Foldable f, Functor f) => Comparator f a -> Integer -> Cofree f a -> Cofree f a -> Int
-constantTimeEditDistance compare m a b = fromMaybe maxBound $ diffCostOfMaybes . cutoff m <$> compare a b
-
-diffCostOfMaybes :: (Prologue.Foldable f, Functor f) => Free (CofreeF f (Both annotation)) (Maybe (Patch (Cofree f annotation))) -> Int
-diffCostOfMaybes = diffSum $ patchSum termSize
+constantTimeEditDistance compare m a b = fromMaybe maxBound $ diffSum (patchSum termSize) . cutoff m <$> compare a b
   where diffSum patchCost diff = sum $ fmap (maybe 0 patchCost) diff
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
