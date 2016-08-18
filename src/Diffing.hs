@@ -138,7 +138,7 @@ compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Te
 compareCategoryEq = (==) `on` category . extract
 
 -- | The sum of the node count of the diff’s patches.
-diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Integer
+diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Int
 diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Free (info :< _) -> sum (cost <$> info)
   Pure patch -> sum (cost . extract <$> patch)
