@@ -31,7 +31,7 @@ spec = parallel $ do
       \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively d)) . length . rhead)
 
   describe "rws" $ do
-    let decorate = featureVectorDecorator (category . headF) 2 3 15
+    let decorate = defaultFeatureVectorDecorator (category . headF)
     let toTerm' = decorate . toTerm
     prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
       \ (as, bs) -> let tas = toTerm' <$> (as :: [ArbitraryTerm Text (Record '[Category])])

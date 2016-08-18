@@ -17,7 +17,7 @@ import Test.QuickCheck
 
 spec :: Spec
 spec = parallel $ do
-  let toTerm' = featureVectorDecorator (category . headF) 2 3 15 . toTerm
+  let toTerm' = defaultFeatureVectorDecorator (category . headF) . toTerm
   prop "equality is reflexive" $
     \ a b -> let diff = diffTerms wrap (==) diffCost (toTerm' a) (toTerm' (b :: ArbitraryTerm Text (Record '[Category]))) in
       diff `shouldBe` diff
