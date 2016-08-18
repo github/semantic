@@ -4,6 +4,9 @@ module Data.RandomWalkSimilarity
 , pqGramDecorator
 , featureVectorDecorator
 , editDistanceUpTo
+, defaultD
+, defaultP
+, defaultQ
 , stripDiff
 , stripTerm
 , Gram(..)
@@ -78,6 +81,13 @@ rws compare as bs
 editDistanceUpTo :: (Prologue.Foldable f, Functor f) => Integer -> Free (CofreeF f (Both a)) (Patch (Cofree f a)) -> Int
 editDistanceUpTo m = diffSum (patchSum termSize) . cutoff m
   where diffSum patchCost diff = sum $ fmap (maybe 0 patchCost) diff
+
+defaultD, defaultL, defaultM, defaultP, defaultQ :: Int
+defaultD = 15
+defaultL = 2
+defaultM = 10
+defaultP = 2
+defaultQ = 3
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
