@@ -64,7 +64,7 @@ diffFiles parser renderer sourceBlobs = do
         getLabel (h :< t) = (category h, case t of
           Leaf s -> Just s
           _ -> Nothing)
-        (p, q, d) = (2, 2, 15)
+        (p, q, d) = (2, 3, 15)
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
