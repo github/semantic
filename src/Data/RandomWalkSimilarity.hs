@@ -3,6 +3,7 @@ module Data.RandomWalkSimilarity
 ( rws
 , pqGramDecorator
 , featureVectorDecorator
+, constantTimeEditDistance
 , stripDiff
 , stripTerm
 , Gram(..)
