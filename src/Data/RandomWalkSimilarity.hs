@@ -62,10 +62,7 @@ rws compare as bs
         -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
         --
         -- cf §4.2 of RWS-Diff
-        nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (constantTimeEditDistance key) (intersectBy ((==) `on` termIndex) unmapped (KdTree.kNearest tree l key)))
-
-        -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-        constantTimeEditDistance key a = fromMaybe (maxBound :: Int) $ diffCostOfMaybes . cutoff m <$> compare (term key) (term a)
+        nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (constantTimeEditDistance compare m key) (intersectBy ((==) `on` termIndex) unmapped (KdTree.kNearest tree l key)))
 
         insertion previous unmappedA unmappedB kv@(UnmappedTerm _ _ b) = do
           put (previous, unmappedA, List.delete kv unmappedB)
@@ -77,6 +74,10 @@ rws compare as bs
         l = 2
         -- | How many nodes to consider for our constant-time approximation to tree edit distance.
         m = 10
+
+-- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
+constantTimeEditDistance :: (Prologue.Foldable f, Functor f) => Comparator f a -> Integer -> UnmappedTerm (Cofree f a) -> UnmappedTerm (Cofree f a) -> Int
+constantTimeEditDistance compare m key a = fromMaybe maxBound $ diffCostOfMaybes . cutoff m <$> compare (term key) (term a)
 
 diffCostOfMaybes :: (Prologue.Foldable f, Functor f) => Free (CofreeF f (Both annotation)) (Maybe (Patch (Cofree f annotation))) -> Int
 diffCostOfMaybes = diffSum $ patchSum termSize
