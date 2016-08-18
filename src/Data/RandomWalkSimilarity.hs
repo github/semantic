@@ -64,7 +64,7 @@ rws compare as bs
         -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
         --
         -- cf §4.2 of RWS-Diff
-        nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo m) . compare (term key) . term) (intersectBy ((==) `on` termIndex) unmapped (KdTree.kNearest tree l key)))
+        nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (intersectBy ((==) `on` termIndex) unmapped (KdTree.kNearest tree defaultL key)))
 
         insertion previous unmappedA unmappedB kv@(UnmappedTerm _ _ b) = do
           put (previous, unmappedA, List.delete kv unmappedB)
@@ -72,22 +72,21 @@ rws compare as bs
 
         deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
 
-        -- | How many of the most similar terms to consider, to rule out false positives.
-        l = 2
-        -- | How many nodes to consider for our constant-time approximation to tree edit distance.
-        m = 10
-
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
 editDistanceUpTo :: (Prologue.Foldable f, Functor f) => Integer -> Free (CofreeF f (Both a)) (Patch (Cofree f a)) -> Int
 editDistanceUpTo m = diffSum (patchSum termSize) . cutoff m
   where diffSum patchCost diff = sum $ fmap (maybe 0 patchCost) diff
 
-defaultD, defaultL, defaultM, defaultP, defaultQ :: Int
+defaultD, defaultL, defaultP, defaultQ :: Int
 defaultD = 15
+-- | How many of the most similar terms to consider, to rule out false positives.
 defaultL = 2
-defaultM = 10
 defaultP = 2
 defaultQ = 3
+
+-- | How many nodes to consider for our constant-time approximation to tree edit distance.
+defaultM :: Integer
+defaultM = 10
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
