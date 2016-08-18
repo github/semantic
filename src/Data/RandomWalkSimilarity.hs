@@ -63,7 +63,7 @@ rws compare as bs
         -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
         --
         -- cf §4.2 of RWS-Diff
-        nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (constantTimeEditDistance compare m (term key) . term) (intersectBy ((==) `on` termIndex) unmapped (KdTree.kNearest tree l key)))
+        nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (constantTimeEditDistance m) . compare (term key) . term) (intersectBy ((==) `on` termIndex) unmapped (KdTree.kNearest tree l key)))
 
         insertion previous unmappedA unmappedB kv@(UnmappedTerm _ _ b) = do
           put (previous, unmappedA, List.delete kv unmappedB)
@@ -77,8 +77,8 @@ rws compare as bs
         m = 10
 
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-constantTimeEditDistance :: (Prologue.Foldable f, Functor f) => Comparator f a -> Integer -> Cofree f a -> Cofree f a -> Int
-constantTimeEditDistance compare m a b = fromMaybe maxBound $ diffSum (patchSum termSize) . cutoff m <$> compare a b
+constantTimeEditDistance :: (Prologue.Foldable f, Functor f) => Integer -> Free (CofreeF f (Both a)) (Patch (Cofree f a)) -> Int
+constantTimeEditDistance m = diffSum (patchSum termSize) . cutoff m
   where diffSum patchCost diff = sum $ fmap (maybe 0 patchCost) diff
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
