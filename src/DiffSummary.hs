@@ -51,9 +51,9 @@ diffSummaries sources = para $ \diff ->
 
 
 summaries :: Patch DiffInfo -> [P.Doc]
-summaries (Insert info) = prefixOrErrorDoc "Added" info <$> toLeafInfos info
-summaries (Delete info) = prefixOrErrorDoc "Deleted" info <$> toLeafInfos info
-summaries (Replace i1 i2) = zipWith (\a b -> prefixOrErrorDoc "Replaced" i1 a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
+summaries (Insert info) = uncurry (prefixOrErrorDoc "Added") <$> toLeafInfos info
+summaries (Delete info) = uncurry (prefixOrErrorDoc "Deleted") <$> toLeafInfos info
+summaries (Replace i1 i2) = zipWith (\a b -> uncurry (prefixOrErrorDoc "Replaced") a <+> "with the" <+> snd b) (toLeafInfos i1) (toLeafInfos i2)
 
 prefixOrErrorDoc :: Text -> DiffInfo -> Doc -> Doc
 prefixOrErrorDoc prefix info doc = message <+> string (toSL prefix) <+> "the" <+> doc
@@ -61,10 +61,10 @@ prefixOrErrorDoc prefix info doc = message <+> string (toSL prefix) <+> "the" <+
                    ErrorInfo{} -> "Error:"
                    _ -> mempty
 
-toLeafInfos :: DiffInfo -> [Doc]
-toLeafInfos LeafInfo{..} = pure $ squotes (toDoc termName) <+> (toDoc categoryName)
+toLeafInfos :: DiffInfo -> [(DiffInfo, Doc)]
+toLeafInfos info@LeafInfo{..} = pure (info, squotes (toDoc termName) <+> (toDoc categoryName))
 toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
-toLeafInfos err@ErrorInfo{} = pure $ pretty err
+toLeafInfos err@ErrorInfo{} = pure (err, pretty err)
 
 toTermName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
 toTermName source term = case unwrap term of
