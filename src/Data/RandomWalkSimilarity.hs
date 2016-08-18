@@ -20,7 +20,6 @@ import Control.Monad.State
 import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
-import qualified Data.IntMap as IntMap
 import qualified Data.KdTree.Static as KdTree
 import qualified Data.List as List
 import Data.Record
@@ -43,11 +42,11 @@ rws compare as bs
   | null as, null bs = []
   | null as = inserting <$> bs
   | null bs = deleting <$> as
-  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, (toList fas), (toList fbs))) $ traverse findNearestNeighbourTo (toList fbs)
-  where fas = IntMap.fromList $ (\ t -> (termIndex t, t)) <$> zipWith featurize [0..] as
-        fbs = IntMap.fromList $ (\ t -> (termIndex t, t)) <$> zipWith featurize [0..] bs
-        kdas = KdTree.build (Vector.toList . feature) (toList fas)
-        kdbs = KdTree.build (Vector.toList . feature) (toList fbs)
+  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, fas, fbs)) $ traverse findNearestNeighbourTo fbs
+  where fas = zipWith featurize [0..] as
+        fbs = zipWith featurize [0..] bs
+        kdas = KdTree.build (Vector.toList . feature) fas
+        kdbs = KdTree.build (Vector.toList . feature) fbs
         featurize index term = UnmappedTerm index (getField (extract term)) term
         findNearestNeighbourTo kv@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
