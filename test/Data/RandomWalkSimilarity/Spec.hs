@@ -44,5 +44,7 @@ spec = parallel $ do
       let (a, b) = (decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "a") ])), decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "b") ]))) in
       fmap stripDiff (rws compare [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, replacing b b ]
   where compare :: (HasField fields Category, Functor f, Eq (Cofree f Category)) => Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
-        compare a b | (category <$> a) == (category <$> b) = Just (cata wrap (fmap pure b))
+        compare a b | (category <$> a) == (category <$> b) = Just (copying b)
                     | otherwise = if ((==) `on` category . extract) a b then Just (replacing a b) else Nothing
+        copying :: Functor f => Cofree f (Record fields) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))
+        copying = cata wrap . fmap pure
