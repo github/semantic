@@ -29,7 +29,6 @@ spec = parallel $ do
       \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively d)) . length . rhead)
 
   describe "rws" $ do
-    let compare a b = if ((==) `on` category . extract) a b then Just (replacing a b) else Nothing
     let decorate = featureVectorDecorator (category . headF) 2 3 15
     let toTerm' = decorate . toTerm
     prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
@@ -42,3 +41,4 @@ spec = parallel $ do
     it "produces unbiased insertions within branches" $
       let (a, b) = (decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "a") ])), decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "b") ]))) in
       fmap stripDiff (rws compare [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, replacing b b ]
+  where compare a b = if ((==) `on` category . extract) a b then Just (replacing a b) else Nothing
