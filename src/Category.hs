@@ -100,6 +100,8 @@ data Category
   | Comment
   -- | A non-standard category, which can be used for comparability.
   | Other Text
+  -- | A relational operator (e.g. < or >=)
+  | RelationalOperator
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances

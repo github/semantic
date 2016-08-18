@@ -19,7 +19,7 @@ type Parser f a = SourceBlob -> IO (Cofree f a)
 
 -- | Whether a category is an Operator Category
 isOperator :: Category -> Bool
-isOperator = flip Set.member (Set.fromList [ Operator, BinaryOperator, BitwiseOperator ])
+isOperator = flip Set.member (Set.fromList [ Operator, BinaryOperator, BitwiseOperator, RelationalOperator ])
 
 -- | Construct a term given source, the span covered, the annotation for the term, and its children.
 --

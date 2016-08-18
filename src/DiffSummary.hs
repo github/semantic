@@ -173,6 +173,7 @@ instance HasCategory Category where
     ArrayLiteral -> "array"
     BinaryOperator -> "binary operator"
     BitwiseOperator -> "bitwise operator"
+    RelationalOperator -> "relational operator"
     Boolean -> "boolean"
     DictionaryLiteral -> "dictionary"
     C.Comment -> "comment"
