@@ -54,10 +54,12 @@ rws compare as bs
             pure $! do
               put (i, List.delete foundA unmappedA, List.delete foundB unmappedB)
               pure (i, compared)
-        -- we get k different things
-        -- we need the nearest unmapped one which is not a false positive
-        -- so filter the k things to the list of unmapped things, and then take the smallest of those by constant-time edit distance approximation
-        -- later on maybe find a better k, filter during k-nearest lookup, etc.
+
+        -- | Finds the most-similar unmapped term to the passed-in term, if any.
+        --
+        -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
+        --
+        -- cf §4.2 of RWS-Diff
         nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (constantTimeEditDistance key) (intersectBy ((==) `on` termIndex) unmapped (KdTree.kNearest tree 2 key)))
 
         constantTimeEditDistance key a = fromMaybe (maxBound :: Int) $ diffCostOfMaybes . cutoff 10 <$> compare (term key) (term a)
