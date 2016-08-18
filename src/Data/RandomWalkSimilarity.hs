@@ -43,7 +43,7 @@ rws compare as bs
   | null as, null bs = []
   | null as = inserting <$> bs
   | null bs = deleting <$> as
-  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, (toList fas), (toList fbs))) $ traverse findNearestNeighbourTo (toList fbs)
+  | otherwise = toList . uncurry deleteRemaining . first IntMap.fromList . (`runState` (negate 1, (toList fas), (toList fbs))) . fmap toList $ traverse findNearestNeighbourTo fbs
   where fas = IntMap.fromList $ (\ t -> (termIndex t, t)) <$> zipWith featurize [0..] as
         fbs = IntMap.fromList $ (\ t -> (termIndex t, t)) <$> zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) (toList fas)
@@ -72,7 +72,7 @@ rws compare as bs
           put (previous, unmappedA, List.delete kv unmappedB)
           pure (negate 1, inserting b)
 
-        deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
+        deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (uncurry IntMap.insert)) diffs ((termIndex &&& deleting . term) <$> unmappedA)
 
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
 editDistanceUpTo :: (Prologue.Foldable f, Functor f) => Integer -> Free (CofreeF f (Both a)) (Patch (Cofree f a)) -> Int
