@@ -21,6 +21,7 @@ import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctua
 import qualified Text.PrettyPrint.Leijen.Text as P
 import SourceSpan
 import Source
+import Data.Text.Lazy (toLower)
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
@@ -51,9 +52,15 @@ diffSummaries sources = para $ \diff ->
 
 
 summaries :: Patch DiffInfo -> [P.Doc]
-summaries (Insert info) = (("Added" <+> "the") <+>) <$> toLeafInfos info
-summaries (Delete info) = (("Deleted" <+> "the") <+>) <$> toLeafInfos info
-summaries (Replace i1 i2) = zipWith (\a b -> "Replaced" <+> "the" <+> a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
+summaries (Insert info) = prefixOrErrorDoc "Added" info <$> toLeafInfos info
+summaries (Delete info) = prefixOrErrorDoc "Deleted" info <$> toLeafInfos info
+summaries (Replace i1 i2) = zipWith (\a b -> prefixOrErrorDoc "Replaced" i1 a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
+
+prefixOrErrorDoc :: Text -> DiffInfo -> Doc -> Doc
+prefixOrErrorDoc prefix info doc = message <+> "the" <+> doc
+ where message = case info of
+                   ErrorInfo{} -> "Error:" <+> string (toLower $ toSL prefix)
+                   _ -> string $ toSL prefix
 
 toLeafInfos :: DiffInfo -> [Doc]
 toLeafInfos LeafInfo{..} = pure $ squotes (toDoc termName) <+> (toDoc categoryName)
@@ -232,4 +239,4 @@ instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
   pretty BranchInfo{..} = mconcat $ punctuate (string "," <> space) (pretty <$> branches)
-  pretty ErrorInfo{..} = "Error:" <+> squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)
+  pretty ErrorInfo{..} = squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)
