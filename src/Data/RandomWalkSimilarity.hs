@@ -91,7 +91,7 @@ pqGramDecorator getLabel p q = cata algebra
   where algebra term = let label = getLabel term in
           cofree ((gram label .: headF term) :< assignParentAndSiblingLabels (tailF term) label)
         gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
-        assignParentAndSiblingLabels functor label = (`evalState` (siblingLabels functor)) (for functor (assignLabels label))
+        assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
         assignLabels :: label -> Cofree f (Record (Gram label ': fields)) -> State [Maybe label] (Cofree f (Record (Gram label ': fields)))
         assignLabels label a = case runCofree a of
           RCons gram rest :< functor -> do
