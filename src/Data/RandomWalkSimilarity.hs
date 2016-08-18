@@ -62,6 +62,7 @@ rws compare as bs
         -- cf §4.2 of RWS-Diff
         nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (constantTimeEditDistance key) (intersectBy ((==) `on` termIndex) unmapped (KdTree.kNearest tree 2 key)))
 
+        -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
         constantTimeEditDistance key a = fromMaybe (maxBound :: Int) $ diffCostOfMaybes . cutoff 10 <$> compare (term key) (term a)
 
         insertion previous unmappedA unmappedB kv@(UnmappedTerm _ _ b) = do
