@@ -71,7 +71,9 @@ rws compare as bs
 
         deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
 
+        -- | How many of the most similar terms to consider, to rule out false positives.
         l = 2
+        -- | How many nodes to consider for our constant-time approximation to tree edit distance.
         m = 10
 
 diffCostOfMaybes :: (Prologue.Foldable f, Functor f) => Free (CofreeF f (Both annotation)) (Maybe (Patch (Cofree f annotation))) -> Int
