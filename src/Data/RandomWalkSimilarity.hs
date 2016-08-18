@@ -63,7 +63,7 @@ rws compare as bs
         nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (constantTimeEditDistance key) (intersectBy ((==) `on` termIndex) unmapped (KdTree.kNearest tree l key)))
 
         -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-        constantTimeEditDistance key a = fromMaybe (maxBound :: Int) $ diffCostOfMaybes . cutoff 10 <$> compare (term key) (term a)
+        constantTimeEditDistance key a = fromMaybe (maxBound :: Int) $ diffCostOfMaybes . cutoff m <$> compare (term key) (term a)
 
         insertion previous unmappedA unmappedB kv@(UnmappedTerm _ _ b) = do
           put (previous, unmappedA, List.delete kv unmappedB)
@@ -72,6 +72,7 @@ rws compare as bs
         deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
 
         l = 2
+        m = 10
 
 diffCostOfMaybes :: (Prologue.Foldable f, Functor f) => Free (CofreeF f (Both annotation)) (Maybe (Patch (Cofree f annotation))) -> Int
 diffCostOfMaybes = diffSum $ patchSum termSize
