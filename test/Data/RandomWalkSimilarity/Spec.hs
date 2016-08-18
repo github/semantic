@@ -1,6 +1,8 @@
 {-# LANGUAGE DataKinds #-}
 module Data.RandomWalkSimilarity.Spec where
 
+import Data.Functor.Both
+import Data.Functor.Foldable (cata)
 import Data.RandomWalkSimilarity
 import Data.Record
 import Diff
@@ -29,8 +31,7 @@ spec = parallel $ do
       \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively d)) . length . rhead)
 
   describe "rws" $ do
-    let compare a b = if ((==) `on` category . extract) a b then Just (replacing a b) else Nothing
-    let decorate = featureVectorDecorator (category . headF) 2 2 15
+    let decorate = defaultFeatureVectorDecorator (category . headF)
     let toTerm' = decorate . toTerm
     prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
       \ (as, bs) -> let tas = toTerm' <$> (as :: [ArbitraryTerm Text (Record '[Category])])
@@ -41,4 +42,10 @@ spec = parallel $ do
 
     it "produces unbiased insertions within branches" $
       let (a, b) = (decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "a") ])), decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "b") ]))) in
-      fmap stripDiff (rws compare [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, replacing b b ]
+      fmap stripDiff (rws compare [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, copying b ]
+
+  where compare :: (HasField fields Category, Functor f, Eq (Cofree f Category)) => Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
+        compare a b | (category <$> a) == (category <$> b) = Just (copying b)
+                    | otherwise = if ((==) `on` category . extract) a b then Just (replacing a b) else Nothing
+        copying :: Functor f => Cofree f (Record fields) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))
+        copying = cata wrap . fmap pure

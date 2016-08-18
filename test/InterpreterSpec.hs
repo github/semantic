@@ -18,7 +18,7 @@ import Test.Hspec.QuickCheck
 spec :: Spec
 spec = parallel $ do
   describe "interpret" $ do
-    let decorate = featureVectorDecorator (category . headF) 2 2 15
+    let decorate = defaultFeatureVectorDecorator (category . headF)
     let compare = ((==) `on` category . extract)
     it "returns a replacement when comparing two unicode equivalent terms" $
       let termA = cofree $ (StringLiteral .: RNil) :< Leaf ("t\776" :: Text)

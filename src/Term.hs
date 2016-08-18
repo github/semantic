@@ -25,7 +25,7 @@ zipTerms t1 t2 = iter go (alignCofreeWith galign (const Nothing) both (These t1 
   where go (a :< s) = cofree . (a :<) <$> sequenceA s
 
 -- | Return the node count of a term.
-termSize :: Term a annotation -> Integer
+termSize :: (Prologue.Foldable f, Functor f) => Cofree f annotation -> Int
 termSize = cata size where
   size (_ :< syntax) = 1 + sum syntax
 

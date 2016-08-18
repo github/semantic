@@ -2,7 +2,12 @@
 module Data.RandomWalkSimilarity
 ( rws
 , pqGramDecorator
+, defaultFeatureVectorDecorator
 , featureVectorDecorator
+, editDistanceUpTo
+, defaultD
+, defaultP
+, defaultQ
 , stripDiff
 , stripTerm
 , Gram(..)
@@ -24,6 +29,8 @@ import Prologue
 import Term ()
 import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
+import Data.List (intersectBy)
+import Term (termSize)
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
 rws :: (Eq (Record fields), Prologue.Foldable f, Functor f, Eq (f (Cofree f (Record fields))), HasField fields (Vector.Vector Double))
@@ -52,11 +59,35 @@ rws compare as bs
             pure $! do
               put (i, List.delete foundA unmappedA, List.delete foundB unmappedB)
               pure (i, compared)
-        nearestUnmapped unmapped tree key = find ((== termIndex (KdTree.nearest tree key)) . termIndex) unmapped
+
+        -- | Finds the most-similar unmapped term to the passed-in term, if any.
+        --
+        -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
+        --
+        -- cf §4.2 of RWS-Diff
+        nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (intersectBy ((==) `on` termIndex) unmapped (KdTree.kNearest tree defaultL key)))
+
         insertion previous unmappedA unmappedB kv@(UnmappedTerm _ _ b) = do
           put (previous, unmappedA, List.delete kv unmappedB)
           pure (negate 1, inserting b)
+
         deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
+
+-- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
+editDistanceUpTo :: (Prologue.Foldable f, Functor f) => Integer -> Free (CofreeF f (Both a)) (Patch (Cofree f a)) -> Int
+editDistanceUpTo m = diffSum (patchSum termSize) . cutoff m
+  where diffSum patchCost diff = sum $ fmap (maybe 0 patchCost) diff
+
+defaultD, defaultL, defaultP, defaultQ :: Int
+defaultD = 15
+-- | How many of the most similar terms to consider, to rule out false positives.
+defaultL = 2
+defaultP = 2
+defaultQ = 3
+
+-- | How many nodes to consider for our constant-time approximation to tree edit distance.
+defaultM :: Integer
+defaultM = 10
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
@@ -78,7 +109,7 @@ pqGramDecorator getLabel p q = cata algebra
   where algebra term = let label = getLabel term in
           cofree ((gram label .: headF term) :< assignParentAndSiblingLabels (tailF term) label)
         gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
-        assignParentAndSiblingLabels functor label = (`evalState` (siblingLabels functor)) (for functor (assignLabels label))
+        assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
         assignLabels :: label -> Cofree f (Record (Gram label ': fields)) -> State [Maybe label] (Cofree f (Record (Gram label ': fields)))
         assignLabels label a = case runCofree a of
           RCons gram rest :< functor -> do
@@ -95,12 +126,16 @@ unitVector d hash = normalize ((`evalRand` mkQCGen hash) (sequenceA (Vector.repl
   where normalize vec = fmap (/ vmagnitude vec) vec
         vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
 
--- | Annotates a term with a feature vector at each node.
+-- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
 featureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
 featureVectorDecorator getLabel p q d
   = cata (\ (RCons gram rest :< functor) ->
       cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor))
   . pqGramDecorator getLabel p q
+
+-- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
+defaultFeatureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
+defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
 
 -- | Strips the head annotation off a term annotated with non-empty records.
 stripTerm :: Functor f => Cofree f (Record (h ': t)) -> Cofree f (Record t)
