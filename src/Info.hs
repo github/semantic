@@ -7,7 +7,7 @@ import Category
 import Range
 import Test.QuickCheck
 
-newtype Cost = Cost { unCost :: Integer }
+newtype Cost = Cost { unCost :: Int }
   deriving (Eq, Num, Ord, Show)
 
 characterRange :: HasField fields Range => Record fields -> Range

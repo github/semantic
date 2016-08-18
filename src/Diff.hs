@@ -18,11 +18,11 @@ type instance Base (Free f a) = FreeF f a
 instance Functor f => Foldable.Foldable (Free f a) where project = runFree
 instance Functor f => Foldable.Unfoldable (Free f a) where embed = free
 
-diffSum :: (Patch (Term a annotation) -> Integer) -> Diff a annotation -> Integer
+diffSum :: (Patch (Term a annotation) -> Int) -> Diff a annotation -> Int
 diffSum patchCost diff = sum $ fmap patchCost diff
 
 -- | The sum of the node count of the diff’s patches.
-diffCost :: Diff a annotation -> Integer
+diffCost :: Diff a annotation -> Int
 diffCost = diffSum $ patchSum termSize
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.

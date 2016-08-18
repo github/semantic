@@ -45,7 +45,7 @@ spec = parallel $ do
       diffSummaries sources testDiff `shouldBe` [ DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotation = Nothing } ]
 
     prop "equal terms produce identity diffs" $
-      \ a -> let term = featureVectorDecorator (category . headF) 2 2 15 (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range]))) in
+      \ a -> let term = defaultFeatureVectorDecorator (category . headF) (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range]))) in
         diffSummaries sources (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
   describe "annotatedSummaries" $ do

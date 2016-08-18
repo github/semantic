@@ -45,7 +45,7 @@ import Data.Aeson.Encoding (encodingToLazyByteString)
 -- | with respect to other IO actions.
 diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record (Vector.Vector Double ': fields)) -> Both SourceBlob -> IO Output
 diffFiles parser renderer sourceBlobs = do
-  terms <- traverse (fmap (featureVectorDecorator getLabel p q d) . parser) sourceBlobs
+  terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel) . parser) sourceBlobs
 
   let areNullOids = runBothWith (\a b -> (oid a == nullOid || null (source a), oid b == nullOid || null (source b))) sourceBlobs
   let textDiff = case areNullOids of
@@ -64,7 +64,6 @@ diffFiles parser renderer sourceBlobs = do
         getLabel (h :< t) = (category h, case t of
           Leaf s -> Just s
           _ -> Nothing)
-        (p, q, d) = (2, 2, 15)
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
@@ -138,7 +137,7 @@ compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Te
 compareCategoryEq = (==) `on` category . extract
 
 -- | The sum of the node count of the diff’s patches.
-diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Integer
+diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Int
 diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Free (info :< _) -> sum (cost <$> info)
   Pure patch -> sum (cost . extract <$> patch)
