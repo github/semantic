@@ -54,7 +54,7 @@ rws compare as bs
           (previous, unmappedA, unmappedB) <- get
           fromMaybe (insertion previous unmappedA unmappedB kv) $ do
             foundA@(UnmappedTerm i _ a) <- nearestUnmapped (toList unmappedA) kdas kv
-            foundB@(UnmappedTerm j' _ _) <- nearestUnmapped (toList unmappedB) kdbs foundA
+            UnmappedTerm j' _ _ <- nearestUnmapped (toList unmappedB) kdbs foundA
             guard (j == j')
             guard (previous <= i && i <= previous + defaultMoveBound)
             compared <- compare a b
