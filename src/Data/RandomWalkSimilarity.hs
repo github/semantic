@@ -20,6 +20,7 @@ import Control.Monad.State
 import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
+import qualified Data.IntMap as IntMap
 import qualified Data.KdTree.Static as KdTree
 import qualified Data.List as List
 import Data.Record
@@ -42,22 +43,23 @@ rws compare as bs
   | null as, null bs = []
   | null as = inserting <$> bs
   | null bs = deleting <$> as
-  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, fas, fbs)) $ traverse findNearestNeighbourTo fbs
+  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, toMap fas, toMap fbs)) $ traverse findNearestNeighbourTo fbs
   where fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
         kdbs = KdTree.build (Vector.toList . feature) fbs
         featurize index term = UnmappedTerm index (getField (extract term)) term
+        toMap = IntMap.fromList . fmap (termIndex &&& identity)
         findNearestNeighbourTo kv@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
           fromMaybe (insertion previous unmappedA unmappedB kv) $ do
-            foundA@(UnmappedTerm i _ a) <- nearestUnmapped unmappedA kdas kv
-            foundB@(UnmappedTerm j' _ _) <- nearestUnmapped unmappedB kdbs foundA
+            foundA@(UnmappedTerm i _ a) <- nearestUnmapped (toList unmappedA) kdas kv
+            foundB@(UnmappedTerm j' _ _) <- nearestUnmapped (toList unmappedB) kdbs foundA
             guard (j == j')
             guard (previous <= i && i <= previous + defaultMoveBound)
             compared <- compare a b
             pure $! do
-              put (i, List.delete foundA unmappedA, List.delete foundB unmappedB)
+              put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
               pure (i, compared)
 
         -- | Finds the most-similar unmapped term to the passed-in term, if any.
@@ -67,8 +69,8 @@ rws compare as bs
         -- cf §4.2 of RWS-Diff
         nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (intersectBy ((==) `on` termIndex) unmapped (KdTree.kNearest tree defaultL key)))
 
-        insertion previous unmappedA unmappedB kv@(UnmappedTerm _ _ b) = do
-          put (previous, unmappedA, List.delete kv unmappedB)
+        insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
+          put (previous, unmappedA, IntMap.delete j unmappedB)
           pure (negate 1, inserting b)
 
         deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
