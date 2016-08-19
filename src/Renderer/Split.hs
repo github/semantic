@@ -34,12 +34,16 @@ styleName category = "category-" <> case category of
   Program -> "program"
   C.Error -> "error"
   BinaryOperator -> "binary-operator"
+  BitwiseOperator -> "bitwise-operator"
+  RelationalOperator -> "relational-operator"
+  C.CommaOperator -> "comma-operator"
   Boolean -> "boolean"
   DictionaryLiteral -> "dictionary"
   C.Pair -> "pair"
   StringLiteral -> "string"
   SymbolLiteral -> "symbol"
   IntegerLiteral -> "integer"
+  C.Comment -> "comment"
   C.FunctionCall -> "function_call"
   C.Function -> "function"
   C.MethodCall -> "method_call"
@@ -73,6 +77,7 @@ styleName category = "category-" <> case category of
   C.Class -> "class_statement"
   C.Method -> "method"
   C.If -> "if_statement"
+  C.CommaOperator -> "comma_operator"
   Other string -> string
 
 -- | Pick the class name for a split patch.

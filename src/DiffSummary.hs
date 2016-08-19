@@ -57,7 +57,7 @@ summaries (Replace i1 i2) = zipWith (\a b -> "Replaced" <+> "the" <+> a <+> "wit
 
 toLeafInfos :: DiffInfo -> [Doc]
 toLeafInfos LeafInfo{..} = pure $ squotes (toDoc termName) <+> (toDoc categoryName)
-toLeafInfos BranchInfo{..} = pretty <$> branches
+toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure $ pretty err
 
 toTermName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
@@ -108,7 +108,7 @@ toTermName source term = case unwrap term of
   S.Array _ -> termNameFromSource term
   S.Class identifier _ _ -> toTermName' identifier
   S.Method identifier _ _ -> toTermName' identifier
-  Comment a -> toCategoryName a
+  S.Comment a -> toCategoryName a
   S.Commented _ _ -> termNameFromChildren term
   where toTermName' = toTermName source
         termNameFromChildren term = termNameFromRange (unionRangesFrom (range term) (range <$> toList (unwrap term)))
@@ -172,8 +172,11 @@ instance HasCategory Category where
   toCategoryName = \case
     ArrayLiteral -> "array"
     BinaryOperator -> "binary operator"
+    BitwiseOperator -> "bitwise operator"
+    RelationalOperator -> "relational operator"
     Boolean -> "boolean"
     DictionaryLiteral -> "dictionary"
+    C.Comment -> "comment"
     C.Error -> "error"
     ExpressionStatements -> "expression statements"
     C.Assignment -> "assignment"
@@ -213,6 +216,7 @@ instance HasCategory Category where
     C.Class -> "class"
     C.Method -> "method"
     C.If -> "if statement"
+    C.CommaOperator -> "comma operator"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract

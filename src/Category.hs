@@ -14,6 +14,8 @@ data Category
   | Error
   -- | A boolean expression.
   | Boolean
+  -- | A bitwise operator.
+  | BitwiseOperator
   -- | An operator with 2 operands.
   | BinaryOperator
   -- | A literal key-value data structure.
@@ -76,6 +78,8 @@ data Category
   | Case
   -- | An expression with an operator.
   | Operator
+  -- | An comma operator expression
+  | CommaOperator
   -- | An object/dictionary/hash literal.
   | Object
   -- | A throw statement.
@@ -92,8 +96,12 @@ data Category
   | Class
   -- | A class method declaration.
   | Method
+  -- | A comment.
+  | Comment
   -- | A non-standard category, which can be used for comparability.
   | Other Text
+  -- | A relational operator (e.g. < or >=)
+  | RelationalOperator
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances

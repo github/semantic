@@ -19,7 +19,7 @@ type Parser f a = SourceBlob -> IO (Cofree f a)
 
 -- | Whether a category is an Operator Category
 isOperator :: Category -> Bool
-isOperator = flip Set.member (Set.fromList [ Operator, BinaryOperator ])
+isOperator = flip Set.member (Set.fromList [ Operator, BinaryOperator, BitwiseOperator, RelationalOperator ])
 
 -- | Construct a term given source, the span covered, the annotation for the term, and its children.
 --
@@ -55,6 +55,9 @@ termConstructor source sourceSpan info = fmap cofree . construct
       (base:element:[]) -> withDefaultInfo $ S.SubscriptAccess base element
       _ -> errorWith children
     construct children | isOperator (category info) = withDefaultInfo $ S.Operator children
+    construct children | CommaOperator == category info = withDefaultInfo $ case children of
+      [child, rest] | S.Indexed cs <- unwrap rest -> S.Indexed $ child : toList cs
+      _ -> S.Indexed children
     construct children | Function == category info = case children of
       (body:[]) -> withDefaultInfo $ S.Function Nothing Nothing body
       (params:body:[]) | (info :< _) <- runCofree params, Params == category info ->
@@ -66,8 +69,10 @@ termConstructor source sourceSpan info = fmap cofree . construct
       _ -> errorWith children
 
     construct children | FunctionCall == category info = case runCofree <$> children of
-      [ (_ :< S.MemberAccess{..}), params@(_ :< S.Args{}) ] ->
-        pure $! setCategory info MethodCall :< S.MethodCall memberId property (cofree params)
+      [ (_ :< S.MemberAccess{..}), (_ :< S.Args args) ] ->
+        pure $! setCategory info MethodCall :< S.MethodCall memberId property args
+      [ (_ :< S.MemberAccess{..}) ] ->
+        pure $! setCategory info MethodCall :< S.MethodCall memberId property []
       (x:xs) ->
         withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
       _ -> errorWith children
