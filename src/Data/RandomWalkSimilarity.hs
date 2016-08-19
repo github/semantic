@@ -48,25 +48,32 @@ rws compare as bs
         kdbs = KdTree.build (Vector.toList . feature) fbs
         featurize index term = UnmappedTerm index (getField (extract term)) term
         toMap = IntMap.fromList . fmap (termIndex &&& identity)
+        -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
         findNearestNeighbourTo :: UnmappedTerm (Cofree f (Record fields)) -> State (Int, IntMap (UnmappedTerm (Cofree f (Record fields))), IntMap (UnmappedTerm (Cofree f (Record fields)))) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
         findNearestNeighbourTo kv@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
           fromMaybe (insertion previous unmappedA unmappedB kv) $ do
-            foundA@(UnmappedTerm i _ a) <- nearestUnmapped unmappedA kdas kv
+            foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filterWithKey (\ k _ -> isInMoveBounds previous k) unmappedA) kdas kv
             UnmappedTerm j' _ _ <- nearestUnmapped unmappedB kdbs foundA
             guard (j == j')
-            guard (previous <= i && i <= previous + defaultMoveBound)
             compared <- compare a b
             pure $! do
               put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
               pure (i, compared)
+
+        -- | Determines whether an index is in-bounds for a move given the most recently matched index.
+        isInMoveBounds previous i = previous <= i && i <= previous + defaultMoveBound
 
         -- | Finds the most-similar unmapped term to the passed-in term, if any.
         --
         -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
         --
         -- cf §4.2 of RWS-Diff
-        nearestUnmapped :: IntMap (UnmappedTerm (Cofree f (Record fields))) -> KdTree.KdTree Double (UnmappedTerm (Cofree f (Record fields))) -> UnmappedTerm (Cofree f (Record fields)) -> Maybe (UnmappedTerm (Cofree f (Record fields)))
+        nearestUnmapped
+          :: IntMap (UnmappedTerm (Cofree f (Record fields))) -- ^ A set of terms eligible for matching against.
+          -> KdTree.KdTree Double (UnmappedTerm (Cofree f (Record fields))) -- ^ The k-d tree to look up nearest neighbours within.
+          -> UnmappedTerm (Cofree f (Record fields)) -- ^ The term to find the nearest neighbour to.
+          -> Maybe (UnmappedTerm (Cofree f (Record fields))) -- ^ The most similar unmapped term, if any.
         nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
 
         insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
@@ -86,7 +93,7 @@ defaultD = 15
 defaultL = 2
 defaultP = 2
 defaultQ = 3
-defaultMoveBound = 3
+defaultMoveBound = 2
 
 -- | How many nodes to consider for our constant-time approximation to tree edit distance.
 defaultM :: Integer
