@@ -27,10 +27,9 @@ import Data.Record
 import qualified Data.Vector as Vector
 import Patch
 import Prologue
+import Term (termSize)
 import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
-import Data.List (intersectBy)
-import Term (termSize)
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
 rws :: (Eq (Record fields), Prologue.Foldable f, Functor f, Eq (f (Cofree f (Record fields))), HasField fields (Vector.Vector Double))
@@ -52,8 +51,8 @@ rws compare as bs
         findNearestNeighbourTo kv@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
           fromMaybe (insertion previous unmappedA unmappedB kv) $ do
-            foundA@(UnmappedTerm i _ a) <- nearestUnmapped (toList unmappedA) kdas kv
-            UnmappedTerm j' _ _ <- nearestUnmapped (toList unmappedB) kdbs foundA
+            foundA@(UnmappedTerm i _ a) <- nearestUnmapped unmappedA kdas kv
+            UnmappedTerm j' _ _ <- nearestUnmapped unmappedB kdbs foundA
             guard (j == j')
             guard (previous <= i && i <= previous + defaultMoveBound)
             compared <- compare a b
@@ -66,7 +65,7 @@ rws compare as bs
         -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
         --
         -- cf §4.2 of RWS-Diff
-        nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (intersectBy ((==) `on` termIndex) unmapped (KdTree.kNearest tree defaultL key)))
+        nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
 
         insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
           put (previous, unmappedA, IntMap.delete j unmappedB)
