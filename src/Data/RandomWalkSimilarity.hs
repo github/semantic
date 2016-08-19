@@ -54,7 +54,7 @@ rws compare as bs
             foundA@(UnmappedTerm i _ a) <- nearestUnmapped unmappedA kdas kv
             foundB@(UnmappedTerm j' _ _) <- nearestUnmapped unmappedB kdbs foundA
             guard (j == j')
-            guard (i >= previous)
+            guard (previous <= i && i <= previous + defaultMoveBound)
             compared <- compare a b
             pure $! do
               put (i, List.delete foundA unmappedA, List.delete foundB unmappedB)
@@ -78,12 +78,13 @@ editDistanceUpTo :: (Prologue.Foldable f, Functor f) => Integer -> Free (CofreeF
 editDistanceUpTo m = diffSum (patchSum termSize) . cutoff m
   where diffSum patchCost diff = sum $ fmap (maybe 0 patchCost) diff
 
-defaultD, defaultL, defaultP, defaultQ :: Int
+defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
 defaultD = 15
 -- | How many of the most similar terms to consider, to rule out false positives.
 defaultL = 2
 defaultP = 2
 defaultQ = 3
+defaultMoveBound = 3
 
 -- | How many nodes to consider for our constant-time approximation to tree edit distance.
 defaultM :: Integer
