@@ -66,7 +66,11 @@ rws compare as bs
         -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
         --
         -- cf §4.2 of RWS-Diff
-        nearestUnmapped :: IntMap (UnmappedTerm (Cofree f (Record fields))) -> KdTree.KdTree Double (UnmappedTerm (Cofree f (Record fields))) -> UnmappedTerm (Cofree f (Record fields)) -> Maybe (UnmappedTerm (Cofree f (Record fields)))
+        nearestUnmapped
+          :: IntMap (UnmappedTerm (Cofree f (Record fields))) -- ^ A set of terms eligible for matching against.
+          -> KdTree.KdTree Double (UnmappedTerm (Cofree f (Record fields))) -- ^ The k-d tree to look up nearest neighbours within.
+          -> UnmappedTerm (Cofree f (Record fields)) -- ^ The term to find the nearest neighbour to.
+          -> Maybe (UnmappedTerm (Cofree f (Record fields))) -- ^ The most similar unmapped term, if any.
         nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
 
         insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
