@@ -27,7 +27,6 @@ import Data.Record
 import qualified Data.Vector as Vector
 import Patch
 import Prologue
-import Term ()
 import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
 import Data.List (intersectBy)
