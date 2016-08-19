@@ -51,10 +51,9 @@ rws compare as bs
         findNearestNeighbourTo kv@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
           fromMaybe (insertion previous unmappedA unmappedB kv) $ do
-            foundA@(UnmappedTerm i _ a) <- nearestUnmapped unmappedA kdas kv
+            foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filterWithKey (\ k _ -> isInMoveBounds previous k) unmappedA) kdas kv
             UnmappedTerm j' _ _ <- nearestUnmapped unmappedB kdbs foundA
             guard (j == j')
-            guard (isInMoveBounds previous i)
             compared <- compare a b
             pure $! do
               put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
