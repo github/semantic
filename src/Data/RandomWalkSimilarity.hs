@@ -54,11 +54,14 @@ rws compare as bs
             foundA@(UnmappedTerm i _ a) <- nearestUnmapped unmappedA kdas kv
             UnmappedTerm j' _ _ <- nearestUnmapped unmappedB kdbs foundA
             guard (j == j')
-            guard (previous <= i && i <= previous + defaultMoveBound)
+            guard (isInMoveBounds previous i)
             compared <- compare a b
             pure $! do
               put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
               pure (i, compared)
+
+        -- | Determines whether an index is in-bounds for a move given the most recently matched index.
+        isInMoveBounds previous i = previous <= i && i <= previous + defaultMoveBound
 
         -- | Finds the most-similar unmapped term to the passed-in term, if any.
         --
