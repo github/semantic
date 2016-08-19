@@ -48,6 +48,7 @@ rws compare as bs
         kdbs = KdTree.build (Vector.toList . feature) fbs
         featurize index term = UnmappedTerm index (getField (extract term)) term
         toMap = IntMap.fromList . fmap (termIndex &&& identity)
+        -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
         findNearestNeighbourTo :: UnmappedTerm (Cofree f (Record fields)) -> State (Int, IntMap (UnmappedTerm (Cofree f (Record fields))), IntMap (UnmappedTerm (Cofree f (Record fields)))) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
         findNearestNeighbourTo kv@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
