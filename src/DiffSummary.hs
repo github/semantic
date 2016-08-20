@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
 
-module DiffSummary (DiffSummary(..), diffSummaries, DiffInfo(..), annotatedSummaries) where
+module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..)) where
 
 import Prologue hiding (intercalate)
 import Diff
@@ -34,11 +34,14 @@ data DiffSummary a = DiffSummary {
   parentAnnotation :: Maybe (Category, Text)
 } deriving (Eq, Functor, Show, Generic)
 
-annotatedSummaries :: DiffSummary DiffInfo -> [Text]
-annotatedSummaries DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotation) <$> summaries patch
+diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both SourceBlob -> Diff leaf (Record fields) -> [Text]
+diffSummaries blobs diff = summaryToTexts =<< diffSummaries' (source <$> blobs) diff
 
-diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
-diffSummaries sources = para $ \diff ->
+summaryToTexts :: DiffSummary DiffInfo -> [Text]
+summaryToTexts DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotation) <$> summaries patch
+
+diffSummaries' :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffSummaries' sources = para $ \diff ->
   let diff' = free (Prologue.fst <$> diff)
       annotateWithCategory :: [(Diff leaf (Record fields), [DiffSummary DiffInfo])] -> [DiffSummary DiffInfo]
       annotateWithCategory children = maybeToList (prependSummary (Both.snd sources) <$> (afterTerm diff')) <*> (children >>= snd) in
@@ -49,11 +52,11 @@ diffSummaries sources = para $ \diff ->
   where
     (beforeSource, afterSource) = runJoin sources
 
-
 summaries :: Patch DiffInfo -> [P.Doc]
-summaries (Insert info) = (("Added" <+> "the") <+>) <$> toLeafInfos info
-summaries (Delete info) = (("Deleted" <+> "the") <+>) <$> toLeafInfos info
-summaries (Replace i1 i2) = zipWith (\a b -> "Replaced" <+> "the" <+> a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
+summaries = \case
+  Insert info -> (("Added" <+> "the") <+>) <$> toLeafInfos info
+  Delete info -> (("Deleted" <+> "the") <+>) <$> toLeafInfos info
+  Replace i1 i2 -> zipWith (\a b -> "Replaced" <+> "the" <+> a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
 
 toLeafInfos :: DiffInfo -> [Doc]
 toLeafInfos LeafInfo{..} = pure $ squotes (toDoc termName) <+> (toDoc categoryName)
