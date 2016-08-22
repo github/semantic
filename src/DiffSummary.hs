@@ -58,7 +58,7 @@ summaries (Replace i1 i2) = zipWith (\a b -> uncurry (prefixOrErrorDoc "Replaced
 prefixOrErrorDoc :: Text -> DiffInfo -> Doc -> Doc
 prefixOrErrorDoc prefix info doc = message <+> string (toSL prefix) <+> "the" <+> doc
  where message = case info of
-                   ErrorInfo{} -> "Error:"
+                   ErrorInfo{} -> "Diff Summary Error:"
                    _ -> mempty
 
 toLeafInfos :: DiffInfo -> [(DiffInfo, Doc)]
