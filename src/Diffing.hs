@@ -36,8 +36,9 @@ import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
 import Category
-import Data.Aeson (pairs)
+import Data.Aeson (pairs, toJSON, ToJSON, Value, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
+import Data.HashMap.Strict (HashMap)
 
 -- | Given a parser and renderer, diff two sources and return the rendered
 -- | result.
@@ -143,7 +144,7 @@ diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Pure patch -> sum (cost . extract <$> patch)
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
+textDiff :: (ToJSON (Record fields), Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
 textDiff parser arguments = diffFiles parser $ case format arguments of
   Split -> split
   Patch -> patch
@@ -159,14 +160,14 @@ truncatedDiff arguments sources = pure $ case format arguments of
   Summary -> SummaryOutput mempty
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
-printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
+printDiff :: (ToJSON (Record fields), Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
   let renderedText = case rendered of
                        SplitOutput text -> text
                        PatchOutput text -> text
-                       JSONOutput series -> toS . encodingToLazyByteString $ pairs series
-                       SummaryOutput summaries -> toS . encodingToLazyByteString $ pairs summaries
+                       JSONOutput series -> toS . encodingToLazyByteString . toEncoding $ toJSON (series :: HashMap Text Value)
+                       SummaryOutput summaries -> toS . encodingToLazyByteString . toEncoding $ toJSON (summaries :: HashMap Text [Text])
 
   case output arguments of
     Nothing -> TextIO.putStr renderedText

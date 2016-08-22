@@ -7,17 +7,15 @@ import Renderer
 import Data.Record
 import Range
 import DiffSummary
-import Data.Aeson
 import Data.List (partition)
-import Data.Functor.Both (runBothWith)
+import Data.HashMap.Strict as HashMap
 import Source
 
 summary :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
-summary blobs diff = SummaryOutput $ "changes" .= changes <> "errors" .= errors
+summary blobs diff = SummaryOutput $ HashMap.fromList [("changes", changes), ("errors", errors)]
   where
     changes = ((toSummaryKey (path <$> blobs) <> ": ") <>) <$> changes'
     (errors, changes') = partition ("Error" `isPrefixOf`) summaries
-    toSummaryKey = runBothWith $ \before after ->
-      toS $ if before == after then after else before <> " -> " <> after
+
 
     summaries = diffSummaries blobs diff

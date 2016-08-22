@@ -6,9 +6,10 @@ import Prologue
 import Category
 import Range
 import Test.QuickCheck
+import Data.Aeson (ToJSON)
 
 newtype Cost = Cost { unCost :: Int }
-  deriving (Eq, Num, Ord, Show)
+  deriving (Eq, Num, Ord, Show, Generic, ToJSON)
 
 characterRange :: HasField fields Range => Record fields -> Range
 characterRange = getField
