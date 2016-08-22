@@ -5,9 +5,9 @@ import Data.Functor.Both
 import Diff
 import Source (SourceBlob)
 import Data.Text as T (intercalate)
-import Data.Aeson (Object, toEncoding)
+import Data.Aeson (Value, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
-import Data.HashMap.Strict as HashMap
+import Data.Map as Map
 
 -- | A function that will render a diff, given the two source blobs.
 type Renderer annotation = Both SourceBlob -> Diff Text annotation -> Output
