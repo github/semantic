@@ -15,6 +15,10 @@ type Renderer annotation = Both SourceBlob -> Diff Text annotation -> Output
 data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath, outputPath :: FilePath }
  deriving (Show)
 
+-- | The available types of diff rendering.
+data Format = Split | Patch | JSON | Summary
+  deriving (Show)
+
 data Output = SplitOutput Text | PatchOutput Text | JSONOutput Object  | SummaryOutput (HashMap Text [Text])
   deriving (Show)
 
@@ -49,27 +53,7 @@ isText (SplitOutput _ : _) = True
 isText (PatchOutput _ : _) = True
 isText _ = False
 
--- runJSONOutput :: HashMap Text [Text] -> HashMap Text [Text]
--- runJSONOutput hash = foldrWithKey prependPaths mempty hash
---   where
---     prependPaths :: Text -> [Text] -> HashMap Text [Text] -> HashMap Text [Text]
---     prependPaths path texts prev = HashMap.insertWith (\new old -> new <> old) "changes" texts
-    --  (toValue hash) prev
-    --  where
-    --    toValue :: HashMap Text [Text] -> HashMap Text [Text] -> HashMap Text [Text]
-    --    toValue hash = maybe (singleton path texts)  (HashMap.lookup "changes" hash :: Maybe [Text])
-
--- toSeries :: Output -> Series
--- toSeries (JSONOutput series) = series
--- toSeries (SummaryOutput series) = (fromlist . prologue.tolist $ series)
--- toSeries _ = mempty
-
 toText :: Output -> Text
 toText (SplitOutput text) = text
 toText (PatchOutput text) = text
 toText _ = mempty
-
-
--- | The available types of diff rendering.
-data Format = Split | Patch | JSON | Summary
-  deriving (Show)
