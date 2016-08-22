@@ -65,6 +65,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   Leaf _ -> []
   Indexed c -> childrenFields c
   Fixed c -> childrenFields c
+  S.AnonymousFunction params c -> [ "params" .= params ] <> childrenFields c
   S.FunctionCall identifier params -> [ "identifier" .= identifier ] <> [ "params" .= params ]
   S.Function identifier params c -> [ "identifier" .= identifier ] <> [ "params" .= params ] <> childrenFields c
   S.MethodCall targetId methodId args -> [ "targetIdentifier" .= targetId ] <> [ "methodId" .= methodId ] <> [ "args" .= args ]
