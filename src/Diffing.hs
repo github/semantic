@@ -36,9 +36,8 @@ import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
 import Category
-import Data.Aeson (pairs, toJSON, ToJSON, Value, toEncoding)
+import Data.Aeson (toJSON, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
-import Data.HashMap.Strict (HashMap)
 
 -- | Given a parser and renderer, diff two sources and return the rendered
 -- | result.
