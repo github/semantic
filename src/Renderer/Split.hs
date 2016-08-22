@@ -33,9 +33,9 @@ styleName :: Category -> Text
 styleName category = "category-" <> case category of
   Program -> "program"
   C.Error -> "error"
-  BinaryOperator -> "binary-operator"
-  BitwiseOperator -> "bitwise-operator"
-  RelationalOperator -> "relational-operator"
+  BinaryOperator -> "binary_operator"
+  BitwiseOperator -> "bitwise_operator"
+  RelationalOperator -> "relational_operator"
   Boolean -> "boolean"
   DictionaryLiteral -> "dictionary"
   C.Pair -> "pair"
