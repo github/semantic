@@ -35,29 +35,24 @@ testSummary = DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnota
 replacementSummary :: DiffSummary DiffInfo
 replacementSummary = DiffSummary { patch = Replace (LeafInfo "string" "a") (LeafInfo "symbol" "b"), parentAnnotation = Just (Info.FunctionCall, "foo") }
 
-sources :: Both (Source Char)
-sources = both (fromText "[]") (fromText "[a]")
+blobs :: Both SourceBlob
+blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))
 
 spec :: Spec
 spec = parallel $ do
   describe "diffSummaries" $ do
     it "outputs a diff summary" $ do
-      diffSummaries sources testDiff `shouldBe` [ DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotation = Nothing } ]
+      diffSummaries blobs testDiff `shouldBe` [ "Added the 'a' string" ]
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = defaultFeatureVectorDecorator (category . headF) (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range]))) in
-        diffSummaries sources (diffTerms wrap (==) diffCost term term) `shouldBe` []
+        diffSummaries blobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
-  describe "annotatedSummaries" $ do
-    it "should print adds" $
-      annotatedSummaries testSummary `shouldBe` ["Added the 'a' string"]
-    it "prints a replacement" $ do
-      annotatedSummaries replacementSummary `shouldBe` ["Replaced the 'a' string with the 'b' symbol in the foo function call"]
   describe "DiffInfo" $ do
     prop "patches in summaries match the patches in diffs" $
       \a -> let
         diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Cost, Range])))
-        summaries = diffSummaries sources diff
+        summaries = diffSummaries' (source <$> blobs) diff
         patches = toList diff
         in
           case (partition isBranchNode (patch <$> summaries), partition isIndexedOrFixed patches) of
@@ -66,7 +61,7 @@ spec = parallel $ do
     prop "generates one LeafInfo for each child in an arbitrary branch patch" $
       \a -> let
         diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Range])))
-        diffInfoPatches = patch <$> diffSummaries sources diff
+        diffInfoPatches = patch <$> diffSummaries' (source <$> blobs) diff
         syntaxPatches = toList diff
         extractLeaves :: DiffInfo -> [DiffInfo]
         extractLeaves (BranchInfo children _ _) = join $ extractLeaves <$> children
