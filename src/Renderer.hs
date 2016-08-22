@@ -38,7 +38,6 @@ concatSummaries _ = mempty
 
 isJSON :: [Output] -> Bool
 isJSON (JSONOutput _ : _) = True
-isJSON (SummaryOutput _ : _) = True
 isJSON _ = False
 
 isSummary :: [Output] -> Bool
