@@ -135,11 +135,12 @@ toDoc = string . toS
 termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
   Leaf _ -> LeafInfo (toCategoryName term) (toTermName' term)
+  S.AnonymousFunction _ _ -> LeafInfo (toCategoryName term) ("anonymous")
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
   S.FunctionCall identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   S.Ternary ternaryCondition _ -> LeafInfo (toCategoryName term) (toTermName' ternaryCondition)
-  S.Function identifier _ _ -> LeafInfo (toCategoryName term) (maybe "anonymous" toTermName' identifier)
+  S.Function identifier _ _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   S.Assignment identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   S.MathAssignment identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
@@ -157,7 +158,7 @@ prependSummary source term summary = if (isNothing $ parentAnnotation summary) &
   else summary
   where hasIdentifier term = case unwrap term of
           S.FunctionCall{} -> True
-          S.Function id _ _ -> isJust id
+          S.Function _ _ _ -> True
           S.Assignment{} -> True
           S.MathAssignment{} -> True
           S.MemberAccess{} -> True
