@@ -143,7 +143,7 @@ diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Pure patch -> sum (cost . extract <$> patch)
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: (ToJSON (Record fields), Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
+textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
 textDiff parser arguments = diffFiles parser $ case format arguments of
   Split -> split
   Patch -> patch
@@ -159,14 +159,14 @@ truncatedDiff arguments sources = pure $ case format arguments of
   Summary -> SummaryOutput mempty
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
-printDiff :: (ToJSON (Record fields), Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
+printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
   let renderedText = case rendered of
                        SplitOutput text -> text
                        PatchOutput text -> text
-                       JSONOutput series -> toS . encodingToLazyByteString . toEncoding $ toJSON (series :: HashMap Text Value)
-                       SummaryOutput summaries -> toS . encodingToLazyByteString . toEncoding $ toJSON (summaries :: HashMap Text [Text])
+                       JSONOutput series -> toS . encodingToLazyByteString . toEncoding $ toJSON series
+                       SummaryOutput summaries -> toS . encodingToLazyByteString . toEncoding $ toJSON summaries
 
   case output arguments of
     Nothing -> TextIO.putStr renderedText
