@@ -16,6 +16,7 @@ data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath,
  deriving (Show)
 
 data Output = SplitOutput Text | PatchOutput Text | JSONOutput Object  | SummaryOutput (HashMap Text [Text])
+  deriving (Show)
 
 toSummaryKey :: Both FilePath -> Text
 toSummaryKey = runBothWith $ \before after ->
