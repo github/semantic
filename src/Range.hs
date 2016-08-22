@@ -1,4 +1,3 @@
-{-# LANGUAGE DeriveAnyClass, MultiParamTypeClasses #-}
 module Range where
 
 import qualified Data.Char as Char
@@ -12,7 +11,7 @@ import Data.Aeson
 
 -- | A half-open interval of integers, defined by start & end indices.
 data Range = Range { start :: !Int, end :: !Int }
-  deriving (Eq, Show, Generic, ToJSON)
+  deriving (Eq, Show)
 
 -- | Make a range at a given index.
 rangeAt :: Int -> Range
