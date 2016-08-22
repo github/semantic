@@ -71,7 +71,10 @@ toTermName source term = case unwrap term of
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
-  S.Assignment identifier value -> toTermName' identifier <> toTermName' value
+  S.Assignment identifier value -> case (unwrap identifier, unwrap value) of
+    (S.MemberAccess{}, S.Function{..}) -> if functionName == "anonymous" then toTermName' identifier else toTermName' identifier <> functionName
+                                          where functionName = toTermName' value
+    (_, _) -> toTermName' identifier <> toTermName' value
   S.Function identifier _ _ -> (maybe "anonymous" toTermName' identifier)
   S.FunctionCall i _ -> toTermName' i
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
