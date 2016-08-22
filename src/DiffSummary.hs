@@ -75,7 +75,7 @@ toTermName source term = case unwrap term of
   S.Assignment identifier value -> case (unwrap identifier, unwrap value) of
     (S.MemberAccess{}, S.AnonymousFunction{..}) -> toTermName' identifier
     (_, _) -> toTermName' identifier <> toTermName' value
-  S.Function identifier _ _ -> (maybe "anonymous" toTermName' identifier)
+  S.Function identifier _ _ -> toTermName' identifier
   S.FunctionCall i _ -> toTermName' i
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
     (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' property <> "()"
