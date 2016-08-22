@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
 
-module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..)) where
+module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffSummaries') where
 
 import Prologue hiding (intercalate)
 import Diff
