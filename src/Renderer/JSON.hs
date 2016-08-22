@@ -12,46 +12,20 @@ import Data.Bifunctor.Join
 import Data.Record
 import qualified Data.Text as T
 import Data.These
-import Data.Vector hiding (toList)
+import Data.Vector as Vector hiding (toList)
 import Info
 import Renderer
 import Source hiding (fromList)
 import SplitDiff
 import Syntax as S
 import Term
-import Data.Aeson (toJSON, Object)
-import Data.Aeson.Types (emptyArray, listValue)
 import qualified Data.Map as Map
-import Data.HashMap.Strict as HashMap
-import Data.Vector as Vector
-import Data.Functor.Both as Both
-
-
-instance (ToJSON h, ToJSON (Record t)) => ToJSON (Record (h ': t)) where
-  toJSON (RCons h t) =  (toJSON t)
-  --  showParen (n > 0) $ showsPrec 1 h . (" .: " <>) . shows t
-
-instance ToJSON (Record '[]) where
-  toJSON RNil = emptyArray
-
--- deriving instance (ToJSON leaf, HasField fields Category, HasField fields Range) => ToJSON (JSONAPI (Record fields) leaf)
-
--- data JSONAPI record leaf = JSONAPI { rows :: [Join These (NumberedLine (SplitDiff leaf record))], oids :: Both FilePath, paths :: Both FilePath } deriving (Generic)
---
--- instance (HasField fields Category) => ToJSON (Record fields) where
---   toJSON a = toJSON $ category a
 
 -- | Render a diff to a string representing its JSON.
-json :: forall fields. (ToJSON Category, ToJSON Range, ToJSON (Record fields), HasField fields Category, HasField fields Range) => Renderer (Record fields)
-json blobs diff = JSONOutput $ HashMap.fromList [ ("rows" :: Text, toJSON ["leaf" :: Text])
+json :: forall fields. (ToJSON Category, ToJSON Range, HasField fields Category, HasField fields Range) => Renderer (Record fields)
+json blobs diff = JSONOutput $ Map.fromList [ ("rows", toJSON $ annotateRows (alignDiff (source <$> blobs) diff) )
   , ("oids", toJSON (oid <$> blobs)), ("paths", toJSON (path <$> blobs))]
-
--- (toSummaryKey $ path <$> blobs) . toJSON $ ("rows" .=
-  -- (annotateRows :: [ Join These (NumberedLine (SplitDiff leaf (Record fields))) ])) <> ("oids" .= (oid <$> blobs)) <> ("paths" .= (path <$> blobs))
-
-  where
-    -- annotateRows :: [ Join These (NumberedLine (SplitDiff leaf (Record fields))) ]
-    -- annotateRows = (fmap NumberedLine) <$> numberedRows ((alignDiff (source <$> blobs) diff) )
+  where annotateRows = fmap (fmap NumberedLine) . numberedRows
 
 -- | A numbered 'a'.
 newtype NumberedLine a = NumberedLine (Int, a)
@@ -62,9 +36,9 @@ instance (HasField fields Category, HasField fields Range) => ToJSON (NumberedLi
 instance ToJSON Category where
   toJSON (Other s) = String s
   toJSON s = String . T.pack $ show s
--- instance ToJSON Range where
---   toJSON (Range start end) = A.Array . Map.fromList $ toJSON <$> [ start, end ]
---   toEncoding (Range start end) = foldable [ start,  end ]
+instance ToJSON Range where
+  toJSON (Range start end) = A.Array . Vector.fromList $ toJSON <$> [ start, end ]
+  toEncoding (Range start end) = foldable [ start,  end ]
 instance ToJSON a => ToJSON (Join These a) where
   toJSON (Join vs) = A.Array . Vector.fromList $ toJSON <$> these pure pure (\ a b -> [ a, b ]) vs
   toEncoding = foldable

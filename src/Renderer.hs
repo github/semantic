@@ -19,7 +19,7 @@ data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath,
 data Format = Split | Patch | JSON | Summary
   deriving (Show)
 
-data Output = SplitOutput Text | PatchOutput Text | JSONOutput Object  | SummaryOutput (HashMap Text [Text])
+data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value)  | SummaryOutput (Map Text [Text])
   deriving (Show)
 
 toSummaryKey :: Both FilePath -> Text
@@ -32,12 +32,12 @@ concatOutputs list | isSummary list = toS . encodingToLazyByteString . toEncodin
 concatOutputs list | isText list = T.intercalate "\n" (toText <$> list)
 concatOutputs _ = mempty
 
-concatJSON :: [Output] -> Object
-concatJSON (JSONOutput hash : rest) = HashMap.union hash (concatJSON rest)
+concatJSON :: [Output] -> Map Text Value
+concatJSON (JSONOutput hash : rest) = Map.union hash (concatJSON rest)
 concatJSON _ = mempty
 
-concatSummaries :: [Output] -> HashMap Text [Text]
-concatSummaries (SummaryOutput hash : rest) = HashMap.unionWith (<>) hash (concatSummaries rest)
+concatSummaries :: [Output] -> Map Text [Text]
+concatSummaries (SummaryOutput hash : rest) = Map.unionWith (<>) hash (concatSummaries rest)
 concatSummaries _ = mempty
 
 isJSON :: [Output] -> Bool

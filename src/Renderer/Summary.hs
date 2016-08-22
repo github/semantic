@@ -8,11 +8,11 @@ import Data.Record
 import Range
 import DiffSummary
 import Data.List (partition)
-import Data.HashMap.Strict as HashMap
+import Data.Map as Map hiding (partition)
 import Source
 
 summary :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
-summary blobs diff = SummaryOutput $ HashMap.fromList [("changes", changes), ("errors", errors)]
+summary blobs diff = SummaryOutput $ Map.fromList [("changes", changes), ("errors", errors)]
   where
     changes = ((toSummaryKey (path <$> blobs) <> ": ") <>) <$> changes'
     (errors, changes') = partition ("Error" `isPrefixOf`) summaries
