@@ -61,7 +61,7 @@ summaries = \case
 prefixOrErrorDoc :: Text -> DiffInfo -> Doc -> Doc
 prefixOrErrorDoc prefix info doc = message <+> string (toSL prefix) <+> "the" <+> doc
  where message = case info of
-                   ErrorInfo{} -> "Error:"
+                   ErrorInfo{} -> "Diff Summary Error:"
                    _ -> mempty
 
 toLeafInfos :: DiffInfo -> [(DiffInfo, Doc)]
@@ -71,11 +71,14 @@ toLeafInfos err@ErrorInfo{} = pure (err, pretty err)
 
 toTermName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
 toTermName source term = case unwrap term of
+  S.AnonymousFunction _ _ -> "anonymous"
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
-  S.Assignment identifier value -> toTermName' identifier <> toTermName' value
-  S.Function identifier _ _ -> (maybe "anonymous" toTermName' identifier)
+  S.Assignment identifier value -> case (unwrap identifier, unwrap value) of
+    (S.MemberAccess{}, S.AnonymousFunction{..}) -> toTermName' identifier
+    (_, _) -> toTermName' identifier <> toTermName' value
+  S.Function identifier _ _ -> toTermName' identifier
   S.FunctionCall i _ -> toTermName' i
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
     (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' property <> "()"
@@ -135,11 +138,12 @@ toDoc = string . toS
 termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
   Leaf _ -> LeafInfo (toCategoryName term) (toTermName' term)
+  S.AnonymousFunction _ _ -> LeafInfo (toCategoryName term) ("anonymous")
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
   S.FunctionCall identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   S.Ternary ternaryCondition _ -> LeafInfo (toCategoryName term) (toTermName' ternaryCondition)
-  S.Function identifier _ _ -> LeafInfo (toCategoryName term) (maybe "anonymous" toTermName' identifier)
+  S.Function identifier _ _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   S.Assignment identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   S.MathAssignment identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
@@ -157,7 +161,7 @@ prependSummary source term summary = if (isNothing $ parentAnnotation summary) &
   else summary
   where hasIdentifier term = case unwrap term of
           S.FunctionCall{} -> True
-          S.Function id _ _ -> isJust id
+          S.Function _ _ _ -> True
           S.Assignment{} -> True
           S.MathAssignment{} -> True
           S.MemberAccess{} -> True
@@ -226,6 +230,7 @@ instance HasCategory Category where
     C.Method -> "method"
     C.If -> "if statement"
     C.CommaOperator -> "comma operator"
+    C.Empty -> "empty statement"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract

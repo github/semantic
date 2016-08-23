@@ -102,6 +102,8 @@ data Category
   | Other Text
   -- | A relational operator (e.g. < or >=)
   | RelationalOperator
+  -- | An empty statement. (e.g. ; in JavaScript)
+  | Empty
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
