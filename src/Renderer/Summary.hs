@@ -16,6 +16,4 @@ summary blobs diff = SummaryOutput $ Map.fromList [("changes", changes), ("error
   where
     changes = ((toSummaryKey (path <$> blobs) <> ": ") <>) <$> changes'
     (errors, changes') = partition ("Diff Summary Error" `isPrefixOf`) summaries
-
-
     summaries = diffSummaries blobs diff
