@@ -59,13 +59,13 @@ termConstructor source sourceSpan info = fmap cofree . construct
       [child, rest] | S.Indexed cs <- unwrap rest -> S.Indexed $ child : toList cs
       _ -> S.Indexed children
     construct children | Function == category info = case children of
-      (body:[]) -> withDefaultInfo $ S.Function Nothing Nothing body
+      (body:[]) -> withDefaultInfo $ S.AnonymousFunction Nothing body
       (params:body:[]) | (info :< _) <- runCofree params, Params == category info ->
-        withDefaultInfo $ S.Function Nothing (Just params) body
+        withDefaultInfo $ S.AnonymousFunction (Just params) body
       (id:body:[]) | (info :< _) <- runCofree id, Identifier == category info ->
-        withDefaultInfo $ S.Function (Just id) Nothing body
+        withDefaultInfo $ S.Function id Nothing body
       (id:params:body:[]) | (info :< _) <- runCofree id, Identifier == category info ->
-        withDefaultInfo $ S.Function (Just id) (Just params) body
+        withDefaultInfo $ S.Function id (Just params) body
       _ -> errorWith children
 
     construct children | FunctionCall == category info = case runCofree <$> children of
