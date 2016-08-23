@@ -15,7 +15,7 @@ summary :: (HasField fields Category, HasField fields Range) => Renderer (Record
 summary blobs diff = SummaryOutput $ Map.fromList [("changes", changes), ("errors", errors)]
   where
     changes = ((toSummaryKey (path <$> blobs) <> ": ") <>) <$> changes'
-    (errors, changes') = partition ("Error" `isPrefixOf`) summaries
+    (errors, changes') = partition ("Diff Summary Error" `isPrefixOf`) summaries
 
 
     summaries = diffSummaries blobs diff
