@@ -227,6 +227,7 @@ instance HasCategory Category where
     C.Method -> "method"
     C.If -> "if statement"
     C.CommaOperator -> "comma operator"
+    C.Empty -> "empty statement"
 
 instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract

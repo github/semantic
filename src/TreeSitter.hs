@@ -15,6 +15,7 @@ import Foreign.C.String
 import Text.Parser.TreeSitter hiding (Language(..))
 import qualified Text.Parser.TreeSitter as TS
 import SourceSpan
+import Info
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
 treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax.Syntax Text) (Record '[Range, Category])
@@ -51,6 +52,7 @@ categoriesForLanguage language name = case (language, name) of
   (JavaScript, "catch") -> Catch
   (JavaScript, "finally") -> Finally
   (JavaScript, "if_statement") -> If
+  (JavaScript, "empty_statement") -> Empty
 
   (Ruby, "hash") -> Object
   _ -> defaultCategoryForNodeName name
@@ -118,6 +120,6 @@ documentToTerm language document blob = alloca $ \ root -> do
 
           -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
           let info = range `seq` range .: categoriesForLanguage language (toS name) .: RNil
-          termConstructor (source blob) (sourceSpan `seq` pure sourceSpan) info children
+          termConstructor (source blob) (sourceSpan `seq` pure sourceSpan) info (filter (\child -> category (extract child) /= Empty) children)
         getChild node n out = ts_node_p_named_child node n out >> toTerm out
         {-# INLINE getChild #-}
