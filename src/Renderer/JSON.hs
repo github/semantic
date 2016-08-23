@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, TypeSynonymInstances, DeriveAnyClass, StandaloneDeriving, ScopedTypeVariables, TypeOperators, DataKinds, KindSignatures, GADTs, UndecidableInstances #-}
+{-# LANGUAGE OverloadedStrings, TypeSynonymInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Renderer.JSON (
   json
@@ -22,7 +22,7 @@ import Term
 import qualified Data.Map as Map
 
 -- | Render a diff to a string representing its JSON.
-json :: forall fields. (ToJSON Category, ToJSON Range, HasField fields Category, HasField fields Range) => Renderer (Record fields)
+json :: (ToJSON Category, ToJSON Range, HasField fields Category, HasField fields Range) => Renderer (Record fields)
 json blobs diff = JSONOutput $ Map.fromList [ ("rows", toJSON $ annotateRows (alignDiff (source <$> blobs) diff) )
   , ("oids", toJSON (oid <$> blobs)), ("paths", toJSON (path <$> blobs))]
   where annotateRows = fmap (fmap NumberedLine) . numberedRows
