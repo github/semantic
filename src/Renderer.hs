@@ -26,6 +26,11 @@ toSummaryKey :: Both FilePath -> Text
 toSummaryKey = runBothWith $ \before after ->
   toS $ if before == after then after else before <> " -> " <> after
 
+-- Concatenates a list of 'Output' depending on the output type.
+-- For JSON, each file output is merged since they're uniquely keyed by filename.
+-- For Summaries, each file output is merged into one 'Object' consisting of lists of
+-- changes and errors.
+-- Split and Patch output is appended together with newlines.
 concatOutputs :: [Output] -> Text
 concatOutputs list | isJSON list = toS . encodingToLazyByteString . toEncoding $ concatJSON list
   where
