@@ -76,7 +76,7 @@ toTermName source term = case unwrap term of
     (S.MemberAccess{}, S.AnonymousFunction{..}) -> toTermName' identifier
     (_, _) -> toTermName' identifier <> toTermName' value
   S.Function identifier _ _ -> toTermName' identifier
-  S.FunctionCall i _ -> toTermName' i
+  S.FunctionCall i args -> toTermName' i <> "(" <> (intercalate ", " (toTermName' <$> args)) <> ")"
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
     (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' property <> "()"
     (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' property
