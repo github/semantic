@@ -7,15 +7,17 @@ import Renderer
 import Data.Record
 import Range
 import DiffSummary
-import Data.Map as Map
+import Data.Map as Map hiding (null)
 import Source
 
 summary :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
 summary blobs diff = SummaryOutput $ Map.fromList [
-    ("changes", [ Map.singleton summaryKey changes ]),
-    ("errors", [ Map.singleton summaryKey errors ])
+    ("changes", changes),
+    ("errors", errors)
   ]
   where
+    changes = if null changes' then [] else [ Map.singleton summaryKey changes' ]
+    errors = if null errors' then [] else [ Map.singleton summaryKey errors' ]
+    (errors', changes') = partitionEithers summaries
     summaryKey = toSummaryKey (path <$> blobs)
-    (errors, changes) = partitionEithers summaries
     summaries = diffSummaries blobs diff
