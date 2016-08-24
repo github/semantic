@@ -34,12 +34,16 @@ data DiffSummary a = DiffSummary {
   parentAnnotation :: Maybe (Category, Text)
 } deriving (Eq, Functor, Show, Generic)
 
+-- Returns a list of diff summary texts given two source blobs and a diff.
 diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both SourceBlob -> Diff leaf (Record fields) -> [Text]
 diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> blobs) diff
 
+-- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
+-- in that 'DiffSummary'.
 summaryToTexts :: DiffSummary DiffInfo -> [Text]
 summaryToTexts DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotation) <$> summaries patch
 
+-- Returns a list of 'DiffSummary' given two source blobs and a diff.
 diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffToDiffSummaries sources = para $ \diff ->
   let diff' = free (Prologue.fst <$> diff)
@@ -52,12 +56,15 @@ diffToDiffSummaries sources = para $ \diff ->
   where
     (beforeSource, afterSource) = runJoin sources
 
+-- Returns a list of diff summary 'Docs' prefixed given a 'Patch'.
 summaries :: Patch DiffInfo -> [P.Doc]
 summaries = \case
   (Insert info) -> uncurry (prefixOrErrorDoc "Added") <$> toLeafInfos info
   (Delete info) -> uncurry (prefixOrErrorDoc "Deleted") <$> toLeafInfos info
   (Replace i1 i2) -> zipWith (\a b -> uncurry (prefixOrErrorDoc "Replaced") a <+> "with the" <+> snd b) (toLeafInfos i1) (toLeafInfos i2)
 
+-- Prefixes a diff summary 'Doc' with 'Diff Summary Error:' if its 'info' is an
+-- 'ErrorInfo'.
 prefixOrErrorDoc :: Text -> DiffInfo -> Doc -> Doc
 prefixOrErrorDoc prefix info doc = message <+> string (toSL prefix) <+> "the" <+> doc
  where message = case info of
@@ -69,6 +76,7 @@ toLeafInfos info@LeafInfo{..} = pure (info, squotes (toDoc termName) <+> (toDoc 
 toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure (err, pretty err)
 
+-- Returns a text representing a specific term given a source and a term.
 toTermName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
 toTermName source term = case unwrap term of
   S.AnonymousFunction _ _ -> "anonymous"
