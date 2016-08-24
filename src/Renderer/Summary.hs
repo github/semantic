@@ -2,14 +2,12 @@
 module Renderer.Summary where
 
 import Category
-import Prologue hiding (isPrefixOf)
-import Data.Text (isPrefixOf)
+import Prologue
 import Renderer
 import Data.Record
 import Range
 import DiffSummary
-import Data.List (partition)
-import Data.Map as Map hiding (partition)
+import Data.Map as Map
 import Source
 
 summary :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
