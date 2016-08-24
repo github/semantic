@@ -7,7 +7,7 @@ import Source (SourceBlob)
 import Data.Text as T (intercalate)
 import Data.Aeson (Value, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
-import Data.Map as Map
+import Data.Map as Map hiding (null)
 
 -- | A function that will render a diff, given the two source blobs.
 type Renderer annotation = Both SourceBlob -> Diff Text annotation -> Output
@@ -22,9 +22,16 @@ data Format = Split | Patch | JSON | Summary
 data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value)  | SummaryOutput (Map Text [Text])
   deriving (Show)
 
+-- Returns a key representing the filename. If the filenames are different,
+-- return 'before -> after'.
 toSummaryKey :: Both FilePath -> Text
 toSummaryKey = runBothWith $ \before after ->
-  toS $ if before == after then after else before <> " -> " <> after
+  toS $ case (before, after) of
+    ("", after) -> after
+    (before, "") -> before
+    (before, after) | before == after -> after
+    (before, after) | not (null before) && not (null after) -> before <> " -> " <> after
+    (_, _) -> mempty
 
 -- Concatenates a list of 'Output' depending on the output type.
 -- For JSON, each file output is merged since they're uniquely keyed by filename.
