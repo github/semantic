@@ -1,3 +1,4 @@
+{-# LANGUAGE TupleSections #-}
 module Renderer.Summary where
 
 import Category
@@ -12,8 +13,11 @@ import Data.Map as Map hiding (partition)
 import Source
 
 summary :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
-summary blobs diff = SummaryOutput $ Map.fromList [("changes", changes), ("errors", errors)]
+summary blobs diff = SummaryOutput $ Map.fromList [
+    ("changes", [ Map.singleton summaryKey changes ]),
+    ("errors", [ Map.singleton summaryKey errors ])
+  ]
   where
-    changes = ((toSummaryKey (path <$> blobs) <> ": ") <>) <$> changes'
-    (errors, changes') = partition (isPrefixOf "Diff Summary Error") summaries
+    summaryKey = toSummaryKey (path <$> blobs)
+    (errors, changes) = partitionEithers summaries
     summaries = diffSummaries blobs diff
