@@ -22,7 +22,7 @@ import Term
 import qualified Data.Map as Map
 
 -- | Render a diff to a string representing its JSON.
-json :: (ToJSON Category, ToJSON Range, HasField fields Category, HasField fields Range) => Renderer (Record fields)
+json :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
 json blobs diff = JSONOutput $ Map.fromList [ ("rows", toJSON $ annotateRows (alignDiff (source <$> blobs) diff) )
   , ("oids", toJSON (oid <$> blobs)), ("paths", toJSON (path <$> blobs))]
   where annotateRows = fmap (fmap NumberedLine) . numberedRows
