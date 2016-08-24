@@ -28,17 +28,17 @@ toSummaryKey = runBothWith $ \before after ->
 
 concatOutputs :: [Output] -> Text
 concatOutputs list | isJSON list = toS . encodingToLazyByteString . toEncoding $ concatJSON list
+  where
+    concatJSON :: [Output] -> Map Text Value
+    concatJSON (JSONOutput hash : rest) = Map.union hash (concatJSON rest)
+    concatJSON _ = mempty
 concatOutputs list | isSummary list = toS . encodingToLazyByteString . toEncoding $ concatSummaries list
+  where
+    concatSummaries :: [Output] -> Map Text [Text]
+    concatSummaries (SummaryOutput hash : rest) = Map.unionWith (<>) hash (concatSummaries rest)
+    concatSummaries _ = mempty
 concatOutputs list | isText list = T.intercalate "\n" (toText <$> list)
 concatOutputs _ = mempty
-
-concatJSON :: [Output] -> Map Text Value
-concatJSON (JSONOutput hash : rest) = Map.union hash (concatJSON rest)
-concatJSON _ = mempty
-
-concatSummaries :: [Output] -> Map Text [Text]
-concatSummaries (SummaryOutput hash : rest) = Map.unionWith (<>) hash (concatSummaries rest)
-concatSummaries _ = mempty
 
 isJSON :: [Output] -> Bool
 isJSON (JSONOutput _ : _) = True
