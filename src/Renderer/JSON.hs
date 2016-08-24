@@ -23,8 +23,10 @@ import qualified Data.Map as Map
 
 -- | Render a diff to a string representing its JSON.
 json :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
-json blobs diff = JSONOutput $ Map.fromList [ ("rows", toJSON $ annotateRows (alignDiff (source <$> blobs) diff) )
-  , ("oids", toJSON (oid <$> blobs)), ("paths", toJSON (path <$> blobs))]
+json blobs diff = JSONOutput $ Map.fromList [
+  ("rows", toJSON (annotateRows (alignDiff (source <$> blobs) diff))),
+  ("oids", toJSON (oid <$> blobs)),
+  ("paths", toJSON (path <$> blobs)) ]
   where annotateRows = fmap (fmap NumberedLine) . numberedRows
 
 -- | A numbered 'a'.
