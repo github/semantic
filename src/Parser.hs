@@ -73,8 +73,8 @@ termConstructor source sourceSpan info = fmap cofree . construct
         pure $! setCategory info MethodCall :< S.MethodCall memberId property args
       [ (_ :< S.MemberAccess{..}) ] ->
         pure $! setCategory info MethodCall :< S.MethodCall memberId property []
-      (x:xs) ->
-        withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
+      [ x@(_ :< S.Leaf{}), (_ :< S.Args args) ] ->
+        withDefaultInfo $ S.FunctionCall (cofree x) args
       _ -> errorWith children
 
     construct children | Ternary == category info = case children of
