@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
 
-module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffSummaries') where
+module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries) where
 
 import Prologue hiding (intercalate)
 import Diff
@@ -35,13 +35,13 @@ data DiffSummary a = DiffSummary {
 } deriving (Eq, Functor, Show, Generic)
 
 diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both SourceBlob -> Diff leaf (Record fields) -> [Text]
-diffSummaries blobs diff = summaryToTexts =<< diffSummaries' (source <$> blobs) diff
+diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> blobs) diff
 
 summaryToTexts :: DiffSummary DiffInfo -> [Text]
 summaryToTexts DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotation) <$> summaries patch
 
-diffSummaries' :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
-diffSummaries' sources = para $ \diff ->
+diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffToDiffSummaries sources = para $ \diff ->
   let diff' = free (Prologue.fst <$> diff)
       annotateWithCategory :: [(Diff leaf (Record fields), [DiffSummary DiffInfo])] -> [DiffSummary DiffInfo]
       annotateWithCategory children = maybeToList (prependSummary (Both.snd sources) <$> (afterTerm diff')) <*> (children >>= snd) in
