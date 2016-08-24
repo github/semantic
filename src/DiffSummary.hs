@@ -35,13 +35,13 @@ data DiffSummary a = DiffSummary {
 } deriving (Eq, Functor, Show, Generic)
 
 -- Returns a list of diff summary texts given two source blobs and a diff.
-diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both SourceBlob -> Diff leaf (Record fields) -> [Text]
+diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both SourceBlob -> Diff leaf (Record fields) -> [Either Text Text]
 diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> blobs) diff
 
 -- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
 -- in that 'DiffSummary'.
-summaryToTexts :: DiffSummary DiffInfo -> [Text]
-summaryToTexts DiffSummary{..} = show . (P.<> maybeParentContext parentAnnotation) <$> summaries patch
+summaryToTexts :: DiffSummary DiffInfo -> [Either Text Text]
+summaryToTexts DiffSummary{..} = runJoin . fmap (show . (P.<> maybeParentContext parentAnnotation)) <$> (Join <$> summaries patch)
 
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
 diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
@@ -57,24 +57,26 @@ diffToDiffSummaries sources = para $ \diff ->
     (beforeSource, afterSource) = runJoin sources
 
 -- Returns a list of diff summary 'Docs' prefixed given a 'Patch'.
-summaries :: Patch DiffInfo -> [P.Doc]
-summaries = \case
-  (Insert info) -> uncurry (prefixOrErrorDoc "Added") <$> toLeafInfos info
-  (Delete info) -> uncurry (prefixOrErrorDoc "Deleted") <$> toLeafInfos info
-  (Replace i1 i2) -> zipWith (\a b -> uncurry (prefixOrErrorDoc "Replaced") a <+> "with the" <+> snd b) (toLeafInfos i1) (toLeafInfos i2)
+summaries :: Patch DiffInfo -> [Either Doc Doc]
+summaries patch = eitherErrorOrDoc <$> patchToDoc patch
+  where eitherErrorOrDoc = if any isErrorInfo patch then Left else Right
 
--- Prefixes a diff summary 'Doc' with 'Diff Summary Error:' if its 'info' is an
--- 'ErrorInfo'.
-prefixOrErrorDoc :: Text -> DiffInfo -> Doc -> Doc
-prefixOrErrorDoc prefix info doc = message <+> string (toSL prefix) <+> "the" <+> doc
- where message = case info of
-                   ErrorInfo{} -> "Diff Summary Error:"
-                   _ -> mempty
+patchToDoc = \case
+  p@(Replace i1 i2) -> zipWith (\a b -> (prefixWithPatch p) a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
+  p@(Insert info) -> (prefixWithPatch p) <$> toLeafInfos info
+  p@(Delete info) -> (prefixWithPatch p) <$> toLeafInfos info
 
-toLeafInfos :: DiffInfo -> [(DiffInfo, Doc)]
-toLeafInfos info@LeafInfo{..} = pure (info, squotes (toDoc termName) <+> (toDoc categoryName))
+prefixWithPatch patch = prefixWithThe (patchToPrefix patch)
+prefixWithThe prefix doc = prefix <+> "the" <+> doc
+patchToPrefix = \case
+  (Replace _ _) -> "Replaced"
+  (Insert _) -> "Added"
+  (Delete _) -> "Deleted"
+
+toLeafInfos :: DiffInfo -> [Doc]
+toLeafInfos info@LeafInfo{..} = pure (squotes (toDoc termName) <+> (toDoc categoryName))
 toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
-toLeafInfos err@ErrorInfo{} = pure (err, pretty err)
+toLeafInfos err@ErrorInfo{} = pure (pretty err)
 
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
@@ -179,6 +181,16 @@ prependSummary source term summary = if (isNothing $ parentAnnotation summary) &
           S.Class{} -> True
           S.Method{} -> True
           _ -> False
+
+isBranchInfo :: DiffInfo -> Bool
+isBranchInfo info = case info of
+  (BranchInfo _ _ _) -> True
+  _ -> False
+
+isErrorInfo :: DiffInfo -> Bool
+isErrorInfo info = case info of
+  (ErrorInfo _ _) -> True
+  _ -> False
 
 -- The user-facing category name of 'a'.
 class HasCategory a where
