@@ -16,8 +16,8 @@ summary blobs diff = SummaryOutput $ Map.fromList [
     ("errors", errors)
   ]
   where
-    changes = if null changes' then [] else [ Map.singleton summaryKey changes' ]
-    errors = if null errors' then [] else [ Map.singleton summaryKey errors' ]
+    changes = if null changes' then mempty else Map.singleton summaryKey changes'
+    errors = if null errors' then mempty else Map.singleton summaryKey errors'
     (errors', changes') = partitionEithers summaries
     summaryKey = toSummaryKey (path <$> blobs)
     summaries = diffSummaries blobs diff
