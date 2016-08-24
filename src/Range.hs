@@ -6,7 +6,6 @@ import Data.Semigroup
 import Data.String
 import Prologue
 import Test.QuickCheck
-import Data.Aeson
 
 
 -- | A half-open interval of integers, defined by start & end indices.
