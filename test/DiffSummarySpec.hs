@@ -90,10 +90,5 @@ isIndexedOrFixed' syntax = case syntax of
   (Fixed _) -> True
   _ -> False
 
-isBranchInfo :: DiffInfo -> Bool
-isBranchInfo info = case info of
-  (BranchInfo _ _ _) -> True
-  _ -> False
-
 isBranchNode :: Patch DiffInfo -> Bool
 isBranchNode = any isBranchInfo
