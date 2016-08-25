@@ -42,7 +42,7 @@ spec :: Spec
 spec = parallel $ do
   describe "diffSummaries" $ do
     it "outputs a diff summary" $ do
-      diffSummaries blobs testDiff `shouldBe` [ "Added the 'a' string" ]
+      diffSummaries blobs testDiff `shouldBe` [ Right $ "Added the 'a' string" ]
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = defaultFeatureVectorDecorator (category . headF) (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range]))) in
@@ -52,7 +52,7 @@ spec = parallel $ do
     prop "patches in summaries match the patches in diffs" $
       \a -> let
         diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Cost, Range])))
-        summaries = diffSummaries' (source <$> blobs) diff
+        summaries = diffToDiffSummaries (source <$> blobs) diff
         patches = toList diff
         in
           case (partition isBranchNode (patch <$> summaries), partition isIndexedOrFixed patches) of
@@ -61,7 +61,7 @@ spec = parallel $ do
     prop "generates one LeafInfo for each child in an arbitrary branch patch" $
       \a -> let
         diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Range])))
-        diffInfoPatches = patch <$> diffSummaries' (source <$> blobs) diff
+        diffInfoPatches = patch <$> diffToDiffSummaries (source <$> blobs) diff
         syntaxPatches = toList diff
         extractLeaves :: DiffInfo -> [DiffInfo]
         extractLeaves (BranchInfo children _ _) = join $ extractLeaves <$> children

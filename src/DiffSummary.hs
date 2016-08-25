@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
 
-module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries) where
+module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo) where
 
 import Prologue hiding (intercalate)
 import Diff
@@ -61,20 +61,26 @@ summaries :: Patch DiffInfo -> [Either Doc Doc]
 summaries patch = eitherErrorOrDoc <$> patchToDoc patch
   where eitherErrorOrDoc = if any hasErrorInfo patch then Left else Right
 
+-- Flattens a patch of diff infos into a list of docs, one for every 'LeafInfo'
+-- or `ErrorInfo` it contains.
+patchToDoc :: Patch DiffInfo -> [Doc]
 patchToDoc = \case
   p@(Replace i1 i2) -> zipWith (\a b -> (prefixWithPatch p) a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
   p@(Insert info) -> (prefixWithPatch p) <$> toLeafInfos info
   p@(Delete info) -> (prefixWithPatch p) <$> toLeafInfos info
 
+-- Prefixes a given doc with the type of patch it represents.
+prefixWithPatch :: Patch DiffInfo -> Doc -> Doc
 prefixWithPatch patch = prefixWithThe (patchToPrefix patch)
-prefixWithThe prefix doc = prefix <+> "the" <+> doc
-patchToPrefix = \case
-  (Replace _ _) -> "Replaced"
-  (Insert _) -> "Added"
-  (Delete _) -> "Deleted"
+  where
+    prefixWithThe prefix doc = prefix <+> "the" <+> doc
+    patchToPrefix = \case
+      (Replace _ _) -> "Replaced"
+      (Insert _) -> "Added"
+      (Delete _) -> "Deleted"
 
 toLeafInfos :: DiffInfo -> [Doc]
-toLeafInfos info@LeafInfo{..} = pure (squotes (toDoc termName) <+> (toDoc categoryName))
+toLeafInfos LeafInfo{..} = pure (squotes (toDoc termName) <+> (toDoc categoryName))
 toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure (pretty err)
 
