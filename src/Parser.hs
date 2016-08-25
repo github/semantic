@@ -46,7 +46,7 @@ termConstructor source sourceSpan info children = case category info of
     _ -> errorWith children
   op | isOperator op -> withDefaultInfo $ S.Operator children
   CommaOperator -> withDefaultInfo $ case children of
-    [ child, rest ] | S.Indexed cs <- unwrap rest -> S.Indexed $ child : toList cs
+    [ child, rest ] -> S.Indexed $ child : toList (unwrap rest)
     _ -> S.Indexed children
   Function -> case children of
     [ body ] -> withDefaultInfo $ S.AnonymousFunction Nothing body
