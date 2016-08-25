@@ -129,8 +129,69 @@ javascriptTermConstructor
 javascriptTermConstructor source sourceSpan name range children = withDefaultInfo $ case name of
   "return_statement" -> S.Return (listToMaybe children)
   _ -> S.Indexed children
-  where withDefaultInfo = pure . cofree . ((range .: Other name .: RNil) :<)
+  where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
 
+categoryForJavaScriptProductionName :: Text -> Category
+categoryForJavaScriptProductionName name = case name of
+  "object" -> Object
+  "expression_statement" -> ExpressionStatements
+  "this_expression" -> Identifier
+  "null" -> Identifier
+  "undefined" -> Identifier
+  "arrow_function" -> Function
+  "generator_function" -> Function
+  "math_op" -> BinaryOperator -- bitwise operator, e.g. +, -, *, /.
+  "bool_op" -> BinaryOperator -- boolean operator, e.g. ||, &&.
+  "comma_op" -> CommaOperator -- comma operator, e.g. expr1, expr2.
+  "delete_op" -> Operator -- delete operator, e.g. delete x[2].
+  "type_op" -> Operator -- type operator, e.g. typeof Object.
+  "void_op" -> Operator -- void operator, e.g. void 2.
+  "for_in_statement" -> For
+  "for_of_statement" -> For
+  "new_expression" -> Constructor
+  "class"  -> Class
+  "catch" -> Catch
+  "finally" -> Finally
+  "if_statement" -> If
+  "empty_statement" -> Empty
+  "program" -> Program
+  "ERROR" -> Error
+  "function_call" -> FunctionCall
+  "pair" -> Pair
+  "string" -> StringLiteral
+  "integer" -> IntegerLiteral
+  "symbol" -> SymbolLiteral
+  "array" -> ArrayLiteral
+  "function" -> Function
+  "identifier" -> Identifier
+  "formal_parameters" -> Params
+  "arguments" -> Args
+  "statement_block" -> ExpressionStatements
+  "assignment" -> Assignment
+  "member_access" -> MemberAccess
+  "op" -> Operator
+  "subscript_access" -> SubscriptAccess
+  "regex" -> Regex
+  "template_string" -> TemplateString
+  "var_assignment" -> VarAssignment
+  "var_declaration" -> VarDecl
+  "switch_statement" -> Switch
+  "math_assignment" -> MathAssignment
+  "case" -> Case
+  "true" -> Boolean
+  "false" -> Boolean
+  "ternary" -> Ternary
+  "for_statement" -> For
+  "while_statement" -> While
+  "do_statement" -> DoWhile
+  "return_statement" -> Return
+  "throw_statement" -> Throw
+  "try_statement" -> Try
+  "method_definition" -> Method
+  "comment" -> Comment
+  "bitwise_op" -> BitwiseOperator
+  "rel_op" -> RelationalOperator
+  _ -> Other name
 
 toVarDecl :: (HasField fields Category) => Term Text (Record fields) -> Term Text (Record fields)
 toVarDecl child = cofree $ (setCategory (extract child) VarDecl :< S.VarDecl child)
