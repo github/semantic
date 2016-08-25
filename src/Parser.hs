@@ -145,6 +145,7 @@ javascriptTermConstructor source sourceSpan name range children = withDefaultInf
     _ -> S.Indexed children
   ("ternary", (condition:cases)) -> S.Ternary condition cases
   ("arguments", _) -> S.Args children
+  ("var_assignment", [ x, y ]) -> S.VarAssignment x y
   (_, []) -> S.Leaf . toText $ slice range source
   _ -> S.Indexed children
   where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
