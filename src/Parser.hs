@@ -153,6 +153,8 @@ javascriptTermConstructor source sourceSpan name range children = withDefaultInf
   ("pair", _) -> S.Fixed children
   ("if_statement", [ expr, clause1, clause2 ]) -> S.If expr clause1 (Just clause2)
   ("if_statement", [ expr, clause ]) -> S.If expr clause Nothing
+  ("for_in_statement", _) | Just (exprs, body) <- unsnoc children -> S.For exprs body
+  ("for_of_statement", _) | Just (exprs, body) <- unsnoc children -> S.For exprs body
   (_, []) -> S.Leaf . toText $ slice range source
   _ -> S.Indexed children
   where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
