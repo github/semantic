@@ -1,3 +1,4 @@
+{-# LANGUAGE DataKinds #-}
 module Parser where
 
 import Prologue hiding (Constructor)
@@ -117,6 +118,19 @@ termConstructor source sourceSpan info children = case category info of
         errorWith children = do
           sourceSpan' <- sourceSpan
           withDefaultInfo (S.Error sourceSpan' children)
+
+javascriptTermConstructor
+  :: Source Char -- ^ The source that the term occurs within.
+  -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
+  -> Text -- ^ The name of the production for this node.
+  -> Range -- ^ The character range that the term occupies.
+  -> [Term Text (Record '[Range, Category])] -- ^ The child nodes of the term.
+  -> IO (Term Text (Record '[Range, Category])) -- ^ The resulting term, in IO.
+javascriptTermConstructor source sourceSpan name range children = withDefaultInfo $ case name of
+  "return_statement" -> S.Return (listToMaybe children)
+  _ -> S.Indexed children
+  where withDefaultInfo = pure . cofree . ((range .: Other name .: RNil) :<)
+
 
 toVarDecl :: (HasField fields Category) => Term Text (Record fields) -> Term Text (Record fields)
 toVarDecl child = cofree $ (setCategory (extract child) VarDecl :< S.VarDecl child)
