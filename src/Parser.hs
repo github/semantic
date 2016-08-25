@@ -156,6 +156,7 @@ javascriptTermConstructor source sourceSpan name range children = withDefaultInf
   ("for_in_statement", _) | Just (exprs, body) <- unsnoc children -> S.For exprs body
   ("for_of_statement", _) | Just (exprs, body) <- unsnoc children -> S.For exprs body
   ("while_statement", [ expr, body ]) -> S.While expr body
+  ("do_statement", [ expr, body ]) -> S.DoWhile expr body
   (_, []) -> S.Leaf . toText $ slice range source
   _ -> S.Indexed children
   where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
