@@ -59,7 +59,7 @@ diffToDiffSummaries sources = para $ \diff ->
 -- Returns a list of diff summary 'Docs' prefixed given a 'Patch'.
 summaries :: Patch DiffInfo -> [Either Doc Doc]
 summaries patch = eitherErrorOrDoc <$> patchToDoc patch
-  where eitherErrorOrDoc = if any isErrorInfo patch then Left else Right
+  where eitherErrorOrDoc = if any hasErrorInfo patch then Left else Right
 
 patchToDoc = \case
   p@(Replace i1 i2) -> zipWith (\a b -> (prefixWithPatch p) a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
@@ -187,9 +187,10 @@ isBranchInfo info = case info of
   (BranchInfo _ _ _) -> True
   _ -> False
 
-isErrorInfo :: DiffInfo -> Bool
-isErrorInfo info = case info of
+hasErrorInfo :: DiffInfo -> Bool
+hasErrorInfo info = case info of
   (ErrorInfo _ _) -> True
+  (BranchInfo branches _ _) -> any isErrorInfo branches
   _ -> False
 
 -- The user-facing category name of 'a'.
