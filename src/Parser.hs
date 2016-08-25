@@ -159,6 +159,12 @@ javascriptTermConstructor source sourceSpan name range children = withDefaultInf
   ("do_statement", [ expr, body ]) -> S.DoWhile expr body
   ("throw_statement", [ expr ]) -> S.Throw expr
   ("new_expression", [ expr ]) -> S.Constructor expr
+  ("try_statement", [ body ]) -> S.Try body Nothing Nothing
+  ("try_statement", [ body, catch ]) | Catch <- category (extract catch) -> S.Try body (Just catch) Nothing
+  ("try_statement", [ body, finally ]) | Finally <- category (extract finally) -> S.Try body Nothing (Just finally)
+  ("try_statement", [ body, catch, finally ])
+    | Catch <- category (extract catch)
+    , Finally <- category (extract finally) -> S.Try body (Just catch) (Just finally)
   (_, []) -> S.Leaf . toText $ slice range source
   _ -> S.Indexed children
   where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
