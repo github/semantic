@@ -30,13 +30,13 @@ termConstructor :: forall fields. (Show (Record fields), HasField fields Categor
   -> Record fields -- ^ The annotation for the term.
   -> [Term Text (Record fields)] -- ^ The child nodes of the term.
   -> IO (Term Text (Record fields)) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan info = fmap cofree . construct
+termConstructor source sourceSpan info = construct
   where
-    withDefaultInfo syntax = pure (info :< syntax)
+    withDefaultInfo syntax = pure $! cofree (info :< syntax)
     errorWith children = do
       sourceSpan' <- sourceSpan
       withDefaultInfo (S.Error sourceSpan' children)
-    construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [Term Text (Record fields)] -> IO (CofreeF (S.Syntax Text) (Record fields) (Term Text (Record fields)))
+    construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [Term Text (Record fields)] -> IO (Term Text (Record fields))
     construct children = case category info of
       Return -> withDefaultInfo $ S.Return (listToMaybe children)
       Assignment -> case children of
@@ -66,9 +66,9 @@ termConstructor source sourceSpan info = fmap cofree . construct
         _ -> errorWith children
       FunctionCall -> case runCofree <$> children of
         [ (_ :< S.MemberAccess{..}), (_ :< S.Args args) ] ->
-          pure $! setCategory info MethodCall :< S.MethodCall memberId property args
+          pure $! cofree $ setCategory info MethodCall :< S.MethodCall memberId property args
         [ (_ :< S.MemberAccess{..}) ] ->
-          pure $! setCategory info MethodCall :< S.MethodCall memberId property []
+          pure $! cofree $ setCategory info MethodCall :< S.MethodCall memberId property []
         (x:xs) ->
           withDefaultInfo $ S.FunctionCall (cofree x) (cofree <$> xs)
         _ -> errorWith children
