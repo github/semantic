@@ -126,11 +126,9 @@ javascriptTermConstructor
   -> Range -- ^ The character range that the term occupies.
   -> [Term Text (Record '[Range, Category])] -- ^ The child nodes of the term.
   -> IO (Term Text (Record '[Range, Category])) -- ^ The resulting term, in IO.
-javascriptTermConstructor source sourceSpan name range children = withDefaultInfo $ case name of
-  "return_statement" -> S.Return (listToMaybe children)
-  "assignment" -> case children of
-    [ identifier, value ] -> S.Assignment identifier value
-    _ -> S.Indexed children
+javascriptTermConstructor source sourceSpan name range children = withDefaultInfo $ case (name, children) of
+  ("return_statement", _) -> S.Return (listToMaybe children)
+  ("assignment", [ identifier, value ]) -> S.Assignment identifier value
   _ -> S.Indexed children
   where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
 
