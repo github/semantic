@@ -71,7 +71,7 @@ termConstructor source sourceSpan info children = case category info of
   Args -> withDefaultInfo $ S.Args children
   VarAssignment | [ x, y ] <- children -> withDefaultInfo $ S.VarAssignment x y
   VarDecl -> withDefaultInfo . S.Indexed $ toVarDecl <$> children
-  Switch | [ expr, body ] <- children -> withDefaultInfo $ S.Case expr body
+  Switch | (expr:rest) <- children -> withDefaultInfo $ S.Switch expr rest
   Case | [ expr, body ] <- children -> withDefaultInfo $ S.Case expr body
   Object -> withDefaultInfo . S.Object $ foldMap toTuple children
   Pair -> withDefaultInfo $ S.Fixed children
