@@ -175,7 +175,8 @@ javascriptTermConstructor source sourceSpan name range children
 
   (_, []) -> S.Leaf . toText $ slice range source
   _ -> S.Indexed children
-  where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
+  where withDefaultInfo syntax@(S.MethodCall _ _ _) = pure $! cofree ((range .:  MethodCall .: RNil) :< syntax)
+        withDefaultInfo syntax = pure $! cofree ((range .: categoryForJavaScriptProductionName name .: RNil) :< syntax)
 
 categoryForJavaScriptProductionName :: Text -> Category
 categoryForJavaScriptProductionName name = case name of
