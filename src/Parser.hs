@@ -128,6 +128,9 @@ javascriptTermConstructor
   -> IO (Term Text (Record '[Range, Category])) -- ^ The resulting term, in IO.
 javascriptTermConstructor source sourceSpan name range children = withDefaultInfo $ case name of
   "return_statement" -> S.Return (listToMaybe children)
+  "assignment" -> case children of
+    [ identifier, value ] -> S.Assignment identifier value
+    _ -> S.Indexed children
   _ -> S.Indexed children
   where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
 
