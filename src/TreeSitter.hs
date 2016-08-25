@@ -1,5 +1,5 @@
 {-# LANGUAGE DataKinds #-}
-module TreeSitter where
+module TreeSitter (treeSitterParser) where
 
 import Prologue hiding (Constructor)
 import Control.Monad
