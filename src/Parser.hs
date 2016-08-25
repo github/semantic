@@ -133,6 +133,11 @@ javascriptTermConstructor source sourceSpan name range children = withDefaultInf
   ("member_access", [ base, property ]) -> S.MemberAccess base property
   ("subscript_access", [ base, element ]) -> S.SubscriptAccess base element
   ("comma_op", [ child, rest ]) -> S.Indexed $ child : toList (unwrap rest)
+  _ | name `elem` [ "arrow_function", "generator_function", "function" ] -> case children of
+    [ body ] -> S.AnonymousFunction Nothing body
+    [ params, body ] -> S.AnonymousFunction (Just params) body
+    [ id, params, body ] -> S.Function id (Just params) body
+    _ -> S.Indexed children
   (_, []) -> S.Leaf . toText $ slice range source
   _ -> S.Indexed children
   where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
