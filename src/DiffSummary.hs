@@ -127,7 +127,7 @@ toTermName source term = case unwrap term of
   S.Return expr -> maybe "empty" toTermName' expr
   S.Error _ _ -> termNameFromSource term
   S.If expr _ _ -> termNameFromSource expr
-  S.For _ _ -> termNameFromChildren term
+  S.For clauses _ -> termNameFromChildren term clauses
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
   S.Throw expr -> termNameFromSource expr
@@ -137,9 +137,9 @@ toTermName source term = case unwrap term of
   S.Class identifier _ _ -> toTermName' identifier
   S.Method identifier _ _ -> toTermName' identifier
   S.Comment a -> toCategoryName a
-  S.Commented _ _ -> termNameFromChildren term
+  S.Commented comments _ -> termNameFromChildren term comments
   where toTermName' = toTermName source
-        termNameFromChildren term = termNameFromRange (unionRangesFrom (range term) (range <$> toList (unwrap term)))
+        termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
         termNameFromRange range = toText $ Source.slice range source
         range = characterRange . extract
