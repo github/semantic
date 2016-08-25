@@ -1,4 +1,3 @@
-{-# LANGUAGE ScopedTypeVariables #-}
 module Parser where
 
 import Prologue hiding (Constructor)
@@ -24,7 +23,7 @@ isOperator = flip Set.member (Set.fromList [ Operator, BinaryOperator, BitwiseOp
 -- | Construct a term given source, the span covered, the annotation for the term, and its children.
 --
 -- This is typically called during parsing, building terms up leaf-to-root.
-termConstructor :: forall fields. (Show (Record fields), HasField fields Category, HasField fields Range)
+termConstructor :: (Show (Record fields), HasField fields Category, HasField fields Range)
   => Source Char -- ^ The source that the term occurs within.
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
   -> Record fields -- ^ The annotation for the term.
