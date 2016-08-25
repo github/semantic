@@ -168,6 +168,9 @@ javascriptTermConstructor source sourceSpan name range children = withDefaultInf
   ("array", _) -> S.Array children
   ("method_definition", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
   ("method_definition", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
+  ("class", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
+  ("class", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
+
   (_, []) -> S.Leaf . toText $ slice range source
   _ -> S.Indexed children
   where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
