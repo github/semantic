@@ -119,7 +119,6 @@ documentToTerm language document blob = alloca $ \ root -> do
             , spanEnd = SourcePos (fromIntegral $! ts_node_p_end_point_row node) (fromIntegral $! ts_node_p_end_point_column node) }
 
           -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
-          let info = range `seq` range .: categoriesForLanguage language (toS name) .: RNil
-          termConstructor (source blob) (sourceSpan `seq` pure sourceSpan) info (filter (\child -> category (extract child) /= Empty) children)
+          range `seq` javascriptTermConstructor (source blob) (sourceSpan `seq` pure sourceSpan) (toS name) range (filter (\child -> category (extract child) /= Empty) children)
         getChild node n out = ts_node_p_named_child node n out >> toTerm out
         {-# INLINE getChild #-}
