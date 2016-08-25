@@ -148,6 +148,7 @@ javascriptTermConstructor source sourceSpan name range children = withDefaultInf
   ("var_assignment", [ x, y ]) -> S.VarAssignment x y
   ("var_declaration", _) -> S.Indexed $ toVarDecl <$> children
   ("switch_statement", (expr:rest)) -> S.Switch expr rest
+  ("case", [ expr, body ]) -> S.Case expr body
   (_, []) -> S.Leaf . toText $ slice range source
   _ -> S.Indexed children
   where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
