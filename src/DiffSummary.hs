@@ -190,7 +190,7 @@ isBranchInfo info = case info of
 hasErrorInfo :: DiffInfo -> Bool
 hasErrorInfo info = case info of
   (ErrorInfo _ _) -> True
-  (BranchInfo branches _ _) -> any isErrorInfo branches
+  (BranchInfo branches _ _) -> any hasErrorInfo branches
   _ -> False
 
 -- The user-facing category name of 'a'.
