@@ -138,6 +138,11 @@ javascriptTermConstructor source sourceSpan name range children = withDefaultInf
     [ params, body ] -> S.AnonymousFunction (Just params) body
     [ id, params, body ] -> S.Function id (Just params) body
     _ -> S.Indexed children
+  ("function_call", _) -> case runCofree <$> children of
+    [ (_ :< S.MemberAccess{..}), (_ :< S.Args args) ] -> S.MethodCall memberId property args
+    [ (_ :< S.MemberAccess{..}) ] -> S.MethodCall memberId property []
+    (x:xs) -> S.FunctionCall (cofree x) (cofree <$> xs)
+    _ -> S.Indexed children
   (_, []) -> S.Leaf . toText $ slice range source
   _ -> S.Indexed children
   where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
