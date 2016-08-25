@@ -151,6 +151,8 @@ javascriptTermConstructor source sourceSpan name range children = withDefaultInf
   ("case", [ expr, body ]) -> S.Case expr body
   ("object", _) -> S.Object $ foldMap toTuple children
   ("pair", _) -> S.Fixed children
+  ("if_statement", [ expr, clause1, clause2 ]) -> S.If expr clause1 (Just clause2)
+  ("if_statement", [ expr, clause ]) -> S.If expr clause Nothing
   (_, []) -> S.Leaf . toText $ slice range source
   _ -> S.Indexed children
   where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
