@@ -85,7 +85,7 @@ toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure (pretty err)
 
 -- Returns a text representing a specific term given a source and a term.
-toTermName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
+toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
 toTermName source term = case unwrap term of
   S.AnonymousFunction _ _ -> "anonymous"
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
@@ -95,7 +95,7 @@ toTermName source term = case unwrap term of
     (S.MemberAccess{}, S.AnonymousFunction{..}) -> toTermName' identifier
     (_, _) -> toTermName' identifier <> toTermName' value
   S.Function identifier _ _ -> toTermName' identifier
-  S.FunctionCall i args -> toTermName' i <> "(" <> (intercalate ", " (toTermName' <$> args)) <> ")"
+  S.FunctionCall i args -> toTermName' i <> "(" <> (intercalate ", " (toArgName <$> args)) <> ")"
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
     (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' property <> "()"
     (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' property
@@ -143,6 +143,10 @@ toTermName source term = case unwrap term of
         termNameFromSource term = termNameFromRange (range term)
         termNameFromRange range = toText $ Source.slice range source
         range = characterRange . extract
+        toArgName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Term leaf (Record fields) -> Text
+        toArgName arg = case unwrap arg of
+          S.AnonymousFunction _ _ -> "..."
+          _ -> toTermName' arg
 
 maybeParentContext :: Maybe (Category, Text) -> Doc
 maybeParentContext = maybe "" (\annotation ->
