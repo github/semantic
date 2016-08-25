@@ -130,6 +130,7 @@ javascriptTermConstructor source sourceSpan name range children = withDefaultInf
   ("return_statement", _) -> S.Return (listToMaybe children)
   ("assignment", [ identifier, value ]) -> S.Assignment identifier value
   ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
+  ("member_access", [ base, property ]) -> S.MemberAccess base property
   _ -> S.Indexed children
   where withDefaultInfo = pure . cofree . ((range .: categoryForJavaScriptProductionName name .: RNil) :<)
 
