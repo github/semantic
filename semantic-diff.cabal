@@ -94,10 +94,7 @@ benchmark semantic-diff-bench
                      , recursion-schemes
                      , semantic-diff
                      , these
-  if os(darwin)
-    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -O2 -static
-  else
-    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -O2 -static -pgml=script/g++
+  ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -O2 -static -pgml=script/g++
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings, NoImplicitPrelude
 
@@ -134,18 +131,9 @@ test-suite semantic-diff-test
                      , vector
                      , wl-pprint-text
                      , protolude
-  if os(darwin)
-    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j
-  else
-    ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -pgml=script/g++
+  ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -pgml=script/g++
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
-  if os(darwin)
-    extra-libraries:   stdc++ icuuc icudata icui18n
-  if os(darwin)
-    extra-lib-dirs:    /usr/local/opt/icu4c/lib
-  if os(darwin)
-    include-dirs:      /usr/local/opt/icu4c/include
 
 source-repository head
   type:     git
