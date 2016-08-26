@@ -22,6 +22,7 @@ import qualified Text.PrettyPrint.Leijen.Text as P
 import SourceSpan
 import Source
 
+data Identifiable a = Identifiable a | Unidentifiable a
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
  | ErrorInfo { errorSpan :: SourceSpan, termName :: Text }
