@@ -40,49 +40,56 @@ termConstructor source sourceSpan info = fmap cofree . construct
     construct [] = case category info of
       Return -> withDefaultInfo $ S.Return Nothing -- Map empty return statements to Return Nothing
       _ -> withDefaultInfo . S.Leaf . pack . toString $ slice (characterRange info) source
+
     construct children | Return == category info =
       withDefaultInfo $ S.Return (listToMaybe children)
+
     construct children | Assignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.Assignment identifier value
       children -> errorWith children
+
     construct children | MathAssignment == category info = case children of
       (identifier:value:[]) -> withDefaultInfo $ S.MathAssignment identifier value
       children -> errorWith children
+
     construct children | MemberAccess == category info = case children of
       (base:property:[]) -> withDefaultInfo $ S.MemberAccess base property
       children -> errorWith children
+
     construct children | SubscriptAccess == category info = case children of
       (base:element:[]) -> withDefaultInfo $ S.SubscriptAccess base element
       _ -> errorWith children
+
     construct children | isOperator (category info) = withDefaultInfo $ S.Operator children
+
     construct children | CommaOperator == category info = withDefaultInfo $ case children of
       [child, rest] | S.Indexed cs <- unwrap rest -> S.Indexed $ child : toList cs
       _ -> S.Indexed children
-    construct children | Function == category info = case children of
-      (body:[]) -> withDefaultInfo $ S.AnonymousFunction Nothing body
-      (params:body:[]) | (info :< _) <- runCofree params, Params == category info ->
-        withDefaultInfo $ S.AnonymousFunction (Just params) body
-      (id:body:[]) | (info :< _) <- runCofree id, Identifier == category info ->
-        withDefaultInfo $ S.Function id Nothing body
-      (id:params:body:[]) | (info :< _) <- runCofree id, Identifier == category info ->
-        withDefaultInfo $ S.Function id (Just params) body
-      _ -> errorWith children
 
-    construct children | FunctionCall == category info = case runCofree <$> children of
-      [ (_ :< S.MemberAccess{..}), (_ :< S.Args args) ] ->
-        pure $! setCategory info MethodCall :< S.MethodCall memberId property args
-      [ (_ :< S.MemberAccess{..}) ] ->
-        pure $! setCategory info MethodCall :< S.MethodCall memberId property []
-      [ x@(_ :< S.Leaf{}), (_ :< S.Args args) ] ->
-        withDefaultInfo $ S.FunctionCall (cofree x) args
-      _ -> errorWith children
+    construct children | Function == category info =
+      case children of
+        (body:[]) -> withDefaultInfo $ S.AnonymousFunction Nothing body
+        (params:body:[]) | (info :< _) <- runCofree params, Params == category info -> withDefaultInfo $ S.AnonymousFunction (Just params) body
+        (id:body:[]) | (info :< _) <- runCofree id, Identifier == category info -> withDefaultInfo $ S.Function id Nothing body
+        (id:params:body:[]) | (info :< _) <- runCofree id, Identifier == category info -> withDefaultInfo $ S.Function id (Just params) body
+        _ -> errorWith children
 
-    construct children | Ternary == category info = case children of
-      (condition:cases) -> withDefaultInfo $ S.Ternary condition cases
-      _ -> errorWith children
+    construct children | FunctionCall == category info =
+      case runCofree <$> children of
+        [ (_ :< S.MemberAccess{..}), (_ :< S.Args args) ] -> pure $! setCategory info MethodCall :< S.MethodCall memberId property args
+        [ (_ :< S.MemberAccess{..}) ] -> pure $! setCategory info MethodCall :< S.MethodCall memberId property []
+        [ x@(_ :< S.Leaf{}), (_ :< S.Args args) ] -> withDefaultInfo $ S.FunctionCall (cofree x) args
+        _ -> errorWith children
+
+    construct children | Ternary == category info =
+      case children of
+        (condition:cases) -> withDefaultInfo $ S.Ternary condition cases
+        _ -> errorWith children
+
     construct children | Args == category info = withDefaultInfo $ S.Args children
-    construct children | VarAssignment == category info
-                         , [x, y] <- children = withDefaultInfo $ S.VarAssignment x y
+
+    construct children | VarAssignment == category info, [x, y] <- children = withDefaultInfo $ S.VarAssignment x y
+
     construct children | VarDecl == category info = withDefaultInfo . S.Indexed $ toVarDecl <$> children
       where
         toVarDecl :: (HasField fields Category) => Term Text (Record fields) -> Term Text (Record fields)
@@ -103,46 +110,45 @@ termConstructor source sourceSpan info = fmap cofree . construct
         toTuple child = pure child
 
     construct children | Pair == (category info) = withDefaultInfo $ S.Fixed children
-    construct children | C.Error == category info =
-      errorWith children
+
+    construct children | C.Error == category info = errorWith children
+
     construct children | If == category info, Just (expr, clauses) <- uncons children =
       case clauses of
         [clause1, clause2] -> withDefaultInfo $ S.If expr clause1 (Just clause2)
         [clause] -> withDefaultInfo $ S.If expr clause Nothing
         _ -> errorWith children
-    construct children | For == category info, Just (exprs, body) <- unsnoc children =
-      withDefaultInfo $ S.For exprs body
-    construct children | While == category info, [expr, body] <- children =
-      withDefaultInfo $ S.While expr body
-    construct children | DoWhile == category info, [expr, body] <- children =
-      withDefaultInfo $ S.DoWhile expr body
-    construct children | Throw == category info, [expr] <- children =
-      withDefaultInfo $ S.Throw expr
-    construct children | Constructor == category info, [expr] <- children =
-      withDefaultInfo $ S.Constructor expr
-    construct children | Try == category info = case children of
-      [body] -> withDefaultInfo $ S.Try body Nothing Nothing
-      [body, catch] | Catch <- category (extract catch) -> withDefaultInfo $ S.Try body (Just catch) Nothing
-      [body, finally] | Finally <- category (extract finally) -> withDefaultInfo $ S.Try body Nothing (Just finally)
-      [body, catch, finally] | Catch <- category (extract catch),
-                               Finally <- category (extract finally) ->
-        withDefaultInfo $ S.Try body (Just catch) (Just finally)
-      _ -> errorWith children
-    construct children | ArrayLiteral == category info =
-      withDefaultInfo $ S.Array children
-    construct children | Method == category info = case children of
-      [identifier, params, exprs] |
-        Params == category (extract params),
-        S.Indexed params' <- unwrap params ->
-          withDefaultInfo $ S.Method identifier params' (toList (unwrap exprs))
-      [identifier, exprs] ->
-        withDefaultInfo $ S.Method identifier mempty (toList (unwrap exprs))
-      _ -> errorWith children
-    construct children | Class == category info = case children of
-      [identifier, superclass, definitions] ->
-        withDefaultInfo $ S.Class identifier (Just superclass) (toList (unwrap definitions))
-      [identifier, definitions] ->
-        withDefaultInfo $ S.Class identifier Nothing (toList (unwrap definitions))
-      _ -> errorWith children
-    construct children =
-      withDefaultInfo $ S.Indexed children
+
+    construct children | For == category info, Just (exprs, body) <- unsnoc children = withDefaultInfo $ S.For exprs body
+
+    construct children | While == category info, [expr, body] <- children = withDefaultInfo $ S.While expr body
+
+    construct children | DoWhile == category info, [expr, body] <- children = withDefaultInfo $ S.DoWhile expr body
+
+    construct children | Throw == category info, [expr] <- children = withDefaultInfo $ S.Throw expr
+
+    construct children | Constructor == category info, [expr] <- children = withDefaultInfo $ S.Constructor expr
+
+    construct children | Try == category info =
+      case children of
+        [body] -> withDefaultInfo $ S.Try body Nothing Nothing
+        [body, catch] | Catch <- category (extract catch) -> withDefaultInfo $ S.Try body (Just catch) Nothing
+        [body, finally] | Finally <- category (extract finally) -> withDefaultInfo $ S.Try body Nothing (Just finally)
+        [body, catch, finally] | Catch <- category (extract catch), Finally <- category (extract finally) -> withDefaultInfo $ S.Try body (Just catch) (Just finally)
+        _ -> errorWith children
+
+    construct children | ArrayLiteral == category info = withDefaultInfo $ S.Array children
+
+    construct children | Method == category info =
+      case children of
+        [identifier, params, exprs] | Params == category (extract params), S.Indexed params' <- unwrap params -> withDefaultInfo $ S.Method identifier params' (toList (unwrap exprs))
+        [identifier, exprs] -> withDefaultInfo $ S.Method identifier mempty (toList (unwrap exprs))
+        _ -> errorWith children
+
+    construct children | Class == category info =
+      case children of
+        [identifier, superclass, definitions] -> withDefaultInfo $ S.Class identifier (Just superclass) (toList (unwrap definitions))
+        [identifier, definitions] -> withDefaultInfo $ S.Class identifier Nothing (toList (unwrap definitions))
+        _ -> errorWith children
+
+    construct children = withDefaultInfo $ S.Indexed children
