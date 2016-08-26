@@ -13,6 +13,7 @@ import Category as C
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
+import qualified Data.Set as Set
 import Data.Text as Text (intercalate)
 import Test.QuickCheck hiding (Fixed)
 import Patch.Arbitrary()
@@ -23,6 +24,23 @@ import SourceSpan
 import Source
 
 data Identifiable a = Identifiable a | Unidentifiable a
+
+hasIdentity = Set.fromList  [ C.FunctionCall
+                            , C.Function
+                            , C.Assignment
+                            , C.MathAssignment
+                            , C.MemberAccess
+                            , C.MethodCall
+                            , C.VarAssignment
+                            , C.SubscriptAccess
+                            , C.Class
+                            , C.Method
+                            , C.Identifier
+                            ]
+
+identifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Term leaf (Record fields) -> Identifiable (Term leaf (Record fields))
+identifiable term = if Set.member (category . extract $ term) hasIdentity then Identifiable term else Unidentifiable term
+
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
  | ErrorInfo { errorSpan :: SourceSpan, termName :: Text }
