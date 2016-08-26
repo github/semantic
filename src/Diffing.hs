@@ -36,7 +36,7 @@ import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
 import Category
-import Data.Aeson (pairs)
+import Data.Aeson (toJSON, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
 
 -- | Given a parser and renderer, diff two sources and return the rendered
@@ -165,8 +165,8 @@ printDiff parser arguments sources = do
   let renderedText = case rendered of
                        SplitOutput text -> text
                        PatchOutput text -> text
-                       JSONOutput series -> toS . encodingToLazyByteString $ pairs series
-                       SummaryOutput summaries -> toS . encodingToLazyByteString $ pairs summaries
+                       JSONOutput series -> toS . encodingToLazyByteString . toEncoding $ toJSON series
+                       SummaryOutput summaries -> toS . encodingToLazyByteString . toEncoding $ toJSON summaries
 
   case output arguments of
     Nothing -> TextIO.putStr renderedText
