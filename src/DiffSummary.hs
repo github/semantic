@@ -120,7 +120,7 @@ toTermName source term = case unwrap term of
     (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' property
     (_, S.FunctionCall{}) -> toTermName' base <> "." <> toTermName' property <> "()"
     (_, _) -> toTermName' base <> "." <> toTermName' property
-  S.MethodCall targetId methodId _ -> toTermName' targetId <> sep <> toTermName' methodId <> "()"
+  S.MethodCall targetId methodId methodParams -> toTermName' targetId <> sep <> toTermName' methodId <> "(" <> (intercalate ", " (toArgName <$> methodParams)) <> ")"
     where sep = case unwrap targetId of
             S.FunctionCall{} -> "()."
             _ -> "."
@@ -163,9 +163,9 @@ toTermName source term = case unwrap term of
         termNameFromRange range = toText $ Source.slice range source
         range = characterRange . extract
         toArgName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Term leaf (Record fields) -> Text
-        toArgName arg = case unwrap arg of
-          S.AnonymousFunction _ _ -> "..."
-          _ -> toTermName' arg
+        toArgName arg = case identifiable arg of
+                          Identifiable arg -> toTermName' arg
+                          Unidentifiable _ -> "..."
 
 maybeParentContext :: Maybe (Category, Text) -> Doc
 maybeParentContext = maybe "" (\annotation ->
