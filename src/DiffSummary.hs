@@ -137,7 +137,7 @@ toTermName source term = case unwrap term of
   S.Class identifier _ _ -> toTermName' identifier
   S.Method identifier _ _ -> toTermName' identifier
   S.Comment a -> toCategoryName a
-  S.Commented comments _ -> termNameFromChildren term comments
+  S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
