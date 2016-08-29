@@ -55,6 +55,7 @@ library
                      , blaze-html
                      , blaze-markup
                      , bytestring
+                     , cmark
                      , containers
                      , directory
                      , dlist
