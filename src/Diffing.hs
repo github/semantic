@@ -3,6 +3,8 @@ module Diffing where
 
 import qualified Prologue
 import Prologue hiding (fst, snd)
+import Category
+import CMark
 import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
 import Data.Functor.Foldable
@@ -35,7 +37,6 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
-import Category
 import Data.Aeson (toJSON, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
 
@@ -65,11 +66,36 @@ diffFiles parser renderer sourceBlobs = do
           Leaf s -> Just s
           _ -> Nothing)
 
+cmarkParser :: Parser (Syntax Text) (Record '[Range, Category])
+cmarkParser blob = pure $ toTerm $ commonmarkToNode [ optSourcePos, optSafe ] (toText (source blob))
+  where toTerm :: Node -> Cofree (Syntax Text) (Record '[Range, Category])
+        toTerm (Node position t children) = cofree $ (Range 0 0 .: toCategory t .: RNil) :< case t of
+          -- Leaves
+          CODE text -> Leaf text
+          TEXT text -> Leaf text
+          CODE_BLOCK language text -> Leaf text
+          -- Branches
+          _ -> Indexed (toTerm <$> children)
+        -- Node (Maybe PosInfo) NodeType [Node]
+        toCategory :: NodeType -> Category
+        toCategory (TEXT _) = Other "text"
+        toCategory (CODE _) = Other "code"
+        toCategory (HTML_BLOCK _) = Other "html"
+        toCategory (HTML_INLINE _) = Other "html"
+        toCategory (HEADING _) = Other "heading"
+        toCategory (LIST (ListAttributes{..})) = Other $ case listType of
+          BULLET_LIST -> "unordered list"
+          ORDERED_LIST -> "ordered list"
+        toCategory (LINK{}) = Other "link"
+        toCategory (IMAGE{}) = Other "image"
+        toCategory t = Other (show t)
+
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
 parserForType mediaType = case languageForType mediaType of
   Just C -> treeSitterParser C ts_language_c
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
+  Just Markdown -> cmarkParser
   Just Ruby -> treeSitterParser Ruby ts_language_ruby
   _ -> lineByLineParser
 
