@@ -13,6 +13,7 @@ data Language =
     | HTML
     | Java
     | JavaScript
+    | Markdown
     | ObjectiveC
     | Perl
     | PHP
