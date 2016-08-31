@@ -1,7 +1,8 @@
-module Arguments (Arguments(..)) where
+module Arguments (Arguments(..), args) where
 
 import Data.Functor.Both
 import qualified Prelude as P
+import Prelude
 import Prologue
 import qualified Renderer as R
 
@@ -13,3 +14,11 @@ data Arguments = Arguments {
   output :: Maybe FilePath,
   filepaths :: [FilePath] }
   deriving (Show)
+
+args :: String -> String -> [String] -> R.Format -> Arguments
+args sha1 sha2 filePaths format = Arguments { format = format
+                                            , maybeShas = Just <$> both sha1 sha2
+                                            , filepaths = filePaths
+                                            , maybeTimeout = Just 10.0
+                                            , output = Nothing
+                                            }
