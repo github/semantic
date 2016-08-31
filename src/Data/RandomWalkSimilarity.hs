@@ -41,7 +41,21 @@ rws compare as bs
   | null as, null bs = []
   | null as = inserting <$> bs
   | null bs = deleting <$> as
-  | otherwise = fmap snd . uncurry deleteRemaining . (`runState` (negate 1, toMap fas, toMap fbs)) $ traverse findNearestNeighbourTo fbs
+  | otherwise =
+    -- Construct a State who's final value is a list of (Int, Diff leaf (Record fields))
+    -- and who's final state is (Int, IntMap UmappedTerm, IntMap UmappedTerm)
+    traverse findNearestNeighbourTo fbs &
+    -- Run the state with an initial state
+    (`runState` (negate 1, toMap fas, toMap fbs)) &
+    uncurry deleteRemaining &
+    fmap snd
+    -- Modified xydiff + RWS
+    -- 1. Annotate each node with a unique key top down based off its categories and termIndex?
+    -- 1. Construct two priority queues of hash values for each node ordered by max weight
+    -- 3. Try to find matchings starting with the heaviest nodes
+    -- 4. Use structure to propagate matchings?
+    -- 5. Compute the diff
+    
   where fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
@@ -80,6 +94,8 @@ rws compare as bs
           put (previous, unmappedA, IntMap.delete j unmappedB)
           pure (negate 1, inserting b)
 
+        -- Given a list of diffs, and unmapped terms in unmappedA, deletes
+        -- any terms that remain in umappedA.
         deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
 
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
