@@ -136,6 +136,7 @@ pqGramDecorator getLabel p q = cata algebra
           cofree ((gram label .: headF term) :< assignParentAndSiblingLabels (tailF term) label)
         gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
         assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
+
         assignLabels :: label -> Cofree f (Record (Gram label ': fields)) -> State [Maybe label] (Cofree f (Record (Gram label ': fields)))
         assignLabels label a = case runCofree a of
           RCons gram rest :< functor -> do
@@ -151,6 +152,11 @@ unitVector :: Int -> Int -> Vector.Vector Double
 unitVector d hash = normalize ((`evalRand` mkQCGen hash) (sequenceA (Vector.replicate d getRandom)))
   where normalize vec = fmap (/ vmagnitude vec) vec
         vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
+
+-- -- | Annotates a term with it's hash at each node.
+hashDecorator :: (Hashable hash, Traversable f) => (forall b. CofreeF f (Record fields) b -> hash) -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Int ': fields))
+hashDecorator getHash = cata $ \case
+  term@(record :< functor) -> cofree ((foldr (Vector.zipWith (+) . getField . extract) (Vector.singleton . hash $ getHash term) functor .: record) :< functor)
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
 featureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
