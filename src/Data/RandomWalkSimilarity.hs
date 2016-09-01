@@ -147,16 +147,14 @@ pqGramDecorator getLabel p q = cata algebra
         siblingLabels = foldMap (base . rhead . extract)
         padToSize n list = take n (list <> repeat empty)
 
--- | Computes a unit vector of the specified dimension from a hash.
-unitVector :: Int -> Int -> Vector.Vector Double
-unitVector d hash = normalize ((`evalRand` mkQCGen hash) (sequenceA (Vector.replicate d getRandom)))
-  where normalize vec = fmap (/ vmagnitude vec) vec
-        vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
-
 -- -- | Annotates a term with it's hash at each node.
 hashDecorator :: (Hashable hash, Traversable f) => (forall b. CofreeF f (Record fields) b -> hash) -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Int ': fields))
 hashDecorator getHash = cata $ \case
   term@(record :< functor) -> cofree ((foldr (Vector.zipWith (+) . getField . extract) (Vector.singleton . hash $ getHash term) functor .: record) :< functor)
+
+-- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
+defaultFeatureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
+defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
 featureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Int -> Int -> Int -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
@@ -165,9 +163,11 @@ featureVectorDecorator getLabel p q d
       cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor))
   . pqGramDecorator getLabel p q
 
--- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
-defaultFeatureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
-defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
+-- | Computes a unit vector of the specified dimension from a hash.
+unitVector :: Int -> Int -> Vector.Vector Double
+unitVector d hash = normalize ((`evalRand` mkQCGen hash) (sequenceA (Vector.replicate d getRandom)))
+  where normalize vec = fmap (/ vmagnitude vec) vec
+        vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
 
 -- | Strips the head annotation off a term annotated with non-empty records.
 stripTerm :: Functor f => Cofree f (Record (h ': t)) -> Cofree f (Record t)
