@@ -38,6 +38,7 @@ import qualified Data.Text as T
 import Category
 import Data.Aeson (toJSON, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
+import Data.Hashable
 
 -- | Given a parser and renderer, diff two sources and return the rendered
 -- | result.
@@ -64,6 +65,7 @@ diffFiles parser renderer sourceBlobs = do
         getLabel (h :< t) = (category h, case t of
           Leaf s -> Just s
           _ -> Nothing)
+        getHash (h :< t) = (hash h)
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
