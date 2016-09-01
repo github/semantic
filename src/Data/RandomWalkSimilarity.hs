@@ -59,14 +59,28 @@ rws compare as bs
     -- 5. Compute the diff
 
   where queueAs = PQueue.fromList (zipWith hashabilize [0..] as)
-        queueBs = PQueue.fromList (zipWith hashabilize [0..] as)
+        queueBs = PQueue.fromList (zipWith hashabilize [0..] bs)
+        (fas, fbs) = dropEqualTerms queueAs queueBs
+
+        dropEqualTerms :: PQueue.MaxPQueue (Vector.Vector Int) (UnmappedHashTerm (Cofree f (Record fields))) -> PQueue.MaxPQueue (Vector.Vector Int) (UnmappedHashTerm (Cofree f (Record fields))) ->  ([UnmappedTerm (Cofree f (Record fields))], [UnmappedTerm (Cofree f (Record fields))])
+        dropEqualTerms as bs = (unmappedAs, unmappedBs)
+          where
+            (unmappedAs, unmappedBs, _, _) = dropEqualTerms' ([], [], as, bs)
+
+            dropEqualTerms' (as', bs', queueA, queueB) = case (PQueue.maxViewWithKey queueA, PQueue.maxViewWithKey queueB) of
+              (Just ((kA, a), queueA'), Just ((kB, b), queueB')) ->
+                if kA /= kB
+                then dropEqualTerms' (toUnmappedTerm a : as', toUnmappedTerm b : bs', queueA', queueB')
+                else dropEqualTerms' (as', bs', queueA', queueB')
+              (Just ((_, a), queueA'), Nothing) -> (toUnmappedTerm a : as', bs', queueA', queueB)
+              (Nothing, Just ((_, b), queueB')) -> (as', toUnmappedTerm b : bs', queueA, queueB')
+              (Nothing, Nothing) -> (as', bs', queueA, queueB)
+            toUnmappedTerm (UnmappedHashTerm index _ term) = UnmappedTerm index (getField (extract term)) term
 
         hashabilize :: (HasField fields (Vector.Vector Int)) => Int -> Cofree f (Record fields) -> (Vector.Vector Int, UnmappedHashTerm (Cofree f (Record fields)))
         hashabilize index term = (hash, UnmappedHashTerm index hash term)
           where hash = (getField (extract term) :: Vector.Vector Int)
 
-        fas = zipWith featurize [0..] as
-        fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
         kdbs = KdTree.build (Vector.toList . feature) fbs
         featurize index term = UnmappedTerm index (getField (extract term)) term
