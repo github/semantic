@@ -3,6 +3,7 @@ module Data.RandomWalkSimilarity
 ( rws
 , pqGramDecorator
 , defaultFeatureVectorDecorator
+, hashDecorator
 , featureVectorDecorator
 , editDistanceUpTo
 , defaultD
