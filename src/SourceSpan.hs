@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 -- |
 -- Source position and span information
 -- Mostly taken from purescript's SourcePos definition.
@@ -9,6 +10,7 @@ import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
 import Test.QuickCheck
 import Data.Text.Arbitrary()
+import Data.Hashable
 
 -- |
 -- Source position information
@@ -22,7 +24,7 @@ data SourcePos = SourcePos
     -- Column number
     --
   , column :: !Int
-  } deriving (Show, Read, Eq, Ord, Generic)
+  } deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
 displaySourcePos :: SourcePos -> Text
 displaySourcePos sp =
@@ -49,7 +51,7 @@ data SourceSpan = SourceSpan
     -- End of the span
     --
   , spanEnd :: !SourcePos
-  } deriving (Show, Read, Eq, Ord, Generic)
+  } deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
 displayStartEndPos :: SourceSpan -> Text
 displayStartEndPos sp =
