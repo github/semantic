@@ -64,7 +64,6 @@ diffFiles parser renderer sourceBlobs = do
           Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
         getLabel (h :< t) = (category h, case t of
           Leaf s -> Just s
-          Syntax.Comment s -> Just s
           _ -> Nothing)
 
 -- | Return a parser based on the file extension (including the ".").
