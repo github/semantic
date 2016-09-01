@@ -34,7 +34,7 @@ import Test.QuickCheck.Random
 import qualified Data.PQueue.Prio.Max as PQueue
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: forall f fields. (Eq (Record fields), Prologue.Foldable f, Functor f, Eq (f (Cofree f (Record fields))), HasField fields (Vector.Vector Double), HasField fields (Vector.Vector Int))
+rws :: forall f fields. (Eq (Record fields), Prologue.Foldable f, Functor f, Eq (f (Cofree f (Record fields))), HasField fields (Vector.Vector Double), HasField fields Int)
   => (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
   -> [Cofree f (Record fields)] -- ^ The list of old terms.
   -> [Cofree f (Record fields)] -- ^ The list of new terms.
@@ -53,7 +53,7 @@ rws compare as bs
     fmap snd
     -- Modified xydiff + RWS
     -- 1. Annotate each node with a unique key top down based off its categories and termIndex?
-    -- 1. Construct two priority queues of hash values for each node ordered by max weight
+    -- 2. Construct two priority queues of hash values for each node ordered by max weight
     -- 3. Try to find matchings starting with the heaviest nodes
     -- 4. Use structure to propagate matchings?
     -- 5. Compute the diff
@@ -62,14 +62,14 @@ rws compare as bs
         queueBs = PQueue.fromList (zipWith hashabilize [0..] bs)
         (fas, fbs) = dropEqualTerms queueAs queueBs
 
-        dropEqualTerms :: PQueue.MaxPQueue (Vector.Vector Int) (UnmappedHashTerm (Cofree f (Record fields))) -> PQueue.MaxPQueue (Vector.Vector Int) (UnmappedHashTerm (Cofree f (Record fields))) ->  ([UnmappedTerm (Cofree f (Record fields))], [UnmappedTerm (Cofree f (Record fields))])
+        dropEqualTerms :: PQueue.MaxPQueue Int (UnmappedHashTerm (Cofree f (Record fields))) -> PQueue.MaxPQueue Int (UnmappedHashTerm (Cofree f (Record fields))) ->  ([UnmappedTerm (Cofree f (Record fields))], [UnmappedTerm (Cofree f (Record fields))])
         dropEqualTerms as bs = (unmappedAs, unmappedBs)
           where
             (unmappedAs, unmappedBs, _, _) = dropEqualTerms' ([], [], as, bs)
 
             dropEqualTerms' (as', bs', queueA, queueB) = case (PQueue.maxViewWithKey queueA, PQueue.maxViewWithKey queueB) of
               (Just ((kA, a), queueA'), Just ((kB, b), queueB')) ->
-                if kA /= kB
+                if hashInt a /= hashInt b
                 then dropEqualTerms' (toUnmappedTerm a : as', toUnmappedTerm b : bs', queueA', queueB')
                 else dropEqualTerms' (as', bs', queueA', queueB')
               (Just ((_, a), queueA'), Nothing) -> (toUnmappedTerm a : as', bs', queueA', queueB)
@@ -77,9 +77,9 @@ rws compare as bs
               (Nothing, Nothing) -> (as', bs', queueA, queueB)
             toUnmappedTerm (UnmappedHashTerm index _ term) = UnmappedTerm index (getField (extract term)) term
 
-        hashabilize :: (HasField fields (Vector.Vector Int)) => Int -> Cofree f (Record fields) -> (Vector.Vector Int, UnmappedHashTerm (Cofree f (Record fields)))
-        hashabilize index term = (hash, UnmappedHashTerm index hash term)
-          where hash = (getField (extract term) :: Vector.Vector Int)
+        hashabilize :: (HasField fields Int) => Int -> Cofree f (Record fields) -> (Int, UnmappedHashTerm (Cofree f (Record fields)))
+        hashabilize index term = (termSize term, UnmappedHashTerm index hash term)
+          where hash = (getField (extract term) :: Int)
 
         kdas = KdTree.build (Vector.toList . feature) fas
         kdbs = KdTree.build (Vector.toList . feature) fbs
@@ -142,7 +142,7 @@ defaultM = 10
 data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
   deriving Eq
 
-data UnmappedHashTerm a = UnmappedHashTerm { hashTermIndex :: {-# UNPACK #-} !Int, hashVector :: !(Vector.Vector Int), hashTerm :: !a }
+data UnmappedHashTerm a = UnmappedHashTerm { hashTermIndex :: {-# UNPACK #-} !Int, hashInt :: !Int, hashTerm :: !a }
   deriving Eq
 
 
@@ -151,9 +151,10 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
 -- -- | Annotates a term with it's hash at each node.
-hashDecorator :: (Hashable hash, Traversable f) => (forall b. CofreeF f (Record fields) b -> hash) -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Int ': fields))
-hashDecorator getHash = cata $ \case
-  term@(record :< functor) -> cofree ((foldr (Vector.zipWith (+) . getField . extract) (Vector.singleton . hash $ getHash term) functor .: record) :< functor)
+hashDecorator :: forall hash f fields. (Hashable (f Int), Hashable hash, Traversable f) => (forall b. CofreeF f (Record fields) b -> hash) -> Cofree f (Record fields) -> Cofree f (Record (Int ': fields))
+hashDecorator getLabel = cata $ \case
+  term@(record :< functor) ->
+    cofree ((hash (getLabel term, fmap (getField . extract) functor :: f Int) .: record) :< functor)
 
 -- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
 defaultFeatureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))

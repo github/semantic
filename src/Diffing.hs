@@ -44,9 +44,9 @@ import Data.Hashable
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record (Vector.Vector Double ': Vector.Vector Int ': fields)) -> Both SourceBlob -> IO Output
+diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record (Vector.Vector Double ': Int ': fields)) -> Both SourceBlob -> IO Output
 diffFiles parser renderer sourceBlobs = do
-  terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel . hashDecorator getHash) . parser) sourceBlobs
+  terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel . hashDecorator getLabel) . parser) sourceBlobs
 
   let areNullOids = runBothWith (\a b -> (oid a == nullOid || null (source a), oid b == nullOid || null (source b))) sourceBlobs
   let textDiff = case areNullOids of
@@ -64,8 +64,8 @@ diffFiles parser renderer sourceBlobs = do
           Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
         getLabel (h :< t) = (category h, case t of
           Leaf s -> Just s
+          Syntax.Comment s -> Just s
           _ -> Nothing)
-        getHash (h :< _) = (category h)
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
