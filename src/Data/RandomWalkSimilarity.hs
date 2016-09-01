@@ -31,9 +31,10 @@ import Prologue
 import Term (termSize)
 import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
+import qualified Data.PQueue.Prio.Max as PQueue
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: forall f fields. (Eq (Record fields), Prologue.Foldable f, Functor f, Eq (f (Cofree f (Record fields))), HasField fields (Vector.Vector Double))
+rws :: forall f fields. (Eq (Record fields), Prologue.Foldable f, Functor f, Eq (f (Cofree f (Record fields))), HasField fields (Vector.Vector Double), HasField fields (Vector.Vector Int))
   => (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
   -> [Cofree f (Record fields)] -- ^ The list of old terms.
   -> [Cofree f (Record fields)] -- ^ The list of new terms.
@@ -56,8 +57,15 @@ rws compare as bs
     -- 3. Try to find matchings starting with the heaviest nodes
     -- 4. Use structure to propagate matchings?
     -- 5. Compute the diff
-    
-  where fas = zipWith featurize [0..] as
+
+  where queueAs = PQueue.fromList (zipWith hashabilize [0..] as)
+        queueBs = PQueue.fromList (zipWith hashabilize [0..] as)
+
+        hashabilize :: (HasField fields (Vector.Vector Int)) => Int -> Cofree f (Record fields) -> (Vector.Vector Int, UnmappedHashTerm (Cofree f (Record fields)))
+        hashabilize index term = (hash, UnmappedHashTerm index hash term)
+          where hash = (getField (extract term) :: Vector.Vector Int)
+
+        fas = zipWith featurize [0..] as
         fbs = zipWith featurize [0..] bs
         kdas = KdTree.build (Vector.toList . feature) fas
         kdbs = KdTree.build (Vector.toList . feature) fbs
@@ -118,6 +126,9 @@ defaultM = 10
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
+  deriving Eq
+
+data UnmappedHashTerm a = UnmappedHashTerm { hashTermIndex :: {-# UNPACK #-} !Int, hashVector :: !(Vector.Vector Int), hashTerm :: !a }
   deriving Eq
 
 
