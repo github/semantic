@@ -20,7 +20,7 @@ instance Functor f => Foldable.Unfoldable (Cofree f a) where embed = cofree
 -- | Zip two terms by combining their annotations into a pair of annotations.
 -- | If the structure of the two terms don't match, then Nothing will be returned.
 
-zipTerms :: (Eq a, Eq annotation) => Term a annotation -> Term a annotation -> Maybe (Term a (Both annotation))
+zipTerms :: (Eq annotation, GAlign f, Traversable f) => Cofree f annotation -> Cofree f annotation -> Maybe (Cofree f (Both annotation))
 zipTerms t1 t2 = iter go (alignCofreeWith galign (const Nothing) both (These t1 t2))
   where go (a :< s) = cofree . (a :<) <$> sequenceA s
 

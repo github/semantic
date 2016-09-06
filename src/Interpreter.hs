@@ -71,7 +71,7 @@ algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
         branch constructor a b = bySimilarity a b >>= annotate . constructor
 
 -- | Run an algorithm, given functions characterizing the evaluation.
-runAlgorithm :: (Functor f, GAlign f, Eq a, Eq (Record fields), Eq (f (Cofree f (Record fields))), Prologue.Foldable f, Traversable f, HasField fields (Vector.Vector Double), HasField fields Int)
+runAlgorithm :: (Functor f, GAlign f, Eq a, Eq (Record fields), HasField fields Category, Eq (f (Cofree f Category)), Prologue.Foldable f, Traversable f, HasField fields (Vector.Vector Double), HasField fields Int)
   => (CofreeF f (Both (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to wrap up & possibly annotate every produced diff.
   -> (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function to diff two subterms recursively, if they are comparable, or else return 'Nothing'.
   -> SES.Cost (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to compute the cost of a given diff node.

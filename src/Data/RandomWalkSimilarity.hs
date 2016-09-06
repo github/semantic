@@ -28,17 +28,22 @@ import Data.Record
 import qualified Data.Vector as Vector
 import Patch
 import Prologue
-import Term (termSize)
+import Term (termSize, zipTerms)
 import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
 import qualified Data.PQueue.Prio.Max as PQueue
+import qualified SES as SES
+import Info
+import Data.Align.Generic
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: forall f fields. (Eq (Record fields), Prologue.Foldable f, Functor f, Eq (f (Cofree f (Record fields))), HasField fields (Vector.Vector Double), HasField fields Int)
-  => (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
-  -> [Cofree f (Record fields)] -- ^ The list of old terms.
-  -> [Cofree f (Record fields)] -- ^ The list of new terms.
-  -> [Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))] -- ^ The resulting list of similarity-matched diffs.
+rws :: forall f fields. (Eq (Record fields), GAlign f, HasField fields Category, Traversable f, Eq (f (Cofree f Category)), HasField fields (Vector.Vector Double), HasField fields Int)
+    => (Cofree f (Record fields)
+       -> Cofree f (Record fields)
+       -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
+    -> [Cofree f (Record fields)] -- ^ The list of old terms.
+    -> [Cofree f (Record fields)] -- ^ The list of new terms.
+    -> [Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))] -- ^ The resulting list of similarity-matched diffs.
 rws compare as bs
   | null as, null bs = []
   | null as = inserting <$> bs
@@ -60,7 +65,31 @@ rws compare as bs
 
   where queueAs = PQueue.fromList (zipWith hashabilize [0..] as)
         queueBs = PQueue.fromList (zipWith hashabilize [0..] bs)
-        (fas, fbs) = dropEqualTerms queueAs queueBs
+        sesDiff = SES.ses replaceIfEqual cost as bs
+        replaceIfEqual a b
+          | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
+          | otherwise = Nothing
+        cost = iter (const 0) . (1 <$)
+
+        -- sesDiff' :: [ Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))) ] -> ([ Either Diff (Either UnmappedTerm UnmappedTerm) ])
+        -- sesDiff' diffs =  foldl' (\(as, bs) diff -> ([], [])) mempty diffs
+        --   where go (Replace a b :< s) = cofree . ((a : as, b : bs) :<) <$> sequenceA s
+
+
+
+
+
+        -- (fas, fbs) = iter sesDiff (\case
+        --   Replace a b -> (a, b)
+        --   Insert b -> ()
+        --   otherwise -> expression)
+        (fas, fbs, _, _) = foldl' (\(as, bs, counterA, counterB) diff -> case runFree diff of
+          Pure (Delete term) -> (featurize counterA term : as, bs, succ counterA, counterB)
+          Pure (Insert term) -> (as, featurize counterB term : bs, counterA, succ counterB)
+          _ -> (as, bs, succ counterA, succ counterB)
+          ) ([], [], 0, 0) sesDiff
+
+        -- (catMaybes $ (\ diff -> case runFree diff of { Pure (Delete term) -> UnmappedTerm  }) <$> sesDiff, )
 
         dropEqualTerms :: PQueue.MaxPQueue Int (UnmappedHashTerm (Cofree f (Record fields))) -> PQueue.MaxPQueue Int (UnmappedHashTerm (Cofree f (Record fields))) ->  ([UnmappedTerm (Cofree f (Record fields))], [UnmappedTerm (Cofree f (Record fields))])
         dropEqualTerms as bs = (unmappedAs, unmappedBs)
