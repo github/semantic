@@ -240,8 +240,8 @@ categoryForJavaScriptProductionName name = case name of
   "rel_op" -> RelationalOperator
   _ -> Other name
 
-toVarDecl :: (HasField fields Category) => Term Text (Record fields) -> Term Text (Record fields)
-toVarDecl child = cofree $ (setCategory (extract child) VarDecl :< S.VarDecl child)
+toVarDecl :: Term Text (Record fields) -> Term Text (Record fields)
+toVarDecl child = cofree (extract child :< S.VarDecl child)
 
 toTuple :: Term Text (Record fields) -> [Term Text (Record fields)]
 toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
