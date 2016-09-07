@@ -55,4 +55,4 @@ documentToTerm language document blob = alloca $ \ root -> do
         termConstructor = case language of
           JavaScript -> JS.termConstructor
           C -> C.termConstructor
-          _ -> JS.termConstructor
+          _ -> Language.termConstructor
