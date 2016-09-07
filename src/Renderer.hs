@@ -19,7 +19,7 @@ data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath,
 data Format = Split | Patch | JSON | Summary
   deriving (Show)
 
-data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value)  | SummaryOutput (Map Text (Map Text [Text]))
+data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value) | SummaryOutput (Map Text (Map Text [Text]))
   deriving (Show)
 
 -- Returns a key representing the filename. If the filenames are different,

@@ -22,6 +22,25 @@ import qualified Text.PrettyPrint.Leijen.Text as P
 import SourceSpan
 import Source
 
+data Identifiable a = Identifiable a | Unidentifiable a
+
+isIdentifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Term leaf (Record fields) -> Bool
+isIdentifiable term =
+  case unwrap term of
+    S.FunctionCall _ _ -> True
+    S.Function{} -> True
+    S.Assignment{} -> True
+    S.MathAssignment{} -> True
+    S.VarAssignment{} -> True
+    S.SubscriptAccess{} -> True
+    S.Class _ _ _ -> True
+    S.Method _ _ _ -> True
+    S.Leaf _ -> True
+    _ -> False
+
+identifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Term leaf (Record fields) -> Identifiable (Term leaf (Record fields))
+identifiable term = if isIdentifiable term then Identifiable term else Unidentifiable term
+
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
  | ErrorInfo { errorSpan :: SourceSpan, termName :: Text }
@@ -85,7 +104,7 @@ toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure (pretty err)
 
 -- Returns a text representing a specific term given a source and a term.
-toTermName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
+toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
 toTermName source term = case unwrap term of
   S.AnonymousFunction _ _ -> "anonymous"
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
@@ -95,13 +114,13 @@ toTermName source term = case unwrap term of
     (S.MemberAccess{}, S.AnonymousFunction{..}) -> toTermName' identifier
     (_, _) -> toTermName' identifier <> toTermName' value
   S.Function identifier _ _ -> toTermName' identifier
-  S.FunctionCall i _ -> toTermName' i
+  S.FunctionCall i args -> toTermName' i <> "(" <> (intercalate ", " (toArgName <$> args)) <> ")"
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
     (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' property <> "()"
     (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' property
     (_, S.FunctionCall{}) -> toTermName' base <> "." <> toTermName' property <> "()"
     (_, _) -> toTermName' base <> "." <> toTermName' property
-  S.MethodCall targetId methodId _ -> toTermName' targetId <> sep <> toTermName' methodId <> "()"
+  S.MethodCall targetId methodId methodParams -> toTermName' targetId <> sep <> toTermName' methodId <> "(" <> (intercalate ", " (toArgName <$> methodParams)) <> ")"
     where sep = case unwrap targetId of
             S.FunctionCall{} -> "()."
             _ -> "."
@@ -143,6 +162,10 @@ toTermName source term = case unwrap term of
         termNameFromSource term = termNameFromRange (range term)
         termNameFromRange range = toText $ Source.slice range source
         range = characterRange . extract
+        toArgName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Term leaf (Record fields) -> Text
+        toArgName arg = case identifiable arg of
+                          Identifiable arg -> toTermName' arg
+                          Unidentifiable arg -> "..."
 
 maybeParentContext :: Maybe (Category, Text) -> Doc
 maybeParentContext = maybe "" (\annotation ->
@@ -157,7 +180,6 @@ termToDiffInfo blob term = case unwrap term of
   S.AnonymousFunction _ _ -> LeafInfo (toCategoryName term) ("anonymous")
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
-  S.FunctionCall identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   S.Ternary ternaryCondition _ -> LeafInfo (toCategoryName term) (toTermName' ternaryCondition)
   S.Function identifier _ _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   S.Assignment identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
@@ -172,21 +194,10 @@ termToDiffInfo blob term = case unwrap term of
         termToDiffInfo' = termToDiffInfo blob
 
 prependSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> Term leaf (Record fields) -> DiffSummary DiffInfo -> DiffSummary DiffInfo
-prependSummary source term summary = if (isNothing $ parentAnnotation summary) && hasIdentifier term
-  then summary { parentAnnotation = Just (category $ extract term, toTermName source term) }
-  else summary
-  where hasIdentifier term = case unwrap term of
-          S.FunctionCall{} -> True
-          S.Function _ _ _ -> True
-          S.Assignment{} -> True
-          S.MathAssignment{} -> True
-          S.MemberAccess{} -> True
-          S.MethodCall{} -> True
-          S.VarAssignment{} -> True
-          S.SubscriptAccess{} -> True
-          S.Class{} -> True
-          S.Method{} -> True
-          _ -> False
+prependSummary source term summary =
+  case (parentAnnotation summary, identifiable term) of
+    (Nothing, Identifiable term) -> summary { parentAnnotation = Just (category . extract $ term, toTermName source term) }
+    (_, _) -> summary
 
 isBranchInfo :: DiffInfo -> Bool
 isBranchInfo info = case info of
