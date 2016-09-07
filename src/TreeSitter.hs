@@ -6,6 +6,7 @@ import Control.Monad
 import Category
 import Data.Record
 import Language
+import Language.JavaScript
 import Parser
 import Range
 import Source
