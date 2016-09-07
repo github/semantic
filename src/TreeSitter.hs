@@ -29,35 +29,6 @@ treeSitterParser language grammar blob = do
     ts_document_free document
     pure term)
 
--- Given a language and a node name, return the correct categories.
-categoriesForLanguage :: Language -> Text -> Category
-categoriesForLanguage language name = case (language, name) of
-  (JavaScript, "object") -> Object
-  (JavaScript, "expression_statement") -> ExpressionStatements
-  (JavaScript, "this_expression") -> Identifier
-  (JavaScript, "null") -> Identifier
-  (JavaScript, "undefined") -> Identifier
-  (JavaScript, "arrow_function") -> Function
-  (JavaScript, "generator_function") -> Function
-  (JavaScript, "math_op") -> BinaryOperator -- bitwise operator, e.g. +, -, *, /.
-  (JavaScript, "bool_op") -> BinaryOperator -- boolean operator, e.g. ||, &&.
-  (JavaScript, "comma_op") -> CommaOperator -- comma operator, e.g. expr1, expr2.
-  (JavaScript, "delete_op") -> Operator -- delete operator, e.g. delete x[2].
-  (JavaScript, "type_op") -> Operator -- type operator, e.g. typeof Object.
-  (JavaScript, "void_op") -> Operator -- void operator, e.g. void 2.
-  (JavaScript, "for_in_statement") -> For
-  (JavaScript, "for_of_statement") -> For
-  (JavaScript, "new_expression") -> Constructor
-  (JavaScript, "class")  -> Class
-  (JavaScript, "catch") -> Catch
-  (JavaScript, "finally") -> Finally
-  (JavaScript, "if_statement") -> If
-  (JavaScript, "empty_statement") -> Empty
-
-  (Ruby, "hash") -> Object
-  _ -> defaultCategoryForNodeName name
-{-# INLINE categoriesForLanguage #-}
-
 -- | Given a node name from TreeSitter, return the correct categories.
 defaultCategoryForNodeName :: Text -> Category
 defaultCategoryForNodeName name = case name of
