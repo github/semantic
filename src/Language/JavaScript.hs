@@ -49,9 +49,9 @@ termConstructor source sourceSpan name range children
   ("pair", _) -> S.Fixed children
   ("if_statement", [ expr, clause1, clause2 ]) -> S.If expr clause1 (Just clause2)
   ("if_statement", [ expr, clause ]) -> S.If expr clause Nothing
-  ("for_in_statement", _) | Just (exprs, body) <- unsnoc children -> S.For exprs body
-  ("for_of_statement", _) | Just (exprs, body) <- unsnoc children -> S.For exprs body
-  ("for_statement", _) | Just (exprs, body) <- unsnoc children -> S.For exprs body
+  _ | name `elem` [ "for_statement", "for_of_statement", "for_in_statement" ]
+    , Just (exprs, body) <- unsnoc children
+    -> S.For exprs body
   ("while_statement", [ expr, body ]) -> S.While expr body
   ("do_statement", [ expr, body ]) -> S.DoWhile expr body
   ("throw_statement", [ expr ]) -> S.Throw expr
