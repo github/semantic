@@ -82,10 +82,11 @@ rws compare as bs
 
         deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
 
+-- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
 editDistanceUpTo :: (Prologue.Foldable f, Functor f) => Integer -> Free (CofreeF f (Both a)) (Patch (Cofree f a)) -> Int
 editDistanceUpTo m = diffSum (patchSum termSize) . cutoff m
-  where diffSum patchCost diff = sum $ fmap (maybe 0 patchCost) diff
+  where diffSum patchCost = sum . fmap (maybe 0 patchCost)
 
 defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
 defaultD = 15
