@@ -25,6 +25,8 @@ termConstructor source sourceSpan name range children
   ("member_access", [ base, property ]) -> S.MemberAccess base property
   ("subscript_access", [ base, element ]) -> S.SubscriptAccess base element
   ("comma_op", [ child, rest ]) -> S.Indexed $ child : toList (unwrap rest)
+  _ | name `elem` [ "op", "bool_op", "math_op", "delete_op", "type_op", "void_op", "rel_op", "bitwise_op" ]
+    -> S.Operator children
   _ | name `elem` [ "arrow_function", "generator_function", "function" ] -> case children of
     [ body ] -> S.AnonymousFunction Nothing body
     [ params, body ] -> S.AnonymousFunction (Just params) body
