@@ -29,49 +29,6 @@ treeSitterParser language grammar blob = do
     ts_document_free document
     pure term)
 
--- | Given a node name from TreeSitter, return the correct categories.
-defaultCategoryForNodeName :: Text -> Category
-defaultCategoryForNodeName name = case name of
-  "program" -> Program
-  "ERROR" -> Error
-  "function_call" -> FunctionCall
-  "pair" -> Pair
-  "string" -> StringLiteral
-  "integer" -> IntegerLiteral
-  "symbol" -> SymbolLiteral
-  "array" -> ArrayLiteral
-  "function" -> Function
-  "identifier" -> Identifier
-  "formal_parameters" -> Params
-  "arguments" -> Args
-  "statement_block" -> ExpressionStatements
-  "assignment" -> Assignment
-  "member_access" -> MemberAccess
-  "op" -> Operator
-  "subscript_access" -> SubscriptAccess
-  "regex" -> Regex
-  "template_string" -> TemplateString
-  "var_assignment" -> VarAssignment
-  "var_declaration" -> VarDecl
-  "switch_statement" -> Switch
-  "math_assignment" -> MathAssignment
-  "case" -> Case
-  "true" -> Boolean
-  "false" -> Boolean
-  "ternary" -> Ternary
-  "for_statement" -> For
-  "while_statement" -> While
-  "do_statement" -> DoWhile
-  "return_statement" -> Return
-  "throw_statement" -> Throw
-  "try_statement" -> Try
-  "method_definition" -> Method
-  "comment" -> Comment
-  "bitwise_op" -> BitwiseOperator
-  "rel_op" -> RelationalOperator
-  _ -> Other name
-{-# INLINE defaultCategoryForNodeName #-}
-
 -- | Return a parser for a tree sitter language & document.
 documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record '[Range, Category])
 documentToTerm language document blob = alloca $ \ root -> do
