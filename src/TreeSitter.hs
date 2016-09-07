@@ -7,6 +7,7 @@ import Category
 import Data.Record
 import Language
 import qualified Language.JavaScript as JS
+import qualified Language.C as C
 import Parser
 import Range
 import Source
@@ -53,4 +54,5 @@ documentToTerm language document blob = alloca $ \ root -> do
         {-# INLINE getChild #-}
         termConstructor = case language of
           JavaScript -> JS.termConstructor
+          C -> C.termConstructor
           _ -> JS.termConstructor
