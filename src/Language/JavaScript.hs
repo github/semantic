@@ -9,14 +9,14 @@ import SourceSpan
 import qualified Syntax as S
 import Term
 
-javascriptTermConstructor
+termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
   -> Text -- ^ The name of the production for this node.
   -> Range -- ^ The character range that the term occupies.
   -> [Term Text (Record '[Range, Category])] -- ^ The child nodes of the term.
   -> IO (Term Text (Record '[Range, Category])) -- ^ The resulting term, in IO.
-javascriptTermConstructor source sourceSpan name range children
+termConstructor source sourceSpan name range children
   | name == "ERROR" = sourceSpan >>= withDefaultInfo . (`S.Error` children)
   | otherwise = withDefaultInfo $ case (name, children) of
   ("return_statement", _) -> S.Return (listToMaybe children)
