@@ -53,7 +53,10 @@ rws compare as bs
     -- Run the state with an initial state
     (`runState` (negate 1, toMap fas, toMap fbs)) &
     uncurry deleteRemaining &
+    (<> countersAndDiffs) &
+    sortOn fst &
     fmap snd
+
     -- Modified xydiff + RWS
     -- 1. Annotate each node with a unique key top down based off its categories and termIndex?
     -- 2. Construct two priority queues of hash values for each node ordered by max weight
@@ -75,11 +78,11 @@ rws compare as bs
           where eitherCutoff' n  _ diff | n <= 0 = pure (Left diff)
                 eitherCutoff' n (FreeT m) diff = FreeT $ bimap Right (\level -> eitherCutoff' (n - 1) level diff) `liftM` m
 
-        (fas, fbs, _, _, diffs) = foldr' (\diff (as, bs, counterA, counterB, diffs) -> case runFree diff of
+        (fas, fbs, _, _, countersAndDiffs) = foldr' (\diff (as, bs, counterA, counterB, diffs) -> case runFree diff of
           Pure (Right (Delete term)) -> (featurize counterA term : as, bs, succ counterA, counterB, diffs)
           Pure (Right (Insert term)) -> (as, featurize counterB term : bs, counterA, succ counterB, diffs)
           syntax -> let diff' = free syntax >>= either identity pure in
-            (as, bs, succ counterA, succ counterB, diff' : diffs)
+            (as, bs, succ counterA, succ counterB, (counterA, diff') : diffs)
           ) ([], [], 0, 0, []) sesDiff
 
         kdas = KdTree.build (Vector.toList . feature) fas
