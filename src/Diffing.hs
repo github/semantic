@@ -38,15 +38,18 @@ import qualified Data.Text as T
 import Category
 import Data.Aeson (toJSON, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
-import Data.Hashable
 
 -- | Given a parser and renderer, diff two sources and return the rendered
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record (Vector.Vector Double ': Int ': fields)) -> Both SourceBlob -> IO Output
+diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields))
+          => Parser (Syntax Text) (Record fields)
+          -> Renderer (Record (Vector.Vector Double ': fields))
+          -> Both SourceBlob
+          -> IO Output
 diffFiles parser renderer sourceBlobs = do
-  terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel . hashDecorator getLabel) . parser) sourceBlobs
+  terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel) . parser) sourceBlobs
 
   let areNullOids = runBothWith (\a b -> (oid a == nullOid || null (source a), oid b == nullOid || null (source b))) sourceBlobs
   let textDiff = case areNullOids of
@@ -81,8 +84,8 @@ lineByLineParser blob = pure . cofree . root $ case foldl' annotateLeaves ([], 0
   where
     input = source blob
     lines = actualLines input
-    root children = ((Range 0 $ length input) .: Program .: RNil) :< Indexed children
-    leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Program .: RNil) :< Leaf line
+    root children = (Range 0 (length input) .: Program .: RNil) :< Indexed children
+    leaf charIndex line = (Range charIndex (charIndex + T.length line) .: Program .: RNil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum <> [ leaf charIndex (toText line) ] , charIndex + length line)
     toText = T.pack . Source.toString

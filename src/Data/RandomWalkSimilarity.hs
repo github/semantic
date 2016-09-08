@@ -3,7 +3,6 @@ module Data.RandomWalkSimilarity
 ( rws
 , pqGramDecorator
 , defaultFeatureVectorDecorator
-, hashDecorator
 , featureVectorDecorator
 , editDistanceUpTo
 , defaultD
@@ -31,7 +30,7 @@ import Prologue
 import Term (termSize, zipTerms)
 import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
-import qualified SES as SES
+import qualified SES
 import Info
 import Data.Align.Generic
 
@@ -142,12 +141,6 @@ data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
-
--- -- | Annotates a term with it's hash at each node.
-hashDecorator :: forall hash f fields. (Hashable (f Int), Hashable hash, Traversable f) => (forall b. CofreeF f (Record fields) b -> hash) -> Cofree f (Record fields) -> Cofree f (Record (Int ': fields))
-hashDecorator getLabel = cata $ \case
-  term@(record :< functor) ->
-    cofree ((hash (getLabel term, fmap (getField . extract) functor :: f Int) .: record) :< functor)
 
 -- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
 defaultFeatureVectorDecorator :: (Hashable label, Traversable f) => (forall b. CofreeF f (Record fields) b -> label) -> Cofree f (Record fields) -> Cofree f (Record (Vector.Vector Double ': fields))
