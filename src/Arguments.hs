@@ -3,7 +3,6 @@ module Arguments (Arguments(..), args) where
 import Data.Functor.Both
 import qualified Prelude as P
 import Prelude
-import Prologue
 import qualified Renderer as R
 
 -- | The command line arguments to the application.
