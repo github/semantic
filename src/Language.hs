@@ -45,9 +45,9 @@ termConstructor
   -> Range -- ^ The character range that the term occupies.
   -> [Term Text (Record '[Range, Category])] -- ^ The child nodes of the term.
   -> IO (Term Text (Record '[Range, Category])) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan name range children
-  | name == "ERROR" = sourceSpan >>= withDefaultInfo . (`S.Error` children)
-  | otherwise = withDefaultInfo $ case (name, children) of
-  (_, []) -> S.Leaf . toText $ slice range source
-  _ -> S.Indexed children
-  where withDefaultInfo syntax = pure $! cofree ((range .: Other name .: RNil) :< syntax)
+termConstructor source sourceSpan name range children =
+  withDefaultInfo <$> case (name, children) of
+    ("ERROR", _) -> S.Error <$> sourceSpan <*> pure children
+    (_, []) -> S.Leaf <$> pure (toText $ slice range source)
+    _ -> S.Indexed <$> pure children
+  where withDefaultInfo syntax = cofree ((range .: Other name .: RNil) :< syntax)
