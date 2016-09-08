@@ -31,6 +31,8 @@ library
                      , Info
                      , Interpreter
                      , Language
+                     , Language.C
+                     , Language.JavaScript
                      , Parser
                      , Patch
                      , Patch.Arbitrary
