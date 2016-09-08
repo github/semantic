@@ -77,9 +77,9 @@ rws compare as bs
           _ -> (as, bs, succ counterA, succ counterB)
           ) ([], [], 0, 0) sesDiff
 
-        -- (catMaybes $ (\ diff -> case runFree diff of { Pure (Delete term) -> UnmappedTerm  }) <$> sesDiff, )
-
-        dropEqualTerms :: PQueue.MaxPQueue Int (UnmappedHashTerm (Cofree f (Record fields))) -> PQueue.MaxPQueue Int (UnmappedHashTerm (Cofree f (Record fields))) ->  ([UnmappedTerm (Cofree f (Record fields))], [UnmappedTerm (Cofree f (Record fields))])
+        dropEqualTerms :: PQueue.MaxPQueue Int (UnmappedHashTerm (Cofree f (Record fields)))
+                          -> PQueue.MaxPQueue Int (UnmappedHashTerm (Cofree f (Record fields)))
+                          -> ([UnmappedTerm (Cofree f (Record fields))], [UnmappedTerm (Cofree f (Record fields))])
         dropEqualTerms as bs = (unmappedAs, unmappedBs)
           where
             (unmappedAs, unmappedBs, _, _) = dropEqualTerms' ([], [], as, bs)
