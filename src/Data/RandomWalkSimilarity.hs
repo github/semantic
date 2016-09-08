@@ -94,14 +94,19 @@ rws compare as bs
               (Nothing, Nothing) -> (as', bs', queueA, queueB)
             toUnmappedTerm (UnmappedHashTerm index _ term) = UnmappedTerm index (getField (extract term)) term
 
-        hashabilize :: (HasField fields Int) => Int -> Cofree f (Record fields) -> (Int, UnmappedHashTerm (Cofree f (Record fields)))
+        hashabilize :: (HasField fields Int) => Int
+                    -> Cofree f (Record fields)
+                    -> (Int, UnmappedHashTerm (Cofree f (Record fields)))
         hashabilize index term = (termSize term, UnmappedHashTerm index hash term)
-          where hash = (getField (extract term) :: Int)
+          where hash = getField (extract term)
 
         kdas = KdTree.build (Vector.toList . feature) fas
         kdbs = KdTree.build (Vector.toList . feature) fbs
+
         featurize index term = UnmappedTerm index (getField (extract term)) term
+
         toMap = IntMap.fromList . fmap (termIndex &&& identity)
+
         -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
         findNearestNeighbourTo :: UnmappedTerm (Cofree f (Record fields)) -> State (Int, IntMap (UnmappedTerm (Cofree f (Record fields))), IntMap (UnmappedTerm (Cofree f (Record fields)))) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
         findNearestNeighbourTo kv@(UnmappedTerm j _ b) = do
