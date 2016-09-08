@@ -65,15 +65,15 @@ rws compare as bs
 
   where queueAs = PQueue.fromList (zipWith hashabilize [0..] as)
         queueBs = PQueue.fromList (zipWith hashabilize [0..] bs)
-        sesDiff = SES.ses replaceIfEqual cost as bs
+        sesDiff = cutoff 1 <$> SES.ses replaceIfEqual cost as bs
         replaceIfEqual a b
           | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
           | otherwise = Nothing
         cost = iter (const 0) . (1 <$)
 
-        (fas, fbs, _, _) = foldl' (\(as, bs, counterA, counterB) diff -> case runFree diff of
-          Pure (Delete term) -> (featurize counterA term : as, bs, succ counterA, counterB)
-          Pure (Insert term) -> (as, featurize counterB term : bs, counterA, succ counterB)
+        (fas, fbs, _, _) = foldr' (\diff (as, bs, counterA, counterB) -> case runFree diff of
+          Pure (Just (Delete term)) -> (featurize counterA term : as, bs, succ counterA, counterB)
+          Pure (Just (Insert term)) -> (as, featurize counterB term : bs, counterA, succ counterB)
           _ -> (as, bs, succ counterA, succ counterB)
           ) ([], [], 0, 0) sesDiff
 
