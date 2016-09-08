@@ -37,6 +37,7 @@ termConstructor source sourceSpan name range children
     ("function_call", _) -> case runCofree <$> children of
       [ (_ :< S.MemberAccess{..}), (_ :< S.Args args) ] -> S.MethodCall memberId property args
       [ (_ :< S.MemberAccess{..}) ] -> S.MethodCall memberId property []
+      [ function, (_ :< S.Args args) ] -> S.FunctionCall (cofree function) args
       (x:xs) -> S.FunctionCall (cofree x) (cofree <$> xs)
       _ -> S.Indexed children
     ("ternary", (condition:cases)) -> S.Ternary condition cases
