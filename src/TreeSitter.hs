@@ -40,7 +40,7 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
           name <- ts_node_p_name node document
           name <- peekCString name
           count <- ts_node_p_named_child_count node
-          children <- traverse (alloca . getChild node) $ take (fromIntegral count) [0..]
+          children <- filter isNonEmpty <$> traverse (alloca . getChild node) (take (fromIntegral count) [0..])
 
           let range = Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
 
@@ -49,10 +49,11 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
             , spanEnd = SourcePos (fromIntegral $! ts_node_p_end_point_row node) (fromIntegral $! ts_node_p_end_point_column node) }
 
           -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
-          range `seq` termConstructor source (pure $! sourceSpan) (toS name) range (filter (\child -> category (extract child) /= Empty) children)
+          range `seq` termConstructor source (pure $! sourceSpan) (toS name) range children
         getChild node n out = ts_node_p_named_child node n out >> toTerm out
         {-# INLINE getChild #-}
         termConstructor = case language of
           JavaScript -> JS.termConstructor
           C -> C.termConstructor
           _ -> Language.termConstructor
+        isNonEmpty child = category (extract child) /= Empty
