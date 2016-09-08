@@ -78,9 +78,8 @@ rws compare as bs
         (fas, fbs, _, _, diffs) = foldr' (\diff (as, bs, counterA, counterB, diffs) -> case runFree diff of
           Pure (Right (Delete term)) -> (featurize counterA term : as, bs, succ counterA, counterB, diffs)
           Pure (Right (Insert term)) -> (as, featurize counterB term : bs, counterA, succ counterB, diffs)
-          syntax@(Free _) -> let diff' = free syntax >>= either identity pure in (as, bs, counterA, counterB, diff' : diffs) -- (featurize counterA term : as, bs, succ counterA, counterB)
-          -- Pure (Left term) -> (as, featurize counterB term : bs, counterA, succ counterB)
-          _ -> (as, bs, succ counterA, succ counterB, diffs)
+          syntax -> let diff' = free syntax >>= either identity pure in
+            (as, bs, succ counterA, succ counterB, diff' : diffs)
           ) ([], [], 0, 0, []) sesDiff
 
         kdas = KdTree.build (Vector.toList . feature) fas
