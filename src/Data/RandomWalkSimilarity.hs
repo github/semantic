@@ -31,7 +31,6 @@ import Prologue
 import Term (termSize, zipTerms)
 import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
-import qualified Data.PQueue.Prio.Max as PQueue
 import qualified SES as SES
 import Info
 import Data.Align.Generic
@@ -63,9 +62,7 @@ rws compare as bs
     -- 4. Use structure to propagate matchings?
     -- 5. Compute the diff
 
-  where queueAs = PQueue.fromList (zipWith hashabilize [0..] as)
-        queueBs = PQueue.fromList (zipWith hashabilize [0..] bs)
-        sesDiff = cutoff 1 <$> SES.ses replaceIfEqual cost as bs
+  where sesDiff = cutoff 1 <$> SES.ses replaceIfEqual cost as bs
         replaceIfEqual a b
           | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
           | otherwise = Nothing
@@ -76,29 +73,6 @@ rws compare as bs
           Pure (Just (Insert term)) -> (as, featurize counterB term : bs, counterA, succ counterB)
           _ -> (as, bs, succ counterA, succ counterB)
           ) ([], [], 0, 0) sesDiff
-
-        dropEqualTerms :: PQueue.MaxPQueue Int (UnmappedHashTerm (Cofree f (Record fields)))
-                          -> PQueue.MaxPQueue Int (UnmappedHashTerm (Cofree f (Record fields)))
-                          -> ([UnmappedTerm (Cofree f (Record fields))], [UnmappedTerm (Cofree f (Record fields))])
-        dropEqualTerms as bs = (unmappedAs, unmappedBs)
-          where
-            (unmappedAs, unmappedBs, _, _) = dropEqualTerms' ([], [], as, bs)
-
-            dropEqualTerms' (as', bs', queueA, queueB) = case (PQueue.maxViewWithKey queueA, PQueue.maxViewWithKey queueB) of
-              (Just ((kA, a), queueA'), Just ((kB, b), queueB')) ->
-                if hashInt a /= hashInt b
-                then dropEqualTerms' (toUnmappedTerm a : as', toUnmappedTerm b : bs', queueA', queueB')
-                else dropEqualTerms' (as', bs', queueA', queueB')
-              (Just ((_, a), queueA'), Nothing) -> (toUnmappedTerm a : as', bs', queueA', queueB)
-              (Nothing, Just ((_, b), queueB')) -> (as', toUnmappedTerm b : bs', queueA, queueB')
-              (Nothing, Nothing) -> (as', bs', queueA, queueB)
-            toUnmappedTerm (UnmappedHashTerm index _ term) = UnmappedTerm index (getField (extract term)) term
-
-        hashabilize :: (HasField fields Int) => Int
-                    -> Cofree f (Record fields)
-                    -> (Int, UnmappedHashTerm (Cofree f (Record fields)))
-        hashabilize index term = (termSize term, UnmappedHashTerm index hash term)
-          where hash = getField (extract term)
 
         kdas = KdTree.build (Vector.toList . feature) fas
         kdbs = KdTree.build (Vector.toList . feature) fbs
@@ -164,10 +138,6 @@ defaultM = 10
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
   deriving Eq
-
-data UnmappedHashTerm a = UnmappedHashTerm { hashTermIndex :: {-# UNPACK #-} !Int, hashInt :: !Int, hashTerm :: !a }
-  deriving Eq
-
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
