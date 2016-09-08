@@ -52,6 +52,7 @@ library
                      , TreeSitter
                      , DiffSummary
                      , Prologue
+                     , Paths_semantic_diff
   build-depends:       aeson
                      , base >= 4.8 && < 5
                      , bifunctors
