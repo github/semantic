@@ -71,18 +71,6 @@ rws compare as bs
           | otherwise = Nothing
         cost = iter (const 0) . (1 <$)
 
-        -- sesDiff' :: [ Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))) ] -> ([ Either Diff (Either UnmappedTerm UnmappedTerm) ])
-        -- sesDiff' diffs =  foldl' (\(as, bs) diff -> ([], [])) mempty diffs
-        --   where go (Replace a b :< s) = cofree . ((a : as, b : bs) :<) <$> sequenceA s
-
-
-
-
-
-        -- (fas, fbs) = iter sesDiff (\case
-        --   Replace a b -> (a, b)
-        --   Insert b -> ()
-        --   otherwise -> expression)
         (fas, fbs, _, _) = foldl' (\(as, bs, counterA, counterB) diff -> case runFree diff of
           Pure (Delete term) -> (featurize counterA term : as, bs, succ counterA, counterB)
           Pure (Insert term) -> (as, featurize counterB term : bs, counterA, succ counterB)
@@ -150,10 +138,11 @@ rws compare as bs
         -- any terms that remain in umappedA.
         deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
 
+-- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
 editDistanceUpTo :: (Prologue.Foldable f, Functor f) => Integer -> Free (CofreeF f (Both a)) (Patch (Cofree f a)) -> Int
 editDistanceUpTo m = diffSum (patchSum termSize) . cutoff m
-  where diffSum patchCost diff = sum $ fmap (maybe 0 patchCost) diff
+  where diffSum patchCost = sum . fmap (maybe 0 patchCost)
 
 defaultD, defaultL, defaultP, defaultQ, defaultMoveBound :: Int
 defaultD = 15
