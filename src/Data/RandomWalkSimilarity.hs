@@ -61,17 +61,27 @@ rws compare as bs
     -- 4. Use structure to propagate matchings?
     -- 5. Compute the diff
 
-  where sesDiff = cutoff 1 <$> SES.ses replaceIfEqual cost as bs
+  where sesDiff = eitherCutoff 1 <$> SES.ses replaceIfEqual cost as bs
+        replaceIfEqual :: HasField fields Category => Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
         replaceIfEqual a b
           | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
           | otherwise = Nothing
         cost = iter (const 0) . (1 <$)
 
-        (fas, fbs, _, _) = foldr' (\diff (as, bs, counterA, counterB) -> case runFree diff of
-          Pure (Just (Delete term)) -> (featurize counterA term : as, bs, succ counterA, counterB)
-          Pure (Just (Insert term)) -> (as, featurize counterB term : bs, counterA, succ counterB)
-          _ -> (as, bs, succ counterA, succ counterB)
-          ) ([], [], 0, 0) sesDiff
+        eitherCutoff :: (Functor f) => Integer
+                     -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))
+                     -> Free (CofreeF f (Both (Record fields))) (Either (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) (Patch (Cofree f (Record fields))))
+        eitherCutoff n m = eitherCutoff' n m m
+          where eitherCutoff' n  _ diff | n <= 0 = pure (Left diff)
+                eitherCutoff' n (FreeT m) diff = FreeT $ bimap Right (\level -> eitherCutoff' (n - 1) level diff) `liftM` m
+
+        (fas, fbs, _, _, diffs) = foldr' (\diff (as, bs, counterA, counterB, diffs) -> case runFree diff of
+          Pure (Right (Delete term)) -> (featurize counterA term : as, bs, succ counterA, counterB, diffs)
+          Pure (Right (Insert term)) -> (as, featurize counterB term : bs, counterA, succ counterB, diffs)
+          syntax@(Free _) -> let diff' = free syntax >>= either identity pure in (as, bs, counterA, counterB, diff' : diffs) -- (featurize counterA term : as, bs, succ counterA, counterB)
+          -- Pure (Left term) -> (as, featurize counterB term : bs, counterA, succ counterB)
+          _ -> (as, bs, succ counterA, succ counterB, diffs)
+          ) ([], [], 0, 0, []) sesDiff
 
         kdas = KdTree.build (Vector.toList . feature) fas
         kdbs = KdTree.build (Vector.toList . feature) fbs
