@@ -54,7 +54,8 @@ rws compare as bs
     (`runState` (negate 1, toMap fas, toMap fbs)) &
     uncurry deleteRemaining &
     (<> countersAndDiffs) &
-    sortOn fst &
+    (\diffs -> let sorted = sortOn fst diffs in
+      traceShow (fst <$> sorted) sorted) &
     fmap snd
 
     -- Modified xydiff + RWS
@@ -79,8 +80,10 @@ rws compare as bs
                 eitherCutoff' n (FreeT m) diff = FreeT $ bimap Right (\level -> eitherCutoff' (n - 1) level diff) `liftM` m
 
         (fas, fbs, _, _, countersAndDiffs) = foldr' (\diff (as, bs, counterA, counterB, diffs) -> case runFree diff of
-          Pure (Right (Delete term)) -> (featurize counterA term : as, bs, succ counterA, counterB, diffs)
-          Pure (Right (Insert term)) -> (as, featurize counterB term : bs, counterA, succ counterB, diffs)
+          Pure (Right (Delete term)) ->
+            (featurize counterA term : as, bs, succ counterA, counterB, diffs)
+          Pure (Right (Insert term)) ->
+            (as, featurize counterB term : bs, counterA, succ counterB, diffs)
           syntax -> let diff' = free syntax >>= either identity pure in
             (as, bs, succ counterA, succ counterB, (counterA, diff') : diffs)
           ) ([], [], 0, 0, []) sesDiff
