@@ -11,7 +11,7 @@ import Term
 
 -- | A programming language.
 data Language =
-    C
+      C
     | CoffeeScript
     | CPlusPlus
     | CSharp
