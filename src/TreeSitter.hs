@@ -48,7 +48,10 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
             , spanStart = SourcePos (fromIntegral $! ts_node_p_start_point_row node) (fromIntegral $! ts_node_p_start_point_column node)
             , spanEnd = SourcePos (fromIntegral $! ts_node_p_end_point_row node) (fromIntegral $! ts_node_p_end_point_column node) }
 
-          -- Note: The strict application here is semantically important. Without it, we may not evaluate the range until after we’ve exited the scope that `node` was allocated within, meaning `alloca` will free it & other stack data may overwrite it.
+          -- Note: The strict application here is semantically important.
+          -- Without it, we may not evaluate the range until after we’ve exited
+          -- the scope that `node` was allocated within, meaning `alloca` will
+          -- free it & other stack data may overwrite it.
           range `seq` termConstructor source (pure $! sourceSpan) (toS name) range children
         getChild node n out = ts_node_p_named_child node n out >> toTerm out
         {-# INLINE getChild #-}
