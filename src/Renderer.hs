@@ -10,7 +10,7 @@ import Data.Aeson.Encoding (encodingToLazyByteString)
 import Data.Map as Map hiding (null)
 
 -- | A function that will render a diff, given the two source blobs.
-type Renderer annotation = Both SourceBlob -> Diff Text annotation -> Output
+type Renderer annotation = Both SourceBlob -> SyntaxDiff Text annotation -> Output
 
 data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath, outputPath :: FilePath }
  deriving (Show)

@@ -97,7 +97,7 @@ parserForFilepath path blob = decorateTerm termCostDecorator <$> do
    pure $! breakDownLeavesByWord (source blob) parsed
 
 -- | Replace every string leaf with leaves of the words in the string.
-breakDownLeavesByWord :: (HasField fields Category, HasField fields Range) => Source Char -> Term Text (Record fields) -> Term Text (Record fields)
+breakDownLeavesByWord :: (HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm Text (Record fields) -> SyntaxTerm Text (Record fields)
 breakDownLeavesByWord source = cata replaceIn
   where
     replaceIn (info :< syntax) = cofree $ info :< syntax'
@@ -126,10 +126,10 @@ readAndTranscodeFile path = do
   transcode text
 
 -- | A function computing a value to decorate terms with. This can be used to cache synthesized attributes on terms.
-type TermDecorator f fields field = CofreeF f (Record fields) (Record (field ': fields)) -> field
+type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fields)) -> field
 
 -- | Decorate a 'Term' using a function to compute the annotation values at every node.
-decorateTerm :: Functor f => TermDecorator f fields field -> Cofree f (Record fields) -> Cofree f (Record (field ': fields))
+decorateTerm :: Functor f => TermDecorator f fields field -> Term f (Record fields) -> Term f (Record (field ': fields))
 decorateTerm decorator = cata $ \ c -> cofree ((decorator (extract <$> c) .: headF c) :< tailF c)
 
 -- | Term decorator computing the cost of an unpacked term.
@@ -137,11 +137,11 @@ termCostDecorator :: (Prologue.Foldable f, Functor f) => TermDecorator f a Cost
 termCostDecorator c = 1 + sum (cost <$> tailF c)
 
 -- | Determine whether two terms are comparable based on the equality of their categories.
-compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Term leaf (Record fields) -> Bool
+compareCategoryEq :: HasField fields Category => SyntaxTerm leaf (Record fields) -> SyntaxTerm leaf (Record fields) -> Bool
 compareCategoryEq = (==) `on` category . extract
 
 -- | The sum of the node count of the diff’s patches.
-diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Int
+diffCostWithCachedTermCosts :: HasField fields Cost => SyntaxDiff leaf (Record fields) -> Int
 diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Free (info :< _) -> sum (cost <$> info)
   Pure patch -> sum (cost . extract <$> patch)

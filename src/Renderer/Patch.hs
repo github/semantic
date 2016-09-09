@@ -53,7 +53,7 @@ rowIncrement :: Join These a -> Both (Sum Int)
 rowIncrement = Join . fromThese (Sum 0) (Sum 0) . runJoin . (Sum 1 <$)
 
 -- | Given the before and after sources, render a hunk to a string.
-showHunk :: HasField fields Range => Both SourceBlob -> Hunk (SplitDiff a (Record fields)) -> String
+showHunk :: HasField fields Range => Both SourceBlob -> Hunk (SplitDiff a fields) -> String
 showHunk blobs hunk = maybeOffsetHeader <>
   concat (showChange sources <$> changes hunk) <>
   showLines (snd sources) ' ' (maybeSnd . runJoin <$> trailingContext hunk)
@@ -66,18 +66,18 @@ showHunk blobs hunk = maybeOffsetHeader <>
         (offsetA, offsetB) = runJoin . fmap (show . getSum) $ offset hunk
 
 -- | Given the before and after sources, render a change to a string.
-showChange :: HasField fields Range => Both (Source Char) -> Change (SplitDiff a (Record fields)) -> String
+showChange :: HasField fields Range => Both (Source Char) -> Change (SplitDiff a fields) -> String
 showChange sources change = showLines (snd sources) ' ' (maybeSnd . runJoin <$> context change) <> deleted <> inserted
   where (deleted, inserted) = runJoin $ pure showLines <*> sources <*> both '-' '+' <*> Join (unzip (fromThese Nothing Nothing . runJoin . fmap Just <$> contents change))
 
 -- | Given a source, render a set of lines to a string with a prefix.
-showLines :: HasField fields Range => Source Char -> Char -> [Maybe (SplitDiff leaf (Record fields))] -> String
+showLines :: HasField fields Range => Source Char -> Char -> [Maybe (SplitDiff leaf fields)] -> String
 showLines source prefix lines = fromMaybe "" . mconcat $ fmap prepend . showLine source <$> lines
   where prepend "" = ""
         prepend source = prefix : source
 
 -- | Given a source, render a line to a string.
-showLine :: HasField fields Range => Source Char -> Maybe (SplitDiff leaf (Record fields)) -> Maybe String
+showLine :: HasField fields Range => Source Char -> Maybe (SplitDiff leaf fields) -> Maybe String
 showLine source line | Just line <- line = Just . toString . (`slice` source) $ getRange line
                      | otherwise = Nothing
 
@@ -116,7 +116,7 @@ emptyHunk :: Hunk (SplitDiff a annotation)
 emptyHunk = Hunk { offset = mempty, changes = [], trailingContext = [] }
 
 -- | Render a diff as a series of hunks.
-hunks :: HasField fields Range => Diff a (Record fields) -> Both SourceBlob -> [Hunk (SplitDiff a (Record fields))]
+hunks :: HasField fields Range => SyntaxDiff a (Record fields) -> Both SourceBlob -> [Hunk (SplitDiff a fields)]
 hunks _ blobs | sources <- source <$> blobs
               , sourcesEqual <- runBothWith (==) sources
               , sourcesNull <- runBothWith (&&) (null <$> sources)

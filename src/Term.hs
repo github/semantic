@@ -10,8 +10,11 @@ import Data.These
 import Syntax
 
 -- | An annotated node (Syntax) in an abstract syntax tree.
-type TermF a annotation = CofreeF (Syntax a) annotation
-type Term a annotation = Cofree (Syntax a) annotation
+type TermF a annotation = CofreeF a annotation
+type Term a annotation = Cofree a annotation
+
+type SyntaxTermF a annotation = TermF (Syntax a) annotation
+type SyntaxTerm  a annotation = Term  (Syntax a) annotation
 
 type instance Base (Cofree f a) = CofreeF f a
 instance Functor f => Foldable.Foldable (Cofree f a) where project = runCofree

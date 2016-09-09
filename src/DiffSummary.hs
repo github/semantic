@@ -24,7 +24,7 @@ import Source
 
 data Identifiable a = Identifiable a | Unidentifiable a
 
-isIdentifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Term leaf (Record fields) -> Bool
+isIdentifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf (Record fields) -> Bool
 isIdentifiable term =
   case unwrap term of
     S.FunctionCall _ _ -> True
@@ -38,7 +38,7 @@ isIdentifiable term =
     S.Leaf _ -> True
     _ -> False
 
-identifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Term leaf (Record fields) -> Identifiable (Term leaf (Record fields))
+identifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf (Record fields) -> Identifiable (SyntaxTerm leaf (Record fields))
 identifiable term = if isIdentifiable term then Identifiable term else Unidentifiable term
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
@@ -54,7 +54,7 @@ data DiffSummary a = DiffSummary {
 } deriving (Eq, Functor, Show, Generic)
 
 -- Returns a list of diff summary texts given two source blobs and a diff.
-diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both SourceBlob -> Diff leaf (Record fields) -> [Either Text Text]
+diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both SourceBlob -> SyntaxDiff leaf (Record fields) -> [Either Text Text]
 diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> blobs) diff
 
 -- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
@@ -63,7 +63,7 @@ summaryToTexts :: DiffSummary DiffInfo -> [Either Text Text]
 summaryToTexts DiffSummary{..} = runJoin . fmap (show . (P.<> maybeParentContext parentAnnotation)) <$> (Join <$> summaries patch)
 
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
-diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> Diff leaf (Record fields) -> [DiffSummary DiffInfo]
+diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> SyntaxDiff leaf (Record fields) -> [DiffSummary DiffInfo]
 diffToDiffSummaries sources = para $ \diff ->
   let diff' = free (Prologue.fst <$> diff)
       annotateWithCategory :: [(Diff leaf (Record fields), [DiffSummary DiffInfo])] -> [DiffSummary DiffInfo]
@@ -104,7 +104,7 @@ toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure (pretty err)
 
 -- Returns a text representing a specific term given a source and a term.
-toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> Text
+toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf (Record fields) -> Text
 toTermName source term = case unwrap term of
   S.AnonymousFunction _ _ -> "anonymous"
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
@@ -162,7 +162,7 @@ toTermName source term = case unwrap term of
         termNameFromSource term = termNameFromRange (range term)
         termNameFromRange range = toText $ Source.slice range source
         range = characterRange . extract
-        toArgName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Term leaf (Record fields) -> Text
+        toArgName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf (Record fields) -> Text
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
                           Unidentifiable arg -> "..."
@@ -174,7 +174,7 @@ maybeParentContext = maybe "" (\annotation ->
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> Term leaf (Record fields) -> DiffInfo
+termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf (Record fields) -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
   Leaf _ -> LeafInfo (toCategoryName term) (toTermName' term)
   S.AnonymousFunction _ _ -> LeafInfo (toCategoryName term) ("anonymous")
@@ -193,7 +193,7 @@ termToDiffInfo blob term = case unwrap term of
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob
 
-prependSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> Term leaf (Record fields) -> DiffSummary DiffInfo -> DiffSummary DiffInfo
+prependSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> SyntaxTerm leaf (Record fields) -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary source term summary =
   case (parentAnnotation summary, identifiable term) of
     (Nothing, Identifiable term) -> summary { parentAnnotation = Just (category . extract $ term, toTermName source term) }
@@ -270,7 +270,7 @@ instance HasCategory Category where
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
 
-instance (HasCategory leaf, HasField fields Category) => HasCategory (Term leaf (Record fields)) where
+instance (HasCategory leaf, HasField fields Category) => HasCategory (SyntaxTerm leaf (Record fields)) where
   toCategoryName = toCategoryName . category . extract
 
 instance Arbitrary Branch where

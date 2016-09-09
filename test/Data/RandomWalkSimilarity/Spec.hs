@@ -21,14 +21,14 @@ spec = parallel $ do
   let positively = succ . abs
   describe "pqGramDecorator" $ do
     prop "produces grams with stems of the specified length" $
-      \ (term, p, q) -> pqGramDecorator (rhead . headF) (positively p) (positively q) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively p)) . length . stem . rhead)
+      \ (term, p, q) -> pqGramDecorator (rhead . headF) (positively p) (positively q) (toTerm term :: SyntaxTerm Text (Record '[Text])) `shouldSatisfy` all ((== (positively p)) . length . stem . rhead)
 
     prop "produces grams with bases of the specified width" $
-      \ (term, p, q) -> pqGramDecorator (rhead . headF) (positively p) (positively q) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively q)) . length . base . rhead)
+      \ (term, p, q) -> pqGramDecorator (rhead . headF) (positively p) (positively q) (toTerm term :: SyntaxTerm Text (Record '[Text])) `shouldSatisfy` all ((== (positively q)) . length . base . rhead)
 
   describe "featureVectorDecorator" $ do
     prop "produces a vector of the specified dimension" $
-      \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (toTerm term :: Term Text (Record '[Text])) `shouldSatisfy` all ((== (positively d)) . length . rhead)
+      \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (toTerm term :: SyntaxTerm Text (Record '[Text])) `shouldSatisfy` all ((== (positively d)) . length . rhead)
 
   describe "rws" $ do
     let decorate = defaultFeatureVectorDecorator (category . headF)
@@ -44,7 +44,7 @@ spec = parallel $ do
       let (a, b) = (decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "a") ])), decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "b") ]))) in
       fmap stripDiff (rws compare [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, copying b ]
 
-  where compare :: (HasField fields Category, Functor f, Eq (Cofree f Category)) => Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
+  where compare :: (HasField fields Category, Functor f, Eq (Cofree f Category)) => Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
         compare a b | (category <$> a) == (category <$> b) = Just (copying b)
                     | otherwise = if ((==) `on` category . extract) a b then Just (replacing a b) else Nothing
         copying :: Functor f => Cofree f (Record fields) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))

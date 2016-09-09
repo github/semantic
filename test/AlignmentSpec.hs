@@ -32,7 +32,7 @@ spec :: Spec
 spec = parallel $ do
   describe "alignBranch" $ do
     it "produces symmetrical context" $
-      alignBranch getRange ([] :: [Join These (SplitDiff String (Record '[Range]))]) (both [Range 0 2, Range 2 4] [Range 0 2, Range 2 4]) `shouldBe`
+      alignBranch getRange ([] :: [Join These (SplitDiff String '[Range])]) (both [Range 0 2, Range 2 4] [Range 0 2, Range 2 4]) `shouldBe`
         [ Join (These (Range 0 2, [])
                       (Range 0 2, []))
         , Join (These (Range 2 4, [])
@@ -40,7 +40,7 @@ spec = parallel $ do
         ]
 
     it "produces asymmetrical context" $
-      alignBranch getRange ([] :: [Join These (SplitDiff String (Record '[Range]))]) (both [Range 0 2, Range 2 4] [Range 0 1]) `shouldBe`
+      alignBranch getRange ([] :: [Join These (SplitDiff String '[Range])]) (both [Range 0 2, Range 2 4] [Range 0 1]) `shouldBe`
         [ Join (These (Range 0 2, [])
                       (Range 0 1, []))
         , Join (This  (Range 2 4, []))
@@ -257,13 +257,13 @@ instance Arbitrary BranchElement where
 counts :: [Join These (Int, a)] -> Both Int
 counts numbered = fromMaybe 0 . getLast . mconcat . fmap Last <$> Join (unalign (runJoin . fmap Prologue.fst <$> numbered))
 
-align :: Both (Source.Source Char) -> ConstructibleFree (Patch (Term String (Record '[Range]))) (Both (Record '[Range])) -> PrettyDiff (SplitDiff String (Record '[Range]))
+align :: Both (Source.Source Char) -> ConstructibleFree (Patch (SyntaxTerm String (Record '[Range]))) (Both (Record '[Range])) -> PrettyDiff (SplitDiff String '[Range])
 align sources = PrettyDiff sources . fmap (fmap (getRange &&& identity)) . alignDiff sources . deconstruct
 
 info :: Int -> Int -> Record '[Range]
 info start end = Range start end .: RNil
 
-prettyDiff :: Both (Source.Source Char) -> [Join These (ConstructibleFree (SplitPatch (Term String (Record '[Range]))) (Record '[Range]))] -> PrettyDiff (SplitDiff String (Record '[Range]))
+prettyDiff :: Both (Source.Source Char) -> [Join These (ConstructibleFree (SplitPatch (SyntaxTerm String (Record '[Range]))) (Record '[Range]))] -> PrettyDiff (SplitDiff String '[Range])
 prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& identity) . deconstruct))
 
 data PrettyDiff a = PrettyDiff { unPrettySources :: Both (Source.Source Char), unPrettyLines :: [Join These (Range, a)] }
@@ -282,14 +282,14 @@ newtype ConstructibleFree patch annotation = ConstructibleFree { deconstruct :: 
 
 
 class PatchConstructible p where
-  insert :: Term String (Record '[Range]) -> p
-  delete :: Term String (Record '[Range]) -> p
+  insert :: SyntaxTerm String (Record '[Range]) -> p
+  delete :: SyntaxTerm String (Record '[Range]) -> p
 
-instance PatchConstructible (Patch (Term String (Record '[Range]))) where
+instance PatchConstructible (Patch (SyntaxTerm String (Record '[Range]))) where
   insert = Insert
   delete = Delete
 
-instance PatchConstructible (SplitPatch (Term String (Record '[Range]))) where
+instance PatchConstructible (SplitPatch (SyntaxTerm String (Record '[Range]))) where
   insert = SplitInsert
   delete = SplitDelete
 

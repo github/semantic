@@ -28,15 +28,15 @@ termConstructor :: forall fields. (Show (Record fields), HasField fields Categor
   => Source Char -- ^ The source that the term occurs within.
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
   -> Record fields -- ^ The annotation for the term.
-  -> [Term Text (Record fields)] -- ^ The child nodes of the term.
-  -> IO (Term Text (Record fields)) -- ^ The resulting term, in IO.
+  -> [SyntaxTerm Text (Record fields)] -- ^ The child nodes of the term.
+  -> IO (SyntaxTerm Text (Record fields)) -- ^ The resulting term, in IO.
 termConstructor source sourceSpan info = fmap cofree . construct
   where
     withDefaultInfo syntax = pure (info :< syntax)
     errorWith children = do
       sourceSpan' <- sourceSpan
       withDefaultInfo (S.Error sourceSpan' children)
-    construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [Term Text (Record fields)] -> IO (CofreeF (S.Syntax Text) (Record fields) (Term Text (Record fields)))
+    construct :: (Show (Record fields), HasField fields Category, HasField fields Range) => [SyntaxTerm Text (Record fields)] -> IO (SyntaxTermF Text (Record fields) (SyntaxTerm Text (Record fields)))
     construct [] = case category info of
       Return -> withDefaultInfo $ S.Return Nothing -- Map empty return statements to Return Nothing
       _ -> withDefaultInfo . S.Leaf . pack . toString $ slice (characterRange info) source
@@ -92,7 +92,7 @@ termConstructor source sourceSpan info = fmap cofree . construct
 
     construct children | VarDecl == category info = withDefaultInfo . S.Indexed $ toVarDecl <$> children
       where
-        toVarDecl :: (HasField fields Category) => Term Text (Record fields) -> Term Text (Record fields)
+        toVarDecl :: (HasField fields Category) => SyntaxTerm Text (Record fields) -> SyntaxTerm Text (Record fields)
         toVarDecl child = cofree $ (setCategory (extract child) VarDecl :< S.VarDecl child)
 
     construct children | Switch == category info, (expr:_) <- children =
@@ -103,7 +103,7 @@ termConstructor source sourceSpan info = fmap cofree . construct
 
     construct children | Object == category info = withDefaultInfo . S.Object $ foldMap toTuple children
       where
-        toTuple :: Term Text (Record fields) -> [Term Text (Record fields)]
+        toTuple :: SyntaxTerm Text (Record fields) -> [SyntaxTerm Text (Record fields)]
         toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
         toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
         toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
