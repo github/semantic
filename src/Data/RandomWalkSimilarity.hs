@@ -96,8 +96,8 @@ rws compare as bs
         toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
         -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
-        findNearestNeighbourTo :: UnmappedTerm (Cofree f (Record fields))
-                               -> State (Int, IntMap (UnmappedTerm (Cofree f (Record fields))), IntMap (UnmappedTerm (Cofree f (Record fields)))) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
+        findNearestNeighbourTo :: UnmappedTerm f fields
+                               -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
         findNearestNeighbourTo term@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
           fromMaybe (insertion previous unmappedA unmappedB term) $ do
@@ -110,10 +110,10 @@ rws compare as bs
               pure (i, compared)
 
         insertion :: Int
-                     -> IntMap (UnmappedTerm (Cofree f (Record fields)))
-                     -> IntMap (UnmappedTerm (Cofree f (Record fields)))
-                     -> UnmappedTerm (Cofree f (Record fields))
-                     -> State (Int, IntMap (UnmappedTerm (Cofree f (Record fields))), IntMap (UnmappedTerm (Cofree f (Record fields)))) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
+                     -> UnmappedTerms f fields
+                     -> UnmappedTerms f fields
+                     -> UnmappedTerm f fields
+                     -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
         insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
           put (previous, unmappedA, IntMap.delete j unmappedB)
           pure (negate 1, inserting b)
@@ -124,10 +124,10 @@ rws compare as bs
         --
         -- cf §4.2 of RWS-Diff
         nearestUnmapped
-          :: IntMap (UnmappedTerm (Cofree f (Record fields))) -- ^ A set of terms eligible for matching against.
-          -> KdTree.KdTree Double (UnmappedTerm (Cofree f (Record fields))) -- ^ The k-d tree to look up nearest neighbours within.
-          -> UnmappedTerm (Cofree f (Record fields)) -- ^ The term to find the nearest neighbour to.
-          -> Maybe (UnmappedTerm (Cofree f (Record fields))) -- ^ The most similar unmapped term, if any.
+          :: UnmappedTerms f fields -- ^ A set of terms eligible for matching against.
+          -> KdTree.KdTree Double (UnmappedTerm f fields) -- ^ The k-d tree to look up nearest neighbours within.
+          -> UnmappedTerm f fields -- ^ The term to find the nearest neighbour to.
+          -> Maybe (UnmappedTerm f fields) -- ^ The most similar unmapped term, if any.
         nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
 
         -- | Determines whether an index is in-bounds for a move given the most recently matched index.
@@ -156,8 +156,9 @@ defaultM :: Integer
 defaultM = 10
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
-data UnmappedTerm a = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !a }
-  deriving Eq
+data UnmappedTerm f fields = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Cofree f (Record fields)) }
+
+type UnmappedTerms f fields = IntMap (UnmappedTerm f fields)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
 data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
