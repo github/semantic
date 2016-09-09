@@ -109,8 +109,14 @@ rws compare as bs
               put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
               pure (i, compared)
 
-        -- | Determines whether an index is in-bounds for a move given the most recently matched index.
-        isInMoveBounds previous i = previous <= i && i <= previous + defaultMoveBound
+        insertion :: Int
+                     -> IntMap (UnmappedTerm (Cofree f (Record fields)))
+                     -> IntMap (UnmappedTerm (Cofree f (Record fields)))
+                     -> UnmappedTerm (Cofree f (Record fields))
+                     -> State (Int, IntMap (UnmappedTerm (Cofree f (Record fields))), IntMap (UnmappedTerm (Cofree f (Record fields)))) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
+        insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
+          put (previous, unmappedA, IntMap.delete j unmappedB)
+          pure (negate 1, inserting b)
 
         -- | Finds the most-similar unmapped term to the passed-in term, if any.
         --
@@ -124,9 +130,8 @@ rws compare as bs
           -> Maybe (UnmappedTerm (Cofree f (Record fields))) -- ^ The most similar unmapped term, if any.
         nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
 
-        insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
-          put (previous, unmappedA, IntMap.delete j unmappedB)
-          pure (negate 1, inserting b)
+        -- | Determines whether an index is in-bounds for a move given the most recently matched index.
+        isInMoveBounds previous i = previous <= i && i <= previous + defaultMoveBound
 
         -- Given a list of diffs, and unmapped terms in unmappedA, deletes
         -- any terms that remain in umappedA.
