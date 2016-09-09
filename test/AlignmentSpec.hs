@@ -231,7 +231,7 @@ toAlignBranchInputs elements = (sources, join . (`evalState` both 0 0) . travers
         branchElementContents (Margin contents) = contents
 
 keysOfAlignedChildren :: [Join These (Range, [(String, Range)])] -> [String]
-keysOfAlignedChildren lines = lines >>= these identity identity (++) . runJoin . fmap (fmap Prologue.fst . Prologue.snd)
+keysOfAlignedChildren lines = lines >>= these identity identity (<>) . runJoin . fmap (fmap Prologue.fst . Prologue.snd)
 
 joinCrosswalk :: Bicrosswalk p => Align f => (a -> f b) -> Join p a -> f (Join p b)
 joinCrosswalk f = fmap Join . bicrosswalk f f . runJoin
@@ -273,9 +273,9 @@ instance Show a => Show (PrettyDiff a) where
   showsPrec _ (PrettyDiff sources lines) = (prettyPrinted ++) -- . (("\n" ++ show lines) ++)
     where prettyPrinted = showLine (maximum (0 : (maximum . fmap length <$> shownLines))) <$> shownLines >>= ('\n':)
           shownLines = catMaybes $ toBoth <$> lines
-          showLine n line = uncurry ((++) . (++ " | ")) (fromThese (replicate n ' ') (replicate n ' ') (runJoin (pad n <$> line)))
+          showLine n line = uncurry ((<>) . (++ " | ")) (fromThese (replicate n ' ') (replicate n ' ') (runJoin (pad n <$> line)))
           showDiff (range, _) = filter (/= '\n') . toList . Source.slice range
-          pad n string = (++) (take n string) (replicate (max 0 (n - length string)) ' ')
+          pad n string = (<>) (take n string) (replicate (max 0 (n - length string)) ' ')
           toBoth them = showDiff <$> them `applyThese` modifyJoin (uncurry These) sources
 
 newtype ConstructibleFree patch annotation = ConstructibleFree { deconstruct :: Free (CofreeF (Syntax String) annotation) patch }
