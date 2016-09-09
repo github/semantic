@@ -14,8 +14,8 @@ termConstructor
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
   -> Text -- ^ The name of the production for this node.
   -> Range -- ^ The character range that the term occupies.
-  -> [Term Text (Record '[Range, Category])] -- ^ The child nodes of the term.
-  -> IO (Term Text (Record '[Range, Category])) -- ^ The resulting term, in IO.
+  -> [Term (S.Syntax Text) (Record '[Range, Category])] -- ^ The child nodes of the term.
+  -> IO (Term (S.Syntax Text) (Record '[Range, Category])) -- ^ The resulting term, in IO.
 termConstructor source sourceSpan name range children
   | name == "ERROR" = sourceSpan >>= withDefaultInfo . (`S.Error` children)
   | otherwise = withDefaultInfo $ case (name, children) of
@@ -136,10 +136,10 @@ categoryForJavaScriptProductionName name = case name of
   "rel_op" -> RelationalOperator
   _ -> Other name
 
-toVarDecl :: (HasField fields Category) => Term Text (Record fields) -> Term Text (Record fields)
+toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
 toVarDecl child = cofree $ (setCategory (extract child) VarDecl :< S.VarDecl child)
 
-toTuple :: Term Text (Record fields) -> [Term Text (Record fields)]
+toTuple :: Term (S.Syntax Text) (Record fields) -> [Term (S.Syntax Text) (Record fields)]
 toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
 toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
 toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
