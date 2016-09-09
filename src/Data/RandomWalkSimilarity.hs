@@ -98,10 +98,10 @@ rws compare as bs
         -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
         findNearestNeighbourTo :: UnmappedTerm (Cofree f (Record fields))
                                -> State (Int, IntMap (UnmappedTerm (Cofree f (Record fields))), IntMap (UnmappedTerm (Cofree f (Record fields)))) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
-        findNearestNeighbourTo kv@(UnmappedTerm j _ b) = do
+        findNearestNeighbourTo term@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
-          fromMaybe (insertion previous unmappedA unmappedB kv) $ do
-            foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filterWithKey (\ k _ -> isInMoveBounds previous k) unmappedA) kdas kv
+          fromMaybe (insertion previous unmappedA unmappedB term) $ do
+            foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filterWithKey (\ k _ -> isInMoveBounds previous k) unmappedA) kdas term
             UnmappedTerm j' _ _ <- nearestUnmapped unmappedB kdbs foundA
             guard (j == j')
             compared <- compare a b
