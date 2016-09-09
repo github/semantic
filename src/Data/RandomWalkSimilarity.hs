@@ -65,7 +65,7 @@ rws compare as bs
     -- 4. Use structure to propagate matchings?
     -- 5. Compute the diff
 
-  where sesDiff = eitherCutoff 1 <$> SES.ses replaceIfEqual cost as bs
+  where sesDiffs = eitherCutoff 1 <$> SES.ses replaceIfEqual cost as bs
         replaceIfEqual :: HasField fields Category => Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
         replaceIfEqual a b
           | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
@@ -86,7 +86,7 @@ rws compare as bs
             (as, featurize counterB term : bs, counterA, succ counterB, diffs)
           syntax -> let diff' = free syntax >>= either identity pure in
             (as, bs, succ counterA, succ counterB, (counterA, diff') : diffs)
-          ) ([], [], 0, 0, []) sesDiff
+          ) ([], [], 0, 0, []) sesDiffs
 
         kdas = KdTree.build (Vector.toList . feature) fas
         kdbs = KdTree.build (Vector.toList . feature) fbs
