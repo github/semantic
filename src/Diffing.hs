@@ -36,7 +36,7 @@ import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
 import Category
-import Data.Aeson (pairs)
+import Data.Aeson (toJSON, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
 
 -- | Given a parser and renderer, diff two sources and return the rendered
@@ -106,7 +106,7 @@ breakDownLeavesByWord source = cata replaceIn
     -- Some Category constructors should retain their original structure, and not be sliced
     -- into words. This Set represents those Category constructors for which we want to
     -- preserve the original Syntax.
-    preserveSyntax = Set.fromList [Regex, Category.Comment]
+    preserveSyntax = Set.fromList [Regex, Category.Comment, Category.TemplateString]
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
@@ -165,8 +165,8 @@ printDiff parser arguments sources = do
   let renderedText = case rendered of
                        SplitOutput text -> text
                        PatchOutput text -> text
-                       JSONOutput series -> toS . encodingToLazyByteString $ pairs series
-                       SummaryOutput summaries -> toS . encodingToLazyByteString $ pairs summaries
+                       JSONOutput series -> toS . encodingToLazyByteString . toEncoding $ toJSON series
+                       SummaryOutput summaries -> toS . encodingToLazyByteString . toEncoding $ toJSON summaries
 
   case output arguments of
     Nothing -> TextIO.putStr renderedText

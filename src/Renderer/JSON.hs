@@ -12,19 +12,24 @@ import Data.Bifunctor.Join
 import Data.Record
 import qualified Data.Text as T
 import Data.These
-import Data.Vector hiding (toList)
+import Data.Vector as Vector hiding (toList)
 import Info
 import Renderer
 import Source hiding (fromList)
 import SplitDiff
 import Syntax as S
 import Term
+import qualified Data.Map as Map
 
 -- | Render a diff to a string representing its JSON.
 json :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
-json blobs diff = JSONOutput $ "rows" .= annotateRows (alignDiff (source <$> blobs) diff) <> "oids" .= (oid <$> blobs) <> "paths" .= (path <$> blobs)
+json blobs diff = JSONOutput $ Map.fromList [
+  ("rows", toJSON (annotateRows (alignDiff (source <$> blobs) diff))),
+  ("oids", toJSON (oid <$> blobs)),
+  ("paths", toJSON (path <$> blobs)) ]
   where annotateRows = fmap (fmap NumberedLine) . numberedRows
 
+-- | A numbered 'a'.
 newtype NumberedLine a = NumberedLine (Int, a)
 
 instance (HasField fields Category, HasField fields Range) => ToJSON (NumberedLine (SplitDiff leaf (Record fields))) where
@@ -34,14 +39,13 @@ instance ToJSON Category where
   toJSON (Other s) = String s
   toJSON s = String . T.pack $ show s
 instance ToJSON Range where
-  toJSON (Range start end) = A.Array . fromList $ toJSON <$> [ start, end ]
+  toJSON (Range start end) = A.Array . Vector.fromList $ toJSON <$> [ start, end ]
   toEncoding (Range start end) = foldable [ start,  end ]
 instance ToJSON a => ToJSON (Join These a) where
-  toJSON (Join vs) = A.Array . fromList $ toJSON <$> these pure pure (\ a b -> [ a, b ]) vs
+  toJSON (Join vs) = A.Array . Vector.fromList $ toJSON <$> these pure pure (\ a b -> [ a, b ]) vs
   toEncoding = foldable
 instance ToJSON a => ToJSON (Join (,) a) where
-  toJSON (Join (a, b)) = A.Array . fromList $ toJSON <$> [ a, b ]
-  toEncoding = foldable
+  toJSON (Join (a, b)) = A.Array . Vector.fromList $ toJSON <$> [ a, b ]
 instance (HasField fields Category, HasField fields Range) => ToJSON (SplitDiff leaf (Record fields)) where
   toJSON splitDiff = case runFree splitDiff of
     (Free (info :< syntax)) -> object (termFields info syntax)
@@ -65,6 +69,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   Leaf _ -> []
   Indexed c -> childrenFields c
   Fixed c -> childrenFields c
+  S.AnonymousFunction params c -> [ "params" .= params ] <> childrenFields c
   S.FunctionCall identifier params -> [ "identifier" .= identifier ] <> [ "params" .= params ]
   S.Function identifier params c -> [ "identifier" .= identifier ] <> [ "params" .= params ] <> childrenFields c
   S.MethodCall targetId methodId args -> [ "targetIdentifier" .= targetId ] <> [ "methodId" .= methodId ] <> [ "args" .= args ]

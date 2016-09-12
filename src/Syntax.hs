@@ -22,8 +22,10 @@ data Syntax a f
   | FunctionCall f [f]
   -- | A ternary has a condition, a true case and a false case
   | Ternary { ternaryCondition :: f, ternaryCases :: [f] }
+  -- | An anonymous function has a list of expressions and params.
+  | AnonymousFunction { params :: (Maybe f), expressions :: f }
   -- | A function has a list of expressions.
-  | Function { id :: (Maybe f), params :: (Maybe f), expressions :: f }
+  | Function { id :: f, params :: (Maybe f), expressions :: f }
   -- | An assignment has an identifier where f can be a member access, and the value is another syntax element (function call, leaf, etc.)
   | Assignment { assignmentId :: f, value :: f }
   -- | A math assignment represents expressions whose operator classifies as mathy (e.g. += or *=).
