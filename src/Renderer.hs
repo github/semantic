@@ -1,16 +1,17 @@
 module Renderer (Renderer, DiffArguments(..), Output(..), concatOutputs, toSummaryKey, Format(..)) where
 
-import Prologue
-import Data.Functor.Both
-import Diff
-import Source (SourceBlob)
-import Data.Text as T (intercalate)
 import Data.Aeson (Value, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
+import Data.Functor.Both
 import Data.Map as Map hiding (null)
+import Data.Text as T (intercalate)
+import Diff
+import Prologue
+import Source (SourceBlob)
+import Syntax
 
 -- | A function that will render a diff, given the two source blobs.
-type Renderer annotation = Both SourceBlob -> Diff Text annotation -> Output
+type Renderer annotation = Both SourceBlob -> Diff (Syntax Text) annotation -> Output
 
 data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath, outputPath :: FilePath }
  deriving (Show)
