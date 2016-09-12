@@ -1,5 +1,5 @@
 name:                semantic-diff
-version:             0.1.0.0
+version:             0.1.0
 synopsis:            Initial project template from stack
 description:         Please see README.md
 homepage:            http://github.com/github/semantic-diff#readme
@@ -31,6 +31,8 @@ library
                      , Info
                      , Interpreter
                      , Language
+                     , Language.C
+                     , Language.JavaScript
                      , Parser
                      , Patch
                      , Patch.Arbitrary
@@ -50,6 +52,7 @@ library
                      , TreeSitter
                      , DiffSummary
                      , Prologue
+                     , Paths_semantic_diff
   build-depends:       aeson
                      , base >= 4.8 && < 5
                      , bifunctors

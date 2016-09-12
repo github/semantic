@@ -4,11 +4,13 @@ import Diff
 import Term
 import Data.Bifunctor.Join
 import Data.Bifunctor.Join.Arbitrary ()
+import Data.Functor.Both
 import Data.Functor.Foldable (unfold)
 import Patch
 import Patch.Arbitrary ()
 import Syntax
 import Prologue
+import Term
 import Term.Arbitrary
 import Test.QuickCheck hiding (Fixed)
 
@@ -17,11 +19,11 @@ data ArbitraryDiff leaf annotation
   | ArbitraryPure (Patch (ArbitraryTerm leaf annotation))
   deriving (Show, Eq, Generic)
 
-unArbitraryDiff :: ArbitraryDiff leaf annotation -> FreeF (SyntaxTermF leaf (Join (,) annotation)) (Patch (ArbitraryTerm leaf annotation)) (ArbitraryDiff leaf annotation)
+unArbitraryDiff :: ArbitraryDiff leaf annotation -> FreeF (TermF (Syntax leaf) (Both annotation)) (Patch (ArbitraryTerm leaf annotation)) (ArbitraryDiff leaf annotation)
 unArbitraryDiff (ArbitraryFree a s) = Free (a :< s)
 unArbitraryDiff (ArbitraryPure p) = Pure p
 
-toDiff :: ArbitraryDiff leaf annotation -> SyntaxDiff leaf annotation
+toDiff :: ArbitraryDiff leaf annotation -> Diff (Syntax leaf) annotation
 toDiff = fmap (fmap toTerm) . unfold unArbitraryDiff
 
 diffOfSize :: (Arbitrary leaf, Arbitrary annotation) => Int -> Gen (ArbitraryDiff leaf annotation)

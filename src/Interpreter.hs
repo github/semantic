@@ -1,5 +1,5 @@
 {-# LANGUAGE RankNTypes #-}
-module Interpreter (Comparable, SyntaxDiffConstructor, diffTerms) where
+module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
 import Data.Align.Generic
@@ -19,23 +19,23 @@ import Syntax as S
 import Term
 
 -- | Returns whether two terms are comparable
-type Comparable leaf annotation = SyntaxTerm leaf annotation -> SyntaxTerm leaf annotation -> Bool
+type Comparable f annotation = Term f annotation -> Term f annotation -> Bool
 
 -- | Constructs a diff from the CofreeF containing its annotation and syntax. This function has the opportunity to, for example, cache properties in the annotation.
-type SyntaxDiffConstructor leaf annotation = CofreeF (Syntax leaf) (Both annotation) (SyntaxDiff leaf annotation) -> SyntaxDiff leaf annotation
+type DiffConstructor f annotation = TermF f (Both annotation) (Diff f annotation) -> Diff f annotation
 
 -- | Diff two terms recursively, given functions characterizing the diffing.
 diffTerms :: (Eq leaf, Eq (Record fields), HasField fields Category, HasField fields (Vector.Vector Double))
-  => SyntaxDiffConstructor leaf (Record fields) -- ^ A function to wrap up & possibly annotate every produced diff.
-  -> Comparable leaf (Record fields) -- ^ A function to determine whether or not two terms should even be compared.
-  -> SES.Cost (SyntaxDiff leaf (Record fields)) -- ^ A function to compute the cost of a given diff node.
-  -> SyntaxTerm leaf (Record fields) -- ^ A term representing the old state.
-  -> SyntaxTerm leaf (Record fields) -- ^ A term representing the new state.
-  -> SyntaxDiff leaf (Record fields)
+  => DiffConstructor (Syntax leaf) (Record fields) -- ^ A function to wrap up & possibly annotate every produced diff.
+  -> Comparable (Syntax leaf) (Record fields) -- ^ A function to determine whether or not two terms should even be compared.
+  -> SES.Cost (SyntaxDiff leaf fields) -- ^ A function to compute the cost of a given diff node.
+  -> SyntaxTerm leaf fields -- ^ A term representing the old state.
+  -> SyntaxTerm leaf fields -- ^ A term representing the new state.
+  -> SyntaxDiff leaf fields
 diffTerms construct comparable cost a b = fromMaybe (replacing a b) $ diffComparableTerms construct comparable cost a b
 
 -- | Diff two terms recursively, given functions characterizing the diffing. If the terms are incomparable, returns 'Nothing'.
-diffComparableTerms :: (Eq leaf, Eq (Record fields), HasField fields Category, HasField fields (Vector.Vector Double)) => SyntaxDiffConstructor leaf (Record fields) -> Comparable leaf (Record fields) -> SES.Cost (SyntaxDiff leaf (Record fields)) -> SyntaxTerm leaf (Record fields) -> SyntaxTerm leaf (Record fields) -> Maybe (SyntaxDiff leaf (Record fields))
+diffComparableTerms :: (Eq leaf, Eq (Record fields), HasField fields Category, HasField fields (Vector.Vector Double)) => DiffConstructor (Syntax leaf) (Record fields) -> Comparable (Syntax leaf) (Record fields) -> SES.Cost (SyntaxDiff leaf fields) -> SyntaxTerm leaf fields -> SyntaxTerm leaf fields -> Maybe (SyntaxDiff leaf fields)
 diffComparableTerms construct comparable cost = recur
   where recur a b
           | (category <$> a) == (category <$> b) = hylo construct runCofree <$> zipTerms a b
@@ -43,7 +43,7 @@ diffComparableTerms construct comparable cost = recur
           | otherwise = Nothing
 
 -- | Construct an algorithm to diff a pair of terms.
-algorithmWithTerms :: (SyntaxTermF leaf (Both a) diff -> diff) -> SyntaxTerm leaf a -> SyntaxTerm leaf a -> Algorithm (SyntaxTerm leaf a) diff diff
+algorithmWithTerms :: (TermF (Syntax leaf) (Both a) diff -> diff) -> Term (Syntax leaf) a -> Term (Syntax leaf) a -> Algorithm (Term (Syntax leaf) a) diff diff
 algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) -> branch Indexed a b
   (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) -> do
