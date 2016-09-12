@@ -6,11 +6,16 @@ import Prologue
 import Data.Align.Generic
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both
+import Data.Record
 import Data.These
+import Syntax
 
 -- | An annotated node (Syntax) in an abstract syntax tree.
 type TermF = CofreeF
 type Term f = Cofree f
+
+type SyntaxTermF leaf fields = TermF (Syntax leaf) (Record fields)
+type SyntaxTerm leaf fields = Term (Syntax leaf) (Record fields)
 
 type instance Base (Term f a) = TermF f a
 instance Functor f => Foldable.Foldable (Term f a) where project = runCofree

@@ -28,14 +28,14 @@ type DiffConstructor f annotation = TermF f (Both annotation) (Diff f annotation
 diffTerms :: (Eq leaf, Eq (Record fields), HasField fields Category, HasField fields (Vector.Vector Double))
   => DiffConstructor (Syntax leaf) (Record fields) -- ^ A function to wrap up & possibly annotate every produced diff.
   -> Comparable (Syntax leaf) (Record fields) -- ^ A function to determine whether or not two terms should even be compared.
-  -> SES.Cost (Diff (Syntax leaf) (Record fields)) -- ^ A function to compute the cost of a given diff node.
-  -> Term (Syntax leaf) (Record fields) -- ^ A term representing the old state.
-  -> Term (Syntax leaf) (Record fields) -- ^ A term representing the new state.
-  -> Diff (Syntax leaf) (Record fields)
+  -> SES.Cost (SyntaxDiff leaf fields) -- ^ A function to compute the cost of a given diff node.
+  -> SyntaxTerm leaf fields -- ^ A term representing the old state.
+  -> SyntaxTerm leaf fields -- ^ A term representing the new state.
+  -> SyntaxDiff leaf fields
 diffTerms construct comparable cost a b = fromMaybe (replacing a b) $ diffComparableTerms construct comparable cost a b
 
 -- | Diff two terms recursively, given functions characterizing the diffing. If the terms are incomparable, returns 'Nothing'.
-diffComparableTerms :: (Eq leaf, Eq (Record fields), HasField fields Category, HasField fields (Vector.Vector Double)) => DiffConstructor (Syntax leaf) (Record fields) -> Comparable (Syntax leaf) (Record fields) -> SES.Cost (Diff (Syntax leaf) (Record fields)) -> Term (Syntax leaf) (Record fields) -> Term (Syntax leaf) (Record fields) -> Maybe (Diff (Syntax leaf) (Record fields))
+diffComparableTerms :: (Eq leaf, Eq (Record fields), HasField fields Category, HasField fields (Vector.Vector Double)) => DiffConstructor (Syntax leaf) (Record fields) -> Comparable (Syntax leaf) (Record fields) -> SES.Cost (SyntaxDiff leaf fields) -> SyntaxTerm leaf fields -> SyntaxTerm leaf fields -> Maybe (SyntaxDiff leaf fields)
 diffComparableTerms construct comparable cost = recur
   where recur a b
           | (category <$> a) == (category <$> b) = hylo construct runCofree <$> zipTerms a b

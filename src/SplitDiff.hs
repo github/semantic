@@ -3,6 +3,7 @@ module SplitDiff where
 import Data.Record
 import Info
 import Prologue
+import Syntax
 import Term (Term, TermF)
 
 -- | A patch to only one side of a diff.
@@ -23,3 +24,4 @@ getRange diff = characterRange $ case runFree diff of
 
 -- | A diff with only one side’s annotations.
 type SplitDiff f annotation = Free (TermF f annotation) (SplitPatch (Term f annotation))
+type SplitSyntaxDiff leaf fields = SplitDiff (Syntax leaf) (Record fields)

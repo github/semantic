@@ -6,12 +6,17 @@ import Prologue
 import Data.Functor.Foldable as Foldable
 import Data.Functor.Both as Both
 import Data.Mergeable
+import Data.Record
 import Patch
+import Syntax
 import Term
 
 -- | An annotated series of patches of terms.
 type DiffF f annotation = FreeF (TermF f (Both annotation)) (Patch (Term f annotation))
 type Diff f annotation = Free (TermF f (Both annotation)) (Patch (Term f annotation))
+
+type SyntaxDiff leaf fields = Diff (Syntax leaf) (Record fields)
+
 
 type instance Base (Free f a) = FreeF f a
 instance Functor f => Foldable.Foldable (Free f a) where project = runFree

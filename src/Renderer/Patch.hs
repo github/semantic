@@ -117,7 +117,7 @@ emptyHunk :: Hunk (SplitDiff a annotation)
 emptyHunk = Hunk { offset = mempty, changes = [], trailingContext = [] }
 
 -- | Render a diff as a series of hunks.
-hunks :: HasField fields Range => Diff (Syntax leaf) (Record fields) -> Both SourceBlob -> [Hunk (SplitDiff (Syntax leaf) (Record fields))]
+hunks :: HasField fields Range => SyntaxDiff leaf fields -> Both SourceBlob -> [Hunk (SplitSyntaxDiff leaf fields)]
 hunks _ blobs | sources <- source <$> blobs
               , sourcesEqual <- runBothWith (==) sources
               , sourcesNull <- runBothWith (&&) (null <$> sources)
