@@ -141,7 +141,7 @@ toTermName source term = case unwrap term of
   S.Ternary expr _ -> toTermName' expr
   S.MathAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
-  S.Object kvs -> "{" <> intercalate ", " (toTermName' <$> kvs) <> "}"
+  S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
   S.Pair a _ -> toTermName' a <> ": ..."
   S.Return expr -> maybe "empty" toTermName' expr
   S.Error _ _ -> termNameFromSource term
