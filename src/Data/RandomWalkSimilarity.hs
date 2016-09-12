@@ -101,14 +101,19 @@ rws compare as bs
         findNearestNeighbourTo term@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
           fromMaybe (insertion previous unmappedA unmappedB term) $ do
+            -- Look up the nearest unmapped term in `unmappedA`.
             foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filterWithKey (\ k _ -> isInMoveBounds previous k) unmappedA) kdas term
+            -- Look up the nearest `foundA` in `unmappedB`
             UnmappedTerm j' _ _ <- nearestUnmapped unmappedB kdbs foundA
+            -- Return Nothing if their indices don't match
             guard (j == j')
             compared <- compare a b
             pure $! do
               put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
               pure (i, compared)
 
+        -- Returns a `State s a` of where `s` is the index, old unmapped terms, new unmapped terms, and value is
+        -- (index, inserted diff), given a previous index, two sets of umapped terms, and an unmapped term to insert.
         insertion :: Int
                      -> UnmappedTerms f fields
                      -> UnmappedTerms f fields
