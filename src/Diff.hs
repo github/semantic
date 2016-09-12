@@ -12,10 +12,10 @@ import Term
 
 -- | An annotated series of patches of terms.
 type DiffF leaf annotation = FreeF (CofreeF leaf (Both annotation)) (Patch (Term leaf annotation))
-type Diff a annotation = Free (CofreeF a (Both annotation)) (Patch (Term a annotation))
+type Diff leaf annotation = Free (CofreeF leaf (Both annotation)) (Patch (Term leaf annotation))
 
 type SyntaxDiffF leaf annotation = DiffF (Syntax leaf) annotation
-type SyntaxDiff a annotation = Diff (Syntax a) annotation
+type SyntaxDiff leaf annotation = Diff (Syntax leaf) annotation
 
 type instance Base (Free f a) = FreeF f a
 instance Functor f => Foldable.Foldable (Free f a) where project = runFree
