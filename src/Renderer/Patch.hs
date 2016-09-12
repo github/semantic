@@ -20,7 +20,6 @@ import Range
 import Renderer
 import Source hiding (break)
 import SplitDiff
-import Syntax
 
 -- | Render a timed out file as a truncated diff.
 truncatePatch :: DiffArguments -> Both SourceBlob -> Text
