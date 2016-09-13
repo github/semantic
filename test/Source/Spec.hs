@@ -26,8 +26,7 @@ spec = parallel $ do
         sourceSpanToRange source <$> spans `shouldBe` ranges
 
     prop "computes multi-line ranges" $
-      \ s -> let source = fromList s
-                 ranges = actualLineRanges (totalRange source) source in
+      \ s -> let source = fromList s in
         sourceSpanToRange source (totalSpan source) `shouldBe` totalRange source
 
     prop "computes sub-line ranges" $
