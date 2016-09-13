@@ -3,6 +3,7 @@ module Source.Spec where
 import Prologue
 import Range
 import Source
+import SourceSpan
 import Test.Hspec
 import Test.Hspec.QuickCheck
 
@@ -16,5 +17,9 @@ spec = parallel $ do
       \ s -> let source = fromList s in
         foldMap (`slice` source) (actualLineRanges (totalRange s) source) `shouldBe` source
 
-  describe "sourceSpanToRange" $
+  describe "sourceSpanToRange" $ do
     prop "is one-indexed" pending
+
+    it "_" $
+      let source = fromList "a\nb" in
+      sourceSpanToRange source (SourceSpan "" (SourcePos 1 1) (SourcePos 2 2)) `shouldBe` totalRange source
