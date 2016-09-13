@@ -119,7 +119,7 @@ parserForFilepath path blob = decorateTerm termCostDecorator <$> do
    pure $! breakDownLeavesByWord (source blob) parsed
 
 -- | Replace every string leaf with leaves of the words in the string.
-breakDownLeavesByWord :: (HasField fields Category, HasField fields Range) => Source Char -> Term Text (Record fields) -> Term Text (Record fields)
+breakDownLeavesByWord :: (HasField fields Category, HasField fields Range) => Source Char -> Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record fields)
 breakDownLeavesByWord source = cata replaceIn
   where
     replaceIn (info :< syntax) = cofree $ info :< syntax'
@@ -132,7 +132,7 @@ breakDownLeavesByWord source = cata replaceIn
     -- Some Category constructors should retain their original structure, and not be sliced
     -- into words. This Set represents those Category constructors for which we want to
     -- preserve the original Syntax.
-    preserveSyntax = Set.fromList [Regex, Category.Comment]
+    preserveSyntax = Set.fromList [Regex, Category.Comment, Category.TemplateString]
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
@@ -159,11 +159,11 @@ termCostDecorator :: (Prologue.Foldable f, Functor f) => TermDecorator f a Cost
 termCostDecorator c = 1 + sum (cost <$> tailF c)
 
 -- | Determine whether two terms are comparable based on the equality of their categories.
-compareCategoryEq :: HasField fields Category => Term leaf (Record fields) -> Term leaf (Record fields) -> Bool
+compareCategoryEq :: Functor f => HasField fields Category => Term f (Record fields) -> Term f (Record fields) -> Bool
 compareCategoryEq = (==) `on` category . extract
 
 -- | The sum of the node count of the diff’s patches.
-diffCostWithCachedTermCosts :: HasField fields Cost => Diff leaf (Record fields) -> Int
+diffCostWithCachedTermCosts :: Functor f => HasField fields Cost => Diff f (Record fields) -> Int
 diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Free (info :< _) -> sum (cost <$> info)
   Pure patch -> sum (cost . extract <$> patch)
