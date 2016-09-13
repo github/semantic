@@ -106,7 +106,7 @@ breakDownLeavesByWord source = cata replaceIn
     -- Some Category constructors should retain their original structure, and not be sliced
     -- into words. This Set represents those Category constructors for which we want to
     -- preserve the original Syntax.
-    preserveSyntax = Set.fromList [Regex, Category.Comment, Category.TemplateString]
+    preserveSyntax = Set.fromList [Regex, Category.Comment, Category.TemplateString, Category.NumberLiteral]
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)

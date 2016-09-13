@@ -246,6 +246,7 @@ instance HasCategory Category where
     C.Operator -> "operator"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
+    NumberLiteral -> "number"
     Other s -> s
     C.Pair -> "pair"
     Params -> "params"

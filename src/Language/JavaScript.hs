@@ -108,6 +108,7 @@ categoryForJavaScriptProductionName name = case name of
   "pair" -> Pair
   "string" -> StringLiteral
   "integer" -> IntegerLiteral
+  "number" -> NumberLiteral
   "symbol" -> SymbolLiteral
   "array" -> ArrayLiteral
   "function" -> Function

@@ -42,6 +42,7 @@ styleName category = "category-" <> case category of
   StringLiteral -> "string"
   SymbolLiteral -> "symbol"
   IntegerLiteral -> "integer"
+  NumberLiteral -> "number"
   C.Comment -> "comment"
   C.FunctionCall -> "function_call"
   C.Function -> "function"
