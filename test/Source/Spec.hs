@@ -25,6 +25,11 @@ spec = parallel $ do
                  ranges = actualLineRanges (totalRange source) source in
         sourceSpanToRange source <$> spans `shouldBe` ranges
 
+    prop "computes multi-line ranges" $
+      \ s -> let source = fromList s
+                 ranges = actualLineRanges (totalRange source) source in
+        sourceSpanToRange source (totalSpan source) `shouldBe` totalRange source
+
   describe "totalSpan" $ do
     prop "covers single lines" $
       \ n -> totalSpan (fromList (replicate n '*')) `shouldBe` SourceSpan "" (SourcePos 0 0) (SourcePos 0 (max 0 n))
