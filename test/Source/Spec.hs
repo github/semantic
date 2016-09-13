@@ -22,4 +22,4 @@ spec = parallel $ do
       \ s -> let source = fromList s
                  spans = zipWith (\ i Range {..} -> SourceSpan "" (SourcePos i 0) (SourcePos i (end - start))) [0..] ranges
                  ranges = actualLineRanges (totalRange source) source in
-      sourceSpanToRange source <$> spans `shouldBe` ranges
+        sourceSpanToRange source <$> spans `shouldBe` ranges
