@@ -29,6 +29,7 @@ import Renderer.Patch
 import Renderer.Split
 import Renderer.Summary
 import Source
+import SourceSpan
 import Syntax
 import System.Directory
 import System.FilePath
@@ -69,7 +70,7 @@ diffFiles parser renderer sourceBlobs = do
 cmarkParser :: Parser (Syntax Text) (Record '[Range, Category])
 cmarkParser blob = pure . toTerm $ commonmarkToNode [ optSourcePos, optSafe ] (toText (source blob))
   where toTerm :: Node -> Cofree (Syntax Text) (Record '[Range, Category])
-        toTerm (Node _ t children) = cofree $ (Range 0 0 .: toCategory t .: RNil) :< case t of
+        toTerm (Node position t children) = cofree $ (maybe (Range 0 0) (sourceSpanToRange (source blob) . toSpan) position .: toCategory t .: RNil) :< case t of
           -- Leaves
           CODE text -> Leaf text
           TEXT text -> Leaf text
@@ -89,6 +90,7 @@ cmarkParser blob = pure . toTerm $ commonmarkToNode [ optSourcePos, optSafe ] (t
         toCategory (LINK{}) = Other "link"
         toCategory (IMAGE{}) = Other "image"
         toCategory t = Other (show t)
+        toSpan PosInfo {..} = SourceSpan "" (SourcePos startLine startColumn) (SourcePos endLine endColumn)
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
