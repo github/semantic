@@ -26,7 +26,7 @@ arrayInfo = ArrayLiteral .: Range 0 3 .: RNil
 literalInfo :: Record '[Category, Range]
 literalInfo = StringLiteral .: Range 1 2 .: RNil
 
-testDiff :: Diff Text (Record '[Category, Range])
+testDiff :: Diff (Syntax Text) (Record '[Category, Range])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])
 
 testSummary :: DiffSummary DiffInfo
@@ -67,7 +67,7 @@ spec = parallel $ do
         extractLeaves (BranchInfo children _ _) = join $ extractLeaves <$> children
         extractLeaves leaf = [ leaf ]
 
-        extractDiffLeaves :: Term Text (Record '[Category, Range]) -> [ Term Text (Record '[Category, Range]) ]
+        extractDiffLeaves :: Term (Syntax Text) (Record '[Category, Range]) -> [ Term (Syntax Text) (Record '[Category, Range]) ]
         extractDiffLeaves term = case unwrap term of
           (Indexed children) -> join $ extractDiffLeaves <$> children
           (Fixed children) -> join $ extractDiffLeaves <$> children
@@ -81,7 +81,7 @@ spec = parallel $ do
                in
                 length listOfLeaves `shouldBe` length listOfDiffLeaves
 
-isIndexedOrFixed :: Patch (Term a annotation) -> Bool
+isIndexedOrFixed :: Patch (Term (Syntax a) annotation) -> Bool
 isIndexedOrFixed = any (isIndexedOrFixed' . unwrap)
 
 isIndexedOrFixed' :: Syntax a f -> Bool

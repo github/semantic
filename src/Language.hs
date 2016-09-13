@@ -11,7 +11,7 @@ import Term
 
 -- | A programming language.
 data Language =
-    C
+      C
     | CoffeeScript
     | CPlusPlus
     | CSharp
@@ -43,8 +43,8 @@ termConstructor
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
   -> Text -- ^ The name of the production for this node.
   -> Range -- ^ The character range that the term occupies.
-  -> [Term Text (Record '[Range, Category])] -- ^ The child nodes of the term.
-  -> IO (Term Text (Record '[Range, Category])) -- ^ The resulting term, in IO.
+  -> [Term (S.Syntax Text) (Record '[Range, Category])] -- ^ The child nodes of the term.
+  -> IO (Term (S.Syntax Text) (Record '[Range, Category])) -- ^ The resulting term, in IO.
 termConstructor source sourceSpan name range children =
   withDefaultInfo <$> case (name, children) of
     ("ERROR", _) -> S.Error <$> sourceSpan <*> pure children

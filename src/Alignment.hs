@@ -38,15 +38,15 @@ numberedRows = countUp (both 1 1)
         nextLineNumbers from row = modifyJoin (fromThese identity identity) (succ <$ row) <*> from
 
 -- | Determine whether a line contains any patches.
-hasChanges :: SplitDiff leaf annotation -> Bool
+hasChanges :: (Prologue.Foldable f, Functor f) => SplitDiff f annotation -> Bool
 hasChanges = or . (True <$)
 
 -- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
-alignDiff :: HasField fields Range => Both (Source Char) -> Diff leaf (Record fields) -> [Join These (SplitDiff leaf (Record fields))]
+alignDiff :: HasField fields Range => Both (Source Char) -> SyntaxDiff leaf fields -> [Join These (SplitSyntaxDiff leaf fields)]
 alignDiff sources diff = iter (alignSyntax (runBothWith ((Join .) . These)) wrap getRange sources) (alignPatch sources <$> diff)
 
 -- | Align the contents of a patch into a list of lines on the corresponding side(s) of the diff.
-alignPatch :: forall fields leaf. HasField fields Range => Both (Source Char) -> Patch (Term leaf (Record fields)) -> [Join These (SplitDiff leaf (Record fields))]
+alignPatch :: forall fields leaf. HasField fields Range => Both (Source Char) -> Patch (SyntaxTerm leaf fields) -> [Join These (SplitSyntaxDiff leaf fields)]
 alignPatch sources patch = case patch of
   Delete term -> fmap (pure . SplitDelete) <$> alignSyntax' this (fst sources) term
   Insert term -> fmap (pure . SplitInsert) <$> alignSyntax' that (snd sources) term
@@ -54,13 +54,13 @@ alignPatch sources patch = case patch of
     (alignSyntax' this (fst sources) term1)
     (alignSyntax' that (snd sources) term2)
   where getRange = characterRange . extract
-        alignSyntax' :: (forall a. Identity a -> Join These a) -> Source Char -> Term leaf (Record fields) -> [Join These (Term leaf (Record fields))]
+        alignSyntax' :: (forall a. Identity a -> Join These a) -> Source Char -> SyntaxTerm leaf fields -> [Join These (SyntaxTerm leaf fields)]
         alignSyntax' side source term = hylo (alignSyntax side cofree getRange (Identity source)) runCofree (Identity <$> term)
         this = Join . This . runIdentity
         that = Join . That . runIdentity
 
 -- | The Applicative instance f is either Identity or Both. Identity is for Terms in Patches, Both is for Diffs in unchanged portions of the diff.
-alignSyntax :: (Applicative f, HasField fields Range) => (forall a. f a -> Join These a) -> (CofreeF (Syntax leaf) (Record fields) term -> term) -> (term -> Range) -> f (Source Char) -> CofreeF (Syntax leaf) (f (Record fields)) [Join These term] -> [Join These term]
+alignSyntax :: (Applicative f, HasField fields Range) => (forall a. f a -> Join These a) -> (SyntaxTermF leaf fields term -> term) -> (term -> Range) -> f (Source Char) -> TermF (Syntax leaf) (f (Record fields)) [Join These term] -> [Join These term]
 alignSyntax toJoinThese toNode getRange sources (infos :< syntax) = catMaybes $ case syntax of
   Leaf s -> wrapInBranch (const (Leaf s)) <$> alignBranch getRange [] bothRanges
   Syntax.Comment a -> wrapInBranch (const (Syntax.Comment a)) <$> alignBranch getRange [] bothRanges

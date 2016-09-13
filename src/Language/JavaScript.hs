@@ -9,13 +9,22 @@ import SourceSpan
 import qualified Syntax as S
 import Term
 
+operators :: [Text]
+operators = [ "op", "bool_op", "math_op", "delete_op", "type_op", "void_op", "rel_op", "bitwise_op" ]
+
+functions :: [Text]
+functions = [ "arrow_function", "generator_function", "function" ]
+
+forStatements :: [Text]
+forStatements = [ "for_statement", "for_of_statement", "for_in_statement" ]
+
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
   -> Text -- ^ The name of the production for this node.
   -> Range -- ^ The character range that the term occupies.
-  -> [Term Text (Record '[Range, Category])] -- ^ The child nodes of the term.
-  -> IO (Term Text (Record '[Range, Category])) -- ^ The resulting term, in IO.
+  -> [Term (S.Syntax Text) (Record '[Range, Category])] -- ^ The child nodes of the term.
+  -> IO (Term (S.Syntax Text) (Record '[Range, Category])) -- ^ The resulting term, in IO.
 termConstructor source sourceSpan name range children
   | name == "ERROR" = sourceSpan >>= withDefaultInfo . (`S.Error` children)
   | otherwise = withDefaultInfo $ case (name, children) of
@@ -26,13 +35,6 @@ termConstructor source sourceSpan name range children
     ("subscript_access", [ base, element ]) -> S.SubscriptAccess base element
     ("comma_op", [ a, b ]) -> case unwrap b of
       S.Indexed rest -> S.Indexed $ a : rest
-      _ -> S.Indexed children
-    _ | name `elem` [ "op", "bool_op", "math_op", "delete_op", "type_op", "void_op", "rel_op", "bitwise_op" ]
-      -> S.Operator children
-    _ | name `elem` [ "arrow_function", "generator_function", "function" ] -> case children of
-      [ body ] -> S.AnonymousFunction Nothing body
-      [ params, body ] -> S.AnonymousFunction (Just params) body
-      [ id, params, body ] -> S.Function id (Just params) body
       _ -> S.Indexed children
     ("function_call", _) -> case runCofree <$> children of
       [ (_ :< S.MemberAccess{..}), (_ :< S.Args args) ] -> S.MethodCall memberId property args
@@ -50,9 +52,6 @@ termConstructor source sourceSpan name range children
     ("pair", _) -> S.Fixed children
     ("if_statement", [ expr, clause1, clause2 ]) -> S.If expr clause1 (Just clause2)
     ("if_statement", [ expr, clause ]) -> S.If expr clause Nothing
-    _ | name `elem` [ "for_statement", "for_of_statement", "for_in_statement" ]
-      , Just (exprs, body) <- unsnoc children
-      -> S.For exprs body
     ("while_statement", [ expr, body ]) -> S.While expr body
     ("do_statement", [ expr, body ]) -> S.DoWhile expr body
     ("throw_statement", [ expr ]) -> S.Throw expr
@@ -68,7 +67,13 @@ termConstructor source sourceSpan name range children
     ("method_definition", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
     ("class", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
     ("class", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
-
+    _ | name `elem` forStatements, Just (exprs, body) <- unsnoc children -> S.For exprs body
+    _ | name `elem` operators -> S.Operator children
+    _ | name `elem` functions -> case children of
+          [ body ] -> S.AnonymousFunction Nothing body
+          [ params, body ] -> S.AnonymousFunction (Just params) body
+          [ id, params, body ] -> S.Function id (Just params) body
+          _ -> S.Indexed children
     (_, []) -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
   where withDefaultInfo syntax@(S.MethodCall _ _ _) = pure $! cofree ((range .:  MethodCall .: RNil) :< syntax)
@@ -136,10 +141,10 @@ categoryForJavaScriptProductionName name = case name of
   "rel_op" -> RelationalOperator
   _ -> Other name
 
-toVarDecl :: (HasField fields Category) => Term Text (Record fields) -> Term Text (Record fields)
+toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
 toVarDecl child = cofree $ (setCategory (extract child) VarDecl :< S.VarDecl child)
 
-toTuple :: Term Text (Record fields) -> [Term Text (Record fields)]
+toTuple :: Term (S.Syntax Text) (Record fields) -> [Term (S.Syntax Text) (Record fields)]
 toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
 toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
 toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
