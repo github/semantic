@@ -25,6 +25,10 @@ spec = parallel $ do
                  ranges = actualLineRanges (totalRange source) source in
         sourceSpanToRange source <$> spans `shouldBe` ranges
 
+  describe "totalSpan" $ do
+    prop "covers single lines" $
+      \ n -> totalSpan (fromList (replicate n '*')) `shouldBe` SourceSpan "" (SourcePos 0 0) (SourcePos 0 (max 0 n))
+
 totalSpan :: Source Char -> SourceSpan
 totalSpan source = SourceSpan "" (SourcePos 0 0) (SourcePos (pred (length ranges)) (end lastRange - start lastRange))
   where ranges = actualLineRanges (totalRange source) source
