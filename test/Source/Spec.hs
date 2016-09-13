@@ -22,4 +22,4 @@ spec = parallel $ do
 
     it "_" $
       let source = fromList "a\nb" in
-      sourceSpanToRange source (SourceSpan "" (SourcePos 1 1) (SourcePos 2 2)) `shouldBe` totalRange source
+      sourceSpanToRange source (SourceSpan "" (SourcePos 0 0) (SourcePos 1 1)) `shouldBe` totalRange source
