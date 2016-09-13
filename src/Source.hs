@@ -7,6 +7,7 @@ import Data.String
 import qualified Data.Vector as Vector
 import Numeric
 import Range
+import SourceSpan
 
 -- | The source, oid, path, and Maybe SourceKind of a blob in a Git repo.
 data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
@@ -89,6 +90,9 @@ actualLines source = case Source.break (== '\n') source of
 actualLineRanges :: Range -> Source Char -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous string = Range (end previous) $ end previous + length string
+
+sourceSpanToRange :: Source Char -> SourceSpan -> Range
+sourceSpanToRange _ _ = Range 0 0
 
 
 instance Monoid (Source a) where
