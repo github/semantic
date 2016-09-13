@@ -165,7 +165,7 @@ toTermName source term = case unwrap term of
         toArgName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Text
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
-                          Unidentifiable _ -> "..."
+                          Unidentifiable _ -> "…"
 
 maybeParentContext :: Maybe (Category, Text) -> Doc
 maybeParentContext = maybe "" (\annotation ->
