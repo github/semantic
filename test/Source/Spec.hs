@@ -30,6 +30,10 @@ spec = parallel $ do
                  ranges = actualLineRanges (totalRange source) source in
         sourceSpanToRange source (totalSpan source) `shouldBe` totalRange source
 
+    prop "computes sub-line ranges" $
+      \ s -> let source = fromList ('*' : s <> "*") in
+        sourceSpanToRange source (insetSpan (totalSpan source)) `shouldBe` insetRange (totalRange source)
+
   describe "totalSpan" $ do
     prop "covers single lines" $
       \ n -> totalSpan (fromList (replicate n '*')) `shouldBe` SourceSpan "" (SourcePos 0 0) (SourcePos 0 (max 0 n))
