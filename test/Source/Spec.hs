@@ -15,3 +15,6 @@ spec = parallel $ do
     prop "produces exhaustive ranges" $
       \ s -> let source = fromList s in
         foldMap (`slice` source) (actualLineRanges (totalRange s) source) `shouldBe` source
+
+  describe "sourceSpanToRange" $
+    prop "is one-indexed" pending
