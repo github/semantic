@@ -91,6 +91,7 @@ actualLineRanges :: Range -> Source Char -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous string = Range (end previous) $ end previous + length string
 
+-- | Compute the character range corresponding to a given SourceSpan within a Source.
 sourceSpanToRange :: Source Char -> SourceSpan -> Range
 sourceSpanToRange _ _ = Range 0 0
 
