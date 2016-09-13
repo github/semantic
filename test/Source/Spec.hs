@@ -11,3 +11,7 @@ spec = parallel $ do
   describe "actualLineRanges" $ do
     prop "produces 1 more range than there are newlines" $
       \ s -> length (actualLineRanges (totalRange s) (fromList s)) `shouldBe` succ (length (filter (== '\n') s))
+
+    prop "produces exhaustive ranges" $
+      \ s -> let source = fromList s in
+        foldMap (`slice` source) (actualLineRanges (totalRange s) source) `shouldBe` source
