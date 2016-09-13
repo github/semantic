@@ -115,6 +115,7 @@ test-suite semantic-diff-test
                      , DiffSummarySpec
                      , InterpreterSpec
                      , PatchOutputSpec
+                     , RangeSpec
                      , TermSpec
   build-depends:       base
                      , bifunctors
