@@ -69,11 +69,11 @@ diffFiles parser renderer sourceBlobs = do
 cmarkParser :: Parser (Syntax Text) (Record '[Range, Category])
 cmarkParser blob = pure $ toTerm $ commonmarkToNode [ optSourcePos, optSafe ] (toText (source blob))
   where toTerm :: Node -> Cofree (Syntax Text) (Record '[Range, Category])
-        toTerm (Node position t children) = cofree $ (Range 0 0 .: toCategory t .: RNil) :< case t of
+        toTerm (Node _ t children) = cofree $ (Range 0 0 .: toCategory t .: RNil) :< case t of
           -- Leaves
           CODE text -> Leaf text
           TEXT text -> Leaf text
-          CODE_BLOCK language text -> Leaf text
+          CODE_BLOCK _ text -> Leaf text
           -- Branches
           _ -> Indexed (toTerm <$> children)
         -- Node (Maybe PosInfo) NodeType [Node]
