@@ -1,5 +1,6 @@
 module Source.Spec where
 
+import qualified Prelude
 import Prologue
 import Range
 import Source
@@ -23,3 +24,8 @@ spec = parallel $ do
                  spans = zipWith (\ i Range {..} -> SourceSpan "" (SourcePos i 0) (SourcePos i (end - start))) [0..] ranges
                  ranges = actualLineRanges (totalRange source) source in
         sourceSpanToRange source <$> spans `shouldBe` ranges
+
+totalSpan :: Source Char -> SourceSpan
+totalSpan source = SourceSpan "" (SourcePos 0 0) (SourcePos (pred (length ranges)) (end lastRange - start lastRange))
+  where ranges = actualLineRanges (totalRange source) source
+        lastRange = Prelude.last ranges
