@@ -18,6 +18,8 @@ spec = parallel $ do
         foldMap (`slice` source) (actualLineRanges (totalRange s) source) `shouldBe` source
 
   describe "sourceSpanToRange" $ do
-    it "computes the range covering a span in a source" $
-      let source = fromList "a\nb" in
-      sourceSpanToRange source (SourceSpan "" (SourcePos 0 0) (SourcePos 1 1)) `shouldBe` totalRange source
+    prop "computes the range covering a span in some source" $
+      \ s -> let source = fromList s
+                 spans = zipWith (\ i Range {..} -> SourceSpan "" (SourcePos i 0) (SourcePos i (end - start))) [0..] ranges
+                 ranges = actualLineRanges (totalRange source) source in
+      sourceSpanToRange source <$> spans `shouldBe` ranges
