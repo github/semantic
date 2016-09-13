@@ -41,3 +41,10 @@ totalSpan :: Source Char -> SourceSpan
 totalSpan source = SourceSpan "" (SourcePos 0 0) (SourcePos (pred (length ranges)) (end lastRange - start lastRange))
   where ranges = actualLineRanges (totalRange source) source
         lastRange = Prelude.last ranges
+
+insetSpan :: SourceSpan -> SourceSpan
+insetSpan sourceSpan = sourceSpan { spanStart = (spanStart sourceSpan) { column = succ (column (spanStart sourceSpan)) }
+                                  , spanEnd = (spanEnd sourceSpan) { column = pred (column (spanEnd sourceSpan)) } }
+
+insetRange :: Range -> Range
+insetRange Range {..} = Range (succ start) (pred end)
