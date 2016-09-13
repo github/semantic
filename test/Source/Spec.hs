@@ -18,8 +18,6 @@ spec = parallel $ do
         foldMap (`slice` source) (actualLineRanges (totalRange s) source) `shouldBe` source
 
   describe "sourceSpanToRange" $ do
-    prop "is one-indexed" pending
-
     it "_" $
       let source = fromList "a\nb" in
       sourceSpanToRange source (SourceSpan "" (SourcePos 0 0) (SourcePos 1 1)) `shouldBe` totalRange source
