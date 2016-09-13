@@ -28,7 +28,7 @@ import Renderer.JSON
 import Renderer.Patch
 import Renderer.Split
 import Renderer.Summary
-import Source hiding ((++))
+import Source
 import Syntax
 import System.Directory
 import System.FilePath

@@ -77,17 +77,13 @@ uncons (Source vector) = if null vector then Nothing else Just (Vector.head vect
 break :: (a -> Bool) -> Source a -> (Source a, Source a)
 break predicate (Source vector) = let (start, remainder) = Vector.break predicate vector in (Source start, Source remainder)
 
--- | Concatenate two sources.
-(++) :: Source a -> Source a -> Source a
-(++) (Source a) = Source . (a Vector.++) . getVector
-
 -- | Split the contents of the source after newlines.
 actualLines :: Source Char -> [Source Char]
 actualLines source | null source = [ source ]
 actualLines source = case Source.break (== '\n') source of
   (l, lines') -> case uncons lines' of
     Nothing -> [ l ]
-    Just (_, lines') -> (l Source.++ fromList "\n") : actualLines lines'
+    Just (_, lines') -> (l <> fromList "\n") : actualLines lines'
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source Char -> [Range]
