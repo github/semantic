@@ -95,7 +95,7 @@ actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start rang
 sourceSpanToRange :: Source Char -> SourceSpan -> Range
 sourceSpanToRange source SourceSpan{..} = Range start end
   where start = sumLengths leadingRanges + column spanStart
-        end = start + sumLengths (take (line spanEnd - line spanStart) remainingRanges) + column spanEnd
+        end = start + sumLengths (take (line spanEnd - line spanStart) remainingRanges) + (column spanEnd - column spanStart)
         (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (totalRange source) source)
         sumLengths = sum . fmap (\ Range{..} -> end - start)
 
