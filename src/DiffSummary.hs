@@ -24,22 +24,21 @@ import Source
 
 data Identifiable a = Identifiable a | Unidentifiable a
 
-isIdentifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Bool
-isIdentifiable term =
-  case unwrap term of
-    S.FunctionCall _ _ -> True
-    S.Function{} -> True
-    S.Assignment{} -> True
-    S.MathAssignment{} -> True
-    S.VarAssignment{} -> True
-    S.SubscriptAccess{} -> True
-    S.Class _ _ _ -> True
-    S.Method _ _ _ -> True
-    S.Leaf _ -> True
-    _ -> False
-
 identifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
-identifiable term = if isIdentifiable term then Identifiable term else Unidentifiable term
+identifiable term = isIdentifiable (unwrap term) $ term
+  where isIdentifiable = \case
+          S.FunctionCall{} -> Identifiable
+          S.MethodCall{} -> Identifiable
+          S.Function{} -> Identifiable
+          S.Assignment{} -> Identifiable
+          S.MathAssignment{} -> Identifiable
+          S.VarAssignment{} -> Identifiable
+          S.SubscriptAccess{} -> Identifiable
+          S.Class{} -> Identifiable
+          S.Method{} -> Identifiable
+          S.Leaf{} -> Identifiable
+          S.DoWhile{} -> Identifiable
+          _ -> Unidentifiable
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
