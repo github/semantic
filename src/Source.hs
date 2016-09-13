@@ -97,4 +97,4 @@ actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start rang
 
 instance Monoid (Source a) where
   mempty = fromList []
-  mappend = (Source.++)
+  mappend = (Source .) . (Vector.++) `on` getVector
