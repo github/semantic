@@ -67,7 +67,7 @@ diffFiles parser renderer sourceBlobs = do
           _ -> Nothing)
 
 cmarkParser :: Parser (Syntax Text) (Record '[Range, Category])
-cmarkParser blob = pure $ toTerm $ commonmarkToNode [ optSourcePos, optSafe ] (toText (source blob))
+cmarkParser blob = pure . toTerm $ commonmarkToNode [ optSourcePos, optSafe ] (toText (source blob))
   where toTerm :: Node -> Cofree (Syntax Text) (Record '[Range, Category])
         toTerm (Node _ t children) = cofree $ (Range 0 0 .: toCategory t .: RNil) :< case t of
           -- Leaves
