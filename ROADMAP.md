@@ -1,5 +1,7 @@
 # Roadmap
 
+This is the long form version of our [roadmap project][].
+
 ## Things we are currently doing:
 
 1. [Diff summaries][] for C & JavaScript. Q3 2016 or so.
@@ -34,6 +36,7 @@
 2. Collect data on our heuristics &c. and refine them via e.g. ML.
 3. Diffs as a [service][].
 
+[roadmap project]: https://github.com/github/semantic-diff/projects/5
 [Diff summaries]: https://github.com/github/semantic-diff/milestones/Summer%20Eyes
 [Semantic diffs]: https://github.com/github/semantic-diff/milestones/Dot%20Calm
 [Ruby]: https://github.com/github/semantic-diff/issues/282
