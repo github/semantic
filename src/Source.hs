@@ -95,7 +95,7 @@ actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start rang
 sourceSpanToRange :: Source Char -> SourceSpan -> Range
 sourceSpanToRange source SourceSpan{..} = Range start end
   where start = sum (olength <$> leadingRanges) + column spanStart
-        end = start
+        end = start + (sum (olength <$> take (line spanEnd - line spanStart) remainingRanges)) + column spanEnd
         (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (totalRange source) source)
         olength Range{..} = end - start
 
