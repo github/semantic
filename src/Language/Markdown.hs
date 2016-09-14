@@ -7,20 +7,21 @@ import Data.Text
 import Info
 import Parser
 import Prologue
+import Range
 import Source
 import SourceSpan
 import Syntax
 
 cmarkParser :: Parser (Syntax Text) (Record '[Range, Category])
-cmarkParser SourceBlob{..} = pure . toTerm (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
-  where toTerm :: SourceSpan -> Node -> Cofree (Syntax Text) (Record '[Range, Category])
-        toTerm within (Node position t children) = let span = maybe within toSpan position in cofree $ (sourceSpanToRange source span .: toCategory t .: RNil) :< case t of
+cmarkParser SourceBlob{..} = pure . toTerm (totalRange source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
+  where toTerm :: Range -> Node -> Cofree (Syntax Text) (Record '[Range, Category])
+        toTerm within (Node position t children) = let range = maybe within (sourceSpanToRange source . toSpan) position in cofree $ (range .: toCategory t .: RNil) :< case t of
           -- Leaves
           CODE text -> Leaf text
           TEXT text -> Leaf text
           CODE_BLOCK _ text -> Leaf text
           -- Branches
-          _ -> Indexed (toTerm span <$> children)
+          _ -> Indexed (toTerm range <$> children)
 
         toCategory :: NodeType -> Category
         toCategory (TEXT _) = Other "text"
