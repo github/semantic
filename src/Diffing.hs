@@ -22,7 +22,6 @@ import Interpreter
 import Language
 import Parser
 import Patch
-import qualified Prelude
 import Range
 import Renderer
 import Renderer.JSON
@@ -94,8 +93,7 @@ cmarkParser SourceBlob{..} = pure . fromMaybe errorNode . toTerm $ commonmarkToN
         toCategory t = Other (show t)
         toSpan PosInfo{..} = SourceSpan "" (SourcePos (pred startLine) (pred startColumn)) (SourcePos (pred endLine) (pred endColumn))
 
-        errorNode = cofree $ (totalRange source .: Category.Error .: RNil) :< Syntax.Error (SourceSpan (toS path) (SourcePos 0 0) (SourcePos (pred (length ranges)) (end (Prelude.last ranges) - start (Prelude.last ranges)))) []
-        ranges = actualLineRanges (totalRange source) source
+        errorNode = cofree $ (totalRange source .: Category.Error .: RNil) :< Syntax.Error (totalSpan source) []
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
