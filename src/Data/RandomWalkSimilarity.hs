@@ -116,7 +116,7 @@ rws compare as bs
                      -> UnmappedTerms f fields
                      -> UnmappedTerm f fields
                      -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
-        insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
+        insertion _ unmappedA unmappedB (UnmappedTerm j _ b) = do
           put (j, unmappedA, IntMap.delete j unmappedB)
           pure (j, inserting b)
 

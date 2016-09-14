@@ -10,7 +10,6 @@ import Patch
 import Patch.Arbitrary ()
 import Syntax
 import Prologue
-import Term
 import Term.Arbitrary
 import Test.QuickCheck hiding (Fixed)
 
