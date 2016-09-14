@@ -30,15 +30,15 @@ diffCost :: (Foldable f, Functor f) => Diff f annotation -> Int
 diffCost = diffSum $ patchSum termSize
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
-mergeMaybe :: (Functor f, Mergeable f) => (Patch (Term f annotation) -> Maybe (Term f annotation)) -> Diff f annotation -> Maybe (Term f annotation)
+mergeMaybe :: Mergeable f => (Patch (Term f annotation) -> Maybe (Term f annotation)) -> Diff f annotation -> Maybe (Term f annotation)
 mergeMaybe transform = iter algebra . fmap transform
   where algebra :: Mergeable f => TermF f (Both annotation) (Maybe (Term f annotation)) -> Maybe (Term f annotation)
         algebra (annotations :< syntax) = cofree . (Both.fst annotations :<) <$> sequenceAlt syntax
 
 -- | Recover the before state of a diff.
-beforeTerm :: (Functor f, Mergeable f) => Diff f annotation -> Maybe (Term f annotation)
+beforeTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
 beforeTerm = mergeMaybe before
 
 -- | Recover the after state of a diff.
-afterTerm :: (Functor f, Mergeable f) => Diff f annotation -> Maybe (Term f annotation)
+afterTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
 afterTerm = mergeMaybe after
