@@ -73,9 +73,8 @@ rws compare as bs
         eitherCutoff :: (Functor f) => Integer
                      -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))
                      -> Free (CofreeF f (Both (Record fields))) (Either (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) (Patch (Cofree f (Record fields))))
-        eitherCutoff n m = eitherCutoff' n m
-          where eitherCutoff' n diff | n <= 0 = pure (Left diff)
-                eitherCutoff' n m = free $ bimap Right (\level -> eitherCutoff' (n - 1) level) (runFree m)
+        eitherCutoff n diff | n <= 0 = pure (Left diff)
+        eitherCutoff n diff = free . bimap Right (eitherCutoff (pred n)) $ runFree diff
 
         (fas, fbs, _, _, countersAndDiffs) = foldr' (\diff (as, bs, counterA, counterB, diffs) -> case runFree diff of
           Pure (Right (Delete term)) ->
