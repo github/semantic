@@ -33,6 +33,7 @@ import Test.QuickCheck.Random
 import qualified SES
 import Info
 import Data.Align.Generic
+import Data.These
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
 rws :: forall f fields. (GAlign f, HasField fields Category, Traversable f, Eq (f (Cofree f Category)), HasField fields (Vector.Vector Double))
@@ -84,7 +85,7 @@ rws compare as bs
           Pure (Right (Insert term)) ->
             (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs)
           syntax -> let diff' = free syntax >>= either identity pure in
-            (as, bs, succ counterA, succ counterB, diffs <> pure (counterA, diff'))
+            (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'))
           ) ([], [], 0, 0, []) sesDiffs
 
         kdas = KdTree.build (Vector.toList . feature) fas
@@ -96,7 +97,7 @@ rws compare as bs
 
         -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
         findNearestNeighbourTo :: UnmappedTerm f fields
-                               -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
+                               -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (These Int Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
         findNearestNeighbourTo term@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
           fromMaybe (insertion previous unmappedA unmappedB term) $ do
@@ -109,7 +110,7 @@ rws compare as bs
             compared <- compare a b
             pure $! do
               put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
-              pure (i, compared)
+              pure (These i j, compared)
 
         -- Returns a `State s a` of where `s` is the index, old unmapped terms, new unmapped terms, and value is
         -- (index, inserted diff), given a previous index, two sets of umapped terms, and an unmapped term to insert.
@@ -117,10 +118,10 @@ rws compare as bs
                      -> UnmappedTerms f fields
                      -> UnmappedTerms f fields
                      -> UnmappedTerm f fields
-                     -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
+                     -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (These Int Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
         insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
           put (previous, unmappedA, IntMap.delete j unmappedB)
-          pure (negate 1, inserting b)
+          pure (That (negate 1), inserting b)
 
         -- | Finds the most-similar unmapped term to the passed-in term, if any.
         --
@@ -136,10 +137,16 @@ rws compare as bs
 
         -- | Determines whether an index is in-bounds for a move given the most recently matched index.
         isInMoveBounds previous i = previous <= i && i <= previous + defaultMoveBound
-        insertMapped diffs into = foldl' (flip (List.insertBy (comparing fst))) into diffs
+        insertMapped diffs into = foldl' (\into (i, mappedTerm) ->
+            List.insertBy (comparing fst) (i, mappedTerm) into)
+            into
+            diffs
         -- Given a list of diffs, and unmapped terms in unmappedA, deletes
         -- any terms that remain in umappedA.
-        deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
+        deleteRemaining diffs (_, unmappedA, _) = foldl' (\into (i, deletion) ->
+            List.insertBy (comparing fst) (This i, deletion) into)
+          diffs
+          ((termIndex &&& deleting . term) <$> unmappedA)
 
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
