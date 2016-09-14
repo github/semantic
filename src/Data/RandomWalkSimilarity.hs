@@ -51,11 +51,10 @@ rws compare as bs
     -- and who's final state is (Int, IntMap UmappedTerm, IntMap UmappedTerm)
     traverse findNearestNeighbourTo fbs &
     -- Run the state with an initial state
-    (`runState` (negate 1, toMap fas, toMap fbs)) &
+    (`runState` (0, toMap fas, toMap fbs)) &
     uncurry deleteRemaining &
+    (\things -> traceShow (fst <$> sortOn fst things) things) &
     (<> countersAndDiffs) &
-    (\diffs -> let sorted = sortOn fst diffs in
-      traceShow (fst <$> sorted) sorted) &
     fmap snd
 
     -- Modified xydiff + RWS
