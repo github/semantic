@@ -1,6 +1,5 @@
 module Source.Spec where
 
-import qualified Prelude
 import Prologue
 import Range
 import Source
