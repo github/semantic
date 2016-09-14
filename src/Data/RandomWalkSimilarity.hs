@@ -20,7 +20,6 @@ import Control.Monad.State
 import Data.Functor.Both hiding (fst, snd)
 import Data.Functor.Foldable as Foldable
 import Data.Hashable
-import Data.These
 import qualified Data.IntMap as IntMap
 import qualified Data.KdTree.Static as KdTree
 import qualified Data.List as List
@@ -171,8 +170,3 @@ instance Arbitrary label => Arbitrary (Gram label) where
   arbitrary = join $ gramWithPQ <$> arbitrary <*> arbitrary
 
   shrink (Gram a b) = Gram <$> shrink a <*> shrink b
-
-compareTheseMonotone :: (Ord a, Ord b) => These a b -> These a b -> Ordering
-compareTheseMonotone This{} That{} = LT
-compareTheseMonotone That{} This{} = GT
-compareTheseMonotone (These i1 j1) (These i2 j2) = let i = compare i1 i2 in if i == EQ then compare j1 j2 else i
