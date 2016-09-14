@@ -80,9 +80,9 @@ rws compare as bs
 
         (fas, fbs, _, _, countersAndDiffs) = foldr' (\diff (as, bs, counterA, counterB, diffs) -> case runFree diff of
           Pure (Right (Delete term)) ->
-            (featurize counterA term : as, bs, succ counterA, counterB, diffs)
+            (featurize counterA term : as, bs, succ counterA, succ $ succ counterB, diffs)
           Pure (Right (Insert term)) ->
-            (as, featurize counterB term : bs, counterA, succ counterB, diffs)
+            (as, featurize counterB term : bs, succ $ succ counterA, succ counterB, diffs)
           syntax -> let diff' = free syntax >>= either identity pure in
             (as, bs, succ counterA, succ counterB, (counterA, diff') : diffs)
           ) ([], [], 0, 0, []) sesDiffs
