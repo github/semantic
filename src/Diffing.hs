@@ -77,7 +77,7 @@ cmarkParser blob = pure . toTerm $ commonmarkToNode [ optSourcePos, optSafe ] (t
           CODE_BLOCK _ text -> Leaf text
           -- Branches
           _ -> Indexed (toTerm <$> children)
-        -- Node (Maybe PosInfo) NodeType [Node]
+
         toCategory :: NodeType -> Category
         toCategory (TEXT _) = Other "text"
         toCategory (CODE _) = Other "code"
