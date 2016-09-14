@@ -1,0 +1,3 @@
+diff --git a/test/diffs/file-deletion.A.js b/test/diffs/file-deletion.A.js
+deleted file mode 100644
+index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000000

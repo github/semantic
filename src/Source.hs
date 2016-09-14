@@ -2,12 +2,21 @@
 module Source where
 
 import Prologue hiding (uncons)
-import Data.Text (unpack)
+import Data.Text (unpack, pack)
 import Data.String
 import qualified Data.Vector as Vector
 import Numeric
 import Range
 
+-- | The source, oid, path, and Maybe SourceKind of a blob in a Git repo.
+data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
+  deriving (Show, Eq)
+
+-- | The contents of a source file, backed by a vector for efficient slicing.
+newtype Source a = Source { getVector :: Vector.Vector a  }
+  deriving (Eq, Show, Foldable, Functor, Traversable)
+
+-- | The kind of a blob, along with it's file mode.
 data SourceKind = PlainBlob Word32  | ExecutableBlob Word32 | SymlinkBlob Word32
   deriving (Show, Eq)
 
@@ -16,17 +25,16 @@ modeToDigits (PlainBlob mode) = showOct mode ""
 modeToDigits (ExecutableBlob mode) = showOct mode ""
 modeToDigits (SymlinkBlob mode) = showOct mode ""
 
-data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
-  deriving (Show, Eq)
 
 -- | The default plain blob mode
 defaultPlainBlob :: SourceKind
 defaultPlainBlob = PlainBlob 0o100644
 
--- | The contents of a source file, backed by a vector for efficient slicing.
-newtype Source a = Source { getVector :: Vector.Vector a  }
-  deriving (Eq, Show, Foldable, Functor, Traversable)
+emptySourceBlob :: FilePath -> SourceBlob
+emptySourceBlob filepath = SourceBlob (Source.fromList "")  Source.nullOid filepath Nothing
 
+sourceBlob :: Source Char -> FilePath -> SourceBlob
+sourceBlob source filepath = SourceBlob source Source.nullOid filepath (Just defaultPlainBlob)
 
 -- | Map blobs with Nothing blobKind to empty blobs.
 idOrEmptySourceBlob :: SourceBlob -> SourceBlob
@@ -52,6 +60,10 @@ slice range = Source . Vector.slice (start range) (rangeLength range) . getVecto
 -- | Return a String with the contents of the Source.
 toString :: Source Char -> String
 toString = toList
+
+-- | Return a text with the contents of the Source.
+toText :: Source Char -> Text
+toText = pack . toList
 
 -- | Return the item at the given  index.
 at :: Source a -> Int -> a

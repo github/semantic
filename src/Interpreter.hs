@@ -1,69 +1,85 @@
+{-# LANGUAGE RankNTypes #-}
 module Interpreter (Comparable, DiffConstructor, diffTerms) where
 
 import Algorithm
+import Data.Align.Generic
 import Data.Functor.Foldable
 import Data.Functor.Both
-import qualified Data.OrderedMap as Map
-import qualified Data.List as List
-import Data.List ((\\))
-import Data.OrderedMap ((!))
+import Data.RandomWalkSimilarity
+import Data.Record
+import Data.These
+import qualified Data.Vector as Vector
 import Diff
-import Operation
+import qualified Control.Monad.Free.Church as F
+import Info
 import Patch
 import Prologue hiding (lookup)
 import SES
-import Syntax
+import Syntax as S
 import Term
 
 -- | Returns whether two terms are comparable
-type Comparable a annotation = Term a annotation -> Term a annotation -> Bool
+type Comparable f annotation = Term f annotation -> Term f annotation -> Bool
 
 -- | Constructs a diff from the CofreeF containing its annotation and syntax. This function has the opportunity to, for example, cache properties in the annotation.
-type DiffConstructor leaf annotation = CofreeF (Syntax leaf) (Both annotation) (Diff leaf annotation) -> Diff leaf annotation
+type DiffConstructor f annotation = TermF f (Both annotation) (Diff f annotation) -> Diff f annotation
 
--- | Diff two terms, given a function that determines whether two terms can be compared and a cost function.
-diffTerms :: (Eq a, Eq annotation) => DiffConstructor a annotation -> Comparable a annotation -> Cost (Diff a annotation) -> Term a annotation -> Term a annotation -> Diff a annotation
-diffTerms construct comparable cost a b = fromMaybe (pure $ Replace a b) $ constructAndRun construct comparable cost a b
+-- | Diff two terms recursively, given functions characterizing the diffing.
+diffTerms :: (Eq leaf, Eq (Record fields), HasField fields Category, HasField fields (Vector.Vector Double))
+  => DiffConstructor (Syntax leaf) (Record fields) -- ^ A function to wrap up & possibly annotate every produced diff.
+  -> Comparable (Syntax leaf) (Record fields) -- ^ A function to determine whether or not two terms should even be compared.
+  -> SES.Cost (SyntaxDiff leaf fields) -- ^ A function to compute the cost of a given diff node.
+  -> SyntaxTerm leaf fields -- ^ A term representing the old state.
+  -> SyntaxTerm leaf fields -- ^ A term representing the new state.
+  -> SyntaxDiff leaf fields
+diffTerms construct comparable cost a b = fromMaybe (replacing a b) $ diffComparableTerms construct comparable cost a b
 
--- | Constructs an algorithm and runs it
-constructAndRun :: (Eq a, Eq annotation) => DiffConstructor a annotation -> Comparable a annotation -> Cost (Diff a annotation) -> Term a annotation -> Term a annotation -> Maybe (Diff a annotation)
-constructAndRun _ comparable _ a b | not $ comparable a b = Nothing
+-- | Diff two terms recursively, given functions characterizing the diffing. If the terms are incomparable, returns 'Nothing'.
+diffComparableTerms :: (Eq leaf, Eq (Record fields), HasField fields Category, HasField fields (Vector.Vector Double)) => DiffConstructor (Syntax leaf) (Record fields) -> Comparable (Syntax leaf) (Record fields) -> SES.Cost (SyntaxDiff leaf fields) -> SyntaxTerm leaf fields -> SyntaxTerm leaf fields -> Maybe (SyntaxDiff leaf fields)
+diffComparableTerms construct comparable cost = recur
+  where recur a b
+          | (category <$> a) == (category <$> b) = hylo construct runCofree <$> zipTerms a b
+          | comparable a b = runAlgorithm construct recur cost (Just <$> algorithmWithTerms construct a b)
+          | otherwise = Nothing
 
-constructAndRun construct _ _ a b | (() <$ a) == (() <$ b) = hylo construct runCofree <$> zipTerms a b
+-- | Construct an algorithm to diff a pair of terms.
+algorithmWithTerms :: (TermF (Syntax leaf) (Both a) diff -> diff) -> Term (Syntax leaf) a -> Term (Syntax leaf) a -> Algorithm (Term (Syntax leaf) a) diff diff
+algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
+  (Indexed a, Indexed b) -> branch Indexed a b
+  (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) -> do
+    identifier <- recursively identifierA identifierB
+    branch (S.FunctionCall identifier) argsA argsB
+  (S.Switch exprA casesA, S.Switch exprB casesB) -> do
+    expr <- recursively exprA exprB
+    branch (S.Switch expr) casesA casesB
+  (S.Object a, S.Object b) -> branch S.Object a b
+  (Commented commentsA a, Commented commentsB b) -> do
+    wrapped <- sequenceA (recursively <$> a <*> b)
+    branch (`Commented` wrapped) commentsA commentsB
+  (Array a, Array b) -> branch Array a b
+  (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) -> do
+    identifier <- recursively identifierA identifierB
+    params <- sequenceA (recursively <$> paramsA <*> paramsB)
+    branch (S.Class identifier params) expressionsA expressionsB
+  (S.Method identifierA paramsA expressionsA, S.Method identifierB paramsB expressionsB) -> do
+    identifier <- recursively identifierA identifierB
+    params <- bySimilarity paramsA paramsB
+    expressions <- bySimilarity expressionsA expressionsB
+    annotate $! S.Method identifier params expressions
+  _ -> recursively t1 t2
+  where annotate = pure . construct . (both (extract t1) (extract t2) :<)
+        branch constructor a b = bySimilarity a b >>= annotate . constructor
 
-constructAndRun construct comparable cost t1 t2 =
-  run construct comparable cost $ algorithm a b where
-    algorithm (Indexed a') (Indexed b') = free . Free $ ByIndex a' b' (annotate . Indexed)
-    algorithm (Keyed a') (Keyed b') = free . Free $ ByKey a' b' (annotate . Keyed)
-    algorithm (Leaf a') (Leaf b') | a' == b' = annotate $ Leaf b'
-    algorithm a' b' = free . Free $ Recursive (cofree (annotation1 :< a')) (cofree (annotation2 :< b')) pure
-    (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
-    annotate = pure . construct . (both annotation1 annotation2 :<)
-
--- | Runs the diff algorithm
-run :: (Eq a, Eq annotation) => DiffConstructor a annotation -> Comparable a annotation -> Cost (Diff a annotation) -> Algorithm a annotation (Diff a annotation) -> Maybe (Diff a annotation)
-run construct comparable cost algorithm = case runFree algorithm of
-  Pure diff -> Just diff
-  Free (Recursive t1 t2 f) -> run construct comparable cost . f $ recur a b where
-    (annotation1 :< a, annotation2 :< b) = (runCofree t1, runCofree t2)
-    annotate = construct . (both annotation1 annotation2 :<)
-
-    recur (Indexed a') (Indexed b') | length a' == length b' = annotate . Indexed $ zipWith (diffTerms construct comparable cost) a' b'
-    recur (Fixed a') (Fixed b') | length a' == length b' = annotate . Fixed $ zipWith (diffTerms construct comparable cost) a' b'
-    recur (Keyed a') (Keyed b') | Map.keys a' == bKeys = annotate . Keyed . Map.fromList . fmap repack $ bKeys where
-      bKeys = Map.keys b'
-      repack key = (key, interpretInBoth key a' b')
-      interpretInBoth key x y = diffTerms construct comparable cost (x ! key) (y ! key)
-    recur _ _ = pure $ Replace (cofree (annotation1 :< a)) (cofree (annotation2 :< b))
-
-  Free (ByKey a b f) -> run construct comparable cost $ f byKey where
-    byKey = Map.fromList $ toKeyValue <$> List.union aKeys bKeys
-    toKeyValue key | key `List.elem` deleted = (key, pure . Delete $ a ! key)
-    toKeyValue key | key `List.elem` inserted = (key, pure . Insert $ b ! key)
-    toKeyValue key = (key, diffTerms construct comparable cost (a ! key) (b ! key))
-    aKeys = Map.keys a
-    bKeys = Map.keys b
-    deleted = aKeys \\ bKeys
-    inserted = bKeys \\ aKeys
-
-  Free (ByIndex a b f) -> run construct comparable cost . f $ ses (constructAndRun construct comparable cost) cost a b
+-- | Run an algorithm, given functions characterizing the evaluation.
+runAlgorithm :: (GAlign f, Eq a, Eq (Record fields), Eq (f (Cofree f (Record fields))), Traversable f, HasField fields (Vector.Vector Double))
+  => (CofreeF f (Both (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to wrap up & possibly annotate every produced diff.
+  -> (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function to diff two subterms recursively, if they are comparable, or else return 'Nothing'.
+  -> SES.Cost (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to compute the cost of a given diff node.
+  -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
+  -> a
+runAlgorithm construct recur cost = F.iter $ \case
+  Recursive a b f -> f (maybe (replacing a b) (construct . (both (extract a) (extract b) :<)) $ do
+    aligned <- galign (unwrap a) (unwrap b)
+    traverse (these (Just . deleting) (Just . inserting) recur) aligned)
+  ByIndex as bs f -> f (ses recur cost as bs)
+  BySimilarity as bs f -> f (rws recur as bs)

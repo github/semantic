@@ -1,30 +1,50 @@
 module Patch
 ( Patch(..)
+, replacing
+, inserting
+, deleting
 , after
 , before
 , unPatch
 , patchSum
 , maybeFst
 , maybeSnd
+, mapPatch
 ) where
 
 import Data.These
 import Prologue
 
 -- | An operation to replace, insert, or delete an item.
-data Patch a =
-  Replace a a
+data Patch a
+  = Replace a a
   | Insert a
   | Delete a
-  deriving (Eq, Foldable, Functor, Show, Traversable)
+  deriving (Eq, Foldable, Functor, Generic, Ord, Show, Traversable)
+
+
+-- DSL
+
+-- | Constructs the replacement of one value by another in an Applicative context.
+replacing :: Applicative f => a -> a -> f (Patch a)
+replacing = (pure .) . Replace
+
+-- | Constructs the insertion of a value in an Applicative context.
+inserting :: Applicative f => a -> f (Patch a)
+inserting = pure . Insert
+
+-- | Constructs the deletion of a value in an Applicative context.
+deleting :: Applicative f => a -> f (Patch a)
+deleting = pure . Delete
+
 
 -- | Return the item from the after side of the patch.
 after :: Patch a -> Maybe a
-after = maybeFst . unPatch
+after = maybeSnd . unPatch
 
 -- | Return the item from the before side of the patch.
 before :: Patch a -> Maybe a
-before = maybeSnd . unPatch
+before = maybeFst . unPatch
 
 -- | Return both sides of a patch.
 unPatch :: Patch a -> These a a
@@ -32,8 +52,13 @@ unPatch (Replace a b) = These a b
 unPatch (Insert b) = That b
 unPatch (Delete a) = This a
 
+mapPatch :: (a -> b) -> (a -> b) -> Patch a -> Patch b
+mapPatch f _ (Delete  a  ) = Delete  (f a)
+mapPatch _ g (Insert    b) = Insert  (g b)
+mapPatch f g (Replace a b) = Replace (f a) (g b)
+
 -- | Calculate the cost of the patch given a function to compute the cost of a item.
-patchSum :: (a -> Integer) -> Patch a -> Integer
+patchSum :: (a -> Int) -> Patch a -> Int
 patchSum termCost patch = maybe 0 termCost (before patch) + maybe 0 termCost (after patch)
 
 -- | Return Just the value in This, or the first value in These, if any.

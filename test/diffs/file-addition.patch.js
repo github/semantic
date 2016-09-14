@@ -1,0 +1,3 @@
+diff --git a/test/diffs/file-addition.B.js b/test/diffs/file-addition.B.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..0000000000000000000000000000000000000000

@@ -1,10 +1,37 @@
-module Info where
+{-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
+module Info (Range(..), characterRange, setCharacterRange, Category(..), category, setCategory, Cost(..), cost, setCost) where
 
+import Data.Record
 import Prologue
 import Category
 import Range
+import Test.QuickCheck
 
--- | An annotation for a source file, including the source range and semantic
--- | categories.
-data Info = Info { characterRange :: !Range, category :: !Category, size :: !Integer, cost :: !Integer }
-  deriving (Eq, Show)
+newtype Cost = Cost { unCost :: Int }
+  deriving (Eq, Num, Ord, Show)
+
+characterRange :: HasField fields Range => Record fields -> Range
+characterRange = getField
+
+setCharacterRange :: HasField fields Range => Record fields -> Range -> Record fields
+setCharacterRange = setField
+
+category :: HasField fields Category => Record fields -> Category
+category = getField
+
+setCategory :: HasField fields Category => Record fields -> Category -> Record fields
+setCategory = setField
+
+cost :: HasField fields Cost => Record fields -> Cost
+cost = getField
+
+setCost :: HasField fields Cost => Record fields -> Cost -> Record fields
+setCost = setField
+
+
+-- Instances
+
+instance Arbitrary Cost where
+  arbitrary = Cost <$> arbitrary
+
+  shrink = fmap Cost . shrink . unCost
