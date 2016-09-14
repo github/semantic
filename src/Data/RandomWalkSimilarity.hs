@@ -121,7 +121,7 @@ rws compare as bs
                      -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (These Int Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
         insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
           put (previous, unmappedA, IntMap.delete j unmappedB)
-          pure (That (negate 1), inserting b)
+          pure (That j, inserting b)
 
         -- | Finds the most-similar unmapped term to the passed-in term, if any.
         --
@@ -138,15 +138,27 @@ rws compare as bs
         -- | Determines whether an index is in-bounds for a move given the most recently matched index.
         isInMoveBounds previous i = previous <= i && i <= previous + defaultMoveBound
         insertMapped diffs into = foldl' (\into (i, mappedTerm) ->
-            List.insertBy (comparing fst) (i, mappedTerm) into)
+            List.insertBy (compareTheseMonotone `on` fst) (i, mappedTerm) into)
             into
             diffs
         -- Given a list of diffs, and unmapped terms in unmappedA, deletes
         -- any terms that remain in umappedA.
         deleteRemaining diffs (_, unmappedA, _) = foldl' (\into (i, deletion) ->
-            List.insertBy (comparing fst) (This i, deletion) into)
+            List.insertBy (compareTheseMonotone `on` fst) (This i, deletion) into)
           diffs
           ((termIndex &&& deleting . term) <$> unmappedA)
+
+compareTheseMonotone :: (Ord a, Ord b) => These a b -> These a b -> Ordering
+compareTheseMonotone This{} That{} = LT
+compareTheseMonotone That{} This{} = GT
+compareTheseMonotone (These i1 j1) (These i2 j2) = let i = compare i1 i2 in
+  if i == EQ then compare j1 j2 else i
+compareTheseMonotone (This i1) (This i2) = compare i1 i2
+compareTheseMonotone (That j1) (That j2) = compare j1 j2
+compareTheseMonotone (These i1 _) (This i2) = compare i1 i2
+compareTheseMonotone (This i1) (These i2 _) = compare i1 i2
+compareTheseMonotone (These _ j1) (That j2) = compare j1 j2
+compareTheseMonotone (That j1) (These _ j2) = compare j1 j2
 
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
