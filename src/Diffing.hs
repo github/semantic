@@ -90,7 +90,7 @@ cmarkParser blob = pure . toTerm $ commonmarkToNode [ optSourcePos, optSafe ] (t
         toCategory (LINK{}) = Other "link"
         toCategory (IMAGE{}) = Other "image"
         toCategory t = Other (show t)
-        toSpan PosInfo {..} = SourceSpan "" (SourcePos startLine startColumn) (SourcePos endLine endColumn)
+        toSpan PosInfo{..} = SourceSpan "" (SourcePos (pred startLine) (pred startColumn)) (SourcePos (pred endLine) (pred endColumn))
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
