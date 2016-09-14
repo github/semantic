@@ -22,6 +22,7 @@ import Interpreter
 import Language
 import Parser
 import Patch
+import qualified Prelude
 import Range
 import Renderer
 import Renderer.JSON
@@ -68,15 +69,16 @@ diffFiles parser renderer sourceBlobs = do
           _ -> Nothing)
 
 cmarkParser :: Parser (Syntax Text) (Record '[Range, Category])
-cmarkParser blob = pure . toTerm $ commonmarkToNode [ optSourcePos, optSafe ] (toText (source blob))
-  where toTerm :: Node -> Cofree (Syntax Text) (Record '[Range, Category])
-        toTerm (Node position t children) = cofree $ (maybe (Range 0 0) (sourceSpanToRange (source blob) . toSpan) position .: toCategory t .: RNil) :< case t of
+cmarkParser SourceBlob{..} = pure . fromMaybe errorNode . toTerm $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
+  where toTerm :: Node -> Maybe (Cofree (Syntax Text) (Record '[Range, Category]))
+        toTerm (Node Nothing _ _) = Nothing
+        toTerm (Node (Just position) t children) = Just . cofree $ (sourceSpanToRange source (toSpan position) .: toCategory t .: RNil) :< case t of
           -- Leaves
           CODE text -> Leaf text
           TEXT text -> Leaf text
           CODE_BLOCK _ text -> Leaf text
           -- Branches
-          _ -> Indexed (toTerm <$> children)
+          _ -> Indexed (catMaybes (toTerm <$> children))
 
         toCategory :: NodeType -> Category
         toCategory (TEXT _) = Other "text"
@@ -91,6 +93,9 @@ cmarkParser blob = pure . toTerm $ commonmarkToNode [ optSourcePos, optSafe ] (t
         toCategory (IMAGE{}) = Other "image"
         toCategory t = Other (show t)
         toSpan PosInfo{..} = SourceSpan "" (SourcePos (pred startLine) (pred startColumn)) (SourcePos (pred endLine) (pred endColumn))
+
+        errorNode = cofree $ (totalRange source .: Category.Error .: RNil) :< Syntax.Error (SourceSpan (toS path) (SourcePos 0 0) (SourcePos (pred (length ranges)) (end (Prelude.last ranges) - start (Prelude.last ranges)))) []
+        ranges = actualLineRanges (totalRange source) source
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
