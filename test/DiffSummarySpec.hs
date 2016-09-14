@@ -17,7 +17,8 @@ import Source
 import Syntax
 import Term
 import Term.Arbitrary
-import Test.Hspec
+import Test.Hspec (Spec, describe, it, parallel)
+import Test.Hspec.Expectations.Pretty
 import Test.Hspec.QuickCheck
 
 arrayInfo :: Record '[Category, Range]

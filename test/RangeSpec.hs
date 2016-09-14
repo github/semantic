@@ -1,6 +1,8 @@
 module RangeSpec where
 
-import Test.Hspec
+import Prologue
+import Test.Hspec (Spec, describe, it, parallel)
+import Test.Hspec.Expectations.Pretty
 import Range
 
 spec :: Spec

@@ -23,7 +23,8 @@ import qualified Source
 import SplitDiff
 import Syntax
 import Term
-import Test.Hspec
+import Test.Hspec (Spec, describe, it, parallel)
+import Test.Hspec.Expectations.Pretty
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 import GHC.Show (Show(..))
