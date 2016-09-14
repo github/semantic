@@ -119,8 +119,8 @@ rws compare as bs
                      -> UnmappedTerm f fields
                      -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
         insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
-          put (previous, unmappedA, IntMap.delete j unmappedB)
-          pure (negate 1, inserting b)
+          put (j, unmappedA, IntMap.delete j unmappedB)
+          pure (j, inserting b)
 
         -- | Finds the most-similar unmapped term to the passed-in term, if any.
         --
