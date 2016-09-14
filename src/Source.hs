@@ -1,11 +1,12 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 module Source where
 
-import Prologue hiding (uncons)
 import Data.Text (unpack, pack)
 import Data.String
 import qualified Data.Vector as Vector
 import Numeric
+import qualified Prelude (last)
+import Prologue hiding (uncons)
 import Range
 import SourceSpan
 
@@ -99,6 +100,10 @@ sourceSpanToRange source SourceSpan{..} = Range start end
         (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (totalRange source) source)
         sumLengths = sum . fmap (\ Range{..} -> end - start)
 
+totalSpan :: Source Char -> SourceSpan
+totalSpan source = SourceSpan "" (SourcePos 0 0) (SourcePos (pred (length ranges)) (end lastRange - start lastRange))
+  where ranges = actualLineRanges (totalRange source) source
+        lastRange = Prelude.last ranges
 
 instance Monoid (Source a) where
   mempty = fromList []

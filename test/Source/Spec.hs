@@ -40,11 +40,6 @@ spec = parallel $ do
     prop "covers multiple lines" $
       \ n -> totalSpan (fromList (intersperse '\n' (replicate n '*'))) `shouldBe` SourceSpan "" (SourcePos 0 0) (SourcePos (max 0 (pred n)) (if n > 0 then 1 else 0))
 
-totalSpan :: Source Char -> SourceSpan
-totalSpan source = SourceSpan "" (SourcePos 0 0) (SourcePos (pred (length ranges)) (end lastRange - start lastRange))
-  where ranges = actualLineRanges (totalRange source) source
-        lastRange = Prelude.last ranges
-
 insetSpan :: SourceSpan -> SourceSpan
 insetSpan sourceSpan = sourceSpan { spanStart = (spanStart sourceSpan) { column = succ (column (spanStart sourceSpan)) }
                                   , spanEnd = (spanEnd sourceSpan) { column = pred (column (spanEnd sourceSpan)) } }
