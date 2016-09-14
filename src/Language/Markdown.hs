@@ -35,4 +35,4 @@ cmarkParser SourceBlob{..} = pure . toTerm (totalRange source) $ commonmarkToNod
         toCategory (LINK{}) = Other "link"
         toCategory (IMAGE{}) = Other "image"
         toCategory t = Other (show t)
-        toSpan PosInfo{..} = SourceSpan "" (SourcePos (pred startLine) (pred startColumn)) (SourcePos (pred endLine) (pred endColumn))
+        toSpan PosInfo{..} = SourceSpan "" (SourcePos (pred startLine) (pred startColumn)) (SourcePos (pred endLine) endColumn)
