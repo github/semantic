@@ -24,7 +24,7 @@ import Source
 
 data Identifiable a = Identifiable a | Unidentifiable a
 
-isIdentifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Bool
+isIdentifiable :: SyntaxTerm leaf fields -> Bool
 isIdentifiable term =
   case unwrap term of
     S.FunctionCall _ _ -> True
@@ -38,7 +38,7 @@ isIdentifiable term =
     S.Leaf _ -> True
     _ -> False
 
-identifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
+identifiable :: SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
 identifiable term = if isIdentifiable term then Identifiable term else Unidentifiable term
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
@@ -162,7 +162,7 @@ toTermName source term = case unwrap term of
         termNameFromSource term = termNameFromRange (range term)
         termNameFromRange range = toText $ Source.slice range source
         range = characterRange . extract
-        toArgName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Text
+        toArgName :: SyntaxTerm leaf fields -> Text
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
                           Unidentifiable _ -> "..."
@@ -270,14 +270,14 @@ instance HasCategory Category where
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
 
-instance (HasCategory leaf, HasField fields Category) => HasCategory (SyntaxTerm leaf fields) where
+instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
 
 instance Arbitrary Branch where
   arbitrary = oneof [ pure BIndexed, pure BFixed ]
   shrink = genericShrink
 
-instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
+instance Arbitrary a => Arbitrary (DiffSummary a) where
   arbitrary = DiffSummary <$> arbitrary <*> arbitrary
   shrink = genericShrink
 

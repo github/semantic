@@ -25,7 +25,7 @@ type Comparable f annotation = Term f annotation -> Term f annotation -> Bool
 type DiffConstructor f annotation = TermF f (Both annotation) (Diff f annotation) -> Diff f annotation
 
 -- | Diff two terms recursively, given functions characterizing the diffing.
-diffTerms :: (Eq leaf, Eq (Record fields), HasField fields Category, HasField fields (Vector.Vector Double))
+diffTerms :: (Eq leaf, HasField fields Category, HasField fields (Vector.Vector Double))
   => DiffConstructor (Syntax leaf) (Record fields) -- ^ A function to wrap up & possibly annotate every produced diff.
   -> Comparable (Syntax leaf) (Record fields) -- ^ A function to determine whether or not two terms should even be compared.
   -> SES.Cost (SyntaxDiff leaf fields) -- ^ A function to compute the cost of a given diff node.
@@ -35,7 +35,7 @@ diffTerms :: (Eq leaf, Eq (Record fields), HasField fields Category, HasField fi
 diffTerms construct comparable cost a b = fromMaybe (replacing a b) $ diffComparableTerms construct comparable cost a b
 
 -- | Diff two terms recursively, given functions characterizing the diffing. If the terms are incomparable, returns 'Nothing'.
-diffComparableTerms :: (Eq leaf, Eq (Record fields), HasField fields Category, HasField fields (Vector.Vector Double)) => DiffConstructor (Syntax leaf) (Record fields) -> Comparable (Syntax leaf) (Record fields) -> SES.Cost (SyntaxDiff leaf fields) -> SyntaxTerm leaf fields -> SyntaxTerm leaf fields -> Maybe (SyntaxDiff leaf fields)
+diffComparableTerms :: (Eq leaf, HasField fields Category, HasField fields (Vector.Vector Double)) => DiffConstructor (Syntax leaf) (Record fields) -> Comparable (Syntax leaf) (Record fields) -> SES.Cost (SyntaxDiff leaf fields) -> SyntaxTerm leaf fields -> SyntaxTerm leaf fields -> Maybe (SyntaxDiff leaf fields)
 diffComparableTerms construct comparable cost = recur
   where recur a b
           | (category <$> a) == (category <$> b) = hylo construct runCofree <$> zipTerms a b
@@ -71,7 +71,7 @@ algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
         branch constructor a b = bySimilarity a b >>= annotate . constructor
 
 -- | Run an algorithm, given functions characterizing the evaluation.
-runAlgorithm :: (GAlign f, Eq a, Eq (Record fields), Eq (f (Cofree f (Record fields))), Traversable f, HasField fields (Vector.Vector Double))
+runAlgorithm :: (GAlign f, Traversable f, HasField fields (Vector.Vector Double))
   => (CofreeF f (Both (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to wrap up & possibly annotate every produced diff.
   -> (Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function to diff two subterms recursively, if they are comparable, or else return 'Nothing'.
   -> SES.Cost (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to compute the cost of a given diff node.
