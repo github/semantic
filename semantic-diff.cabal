@@ -102,7 +102,7 @@ benchmark semantic-diff-bench
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings, NoImplicitPrelude
 
-test-suite semantic-diff-test
+test-suite test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
