@@ -1,7 +1,6 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 module Diffing where
 
-import qualified Prologue
 import Prologue hiding (fst, snd)
 import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
@@ -43,7 +42,7 @@ import Data.Aeson.Encoding (encodingToLazyByteString)
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record (Vector.Vector Double ': fields)) -> Both SourceBlob -> IO Output
+diffFiles :: (HasField fields Category, HasField fields Cost) => Parser (Syntax Text) (Record fields) -> Renderer (Record (Vector.Vector Double ': fields)) -> Both SourceBlob -> IO Output
 diffFiles parser renderer sourceBlobs = do
   terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel) . parser) sourceBlobs
 
@@ -143,7 +142,7 @@ diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Pure patch -> sum (cost . extract <$> patch)
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
+textDiff :: (HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
 textDiff parser arguments = diffFiles parser $ case format arguments of
   Split -> split
   Patch -> patch
@@ -159,7 +158,7 @@ truncatedDiff arguments sources = pure $ case format arguments of
   Summary -> SummaryOutput mempty
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
-printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
+printDiff :: (HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
   let renderedText = case rendered of
