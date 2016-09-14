@@ -26,13 +26,8 @@ arbitraryTermSize = cata (succ . sum) . toTerm
 
 -- Instances
 
-<<<<<<< HEAD
-type instance Base (ArbitraryTerm leaf annotation) = CofreeF (Syntax leaf) annotation
-instance Corecursive (ArbitraryTerm leaf annotation) where embed = ArbitraryTerm
-=======
 type instance Base (ArbitraryTerm leaf annotation) = TermF (Syntax leaf) annotation
 instance Unfoldable (ArbitraryTerm leaf annotation) where embed (a :< s) = ArbitraryTerm a s
->>>>>>> master
 
 instance (Eq leaf, Eq annotation, Arbitrary leaf, Arbitrary annotation) => Arbitrary (ArbitraryTerm leaf annotation) where
   arbitrary = sized $ \ n -> do
