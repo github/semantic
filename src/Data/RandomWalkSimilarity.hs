@@ -53,7 +53,6 @@ rws compare as bs
     -- Run the state with an initial state
     (`runState` (0, toMap fas, toMap fbs)) &
     uncurry deleteRemaining &
-    (\things -> traceShow (fst <$> sortOn fst things) things) &
     (<> countersAndDiffs) &
     fmap snd
 
