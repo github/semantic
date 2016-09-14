@@ -2,7 +2,6 @@
 module TreeSitter (treeSitterParser) where
 
 import Prologue hiding (Constructor)
-import Control.Monad
 import Category
 import Data.Record
 import Language
