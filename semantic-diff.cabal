@@ -33,6 +33,7 @@ library
                      , Language
                      , Language.C
                      , Language.JavaScript
+                     , Language.Markdown
                      , Parser
                      , Patch
                      , Patch.Arbitrary
