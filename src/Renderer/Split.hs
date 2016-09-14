@@ -10,7 +10,7 @@ import Data.Record
 import qualified Data.Text.Lazy as TL
 import Data.These
 import Info
-import Prologue hiding (div, head, fst, snd, link)
+import Prologue hiding (div, head, fst, snd, link, (<>))
 import qualified Prologue
 import Renderer
 import Source
@@ -164,5 +164,5 @@ instance ToMarkup a => ToMarkup (Cell a) where
     <> td (toMarkup line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
     <> string "\n"
 
-instance Semigroup Html where
-  (<>) = mappend
+(<>) :: Monoid m => m -> m -> m
+(<>) = mappend
