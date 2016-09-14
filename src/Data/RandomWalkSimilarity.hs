@@ -51,9 +51,11 @@ rws compare as bs
     -- and who's final state is (Int, IntMap UmappedTerm, IntMap UmappedTerm)
     traverse findNearestNeighbourTo fbs &
     -- Run the state with an initial state
-    (`runState` (-1, toMap fas, toMap fbs)) &
+    (`runState` (-1,
+      toMap fas,
+      toMap fbs)) &
     uncurry deleteRemaining &
-    (<> countersAndDiffs) &
+    insertMapped countersAndDiffs &
     fmap snd
 
     -- Modified xydiff + RWS
@@ -76,13 +78,13 @@ rws compare as bs
         eitherCutoff n diff | n <= 0 = pure (Left diff)
         eitherCutoff n diff = free . bimap Right (eitherCutoff (pred n)) $ runFree diff
 
-        (fas, fbs, _, _, countersAndDiffs) = foldr' (\diff (as, bs, counterA, counterB, diffs) -> case runFree diff of
+        (fas, fbs, _, _, countersAndDiffs) = foldl' (\(as, bs, counterA, counterB, diffs) diff -> case runFree diff of
           Pure (Right (Delete term)) ->
-            (featurize counterA term : as, bs, succ counterA, counterB, diffs)
+            (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs)
           Pure (Right (Insert term)) ->
-            (as, featurize counterB term : bs, counterA, succ counterB, diffs)
+            (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs)
           syntax -> let diff' = free syntax >>= either identity pure in
-            (as, bs, succ counterA, succ counterB, (counterA, diff') : diffs)
+            (as, bs, succ counterA, succ counterB, diffs <> pure (counterA, diff'))
           ) ([], [], 0, 0, []) sesDiffs
 
         kdas = KdTree.build (Vector.toList . feature) fas
@@ -134,7 +136,7 @@ rws compare as bs
 
         -- | Determines whether an index is in-bounds for a move given the most recently matched index.
         isInMoveBounds previous i = previous <= i && i <= previous + defaultMoveBound
-
+        insertMapped diffs into = foldl' (flip (List.insertBy (comparing fst))) into diffs
         -- Given a list of diffs, and unmapped terms in unmappedA, deletes
         -- any terms that remain in umappedA.
         deleteRemaining diffs (_, unmappedA, _) = foldl' (flip (List.insertBy (comparing fst))) diffs ((termIndex &&& deleting . term) <$> unmappedA)
