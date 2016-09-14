@@ -51,7 +51,7 @@ rws compare as bs
     -- and who's final state is (Int, IntMap UmappedTerm, IntMap UmappedTerm)
     traverse findNearestNeighbourTo fbs &
     -- Run the state with an initial state
-    (`runState` (0, toMap fas, toMap fbs)) &
+    (`runState` (-1, toMap fas, toMap fbs)) &
     uncurry deleteRemaining &
     (<> countersAndDiffs) &
     fmap snd
@@ -116,9 +116,9 @@ rws compare as bs
                      -> UnmappedTerms f fields
                      -> UnmappedTerm f fields
                      -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
-        insertion _ unmappedA unmappedB (UnmappedTerm j _ b) = do
-          put (j, unmappedA, IntMap.delete j unmappedB)
-          pure (j, inserting b)
+        insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
+          put (previous, unmappedA, IntMap.delete j unmappedB)
+          pure (negate 1, inserting b)
 
         -- | Finds the most-similar unmapped term to the passed-in term, if any.
         --
