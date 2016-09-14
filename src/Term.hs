@@ -24,7 +24,7 @@ instance Functor f => Corecursive (Term f a) where embed = cofree
 -- | Zip two terms by combining their annotations into a pair of annotations.
 -- | If the structure of the two terms don't match, then Nothing will be returned.
 
-zipTerms :: (Eq annotation, Traversable f, GAlign f) => Term f annotation -> Term f annotation -> Maybe (Term f (Both annotation))
+zipTerms :: (Traversable f, GAlign f) => Term f annotation -> Term f annotation -> Maybe (Term f (Both annotation))
 zipTerms t1 t2 = iter go (alignCofreeWith galign (const Nothing) both (These t1 t2))
   where go (a :< s) = cofree . (a :<) <$> sequenceA s
 
