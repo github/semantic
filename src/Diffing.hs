@@ -68,16 +68,15 @@ diffFiles parser renderer sourceBlobs = do
           _ -> Nothing)
 
 cmarkParser :: Parser (Syntax Text) (Record '[Range, Category])
-cmarkParser SourceBlob{..} = pure . fromMaybe errorNode . toTerm $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
-  where toTerm :: Node -> Maybe (Cofree (Syntax Text) (Record '[Range, Category]))
-        toTerm (Node Nothing _ _) = Nothing
-        toTerm (Node (Just position) t children) = Just . cofree $ (sourceSpanToRange source (toSpan position) .: toCategory t .: RNil) :< case t of
+cmarkParser SourceBlob{..} = pure . toTerm (totalSpan source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
+  where toTerm :: SourceSpan -> Node -> Cofree (Syntax Text) (Record '[Range, Category])
+        toTerm within (Node position t children) = let span = maybe within toSpan position in cofree $ (sourceSpanToRange source span .: toCategory t .: RNil) :< case t of
           -- Leaves
           CODE text -> Leaf text
           TEXT text -> Leaf text
           CODE_BLOCK _ text -> Leaf text
           -- Branches
-          _ -> Indexed (catMaybes (toTerm <$> children))
+          _ -> Indexed (toTerm span <$> children)
 
         toCategory :: NodeType -> Category
         toCategory (TEXT _) = Other "text"
@@ -92,8 +91,6 @@ cmarkParser SourceBlob{..} = pure . fromMaybe errorNode . toTerm $ commonmarkToN
         toCategory (IMAGE{}) = Other "image"
         toCategory t = Other (show t)
         toSpan PosInfo{..} = SourceSpan "" (SourcePos (pred startLine) (pred startColumn)) (SourcePos (pred endLine) (pred endColumn))
-
-        errorNode = cofree $ (totalRange source .: Category.Error .: RNil) :< Syntax.Error (totalSpan source) []
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
