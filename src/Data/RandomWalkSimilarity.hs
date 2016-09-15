@@ -138,27 +138,38 @@ rws compare as bs
         -- | Determines whether an index is in-bounds for a move given the most recently matched index.
         isInMoveBounds previous i = previous <= i && i <= previous + defaultMoveBound
         insertMapped diffs into = foldl' (\into (i, mappedTerm) ->
-            List.insertBy (compareTheseMonotone `on` fst) (i, mappedTerm) into)
+            insertDiff (i, mappedTerm) into)
             into
             diffs
         -- Given a list of diffs, and unmapped terms in unmappedA, deletes
         -- any terms that remain in umappedA.
         deleteRemaining diffs (_, unmappedA, _) = foldl' (\into (i, deletion) ->
-            List.insertBy (compareTheseMonotone `on` fst) (This i, deletion) into)
+            insertDiff (This i, deletion) into)
           diffs
           ((termIndex &&& deleting . term) <$> unmappedA)
 
-compareTheseMonotone :: (Ord a, Ord b) => These a b -> These a b -> Ordering
-compareTheseMonotone This{} That{} = LT
-compareTheseMonotone That{} This{} = GT
-compareTheseMonotone (These i1 j1) (These i2 j2) = let i = compare i1 i2 in
-  if i == EQ then compare j1 j2 else i
-compareTheseMonotone (This i1) (This i2) = compare i1 i2
-compareTheseMonotone (That j1) (That j2) = compare j1 j2
-compareTheseMonotone (These i1 _) (This i2) = compare i1 i2
-compareTheseMonotone (This i1) (These i2 _) = compare i1 i2
-compareTheseMonotone (These _ j1) (That j2) = compare j1 j2
-compareTheseMonotone (That j1) (These _ j2) = compare j1 j2
+-- data SortedList a = Nil | Cons a (SortedList a) | Amb a a (SortedList a)
+
+insertDiff :: (These Int Int, a) -> [(These Int Int, a)] -> [(These Int Int, a)]
+insertDiff inserted [] = [ inserted ]
+insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
+  (These i1 i2, These j1 j2) -> if i1 <= j1 && i2 <= j2 then a : b : rest else b : insertDiff a rest
+  (This i, This j) -> if i <= j then a : b : rest else b : insertDiff a rest
+  (That i, That j) -> if i <= j then a : b : rest else b : insertDiff a rest
+  (This i, These j _) -> if i <= j then a : b : rest else b : insertDiff a rest
+  (That i, These _ j) -> if i <= j then a : b : rest else b : insertDiff a rest
+
+  (This _, That _) -> b : insertDiff a rest
+  (That _, This _) -> b : insertDiff a rest -- Amb a b rest
+
+  (These i1 i2, _) -> case break (isThese . fst) rest of
+    (rest, tail) -> let (before, after) = foldr' (combine i1 i2) ([] {- elements before a -}, [] {- elements after a -}) (b : rest) in
+       before <> (a : after) <> tail
+  where
+    combine i1 i2 = (\each (before, after) -> case fst each of
+        This j1 -> if i1 <= j1 then (before, each : after) else (each : before, after)
+        That j2 -> if i2 <= j2 then (before, each : after) else (each : before, after)
+       )
 
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
