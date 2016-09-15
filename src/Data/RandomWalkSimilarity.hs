@@ -33,6 +33,7 @@ import Test.QuickCheck.Random
 import qualified SES
 import Info
 import Data.Align.Generic
+import Data.These
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
 rws :: forall f fields. (GAlign f, HasField fields Category, Traversable f, Eq (f (Cofree f Category)), HasField fields (Vector.Vector Double))
@@ -52,8 +53,8 @@ rws compare as bs
     traverse findNearestNeighbourTo fbs &
     -- Run the state with an initial state
     (`runState` (-1,
-      toMap fstIndex fas,
-      toMap sndIndex fbs)) &
+      toMap fas,
+      toMap fbs)) &
     uncurry deleteRemaining &
     insertMapped countersAndDiffs &
     fmap snd
@@ -80,11 +81,11 @@ rws compare as bs
 
         (fas, fbs, _, _, countersAndDiffs) = foldl' (\(as, bs, counterA, counterB, diffs) diff -> case runFree diff of
           Pure (Right (Delete term)) ->
-            (as <> pure (featurize (Indices (counterA, pred counterB)) term), bs, succ counterA, counterB, diffs)
+            (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs)
           Pure (Right (Insert term)) ->
-            (as, bs <> pure (featurize (Indices (pred counterA, counterB)) term), counterA, succ counterB, diffs)
+            (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs)
           syntax -> let diff' = free syntax >>= either identity pure in
-            (as, bs, succ counterA, succ counterB, diffs <> pure (Indices (counterA, counterB), diff'))
+            (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'))
           ) ([], [], 0, 0, []) sesDiffs
 
         kdas = KdTree.build (Vector.toList . feature) fas
@@ -92,24 +93,24 @@ rws compare as bs
 
         featurize index term = UnmappedTerm index (getField (extract term)) term
 
-        toMap f = IntMap.fromList . fmap (f . termIndex &&& identity)
+        toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
         -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
         findNearestNeighbourTo :: UnmappedTerm f fields
-                               -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Indices, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
+                               -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (These Int Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
         findNearestNeighbourTo term@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
           fromMaybe (insertion previous unmappedA unmappedB term) $ do
             -- Look up the nearest unmapped term in `unmappedA`.
-            foundA@(UnmappedTerm i _ a) <- nearestUnmapped fstIndex (IntMap.filterWithKey (\ k _ -> isInMoveBounds previous k) unmappedA) kdas term
+            foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filterWithKey (\ k _ -> isInMoveBounds previous k) unmappedA) kdas term
             -- Look up the nearest `foundA` in `unmappedB`
-            UnmappedTerm j' _ _ <- nearestUnmapped sndIndex unmappedB kdbs foundA
+            UnmappedTerm j' _ _ <- nearestUnmapped unmappedB kdbs foundA
             -- Return Nothing if their indices don't match
             guard (j == j')
             compared <- compare a b
             pure $! do
-              put (fstIndex i, IntMap.delete (fstIndex i) unmappedA, IntMap.delete (sndIndex j) unmappedB)
-              pure (Indices (fstIndex i, sndIndex j), compared)
+              put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
+              pure (These i j, compared)
 
         -- Returns a `State s a` of where `s` is the index, old unmapped terms, new unmapped terms, and value is
         -- (index, inserted diff), given a previous index, two sets of umapped terms, and an unmapped term to insert.
@@ -117,10 +118,10 @@ rws compare as bs
                      -> UnmappedTerms f fields
                      -> UnmappedTerms f fields
                      -> UnmappedTerm f fields
-                     -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Indices, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
+                     -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (These Int Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
         insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
-          put (previous, unmappedA, IntMap.delete (sndIndex j) unmappedB)
-          pure (j, inserting b)
+          put (previous, unmappedA, IntMap.delete j unmappedB)
+          pure (That j, inserting b)
 
         -- | Finds the most-similar unmapped term to the passed-in term, if any.
         --
@@ -128,36 +129,36 @@ rws compare as bs
         --
         -- cf §4.2 of RWS-Diff
         nearestUnmapped
-          :: (Indices -> Int)
-          -> UnmappedTerms f fields -- ^ A set of terms eligible for matching against.
+          :: UnmappedTerms f fields -- ^ A set of terms eligible for matching against.
           -> KdTree.KdTree Double (UnmappedTerm f fields) -- ^ The k-d tree to look up nearest neighbours within.
           -> UnmappedTerm f fields -- ^ The term to find the nearest neighbour to.
           -> Maybe (UnmappedTerm f fields) -- ^ The most similar unmapped term, if any.
-        nearestUnmapped f unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (toList (IntMap.intersection unmapped (toMap f (KdTree.kNearest tree defaultL key)))))
+        nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
 
         -- | Determines whether an index is in-bounds for a move given the most recently matched index.
         isInMoveBounds previous i = previous <= i && i <= previous + defaultMoveBound
         insertMapped diffs into = foldl' (\into (i, mappedTerm) ->
-            List.insertBy (comparing fst) (i, mappedTerm) into)
+            List.insertBy (compareTheseMonotone `on` fst) (i, mappedTerm) into)
             into
             diffs
         -- Given a list of diffs, and unmapped terms in unmappedA, deletes
         -- any terms that remain in umappedA.
         deleteRemaining diffs (_, unmappedA, _) = foldl' (\into (i, deletion) ->
-            List.insertBy (comparing fst) (i, deletion) into)
+            List.insertBy (compareTheseMonotone `on` fst) (This i, deletion) into)
           diffs
           ((termIndex &&& deleting . term) <$> unmappedA)
 
-newtype Indices = Indices { unIndices :: (Int, Int) }
-  deriving Eq
-
-fstIndex :: Indices -> Int
-fstIndex = fst . unIndices
-sndIndex :: Indices -> Int
-sndIndex = snd . unIndices
-
-instance Ord Indices where
-  Indices (i1, j1) <= Indices (i2, j2) = i1 <= i2 && j1 <= j2
+compareTheseMonotone :: (Ord a, Ord b) => These a b -> These a b -> Ordering
+compareTheseMonotone This{} That{} = LT
+compareTheseMonotone That{} This{} = GT
+compareTheseMonotone (These i1 j1) (These i2 j2) = let i = compare i1 i2 in
+  if i == EQ then compare j1 j2 else i
+compareTheseMonotone (This i1) (This i2) = compare i1 i2
+compareTheseMonotone (That j1) (That j2) = compare j1 j2
+compareTheseMonotone (These i1 _) (This i2) = compare i1 i2
+compareTheseMonotone (This i1) (These i2 _) = compare i1 i2
+compareTheseMonotone (These _ j1) (That j2) = compare j1 j2
+compareTheseMonotone (That j1) (These _ j2) = compare j1 j2
 
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
@@ -178,7 +179,7 @@ defaultM :: Integer
 defaultM = 10
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
-data UnmappedTerm f fields = UnmappedTerm { termIndex :: {-# UNPACK #-} !Indices, feature :: !(Vector.Vector Double), term :: !(Cofree f (Record fields)) }
+data UnmappedTerm f fields = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Cofree f (Record fields)) }
 
 type UnmappedTerms f fields = IntMap (UnmappedTerm f fields)
 
