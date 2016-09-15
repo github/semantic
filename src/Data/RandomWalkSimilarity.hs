@@ -89,7 +89,6 @@ rws compare as bs
             (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'), allDiffs <> pure (Index counterA))
           ) ([], [], 0, 0, [], []) sesDiffs
 
-
         findNearestNeighbourToDiff :: TermOrIndexOrNil (UnmappedTerm f fields) -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Maybe (These Int Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))))
         findNearestNeighbourToDiff termThing = case termThing of
           Nil -> pure Nothing
@@ -98,7 +97,6 @@ rws compare as bs
             (_, unA, unB) <- get
             put (i, unA, unB)
             pure Nothing
-
 
         kdas = KdTree.build (Vector.toList . feature) fas
         kdbs = KdTree.build (Vector.toList . feature) fbs
