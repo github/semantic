@@ -10,7 +10,7 @@ import Data.Bifunctor.Join
 import Data.Bifunctor.Join.Arbitrary ()
 import Data.Functor.Both as Both
 import Data.List (nub)
-import Data.Monoid
+import Data.Monoid hiding ((<>))
 import Data.Record
 import Data.String
 import Data.Text.Arbitrary ()
