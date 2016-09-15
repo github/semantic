@@ -22,7 +22,6 @@ import Data.Functor.Foldable as Foldable
 import Data.Hashable
 import qualified Data.IntMap as IntMap
 import qualified Data.KdTree.Static as KdTree
-import qualified Data.List as List
 import Data.Semigroup (Min(..), Option(..))
 import Data.Record
 import qualified Data.Vector as Vector
@@ -166,16 +165,15 @@ insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
   (That _, This _) -> b : insertDiff a rest -- Amb a b rest
 
   (These i1 i2, _) -> case break (isThese . fst) rest of
-    (rest, tail) -> let (before, after) = foldr' (combine i1 i2) ([] {- elements before a -}, [] {- elements after a -}) (b : rest) in
+    (rest, tail) -> let (before, after) = foldr' (combine i1 i2) ([], []) (b : rest) in
        case after of
          [] -> before <> insertDiff a tail
          _ -> before <> (a : after) <> tail
   where
-    combine i1 i2 = (\each (before, after) -> case fst each of
-        This j1 -> if i1 <= j1 then (before, each : after) else (each : before, after)
-        That j2 -> if i2 <= j2 then (before, each : after) else (each : before, after)
-       )
-
+    combine i1 i2 each (before, after) = case fst each of
+      This j1 -> if i1 <= j1 then (before, each : after) else (each : before, after)
+      That j2 -> if i2 <= j2 then (before, each : after) else (each : before, after)
+      These _ _ -> (before, after)
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
 editDistanceUpTo :: (Prologue.Foldable f, Functor f) => Integer -> Free (CofreeF f (Both a)) (Patch (Cofree f a)) -> Int
