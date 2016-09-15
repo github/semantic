@@ -186,7 +186,7 @@ defaultD = 15
 defaultL = 2
 defaultP = 2
 defaultQ = 3
-defaultMoveBound = 1
+defaultMoveBound = 2
 
 -- | How many nodes to consider for our constant-time approximation to tree edit distance.
 defaultM :: Integer
