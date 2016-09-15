@@ -18,7 +18,7 @@ import Control.Arrow ((&&&))
 import Control.Monad.Random
 import Control.Monad.State
 import Data.Functor.Both hiding (fst, snd)
-import Data.Functor.Foldable as Foldable
+import Data.Functor.Foldable as Foldable hiding (Nil)
 import Data.Hashable
 import qualified Data.IntMap as IntMap
 import qualified Data.KdTree.Static as KdTree
@@ -82,18 +82,19 @@ rws compare as bs
 
         (fas, fbs, _, _, countersAndDiffs, allDiffs) = foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff -> case runFree diff of
           Pure (Right (Delete term)) ->
-            (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure (This counterA, featurize counterA term))
+            (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure Nil)
           Pure (Right (Insert term)) ->
-            (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs, allDiffs <> pure (That counterB, featurize counterB term))
+            (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs, allDiffs <> pure (Term (featurize counterB term)))
           syntax -> let diff' = free syntax >>= either identity pure in
-            (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'), allDiffs <> pure (These counterA counterB, undefined))
+            (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'), allDiffs <> pure (Index counterA))
           ) ([], [], 0, 0, [], []) sesDiffs
 
-        findNearestNeighbourToDiff :: (These Int Int, UnmappedTerm f fields) -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Maybe (These Int Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))))
-        findNearestNeighbourToDiff (indices, term) = case indices of
-          This _ -> pure Nothing
-          That _ -> Just <$> findNearestNeighbourTo term
-          These i _ -> do
+
+        findNearestNeighbourToDiff :: TermOrIndexOrNil (UnmappedTerm f fields) -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Maybe (These Int Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))))
+        findNearestNeighbourToDiff termThing = case termThing of
+          Nil -> pure Nothing
+          Term term -> Just <$> findNearestNeighbourTo term
+          Index i -> do
             (_, unA, unB) <- get
             put (i, unA, unB)
             pure Nothing
@@ -205,6 +206,8 @@ defaultM = 10
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm f fields = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Cofree f (Record fields)) }
+
+data TermOrIndexOrNil term = Term term | Index Int | Nil
 
 type UnmappedTerms f fields = IntMap (UnmappedTerm f fields)
 
