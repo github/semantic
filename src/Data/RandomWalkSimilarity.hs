@@ -164,7 +164,9 @@ insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
 
   (These i1 i2, _) -> case break (isThese . fst) rest of
     (rest, tail) -> let (before, after) = foldr' (combine i1 i2) ([] {- elements before a -}, [] {- elements after a -}) (b : rest) in
-       before <> (a : after) <> tail
+       case after of
+         [] -> before <> insertDiff a tail
+         _ -> before <> (a : after) <> tail
   where
     combine i1 i2 = (\each (before, after) -> case fst each of
         This j1 -> if i1 <= j1 then (before, each : after) else (each : before, after)
