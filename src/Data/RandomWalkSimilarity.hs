@@ -50,7 +50,8 @@ rws compare as bs
   | otherwise =
     -- Construct a State who's final value is a list of (Int, Diff leaf (Record fields))
     -- and who's final state is (Int, IntMap UmappedTerm, IntMap UmappedTerm)
-    traverse findNearestNeighbourTo fbs &
+    traverse findNearestNeighbourToDiff allDiffs &
+    fmap catMaybes &
     -- Run the state with an initial state
     (`runState` (pred $ maybe 0 getMin (getOption (foldMap (Option . Just . Min . termIndex) fas)),
       toMap fas,
@@ -79,14 +80,24 @@ rws compare as bs
         eitherCutoff n diff | n <= 0 = pure (Left diff)
         eitherCutoff n diff = free . bimap Right (eitherCutoff (pred n)) $ runFree diff
 
-        (fas, fbs, _, _, countersAndDiffs) = foldl' (\(as, bs, counterA, counterB, diffs) diff -> case runFree diff of
+        (fas, fbs, _, _, countersAndDiffs, allDiffs) = foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff -> case runFree diff of
           Pure (Right (Delete term)) ->
-            (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs)
+            (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure (This counterA, featurize counterA term))
           Pure (Right (Insert term)) ->
-            (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs)
+            (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs, allDiffs <> pure (That counterB, featurize counterB term))
           syntax -> let diff' = free syntax >>= either identity pure in
-            (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'))
-          ) ([], [], 0, 0, []) sesDiffs
+            (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'), allDiffs <> pure (These counterA counterB, undefined))
+          ) ([], [], 0, 0, [], []) sesDiffs
+
+        findNearestNeighbourToDiff :: (These Int Int, UnmappedTerm f fields) -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Maybe (These Int Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))))
+        findNearestNeighbourToDiff (indices, term) = case indices of
+          This _ -> pure Nothing
+          That _ -> Just <$> findNearestNeighbourTo term
+          These i _ -> do
+            (_, unA, unB) <- get
+            put (i, unA, unB)
+            pure Nothing
+
 
         kdas = KdTree.build (Vector.toList . feature) fas
         kdbs = KdTree.build (Vector.toList . feature) fbs
