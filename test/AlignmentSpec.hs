@@ -269,7 +269,7 @@ prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& identity) . 
 data PrettyDiff a = PrettyDiff { unPrettySources :: Both (Source.Source Char), unPrettyLines :: [Join These (Range, a)] }
   deriving Eq
 
-instance Show a => Show (PrettyDiff a) where
+instance Show (PrettyDiff a) where
   showsPrec _ (PrettyDiff sources lines) = (prettyPrinted ++) -- . (("\n" ++ show lines) ++)
     where prettyPrinted = showLine (maximum (0 : (maximum . fmap length <$> shownLines))) <$> shownLines >>= ('\n':)
           shownLines = catMaybes $ toBoth <$> lines
