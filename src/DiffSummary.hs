@@ -140,8 +140,8 @@ toTermName source term = case unwrap term of
   S.Ternary expr _ -> toTermName' expr
   S.MathAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
-  S.Object kvs -> "{" <> intercalate ", " (toTermName' <$> kvs) <> "}"
-  S.Pair a b -> toTermName' a <> ": " <> toTermName' b
+  S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
+  S.Pair a _ -> toTermName' a <> ": …"
   S.Return expr -> maybe "empty" toTermName' expr
   S.Error _ _ -> termNameFromSource term
   S.If expr _ _ -> termNameFromSource expr
@@ -164,7 +164,7 @@ toTermName source term = case unwrap term of
         toArgName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Text
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
-                          Unidentifiable _ -> "..."
+                          Unidentifiable _ -> "…"
 
 maybeParentContext :: Maybe (Category, Text) -> Doc
 maybeParentContext = maybe "" (\annotation ->
