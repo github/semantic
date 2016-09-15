@@ -23,6 +23,7 @@ import Data.Hashable
 import qualified Data.IntMap as IntMap
 import qualified Data.KdTree.Static as KdTree
 import qualified Data.List as List
+import Data.Semigroup (Min(..), Option(..))
 import Data.Record
 import qualified Data.Vector as Vector
 import Patch
@@ -52,7 +53,7 @@ rws compare as bs
     -- and who's final state is (Int, IntMap UmappedTerm, IntMap UmappedTerm)
     traverse findNearestNeighbourTo fbs &
     -- Run the state with an initial state
-    (`runState` (-1,
+    (`runState` (pred $ maybe 0 getMin (getOption (foldMap (Option . Just . Min . termIndex) fas)),
       toMap fas,
       toMap fbs)) &
     uncurry deleteRemaining &
