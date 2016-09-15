@@ -103,7 +103,9 @@ rws compare as bs
           (previous, unmappedA, unmappedB) <- get
           fromMaybe (insertion previous unmappedA unmappedB term) $ do
             -- Look up the nearest unmapped term in `unmappedA`.
-            foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filterWithKey (\ k _ -> isInMoveBounds previous k) unmappedA) kdas term
+            foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filterWithKey (\ k _ ->
+              isInMoveBounds previous k)
+              unmappedA) kdas term
             -- Look up the nearest `foundA` in `unmappedB`
             UnmappedTerm j' _ _ <- nearestUnmapped unmappedB kdbs foundA
             -- Return Nothing if their indices don't match
@@ -137,7 +139,7 @@ rws compare as bs
         nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
 
         -- | Determines whether an index is in-bounds for a move given the most recently matched index.
-        isInMoveBounds previous i = previous <= i && i <= previous + defaultMoveBound
+        isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
         insertMapped diffs into = foldl' (\into (i, mappedTerm) ->
             insertDiff (i, mappedTerm) into)
             into
@@ -186,7 +188,7 @@ defaultD = 15
 defaultL = 2
 defaultP = 2
 defaultQ = 3
-defaultMoveBound = 2
+defaultMoveBound = 1
 
 -- | How many nodes to consider for our constant-time approximation to tree edit distance.
 defaultM :: Integer
