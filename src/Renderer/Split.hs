@@ -114,9 +114,9 @@ split blobs diff = SplitOutput . TL.toStrict . renderHtml
     numberedLinesToMarkup numberedLines = tr $ runBothWith (<>) (renderLine <$> Join (fromThese Nothing Nothing (runJoin (Just <$> numberedLines))) <*> sources) <> string "\n"
 
     renderLine (Just (number, line)) source = toMarkup $ Cell (hasChanges line) number (Renderable source line)
-    renderLine _ _ =
-      td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
-      <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
+    renderLine _ _
+      =  (td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell"))
+      <> (td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell"))
       <> string "\n"
 
 -- | A cell in a table, characterized by whether it contains changes & its line number.
@@ -159,9 +159,9 @@ instance (HasField fields Category, HasField fields Cost, HasField fields Range)
                                        | otherwise = identity
 
 instance ToMarkup a => ToMarkup (Cell a) where
-  toMarkup (Cell hasChanges num line) =
-    td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
-    <> td (toMarkup line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
+  toMarkup (Cell hasChanges num line)
+    =  (td (string (show num)) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num"))
+    <> (td (toMarkup line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code"))
     <> string "\n"
 
 (<>) :: Monoid m => m -> m -> m
