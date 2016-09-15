@@ -5,6 +5,7 @@ import Data.Functor.Both
 import Data.Functor.Foldable (cata)
 import Data.RandomWalkSimilarity
 import Data.Record
+import qualified Data.Vector as Vector
 import Diff
 import Info
 import Patch
@@ -31,7 +32,6 @@ spec = parallel $ do
       \ (term, p, q, d) -> featureVectorDecorator (rhead . headF) (positively p) (positively q) (positively d) (toTerm term :: Term (Syntax Text) (Record '[Text])) `shouldSatisfy` all ((== positively d) . length . rhead)
 
   describe "rws" $ do
-    let decorate = defaultFeatureVectorDecorator (category . headF)
     let toTerm' = decorate . toTerm
     prop "produces correct diffs" . forAll (scale (`div` 4) arbitrary) $
       \ (as, bs) -> let tas = toTerm' <$> (as :: [ArbitraryTerm Text (Record '[Category])])
@@ -49,3 +49,5 @@ spec = parallel $ do
                     | otherwise = if ((==) `on` category . extract) a b then Just (replacing a b) else Nothing
         copying :: Functor f => Cofree f (Record fields) -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))
         copying = cata wrap . fmap pure
+        decorate :: SyntaxTerm leaf '[Category] -> SyntaxTerm leaf '[Vector.Vector Double, Category]
+        decorate = defaultFeatureVectorDecorator (category . headF)
