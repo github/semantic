@@ -91,7 +91,9 @@ rws compare as bs
             (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'), allDiffs <> pure (Index counterA))
           ) ([], [], 0, 0, [], []) sesDiffs
 
-        findNearestNeighbourToDiff :: TermOrIndexOrNil (UnmappedTerm f fields) -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (Maybe (These Int Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))))
+        findNearestNeighbourToDiff :: TermOrIndexOrNil (UnmappedTerm f fields)
+                                   -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
+                                            (Maybe (These Int Int, Diff f (Record fields)))
         findNearestNeighbourToDiff termThing = case termThing of
           Nil -> pure Nothing
           Term term -> Just <$> findNearestNeighbourTo term
@@ -109,7 +111,8 @@ rws compare as bs
 
         -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
         findNearestNeighbourTo :: UnmappedTerm f fields
-                               -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (These Int Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
+                               -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
+                                        (These Int Int, Diff f (Record fields))
         findNearestNeighbourTo term@(UnmappedTerm j _ b) = do
           (previous, unmappedA, unmappedB) <- get
           fromMaybe (insertion previous unmappedA unmappedB term) $ do
@@ -132,7 +135,8 @@ rws compare as bs
                      -> UnmappedTerms f fields
                      -> UnmappedTerms f fields
                      -> UnmappedTerm f fields
-                     -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields) (These Int Int, Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
+                     -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
+                              (These Int Int, Diff f (Record fields))
         insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
           put (previous, unmappedA, IntMap.delete j unmappedB)
           pure (That j, inserting b)
@@ -210,6 +214,7 @@ data UnmappedTerm f fields = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, fe
 
 data TermOrIndexOrNil term = Term term | Index Int | Nil
 
+-- | An IntMap of unmapped terms keyed by their position in a list of terms.
 type UnmappedTerms f fields = IntMap (UnmappedTerm f fields)
 
 -- | A `Gram` is a fixed-size view of some portion of a tree, consisting of a `stem` of _p_ labels for parent nodes, and a `base` of _q_ labels of sibling nodes. Collectively, the bag of `Gram`s for each node of a tree (e.g. as computed by `pqGrams`) form a summary of the tree.
