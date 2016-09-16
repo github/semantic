@@ -69,102 +69,105 @@ rws compare as bs
     insertMapped countersAndDiffs &
     fmap snd
 
-  where sesDiffs = eitherCutoff 1 <$> SES.ses replaceIfEqual cost as bs
-        replaceIfEqual :: HasField fields Category => Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
-        replaceIfEqual a b
-          | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
-          | otherwise = Nothing
-        cost = iter (const 0) . (1 <$)
+  where
+    sesDiffs = eitherCutoff 1 <$> SES.ses replaceIfEqual cost as bs
+    replaceIfEqual :: HasField fields Category => Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
+    replaceIfEqual a b
+      | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
+      | otherwise = Nothing
+    cost = iter (const 0) . (1 <$)
 
-        eitherCutoff :: (Functor f) => Integer
-                     -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))
-                     -> Free (CofreeF f (Both (Record fields))) (Either (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) (Patch (Cofree f (Record fields))))
-        eitherCutoff n diff | n <= 0 = pure (Left diff)
-        eitherCutoff n diff = free . bimap Right (eitherCutoff (pred n)) $ runFree diff
+    eitherCutoff :: (Functor f) => Integer
+                 -> Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))
+                 -> Free (CofreeF f (Both (Record fields))) (Either (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) (Patch (Cofree f (Record fields))))
+    eitherCutoff n diff | n <= 0 = pure (Left diff)
+    eitherCutoff n diff = free . bimap Right (eitherCutoff (pred n)) $ runFree diff
 
-        (fas, fbs, _, _, countersAndDiffs, allDiffs) = foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff -> case runFree diff of
-          Pure (Right (Delete term)) ->
-            (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure Nil)
-          Pure (Right (Insert term)) ->
-            (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs, allDiffs <> pure (Term (featurize counterB term)))
-          syntax -> let diff' = free syntax >>= either identity pure in
-            (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'), allDiffs <> pure (Index counterA))
-          ) ([], [], 0, 0, [], []) sesDiffs
+    (fas, fbs, _, _, countersAndDiffs, allDiffs) =
+      foldl' (\(as, bs, counterA, counterB, diffs, allDiffs) diff -> case runFree diff of
+        Pure (Right (Delete term)) ->
+          (as <> pure (featurize counterA term), bs, succ counterA, counterB, diffs, allDiffs <> pure Nil)
+        Pure (Right (Insert term)) ->
+          (as, bs <> pure (featurize counterB term), counterA, succ counterB, diffs, allDiffs <> pure (Term (featurize counterB term)))
+        syntax -> let diff' = free syntax >>= either identity pure in
+          (as, bs, succ counterA, succ counterB, diffs <> pure (These counterA counterB, diff'), allDiffs <> pure (Index counterA))
+      ) ([], [], 0, 0, [], []) sesDiffs
 
-        findNearestNeighbourToDiff :: TermOrIndexOrNil (UnmappedTerm f fields)
-                                   -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
-                                            (Maybe (These Int Int, Diff f (Record fields)))
-        findNearestNeighbourToDiff termThing = case termThing of
-          Nil -> pure Nothing
-          Term term -> Just <$> findNearestNeighbourTo term
-          Index i -> do
-            (_, unA, unB) <- get
-            put (i, unA, unB)
-            pure Nothing
-
-        kdas = KdTree.build (Vector.toList . feature) fas
-        kdbs = KdTree.build (Vector.toList . feature) fbs
-
-        featurize index term = UnmappedTerm index (getField (extract term)) term
-
-        toMap = IntMap.fromList . fmap (termIndex &&& identity)
-
-        -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
-        findNearestNeighbourTo :: UnmappedTerm f fields
+    findNearestNeighbourToDiff :: TermOrIndexOrNil (UnmappedTerm f fields)
                                -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
-                                        (These Int Int, Diff f (Record fields))
-        findNearestNeighbourTo term@(UnmappedTerm j _ b) = do
-          (previous, unmappedA, unmappedB) <- get
-          fromMaybe (insertion previous unmappedA unmappedB term) $ do
-            -- Look up the nearest unmapped term in `unmappedA`.
-            foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filterWithKey (\ k _ ->
-              isInMoveBounds previous k)
-              unmappedA) kdas term
-            -- Look up the nearest `foundA` in `unmappedB`
-            UnmappedTerm j' _ _ <- nearestUnmapped unmappedB kdbs foundA
-            -- Return Nothing if their indices don't match
-            guard (j == j')
-            compared <- compare a b
-            pure $! do
-              put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
-              pure (These i j, compared)
+                                        (Maybe (These Int Int, Diff f (Record fields)))
+    findNearestNeighbourToDiff termThing = case termThing of
+      Nil -> pure Nothing
+      Term term -> Just <$> findNearestNeighbourTo term
+      Index i -> do
+        (_, unA, unB) <- get
+        put (i, unA, unB)
+        pure Nothing
 
-        -- Returns a `State s a` of where `s` is the index, old unmapped terms, new unmapped terms, and value is
-        -- (index, inserted diff), given a previous index, two sets of umapped terms, and an unmapped term to insert.
-        insertion :: Int
-                     -> UnmappedTerms f fields
-                     -> UnmappedTerms f fields
-                     -> UnmappedTerm f fields
-                     -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
-                              (These Int Int, Diff f (Record fields))
-        insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
-          put (previous, unmappedA, IntMap.delete j unmappedB)
-          pure (That j, inserting b)
+    kdas = KdTree.build (Vector.toList . feature) fas
+    kdbs = KdTree.build (Vector.toList . feature) fbs
 
-        -- | Finds the most-similar unmapped term to the passed-in term, if any.
-        --
-        -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
-        --
-        -- cf §4.2 of RWS-Diff
-        nearestUnmapped
-          :: UnmappedTerms f fields -- ^ A set of terms eligible for matching against.
-          -> KdTree.KdTree Double (UnmappedTerm f fields) -- ^ The k-d tree to look up nearest neighbours within.
-          -> UnmappedTerm f fields -- ^ The term to find the nearest neighbour to.
-          -> Maybe (UnmappedTerm f fields) -- ^ The most similar unmapped term, if any.
-        nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
+    featurize index term = UnmappedTerm index (getField (extract term)) term
 
-        -- | Determines whether an index is in-bounds for a move given the most recently matched index.
-        isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
-        insertMapped diffs into = foldl' (\into (i, mappedTerm) ->
-            insertDiff (i, mappedTerm) into)
-            into
-            diffs
-        -- Given a list of diffs, and unmapped terms in unmappedA, deletes
-        -- any terms that remain in umappedA.
-        deleteRemaining diffs (_, unmappedA, _) = foldl' (\into (i, deletion) ->
-            insertDiff (This i, deletion) into)
-          diffs
-          ((termIndex &&& deleting . term) <$> unmappedA)
+    toMap = IntMap.fromList . fmap (termIndex &&& identity)
+
+    -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any),
+    -- marking both as ineligible for future matches.
+    findNearestNeighbourTo :: UnmappedTerm f fields
+                           -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
+                                    (These Int Int, Diff f (Record fields))
+    findNearestNeighbourTo term@(UnmappedTerm j _ b) = do
+      (previous, unmappedA, unmappedB) <- get
+      fromMaybe (insertion previous unmappedA unmappedB term) $ do
+        -- Look up the nearest unmapped term in `unmappedA`.
+        foundA@(UnmappedTerm i _ a) <- nearestUnmapped (IntMap.filterWithKey (\ k _ ->
+          isInMoveBounds previous k)
+          unmappedA) kdas term
+        -- Look up the nearest `foundA` in `unmappedB`
+        UnmappedTerm j' _ _ <- nearestUnmapped unmappedB kdbs foundA
+        -- Return Nothing if their indices don't match
+        guard (j == j')
+        compared <- compare a b
+        pure $! do
+          put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
+          pure (These i j, compared)
+
+    -- Returns a `State s a` of where `s` is the index, old unmapped terms, new unmapped terms, and value is
+    -- (index, inserted diff), given a previous index, two sets of umapped terms, and an unmapped term to insert.
+    insertion :: Int
+                 -> UnmappedTerms f fields
+                 -> UnmappedTerms f fields
+                 -> UnmappedTerm f fields
+                 -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
+                          (These Int Int, Diff f (Record fields))
+    insertion previous unmappedA unmappedB (UnmappedTerm j _ b) = do
+      put (previous, unmappedA, IntMap.delete j unmappedB)
+      pure (That j, inserting b)
+
+    -- | Finds the most-similar unmapped term to the passed-in term, if any.
+    --
+    -- RWS can produce false positives in the case of e.g. hash collisions. Therefore, we find the _l_ nearest candidates, filter out any which have already been mapped, and select the minimum of the remaining by (a constant-time approximation of) edit distance.
+    --
+    -- cf §4.2 of RWS-Diff
+    nearestUnmapped
+      :: UnmappedTerms f fields -- ^ A set of terms eligible for matching against.
+      -> KdTree.KdTree Double (UnmappedTerm f fields) -- ^ The k-d tree to look up nearest neighbours within.
+      -> UnmappedTerm f fields -- ^ The term to find the nearest neighbour to.
+      -> Maybe (UnmappedTerm f fields) -- ^ The most similar unmapped term, if any.
+    nearestUnmapped unmapped tree key = getFirst $ foldMap (First . Just) (sortOn (maybe maxBound (editDistanceUpTo defaultM) . compare (term key) . term) (toList (IntMap.intersection unmapped (toMap (KdTree.kNearest tree defaultL key)))))
+
+    -- | Determines whether an index is in-bounds for a move given the most recently matched index.
+    isInMoveBounds previous i = previous < i && i < previous + defaultMoveBound
+    insertMapped diffs into = foldl' (\into (i, mappedTerm) ->
+        insertDiff (i, mappedTerm) into)
+        into
+        diffs
+    -- Given a list of diffs, and unmapped terms in unmappedA, deletes
+    -- any terms that remain in umappedA.
+    deleteRemaining diffs (_, unmappedA, _) = foldl' (\into (i, deletion) ->
+        insertDiff (This i, deletion) into)
+      diffs
+      ((termIndex &&& deleting . term) <$> unmappedA)
 
 insertDiff :: (These Int Int, a) -> [(These Int Int, a)] -> [(These Int Int, a)]
 insertDiff inserted [] = [ inserted ]
@@ -212,6 +215,7 @@ defaultM = 10
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
 data UnmappedTerm f fields = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Cofree f (Record fields)) }
 
+-- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNil term = Term term | Index Int | Nil
 
 -- | An IntMap of unmapped terms keyed by their position in a list of terms.
@@ -240,26 +244,28 @@ pqGramDecorator :: Traversable f
   -> Cofree f (Record fields) -- ^ The term to decorate.
   -> Cofree f (Record (Gram label ': fields)) -- ^ The decorated term.
 pqGramDecorator getLabel p q = cata algebra
-  where algebra term = let label = getLabel term in
-          cofree ((gram label .: headF term) :< assignParentAndSiblingLabels (tailF term) label)
-        gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
-        assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
+  where
+    algebra term = let label = getLabel term in
+      cofree ((gram label .: headF term) :< assignParentAndSiblingLabels (tailF term) label)
+    gram label = Gram (padToSize p []) (padToSize q (pure (Just label)))
+    assignParentAndSiblingLabels functor label = (`evalState` (replicate (q `div` 2) Nothing <> siblingLabels functor)) (for functor (assignLabels label))
 
-        assignLabels :: label -> Cofree f (Record (Gram label ': fields)) -> State [Maybe label] (Cofree f (Record (Gram label ': fields)))
-        assignLabels label a = case runCofree a of
-          RCons gram rest :< functor -> do
-            labels <- get
-            put (drop 1 labels)
-            pure $! cofree ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } .: rest) :< functor)
-        siblingLabels :: Traversable f => f (Cofree f (Record (Gram label ': fields))) -> [Maybe label]
-        siblingLabels = foldMap (base . rhead . extract)
-        padToSize n list = take n (list <> repeat empty)
+    assignLabels :: label -> Cofree f (Record (Gram label ': fields)) -> State [Maybe label] (Cofree f (Record (Gram label ': fields)))
+    assignLabels label a = case runCofree a of
+      RCons gram rest :< functor -> do
+        labels <- get
+        put (drop 1 labels)
+        pure $! cofree ((gram { stem = padToSize p (Just label : stem gram), base = padToSize q labels } .: rest) :< functor)
+    siblingLabels :: Traversable f => f (Cofree f (Record (Gram label ': fields))) -> [Maybe label]
+    siblingLabels = foldMap (base . rhead . extract)
+    padToSize n list = take n (list <> repeat empty)
 
 -- | Computes a unit vector of the specified dimension from a hash.
 unitVector :: Int -> Int -> Vector.Vector Double
 unitVector d hash = normalize ((`evalRand` mkQCGen hash) (sequenceA (Vector.replicate d getRandom)))
-  where normalize vec = fmap (/ vmagnitude vec) vec
-        vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
+  where
+    normalize vec = fmap (/ vmagnitude vec) vec
+    vmagnitude = sqrtDouble . Vector.sum . fmap (** 2)
 
 -- | Strips the head annotation off a term annotated with non-empty records.
 stripTerm :: Functor f => Cofree f (Record (h ': t)) -> Cofree f (Record t)
