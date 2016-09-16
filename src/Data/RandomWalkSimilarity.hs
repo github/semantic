@@ -34,7 +34,11 @@ import Data.Align.Generic
 import Data.These
 import Diff
 
--- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
+-- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term,
+-- compute the diff of a pair of lists of terms using a random walk similarity metric,
+-- which completes in log-linear time.
+--
+--This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
 rws :: forall f fields.
     (GAlign f,
      Traversable f,
@@ -43,13 +47,10 @@ rws :: forall f fields.
      HasField fields (Vector.Vector Double)) =>
     (Term f (Record fields)
       -> Term f (Record fields)
-      -- | A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
-      -> Maybe (Diff f (Record fields)))
+      -> Maybe (Diff f (Record fields))) -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
     -- | The list of old terms.
-    -> [Cofree f (Record fields)]
-    -- | The list of new terms.
-    -> [Cofree f (Record fields)]
-    -- | The resulting list of similarity-matched diffs.
+    -> [Cofree f (Record fields)] -- ^ The list of new terms.
+    -> [Cofree f (Record fields)] -- ^ The resulting list of similarity-matched diffs.
     -> [Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))]
 rws compare as bs
   | null as, null bs = []
