@@ -232,10 +232,11 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
   deriving (Eq, Show)
 
 -- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
-defaultFeatureVectorDecorator :: (Hashable label, Traversable f) =>
-                                 (forall b. TermF f (Record fields) b -> label)
-                              -> Term f (Record fields)
-                              -> Term f (Record (Vector.Vector Double ': fields))
+defaultFeatureVectorDecorator
+  :: (Hashable label, Traversable f)
+  => (forall b. TermF f (Record fields) b -> label)
+  -> Term f (Record fields)
+  -> Term f (Record (Vector.Vector Double ': fields))
 defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
@@ -246,12 +247,13 @@ featureVectorDecorator getLabel p q d
   . pqGramDecorator getLabel p q
 
 -- | Annotates a term with the corresponding p,q-gram at each node.
-pqGramDecorator :: Traversable f
-                => (forall b. TermF f (Record fields) b -> label) -- ^ A function computing the label from an arbitrary unpacked term. This function can use the annotation and functor’s constructor, but not any recursive values inside the functor (since they’re held parametric in 'b').
-                -> Int -- ^ 'p'; the desired stem length for the grams.
-                -> Int -- ^ 'q'; the desired base length for the grams.
-                -> Term f (Record fields) -- ^ The term to decorate.
-                -> Term f (Record (Gram label ': fields)) -- ^ The decorated term.
+pqGramDecorator
+  :: Traversable f
+  => (forall b. TermF f (Record fields) b -> label) -- ^ A function computing the label from an arbitrary unpacked term. This function can use the annotation and functor’s constructor, but not any recursive values inside the functor (since they’re held parametric in 'b').
+  -> Int -- ^ 'p'; the desired stem length for the grams.
+  -> Int -- ^ 'q'; the desired base length for the grams.
+  -> Term f (Record fields) -- ^ The term to decorate.
+  -> Term f (Record (Gram label ': fields)) -- ^ The decorated term.
 pqGramDecorator getLabel p q = cata algebra
   where
     algebra term = let label = getLabel term in
@@ -283,9 +285,10 @@ stripTerm :: Functor f => Term f (Record (h ': t)) -> Term f (Record t)
 stripTerm = fmap rtail
 
 -- | Strips the head annotation off a diff annotated with non-empty records.
-stripDiff :: (Functor f, Functor g)
-           => Free (TermF f (g (Record (h ': t)))) (Patch (Term f (Record (h ': t))))
-           -> Free (TermF f (g (Record t)))        (Patch (Term f (Record t)))
+stripDiff
+  :: (Functor f, Functor g)
+  => Free (TermF f (g (Record (h ': t)))) (Patch (Term f (Record (h ': t))))
+  -> Free (TermF f (g (Record t)))        (Patch (Term f (Record t)))
 stripDiff = iter (\ (h :< f) -> wrap (fmap rtail h :< f)) . fmap (pure . fmap stripTerm)
 
 
