@@ -104,6 +104,8 @@ data Category
   | RelationalOperator
   -- | An empty statement. (e.g. ; in JavaScript)
   | Empty
+  -- | A mathematical operator (e.g. +, -, *, /).
+  | MathOperator
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -116,6 +118,7 @@ instance Arbitrary Category where
     , pure Error
     , pure Boolean
     , pure BooleanOperator
+    , pure MathOperator
     , pure DictionaryLiteral
     , pure Pair
     , pure FunctionCall

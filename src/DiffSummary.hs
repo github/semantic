@@ -222,6 +222,7 @@ instance HasCategory Category where
   toCategoryName = \case
     ArrayLiteral -> "array"
     BooleanOperator -> "boolean operator"
+    MathOperator -> "math operator"
     BitwiseOperator -> "bitwise operator"
     RelationalOperator -> "relational operator"
     Boolean -> "boolean"
