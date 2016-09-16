@@ -26,20 +26,27 @@ import Data.Semigroup (Min(..), Option(..))
 import Data.Record
 import qualified Data.Vector as Vector
 import Patch
-import Prologue
-import Term (termSize, zipTerms)
+import Prologue as P
+import Term (termSize, zipTerms, Term)
 import Test.QuickCheck hiding (Fixed)
 import Test.QuickCheck.Random
 import qualified SES
 import Info
 import Data.Align.Generic
 import Data.These
+import Diff
 
 -- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term, compute the diff of a pair of lists of terms using a random walk similarity metric, which completes in log-linear time. This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: forall f fields. (GAlign f, HasField fields Category, Traversable f, Eq (f (Cofree f Category)), HasField fields (Vector.Vector Double))
-    => (Cofree f (Record fields)
-       -> Cofree f (Record fields)
-       -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))) -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
+rws :: forall f fields.
+    (GAlign f,
+     Traversable f,
+     HasField fields Category,
+     Eq (f (Cofree f Category)),
+     HasField fields (Vector.Vector Double)) =>
+    (Term f (Record fields)
+      -> Term f (Record fields)
+      -- | A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
+      -> Maybe (Diff f (Record fields)))
     -> [Cofree f (Record fields)] -- ^ The list of old terms.
     -> [Cofree f (Record fields)] -- ^ The list of new terms.
     -> [Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))] -- ^ The resulting list of similarity-matched diffs.
@@ -186,7 +193,9 @@ insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
       These _ _ -> (before, after)
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-editDistanceUpTo :: (Prologue.Foldable f, Functor f) => Integer -> Free (CofreeF f (Both a)) (Patch (Cofree f a)) -> Int
+editDistanceUpTo :: (P.Foldable f, Functor f) => Integer
+                 -> Free (CofreeF f (Both a)) (Patch (Cofree f a))
+                 -> Int
 editDistanceUpTo m = diffSum (patchSum termSize) . cutoff m
   where diffSum patchCost = sum . fmap (maybe 0 patchCost)
 
