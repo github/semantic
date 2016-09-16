@@ -1,7 +1,6 @@
 module Category where
 
 import Prologue
-import Data.Hashable
 import Test.QuickCheck hiding (Args)
 import Data.Text.Arbitrary()
 

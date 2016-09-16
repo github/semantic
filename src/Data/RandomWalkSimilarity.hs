@@ -14,11 +14,9 @@ module Data.RandomWalkSimilarity
 ) where
 
 import Control.Applicative
-import Control.Arrow ((&&&))
 import Control.Monad.Random
 import Control.Monad.State
 import Data.Functor.Both hiding (fst, snd)
-import Data.Functor.Foldable (hylo, cata)
 import Data.Hashable
 import qualified Data.IntMap as IntMap
 import qualified Data.KdTree.Static as KdTree

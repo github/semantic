@@ -10,7 +10,6 @@ import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
 import Test.QuickCheck
 import Data.Text.Arbitrary()
-import Data.Hashable
 
 -- |
 -- Source position information
