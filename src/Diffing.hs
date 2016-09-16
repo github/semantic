@@ -5,7 +5,6 @@ import qualified Prologue
 import Prologue hiding (fst, snd)
 import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
-import Data.Functor.Foldable
 import Data.RandomWalkSimilarity
 import Data.Record
 import qualified Data.Set as Set

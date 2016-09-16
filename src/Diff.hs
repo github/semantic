@@ -3,7 +3,7 @@
 module Diff where
 
 import Prologue
-import Data.Functor.Foldable as Foldable
+import Data.Functor.Foldable as F
 import Data.Functor.Both as Both
 import Data.Mergeable
 import Data.Record
@@ -19,8 +19,8 @@ type SyntaxDiff leaf fields = Diff (Syntax leaf) (Record fields)
 
 
 type instance Base (Free f a) = FreeF f a
-instance Functor f => Foldable.Foldable (Free f a) where project = runFree
-instance Functor f => Foldable.Unfoldable (Free f a) where embed = free
+instance Functor f => F.Foldable (Free f a) where project = runFree
+instance Functor f => F.Unfoldable (Free f a) where embed = free
 
 diffSum :: (Prologue.Foldable f, Functor f) => (Patch (Term f annotation) -> Int) -> Diff f annotation -> Int
 diffSum patchCost diff = sum $ fmap patchCost diff

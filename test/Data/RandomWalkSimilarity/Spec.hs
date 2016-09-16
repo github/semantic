@@ -2,7 +2,6 @@
 module Data.RandomWalkSimilarity.Spec where
 
 import Data.Functor.Both
-import Data.Functor.Foldable (cata)
 import Data.RandomWalkSimilarity
 import Data.Record
 import Diff
