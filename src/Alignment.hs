@@ -24,7 +24,7 @@ import Info
 import Patch
 import Prologue hiding (fst, snd)
 import Range
-import Source hiding (break, fromList, uncons, (++))
+import Source hiding (break, fromList, uncons)
 import SplitDiff
 import Syntax
 import Term
