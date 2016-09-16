@@ -45,9 +45,12 @@ rws :: forall f fields.
       -> Term f (Record fields)
       -- | A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
       -> Maybe (Diff f (Record fields)))
-    -> [Cofree f (Record fields)] -- ^ The list of old terms.
-    -> [Cofree f (Record fields)] -- ^ The list of new terms.
-    -> [Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))] -- ^ The resulting list of similarity-matched diffs.
+    -- | The list of old terms.
+    -> [Cofree f (Record fields)]
+    -- | The list of new terms.
+    -> [Cofree f (Record fields)]
+    -- | The resulting list of similarity-matched diffs.
+    -> [Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))]
 rws compare as bs
   | null as, null bs = []
   | null as = inserting <$> bs
@@ -64,13 +67,6 @@ rws compare as bs
     uncurry deleteRemaining &
     insertMapped countersAndDiffs &
     fmap snd
-
-    -- Modified xydiff + RWS
-    -- 1. Annotate each node with a unique key top down based off its categories and termIndex?
-    -- 2. Construct two priority queues of hash values for each node ordered by max weight
-    -- 3. Try to find matchings starting with the heaviest nodes
-    -- 4. Use structure to propagate matchings?
-    -- 5. Compute the diff
 
   where sesDiffs = eitherCutoff 1 <$> SES.ses replaceIfEqual cost as bs
         replaceIfEqual :: HasField fields Category => Cofree f (Record fields) -> Cofree f (Record fields) -> Maybe (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields))))
@@ -165,8 +161,6 @@ rws compare as bs
           diffs
           ((termIndex &&& deleting . term) <$> unmappedA)
 
--- data SortedList a = Nil | Cons a (SortedList a) | Amb a a (SortedList a)
-
 insertDiff :: (These Int Int, a) -> [(These Int Int, a)] -> [(These Int Int, a)]
 insertDiff inserted [] = [ inserted ]
 insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
@@ -177,7 +171,7 @@ insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
   (That i, These _ j) -> if i <= j then a : b : rest else b : insertDiff a rest
 
   (This _, That _) -> b : insertDiff a rest
-  (That _, This _) -> b : insertDiff a rest -- Amb a b rest
+  (That _, This _) -> b : insertDiff a rest
 
   (These i1 i2, _) -> case break (isThese . fst) rest of
     (rest, tail) -> let (before, after) = foldr' (combine i1 i2) ([], []) (b : rest) in
@@ -189,6 +183,7 @@ insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
       This j1 -> if i1 <= j1 then (before, each : after) else (each : before, after)
       That j2 -> if i2 <= j2 then (before, each : after) else (each : before, after)
       These _ _ -> (before, after)
+
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
 editDistanceUpTo :: (P.Foldable f, Functor f) => Integer
