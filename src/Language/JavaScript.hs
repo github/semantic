@@ -89,7 +89,7 @@ categoryForJavaScriptProductionName name = case name of
   "arrow_function" -> Function
   "generator_function" -> Function
   "math_op" -> BinaryOperator -- bitwise operator, e.g. +, -, *, /.
-  "bool_op" -> BinaryOperator -- boolean operator, e.g. ||, &&.
+  "bool_op" -> BooleanOperator -- boolean operator, e.g. ||, &&.
   "comma_op" -> CommaOperator -- comma operator, e.g. expr1, expr2.
   "delete_op" -> Operator -- delete operator, e.g. delete x[2].
   "type_op" -> Operator -- type operator, e.g. typeof Object.

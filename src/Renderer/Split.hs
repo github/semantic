@@ -33,7 +33,7 @@ styleName :: Category -> Text
 styleName category = "category-" <> case category of
   Program -> "program"
   C.Error -> "error"
-  BinaryOperator -> "binary_operator"
+  BooleanOperator -> "boolean_operator"
   BitwiseOperator -> "bitwise_operator"
   RelationalOperator -> "relational_operator"
   Boolean -> "boolean"

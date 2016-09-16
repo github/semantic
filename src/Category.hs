@@ -16,8 +16,8 @@ data Category
   | Boolean
   -- | A bitwise operator.
   | BitwiseOperator
-  -- | An operator with 2 operands.
-  | BinaryOperator
+  -- | A boolean operator (e.g. ||, &&).
+  | BooleanOperator
   -- | A literal key-value data structure.
   | DictionaryLiteral
   -- | A pair, e.g. of a key & value
@@ -115,7 +115,7 @@ instance Arbitrary Category where
       pure Program
     , pure Error
     , pure Boolean
-    , pure BinaryOperator
+    , pure BooleanOperator
     , pure DictionaryLiteral
     , pure Pair
     , pure FunctionCall
