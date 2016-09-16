@@ -10,7 +10,6 @@ import Info (category, characterRange)
 import Range
 import Syntax as S
 import Category as C
-import Data.Functor.Foldable as Foldable
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Text as Text (intercalate)
