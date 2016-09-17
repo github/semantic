@@ -242,7 +242,7 @@ instance HasCategory Category where
     C.Case -> "case statement"
     C.SubscriptAccess -> "subscript access"
     C.MathAssignment -> "math assignment"
-    C.Ternary -> "ternary"
+    C.Ternary -> "ternary expression"
     C.Operator -> "operator"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
