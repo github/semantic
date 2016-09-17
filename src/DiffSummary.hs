@@ -221,7 +221,8 @@ instance HasCategory Text where
 instance HasCategory Category where
   toCategoryName = \case
     ArrayLiteral -> "array"
-    BinaryOperator -> "binary operator"
+    BooleanOperator -> "boolean operator"
+    MathOperator -> "math operator"
     BitwiseOperator -> "bitwise operator"
     RelationalOperator -> "relational operator"
     Boolean -> "boolean"
