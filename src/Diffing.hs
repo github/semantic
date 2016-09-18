@@ -2,6 +2,7 @@
 module Diffing where
 
 import Prologue hiding (fst, snd)
+import Category
 import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
 import Data.Functor.Foldable
@@ -17,6 +18,7 @@ import Diff
 import Info
 import Interpreter
 import Language
+import Language.Markdown
 import Parser
 import Patch
 import Range
@@ -25,7 +27,7 @@ import Renderer.JSON
 import Renderer.Patch
 import Renderer.Split
 import Renderer.Summary
-import Source hiding ((++))
+import Source
 import Syntax
 import System.Directory
 import System.FilePath
@@ -34,7 +36,6 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
-import Category
 import Data.Aeson (toJSON, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
 
@@ -69,6 +70,7 @@ parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
 parserForType mediaType = case languageForType mediaType of
   Just C -> treeSitterParser C ts_language_c
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
+  Just Markdown -> cmarkParser
   Just Ruby -> treeSitterParser Ruby ts_language_ruby
   _ -> lineByLineParser
 

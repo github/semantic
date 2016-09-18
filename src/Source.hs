@@ -7,6 +7,7 @@ import Data.String
 import qualified Data.Vector as Vector
 import Numeric
 import Range
+import SourceSpan
 
 -- | The source, oid, path, and Maybe SourceKind of a blob in a Git repo.
 data SourceBlob = SourceBlob { source :: Source Char, oid :: String, path :: FilePath, blobKind :: Maybe SourceKind }
@@ -77,24 +78,28 @@ uncons (Source vector) = if null vector then Nothing else Just (Vector.head vect
 break :: (a -> Bool) -> Source a -> (Source a, Source a)
 break predicate (Source vector) = let (start, remainder) = Vector.break predicate vector in (Source start, Source remainder)
 
--- | Concatenate two sources.
-(++) :: Source a -> Source a -> Source a
-(++) (Source a) = Source . (a Vector.++) . getVector
-
 -- | Split the contents of the source after newlines.
 actualLines :: Source Char -> [Source Char]
 actualLines source | null source = [ source ]
 actualLines source = case Source.break (== '\n') source of
   (l, lines') -> case uncons lines' of
     Nothing -> [ l ]
-    Just (_, lines') -> (l Source.++ fromList "\n") : actualLines lines'
+    Just (_, lines') -> (l <> fromList "\n") : actualLines lines'
 
 -- | Compute the line ranges within a given range of a string.
 actualLineRanges :: Range -> Source Char -> [Range]
 actualLineRanges range = drop 1 . scanl toRange (Range (start range) (start range)) . actualLines . slice range
   where toRange previous string = Range (end previous) $ end previous + length string
 
+-- | Compute the character range corresponding to a given SourceSpan within a Source.
+sourceSpanToRange :: Source Char -> SourceSpan -> Range
+sourceSpanToRange source SourceSpan{..} = Range start end
+  where start = sumLengths leadingRanges + column spanStart
+        end = start + sumLengths (take (line spanEnd - line spanStart) remainingRanges) + (column spanEnd - column spanStart)
+        (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (totalRange source) source)
+        sumLengths = sum . fmap (\ Range{..} -> end - start)
+
 
 instance Monoid (Source a) where
   mempty = fromList []
-  mappend = (Source.++)
+  mappend = (Source .) . (Vector.++) `on` getVector

@@ -1,7 +1,8 @@
 module RangeSpec where
 
-import Test.Hspec
+import Prologue
 import Range
+import Test.Hspec
 
 spec :: Spec
 spec = parallel $ do

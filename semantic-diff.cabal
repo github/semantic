@@ -32,6 +32,7 @@ library
                      , Language
                      , Language.C
                      , Language.JavaScript
+                     , Language.Markdown
                      , Parser
                      , Patch
                      , Patch.Arbitrary
@@ -58,6 +59,7 @@ library
                      , blaze-html
                      , blaze-markup
                      , bytestring
+                     , cmark
                      , containers
                      , directory
                      , dlist
@@ -113,6 +115,8 @@ test-suite semantic-diff-test
                      , DiffSummarySpec
                      , InterpreterSpec
                      , PatchOutputSpec
+                     , RangeSpec
+                     , Source.Spec
                      , TermSpec
   build-depends:       base
                      , bifunctors
