@@ -100,6 +100,9 @@ sourceSpanToRange source SourceSpan{..} = Range start end
         sumLengths = sum . fmap (\ Range{..} -> end - start)
 
 
+instance Semigroup (Source a) where
+  Source a <> Source b = Source (a Vector.++ b)
+
 instance Monoid (Source a) where
   mempty = fromList []
-  mappend = (Source .) . (Vector.++) `on` getVector
+  mappend = (<>)
