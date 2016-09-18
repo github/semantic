@@ -24,7 +24,7 @@ import Source
 
 data Identifiable a = Identifiable a | Unidentifiable a
 
-identifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
+identifiable :: SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
 identifiable term = isIdentifiable (unwrap term) $ term
   where isIdentifiable = \case
           S.FunctionCall{} -> Identifiable
@@ -161,14 +161,14 @@ toTermName source term = case unwrap term of
         termNameFromSource term = termNameFromRange (range term)
         termNameFromRange range = toText $ Source.slice range source
         range = characterRange . extract
-        toArgName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Text
+        toArgName :: SyntaxTerm leaf fields -> Text
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
                           Unidentifiable _ -> "…"
 
 maybeParentContext :: Maybe (Category, Text) -> Doc
 maybeParentContext = maybe "" (\annotation ->
-  space <> "in the" <+> (toDoc $ snd annotation) <+> toDoc (toCategoryName $ fst annotation))
+  space P.<> "in the" <+> (toDoc $ snd annotation) <+> toDoc (toCategoryName $ fst annotation))
 
 toDoc :: Text -> Doc
 toDoc = string . toS
@@ -270,18 +270,18 @@ instance HasCategory Category where
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
 
-instance (HasCategory leaf, HasField fields Category) => HasCategory (SyntaxTerm leaf fields) where
+instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
 
 instance Arbitrary Branch where
   arbitrary = oneof [ pure BIndexed, pure BFixed ]
   shrink = genericShrink
 
-instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
+instance Arbitrary a => Arbitrary (DiffSummary a) where
   arbitrary = DiffSummary <$> arbitrary <*> arbitrary
   shrink = genericShrink
 
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
-  pretty BranchInfo{..} = mconcat $ punctuate (string "," <> space) (pretty <$> branches)
+  pretty BranchInfo{..} = mconcat $ punctuate (string "," P.<> space) (pretty <$> branches)
   pretty ErrorInfo{..} = squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)

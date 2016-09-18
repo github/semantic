@@ -24,6 +24,10 @@ fst = Prologue.fst . runJoin
 snd :: Both a -> a
 snd = Prologue.snd . runJoin
 
-instance Monoid a => Monoid (Join (,) a) where
+instance (Semigroup a, Monoid a) => Monoid (Join (,) a) where
   mempty = pure mempty
-  mappend a b = mappend <$> a <*> b
+  mappend = (<>)
+
+
+instance (Semigroup a) => Semigroup (Join (,) a) where
+  a <> b = Join $ runJoin a <> runJoin b
