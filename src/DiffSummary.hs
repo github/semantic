@@ -84,8 +84,8 @@ summaries patch = eitherErrorOrDoc <$> patchToDoc patch
 patchToDoc :: Patch DiffInfo -> [Doc]
 patchToDoc = \case
   p@(Replace i1 i2) -> zipWith (\a b -> (prefixWithPatch p) a <+> connector i1 <+> b) (toLeafInfos i1) (toLeafInfos i2)
-  p@(Insert info) -> (prefixWithPatch p) <$> toLeafInfos info
-  p@(Delete info) -> (prefixWithPatch p) <$> toLeafInfos info
+  p@(Insert info) -> prefixWithPatch p <$> toLeafInfos info
+  p@(Delete info) -> prefixWithPatch p <$> toLeafInfos info
   where
     connector (LeafInfo "number" _) = "with"
     connector _ = "with the"
@@ -105,7 +105,7 @@ prefixWithPatch patch = prefixWithThe (patchToPrefix patch)
 
 toLeafInfos :: DiffInfo -> [Doc]
 toLeafInfos (LeafInfo "number" termName) = pure (squotes (toDoc termName))
-toLeafInfos LeafInfo{..} = pure (squotes (toDoc termName) <+> (toDoc categoryName))
+toLeafInfos LeafInfo{..} = pure (squotes (toDoc termName) <+> toDoc categoryName)
 toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure (pretty err)
 
