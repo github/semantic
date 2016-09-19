@@ -2,7 +2,8 @@ module RangeSpec where
 
 import Prologue
 import Range
-import Test.Hspec
+import Test.Hspec (Spec, describe, it, parallel)
+import Test.Hspec.Expectations.Pretty
 
 spec :: Spec
 spec = parallel $ do
