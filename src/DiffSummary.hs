@@ -24,22 +24,21 @@ import Source
 
 data Identifiable a = Identifiable a | Unidentifiable a
 
-isIdentifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Bool
-isIdentifiable term =
-  case unwrap term of
-    S.FunctionCall _ _ -> True
-    S.Function{} -> True
-    S.Assignment{} -> True
-    S.MathAssignment{} -> True
-    S.VarAssignment{} -> True
-    S.SubscriptAccess{} -> True
-    S.Class _ _ _ -> True
-    S.Method _ _ _ -> True
-    S.Leaf _ -> True
-    _ -> False
-
-identifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
-identifiable term = if isIdentifiable term then Identifiable term else Unidentifiable term
+identifiable :: SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
+identifiable term = isIdentifiable (unwrap term) $ term
+  where isIdentifiable = \case
+          S.FunctionCall{} -> Identifiable
+          S.MethodCall{} -> Identifiable
+          S.Function{} -> Identifiable
+          S.Assignment{} -> Identifiable
+          S.MathAssignment{} -> Identifiable
+          S.VarAssignment{} -> Identifiable
+          S.SubscriptAccess{} -> Identifiable
+          S.Class{} -> Identifiable
+          S.Method{} -> Identifiable
+          S.Leaf{} -> Identifiable
+          S.DoWhile{} -> Identifiable
+          _ -> Unidentifiable
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
@@ -141,8 +140,8 @@ toTermName source term = case unwrap term of
   S.Ternary expr _ -> toTermName' expr
   S.MathAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
-  S.Object kvs -> "{" <> intercalate ", " (toTermName' <$> kvs) <> "}"
-  S.Pair a b -> toTermName' a <> ": " <> toTermName' b
+  S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
+  S.Pair a _ -> toTermName' a <> ": …"
   S.Return expr -> maybe "empty" toTermName' expr
   S.Error _ _ -> termNameFromSource term
   S.If expr _ _ -> termNameFromSource expr
@@ -162,14 +161,14 @@ toTermName source term = case unwrap term of
         termNameFromSource term = termNameFromRange (range term)
         termNameFromRange range = toText $ Source.slice range source
         range = characterRange . extract
-        toArgName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Text
+        toArgName :: SyntaxTerm leaf fields -> Text
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
-                          Unidentifiable _ -> "..."
+                          Unidentifiable _ -> "…"
 
 maybeParentContext :: Maybe (Category, Text) -> Doc
 maybeParentContext = maybe "" (\annotation ->
-  space <> "in the" <+> (toDoc $ snd annotation) <+> toDoc (toCategoryName $ fst annotation))
+  space P.<> "in the" <+> (toDoc $ snd annotation) <+> toDoc (toCategoryName $ fst annotation))
 
 toDoc :: Text -> Doc
 toDoc = string . toS
@@ -222,7 +221,8 @@ instance HasCategory Text where
 instance HasCategory Category where
   toCategoryName = \case
     ArrayLiteral -> "array"
-    BinaryOperator -> "binary operator"
+    BooleanOperator -> "boolean operator"
+    MathOperator -> "math operator"
     BitwiseOperator -> "bitwise operator"
     RelationalOperator -> "relational operator"
     Boolean -> "boolean"
@@ -242,7 +242,7 @@ instance HasCategory Category where
     C.Case -> "case statement"
     C.SubscriptAccess -> "subscript access"
     C.MathAssignment -> "math assignment"
-    C.Ternary -> "ternary"
+    C.Ternary -> "ternary expression"
     C.Operator -> "operator"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
@@ -270,18 +270,18 @@ instance HasCategory Category where
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
 
-instance (HasCategory leaf, HasField fields Category) => HasCategory (SyntaxTerm leaf fields) where
+instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
 
 instance Arbitrary Branch where
   arbitrary = oneof [ pure BIndexed, pure BFixed ]
   shrink = genericShrink
 
-instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
+instance Arbitrary a => Arbitrary (DiffSummary a) where
   arbitrary = DiffSummary <$> arbitrary <*> arbitrary
   shrink = genericShrink
 
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
-  pretty BranchInfo{..} = mconcat $ punctuate (string "," <> space) (pretty <$> branches)
+  pretty BranchInfo{..} = mconcat $ punctuate (string "," P.<> space) (pretty <$> branches)
   pretty ErrorInfo{..} = squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)
