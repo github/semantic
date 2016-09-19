@@ -10,6 +10,7 @@ import qualified DiffSummarySpec
 import qualified InterpreterSpec
 import qualified PatchOutputSpec
 import qualified RangeSpec
+import qualified Source.Spec
 import qualified TermSpec
 import Test.Hspec
 
@@ -23,5 +24,6 @@ main = hspec . parallel $ do
   describe "DiffSummary" DiffSummarySpec.spec
   describe "Interpreter" InterpreterSpec.spec
   describe "PatchOutput" PatchOutputSpec.spec
-  describe "RangeSpec" RangeSpec.spec
+  describe "Range" RangeSpec.spec
+  describe "Source" Source.Spec.spec
   describe "Term" TermSpec.spec

@@ -1,8 +1,8 @@
 {-# LANGUAGE DataKinds, RankNTypes, TypeOperators #-}
 module Diffing where
 
-import qualified Prologue
 import Prologue hiding (fst, snd)
+import Category
 import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
 import Data.Functor.Foldable
@@ -18,6 +18,7 @@ import Diff
 import Info
 import Interpreter
 import Language
+import Language.Markdown
 import Parser
 import Patch
 import Range
@@ -26,7 +27,7 @@ import Renderer.JSON
 import Renderer.Patch
 import Renderer.Split
 import Renderer.Summary
-import Source hiding ((++))
+import Source
 import Syntax
 import System.Directory
 import System.FilePath
@@ -35,7 +36,6 @@ import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
-import Category
 import Data.Aeson (toJSON, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
 
@@ -43,7 +43,7 @@ import Data.Aeson.Encoding (encodingToLazyByteString)
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost, HasField fields Range, Eq (Record fields)) => Parser (Syntax Text) (Record fields) -> Renderer (Record (Vector.Vector Double ': fields)) -> Both SourceBlob -> IO Output
+diffFiles :: (HasField fields Category, HasField fields Cost) => Parser (Syntax Text) (Record fields) -> Renderer (Record (Vector.Vector Double ': fields)) -> Both SourceBlob -> IO Output
 diffFiles parser renderer sourceBlobs = do
   terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel) . parser) sourceBlobs
 
@@ -70,6 +70,7 @@ parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
 parserForType mediaType = case languageForType mediaType of
   Just C -> treeSitterParser C ts_language_c
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
+  Just Markdown -> cmarkParser
   Just Ruby -> treeSitterParser Ruby ts_language_ruby
   _ -> lineByLineParser
 
@@ -129,7 +130,7 @@ decorateTerm :: Functor f => TermDecorator f fields field -> Cofree f (Record fi
 decorateTerm decorator = cata $ \ c -> cofree ((decorator (extract <$> c) .: headF c) :< tailF c)
 
 -- | Term decorator computing the cost of an unpacked term.
-termCostDecorator :: (Prologue.Foldable f, Functor f) => TermDecorator f a Cost
+termCostDecorator :: (Foldable f, Functor f) => TermDecorator f a Cost
 termCostDecorator c = 1 + sum (cost <$> tailF c)
 
 -- | Determine whether two terms are comparable based on the equality of their categories.
@@ -143,7 +144,7 @@ diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Pure patch -> sum (cost . extract <$> patch)
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
+textDiff :: (HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
 textDiff parser arguments = diffFiles parser $ case format arguments of
   Split -> split
   Patch -> patch
@@ -159,7 +160,7 @@ truncatedDiff arguments sources = pure $ case format arguments of
   Summary -> SummaryOutput mempty
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
-printDiff :: (Eq (Record fields), HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
+printDiff :: (HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
   let renderedText = case rendered of

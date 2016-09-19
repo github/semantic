@@ -13,7 +13,7 @@ import Syntax
 -- | A function that will render a diff, given the two source blobs.
 type Renderer annotation = Both SourceBlob -> Diff (Syntax Text) annotation -> Output
 
-data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath, outputPath :: FilePath }
+data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath }
  deriving (Show)
 
 -- | The available types of diff rendering.
