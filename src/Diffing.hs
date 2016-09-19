@@ -8,7 +8,6 @@ import Data.Functor.Both
 import Data.Functor.Foldable
 import Data.RandomWalkSimilarity
 import Data.Record
-import qualified Data.Set as Set
 import qualified Data.Text.IO as TextIO
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
@@ -21,7 +20,6 @@ import Language
 import Language.Markdown
 import Parser
 import Patch
-import Range
 import Renderer
 import Renderer.JSON
 import Renderer.Patch
