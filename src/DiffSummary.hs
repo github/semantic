@@ -101,7 +101,6 @@ prefixWithPatch patch = prefixWithThe (patchToPrefix patch)
       (Delete _) -> "Deleted"
     connector = \case
       (Replace (LeafInfo "number" _) _) -> ""
-      -- (Delete (BranchInfo _ c _)) -> toDoc c
       _ -> "the"
 
 toLeafInfos :: DiffInfo -> [Doc]
@@ -118,9 +117,6 @@ toTermName source term = case unwrap term of
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
   S.Assignment identifier _ -> toTermName' identifier
-  -- S.Assignment identifier value -> case (unwrap identifier, unwrap value) of
-  --   (S.MemberAccess{}, S.AnonymousFunction{..}) -> toTermName' identifier
-  --   (_, _) -> toTermName' identifier <> toTermName' value
   S.Function identifier _ _ -> toTermName' identifier
   S.FunctionCall i args -> toTermName' i <> "(" <> (intercalate ", " (toArgName <$> args)) <> ")"
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
