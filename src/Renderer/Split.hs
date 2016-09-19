@@ -10,7 +10,7 @@ import Data.Record
 import qualified Data.Text.Lazy as TL
 import Data.These
 import Info
-import Prologue hiding (div, head, fst, snd, link)
+import Prologue hiding (div, head, fst, snd, link, (<>))
 import qualified Prologue
 import Renderer
 import Source
@@ -33,7 +33,8 @@ styleName :: Category -> Text
 styleName category = "category-" <> case category of
   Program -> "program"
   C.Error -> "error"
-  BinaryOperator -> "binary_operator"
+  BooleanOperator -> "boolean_operator"
+  MathOperator -> "math_operator"
   BitwiseOperator -> "bitwise_operator"
   RelationalOperator -> "relational_operator"
   Boolean -> "boolean"
@@ -115,9 +116,9 @@ split blobs diff = SplitOutput . TL.toStrict . renderHtml
     numberedLinesToMarkup numberedLines = tr $ runBothWith (<>) (renderLine <$> Join (fromThese Nothing Nothing (runJoin (Just <$> numberedLines))) <*> sources) <> string "\n"
 
     renderLine (Just (number, line)) source = toMarkup $ Cell (hasChanges line) number (Renderable source line)
-    renderLine _ _ =
-      td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell")
-      <> td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell")
+    renderLine _ _
+      =  (td mempty ! A.class_ (stringValue "blob-num blob-num-empty empty-cell"))
+      <> (td mempty ! A.class_ (stringValue "blob-code blob-code-empty empty-cell"))
       <> string "\n"
 
 -- | A cell in a table, characterized by whether it contains changes & its line number.
@@ -143,12 +144,12 @@ wrapIn f p = f p
 
 -- Instances
 
-instance (ToMarkup f, HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (SyntaxTermF leaf fields (f, Range))) where
+instance (ToMarkup f, HasField fields Category, HasField fields Range) => ToMarkup (Renderable (SyntaxTermF leaf fields (f, Range))) where
   toMarkup (Renderable source (info :< syntax)) = classifyMarkup (category info) $ case syntax of
     Leaf _ -> span . string . toString $ slice (characterRange info) source
     _ -> ul . mconcat $ wrapIn li <$> contentElements source (characterRange info) (toList syntax)
 
-instance (HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (SyntaxTerm leaf fields)) where
+instance (HasField fields Category, HasField fields Range) => ToMarkup (Renderable (SyntaxTerm leaf fields)) where
   toMarkup (Renderable source term) = Prologue.fst $ cata (\ t -> (toMarkup $ Renderable source t, characterRange (headF t))) term
 
 instance (HasField fields Category, HasField fields Cost, HasField fields Range) => ToMarkup (Renderable (SplitSyntaxDiff leaf fields)) where
@@ -160,7 +161,10 @@ instance (HasField fields Category, HasField fields Cost, HasField fields Range)
                                        | otherwise = identity
 
 instance ToMarkup a => ToMarkup (Cell a) where
-  toMarkup (Cell hasChanges num line) =
-    td (string $ show num) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num")
-    <> td (toMarkup line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code")
+  toMarkup (Cell hasChanges num line)
+    =  (td (string (show num)) ! A.class_ (stringValue $ if hasChanges then "blob-num blob-num-replacement" else "blob-num"))
+    <> (td (toMarkup line) ! A.class_ (stringValue $ if hasChanges then "blob-code blob-code-replacement" else "blob-code"))
     <> string "\n"
+
+(<>) :: Monoid m => m -> m -> m
+(<>) = mappend

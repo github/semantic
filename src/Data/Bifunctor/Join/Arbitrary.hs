@@ -4,7 +4,6 @@ module Data.Bifunctor.Join.Arbitrary where
 import Data.Bifunctor.Join
 import Data.Functor.Both as Both
 import Data.These
-import Data.These.Arbitrary ()
 import Prologue
 import Test.QuickCheck
 

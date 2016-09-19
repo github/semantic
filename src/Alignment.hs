@@ -38,7 +38,7 @@ numberedRows = countUp (both 1 1)
         nextLineNumbers from row = modifyJoin (fromThese identity identity) (succ <$ row) <*> from
 
 -- | Determine whether a line contains any patches.
-hasChanges :: (Prologue.Foldable f, Functor f) => SplitDiff f annotation -> Bool
+hasChanges :: (Foldable f, Functor f) => SplitDiff f annotation -> Bool
 hasChanges = or . (True <$)
 
 -- | Align a Diff into a list of Join These SplitDiffs representing the (possibly blank) lines on either side.
