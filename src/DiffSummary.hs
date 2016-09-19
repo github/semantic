@@ -83,21 +83,29 @@ summaries patch = eitherErrorOrDoc <$> patchToDoc patch
 -- or `ErrorInfo` it contains.
 patchToDoc :: Patch DiffInfo -> [Doc]
 patchToDoc = \case
-  p@(Replace i1 i2) -> zipWith (\a b -> (prefixWithPatch p) a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
+  p@(Replace i1 i2) -> zipWith (\a b -> (prefixWithPatch p) a <+> connector i1 <+> b) (toLeafInfos i1) (toLeafInfos i2)
   p@(Insert info) -> (prefixWithPatch p) <$> toLeafInfos info
   p@(Delete info) -> (prefixWithPatch p) <$> toLeafInfos info
+  where
+    connector (LeafInfo "number" _) = "with"
+    connector _ = "with the"
 
 -- Prefixes a given doc with the type of patch it represents.
 prefixWithPatch :: Patch DiffInfo -> Doc -> Doc
 prefixWithPatch patch = prefixWithThe (patchToPrefix patch)
   where
-    prefixWithThe prefix doc = prefix <+> "the" <+> doc
+    prefixWithThe prefix doc = prefix <+> connector patch <+> doc
     patchToPrefix = \case
       (Replace _ _) -> "Replaced"
       (Insert _) -> "Added"
       (Delete _) -> "Deleted"
+    connector = \case
+      (Replace (LeafInfo "number" _) _) -> ""
+      -- (Delete (BranchInfo _ c _)) -> toDoc c
+      _ -> "the"
 
 toLeafInfos :: DiffInfo -> [Doc]
+toLeafInfos (LeafInfo "number" termName) = pure (squotes (toDoc termName))
 toLeafInfos LeafInfo{..} = pure (squotes (toDoc termName) <+> (toDoc categoryName))
 toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure (pretty err)
@@ -109,9 +117,10 @@ toTermName source term = case unwrap term of
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
-  S.Assignment identifier value -> case (unwrap identifier, unwrap value) of
-    (S.MemberAccess{}, S.AnonymousFunction{..}) -> toTermName' identifier
-    (_, _) -> toTermName' identifier <> toTermName' value
+  S.Assignment identifier _ -> toTermName' identifier
+  -- S.Assignment identifier value -> case (unwrap identifier, unwrap value) of
+  --   (S.MemberAccess{}, S.AnonymousFunction{..}) -> toTermName' identifier
+  --   (_, _) -> toTermName' identifier <> toTermName' value
   S.Function identifier _ _ -> toTermName' identifier
   S.FunctionCall i args -> toTermName' i <> "(" <> (intercalate ", " (toArgName <$> args)) <> ")"
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
