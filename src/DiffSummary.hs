@@ -105,7 +105,8 @@ toLeafInfos err@ErrorInfo{} = pure (pretty err)
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
-  S.AnonymousFunction _ _ -> "anonymous"
+  S.AnonymousFunction (Just ps) _ -> "anonymous (" <> termNameFromSource ps <> ")"
+  S.AnonymousFunction Nothing _ -> "anonymous"
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
@@ -176,7 +177,6 @@ toDoc = string . toS
 termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
   Leaf _ -> LeafInfo (toCategoryName term) (toTermName' term)
-  S.AnonymousFunction _ _ -> LeafInfo (toCategoryName term) ("anonymous")
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
   S.Ternary ternaryCondition _ -> LeafInfo (toCategoryName term) (toTermName' ternaryCondition)
