@@ -176,8 +176,12 @@ toTermName source term = case unwrap term of
                           Unidentifiable _ -> "…"
 
 maybeParentContext :: Maybe (Category, Text) -> Doc
-maybeParentContext = maybe "" (\annotation ->
-  space P.<> "in the" <+> (toDoc $ snd annotation) <+> toDoc (toCategoryName $ fst annotation))
+maybeParentContext = maybe "" go
+  where go (c, t) = case c of
+          C.Assignment -> space P.<> "in an" <+> catName <+> "to" <+> termName
+          _ -> space P.<> "in the" <+> termName <+> catName
+          where catName = toDoc $ toCategoryName c
+                termName = toDoc t
 
 toDoc :: Text -> Doc
 toDoc = string . toS
