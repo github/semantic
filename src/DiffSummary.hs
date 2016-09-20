@@ -83,7 +83,7 @@ summaries patch = eitherErrorOrDoc <$> patchToDoc patch
 -- or `ErrorInfo` it contains.
 patchToDoc :: Patch DiffInfo -> [Doc]
 patchToDoc = \case
-  p@(Replace i1 i2) -> zipWith (\a b -> prefixWithPatch p a <+> determiner "with" i1 <+> b) (toLeafInfos i1) (toLeafInfos i2)
+  p@(Replace i1 i2) -> zipWith (\a b -> prefixWithPatch p a <+> "with" <+> determiner i1 <+> b) (toLeafInfos i1) (toLeafInfos i2)
   p@(Insert info) -> prefixWithPatch p <$> toLeafInfos info
   p@(Delete info) -> prefixWithPatch p <$> toLeafInfos info
 
@@ -97,18 +97,15 @@ prefixWithPatch patch = prefixWithThe (patchToPrefix patch)
       (Insert _) -> "Added"
       (Delete _) -> "Deleted"
     connector = \case
-      (Replace leaf _) -> determiner' leaf
-      (Insert leaf) -> determiner' leaf
-      (Delete leaf) -> determiner' leaf
+      (Replace leaf _) -> determiner leaf
+      (Insert leaf) -> determiner leaf
+      (Delete leaf) -> determiner leaf
 
 -- Optional determiner (e.g. "the") to tie together summary statements.
-determiner :: Doc -> DiffInfo -> Doc
-determiner prefix (LeafInfo "number" _) = prefix <+> ""
-determiner prefix (BranchInfo bs _ _) = determiner prefix (last bs)
-determiner prefix _ = prefix <+> "the"
-
-determiner' :: DiffInfo -> Doc
-determiner' = determiner ""
+determiner :: DiffInfo -> Doc
+determiner (LeafInfo "number" _) = ""
+determiner (BranchInfo bs _ _) = determiner (last bs)
+determiner _ = "the"
 
 toLeafInfos :: DiffInfo -> [Doc]
 toLeafInfos (LeafInfo "number" termName) = pure (squotes (toDoc termName))
