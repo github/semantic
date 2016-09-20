@@ -8,7 +8,6 @@ import Data.Functor.Both
 import Data.Functor.Foldable
 import Data.RandomWalkSimilarity
 import Data.Record
-import qualified Data.Set as Set
 import qualified Data.Text.IO as TextIO
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
@@ -21,7 +20,6 @@ import Language
 import Language.Markdown
 import Parser
 import Patch
-import Range
 import Renderer
 import Renderer.JSON
 import Renderer.Patch
@@ -89,25 +87,7 @@ lineByLineParser blob = pure . cofree . root $ case foldl' annotateLeaves ([], 0
 
 -- | Return the parser that should be used for a given path.
 parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category])
-parserForFilepath path blob = decorateTerm termCostDecorator <$> do
-   parsed <- parserForType (toS (takeExtension path)) blob
-   pure $! breakDownLeavesByWord (source blob) parsed
-
--- | Replace every string leaf with leaves of the words in the string.
-breakDownLeavesByWord :: (HasField fields Category, HasField fields Range) => Source Char -> Term (Syntax Text) (Record fields) -> Term (Syntax Text) (Record fields)
-breakDownLeavesByWord source = cata replaceIn
-  where
-    replaceIn (info :< syntax) = cofree $ info :< syntax'
-      where syntax' = case (ranges, syntax) of
-              (_:_:_, Leaf _) | Set.notMember (category info) preserveSyntax -> Indexed (makeLeaf info <$> ranges)
-              _ -> syntax
-            ranges = rangesAndWordsInSource (characterRange info)
-    rangesAndWordsInSource range = rangesAndWordsFrom (start range) (toString $ slice range source)
-    makeLeaf info (range, substring) = cofree $ setCharacterRange info range :< Leaf (toS substring)
-    -- Some Category constructors should retain their original structure, and not be sliced
-    -- into words. This Set represents those Category constructors for which we want to
-    -- preserve the original Syntax.
-    preserveSyntax = Set.fromList [Regex, Category.Comment, Category.TemplateString, Category.NumberLiteral]
+parserForFilepath path blob = decorateTerm termCostDecorator <$> parserForType (toS (takeExtension path)) blob
 
 -- | Transcode a file to a unicode source.
 transcode :: B1.ByteString -> IO (Source Char)
