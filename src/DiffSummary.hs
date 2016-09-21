@@ -60,7 +60,7 @@ diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> bl
 -- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
 -- in that 'DiffSummary'.
 summaryToTexts :: DiffSummary DiffInfo -> [Either Text Text]
-summaryToTexts DiffSummary{..} = runJoin . fmap (show . (P.<> maybeParentContext parentAnnotation)) <$> (Join <$> summaries patch)
+summaryToTexts DiffSummary{..} = runJoin . fmap (show . (<+> maybeParentContext parentAnnotation)) <$> (Join <$> summaries patch)
 
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
 diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
@@ -176,8 +176,8 @@ toTermName source term = case unwrap term of
 maybeParentContext :: Maybe (Category, Text) -> Doc
 maybeParentContext = maybe "" go
   where go (c, t) = case c of
-          C.Assignment -> space P.<> "in an" <+> catName <+> "to" <+> termName
-          _ -> space P.<> "in the" <+> termName <+> catName
+          C.Assignment -> "in an" <+> catName <+> "to" <+> termName
+          _ -> "in the" <+> termName <+> catName
           where catName = toDoc $ toCategoryName c
                 termName = toDoc t
 
