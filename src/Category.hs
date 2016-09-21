@@ -104,6 +104,8 @@ data Category
   | RelationalOperator
   -- | An empty statement. (e.g. ; in JavaScript)
   | Empty
+  -- | A number literal.
+  | NumberLiteral
   -- | A mathematical operator (e.g. +, -, *, /).
   | MathOperator
   deriving (Eq, Generic, Ord, Show)
@@ -130,6 +132,7 @@ instance Arbitrary Category where
     , pure Args
     , pure StringLiteral
     , pure IntegerLiteral
+    , pure NumberLiteral
     , pure Regex
     , pure Return
     , pure SymbolLiteral

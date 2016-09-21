@@ -17,6 +17,7 @@ import Data.Text as Text (intercalate)
 import Test.QuickCheck hiding (Fixed)
 import Patch.Arbitrary()
 import Data.Record
+import Data.These
 import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty)
 import qualified Text.PrettyPrint.Leijen.Text as P
 import SourceSpan
@@ -59,7 +60,7 @@ diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> bl
 -- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
 -- in that 'DiffSummary'.
 summaryToTexts :: DiffSummary DiffInfo -> [Either Text Text]
-summaryToTexts DiffSummary{..} = runJoin . fmap (show . (P.<> maybeParentContext parentAnnotation)) <$> (Join <$> summaries patch)
+summaryToTexts DiffSummary{..} = runJoin . fmap (show . (<+> maybeParentContext parentAnnotation)) <$> (Join <$> summaries patch)
 
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
 diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
@@ -83,22 +84,30 @@ summaries patch = eitherErrorOrDoc <$> patchToDoc patch
 -- or `ErrorInfo` it contains.
 patchToDoc :: Patch DiffInfo -> [Doc]
 patchToDoc = \case
-  p@(Replace i1 i2) -> zipWith (\a b -> (prefixWithPatch p) a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
-  p@(Insert info) -> (prefixWithPatch p) <$> toLeafInfos info
-  p@(Delete info) -> (prefixWithPatch p) <$> toLeafInfos info
+  p@(Replace i1 i2) -> zipWith (\a b -> prefixWithPatch p a <+> "with" <+> determiner i1 <+> b) (toLeafInfos i1) (toLeafInfos i2)
+  p@(Insert info) -> prefixWithPatch p <$> toLeafInfos info
+  p@(Delete info) -> prefixWithPatch p <$> toLeafInfos info
 
 -- Prefixes a given doc with the type of patch it represents.
 prefixWithPatch :: Patch DiffInfo -> Doc -> Doc
 prefixWithPatch patch = prefixWithThe (patchToPrefix patch)
   where
-    prefixWithThe prefix doc = prefix <+> "the" <+> doc
+    prefixWithThe prefix doc = prefix <+> determiner' patch <+> doc
     patchToPrefix = \case
       (Replace _ _) -> "Replaced"
       (Insert _) -> "Added"
       (Delete _) -> "Deleted"
+    determiner' = determiner . these identity identity const . unPatch
+
+-- Optional determiner (e.g. "the") to tie together summary statements.
+determiner :: DiffInfo -> Doc
+determiner (LeafInfo "number" _) = ""
+determiner (BranchInfo bs _ _) = determiner (last bs)
+determiner _ = "the"
 
 toLeafInfos :: DiffInfo -> [Doc]
-toLeafInfos LeafInfo{..} = pure (squotes (toDoc termName) <+> (toDoc categoryName))
+toLeafInfos (LeafInfo "number" termName) = pure (squotes (toDoc termName))
+toLeafInfos LeafInfo{..} = pure (squotes (toDoc termName) <+> toDoc categoryName)
 toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure (pretty err)
 
@@ -109,9 +118,7 @@ toTermName source term = case unwrap term of
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
-  S.Assignment identifier value -> case (unwrap identifier, unwrap value) of
-    (S.MemberAccess{}, S.AnonymousFunction{..}) -> toTermName' identifier
-    (_, _) -> toTermName' identifier <> toTermName' value
+  S.Assignment identifier _ -> toTermName' identifier
   S.Function identifier _ _ -> toTermName' identifier
   S.FunctionCall i args -> toTermName' i <> "(" <> (intercalate ", " (toArgName <$> args)) <> ")"
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
@@ -167,8 +174,12 @@ toTermName source term = case unwrap term of
                           Unidentifiable _ -> "…"
 
 maybeParentContext :: Maybe (Category, Text) -> Doc
-maybeParentContext = maybe "" (\annotation ->
-  space P.<> "in the" <+> (toDoc $ snd annotation) <+> toDoc (toCategoryName $ fst annotation))
+maybeParentContext = maybe "" go
+  where go (c, t) = case c of
+          C.Assignment -> "in an" <+> catName <+> "to" <+> termName
+          _ -> "in the" <+> termName <+> catName
+          where catName = toDoc $ toCategoryName c
+                termName = toDoc t
 
 toDoc :: Text -> Doc
 toDoc = string . toS
@@ -246,6 +257,7 @@ instance HasCategory Category where
     C.Operator -> "operator"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
+    NumberLiteral -> "number"
     Other s -> s
     C.Pair -> "pair"
     Params -> "params"
