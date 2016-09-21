@@ -17,6 +17,7 @@ import Data.Text as Text (intercalate)
 import Test.QuickCheck hiding (Fixed)
 import Patch.Arbitrary()
 import Data.Record
+import Data.These
 import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty)
 import qualified Text.PrettyPrint.Leijen.Text as P
 import SourceSpan
@@ -91,15 +92,12 @@ patchToDoc = \case
 prefixWithPatch :: Patch DiffInfo -> Doc -> Doc
 prefixWithPatch patch = prefixWithThe (patchToPrefix patch)
   where
-    prefixWithThe prefix doc = prefix <+> connector patch <+> doc
+    prefixWithThe prefix doc = prefix <+> determiner' patch <+> doc
     patchToPrefix = \case
       (Replace _ _) -> "Replaced"
       (Insert _) -> "Added"
       (Delete _) -> "Deleted"
-    connector = \case
-      (Replace leaf _) -> determiner leaf
-      (Insert leaf) -> determiner leaf
-      (Delete leaf) -> determiner leaf
+    determiner' = determiner . these identity identity const . unPatch
 
 -- Optional determiner (e.g. "the") to tie together summary statements.
 determiner :: DiffInfo -> Doc
