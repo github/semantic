@@ -11,6 +11,7 @@ data Arguments = Arguments {
   maybeShas :: Both (Maybe P.String),
   maybeTimeout :: Maybe Float,
   output :: Maybe FilePath,
+  noIndex :: Bool,
   filepaths :: [FilePath] }
   deriving (Show)
 
@@ -20,4 +21,5 @@ args sha1 sha2 filePaths format = Arguments { format = format
                                             , filepaths = filePaths
                                             , maybeTimeout = Just 10.0
                                             , output = Nothing
+                                            , noIndex = False
                                             }
