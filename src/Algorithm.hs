@@ -24,7 +24,7 @@ type Algorithm term diff = Ap (AlgorithmF term diff)
 iterAp :: Functor g => (g a -> a) -> Ap g a -> a
 iterAp algebra = go
   where go (Pure a) = a
-        go (Ap u q) = algebra (go . (<$> q) . flip ($) <$> u)
+        go (Ap wrapped apply) = algebra (go . (<$> apply) . flip ($) <$> wrapped)
 
 
 -- DSL
