@@ -45,22 +45,27 @@ diffComparableTerms construct comparable cost = recur
 algorithmWithTerms :: (TermF (Syntax leaf) (Both a) diff -> diff) -> Term (Syntax leaf) a -> Term (Syntax leaf) a -> Algorithm (Term (Syntax leaf) a) diff diff
 algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
   (Indexed a, Indexed b) -> annotate . Indexed <$> bySimilarity a b
-  (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) -> (annotate .) .
+  (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) ->
+    (annotate .) .
     S.FunctionCall <$> recursively identifierA identifierB
                    <*> bySimilarity argsA argsB
-  (S.Switch exprA casesA, S.Switch exprB casesB) -> (annotate .) .
+  (S.Switch exprA casesA, S.Switch exprB casesB) ->
+    (annotate .) .
     S.Switch <$> recursively exprA exprB
              <*> bySimilarity casesA casesB
   (S.Object a, S.Object b) -> annotate . S.Object <$> bySimilarity a b
-  (Commented commentsA a, Commented commentsB b) -> (annotate .) .
+  (Commented commentsA a, Commented commentsB b) ->
+    (annotate .) .
     Commented <$> bySimilarity commentsA commentsB
               <*> sequenceA (recursively <$> a <*> b)
   (Array a, Array b) -> annotate . Array <$> bySimilarity a b
-  (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) -> ((annotate .) .) .
+  (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) ->
+    ((annotate .) .) .
     S.Class <$> recursively identifierA identifierB
             <*> sequenceA (recursively <$> paramsA <*> paramsB)
             <*> bySimilarity expressionsA expressionsB
-  (S.Method identifierA paramsA expressionsA, S.Method identifierB paramsB expressionsB) -> ((annotate .) .) .
+  (S.Method identifierA paramsA expressionsA, S.Method identifierB paramsB expressionsB) ->
+    ((annotate .) .) .
     S.Method <$> recursively identifierA identifierB
              <*> bySimilarity paramsA paramsB
              <*> bySimilarity expressionsA expressionsB
