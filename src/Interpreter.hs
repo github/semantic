@@ -74,7 +74,7 @@ runAlgorithm :: (GAlign f, Traversable f, HasField fields (Vector.Vector Double)
   -> SES.Cost (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to compute the cost of a given diff node.
   -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
   -> a
-runAlgorithm construct recur cost = Algorithm.iter $ \case
+runAlgorithm construct recur cost = iterAp $ \case
   Recursive a b f -> f (maybe (replacing a b) (construct . (both (extract a) (extract b) :<)) $ do
     aligned <- galign (unwrap a) (unwrap b)
     traverse (these (Just . deleting) (Just . inserting) recur) aligned)

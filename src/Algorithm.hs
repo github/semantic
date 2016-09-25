@@ -20,8 +20,8 @@ data AlgorithmF term diff f
 -- | The free applicative for 'AlgorithmF'. This enables us to construct diff values using <$> and <*> notation.
 type Algorithm term diff = Ap (AlgorithmF term diff)
 
-iter :: Functor g => (g a -> a) -> Ap g a -> a
-iter algebra = go
+iterAp :: Functor g => (g a -> a) -> Ap g a -> a
+iterAp algebra = go
   where go (Pure a) = a
         go (Ap u q) = algebra (fmap (go . (`fmap` q) . flip ($)) u)
 
