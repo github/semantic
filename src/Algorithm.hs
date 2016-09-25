@@ -17,7 +17,7 @@ data AlgorithmF term diff f
   | BySimilarity [term] [term] ([diff] -> f)
   deriving Functor
 
--- | The free monad for 'AlgorithmF'. This enables us to construct diff values using do-notation. We use the Church-encoded free monad 'F' for efficiency.
+-- | The free applicative for 'AlgorithmF'. This enables us to construct diff values using <$> and <*> notation.
 type Algorithm term diff = Ap (AlgorithmF term diff)
 
 iter :: Functor g => (g a -> a) -> Ap g a -> a
