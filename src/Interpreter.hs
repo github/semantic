@@ -10,7 +10,6 @@ import Data.Record
 import Data.These
 import qualified Data.Vector as Vector
 import Diff
-import qualified Control.Monad.Free.Church as F
 import Info
 import Patch
 import Prologue hiding (lookup)
@@ -45,30 +44,28 @@ diffComparableTerms construct comparable cost = recur
 -- | Construct an algorithm to diff a pair of terms.
 algorithmWithTerms :: (TermF (Syntax leaf) (Both a) diff -> diff) -> Term (Syntax leaf) a -> Term (Syntax leaf) a -> Algorithm (Term (Syntax leaf) a) diff diff
 algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
-  (Indexed a, Indexed b) -> branch Indexed a b
-  (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) -> do
-    identifier <- recursively identifierA identifierB
-    branch (S.FunctionCall identifier) argsA argsB
-  (S.Switch exprA casesA, S.Switch exprB casesB) -> do
-    expr <- recursively exprA exprB
-    branch (S.Switch expr) casesA casesB
-  (S.Object a, S.Object b) -> branch S.Object a b
-  (Commented commentsA a, Commented commentsB b) -> do
-    wrapped <- sequenceA (recursively <$> a <*> b)
-    branch (`Commented` wrapped) commentsA commentsB
-  (Array a, Array b) -> branch Array a b
-  (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) -> do
-    identifier <- recursively identifierA identifierB
-    params <- sequenceA (recursively <$> paramsA <*> paramsB)
-    branch (S.Class identifier params) expressionsA expressionsB
-  (S.Method identifierA paramsA expressionsA, S.Method identifierB paramsB expressionsB) -> do
-    identifier <- recursively identifierA identifierB
-    params <- bySimilarity paramsA paramsB
-    expressions <- bySimilarity expressionsA expressionsB
-    annotate $! S.Method identifier params expressions
+  (Indexed a, Indexed b) -> annotate . Indexed <$> bySimilarity a b
+  (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) -> (annotate .) .
+    S.FunctionCall <$> recursively identifierA identifierB
+                   <*> bySimilarity argsA argsB
+  (S.Switch exprA casesA, S.Switch exprB casesB) -> (annotate .) .
+    S.Switch <$> recursively exprA exprB
+             <*> bySimilarity casesA casesB
+  (S.Object a, S.Object b) -> annotate . S.Object <$> bySimilarity a b
+  (Commented commentsA a, Commented commentsB b) -> (annotate .) .
+    Commented <$> bySimilarity commentsA commentsB
+              <*> sequenceA (recursively <$> a <*> b)
+  (Array a, Array b) -> annotate . Array <$> bySimilarity a b
+  (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) -> ((annotate .) .) .
+    S.Class <$> recursively identifierA identifierB
+            <*> sequenceA (recursively <$> paramsA <*> paramsB)
+            <*> bySimilarity expressionsA expressionsB
+  (S.Method identifierA paramsA expressionsA, S.Method identifierB paramsB expressionsB) -> ((annotate .) .) .
+    S.Method <$> recursively identifierA identifierB
+             <*> bySimilarity paramsA paramsB
+             <*> bySimilarity expressionsA expressionsB
   _ -> recursively t1 t2
-  where annotate = pure . construct . (both (extract t1) (extract t2) :<)
-        branch constructor a b = bySimilarity a b >>= annotate . constructor
+  where annotate = construct . (both (extract t1) (extract t2) :<)
 
 -- | Run an algorithm, given functions characterizing the evaluation.
 runAlgorithm :: (GAlign f, Traversable f, HasField fields (Vector.Vector Double))
@@ -77,7 +74,7 @@ runAlgorithm :: (GAlign f, Traversable f, HasField fields (Vector.Vector Double)
   -> SES.Cost (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) -- ^ A function to compute the cost of a given diff node.
   -> Algorithm (Cofree f (Record fields)) (Free (CofreeF f (Both (Record fields))) (Patch (Cofree f (Record fields)))) a -- ^ The algorithm to run.
   -> a
-runAlgorithm construct recur cost = F.iter $ \case
+runAlgorithm construct recur cost = Algorithm.iter $ \case
   Recursive a b f -> f (maybe (replacing a b) (construct . (both (extract a) (extract b) :<)) $ do
     aligned <- galign (unwrap a) (unwrap b)
     traverse (these (Just . deleting) (Just . inserting) recur) aligned)

@@ -1,7 +1,7 @@
 module Algorithm where
 
-import Control.Monad.Free.Church
-import Prologue
+import Control.Applicative.Free
+import Prologue hiding (Pure)
 
 -- | A single step in a diffing algorithm.
 --
@@ -18,19 +18,24 @@ data AlgorithmF term diff f
   deriving Functor
 
 -- | The free monad for 'AlgorithmF'. This enables us to construct diff values using do-notation. We use the Church-encoded free monad 'F' for efficiency.
-type Algorithm term diff = F (AlgorithmF term diff)
+type Algorithm term diff = Ap (AlgorithmF term diff)
+
+iter :: Functor g => (g a -> a) -> Ap g a -> a
+iter algebra = go
+  where go (Pure a) = a
+        go (Ap u q) = algebra (fmap (go . (`fmap` q) . flip ($)) u)
 
 
 -- DSL
 
 -- | Constructs a 'Recursive' diff of two terms.
 recursively :: term -> term -> Algorithm term diff diff
-recursively a b = wrap (Recursive a b pure)
+recursively a b = liftAp (Recursive a b identity)
 
 -- | Constructs a 'ByIndex' diff of two lists of terms.
 byIndex :: [term] -> [term] -> Algorithm term diff [diff]
-byIndex a b = wrap (ByIndex a b pure)
+byIndex a b = liftAp (ByIndex a b identity)
 
 -- | Constructs a 'BySimilarity' diff of two lists of terms.
 bySimilarity :: [term] -> [term] -> Algorithm term diff [diff]
-bySimilarity a b = wrap (BySimilarity a b pure)
+bySimilarity a b = liftAp (BySimilarity a b identity)
