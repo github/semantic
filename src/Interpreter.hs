@@ -43,33 +43,28 @@ diffComparableTerms construct comparable cost = recur
 
 -- | Construct an algorithm to diff a pair of terms.
 algorithmWithTerms :: (TermF (Syntax leaf) (Both a) diff -> diff) -> Term (Syntax leaf) a -> Term (Syntax leaf) a -> Algorithm (Term (Syntax leaf) a) diff diff
-algorithmWithTerms construct t1 t2 = case (unwrap t1, unwrap t2) of
-  (Indexed a, Indexed b) -> annotate . Indexed <$> bySimilarity a b
-  (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) ->
-    (annotate .) .
+algorithmWithTerms construct t1 t2 = maybe (recursively t1 t2) (fmap annotate) $ case (unwrap t1, unwrap t2) of
+  (Indexed a, Indexed b) -> Just $ Indexed <$> bySimilarity a b
+  (S.FunctionCall identifierA argsA, S.FunctionCall identifierB argsB) -> Just $
     S.FunctionCall <$> recursively identifierA identifierB
                    <*> bySimilarity argsA argsB
-  (S.Switch exprA casesA, S.Switch exprB casesB) ->
-    (annotate .) .
+  (S.Switch exprA casesA, S.Switch exprB casesB) -> Just $
     S.Switch <$> recursively exprA exprB
              <*> bySimilarity casesA casesB
-  (S.Object a, S.Object b) -> annotate . S.Object <$> bySimilarity a b
-  (Commented commentsA a, Commented commentsB b) ->
-    (annotate .) .
+  (S.Object a, S.Object b) -> Just $ S.Object <$> bySimilarity a b
+  (Commented commentsA a, Commented commentsB b) -> Just $
     Commented <$> bySimilarity commentsA commentsB
               <*> sequenceA (recursively <$> a <*> b)
-  (Array a, Array b) -> annotate . Array <$> bySimilarity a b
-  (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) ->
-    ((annotate .) .) .
+  (Array a, Array b) -> Just $ Array <$> bySimilarity a b
+  (S.Class identifierA paramsA expressionsA, S.Class identifierB paramsB expressionsB) -> Just $
     S.Class <$> recursively identifierA identifierB
             <*> sequenceA (recursively <$> paramsA <*> paramsB)
             <*> bySimilarity expressionsA expressionsB
-  (S.Method identifierA paramsA expressionsA, S.Method identifierB paramsB expressionsB) ->
-    ((annotate .) .) .
+  (S.Method identifierA paramsA expressionsA, S.Method identifierB paramsB expressionsB) -> Just $
     S.Method <$> recursively identifierA identifierB
              <*> bySimilarity paramsA paramsB
              <*> bySimilarity expressionsA expressionsB
-  _ -> recursively t1 t2
+  _ -> Nothing
   where annotate = construct . (both (extract t1) (extract t2) :<)
 
 -- | Run an algorithm, given functions characterizing the evaluation.
