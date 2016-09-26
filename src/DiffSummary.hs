@@ -102,11 +102,13 @@ prefixWithPatch patch = prefixWithThe (patchToPrefix patch)
 -- Optional determiner (e.g. "the") to tie together summary statements.
 determiner :: DiffInfo -> Doc
 determiner (LeafInfo "number" _) = ""
+determiner (LeafInfo "boolean" _) = ""
 determiner (BranchInfo bs _ _) = determiner (last bs)
 determiner _ = "the"
 
 toLeafInfos :: DiffInfo -> [Doc]
 toLeafInfos (LeafInfo "number" termName) = pure (squotes (toDoc termName))
+toLeafInfos (LeafInfo "boolean" termName) = pure (squotes (toDoc termName))
 toLeafInfos LeafInfo{..} = pure (squotes (toDoc termName) <+> toDoc categoryName)
 toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure (pretty err)
