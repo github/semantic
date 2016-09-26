@@ -11,13 +11,13 @@ data Arguments = Arguments {
   maybeShas :: Both (Maybe P.String),
   maybeTimeout :: Maybe Float,
   output :: Maybe FilePath,
-  filepaths :: [FilePath] }
+  filePaths :: [FilePath] }
   deriving (Show)
 
 args :: String -> String -> [String] -> R.Format -> Arguments
-args sha1 sha2 filePaths format = Arguments { format = format
+args sha1 sha2 paths format = Arguments { format = format
                                             , maybeShas = Just <$> both sha1 sha2
-                                            , filepaths = filePaths
+                                            , filePaths = paths
                                             , maybeTimeout = Just 10.0
                                             , output = Nothing
                                             }
