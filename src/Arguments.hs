@@ -14,7 +14,7 @@ data Arguments = Arguments {
   filePaths :: [FilePath] }
   deriving (Show)
 
-args :: String -> String -> [String] -> R.Format -> Arguments
+args :: String -> String -> [FilePath] -> R.Format -> Arguments
 args sha1 sha2 paths format = Arguments { format = format
                                             , maybeShas = Just <$> both sha1 sha2
                                             , filePaths = paths
