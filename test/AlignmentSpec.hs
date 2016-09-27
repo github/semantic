@@ -9,7 +9,7 @@ import Data.Bifunctor.Join
 import Data.Bifunctor.Join.Arbitrary ()
 import Data.Functor.Both as Both
 import Data.List (nub)
-import Data.Monoid
+import Data.Monoid hiding ((<>))
 import Data.Record
 import Data.String
 import Data.Text.Arbitrary ()
@@ -22,7 +22,8 @@ import qualified Source
 import SplitDiff
 import Syntax
 import Term
-import Test.Hspec
+import Test.Hspec (Spec, describe, it, parallel)
+import Test.Hspec.Expectations.Pretty
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 import GHC.Show (Show(..))
@@ -268,7 +269,7 @@ prettyDiff sources = PrettyDiff sources . fmap (fmap ((getRange &&& identity) . 
 data PrettyDiff a = PrettyDiff { unPrettySources :: Both (Source.Source Char), unPrettyLines :: [Join These (Range, a)] }
   deriving Eq
 
-instance Show a => Show (PrettyDiff a) where
+instance Show (PrettyDiff a) where
   showsPrec _ (PrettyDiff sources lines) = (prettyPrinted ++) -- . (("\n" ++ show lines) ++)
     where prettyPrinted = showLine (maximum (0 : (maximum . fmap length <$> shownLines))) <$> shownLines >>= ('\n':)
           shownLines = catMaybes $ toBoth <$> lines

@@ -15,8 +15,8 @@ data Category
   | Boolean
   -- | A bitwise operator.
   | BitwiseOperator
-  -- | An operator with 2 operands.
-  | BinaryOperator
+  -- | A boolean operator (e.g. ||, &&).
+  | BooleanOperator
   -- | A literal key-value data structure.
   | DictionaryLiteral
   -- | A pair, e.g. of a key & value
@@ -103,6 +103,10 @@ data Category
   | RelationalOperator
   -- | An empty statement. (e.g. ; in JavaScript)
   | Empty
+  -- | A number literal.
+  | NumberLiteral
+  -- | A mathematical operator (e.g. +, -, *, /).
+  | MathOperator
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -114,7 +118,8 @@ instance Arbitrary Category where
       pure Program
     , pure Error
     , pure Boolean
-    , pure BinaryOperator
+    , pure BooleanOperator
+    , pure MathOperator
     , pure DictionaryLiteral
     , pure Pair
     , pure FunctionCall
@@ -126,6 +131,7 @@ instance Arbitrary Category where
     , pure Args
     , pure StringLiteral
     , pure IntegerLiteral
+    , pure NumberLiteral
     , pure Regex
     , pure Return
     , pure SymbolLiteral

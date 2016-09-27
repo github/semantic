@@ -3,7 +3,8 @@ module TermSpec where
 import Data.Text.Arbitrary ()
 import Prologue
 import Term.Arbitrary
-import Test.Hspec
+import Test.Hspec (Spec, describe, parallel)
+import Test.Hspec.Expectations.Pretty
 import Test.Hspec.QuickCheck
 import Test.QuickCheck
 

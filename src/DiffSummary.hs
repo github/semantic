@@ -16,6 +16,7 @@ import Data.Text as Text (intercalate)
 import Test.QuickCheck hiding (Fixed)
 import Patch.Arbitrary()
 import Data.Record
+import Data.These
 import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty)
 import qualified Text.PrettyPrint.Leijen.Text as P
 import SourceSpan
@@ -23,7 +24,7 @@ import Source
 
 data Identifiable a = Identifiable a | Unidentifiable a
 
-identifiable :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
+identifiable :: SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
 identifiable term = isIdentifiable (unwrap term) $ term
   where isIdentifiable = \case
           S.FunctionCall{} -> Identifiable
@@ -58,7 +59,7 @@ diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> bl
 -- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
 -- in that 'DiffSummary'.
 summaryToTexts :: DiffSummary DiffInfo -> [Either Text Text]
-summaryToTexts DiffSummary{..} = runJoin . fmap (show . (P.<> maybeParentContext parentAnnotation)) <$> (Join <$> summaries patch)
+summaryToTexts DiffSummary{..} = runJoin . fmap (show . (<+> maybeParentContext parentAnnotation)) <$> (Join <$> summaries patch)
 
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
 diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
@@ -82,22 +83,32 @@ summaries patch = eitherErrorOrDoc <$> patchToDoc patch
 -- or `ErrorInfo` it contains.
 patchToDoc :: Patch DiffInfo -> [Doc]
 patchToDoc = \case
-  p@(Replace i1 i2) -> zipWith (\a b -> (prefixWithPatch p) a <+> "with the" <+> b) (toLeafInfos i1) (toLeafInfos i2)
-  p@(Insert info) -> (prefixWithPatch p) <$> toLeafInfos info
-  p@(Delete info) -> (prefixWithPatch p) <$> toLeafInfos info
+  p@(Replace i1 i2) -> zipWith (\a b -> prefixWithPatch p a <+> "with" <+> determiner i1 <+> b) (toLeafInfos i1) (toLeafInfos i2)
+  p@(Insert info) -> prefixWithPatch p <$> toLeafInfos info
+  p@(Delete info) -> prefixWithPatch p <$> toLeafInfos info
 
 -- Prefixes a given doc with the type of patch it represents.
 prefixWithPatch :: Patch DiffInfo -> Doc -> Doc
 prefixWithPatch patch = prefixWithThe (patchToPrefix patch)
   where
-    prefixWithThe prefix doc = prefix <+> "the" <+> doc
+    prefixWithThe prefix doc = prefix <+> determiner' patch <+> doc
     patchToPrefix = \case
       (Replace _ _) -> "Replaced"
       (Insert _) -> "Added"
       (Delete _) -> "Deleted"
+    determiner' = determiner . these identity identity const . unPatch
+
+-- Optional determiner (e.g. "the") to tie together summary statements.
+determiner :: DiffInfo -> Doc
+determiner (LeafInfo "number" _) = ""
+determiner (LeafInfo "boolean" _) = ""
+determiner (BranchInfo bs _ _) = determiner (last bs)
+determiner _ = "the"
 
 toLeafInfos :: DiffInfo -> [Doc]
-toLeafInfos LeafInfo{..} = pure (squotes (toDoc termName) <+> (toDoc categoryName))
+toLeafInfos (LeafInfo "number" termName) = pure (squotes (toDoc termName))
+toLeafInfos (LeafInfo "boolean" termName) = pure (squotes (toDoc termName))
+toLeafInfos LeafInfo{..} = pure (squotes (toDoc termName) <+> toDoc categoryName)
 toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure (pretty err)
 
@@ -108,9 +119,7 @@ toTermName source term = case unwrap term of
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
-  S.Assignment identifier value -> case (unwrap identifier, unwrap value) of
-    (S.MemberAccess{}, S.AnonymousFunction{..}) -> toTermName' identifier
-    (_, _) -> toTermName' identifier <> toTermName' value
+  S.Assignment identifier _ -> toTermName' identifier
   S.Function identifier _ _ -> toTermName' identifier
   S.FunctionCall i args -> toTermName' i <> "(" <> (intercalate ", " (toArgName <$> args)) <> ")"
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
@@ -160,14 +169,18 @@ toTermName source term = case unwrap term of
         termNameFromSource term = termNameFromRange (range term)
         termNameFromRange range = toText $ Source.slice range source
         range = characterRange . extract
-        toArgName :: (HasCategory leaf, HasField fields Category, HasField fields Range) => SyntaxTerm leaf fields -> Text
+        toArgName :: SyntaxTerm leaf fields -> Text
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
                           Unidentifiable _ -> "…"
 
 maybeParentContext :: Maybe (Category, Text) -> Doc
-maybeParentContext = maybe "" (\annotation ->
-  space <> "in the" <+> (toDoc $ snd annotation) <+> toDoc (toCategoryName $ fst annotation))
+maybeParentContext = maybe "" go
+  where go (c, t) = case c of
+          C.Assignment -> "in an" <+> catName <+> "to" <+> termName
+          _ -> "in the" <+> termName <+> catName
+          where catName = toDoc $ toCategoryName c
+                termName = toDoc t
 
 toDoc :: Text -> Doc
 toDoc = string . toS
@@ -220,7 +233,8 @@ instance HasCategory Text where
 instance HasCategory Category where
   toCategoryName = \case
     ArrayLiteral -> "array"
-    BinaryOperator -> "binary operator"
+    BooleanOperator -> "boolean operator"
+    MathOperator -> "math operator"
     BitwiseOperator -> "bitwise operator"
     RelationalOperator -> "relational operator"
     Boolean -> "boolean"
@@ -240,10 +254,11 @@ instance HasCategory Category where
     C.Case -> "case statement"
     C.SubscriptAccess -> "subscript access"
     C.MathAssignment -> "math assignment"
-    C.Ternary -> "ternary"
+    C.Ternary -> "ternary expression"
     C.Operator -> "operator"
     Identifier -> "identifier"
     IntegerLiteral -> "integer"
+    NumberLiteral -> "number"
     Other s -> s
     C.Pair -> "pair"
     Params -> "params"
@@ -268,18 +283,18 @@ instance HasCategory Category where
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
 
-instance (HasCategory leaf, HasField fields Category) => HasCategory (SyntaxTerm leaf fields) where
+instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
 
 instance Arbitrary Branch where
   arbitrary = oneof [ pure BIndexed, pure BFixed ]
   shrink = genericShrink
 
-instance (Eq a, Arbitrary a) => Arbitrary (DiffSummary a) where
+instance Arbitrary a => Arbitrary (DiffSummary a) where
   arbitrary = DiffSummary <$> arbitrary <*> arbitrary
   shrink = genericShrink
 
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
-  pretty BranchInfo{..} = mconcat $ punctuate (string "," <> space) (pretty <$> branches)
+  pretty BranchInfo{..} = mconcat $ punctuate (string "," P.<> space) (pretty <$> branches)
   pretty ErrorInfo{..} = squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)

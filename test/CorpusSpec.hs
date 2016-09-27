@@ -19,7 +19,8 @@ import qualified Renderer.Split as Split
 import qualified Source as S
 import System.FilePath
 import System.FilePath.Glob
-import Test.Hspec
+import Test.Hspec (Spec, describe, it, SpecWith, runIO, parallel)
+import Test.Hspec.Expectations.Pretty
 import Unsafe (unsafeFromJust)
 
 spec :: Spec

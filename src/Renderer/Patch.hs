@@ -126,14 +126,14 @@ hunks diff blobs = hunksInRows (pure 1) $ alignDiff (source <$> blobs) diff
 
 -- | Given beginning line numbers, turn rows in a split diff into hunks in a
 -- | patch.
-hunksInRows :: (Prologue.Foldable f, Functor f) => Both (Sum Int) -> [Join These (SplitDiff f annotation)] -> [Hunk (SplitDiff f annotation)]
+hunksInRows :: (Foldable f, Functor f) => Both (Sum Int) -> [Join These (SplitDiff f annotation)] -> [Hunk (SplitDiff f annotation)]
 hunksInRows start rows = case nextHunk start rows of
   Nothing -> []
   Just (hunk, rest) -> hunk : hunksInRows (offset hunk <> hunkLength hunk) rest
 
 -- | Given beginning line numbers, return the next hunk and the remaining rows
 -- | of the split diff.
-nextHunk :: (Prologue.Foldable f, Functor f) => Both (Sum Int) -> [Join These (SplitDiff f annotation)] -> Maybe (Hunk (SplitDiff f annotation), [Join These (SplitDiff f annotation)])
+nextHunk :: (Foldable f, Functor f) => Both (Sum Int) -> [Join These (SplitDiff f annotation)] -> Maybe (Hunk (SplitDiff f annotation), [Join These (SplitDiff f annotation)])
 nextHunk start rows = case nextChange start rows of
   Nothing -> Nothing
   Just (offset, change, rest) -> let (changes, rest') = contiguousChanges rest in Just (Hunk offset (change : changes) $ take 3 rest', drop 3 rest')
@@ -145,7 +145,7 @@ nextHunk start rows = case nextChange start rows of
 
 -- | Given beginning line numbers, return the number of lines to the next
 -- | the next change, and the remaining rows of the split diff.
-nextChange :: (Prologue.Foldable f, Functor f) => Both (Sum Int) -> [Join These (SplitDiff f annotation)] -> Maybe (Both (Sum Int), Change (SplitDiff f annotation), [Join These (SplitDiff f annotation)])
+nextChange :: (Foldable f, Functor f) => Both (Sum Int) -> [Join These (SplitDiff f annotation)] -> Maybe (Both (Sum Int), Change (SplitDiff f annotation), [Join These (SplitDiff f annotation)])
 nextChange start rows = case changeIncludingContext leadingContext afterLeadingContext of
   Nothing -> Nothing
   Just (change, afterChanges) -> Just (start <> mconcat (rowIncrement <$> skippedContext), change, afterChanges)
@@ -155,12 +155,12 @@ nextChange start rows = case changeIncludingContext leadingContext afterLeadingC
 -- | Return a Change with the given context and the rows from the begginning of
 -- | the given rows that have changes, or Nothing if the first row has no
 -- | changes.
-changeIncludingContext :: (Prologue.Foldable f, Functor f) => [Join These (SplitDiff f annotation)] -> [Join These (SplitDiff f annotation)] -> Maybe (Change (SplitDiff f annotation), [Join These (SplitDiff f annotation)])
+changeIncludingContext :: (Foldable f, Functor f) => [Join These (SplitDiff f annotation)] -> [Join These (SplitDiff f annotation)] -> Maybe (Change (SplitDiff f annotation), [Join These (SplitDiff f annotation)])
 changeIncludingContext leadingContext rows = case changes of
   [] -> Nothing
   _ -> Just (Change leadingContext changes, afterChanges)
   where (changes, afterChanges) = span rowHasChanges rows
 
 -- | Whether a row has changes on either side.
-rowHasChanges :: (Prologue.Foldable f, Functor f) => Join These (SplitDiff f annotation) -> Bool
+rowHasChanges :: (Foldable f, Functor f) => Join These (SplitDiff f annotation) -> Bool
 rowHasChanges row = or (hasChanges <$> row)

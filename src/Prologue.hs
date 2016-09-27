@@ -6,10 +6,11 @@ module Prologue
 , (***)
 , hylo, cata, para
 , module Data.Hashable
+, last
 ) where
 
 import Protolude as X
-import Data.List (lookup)
+import Data.List (lookup, last)
 
 import Control.Comonad.Trans.Cofree as X
 import Control.Monad.Trans.Free as X
@@ -23,7 +24,3 @@ import Control.Arrow ((&&&), (***))
 import Data.Functor.Foldable (hylo, cata, para)
 
 import Data.Hashable
-
-{-# WARNING traceShowId "'traceShowId' remains in code" #-}
-traceShowId :: P.Show a => a -> a
-traceShowId a = T.trace (P.show a) a

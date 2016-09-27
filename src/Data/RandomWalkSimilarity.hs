@@ -200,9 +200,7 @@ insertDiff a@(ij1, _) (b@(ij2, _):rest) = case (ij1, ij2) of
 
 -- | Return an edit distance as the sum of it's term sizes, given an cutoff and a syntax of terms 'f a'.
 -- | Computes a constant-time approximation to the edit distance of a diff. This is done by comparing at most _m_ nodes, & assuming the rest are zero-cost.
-editDistanceUpTo :: (P.Foldable f, Functor f) => Integer
-                 -> Diff f annotation
-                 -> Int
+editDistanceUpTo :: (Foldable f, Functor f) => Integer -> Diff f annotation -> Int
 editDistanceUpTo m = diffSum (patchSum termSize) . cutoff m
   where diffSum patchCost = sum . fmap (maybe 0 patchCost)
 

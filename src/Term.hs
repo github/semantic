@@ -18,8 +18,8 @@ type SyntaxTermF leaf fields = TermF (Syntax leaf) (Record fields)
 type SyntaxTerm leaf fields = Term (Syntax leaf) (Record fields)
 
 type instance Base (Term f a) = TermF f a
-instance Functor f => Foldable.Foldable (Term f a) where project = runCofree
-instance Functor f => Foldable.Unfoldable (Term f a) where embed = cofree
+instance Functor f => Recursive (Term f a) where project = runCofree
+instance Functor f => Corecursive (Term f a) where embed = cofree
 
 -- | Zip two terms by combining their annotations into a pair of annotations.
 -- | If the structure of the two terms don't match, then Nothing will be returned.
@@ -29,7 +29,7 @@ zipTerms t1 t2 = iter go (alignCofreeWith galign (const Nothing) both (These t1 
   where go (a :< s) = cofree . (a :<) <$> sequenceA s
 
 -- | Return the node count of a term.
-termSize :: (Prologue.Foldable f, Functor f) => Term f annotation -> Int
+termSize :: (Foldable f, Functor f) => Term f annotation -> Int
 termSize = cata size where
   size (_ :< syntax) = 1 + sum syntax
 
