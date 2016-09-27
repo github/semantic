@@ -146,17 +146,14 @@ rws compare as bs
       diffs
       ((termIndex &&& deleting . term) <$> unmappedA)
 
-    replaceIfEqual :: HasField fields Category
-                   => Term f (Record fields)
-                   -> Term f (Record fields)
-                   -> Maybe (Diff f (Record fields))
+    replaceIfEqual :: Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
     replaceIfEqual a b
       | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
       | otherwise = Nothing
 
     cost = iter (const 0) . (1 <$)
 
-    eitherCutoff :: (Functor f) => Integer
+    eitherCutoff :: Integer
                  -> Diff f (Record fields)
                  -> Free (TermF f (Both (Record fields)))
                          (Either (Diff f (Record fields)) (Patch (Term f (Record fields))))
