@@ -188,17 +188,8 @@ toDoc = string . toS
 
 termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
-  Leaf _ -> LeafInfo (toCategoryName term) (toTermName' term)
-  S.AnonymousFunction _ _ -> LeafInfo (toCategoryName term) ("anonymous")
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
-  S.Ternary ternaryCondition _ -> LeafInfo (toCategoryName term) (toTermName' ternaryCondition)
-  S.Function identifier _ _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
-  S.Assignment identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
-  S.MathAssignment identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
-  -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
-  -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
-  -- to indicate where that value should be when constructing DiffInfos.
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
   S.Error sourceSpan _ -> ErrorInfo sourceSpan (toTermName' term)
   _ -> LeafInfo (toCategoryName term) (toTermName' term)
