@@ -190,7 +190,6 @@ termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields R
 termToDiffInfo blob term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
-  S.Ternary ternaryCondition _ -> LeafInfo (toCategoryName term) (toTermName' ternaryCondition)
   S.Function identifier _ _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   S.Assignment identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   S.MathAssignment identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
