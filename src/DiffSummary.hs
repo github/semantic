@@ -50,7 +50,8 @@ data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
 
 data DiffSummary a = DiffSummary {
   patch :: Patch a,
-  parentAnnotation :: Maybe (Category, Text)
+  parentAnnotation :: Maybe (Category, Text),
+  grandParentAnnotation :: Maybe (Category, Text)
 } deriving (Eq, Functor, Show, Generic)
 
 -- Returns a list of diff summary texts given two source blobs and a diff.
@@ -71,7 +72,7 @@ diffToDiffSummaries sources = para $ \diff ->
   case diff of
     -- Skip comments and leaves since they don't have any changes
     (Free (_ :< syntax)) -> annotateWithCategory (toList syntax)
-    (Pure patch) -> [ DiffSummary (mapPatch (termToDiffInfo beforeSource) (termToDiffInfo afterSource) patch) Nothing ]
+    (Pure patch) -> [ DiffSummary (mapPatch (termToDiffInfo beforeSource) (termToDiffInfo afterSource) patch) Nothing Nothing]
   where
     (beforeSource, afterSource) = runJoin sources
 
@@ -292,7 +293,7 @@ instance Arbitrary Branch where
   shrink = genericShrink
 
 instance Arbitrary a => Arbitrary (DiffSummary a) where
-  arbitrary = DiffSummary <$> arbitrary <*> arbitrary
+  arbitrary = DiffSummary <$> arbitrary <*> arbitrary <*> arbitrary
   shrink = genericShrink
 
 instance P.Pretty DiffInfo where
