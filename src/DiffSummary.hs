@@ -190,7 +190,6 @@ termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields R
 termToDiffInfo blob term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
-  S.Function identifier _ _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   S.Assignment identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   S.MathAssignment identifier _ -> LeafInfo (toCategoryName term) (toTermName' identifier)
   -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
