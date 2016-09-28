@@ -90,8 +90,7 @@ rws compare as bs
         put (i, unA, unB)
         pure Nothing
 
-    -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any),
-    -- marking both as ineligible for future matches.
+    -- | Construct a diff for a term in B by matching it against the most similar eligible term in A (if any), marking both as ineligible for future matches.
     findNearestNeighbourTo :: UnmappedTerm f fields
                            -> State (Int, UnmappedTerms f fields, UnmappedTerms f fields)
                                     (These Int Int, Diff f (Record fields))
@@ -111,8 +110,8 @@ rws compare as bs
           put (i, IntMap.delete i unmappedA, IntMap.delete j unmappedB)
           pure (These i j, compared)
 
-    -- Returns a `State s a` of where `s` is the index, old unmapped terms, new unmapped terms, and value is
-    -- (index, inserted diff), given a previous index, two sets of umapped terms, and an unmapped term to insert.
+    -- Returns a state (insertion index, old unmapped terms, new unmapped terms), and value of (index, inserted diff),
+    -- given a previous index, two sets of umapped terms, and an unmapped term to insert.
     insertion :: Int
                  -> UnmappedTerms f fields
                  -> UnmappedTerms f fields
