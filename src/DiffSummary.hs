@@ -190,9 +190,6 @@ termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields R
 termToDiffInfo blob term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
-  -- Currently we cannot express the operator for an operator production from TreeSitter. Eventually we should be able to
-  -- use the term name of the operator identifier when we have that production value. Until then, I'm using a placeholder value
-  -- to indicate where that value should be when constructing DiffInfos.
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
   S.Error sourceSpan _ -> ErrorInfo sourceSpan (toTermName' term)
   _ -> LeafInfo (toCategoryName term) (toTermName' term)
