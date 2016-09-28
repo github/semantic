@@ -188,7 +188,6 @@ toDoc = string . toS
 
 termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
-  S.AnonymousFunction _ _ -> LeafInfo (toCategoryName term) ("anonymous")
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
   S.Ternary ternaryCondition _ -> LeafInfo (toCategoryName term) (toTermName' ternaryCondition)
