@@ -60,14 +60,13 @@ rws compare as bs
     traverse findNearestNeighbourToDiff allDiffs &
     fmap catMaybes &
     -- Run the state with an initial state
-    (`runState` (pred $ maybe 0 getMin (getOption (foldMap (Option . Just . Min . termIndex) featurizedAs)),
-      toMap featurizedAs,
-      toMap featurizedBs)) &
+    (`runState` (minimumTermIndex featurizedAs, toMap featurizedAs, toMap featurizedBs)) &
     uncurry deleteRemaining &
     insertMapped countersAndDiffs &
     fmap snd
 
   where
+    minimumTermIndex = pred . maybe 0 getMin . getOption . foldMap (Option . Just . Min . termIndex)
     sesDiffs = eitherCutoff 1 <$> SES.ses replaceIfEqual cost as bs
 
     (featurizedAs, featurizedBs, _, _, countersAndDiffs, allDiffs) =
