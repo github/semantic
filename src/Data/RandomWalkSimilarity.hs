@@ -34,16 +34,17 @@ import Data.Align.Generic
 import Data.These
 import Diff
 
--- | Given a function comparing two terms recursively, and a function to compute a Hashable label from an unpacked term,
+-- | Given a function comparing two terms recursively,
+-- a function to compute a Hashable label from an unpacked term, and two lists of terms,
 -- compute the diff of a pair of lists of terms using a random walk similarity metric,
 -- which completes in log-linear time.
 --
---This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
+-- This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
 rws :: forall f fields.
     (GAlign f,
      Traversable f,
-     HasField fields Category,
      Eq (f (Term f Category)),
+     HasField fields Category,
      HasField fields (Vector.Vector Double))
     => (Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))) -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
     -> [Term f (Record fields)] -- ^ The list of old terms.
