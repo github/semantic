@@ -103,12 +103,14 @@ prefixWithPatch patch = prefixWithThe (patchToPrefix patch)
 determiner :: DiffInfo -> Doc
 determiner (LeafInfo "number" _) = ""
 determiner (LeafInfo "boolean" _) = ""
+determiner (LeafInfo "anonymous function" _) = "an"
 determiner (BranchInfo bs _ _) = determiner (last bs)
 determiner _ = "the"
 
 toLeafInfos :: DiffInfo -> [Doc]
 toLeafInfos (LeafInfo "number" termName) = pure (squotes (toDoc termName))
 toLeafInfos (LeafInfo "boolean" termName) = pure (squotes (toDoc termName))
+toLeafInfos (LeafInfo "anonymous function" termName) = pure (toDoc termName)
 toLeafInfos LeafInfo{..} = pure (squotes (toDoc termName) <+> toDoc categoryName)
 toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure (pretty err)
@@ -116,7 +118,8 @@ toLeafInfos err@ErrorInfo{} = pure (pretty err)
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
-  S.AnonymousFunction _ _ -> "anonymous"
+  S.AnonymousFunction maybeParams _ -> "anonymous" <> maybe "" toParams maybeParams <> " function"
+    where toParams ps = " (" <> termNameFromSource ps <> ")"
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
@@ -190,6 +193,7 @@ termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields R
 termToDiffInfo blob term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
+  S.AnonymousFunction _ _ -> LeafInfo "anonymous function" (toTermName' term)
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
   S.Error sourceSpan _ -> ErrorInfo sourceSpan (toTermName' term)
   _ -> LeafInfo (toCategoryName term) (toTermName' term)
