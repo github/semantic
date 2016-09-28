@@ -210,7 +210,9 @@ prependSummary :: (HasCategory leaf, HasField fields Range, HasField fields Cate
 prependSummary source term summary =
   case (parentAnnotation summary, identifiable term) of
     (Nothing, Identifiable term) -> summary { parentAnnotation = Just (category . extract $ term, toTermName source term) }
-    (_, _) -> summary
+    (_, _) -> case (grandParentAnnotation summary) of
+                Nothing -> summary { grandParentAnnotation = Just (category . extract $ term, toTermName source term) }
+                _ -> summary
 
 isBranchInfo :: DiffInfo -> Bool
 isBranchInfo info = case info of
