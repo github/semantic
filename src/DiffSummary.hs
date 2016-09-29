@@ -73,7 +73,7 @@ diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> bl
 -- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
 -- in that 'DiffSummary'.
 summaryToTexts :: DiffSummary DiffInfo -> [Either Text Text]
-summaryToTexts DiffSummary{..} = runJoin . fmap (show . (<+> (maybeGrandParentContext grandParentAnnotation <+> "/" <+> maybeParentContext parentAnnotation))) <$> (Join <$> summaries patch)
+summaryToTexts DiffSummary{..} = runJoin . fmap (show . (<+> (maybeGrandParentContext grandParentAnnotation <+> maybeParentContext parentAnnotation))) <$> (Join <$> summaries patch)
 
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
 diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
