@@ -71,7 +71,9 @@ termConstructor source sourceSpan name range children
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction Nothing body
-          [ params, body ] -> S.AnonymousFunction (Just params) body
+          [ idOrParams, body] -> case unwrap idOrParams of
+            S.Leaf _ -> S.Function idOrParams Nothing body
+            _ -> S.AnonymousFunction (Just idOrParams) body
           [ id, params, body ] -> S.Function id (Just params) body
           _ -> S.Indexed children
     (_, []) -> S.Leaf . toText $ slice range source
