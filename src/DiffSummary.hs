@@ -23,6 +23,18 @@ import qualified Text.PrettyPrint.Leijen.Text as P
 import SourceSpan
 import Source
 
+data Annotatable a = Annotatable a | Unannotatable a
+
+annotatable :: (HasField fields Category) => SyntaxTerm leaf fields -> Annotatable (SyntaxTerm leaf fields)
+annotatable term = isAnnotatable (category . extract $ term) $ term
+  where isAnnotatable = \case
+          C.Program -> Unannotatable
+          C.Params  -> Unannotatable
+          C.ExpressionStatements -> Unannotatable
+          C.Args    -> Unannotatable
+          C.Other _ -> Unannotatable
+          _ -> Annotatable
+
 data Identifiable a = Identifiable a | Unidentifiable a
 
 identifiable :: SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
