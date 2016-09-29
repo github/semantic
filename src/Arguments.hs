@@ -1,4 +1,4 @@
-module Arguments (Arguments(..), ExtraArg(..), programArguments, args) where
+module Arguments (Arguments(..), CmdLineOptions(..), ExtraArg(..), programArguments, args) where
 
 import Data.Functor.Both
 import Data.Maybe
@@ -13,18 +13,17 @@ import qualified Renderer as R
 
 data ExtraArg = ShaPair (Both (Maybe String)) | FileArg FilePath deriving (Show)
 
--- | The command line arguments to the application.
-data Arguments =
-   -- | Arguments for optparse-applicative
-  CmdLineArguments
-  { format :: R.Format
+-- | The command line options to the application (arguments for optparse-applicative).
+data CmdLineOptions = CmdLineOptions
+  { outputFormat :: R.Format
   , maybeTimeout :: Maybe Float
-  , output :: Maybe FilePath
-  , noIndex :: Bool
+  , outputFilePath :: Maybe FilePath
+  , noIndexMode :: Bool
   , extraArgs :: [ExtraArg]
   }
-  -- | Arguments actually used by the program (includes command line, environment, and default args).
-  | Arguments
+
+-- | Arguments for the program (includes command line, environment, and defaults).
+data Arguments = Arguments
   { gitDir :: FilePath
   , alternateObjectDirs :: [Text]
   , format :: R.Format
@@ -36,9 +35,8 @@ data Arguments =
   } deriving (Show)
 
 -- | Returns Arguments for the program from parsed command line arguments.
-programArguments :: Arguments -> IO Arguments
-programArguments args@Arguments{..} = pure args
-programArguments CmdLineArguments{..} = do
+programArguments :: CmdLineOptions -> IO Arguments
+programArguments CmdLineOptions{..} = do
   pwd <- getCurrentDirectory
   gitDir <- fromMaybe pwd <$> lookupEnv "GIT_DIR"
   eitherObjectDirs <- try $ parseObjectDirs . toS <$> getEnv "GIT_ALTERNATE_OBJECT_DIRECTORIES"
@@ -48,10 +46,10 @@ programArguments CmdLineArguments{..} = do
   pure Arguments
     { gitDir = gitDir
     , alternateObjectDirs = alternateObjectDirs
-    , format = format
+    , format = outputFormat
     , timeoutInMicroseconds = maybe defaultTimeout toMicroseconds maybeTimeout
-    , output = output
-    , noIndex = noIndex
+    , output = outputFilePath
+    , noIndex = noIndexMode
     , shaRange = fetchShas extraArgs
     , filePaths = fetchPaths extraArgs
     }
