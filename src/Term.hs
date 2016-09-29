@@ -1,4 +1,4 @@
-{-# LANGUAGE RankNTypes, TypeFamilies, TypeSynonymInstances, Unsafe #-}
+{-# LANGUAGE RankNTypes, TypeFamilies, TypeSynonymInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Term where
 
