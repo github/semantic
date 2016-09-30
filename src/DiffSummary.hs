@@ -306,7 +306,7 @@ instance Arbitrary Branch where
   shrink = genericShrink
 
 instance Arbitrary a => Arbitrary (DiffSummary a) where
-  arbitrary = DiffSummary <$> arbitrary <*> arbitrary <*> arbitrary
+  arbitrary = DiffSummary <$> arbitrary <*> arbitrary
   shrink = genericShrink
 
 instance P.Pretty DiffInfo where
