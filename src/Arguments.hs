@@ -1,4 +1,4 @@
-module Arguments (Arguments(..), CmdLineOptions(..), ExtraArg(..), programArguments, args) where
+module Arguments (Arguments(..), CmdLineOptions(..), DiffMode(..), ExtraArg(..), programArguments, args) where
 
 import Data.Functor.Both
 import Data.Maybe
@@ -11,14 +11,20 @@ import System.IO.Error (IOError)
 
 import qualified Renderer as R
 
-data ExtraArg = ShaPair (Both (Maybe String)) | FileArg FilePath deriving (Show)
+data ExtraArg = ShaPair (Both (Maybe String))
+              | FileArg FilePath
+              deriving (Show)
+
+data DiffMode = PathDiff (Both FilePath)
+              | CommitDiff
+              deriving (Show)
 
 -- | The command line options to the application (arguments for optparse-applicative).
 data CmdLineOptions = CmdLineOptions
   { outputFormat :: R.Format
   , maybeTimeout :: Maybe Float
   , outputFilePath :: Maybe FilePath
-  , noIndexMode :: Bool
+  , noIndex :: Bool
   , extraArgs :: [ExtraArg]
   }
 
@@ -29,7 +35,7 @@ data Arguments = Arguments
   , format :: R.Format
   , timeoutInMicroseconds :: Int
   , output :: Maybe FilePath
-  , noIndex :: Bool
+  , diffMode :: DiffMode
   , shaRange :: Both (Maybe String)
   , filePaths :: [FilePath]
   } deriving (Show)
@@ -43,15 +49,19 @@ programArguments CmdLineOptions{..} = do
   let alternateObjectDirs = case (eitherObjectDirs :: Either IOError [Text]) of
                               (Left _) -> []
                               (Right objectDirs) -> objectDirs
+
+  let filePaths = fetchPaths extraArgs
   pure Arguments
     { gitDir = gitDir
     , alternateObjectDirs = alternateObjectDirs
     , format = outputFormat
     , timeoutInMicroseconds = maybe defaultTimeout toMicroseconds maybeTimeout
     , output = outputFilePath
-    , noIndex = noIndexMode
+    , diffMode = case (noIndex, filePaths) of
+      (True, [fileA, fileB]) -> PathDiff (both fileA fileB)
+      (_, _) -> CommitDiff
     , shaRange = fetchShas extraArgs
-    , filePaths = fetchPaths extraArgs
+    , filePaths = filePaths
     }
   where
     fetchPaths :: [ExtraArg] -> [FilePath]
@@ -72,7 +82,7 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , format = format
   , timeoutInMicroseconds = defaultTimeout
   , output = Nothing
-  , noIndex = False
+  , diffMode = CommitDiff
   , shaRange = Just <$> both sha1 sha2
   , filePaths = filePaths
   }
