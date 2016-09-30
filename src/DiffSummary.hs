@@ -187,16 +187,6 @@ toTermName source term = case unwrap term of
                           Identifiable arg -> toTermName' arg
                           Unidentifiable _ -> "…"
 
-maybeParentContext :: Maybe (Category, Text) -> Doc
-maybeParentContext = maybe "" go
-  where go (c, t) = case c of
-          C.Assignment -> "in an" <+> catName <+> "to" <+> termName
-          _ -> "in the" <+> termName <+> catName
-          where catName = toDoc $ toCategoryName c
-                termName = toDoc t
-
-maybeGrandParentContext :: Maybe (Category, Text) -> Doc
-maybeGrandParentContext = maybe "" go
   where go (c, t) = case c of
           C.Assignment -> "in an" <+> catName <+> "to" <+> termName
           _ -> "in the" <+> termName <+> catName
