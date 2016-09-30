@@ -18,7 +18,7 @@ import Test.QuickCheck hiding (Fixed)
 import Patch.Arbitrary()
 import Data.Record
 import Data.These
-import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty)
+import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty, hsep)
 import qualified Text.PrettyPrint.Leijen.Text as P
 import SourceSpan
 import Source
@@ -187,6 +187,8 @@ toTermName source term = case unwrap term of
                           Identifiable arg -> toTermName' arg
                           Unidentifiable _ -> "…"
 
+parentContexts :: [(Category, Text)] -> Doc
+parentContexts contexts = hsep $ go <$> contexts
   where go (c, t) = case c of
           C.Assignment -> "in an" <+> catName <+> "to" <+> termName
           _ -> "in the" <+> termName <+> catName
