@@ -219,11 +219,9 @@ termToDiffInfo blob term = case unwrap term of
 
 prependSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary source term summary =
-  case (parentAnnotation summary, identifiable term) of
-    (Nothing, Identifiable _) -> summary { parentAnnotation = Just (category . extract $ term, toTermName source term) }
-    (_, _) -> case (grandParentAnnotation summary, annotatable term) of
-      (Nothing, Annotatable _) -> summary { grandParentAnnotation = Just (category . extract $ term, toTermName source term) }
-      (_,_) -> summary
+  case (identifiable term, annotatable term) of
+    (_, Annotatable _) -> summary { parentAnnotation = (category . extract $ term, toTermName source term) : parentAnnotation summary }
+    (_, _) -> summary
 
 isBranchInfo :: DiffInfo -> Bool
 isBranchInfo info = case info of
