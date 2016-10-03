@@ -28,7 +28,7 @@ literalInfo :: Record '[Category, Range]
 literalInfo = StringLiteral .: Range 1 2 .: RNil
 
 testDiff :: Diff (Syntax Text) (Record '[Category, Range])
-testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "a")) ])
+testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "\"a\"")) ])
 
 testSummary :: DiffSummary DiffInfo
 testSummary = DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotation = Nothing }
@@ -43,7 +43,7 @@ spec :: Spec
 spec = parallel $ do
   describe "diffSummaries" $ do
     it "outputs a diff summary" $ do
-      diffSummaries blobs testDiff `shouldBe` [ Right $ "Added the 'a' string" ]
+      diffSummaries blobs testDiff `shouldBe` [ Right $ "Added the \"a\" string" ]
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = defaultFeatureVectorDecorator (category . headF) (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range]))) in

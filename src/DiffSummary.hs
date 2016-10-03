@@ -114,6 +114,7 @@ toLeafInfos :: DiffInfo -> [Doc]
 toLeafInfos (LeafInfo "number" termName) = pure (squotes (toDoc termName))
 toLeafInfos (LeafInfo "boolean" termName) = pure (squotes (toDoc termName))
 toLeafInfos (LeafInfo "anonymous function" termName) = pure (toDoc termName)
+toLeafInfos (LeafInfo cName@"string" termName) = pure (toDoc termName <+> toDoc cName)
 toLeafInfos LeafInfo{..} = pure (squotes (toDoc termName) <+> toDoc categoryName)
 toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure (pretty err)
