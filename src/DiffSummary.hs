@@ -28,12 +28,10 @@ data Annotatable a = Annotatable a | Unannotatable a
 annotatable :: (HasField fields Category) => SyntaxTerm leaf fields -> Annotatable (SyntaxTerm leaf fields)
 annotatable term = isAnnotatable (category . extract $ term) $ term
   where isAnnotatable = \case
-          C.Program -> Unannotatable
-          C.Params  -> Unannotatable
-          C.ExpressionStatements -> Unannotatable
-          C.Args    -> Unannotatable
-          C.Other _ -> Unannotatable
-          _ -> Annotatable
+          C.Class -> Annotatable
+          C.Method -> Annotatable
+          C.Function -> Annotatable
+          _ -> Unannotatable
 
 data Identifiable a = Identifiable a | Unidentifiable a
 
