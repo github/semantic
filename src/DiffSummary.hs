@@ -211,6 +211,10 @@ termToDiffInfo blob term = case unwrap term of
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob
 
+-- | Prepends a parentAnnotation to the current DiffSummary instance.
+-- | For a DiffSummary without a parentAnnotation, we prepend a parentAnnotation with the first identifiable term.
+-- | For a DiffSummary with a parentAnnotation, we prepend the next annotatable term to the extant parentAnnotation.
+-- | If a DiffSummary already has a parentAnnotation, and a (grand) parentAnnotation, then we return the summary without modification.
 prependSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary source term summary =
   case (identifiable term, annotatable term) of
