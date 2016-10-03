@@ -217,9 +217,11 @@ termToDiffInfo blob term = case unwrap term of
 -- | If a DiffSummary already has a parentAnnotation, and a (grand) parentAnnotation, then we return the summary without modification.
 prependSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary source term summary =
-  case (identifiable term, annotatable term) of
-    (_, Annotatable _) -> summary { parentAnnotation = (category . extract $ term, toTermName source term) : parentAnnotation summary }
-    (_, _) -> summary
+  case (parentAnnotation summary, identifiable term, annotatable term) of
+    ([], Identifiable _, _) -> prependParentAnnotation source term summary
+    ([_], _, Annotatable _) -> prependParentAnnotation source term summary
+    (_, _, _) -> summary
+  where prependParentAnnotation source term summary = summary { parentAnnotation = (category . extract $ term, toTermName source term) : parentAnnotation summary }
 
 isBranchInfo :: DiffInfo -> Bool
 isBranchInfo info = case info of
