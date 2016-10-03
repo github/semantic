@@ -180,6 +180,7 @@ toTermName source term = case unwrap term of
   S.Method identifier _ _ -> toTermName' identifier
   S.Comment a -> toCategoryName a
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
+  S.Module identifier _ -> toTermName' identifier
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -296,6 +297,7 @@ instance HasCategory Category where
     C.If -> "if statement"
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
+    C.Module -> "module statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
