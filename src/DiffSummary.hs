@@ -31,6 +31,7 @@ annotatable term = isAnnotatable (category . extract $ term) $ term
           C.Class -> Annotatable
           C.Method -> Annotatable
           C.Function -> Annotatable
+          C.Module -> Annotatable
           _ -> Unannotatable
 
 data Identifiable a = Identifiable a | Unidentifiable a
