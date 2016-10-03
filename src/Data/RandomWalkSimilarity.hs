@@ -138,13 +138,14 @@ rws compare as bs
         insertDiff (i, mappedTerm) into)
         into
         diffs
-    -- Given a list of diffs, and unmapped terms in unmappedA, deletes
-    -- any terms that remain in umappedA.
+
+    -- Given a list of diffs, and unmapped terms, deletes any terms that remain in unmappedA.
     deleteRemaining diffs (_, unmappedA, _) = foldl' (\into (i, deletion) ->
         insertDiff (This i, deletion) into)
       diffs
       ((termIndex &&& deleting . term) <$> unmappedA)
 
+    -- Possibly replace terms in a diff.
     replaceIfEqual :: Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
     replaceIfEqual a b
       | (category <$> a) == (category <$> b) = hylo wrap runCofree <$> zipTerms a b
