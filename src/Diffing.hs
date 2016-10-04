@@ -155,7 +155,9 @@ printDiff parser arguments sources = do
 writeToOutput :: Maybe FilePath -> Text -> IO ()
 writeToOutput output text =
   case output of
-    Nothing -> TextIO.putStrLn text
+    Nothing -> do
+      IO.hSetEncoding IO.stdout IO.utf8_bom
+      TextIO.hPutStrLn IO.stdout text
     Just path -> do
       isDir <- doesDirectoryExist path
       let outputPath = if isDir
