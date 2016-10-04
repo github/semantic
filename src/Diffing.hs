@@ -30,6 +30,7 @@ import Syntax
 import System.Directory
 import System.FilePath
 import qualified System.IO as IO
+import System.Environment (lookupEnv)
 import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
@@ -156,7 +157,8 @@ writeToOutput :: Maybe FilePath -> Text -> IO ()
 writeToOutput output text =
   case output of
     Nothing -> do
-      IO.hSetEncoding IO.stdout IO.utf8_bom
+      lang <- lookupEnv "LANG"
+      if isNothing lang then IO.hSetEncoding IO.stdout IO.utf8_bom else pure ()
       TextIO.hPutStrLn IO.stdout text
     Just path -> do
       isDir <- doesDirectoryExist path
