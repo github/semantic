@@ -221,7 +221,7 @@ prependSummary :: (HasCategory leaf, HasField fields Range, HasField fields Cate
 prependSummary source term summary =
   case (parentAnnotation summary, identifiable term, annotatable term) of
     ([], Identifiable _, _) -> prependParentAnnotation source term summary
-    ([_], _, Annotatable _) -> prependParentAnnotation source term summary
+    ([(_)], _, Annotatable _) -> prependParentAnnotation source term summary
     (_, _, _) -> summary
   where prependParentAnnotation source term summary = summary { parentAnnotation = (category . extract $ term, toTermName source term) : parentAnnotation summary }
 
