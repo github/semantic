@@ -26,7 +26,7 @@ import Source
 data Annotatable a = Annotatable a | Unannotatable a
 
 annotatable :: (HasField fields Category) => SyntaxTerm leaf fields -> Annotatable (SyntaxTerm leaf fields)
-annotatable term = isAnnotatable (category . extract $ term) $ term
+annotatable term = isAnnotatable (category . extract $ term) term
   where isAnnotatable = \case
           C.Class -> Annotatable
           C.Method -> Annotatable
@@ -37,7 +37,7 @@ annotatable term = isAnnotatable (category . extract $ term) $ term
 data Identifiable a = Identifiable a | Unidentifiable a
 
 identifiable :: SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
-identifiable term = isIdentifiable (unwrap term) $ term
+identifiable term = isIdentifiable (unwrap term) term
   where isIdentifiable = \case
           S.FunctionCall{} -> Identifiable
           S.MethodCall{} -> Identifiable
@@ -71,14 +71,14 @@ diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> bl
 -- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
 -- in that 'DiffSummary'.
 summaryToTexts :: DiffSummary DiffInfo -> [Either Text Text]
-summaryToTexts DiffSummary{..} = runJoin . fmap (show . (<+> (parentContexts parentAnnotation))) <$> (Join <$> summaries patch)
+summaryToTexts DiffSummary{..} = runJoin . fmap (show . (<+> parentContexts parentAnnotation)) <$> (Join <$> summaries patch)
 
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
 diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
 diffToDiffSummaries sources = para $ \diff ->
   let diff' = free (Prologue.fst <$> diff)
       annotateWithCategory :: [(Diff leaf (Record fields), [DiffSummary DiffInfo])] -> [DiffSummary DiffInfo]
-      annotateWithCategory children = maybeToList (prependSummary (Both.snd sources) <$> (afterTerm diff')) <*> (children >>= snd) in
+      annotateWithCategory children = maybeToList (prependSummary (Both.snd sources) <$> afterTerm diff') <*> (children >>= snd) in
   case diff of
     -- Skip comments and leaves since they don't have any changes
     (Free (_ :< syntax)) -> annotateWithCategory (toList syntax)
@@ -137,13 +137,13 @@ toTermName source term = case unwrap term of
   Leaf leaf -> toCategoryName leaf
   S.Assignment identifier _ -> toTermName' identifier
   S.Function identifier _ _ -> toTermName' identifier
-  S.FunctionCall i args -> toTermName' i <> "(" <> (intercalate ", " (toArgName <$> args)) <> ")"
+  S.FunctionCall i args -> toTermName' i <> "(" <> intercalate ", " (toArgName <$> args) <> ")"
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
     (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' property <> "()"
     (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' property
     (_, S.FunctionCall{}) -> toTermName' base <> "." <> toTermName' property <> "()"
     (_, _) -> toTermName' base <> "." <> toTermName' property
-  S.MethodCall targetId methodId methodParams -> toTermName' targetId <> sep <> toTermName' methodId <> "(" <> (intercalate ", " (toArgName <$> methodParams)) <> ")"
+  S.MethodCall targetId methodId methodParams -> toTermName' targetId <> sep <> toTermName' methodId <> "(" <> intercalate ", " (toArgName <$> methodParams) <> ")"
     where sep = case unwrap targetId of
             S.FunctionCall{} -> "()."
             _ -> "."
@@ -227,7 +227,7 @@ prependSummary source term summary =
 
 isBranchInfo :: DiffInfo -> Bool
 isBranchInfo info = case info of
-  (BranchInfo _ _ _) -> True
+  BranchInfo{} -> True
   _ -> False
 
 hasErrorInfo :: DiffInfo -> Bool
@@ -311,6 +311,6 @@ instance Arbitrary a => Arbitrary (DiffSummary a) where
   shrink = genericShrink
 
 instance P.Pretty DiffInfo where
-  pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
+  pretty LeafInfo{..} = squotes (string $ toSL termName) <+> string (toSL categoryName)
   pretty BranchInfo{..} = mconcat $ punctuate (string "," P.<> space) (pretty <$> branches)
   pretty ErrorInfo{..} = squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)
