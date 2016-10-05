@@ -9,8 +9,9 @@ import Range
 import DiffSummary
 import Data.Map as Map hiding (null)
 import Source
+import SourceSpan
 
-summary :: (HasField fields Category, HasField fields Range) => Renderer (Record fields)
+summary :: (HasField fields Category, HasField fields Range, HasField fields SourceSpan) => Renderer (Record fields)
 summary blobs diff = SummaryOutput $ Map.fromList [
     ("changes", changes),
     ("errors", errors)

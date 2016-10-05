@@ -64,7 +64,7 @@ data DiffSummary a = DiffSummary {
 } deriving (Eq, Functor, Show, Generic)
 
 -- Returns a list of diff summary texts given two source blobs and a diff.
-diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both SourceBlob -> SyntaxDiff leaf fields -> [Either Text Text]
+diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) => Both SourceBlob -> SyntaxDiff leaf fields -> [Either Text Text]
 diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> blobs) diff
 
 -- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
@@ -73,7 +73,7 @@ summaryToTexts :: DiffSummary DiffInfo -> [Either Text Text]
 summaryToTexts DiffSummary{..} = runJoin . fmap (show . (<+> parentContexts parentAnnotation)) <$> (Join <$> summaries patch)
 
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
-diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
+diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
 diffToDiffSummaries sources = para $ \diff ->
   let
     diff' = free (Prologue.fst <$> diff)
@@ -170,7 +170,7 @@ toTermName source term = case unwrap term of
   S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
   S.Pair a _ -> toTermName' a <> ": …"
   S.Return expr -> maybe "empty" toTermName' expr
-  S.Error _ _ -> termNameFromSource term
+  S.Error _ -> termNameFromSource term
   S.If expr _ _ -> termNameFromSource expr
   S.For clauses _ -> termNameFromChildren term clauses
   S.While expr _ -> toTermName' expr
@@ -209,13 +209,13 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
+termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
   S.AnonymousFunction _ _ -> LeafInfo "anonymous function" (toTermName' term)
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
-  S.Error sourceSpan _ -> ErrorInfo sourceSpan (toTermName' term)
+  S.Error _ -> ErrorInfo (getField $ extract term) (toTermName' term)
   _ -> LeafInfo (toCategoryName term) (toTermName' term)
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob

@@ -23,10 +23,10 @@ termConstructor
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
   -> Text -- ^ The name of the production for this node.
   -> Range -- ^ The character range that the term occupies.
-  -> [Term (S.Syntax Text) (Record '[Range, Category])] -- ^ The child nodes of the term.
-  -> IO (Term (S.Syntax Text) (Record '[Range, Category])) -- ^ The resulting term, in IO.
+  -> [Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])] -- ^ The child nodes of the term.
+  -> IO (Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
 termConstructor source sourceSpan name range children
-  | name == "ERROR" = sourceSpan >>= withDefaultInfo . (`S.Error` children)
+  | name == "ERROR" = withDefaultInfo (S.Error children)
   | otherwise = withDefaultInfo $ case (name, children) of
     ("return_statement", _) -> S.Return (listToMaybe children)
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
@@ -37,16 +37,16 @@ termConstructor source sourceSpan name range children
       S.Indexed rest -> S.Indexed $ a : rest
       _ -> S.Indexed children
     ("function_call", _) -> case runCofree <$> children of
-      [ (_ :< S.MemberAccess{..}), (_ :< S.Args args) ] -> S.MethodCall memberId property args
-      [ (_ :< S.MemberAccess{..}) ] -> S.MethodCall memberId property []
-      [ function, (_ :< S.Args args) ] -> S.FunctionCall (cofree function) args
+      [ _ :< S.MemberAccess{..}, _ :< S.Args args ] -> S.MethodCall memberId property args
+      [ _ :< S.MemberAccess{..} ] -> S.MethodCall memberId property []
+      [ function, _ :< S.Args args ] -> S.FunctionCall (cofree function) args
       (x:xs) -> S.FunctionCall (cofree x) (cofree <$> xs)
       _ -> S.Indexed children
-    ("ternary", (condition:cases)) -> S.Ternary condition cases
+    ("ternary", condition : cases) -> S.Ternary condition cases
     ("arguments", _) -> S.Args children
     ("var_assignment", [ x, y ]) -> S.VarAssignment x y
     ("var_declaration", _) -> S.Indexed $ toVarDecl <$> children
-    ("switch_statement", (expr:rest)) -> S.Switch expr rest
+    ("switch_statement", expr : rest) -> S.Switch expr rest
     ("case", [ expr, body ]) -> S.Case expr body
     ("object", _) -> S.Object $ foldMap toTuple children
     ("pair", _) -> S.Fixed children
@@ -78,8 +78,12 @@ termConstructor source sourceSpan name range children
           _ -> S.Indexed children
     (_, []) -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
-  where withDefaultInfo syntax@(S.MethodCall _ _ _) = pure $! cofree ((range .:  MethodCall .: RNil) :< syntax)
-        withDefaultInfo syntax = pure $! cofree ((range .: categoryForJavaScriptProductionName name .: RNil) :< syntax)
+  where
+    withDefaultInfo syntax = do
+      sourceSpan' <- sourceSpan
+      pure $! case syntax of
+        S.MethodCall{} -> cofree ((range .:  MethodCall .: sourceSpan' .: RNil) :< syntax)
+        _ -> cofree ((range .: categoryForJavaScriptProductionName name .: sourceSpan' .: RNil) :< syntax)
 
 categoryForJavaScriptProductionName :: Text -> Category
 categoryForJavaScriptProductionName name = case name of
@@ -145,7 +149,7 @@ categoryForJavaScriptProductionName name = case name of
   _ -> Other name
 
 toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
-toVarDecl child = cofree $ (setCategory (extract child) VarDecl :< S.VarDecl child)
+toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl child
 
 toTuple :: Term (S.Syntax Text) (Record fields) -> [Term (S.Syntax Text) (Record fields)]
 toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]

@@ -36,6 +36,7 @@ import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
 import Data.Aeson (toJSON, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
+import SourceSpan
 
 -- | Given a parser and renderer, diff two sources and return the rendered
 -- | result.
@@ -68,7 +69,7 @@ diffFiles parser renderer sourceBlobs = do
           _ -> Nothing)
 
 -- | Return a parser based on the file extension (including the ".").
-parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category])
+parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
 parserForType mediaType = case languageForType mediaType of
   Just C -> treeSitterParser C ts_language_c
   Just JavaScript -> treeSitterParser JavaScript ts_language_javascript
@@ -77,20 +78,19 @@ parserForType mediaType = case languageForType mediaType of
   _ -> lineByLineParser
 
 -- | A fallback parser that treats a file simply as rows of strings.
-lineByLineParser :: Parser (Syntax Text) (Record '[Range, Category])
-lineByLineParser blob = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
+lineByLineParser :: Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
+lineByLineParser SourceBlob{..} = pure . cofree . root $ case foldl' annotateLeaves ([], 0) lines of
   (leaves, _) -> cofree <$> leaves
   where
-    input = source blob
-    lines = actualLines input
-    root children = (Range 0 (length input) .: Program .: RNil) :< Indexed children
-    leaf charIndex line = (Range charIndex (charIndex + T.length line) .: Program .: RNil) :< Leaf line
+    lines = actualLines source
+    root children = (Range 0 (length source) .: Program .: sourceRangeToSpan source (toS path) (Range 0 (length source)) .: RNil) :< Indexed children
+    leaf charIndex line = (Range charIndex (charIndex + T.length line) .: Program .: sourceRangeToSpan source (toS path) (Range charIndex (charIndex + T.length line)) .: RNil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum <> [ leaf charIndex (toText line) ] , charIndex + length line)
     toText = T.pack . Source.toString
 
 -- | Return the parser that should be used for a given path.
-parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category])
+parserForFilepath :: FilePath -> Parser (Syntax Text) (Record '[Cost, Range, Category, SourceSpan])
 parserForFilepath path blob = decorateTerm termCostDecorator <$> parserForType (toS (takeExtension path)) blob
 
 -- | Transcode a file to a unicode source.
@@ -128,7 +128,7 @@ diffCostWithCachedTermCosts diff = unCost $ case runFree diff of
   Pure patch -> sum (cost . extract <$> patch)
 
 -- | Returns a rendered diff given a parser, diff arguments and two source blobs.
-textDiff :: (HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
+textDiff :: (HasField fields SourceSpan, HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO Output
 textDiff parser arguments = diffFiles parser $ case format arguments of
   Split -> split
   Patch -> patch
@@ -144,7 +144,7 @@ truncatedDiff arguments sources = pure $ case format arguments of
   Summary -> SummaryOutput mempty
 
 -- | Prints a rendered diff to stdio or a filepath given a parser, diff arguments and two source blobs.
-printDiff :: (HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
+printDiff :: (HasField fields SourceSpan, HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
   let renderedText = case rendered of

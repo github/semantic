@@ -15,15 +15,17 @@ termConstructor
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
   -> Text -- ^ The name of the production for this node.
   -> Range -- ^ The character range that the term occupies.
-  -> [Term (Syntax Text) (Record '[Range, Category])] -- ^ The child nodes of the term.
-  -> IO (Term (Syntax Text) (Record '[Range, Category])) -- ^ The resulting term, in IO.
+  -> [Term (Syntax Text) (Record '[Range, Category, SourceSpan])] -- ^ The child nodes of the term.
+  -> IO (Term (Syntax Text) (Record '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
 termConstructor source sourceSpan name range children
-  | name == "ERROR" = sourceSpan >>= withDefaultInfo . (`S.Error` children)
+  | name == "ERROR" = withDefaultInfo (S.Error children)
   | otherwise = withDefaultInfo $ case (name, children) of
   (_, []) -> S.Leaf . toText $ slice range source
   _ -> S.Indexed children
-  where withDefaultInfo syntax = pure $! cofree ((range .: categoryForCProductionName name .: RNil) :< syntax)
+  where
+    withDefaultInfo syntax = do
+      sourceSpan' <- sourceSpan
+      pure $! cofree ((range .: categoryForCProductionName name .: sourceSpan' .: RNil) :< syntax)
 
 categoryForCProductionName :: Text -> Category
-categoryForCProductionName name = case name of
-  _ -> Other name
+categoryForCProductionName name = Other name
