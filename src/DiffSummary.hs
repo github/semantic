@@ -24,13 +24,13 @@ import Source
 
 data Annotatable a = Annotatable a | Unannotatable a
 
-annotatable :: (HasField fields Category) => SyntaxTerm leaf fields -> Annotatable (SyntaxTerm leaf fields)
-annotatable term = isAnnotatable (category . extract $ term) term
+annotatable :: SyntaxTerm leaf fields -> Annotatable (SyntaxTerm leaf fields)
+annotatable term = isAnnotatable (unwrap term) term
   where isAnnotatable = \case
-          C.Class -> Annotatable
-          C.Method -> Annotatable
-          C.Function -> Annotatable
-          C.Module -> Annotatable
+          S.Class{} -> Annotatable
+          S.Method{} -> Annotatable
+          S.Function{} -> Annotatable
+          S.Module{} -> Annotatable
           _ -> Unannotatable
 
 data Identifiable a = Identifiable a | Unidentifiable a
