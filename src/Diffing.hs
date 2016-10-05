@@ -149,11 +149,16 @@ printDiff parser arguments sources = do
                        JSONOutput series -> toS . encodingToLazyByteString . toEncoding $ toJSON series
                        SummaryOutput summaries -> toS . encodingToLazyByteString . toEncoding $ toJSON summaries
 
-  case output arguments of
-    Nothing -> TextIO.putStr renderedText
+  writeToOutput (output arguments) renderedText
+
+-- | Writes text to an output file or stdout.
+writeToOutput :: Maybe FilePath -> Text -> IO ()
+writeToOutput output text =
+  case output of
+    Nothing -> TextIO.putStr text
     Just path -> do
       isDir <- doesDirectoryExist path
       let outputPath = if isDir
           then path </> (takeFileName outputPath -<.> ".html")
           else path
-      IO.withFile outputPath IO.WriteMode (`TextIO.hPutStr` renderedText)
+      IO.withFile outputPath IO.WriteMode (`TextIO.hPutStr` text)
