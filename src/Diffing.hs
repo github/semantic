@@ -36,7 +36,6 @@ import Text.Parser.TreeSitter.Language
 import qualified Data.Text as T
 import Data.Aeson (toJSON, toEncoding)
 import Data.Aeson.Encoding (encodingToLazyByteString)
-import SourceSpan
 
 -- | Given a parser and renderer, diff two sources and return the rendered
 -- | result.
