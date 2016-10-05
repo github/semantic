@@ -29,6 +29,7 @@ import Syntax
 import System.Directory
 import System.FilePath
 import qualified System.IO as IO
+import System.Environment (lookupEnv)
 import Term
 import TreeSitter
 import Text.Parser.TreeSitter.Language
@@ -158,7 +159,10 @@ printDiff parser arguments sources = do
 writeToOutput :: Maybe FilePath -> Text -> IO ()
 writeToOutput output text =
   case output of
-    Nothing -> TextIO.putStr text
+    Nothing -> do
+      lang <- lookupEnv "LANG"
+      if isNothing lang then IO.hSetEncoding IO.stdout IO.utf8 else pure ()
+      TextIO.hPutStrLn IO.stdout text
     Just path -> do
       isDir <- doesDirectoryExist path
       let outputPath = if isDir
