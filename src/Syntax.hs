@@ -72,7 +72,10 @@ data Syntax a f
   -- | A method definition with an identifier, params, and a list of expressions.
   | Method f [f] [f]
   | If f f (Maybe f)
-  deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable, Hashable)
+  -- | A module with an identifier, and a list of syntaxes.
+  | Module { moduleId:: f, moduleBody :: [f] }
+  deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
+
 
 -- Instances
 

@@ -107,6 +107,8 @@ data Category
   | NumberLiteral
   -- | A mathematical operator (e.g. +, -, *, /).
   | MathOperator
+  -- | A module
+  | Module
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -158,6 +160,7 @@ instance Arbitrary Category where
     , pure Finally
     , pure Class
     , pure Method
+    , pure Module
     , Other <$> arbitrary
     ]
 
