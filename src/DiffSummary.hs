@@ -78,7 +78,7 @@ diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fie
 diffToDiffSummaries sources = para $ \diff ->
   let diff' = free (Prologue.fst <$> diff)
       annotateWithCategory :: [(Diff leaf (Record fields), [DiffSummary DiffInfo])] -> [DiffSummary DiffInfo]
-      annotateWithCategory children = maybeToList (prependSummary (Both.snd sources) <$> afterTerm diff') <*> (children >>= snd) in
+      annotateWithCategory children = maybeToList (appendSummary (Both.snd sources) <$> afterTerm diff') <*> (children >>= snd) in
   case diff of
     -- Skip comments and leaves since they don't have any changes
     (Free (_ :< syntax)) -> annotateWithCategory (toList syntax)
@@ -217,12 +217,12 @@ termToDiffInfo blob term = case unwrap term of
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob
 
--- | Prepends a parentAnnotation to the current DiffSummary instance.
--- | For a DiffSummary without a parentAnnotation, we prepend a parentAnnotation with the first identifiable term.
--- | For a DiffSummary with a parentAnnotation, we prepend the next annotatable term to the extant parentAnnotation.
+-- | Append a parentAnnotation to the current DiffSummary instance.
+-- | For a DiffSummary without a parentAnnotation, we append a parentAnnotation with the first identifiable term.
+-- | For a DiffSummary with a parentAnnotation, we append the next annotatable term to the extant parentAnnotation.
 -- | If a DiffSummary already has a parentAnnotation, and a (grand) parentAnnotation, then we return the summary without modification.
-prependSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
-prependSummary source term summary =
+appendSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
+appendSummary source term summary =
   case (parentAnnotation summary, identifiable term, annotatable term) of
     ([], Identifiable _, _) -> appendParentAnnotation Left
     ([_], _, Annotatable _) -> appendParentAnnotation Right
