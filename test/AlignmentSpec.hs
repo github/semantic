@@ -2,7 +2,6 @@
 module AlignmentSpec where
 
 import Alignment
-import Control.Arrow ((&&&))
 import Control.Monad.State
 import Data.Align hiding (align)
 import Data.Bifunctor

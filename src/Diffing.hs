@@ -5,7 +5,6 @@ import Prologue hiding (fst, snd)
 import Category
 import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
-import Data.Functor.Foldable
 import Data.RandomWalkSimilarity
 import Data.Record
 import qualified Data.Text.IO as TextIO
@@ -42,7 +41,11 @@ import Data.Aeson.Encoding (encodingToLazyByteString)
 -- | result.
 -- | Returns the rendered result strictly, so it's always fully evaluated
 -- | with respect to other IO actions.
-diffFiles :: (HasField fields Category, HasField fields Cost) => Parser (Syntax Text) (Record fields) -> Renderer (Record (Vector.Vector Double ': fields)) -> Both SourceBlob -> IO Output
+diffFiles :: (HasField fields Category, HasField fields Cost)
+          => Parser (Syntax Text) (Record fields)
+          -> Renderer (Record (Vector.Vector Double ': fields))
+          -> Both SourceBlob
+          -> IO Output
 diffFiles parser renderer sourceBlobs = do
   terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel) . parser) sourceBlobs
 
@@ -80,8 +83,8 @@ lineByLineParser blob = pure . cofree . root $ case foldl' annotateLeaves ([], 0
   where
     input = source blob
     lines = actualLines input
-    root children = ((Range 0 $ length input) .: Program .: RNil) :< Indexed children
-    leaf charIndex line = ((Range charIndex $ charIndex + T.length line) .: Program .: RNil) :< Leaf line
+    root children = (Range 0 (length input) .: Program .: RNil) :< Indexed children
+    leaf charIndex line = (Range charIndex (charIndex + T.length line) .: Program .: RNil) :< Leaf line
     annotateLeaves (accum, charIndex) line =
       (accum <> [ leaf charIndex (toText line) ] , charIndex + length line)
     toText = T.pack . Source.toString
@@ -104,10 +107,10 @@ readAndTranscodeFile path = do
   transcode text
 
 -- | A function computing a value to decorate terms with. This can be used to cache synthesized attributes on terms.
-type TermDecorator f fields field = CofreeF f (Record fields) (Record (field ': fields)) -> field
+type TermDecorator f fields field = TermF f (Record fields) (Record (field ': fields)) -> field
 
 -- | Decorate a 'Term' using a function to compute the annotation values at every node.
-decorateTerm :: Functor f => TermDecorator f fields field -> Cofree f (Record fields) -> Cofree f (Record (field ': fields))
+decorateTerm :: Functor f => TermDecorator f fields field -> Term f (Record fields) -> Term f (Record (field ': fields))
 decorateTerm decorator = cata $ \ c -> cofree ((decorator (extract <$> c) .: headF c) :< tailF c)
 
 -- | Term decorator computing the cost of an unpacked term.

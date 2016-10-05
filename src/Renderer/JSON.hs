@@ -100,6 +100,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Array c -> childrenFields c
   S.Class identifier superclass definitions -> [ "classIdentifier" .= identifier ] <> [ "superclass" .= superclass ] <> [ "definitions" .= definitions ]
   S.Method identifier params definitions -> [ "methodIdentifier" .= identifier ] <> [ "params" .= params ] <> [ "definitions" .= definitions ]
+  S.Module identifier definitions-> [ "moduleIdentifier" .= identifier ] <> [ "definitions" .= definitions ]
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: (KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (SyntaxTerm leaf fields) -> [kv]
