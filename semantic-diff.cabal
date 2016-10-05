@@ -93,7 +93,7 @@ library
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, LambdaCase
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -fprof-auto -j
 
-executable semantic-git-diff
+executable semantic-diff
   hs-source-dirs:      app
   main-is:             Main.hs
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -static -j -O2 -pgml=script/g++

@@ -56,7 +56,7 @@ argumentsParser = info (version <*> helper <*> argumentsP)
           where regex = mkRegexWithOpts "([0-9a-f]{40})\\.\\.([0-9a-f]{40})" True False
 
 versionString :: String
-versionString = "semantic-git-diff version " <> showVersion Library.version
+versionString = "semantic-diff version " <> showVersion Library.version
 
 version :: Parser (a -> a)
 version = infoOption versionString (long "version" <> short 'V' <> help "output the version of the program")
