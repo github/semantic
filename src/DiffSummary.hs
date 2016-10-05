@@ -10,7 +10,6 @@ import Info (category, characterRange)
 import Range
 import Syntax as S
 import Category as C
-import Data.Functor.Foldable as Foldable
 import Data.Functor.Both hiding (fst, snd)
 import qualified Data.Functor.Both as Both
 import Data.Text as Text (intercalate)
@@ -25,13 +24,13 @@ import Source
 
 data Annotatable a = Annotatable a | Unannotatable a
 
-annotatable :: (HasField fields Category) => SyntaxTerm leaf fields -> Annotatable (SyntaxTerm leaf fields)
-annotatable term = isAnnotatable (category . extract $ term) term
+annotatable :: SyntaxTerm leaf fields -> Annotatable (SyntaxTerm leaf fields)
+annotatable term = isAnnotatable (unwrap term) term
   where isAnnotatable = \case
-          C.Class -> Annotatable
-          C.Method -> Annotatable
-          C.Function -> Annotatable
-          C.Module -> Annotatable
+          S.Class{} -> Annotatable
+          S.Method{} -> Annotatable
+          S.Function{} -> Annotatable
+          S.Module{} -> Annotatable
           _ -> Unannotatable
 
 data Identifiable a = Identifiable a | Unidentifiable a
@@ -76,13 +75,17 @@ summaryToTexts DiffSummary{..} = runJoin . fmap (show . (<+> parentContexts pare
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
 diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
 diffToDiffSummaries sources = para $ \diff ->
-  let diff' = free (Prologue.fst <$> diff)
-      annotateWithCategory :: [(Diff leaf (Record fields), [DiffSummary DiffInfo])] -> [DiffSummary DiffInfo]
-      annotateWithCategory children = maybeToList (appendSummary (Both.snd sources) <$> afterTerm diff') <*> (children >>= snd) in
-  case diff of
+  let
+    diff' = free (Prologue.fst <$> diff)
+    annotateWithCategory :: [DiffSummary DiffInfo] -> [DiffSummary DiffInfo]
+    annotateWithCategory children = case (beforeTerm diff', afterTerm diff') of
+      (_, Just diff'') -> appendSummary (Both.snd sources) diff'' <$> children
+      (Just diff'', _) -> appendSummary (Both.fst sources) diff'' <$> children
+      (Nothing, Nothing) -> []
+  in case diff of
     -- Skip comments and leaves since they don't have any changes
-    (Free (_ :< syntax)) -> annotateWithCategory (toList syntax)
-    (Pure patch) -> [ DiffSummary (mapPatch (termToDiffInfo beforeSource) (termToDiffInfo afterSource) patch) []]
+    (Free (_ :< syntax)) -> annotateWithCategory (toList syntax >>= snd)
+    (Pure patch) -> [ DiffSummary (mapPatch (termToDiffInfo beforeSource) (termToDiffInfo afterSource) patch) [] ]
   where
     (beforeSource, afterSource) = runJoin sources
 

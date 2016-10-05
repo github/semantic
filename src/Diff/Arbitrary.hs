@@ -1,6 +1,7 @@
 module Diff.Arbitrary where
 
 import Diff
+import Term
 import Data.Bifunctor.Join
 import Data.Bifunctor.Join.Arbitrary ()
 import Data.Functor.Both
@@ -9,7 +10,6 @@ import Patch
 import Patch.Arbitrary ()
 import Syntax
 import Prologue
-import Term
 import Term.Arbitrary
 import Test.QuickCheck hiding (Fixed)
 
