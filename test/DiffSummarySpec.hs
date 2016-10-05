@@ -21,13 +21,13 @@ import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.QuickCheck
 
-arrayInfo :: Record '[Category, Range]
-arrayInfo = ArrayLiteral .: Range 0 3 .: RNil
+arrayInfo :: Record '[Category, Range, SourceSpan]
+arrayInfo = ArrayLiteral .: Range 0 3 .: SourceSpan "" (SourcePos 1 0) (SourcePos 1 3) .: RNil
 
-literalInfo :: Record '[Category, Range]
-literalInfo = StringLiteral .: Range 1 2 .: RNil
+literalInfo :: Record '[Category, Range, SourceSpan]
+literalInfo = StringLiteral .: Range 1 2 .: SourceSpan "" (SourcePos 1 2) (SourcePos 1 3) .: RNil
 
-testDiff :: Diff (Syntax Text) (Record '[Category, Range])
+testDiff :: Diff (Syntax Text) (Record '[Category, Range, SourceSpan])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "\"a\"")) ])
 
 testSummary :: DiffSummary DiffInfo
@@ -46,13 +46,13 @@ spec = parallel $ do
       diffSummaries blobs testDiff `shouldBe` [ Right $ "Added the \"a\" string" ]
 
     prop "equal terms produce identity diffs" $
-      \ a -> let term = defaultFeatureVectorDecorator (category . headF) (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range]))) in
+      \ a -> let term = defaultFeatureVectorDecorator (category . headF) (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range, SourceSpan]))) in
         diffSummaries blobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
   describe "DiffInfo" $ do
     prop "patches in summaries match the patches in diffs" $
       \a -> let
-        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Cost, Range])))
+        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Cost, Range, SourceSpan])))
         summaries = diffToDiffSummaries (source <$> blobs) diff
         patches = toList diff
         in
@@ -61,14 +61,14 @@ spec = parallel $ do
               (() <$ branchPatches, () <$ otherPatches) `shouldBe` (() <$ branchDiffPatches, () <$ otherDiffPatches)
     prop "generates one LeafInfo for each child in an arbitrary branch patch" $
       \a -> let
-        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Range])))
+        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Range, SourceSpan])))
         diffInfoPatches = patch <$> diffToDiffSummaries (source <$> blobs) diff
         syntaxPatches = toList diff
         extractLeaves :: DiffInfo -> [DiffInfo]
         extractLeaves (BranchInfo children _ _) = join $ extractLeaves <$> children
         extractLeaves leaf = [ leaf ]
 
-        extractDiffLeaves :: Term (Syntax Text) (Record '[Category, Range]) -> [ Term (Syntax Text) (Record '[Category, Range]) ]
+        extractDiffLeaves :: Term (Syntax Text) (Record '[Category, Range, SourceSpan]) -> [ Term (Syntax Text) (Record '[Category, Range, SourceSpan]) ]
         extractDiffLeaves term = case unwrap term of
           (Indexed children) -> join $ extractDiffLeaves <$> children
           (Fixed children) -> join $ extractDiffLeaves <$> children
