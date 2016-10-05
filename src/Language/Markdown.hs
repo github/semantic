@@ -9,7 +9,6 @@ import Parser
 import Prologue
 import Range
 import Source
-import SourceSpan
 import Syntax
 
 cmarkParser :: Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
