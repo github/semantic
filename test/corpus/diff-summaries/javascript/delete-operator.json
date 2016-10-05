@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-delete-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                "Added the 'delete thing['prop']' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "bc15aec1c4c4587cd5b4d204e3f00feec92121dc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f22024cd7638d58322baf56ac7f4f92d4362ef72"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                "Added the 'delete thing.prop' operator",
+                "Added the 'delete thing['prop']' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "f22024cd7638d58322baf56ac7f4f92d4362ef72",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9826ff64f0489fd1a68ff364565921c9963ebb1b"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                "Added the 'delete thing['prop']' operator",
+                "Deleted the 'delete thing.prop' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "9826ff64f0489fd1a68ff364565921c9963ebb1b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "205aa4c322bbea472e7b9f2c304b095a228cd19f"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                "Added the 'delete thing.prop' operator",
+                "Deleted the 'delete thing['prop']' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "205aa4c322bbea472e7b9f2c304b095a228cd19f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "97b0347b390b2458f820f0b149068f9461a435cf"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                "Deleted the 'delete thing.prop' operator",
+                "Added the 'delete thing.prop' operator",
+                "Deleted the 'delete thing['prop']' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "97b0347b390b2458f820f0b149068f9461a435cf",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6fa3a94c630696908821c630c84c2a88178435e0"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                "Deleted the 'delete thing['prop']' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "6fa3a94c630696908821c630c84c2a88178435e0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0ef9281385ae4b7a3f66369a69804ad14f2da122"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                "Deleted the 'delete thing.prop' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "0ef9281385ae4b7a3f66369a69804ad14f2da122",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0e5929ffe5c88dd824b05f48b9025ccfa67f9c04"
+}]

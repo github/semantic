@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                "Added the 'key in something && i = 0; i < n; i++' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "17f5abea194c00c30becb942c3027e39e06587e5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a21b599a32324604d9112ede61a3088b6cb4b29f"
+}
+,{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                "Added the 'otherKey in something && i = 0; i < n; i++' for statement",
+                "Added the 'key in something && i = 0; i < n; i++' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "a21b599a32324604d9112ede61a3088b6cb4b29f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "36f946485face8ac155e070ddc07f61f5f7bebde"
+}
+,{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                "Deleted the 'otherKey in something && i = 0; i < n; i++' for statement",
+                "Added the 'key in something && i = 0; i < n; i++' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "36f946485face8ac155e070ddc07f61f5f7bebde",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "42d0c83d21fbbfb73a8e125d6c89a5a982fc2ded"
+}
+,{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                "Added the 'otherKey in something && i = 0; i < n; i++' for statement",
+                "Deleted the 'key in something && i = 0; i < n; i++' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "42d0c83d21fbbfb73a8e125d6c89a5a982fc2ded",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "61fdb98bf516ab55f4b85780c01bd2e12b67ddcb"
+}
+,{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                "Deleted the 'otherKey in something && i = 0; i < n; i++' for statement",
+                "Added the 'otherKey in something && i = 0; i < n; i++' for statement",
+                "Deleted the 'key in something && i = 0; i < n; i++' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "61fdb98bf516ab55f4b85780c01bd2e12b67ddcb",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a3240e7ca5052ea60f693dce79bfddf93df68996"
+}
+,{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                "Deleted the 'key in something && i = 0; i < n; i++' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "a3240e7ca5052ea60f693dce79bfddf93df68996",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2815282baf54846662365cb1ab25ff93a6616022"
+}
+,{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                "Deleted the 'otherKey in something && i = 0; i < n; i++' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "2815282baf54846662365cb1ab25ff93a6616022",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6d12c26a06d1329fb2747fa5450d0d1daa5315b4"
+}]

@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-template-string-insert-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                "Added the '`one line`' template string"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "82ac9049dc6dcbfef96c1c8c65501872466b44fb",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "30d0936143b14b2d0e439300e5ef643315046887"
+}
+,{
+    "testCaseDescription": "javascript-template-string-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                "Added the '`multi line`' template string",
+                "Added the '`one line`' template string"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "30d0936143b14b2d0e439300e5ef643315046887",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "699391b454f168a1eab35358bd1cf1a530bbf420"
+}
+,{
+    "testCaseDescription": "javascript-template-string-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                "Added the '`one line`' template string",
+                "Deleted the '`multi line`' template string"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "699391b454f168a1eab35358bd1cf1a530bbf420",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b51c70761a973ea900d4b25a8f8b4ee662b76760"
+}
+,{
+    "testCaseDescription": "javascript-template-string-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                "Added the '`multi line`' template string",
+                "Deleted the '`one line`' template string"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "b51c70761a973ea900d4b25a8f8b4ee662b76760",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f78f831fb49f207742537af6dfe28ae402f783ce"
+}
+,{
+    "testCaseDescription": "javascript-template-string-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                "Deleted the '`multi line`' template string",
+                "Added the '`multi line`' template string",
+                "Deleted the '`one line`' template string"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "f78f831fb49f207742537af6dfe28ae402f783ce",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "498cb72499d1f739e3a8a465049b5f0860fca989"
+}
+,{
+    "testCaseDescription": "javascript-template-string-delete-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                "Deleted the '`one line`' template string"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "498cb72499d1f739e3a8a465049b5f0860fca989",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a6b6a5b162e47aa8fe57774c3edb48547c2144e7"
+}
+,{
+    "testCaseDescription": "javascript-template-string-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                "Deleted the '`multi line`' template string"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "a6b6a5b162e47aa8fe57774c3edb48547c2144e7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a49b3cc79bf0a423e6474f02d4f9b2deae2cf7aa"
+}]

@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-object-insert-test",
+    "expectedResult": {
+        "changes": {
+            "object.js": [
+                "Added the '{ \"key1\": … }' object"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "object.js"
+    ],
+    "sha1": "42568766bb733eed07b52ce1e60228d6ca7b9b3d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b41b2d7a4696d1a9d87dbd741cbd5be43be267e9"
+}
+,{
+    "testCaseDescription": "javascript-object-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "object.js": [
+                "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object",
+                "Added the '{ \"key1\": … }' object"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "object.js"
+    ],
+    "sha1": "b41b2d7a4696d1a9d87dbd741cbd5be43be267e9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bce59fe5bf8a1ebe039cb15c8891279c08d71623"
+}
+,{
+    "testCaseDescription": "javascript-object-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "object.js": [
+                "Added the '{ \"key1\": … }' object",
+                "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "object.js"
+    ],
+    "sha1": "bce59fe5bf8a1ebe039cb15c8891279c08d71623",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "30990ba3e9fafa9a9327f12c00c5fdf4f65299d4"
+}
+,{
+    "testCaseDescription": "javascript-object-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "object.js": [
+                "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object",
+                "Deleted the '{ \"key1\": … }' object"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "object.js"
+    ],
+    "sha1": "30990ba3e9fafa9a9327f12c00c5fdf4f65299d4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3eb8a70412a2dd5619e447555d26906238361198"
+}
+,{
+    "testCaseDescription": "javascript-object-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "object.js": [
+                "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object",
+                "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object",
+                "Deleted the '{ \"key1\": … }' object"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "object.js"
+    ],
+    "sha1": "3eb8a70412a2dd5619e447555d26906238361198",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "29ccc323daa318c1a76240ce58f512640b42212f"
+}
+,{
+    "testCaseDescription": "javascript-object-delete-test",
+    "expectedResult": {
+        "changes": {
+            "object.js": [
+                "Deleted the '{ \"key1\": … }' object"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "object.js"
+    ],
+    "sha1": "29ccc323daa318c1a76240ce58f512640b42212f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "772e2957a5c9e07366553203c493f2bcd1d36c89"
+}
+,{
+    "testCaseDescription": "javascript-object-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "object.js": [
+                "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "object.js"
+    ],
+    "sha1": "772e2957a5c9e07366553203c493f2bcd1d36c89",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e8b2b7fe36d673849485d794fb1cbd70190d690d"
+}]

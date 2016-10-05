@@ -1,0 +1,123 @@
+[{
+    "testCaseDescription": "javascript-constructor-call-insert-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                "Added the 'module.Klass(1, \"two\")' constructor"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "56ac0498e3eca9490af686d48b36ddaaaf867dcc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ad41d965f174f829905e7c3e1af85e4ac66515c0"
+}
+,{
+    "testCaseDescription": "javascript-constructor-call-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                "Added the 'module.Klass(1, \"three\")' constructor",
+                "Added the 'module.Klass(1, \"two\")' constructor"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "ad41d965f174f829905e7c3e1af85e4ac66515c0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a373f053576064a918b1046e076f84522cf5bd91"
+}
+,{
+    "testCaseDescription": "javascript-constructor-call-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                "Added the 'module.Klass(1, \"two\")' constructor",
+                "Deleted the 'module.Klass(1, \"three\")' constructor"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "a373f053576064a918b1046e076f84522cf5bd91",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f79590f526ca63035f84fa6c5863f913c54cf138"
+}
+,{
+    "testCaseDescription": "javascript-constructor-call-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                "Added the 'module.Klass(1, \"three\")' constructor",
+                "Deleted the 'module.Klass(1, \"two\")' constructor"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "f79590f526ca63035f84fa6c5863f913c54cf138",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1f6e48e9190f5c819cec62e4d8a4f649696d9c78"
+}
+,{
+    "testCaseDescription": "javascript-constructor-call-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                "Deleted the 'module.Klass(1, \"three\")' constructor",
+                "Replaced the \"two\" string with the \"three\" string in the module.Klass(1, \"three\") method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "1f6e48e9190f5c819cec62e4d8a4f649696d9c78",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6b576267384568958b95ec13e2bd6a03e91b2566"
+}
+,{
+    "testCaseDescription": "javascript-constructor-call-delete-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                "Deleted the 'module.Klass(1, \"two\")' constructor"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "6b576267384568958b95ec13e2bd6a03e91b2566",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c7c67fb74a7c2bc37086788149ddbdb977698179"
+}
+,{
+    "testCaseDescription": "javascript-constructor-call-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                "Deleted the 'module.Klass(1, \"three\")' constructor"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "c7c67fb74a7c2bc37086788149ddbdb977698179",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7f626789377b5fd3eea7b354c6e5a1cc5fc2e265"
+}]

@@ -1,0 +1,86 @@
+[{
+    "testCaseDescription": "javascript-relational-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "relational-operator.js": [
+                "Added the 'x < y' relational operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "relational-operator.js"
+    ],
+    "sha1": "2b3a648ff2420e7e577c6ac2909dfdf09ec6d3bd",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "acb0990543bb7df4fc817d7dd00bb2f573148565"
+}
+,{
+    "testCaseDescription": "javascript-relational-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "relational-operator.js": [
+                "Added the 'x < y' relational operator",
+                "Added the 'x < y' relational operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "relational-operator.js"
+    ],
+    "sha1": "acb0990543bb7df4fc817d7dd00bb2f573148565",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ad46656407f725ac32983a8271c0efc20eb3db37"
+}
+,{
+    "testCaseDescription": "javascript-relational-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "relational-operator.js": [
+                "Deleted the 'x < y' relational operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "relational-operator.js"
+    ],
+    "sha1": "97ddfebb00c70ab04f760ed922c7f1e6ae052a7b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b2f4c7a5732f1643ec4e44a699131252eb2625b7"
+}
+,{
+    "testCaseDescription": "javascript-relational-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "relational-operator.js": [
+                "Deleted the 'x <= y' relational operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "relational-operator.js"
+    ],
+    "sha1": "b2f4c7a5732f1643ec4e44a699131252eb2625b7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e8492c45be33305d253a9e88ddb2624200ff2cbc"
+}
+,{
+    "testCaseDescription": "javascript-relational-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "relational-operator.js": [
+                "Deleted the 'x <= y' relational operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "relational-operator.js"
+    ],
+    "sha1": "e8492c45be33305d253a9e88ddb2624200ff2cbc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "fed990263904999ef2b80934ed1a3881d7cf7056"
+}]

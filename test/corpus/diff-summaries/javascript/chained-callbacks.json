@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-chained-callbacks-insert-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Added the 'this.map(…)' method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "298fb331dea64b4fe4323fbb01c0b2578a425bcc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c5f3c51f8dd1fecfb3a62ded5fd477c701146b5e"
+}
+,{
+    "testCaseDescription": "javascript-chained-callbacks-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Added the 'this.reduce(…)' method call",
+                "Added the 'this.map(…)' method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "c5f3c51f8dd1fecfb3a62ded5fd477c701146b5e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "08ab7271bae8f27b35fdf8dcb7aec44b1132d5aa"
+}
+,{
+    "testCaseDescription": "javascript-chained-callbacks-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Added the 'this.map(…)' method call",
+                "Deleted the 'this.reduce(…)' method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "08ab7271bae8f27b35fdf8dcb7aec44b1132d5aa",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "60bafa5a398c79d84d3dbf2b54777a67d1069c72"
+}
+,{
+    "testCaseDescription": "javascript-chained-callbacks-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Added the 'this.reduce(…)' method call",
+                "Deleted the 'this.map(…)' method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "60bafa5a398c79d84d3dbf2b54777a67d1069c72",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b99ecde5f452b7f2e765d386fd89a3143cd2a7a3"
+}
+,{
+    "testCaseDescription": "javascript-chained-callbacks-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Deleted the 'this.reduce(…)' method call",
+                "Added the 'this.reduce(…)' method call",
+                "Deleted the 'this.map(…)' method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "b99ecde5f452b7f2e765d386fd89a3143cd2a7a3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a2cc85026538bd98d696b1b9ee5aa6d3dcd4f572"
+}
+,{
+    "testCaseDescription": "javascript-chained-callbacks-delete-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Deleted the 'this.map(…)' method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "a2cc85026538bd98d696b1b9ee5aa6d3dcd4f572",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "cc4a75036f1e12213a1403fcfb29d8a329f09744"
+}
+,{
+    "testCaseDescription": "javascript-chained-callbacks-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Deleted the 'this.reduce(…)' method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "cc4a75036f1e12213a1403fcfb29d8a329f09744",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "95d141d5f4f92f171e7690e40239750e8d55e7da"
+}]

@@ -1,0 +1,136 @@
+[{
+    "testCaseDescription": "javascript-var-declaration-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Added the 'x' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "5099a9bb7a28ce5fe5558ce9c69813cb91a62ac1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "cfc3d6557f320bbb7e8c5b5fc9820db038bc2745"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Added the 'x' variable",
+                "Added the 'y' variable",
+                "Added the 'z' variable",
+                "Added the 'x' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "cfc3d6557f320bbb7e8c5b5fc9820db038bc2745",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "df50d8c3f4cc74a89cd0002dc42347a2c0c493ce"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Deleted the 'x' variable",
+                "Deleted the 'y' variable",
+                "Deleted the 'z' variable",
+                "Added the 'x' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "df50d8c3f4cc74a89cd0002dc42347a2c0c493ce",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2397f594fe9a2f64c9d9b020e3887e464b988069"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Added the 'x' variable",
+                "Added the 'y' variable",
+                "Added the 'z' variable",
+                "Deleted the 'x' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "2397f594fe9a2f64c9d9b020e3887e464b988069",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "557258b247d3bc49b25f3213f42043b129511677"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Deleted the 'x' variable",
+                "Deleted the 'y' variable",
+                "Deleted the 'z' variable",
+                "Added the 'x' variable",
+                "Added the 'y' variable",
+                "Added the 'z' variable",
+                "Deleted the 'x' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "557258b247d3bc49b25f3213f42043b129511677",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b7d9d5c8847f99999a0d2136e592482db7a647b0"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-delete-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Deleted the 'x' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "b7d9d5c8847f99999a0d2136e592482db7a647b0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "42e244fcd70a9dc599ab8a0031d2320e832ea0fe"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Deleted the 'x' variable",
+                "Deleted the 'y' variable",
+                "Deleted the 'z' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "42e244fcd70a9dc599ab8a0031d2320e832ea0fe",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c367cef2a2ab4f6c19c197ff79c0e633b62e30b4"
+}]

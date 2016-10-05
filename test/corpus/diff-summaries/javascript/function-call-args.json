@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-function-call-args-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                "Added the 'someFunction(1, \"string\", …, true)' function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "2311700298627f011623e053dcffce4d08fb2fa5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3a034bfaf70eae77f3dc1e43d934f78c41104c7d"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                "Added the 'someFunction(1, \"otherString\", …, false)' function call",
+                "Added the 'someFunction(1, \"string\", …, true)' function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "3a034bfaf70eae77f3dc1e43d934f78c41104c7d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d13bfcd449c3459e307247a4db7d139260efec5c"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                "Added the 'someFunction(1, \"string\", …, true)' function call",
+                "Deleted the 'someFunction(1, \"otherString\", …, false)' function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "d13bfcd449c3459e307247a4db7d139260efec5c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "40bb22fddcf563e0466e11a6f7e8487f3542ac73"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                "Added the 'someFunction(1, \"otherString\", …, false)' function call",
+                "Deleted the 'someFunction(1, \"string\", …, true)' function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "40bb22fddcf563e0466e11a6f7e8487f3542ac73",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "eeb76aed7b218d3838921ffb5ddf387c49d26a42"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                "Deleted the 'someFunction(1, \"otherString\", …, false)' function call",
+                "Added the 'someFunction(1, \"otherString\", …, false)' function call",
+                "Deleted the 'someFunction(1, \"string\", …, true)' function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "eeb76aed7b218d3838921ffb5ddf387c49d26a42",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f1809a2391fb4d96c2abc1285453ce4adfd85f38"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-delete-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                "Deleted the 'someFunction(1, \"string\", …, true)' function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "f1809a2391fb4d96c2abc1285453ce4adfd85f38",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "44f10969631864287c36cf61e20200c1a0b04033"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                "Deleted the 'someFunction(1, \"otherString\", …, false)' function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "44f10969631864287c36cf61e20200c1a0b04033",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "56ac0498e3eca9490af686d48b36ddaaaf867dcc"
+}]

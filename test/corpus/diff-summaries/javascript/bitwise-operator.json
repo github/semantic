@@ -1,0 +1,123 @@
+[{
+    "testCaseDescription": "javascript-bitwise-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                "Added the 'i >> j' bitwise operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "sha1": "cbe58e2de4353948478c7716d90fa22e6f430b3f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e00ee4c31366730302d1bd06e6359897dd94f02c"
+}
+,{
+    "testCaseDescription": "javascript-bitwise-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                "Added the 'i >> k' bitwise operator",
+                "Added the 'i >> j' bitwise operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "sha1": "e00ee4c31366730302d1bd06e6359897dd94f02c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6724780ecdbfccbc419d351fd0104959a90200b2"
+}
+,{
+    "testCaseDescription": "javascript-bitwise-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                "Added the 'i >> j' bitwise operator",
+                "Deleted the 'i >> k' bitwise operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "sha1": "6724780ecdbfccbc419d351fd0104959a90200b2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "83f1c96a797988568a6466a436d0ee8a1f95b054"
+}
+,{
+    "testCaseDescription": "javascript-bitwise-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                "Added the 'i >> k' bitwise operator",
+                "Deleted the 'i >> j' bitwise operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "sha1": "83f1c96a797988568a6466a436d0ee8a1f95b054",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c546b433a881c30583010d2ac6b4186a2c30c4bb"
+}
+,{
+    "testCaseDescription": "javascript-bitwise-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                "Deleted the 'i >> k' bitwise operator",
+                "Replaced the 'j' identifier with the 'k' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "sha1": "c546b433a881c30583010d2ac6b4186a2c30c4bb",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "df100f5ba9f9c4901c42b1efce658b29e87ea029"
+}
+,{
+    "testCaseDescription": "javascript-bitwise-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                "Deleted the 'i >> j' bitwise operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "sha1": "df100f5ba9f9c4901c42b1efce658b29e87ea029",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3e368d25cc3a3fb92993c5561becf428f03ff75b"
+}
+,{
+    "testCaseDescription": "javascript-bitwise-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                "Deleted the 'i >> k' bitwise operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "sha1": "3e368d25cc3a3fb92993c5561becf428f03ff75b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2b3a648ff2420e7e577c6ac2909dfdf09ec6d3bd"
+}]

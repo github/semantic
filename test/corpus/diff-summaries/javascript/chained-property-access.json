@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-chained-property-access-insert-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                "Added the 'returned.promise().done(…).fail(…)' return statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "0d39978593de2568f3ab5b0db632c7091f305835",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "02e0c92e32e7486f7f3bfecb5ec7901a91b933c5"
+}
+,{
+    "testCaseDescription": "javascript-chained-property-access-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                "Added the 'returned.promise().done(…).fail(…)' return statement",
+                "Added the 'returned.promise().done(…).fail(…)' return statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "02e0c92e32e7486f7f3bfecb5ec7901a91b933c5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4982cbccacaa37f8b98eb05b041be31bf5297b7c"
+}
+,{
+    "testCaseDescription": "javascript-chained-property-access-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                "Added the 'returned.promise().done(…).fail(…)' return statement",
+                "Deleted the 'returned.promise().done(…).fail(…)' return statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "4982cbccacaa37f8b98eb05b041be31bf5297b7c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c8ab77841777008e7b161e300debf78e144756b0"
+}
+,{
+    "testCaseDescription": "javascript-chained-property-access-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                "Added the 'returned.promise().done(…).fail(…)' return statement",
+                "Deleted the 'returned.promise().done(…).fail(…)' return statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "c8ab77841777008e7b161e300debf78e144756b0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7fb67a5e9a60e16d39e521fd3bad8727ed8db378"
+}
+,{
+    "testCaseDescription": "javascript-chained-property-access-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                "Deleted the 'returned.promise().done(…).fail(…)' return statement",
+                "Added the 'returned.promise().done(…).fail(…)' return statement",
+                "Deleted the 'returned.promise().done(…).fail(…)' return statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "7fb67a5e9a60e16d39e521fd3bad8727ed8db378",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ca4793d8cae63c39d45775e17541fe7a156c945b"
+}
+,{
+    "testCaseDescription": "javascript-chained-property-access-delete-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                "Deleted the 'returned.promise().done(…).fail(…)' return statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "ca4793d8cae63c39d45775e17541fe7a156c945b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "58f1fb0cc9f077dec7737a31e5bd120d70623a8d"
+}
+,{
+    "testCaseDescription": "javascript-chained-property-access-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                "Deleted the 'returned.promise().done(…).fail(…)' return statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "58f1fb0cc9f077dec7737a31e5bd120d70623a8d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "298fb331dea64b4fe4323fbb01c0b2578a425bcc"
+}]

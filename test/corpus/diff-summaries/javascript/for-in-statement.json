@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-for-in-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Added the 'thing in things' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "a49b3cc79bf0a423e6474f02d4f9b2deae2cf7aa",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0a7c6659f5ec71c2b1fa3e6e2bb4496a93f32f61"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Added the 'item in items' for statement",
+                "Added the 'thing in things' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "0a7c6659f5ec71c2b1fa3e6e2bb4496a93f32f61",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "99cf353eb02deb90fb186c3f329a08b0d4d8d6af"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Deleted the 'item in items' for statement",
+                "Added the 'thing in things' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "99cf353eb02deb90fb186c3f329a08b0d4d8d6af",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f581d7c8f2909f9bbfd0bd22aa842d4f75024922"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Added the 'item in items' for statement",
+                "Deleted the 'thing in things' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "f581d7c8f2909f9bbfd0bd22aa842d4f75024922",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3d00da198e8cb46729d6731b25996989a2bbc861"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Deleted the 'item in items' for statement",
+                "Added the 'item in items' for statement",
+                "Deleted the 'thing in things' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "3d00da198e8cb46729d6731b25996989a2bbc861",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c89f407311b549fca61cbaf71bb56d3ee6dc7454"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Deleted the 'thing in things' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "c89f407311b549fca61cbaf71bb56d3ee6dc7454",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "36ffd9416fc0678a6934d4b8669d19e7b9a6750b"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Deleted the 'item in items' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "36ffd9416fc0678a6934d4b8669d19e7b9a6750b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "12621d999238618e3a862f232779862ba803a778"
+}]

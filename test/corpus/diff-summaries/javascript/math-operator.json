@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-math-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                "Added the 'i + j * 3 - j % 5' math operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "7f626789377b5fd3eea7b354c6e5a1cc5fc2e265",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8ab55b9d82f1413aa9575f42f301dabd079db78c"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                "Added the 'i + j * 2 - j % 4' math operator",
+                "Added the 'i + j * 3 - j % 5' math operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "8ab55b9d82f1413aa9575f42f301dabd079db78c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4041641de1922c3898a8ee7cd196c558e7e69128"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                "Added the 'i + j * 3 - j % 5' math operator",
+                "Deleted the 'i + j * 2 - j % 4' math operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "4041641de1922c3898a8ee7cd196c558e7e69128",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e8d325535d083a000ba8292202440a5495be8922"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                "Added the 'i + j * 2 - j % 4' math operator",
+                "Deleted the 'i + j * 3 - j % 5' math operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "e8d325535d083a000ba8292202440a5495be8922",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9ca2993d5a9ace2a5028dff739736c6c39bae554"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                "Deleted the 'i + j * 2 - j % 4' math operator",
+                "Replaced '3' with '2'",
+                "Replaced '5' with '4'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "9ca2993d5a9ace2a5028dff739736c6c39bae554",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "dccbc9a4d8485e3a097694ccd115e42062a7722e"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                "Deleted the 'i + j * 3 - j % 5' math operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "dccbc9a4d8485e3a097694ccd115e42062a7722e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "56d97a6e44e0d8ce307d0830658fd81a25eb172e"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                "Deleted the 'i + j * 2 - j % 4' math operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "56d97a6e44e0d8ce307d0830658fd81a25eb172e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "431090fc86018346fe6fe6451088317d64412f5c"
+}]

@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-string-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {
+            "string.js": [
+                "Added the 'A string with \"double\" quotes' at line 0, column 0 - line 0, column 29 in string.js"
+            ]
+        }
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "ab6a9bd2d5a2b7509e21e09bfcbd5a85291bf03c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "068c2d089209d0b5f0db6a679fa5f4eed82f14c2"
+}
+,{
+    "testCaseDescription": "javascript-string-replacement-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {
+            "string.js": [
+                "Replaced the 'A string with \"double\" quotes' at line 0, column 0 - line 0, column 29 in string.js with the 'A different string with \"double\" quotes' at line 0, column 0 - line 0, column 39 in string.js",
+                "Added the 'A string with \"double\" quotes' at line 1, column 0 - line 1, column 29 in string.js",
+                "Added the 'A string with \"double\" quotes' at line 2, column 0 - line 2, column 29 in string.js"
+            ]
+        }
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "068c2d089209d0b5f0db6a679fa5f4eed82f14c2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "40453fc4124883da03a9193b4d22ef74461a3960"
+}
+,{
+    "testCaseDescription": "javascript-string-delete-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {
+            "string.js": [
+                "Replaced the 'A different string with \"double\" quotes' at line 0, column 0 - line 0, column 39 in string.js with the 'A string with \"double\" quotes' at line 0, column 0 - line 0, column 29 in string.js"
+            ]
+        }
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "40453fc4124883da03a9193b4d22ef74461a3960",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "24c2da4cae52472aca75441afc918a0cc90d0bf7"
+}
+,{
+    "testCaseDescription": "javascript-string-replacement-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {
+            "string.js": [
+                "Replaced the 'A string with \"double\" quotes' at line 0, column 0 - line 0, column 29 in string.js with the 'A different string with \"double\" quotes' at line 0, column 0 - line 0, column 39 in string.js"
+            ]
+        }
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "24c2da4cae52472aca75441afc918a0cc90d0bf7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "50b61d150a7dcbb60b29de0ad56e17ae1c0e9acb"
+}
+,{
+    "testCaseDescription": "javascript-string-delete-replacement-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {
+            "string.js": [
+                "Replaced the 'A different string with \"double\" quotes' at line 0, column 0 - line 0, column 39 in string.js with the 'A string with \"double\" quotes' at line 0, column 0 - line 0, column 29 in string.js",
+                "Replaced the 'A string with \"double\" quotes' at line 1, column 0 - line 1, column 29 in string.js with the 'A different string with \"double\" quotes' at line 1, column 0 - line 1, column 39 in string.js",
+                "Deleted the 'A string with \"double\" quotes' at line 2, column 0 - line 2, column 29 in string.js"
+            ]
+        }
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "50b61d150a7dcbb60b29de0ad56e17ae1c0e9acb",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e428a1ce47716442b626a48d1bff3a1424205d56"
+}
+,{
+    "testCaseDescription": "javascript-string-delete-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {
+            "string.js": [
+                "Replaced the 'A string with \"double\" quotes' at line 0, column 0 - line 0, column 29 in string.js with the 'A different string with \"double\" quotes' at line 0, column 0 - line 0, column 39 in string.js",
+                "Deleted the 'A different string with \"double\" quotes' at line 1, column 0 - line 1, column 39 in string.js"
+            ]
+        }
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "e428a1ce47716442b626a48d1bff3a1424205d56",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b4df392490b48828a0e8e7fad317fd6ab695460e"
+}
+,{
+    "testCaseDescription": "javascript-string-delete-rest-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {
+            "string.js": [
+                "Deleted the 'A different string with \"double\" quotes' at line 0, column 0 - line 0, column 39 in string.js"
+            ]
+        }
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "b4df392490b48828a0e8e7fad317fd6ab695460e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9d9884eb636920bf593fc23a02ad4641b8ac8ab7"
+}]

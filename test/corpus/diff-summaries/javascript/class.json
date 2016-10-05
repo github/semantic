@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-class-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Added the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "cf779d502bc851d68864656c5160ca1ff103ca7b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "915375b26040eb52340a39e93c4530ba0fa1744c"
+}
+,{
+    "testCaseDescription": "javascript-class-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Added the 'Foo' class",
+                "Added the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "915375b26040eb52340a39e93c4530ba0fa1744c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2a3ea9a5a99b738cfb766ff64b75748a829f8c52"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Added the 'Foo' class",
+                "Deleted the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "2a3ea9a5a99b738cfb766ff64b75748a829f8c52",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e24adf2f9da4a1445c4cf6dc11490ca36887aad9"
+}
+,{
+    "testCaseDescription": "javascript-class-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Added the 'Foo' class",
+                "Deleted the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "e24adf2f9da4a1445c4cf6dc11490ca36887aad9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c066ead4c8412141afed3629577b7e24da2485da"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Deleted the 'Foo' class",
+                "Added the 'Foo' class",
+                "Deleted the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "c066ead4c8412141afed3629577b7e24da2485da",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9f9eac53aa70887ab98669de440007036c932643"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Deleted the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "9f9eac53aa70887ab98669de440007036c932643",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "dae1e9b59446a1aaeb81cf4ed156f160b01098d6"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Deleted the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "dae1e9b59446a1aaeb81cf4ed156f160b01098d6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "fa492d3a7bab9438e0b740da2a4dd00755e60ed0"
+}]

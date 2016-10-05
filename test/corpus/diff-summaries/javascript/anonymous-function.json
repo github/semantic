@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-anonymous-function-insert-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                "Added an anonymous (a,b) function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "e8b2b7fe36d673849485d794fb1cbd70190d690d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f236f9de5820f3ac23ff0e48b4f754fe5a320422"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-function-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                "Added an anonymous (b,c) function",
+                "Added an anonymous (a,b) function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "f236f9de5820f3ac23ff0e48b4f754fe5a320422",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c5a550f71459ece7fff52e46bf861fd5532dfc54"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-function-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                "Added an anonymous (a,b) function",
+                "Deleted an anonymous (b,c) function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "c5a550f71459ece7fff52e46bf861fd5532dfc54",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8dfd0b811933dca1066fe42705a26bc5ba42f637"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-function-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                "Added an anonymous (b,c) function",
+                "Deleted an anonymous (a,b) function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "8dfd0b811933dca1066fe42705a26bc5ba42f637",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9bd1c3ac61ef7cb186edb551c3c91649fce7aca1"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-function-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                "Deleted an anonymous (b,c) function",
+                "Added an anonymous (b,c) function",
+                "Deleted an anonymous (a,b) function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "9bd1c3ac61ef7cb186edb551c3c91649fce7aca1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "84818bdaa0e92224ebead33361dd3bd8b511087f"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-function-delete-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                "Deleted an anonymous (a,b) function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "84818bdaa0e92224ebead33361dd3bd8b511087f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7bb16bfa674880adab88defb193b412f79c6ce76"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-function-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                "Deleted an anonymous (b,c) function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "7bb16bfa674880adab88defb193b412f79c6ce76",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ff4a6de884ce065c4e38bbed8c96ce7a09b777bb"
+}]

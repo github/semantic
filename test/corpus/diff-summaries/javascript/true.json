@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-true-insert-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                "Added 'true'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "d7e78ffcadb2e3594640d8df159206ccdcf30614",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "403119b24151036bf00fe40610060b9b78bca0e4"
+}
+,{
+    "testCaseDescription": "javascript-true-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                "Added the 'true' return statement",
+                "Added 'true'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "403119b24151036bf00fe40610060b9b78bca0e4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "426d5721b9648b2685fe184f0d33fa3f8fc970d1"
+}
+,{
+    "testCaseDescription": "javascript-true-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                "Deleted the 'true' return statement",
+                "Added 'true'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "426d5721b9648b2685fe184f0d33fa3f8fc970d1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "02e5dbd8227597aab0fe3ae48602af3ac2e8c574"
+}
+,{
+    "testCaseDescription": "javascript-true-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                "Added the 'true' return statement",
+                "Deleted 'true'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "02e5dbd8227597aab0fe3ae48602af3ac2e8c574",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "07162e4f6230106238ce1c824210ad24f038cda4"
+}
+,{
+    "testCaseDescription": "javascript-true-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                "Deleted the 'true' return statement",
+                "Added the 'true' return statement",
+                "Deleted 'true'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "07162e4f6230106238ce1c824210ad24f038cda4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4ec6dde73f341c4279f848466fe2fcb4ea48e708"
+}
+,{
+    "testCaseDescription": "javascript-true-delete-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                "Deleted 'true'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "4ec6dde73f341c4279f848466fe2fcb4ea48e708",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e255f8e05b11954d646414b9b5a69ce8ca2edbf2"
+}
+,{
+    "testCaseDescription": "javascript-true-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "true.js": [
+                "Deleted the 'true' return statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "true.js"
+    ],
+    "sha1": "e255f8e05b11954d646414b9b5a69ce8ca2edbf2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "cbcf093735696437716562b80be6c19a66e585c0"
+}]

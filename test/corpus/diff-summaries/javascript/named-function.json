@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-named-function-insert-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Added the 'myFunction' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "1bb9688393fd59b59ff2f59c16fae5e032ede0ac",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8e28e6cbd4437a3e81ad3442883c24a135895ed9"
+}
+,{
+    "testCaseDescription": "javascript-named-function-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Added the 'anotherFunction' function",
+                "Added the 'myFunction' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "8e28e6cbd4437a3e81ad3442883c24a135895ed9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7a448b82de63a0c6fd18fe27b32262cac4445af1"
+}
+,{
+    "testCaseDescription": "javascript-named-function-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Added the 'myFunction' function",
+                "Deleted the 'anotherFunction' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "7a448b82de63a0c6fd18fe27b32262cac4445af1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7df7ffb6fc3d8b07ee69e1cdf2a93f89d06b6c8e"
+}
+,{
+    "testCaseDescription": "javascript-named-function-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Added the 'anotherFunction' function",
+                "Deleted the 'myFunction' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "7df7ffb6fc3d8b07ee69e1cdf2a93f89d06b6c8e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5b082012ac17f548a754eb6864cf915baa55bbf2"
+}
+,{
+    "testCaseDescription": "javascript-named-function-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Deleted the 'anotherFunction' function",
+                "Added the 'anotherFunction' function",
+                "Deleted the 'myFunction' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "5b082012ac17f548a754eb6864cf915baa55bbf2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ee4115150e100ee5013c1f3cb2177bebf3e913ea"
+}
+,{
+    "testCaseDescription": "javascript-named-function-delete-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Deleted the 'myFunction' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "ee4115150e100ee5013c1f3cb2177bebf3e913ea",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4fd0d6233f7ebc39edcaa80f159aad8fdcf7a298"
+}
+,{
+    "testCaseDescription": "javascript-named-function-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Deleted the 'anotherFunction' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "4fd0d6233f7ebc39edcaa80f159aad8fdcf7a298",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "20a420167bbd93dbb126ff5173ccfea3f5b03a6c"
+}]

@@ -1,0 +1,125 @@
+[{
+    "testCaseDescription": "javascript-throw-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                "Added the 'new Error(\"uh oh\")' throw statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "2ffbc093aa5e7fb91f1dc158a74fd7f9260bc51c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "21ee5f7afe05a4ab0a2269c92f801575d71e8071"
+}
+,{
+    "testCaseDescription": "javascript-throw-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                "Added the 'new Error(\"oooooops\")' throw statement",
+                "Added the 'new Error(\"uh oh\")' throw statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "21ee5f7afe05a4ab0a2269c92f801575d71e8071",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5b29f7a80db0838b538c457a8616cc42ac5e1384"
+}
+,{
+    "testCaseDescription": "javascript-throw-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                "Replaced the \"oooooops\" string with the \"uh oh\" string in the Error(\"uh oh\") function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "5b29f7a80db0838b538c457a8616cc42ac5e1384",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e3cedef9bf3366041a1fae7cde30ea0d27007dea"
+}
+,{
+    "testCaseDescription": "javascript-throw-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                "Added the 'new Error(\"oooooops\")' throw statement",
+                "Added the 'new Error(\"uh oh\")' throw statement",
+                "Deleted the 'new Error(\"uh oh\")' throw statement",
+                "Deleted the 'new Error(\"uh oh\")' throw statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "e3cedef9bf3366041a1fae7cde30ea0d27007dea",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "15ae18a4233211f58fbd7e792eab8994c6a48646"
+}
+,{
+    "testCaseDescription": "javascript-throw-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                "Added the 'new Error(\"uh oh\")' throw statement",
+                "Deleted the 'new Error(\"uh oh\")' throw statement",
+                "Deleted the 'new Error(\"uh oh\")' throw statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "15ae18a4233211f58fbd7e792eab8994c6a48646",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ae1127c99b71527c190f3c09449d7d8fc72fc4ac"
+}
+,{
+    "testCaseDescription": "javascript-throw-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                "Deleted the 'new Error(\"uh oh\")' throw statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "ae1127c99b71527c190f3c09449d7d8fc72fc4ac",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ab76eb0cff6136de1fcf638d226dab9717c95f71"
+}
+,{
+    "testCaseDescription": "javascript-throw-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                "Deleted the 'new Error(\"oooooops\")' throw statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "ab76eb0cff6136de1fcf638d226dab9717c95f71",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "63fd3426061563d57feb9002166fed202ef61781"
+}]

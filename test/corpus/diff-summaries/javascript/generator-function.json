@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-generator-function-insert-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                "Added the 'generateStuff' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "2f2cf1310f873d0fd161b380b7eeded32ac59cb1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0fa30a49bdc004ac54536ba644bb9c3aac277657"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                "Added the 'generateNewStuff' function",
+                "Added the 'generateStuff' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "0fa30a49bdc004ac54536ba644bb9c3aac277657",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "66da496c2e4cd5cd2dfcd9e0e008d5935aa9447d"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                "Added the 'generateStuff' function",
+                "Deleted the 'generateNewStuff' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "66da496c2e4cd5cd2dfcd9e0e008d5935aa9447d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c3749812404d2b8ce48d858e6930a39c6205bb01"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                "Added the 'generateNewStuff' function",
+                "Deleted the 'generateStuff' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "c3749812404d2b8ce48d858e6930a39c6205bb01",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "83f6cb79c4eb628b4c7233d417fa7cfa5fe368ec"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                "Deleted the 'generateNewStuff' function",
+                "Added the 'generateNewStuff' function",
+                "Deleted the 'generateStuff' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "83f6cb79c4eb628b4c7233d417fa7cfa5fe368ec",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9a2afda62b7bc547a118a77bc674115008af0a68"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                "Deleted the 'generateStuff' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "9a2afda62b7bc547a118a77bc674115008af0a68",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5ed821780dd73b7b59ebd6f572a98362bafb10a1"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                "Deleted the 'generateNewStuff' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "5ed821780dd73b7b59ebd6f572a98362bafb10a1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1bb9688393fd59b59ff2f59c16fae5e032ede0ac"
+}]

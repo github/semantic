@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-this-expression-insert-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                "Added the 'this' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "d50748ed7b3cffe454cf051e79a391b70cb1f55d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5a3ed73dc7f583c5d52ee08edb75c381d7ef52d7"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                "Added the 'this' return statement",
+                "Added the 'this' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "5a3ed73dc7f583c5d52ee08edb75c381d7ef52d7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d3fe93b8b10c2c6d052a569bdd2001b582596ca2"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                "Deleted the 'this' return statement",
+                "Added the 'this' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "d3fe93b8b10c2c6d052a569bdd2001b582596ca2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4433219c7827604a4bc803d1bbbb76f8abee643e"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                "Added the 'this' return statement",
+                "Deleted the 'this' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "4433219c7827604a4bc803d1bbbb76f8abee643e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "800d50cac37be657144a55d5f35f6b89cc115b57"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                "Deleted the 'this' return statement",
+                "Added the 'this' return statement",
+                "Deleted the 'this' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "800d50cac37be657144a55d5f35f6b89cc115b57",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "baf032e0f50f00f575036eaf589a91ff85268b00"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-delete-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                "Deleted the 'this' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "baf032e0f50f00f575036eaf589a91ff85268b00",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b0151344a8cdf29ab8a22a0b3b74023032dac75e"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                "Deleted the 'this' return statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "b0151344a8cdf29ab8a22a0b3b74023032dac75e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "33f99e8408e4e4651e7ae66d9f39efac529854de"
+}]

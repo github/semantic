@@ -1,0 +1,125 @@
+[{
+    "testCaseDescription": "javascript-for-of-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Added the 'item of items' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "6d12c26a06d1329fb2747fa5450d0d1daa5315b4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "95e422908cefb7b204b7f8338bb74f09a7d40826"
+}
+,{
+    "testCaseDescription": "javascript-for-of-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Added the 'thing of things' for statement",
+                "Added the 'item of items' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "95e422908cefb7b204b7f8338bb74f09a7d40826",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f33d7cbfde20a878483d6c3cc407018850490900"
+}
+,{
+    "testCaseDescription": "javascript-for-of-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Deleted the 'thing of things' for statement",
+                "Added the 'item of items' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "f33d7cbfde20a878483d6c3cc407018850490900",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a53ae88670f65b2672416d50596c0871ad7ba7cd"
+}
+,{
+    "testCaseDescription": "javascript-for-of-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Added the 'thing of things' for statement",
+                "Deleted the 'item of items' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "a53ae88670f65b2672416d50596c0871ad7ba7cd",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7a4860e91d4f6af74ee726b63bf54c331a26601f"
+}
+,{
+    "testCaseDescription": "javascript-for-of-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Deleted the 'thing of things' for statement",
+                "Replaced the 'item' identifier with the 'thing' identifier",
+                "Replaced the 'items' identifier with the 'things' identifier",
+                "Replaced the 'item' identifier with the 'thing' identifier in the process(thing) function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "7a4860e91d4f6af74ee726b63bf54c331a26601f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "73838673579b3978b898a7ca10ff1695ca578d1b"
+}
+,{
+    "testCaseDescription": "javascript-for-of-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Deleted the 'item of items' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "73838673579b3978b898a7ca10ff1695ca578d1b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "31b06acc145c0e425fc6d20dc235f3d852e4693e"
+}
+,{
+    "testCaseDescription": "javascript-for-of-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Deleted the 'thing of things' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "31b06acc145c0e425fc6d20dc235f3d852e4693e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b8093b25382e8511330d32163f647d8091652050"
+}]

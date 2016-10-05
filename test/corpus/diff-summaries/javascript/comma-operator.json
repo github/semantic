@@ -1,0 +1,130 @@
+[{
+    "testCaseDescription": "javascript-comma-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                "Added the 'a' assignment",
+                "Added the 'b' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "8e9465a057e544de7926bfee045371e151262b37",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "affe6a428f9a8aa0963bb07c4028e3466dba26ec"
+}
+,{
+    "testCaseDescription": "javascript-comma-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                "Added the 'c' assignment",
+                "Added the 'a' assignment",
+                "Added the 'b' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "affe6a428f9a8aa0963bb07c4028e3466dba26ec",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7a0425207d1b61f8fff05006d40964eabc44040c"
+}
+,{
+    "testCaseDescription": "javascript-comma-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                "Added the 'a' assignment",
+                "Added the 'b' assignment",
+                "Deleted the 'c' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "7a0425207d1b61f8fff05006d40964eabc44040c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4a3f9ce608a12e1c6106fd46350ad19e5835d31f"
+}
+,{
+    "testCaseDescription": "javascript-comma-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                "Added the 'c' assignment",
+                "Deleted the 'a' assignment",
+                "Deleted the 'b' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "4a3f9ce608a12e1c6106fd46350ad19e5835d31f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a62b66d9d1db7c14d8427d44622f7213cd31eef1"
+}
+,{
+    "testCaseDescription": "javascript-comma-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                "Deleted the 'c' assignment",
+                "Added the 'c' assignment",
+                "Deleted the 'a' assignment",
+                "Deleted the 'b' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "a62b66d9d1db7c14d8427d44622f7213cd31eef1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e53f041d3a357dea5f8b536b78f6c989096342c6"
+}
+,{
+    "testCaseDescription": "javascript-comma-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                "Deleted the 'a' assignment",
+                "Deleted the 'b' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "e53f041d3a357dea5f8b536b78f6c989096342c6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "78e0935f30388de986c5c1b16f48acccd6f4a26f"
+}
+,{
+    "testCaseDescription": "javascript-comma-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                "Deleted the 'c' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "78e0935f30388de986c5c1b16f48acccd6f4a26f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b4a653f9eafddd6ddabce75bab6f1de384618add"
+}]

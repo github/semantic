@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-switch-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                "Added the '1' switch statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "5b6687475c3b7f8c43a128b52e6c4e9220558a04",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0e588dcc415c6ee6f0ac3182c27869e656d26372"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                "Added the '2' switch statement",
+                "Added the '1' switch statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "0e588dcc415c6ee6f0ac3182c27869e656d26372",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "74b39c4f997dc2bdc3b921a6c00e1f00ddc3222c"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                "Deleted the '2' switch statement",
+                "Added the '1' switch statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "74b39c4f997dc2bdc3b921a6c00e1f00ddc3222c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f3ab8d479c68038ee139c1c1ef92943fbeabcbf7"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                "Added the '2' switch statement",
+                "Deleted the '1' switch statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "f3ab8d479c68038ee139c1c1ef92943fbeabcbf7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9160877730ddc36b3ed036c9599ab233dc0a6ec7"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                "Deleted the '2' switch statement",
+                "Added the '2' switch statement",
+                "Deleted the '1' switch statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "9160877730ddc36b3ed036c9599ab233dc0a6ec7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3fa146d5da730e55b903d214d1b4bed48fb7cac8"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                "Deleted the '1' switch statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "3fa146d5da730e55b903d214d1b4bed48fb7cac8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "69f8f27e8975e8e1f550f3d6eb2db8c2726810d8"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                "Deleted the '2' switch statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "69f8f27e8975e8e1f550f3d6eb2db8c2726810d8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2ffbc093aa5e7fb91f1dc158a74fd7f9260bc51c"
+}]

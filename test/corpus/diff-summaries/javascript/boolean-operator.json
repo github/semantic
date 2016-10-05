@@ -1,0 +1,86 @@
+[{
+    "testCaseDescription": "javascript-boolean-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [
+                "Added the 'i || j' boolean operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "431090fc86018346fe6fe6451088317d64412f5c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ccb11fa49f9987a72e26ef760eacc838ce4a43b7"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [
+                "Added the 'i || j' boolean operator",
+                "Added the 'i || j' boolean operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "ccb11fa49f9987a72e26ef760eacc838ce4a43b7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ed62cd513db43b950517f730e69830ca467c841d"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [
+                "Deleted the 'i || j' boolean operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "f1250aa0e75b50c471588daf6428662e1c1adc46",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ee38b984d7c44aa2b198bef80d859d002bb546e3"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [
+                "Deleted the 'i && j' boolean operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "ee38b984d7c44aa2b198bef80d859d002bb546e3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3f6091d6fdebbc0f0d8134abe4135a004648fa08"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [
+                "Deleted the 'i && j' boolean operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "3f6091d6fdebbc0f0d8134abe4135a004648fa08",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "cbe58e2de4353948478c7716d90fa22e6f430b3f"
+}]

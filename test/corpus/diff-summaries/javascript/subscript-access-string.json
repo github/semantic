@@ -1,0 +1,123 @@
+[{
+    "testCaseDescription": "javascript-subscript-access-string-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Added the 'x[\"some-string\"]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "90219bef77675f7798d2eca6fe534c4efe2fc76d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "abbd81079971f3fba22d7cce5c129ba49322159e"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Added the 'x[\"some-other-string\"]' subscript access",
+                "Added the 'x[\"some-string\"]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "abbd81079971f3fba22d7cce5c129ba49322159e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e47760d1a32b29b95daef26509d2e94197f6eb03"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Added the 'x[\"some-string\"]' subscript access",
+                "Deleted the 'x[\"some-other-string\"]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "e47760d1a32b29b95daef26509d2e94197f6eb03",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3bec91560ae76a5112e3011b616e8144430721ae"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Added the 'x[\"some-other-string\"]' subscript access",
+                "Deleted the 'x[\"some-string\"]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "3bec91560ae76a5112e3011b616e8144430721ae",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "97ddd7b7f13ceb96df8c3cd12d6b20afc4c6821e"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Deleted the 'x[\"some-other-string\"]' subscript access",
+                "Replaced the \"some-string\" string with the \"some-other-string\" string in the x[\"some-other-string\"] subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "97ddd7b7f13ceb96df8c3cd12d6b20afc4c6821e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "de6b1543ed915f74bf49aa9ce3a97ea44c3333e9"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Deleted the 'x[\"some-string\"]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "de6b1543ed915f74bf49aa9ce3a97ea44c3333e9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f5febc4895be2e0634d97c05deb8763892b3580e"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Deleted the 'x[\"some-other-string\"]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "f5febc4895be2e0634d97c05deb8763892b3580e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0d39978593de2568f3ab5b0db632c7091f305835"
+}]

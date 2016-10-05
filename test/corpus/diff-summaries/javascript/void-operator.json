@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-void-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                "Added the 'void b()' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "0e5929ffe5c88dd824b05f48b9025ccfa67f9c04",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "330dbfd3ac17128d8b9f89c09b0a98b4632f4b07"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                "Added the 'void c()' operator",
+                "Added the 'void b()' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "330dbfd3ac17128d8b9f89c09b0a98b4632f4b07",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5bec467955db5f992fda247e6adf08d6a77c15e4"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                "Added the 'void b()' operator",
+                "Deleted the 'void c()' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "5bec467955db5f992fda247e6adf08d6a77c15e4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "16aa9a553cf8b14a5900a4f10a5c9ddc60a03f2e"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                "Added the 'void c()' operator",
+                "Deleted the 'void b()' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "16aa9a553cf8b14a5900a4f10a5c9ddc60a03f2e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "50dad24e865c00cf6fb3bfb45e08f05670eadb0c"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                "Deleted the 'void c()' operator",
+                "Added the 'void c()' operator",
+                "Deleted the 'void b()' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "50dad24e865c00cf6fb3bfb45e08f05670eadb0c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5fd24c7b556fb462c4c8ac55cb04acb69ca54cfa"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                "Deleted the 'void b()' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "5fd24c7b556fb462c4c8ac55cb04acb69ca54cfa",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e406f99aa288ecc7a90f808cd78fde9b034d1dbb"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                "Deleted the 'void c()' operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "e406f99aa288ecc7a90f808cd78fde9b034d1dbb",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5c0c3689340b3b739532d2312d2eb95be94926ce"
+}]

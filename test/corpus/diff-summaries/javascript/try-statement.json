@@ -1,0 +1,126 @@
+[{
+    "testCaseDescription": "javascript-try-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                "Added the '{ f; }' try statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "63fd3426061563d57feb9002166fed202ef61781",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "893cd8c62c644898fc53032a8a0692d0c7a0a965"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                "Added the '{ f; }' try statement",
+                "Added the '{ f; }' try statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "893cd8c62c644898fc53032a8a0692d0c7a0a965",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c505a47a3161f53427e908b46f1dd56af37cee65"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                "Deleted the '{ f; }' try statement",
+                "Added the '{ f; }' try statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "c505a47a3161f53427e908b46f1dd56af37cee65",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c9b19aefc1a5b0680f0344912ebc73ca39ab6ab7"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                "Added the '{ f; }' try statement",
+                "Added the '{ f; }' try statement",
+                "Deleted the '{ f; }' try statement",
+                "Deleted the '{ f; }' try statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "c9b19aefc1a5b0680f0344912ebc73ca39ab6ab7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1b08ba78dcd997dc523a669ac82f65e797dd1ad0"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                "Deleted the '{ f; }' try statement",
+                "Added the '{ f; }' try statement",
+                "Deleted the '{ f; }' try statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "1b08ba78dcd997dc523a669ac82f65e797dd1ad0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c281dd1f1255e7207d7fa281aa1c1f62f05f5cd0"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                "Deleted the '{ f; }' try statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "c281dd1f1255e7207d7fa281aa1c1f62f05f5cd0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "72dabce1dd7ff8c444a2e52c9ea9a359fb993382"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                "Deleted the '{ f; }' try statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "72dabce1dd7ff8c444a2e52c9ea9a359fb993382",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1670fd7f152a029473809cef155bf0af94fd59e6"
+}]
