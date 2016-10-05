@@ -61,7 +61,7 @@ data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
 
 data DiffSummary a = DiffSummary {
   patch :: Patch a,
-  parentAnnotation :: [(Category, Text)]
+  parentAnnotation :: [Either (Category, Text) (Category, Text)]
 } deriving (Eq, Functor, Show, Generic)
 
 -- Returns a list of diff summary texts given two source blobs and a diff.
@@ -191,13 +191,17 @@ toTermName source term = case unwrap term of
                           Identifiable arg -> toTermName' arg
                           Unidentifiable _ -> "…"
 
-parentContexts :: [(Category, Text)] -> Doc
-parentContexts contexts = hsep $ go <$> contexts
-  where go (c, t) = case c of
-          C.Assignment -> "in an" <+> catName <+> "to" <+> termName
-          _ -> "in the" <+> termName <+> catName
-          where catName = toDoc $ toCategoryName c
-                termName = toDoc t
+
+
+parentContexts :: [Either (Category, Text) (Category, Text)] -> Doc
+parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> contexts
+  where
+    identifiableDoc (c, t) = case c of
+      C.Assignment -> "in an" <+> catName c <+> "to" <+> termName t
+      _ -> "in the" <+> termName t <+> catName c
+    annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c
+    catName = toDoc . toCategoryName
+    termName = toDoc
 
 toDoc :: Text -> Doc
 toDoc = string . toS
@@ -220,10 +224,12 @@ termToDiffInfo blob term = case unwrap term of
 prependSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 prependSummary source term summary =
   case (parentAnnotation summary, identifiable term, annotatable term) of
-    ([], Identifiable _, _) -> prependParentAnnotation source term summary
-    ([(_)], _, Annotatable _) -> prependParentAnnotation source term summary
+    ([], Identifiable _, _) -> prependParentAnnotation Left
+    ([_], _, Annotatable _) -> prependParentAnnotation Right
     (_, _, _) -> summary
-  where prependParentAnnotation source term summary = summary { parentAnnotation = (category . extract $ term, toTermName source term) : parentAnnotation summary }
+  where
+    prependParentAnnotation constructor = summary
+      { parentAnnotation = constructor (category (extract term), toTermName source term) : parentAnnotation summary }
 
 isBranchInfo :: DiffInfo -> Bool
 isBranchInfo info = case info of
