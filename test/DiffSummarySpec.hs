@@ -31,10 +31,10 @@ testDiff :: Diff (Syntax Text) (Record '[Category, Range])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "\"a\"")) ])
 
 testSummary :: DiffSummary DiffInfo
-testSummary = DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotation = Nothing }
+testSummary = DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotation = [] }
 
 replacementSummary :: DiffSummary DiffInfo
-replacementSummary = DiffSummary { patch = Replace (LeafInfo "string" "a") (LeafInfo "symbol" "b"), parentAnnotation = Just (Info.FunctionCall, "foo") }
+replacementSummary = DiffSummary { patch = Replace (LeafInfo "string" "a") (LeafInfo "symbol" "b"), parentAnnotation = [Left (Info.FunctionCall, "foo")] }
 
 blobs :: Both SourceBlob
 blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))

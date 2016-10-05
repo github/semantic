@@ -18,15 +18,26 @@ import Test.QuickCheck hiding (Fixed)
 import Patch.Arbitrary()
 import Data.Record
 import Data.These
-import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty)
+import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctuate, pretty, hsep)
 import qualified Text.PrettyPrint.Leijen.Text as P
 import SourceSpan
 import Source
 
+data Annotatable a = Annotatable a | Unannotatable a
+
+annotatable :: (HasField fields Category) => SyntaxTerm leaf fields -> Annotatable (SyntaxTerm leaf fields)
+annotatable term = isAnnotatable (category . extract $ term) term
+  where isAnnotatable = \case
+          C.Class -> Annotatable
+          C.Method -> Annotatable
+          C.Function -> Annotatable
+          C.Module -> Annotatable
+          _ -> Unannotatable
+
 data Identifiable a = Identifiable a | Unidentifiable a
 
 identifiable :: SyntaxTerm leaf fields -> Identifiable (SyntaxTerm leaf fields)
-identifiable term = isIdentifiable (unwrap term) $ term
+identifiable term = isIdentifiable (unwrap term) term
   where isIdentifiable = \case
           S.FunctionCall{} -> Identifiable
           S.MethodCall{} -> Identifiable
@@ -50,7 +61,7 @@ data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
 
 data DiffSummary a = DiffSummary {
   patch :: Patch a,
-  parentAnnotation :: Maybe (Category, Text)
+  parentAnnotation :: [Either (Category, Text) (Category, Text)]
 } deriving (Eq, Functor, Show, Generic)
 
 -- Returns a list of diff summary texts given two source blobs and a diff.
@@ -60,18 +71,18 @@ diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> bl
 -- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
 -- in that 'DiffSummary'.
 summaryToTexts :: DiffSummary DiffInfo -> [Either Text Text]
-summaryToTexts DiffSummary{..} = runJoin . fmap (show . (<+> maybeParentContext parentAnnotation)) <$> (Join <$> summaries patch)
+summaryToTexts DiffSummary{..} = runJoin . fmap (show . (<+> parentContexts parentAnnotation)) <$> (Join <$> summaries patch)
 
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
 diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
 diffToDiffSummaries sources = para $ \diff ->
   let diff' = free (Prologue.fst <$> diff)
       annotateWithCategory :: [(Diff leaf (Record fields), [DiffSummary DiffInfo])] -> [DiffSummary DiffInfo]
-      annotateWithCategory children = maybeToList (prependSummary (Both.snd sources) <$> (afterTerm diff')) <*> (children >>= snd) in
+      annotateWithCategory children = maybeToList (appendSummary (Both.snd sources) <$> afterTerm diff') <*> (children >>= snd) in
   case diff of
     -- Skip comments and leaves since they don't have any changes
     (Free (_ :< syntax)) -> annotateWithCategory (toList syntax)
-    (Pure patch) -> [ DiffSummary (mapPatch (termToDiffInfo beforeSource) (termToDiffInfo afterSource) patch) Nothing ]
+    (Pure patch) -> [ DiffSummary (mapPatch (termToDiffInfo beforeSource) (termToDiffInfo afterSource) patch) []]
   where
     (beforeSource, afterSource) = runJoin sources
 
@@ -126,13 +137,13 @@ toTermName source term = case unwrap term of
   Leaf leaf -> toCategoryName leaf
   S.Assignment identifier _ -> toTermName' identifier
   S.Function identifier _ _ -> toTermName' identifier
-  S.FunctionCall i args -> toTermName' i <> "(" <> (intercalate ", " (toArgName <$> args)) <> ")"
+  S.FunctionCall i args -> toTermName' i <> "(" <> intercalate ", " (toArgName <$> args) <> ")"
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
     (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' property <> "()"
     (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' property
     (_, S.FunctionCall{}) -> toTermName' base <> "." <> toTermName' property <> "()"
     (_, _) -> toTermName' base <> "." <> toTermName' property
-  S.MethodCall targetId methodId methodParams -> toTermName' targetId <> sep <> toTermName' methodId <> "(" <> (intercalate ", " (toArgName <$> methodParams)) <> ")"
+  S.MethodCall targetId methodId methodParams -> toTermName' targetId <> sep <> toTermName' methodId <> "(" <> intercalate ", " (toArgName <$> methodParams) <> ")"
     where sep = case unwrap targetId of
             S.FunctionCall{} -> "()."
             _ -> "."
@@ -169,6 +180,7 @@ toTermName source term = case unwrap term of
   S.Method identifier _ _ -> toTermName' identifier
   S.Comment a -> toCategoryName a
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
+  S.Module identifier _ -> toTermName' identifier
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -179,13 +191,17 @@ toTermName source term = case unwrap term of
                           Identifiable arg -> toTermName' arg
                           Unidentifiable _ -> "…"
 
-maybeParentContext :: Maybe (Category, Text) -> Doc
-maybeParentContext = maybe "" go
-  where go (c, t) = case c of
-          C.Assignment -> "in an" <+> catName <+> "to" <+> termName
-          _ -> "in the" <+> termName <+> catName
-          where catName = toDoc $ toCategoryName c
-                termName = toDoc t
+
+
+parentContexts :: [Either (Category, Text) (Category, Text)] -> Doc
+parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> contexts
+  where
+    identifiableDoc (c, t) = case c of
+      C.Assignment -> "in an" <+> catName c <+> "to" <+> termName t
+      _ -> "in the" <+> termName t <+> catName c
+    annotatableDoc (c, t) = "of the" <+> squotes (termName t) <+> catName c
+    catName = toDoc . toCategoryName
+    termName = toDoc
 
 toDoc :: Text -> Doc
 toDoc = string . toS
@@ -201,15 +217,23 @@ termToDiffInfo blob term = case unwrap term of
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob
 
-prependSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
-prependSummary source term summary =
-  case (parentAnnotation summary, identifiable term) of
-    (Nothing, Identifiable term) -> summary { parentAnnotation = Just (category . extract $ term, toTermName source term) }
-    (_, _) -> summary
+-- | Append a parentAnnotation to the current DiffSummary instance.
+-- | For a DiffSummary without a parentAnnotation, we append a parentAnnotation with the first identifiable term.
+-- | For a DiffSummary with a parentAnnotation, we append the next annotatable term to the extant parentAnnotation.
+-- | If a DiffSummary already has a parentAnnotation, and a (grand) parentAnnotation, then we return the summary without modification.
+appendSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
+appendSummary source term summary =
+  case (parentAnnotation summary, identifiable term, annotatable term) of
+    ([], Identifiable _, _) -> appendParentAnnotation Left
+    ([_], _, Annotatable _) -> appendParentAnnotation Right
+    (_, _, _) -> summary
+  where
+    appendParentAnnotation constructor = summary
+      { parentAnnotation = parentAnnotation summary <> [ constructor (category (extract term), toTermName source term) ] }
 
 isBranchInfo :: DiffInfo -> Bool
 isBranchInfo info = case info of
-  (BranchInfo _ _ _) -> True
+  BranchInfo{} -> True
   _ -> False
 
 hasErrorInfo :: DiffInfo -> Bool
@@ -279,6 +303,7 @@ instance HasCategory Category where
     C.If -> "if statement"
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
+    C.Module -> "module statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
@@ -292,6 +317,6 @@ instance Arbitrary a => Arbitrary (DiffSummary a) where
   shrink = genericShrink
 
 instance P.Pretty DiffInfo where
-  pretty LeafInfo{..} = squotes (string $ toSL termName) <+> (string $ toSL categoryName)
+  pretty LeafInfo{..} = squotes (string $ toSL termName) <+> string (toSL categoryName)
   pretty BranchInfo{..} = mconcat $ punctuate (string "," P.<> space) (pretty <$> branches)
   pretty ErrorInfo{..} = squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)
