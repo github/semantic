@@ -5,7 +5,6 @@ import Category as C
 import Data.Bifunctor.Join
 import Data.Foldable
 import Data.Functor.Both
-import Data.Functor.Foldable (cata)
 import Data.Record
 import qualified Data.Text.Lazy as TL
 import Data.These

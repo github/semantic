@@ -3,7 +3,7 @@
 module Diff where
 
 import Prologue
-import Data.Functor.Foldable as Foldable
+import Data.Functor.Foldable as F
 import Data.Functor.Both as Both
 import Data.Mergeable
 import Data.Record

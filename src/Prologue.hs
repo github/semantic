@@ -1,6 +1,10 @@
 module Prologue
 ( module X
 , lookup
+, (&&&)
+, (***)
+, hylo, cata, para
+, module Data.Hashable
 , last
 ) where
 
@@ -10,3 +14,9 @@ import Data.List (lookup, last)
 import Control.Comonad.Trans.Cofree as X
 import Control.Monad.Trans.Free as X
 import Control.Comonad as X
+
+import Control.Arrow ((&&&), (***))
+
+import Data.Functor.Foldable (hylo, cata, para)
+
+import Data.Hashable

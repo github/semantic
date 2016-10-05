@@ -1,7 +1,7 @@
 {-# LANGUAGE TypeFamilies #-}
 module Term.Arbitrary where
 
-import Data.Functor.Foldable (Base, cata, unfold, Corecursive(embed))
+import Data.Functor.Foldable (Base, unfold, Corecursive(embed))
 import Data.Text.Arbitrary ()
 import Prologue
 import Syntax
