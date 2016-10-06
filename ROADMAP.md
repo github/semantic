@@ -12,7 +12,7 @@ This is the long form version of our [roadmap project][].
 2. [Semantic diffs][] on .com for C & JavaScript. Q4 2016 or so.
 
   - Performance, as above.
-  - Resilience. A fault in `semantic-git-diff` should not break anything else.
+  - Resilience. A fault in `semantic-diff` should not break anything else.
   - Metrics. We need to know how it’s behaving in the wild to know what to do about it. This also includes operational metrics such as health checks.
 
 ## Follow-up things:
