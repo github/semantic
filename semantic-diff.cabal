@@ -20,13 +20,14 @@ library
                      , Data.Align.Generic
                      , Data.Bifunctor.Join.Arbitrary
                      , Data.Functor.Both
-                     , Data.RandomWalkSimilarity
-                     , Data.Record
                      , Data.Mergeable
                      , Data.Mergeable.Generic
+                     , Data.RandomWalkSimilarity
+                     , Data.Record
                      , Diff
                      , Diff.Arbitrary
                      , Diffing
+                     , DiffSummary
                      , Info
                      , Interpreter
                      , Language
@@ -36,6 +37,8 @@ library
                      , Parser
                      , Patch
                      , Patch.Arbitrary
+                     , Paths_semantic_diff
+                     , Prologue
                      , Range
                      , Renderer
                      , Renderer.JSON
@@ -51,12 +54,9 @@ library
                      , Term
                      , Term.Arbitrary
                      , TreeSitter
-                     , DiffSummary
-                     , Prologue
-                     , Paths_semantic_diff
   build-depends:       base >= 4.8 && < 5
-                     , async-pool
                      , aeson
+                     , async-pool
                      , bifunctors
                      , blaze-html
                      , blaze-markup
@@ -70,6 +70,7 @@ library
                      , free
                      , gitlib
                      , gitlib-libgit2
+                     , gitrev
                      , hashable
                      , kdt
                      , MonadRandom
@@ -89,7 +90,6 @@ library
                      , tree-sitter-parsers
                      , vector
                      , wl-pprint-text
-                     , gitrev
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, LambdaCase
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -fprof-auto -j
