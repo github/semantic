@@ -1,0 +1,122 @@
+[{
+    "testCaseDescription": "javascript-member-access-insert-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                "Added the 'x.someProperty' member access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "sha1": "35191e787bea194267476a5eb4a43dc525bd28c3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b12a0a36785c7f97392d9337e5abfadb477e02fe"
+}
+,{
+    "testCaseDescription": "javascript-member-access-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                "Added the 'x.someOtherProperty' member access",
+                "Added the 'x.someProperty' member access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "sha1": "b12a0a36785c7f97392d9337e5abfadb477e02fe",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8df61ed905ad8cc2b2348eaf38f00eac9066e52e"
+}
+,{
+    "testCaseDescription": "javascript-member-access-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                "Replaced the 'someOtherProperty' identifier with the 'someProperty' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "sha1": "8df61ed905ad8cc2b2348eaf38f00eac9066e52e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ba252fd4634053d03e48a65388df7e5d1bf2698c"
+}
+,{
+    "testCaseDescription": "javascript-member-access-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                "Replaced the 'someProperty' identifier with the 'someOtherProperty' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "sha1": "ba252fd4634053d03e48a65388df7e5d1bf2698c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f3c8693395f4b08106d825474a33688622f41b4b"
+}
+,{
+    "testCaseDescription": "javascript-member-access-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                "Deleted the 'x.someOtherProperty' member access",
+                "Deleted the 'x.someProperty' member access",
+                "Added the 'x.someOtherProperty' member access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "sha1": "f3c8693395f4b08106d825474a33688622f41b4b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f2abac915269d158ccd7c57c3d5af06e018b44fc"
+}
+,{
+    "testCaseDescription": "javascript-member-access-delete-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                "Deleted the 'x.someProperty' member access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "sha1": "f2abac915269d158ccd7c57c3d5af06e018b44fc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0b3499864622cf2b092dc92e16628043d72c84e9"
+}
+,{
+    "testCaseDescription": "javascript-member-access-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "member-access.js": [
+                "Deleted the 'x.someOtherProperty' member access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access.js"
+    ],
+    "sha1": "0b3499864622cf2b092dc92e16628043d72c84e9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5798d58803038f4f8b339c71382da80ef0217925"
+}]

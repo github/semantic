@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-undefined-insert-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                "Added the 'undefined' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "fb9592e3bb2b83a7c277c240b74b3c506f4979ed",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f4f7e677d1b68fa8a7c5a113f0bc1229789843c9"
+}
+,{
+    "testCaseDescription": "javascript-undefined-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                "Added the 'undefined' return statement",
+                "Added the 'undefined' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "f4f7e677d1b68fa8a7c5a113f0bc1229789843c9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d2c9f0c30c17b2fae1f9aff068b96d77d2629002"
+}
+,{
+    "testCaseDescription": "javascript-undefined-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                "Added the 'undefined' identifier",
+                "Deleted the 'undefined' return statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "d2c9f0c30c17b2fae1f9aff068b96d77d2629002",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ecc26983fb3905b5da582d38fe661405682fd79c"
+}
+,{
+    "testCaseDescription": "javascript-undefined-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                "Added the 'undefined' return statement",
+                "Deleted the 'undefined' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "ecc26983fb3905b5da582d38fe661405682fd79c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "02dd9718b4821f06a28527e58469f70b0cdd3007"
+}
+,{
+    "testCaseDescription": "javascript-undefined-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                "Deleted the 'undefined' return statement",
+                "Deleted the 'undefined' identifier",
+                "Added the 'undefined' return statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "02dd9718b4821f06a28527e58469f70b0cdd3007",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "001c05a19dce4903649e38680c7db3ffa9dca6ad"
+}
+,{
+    "testCaseDescription": "javascript-undefined-delete-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                "Deleted the 'undefined' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "001c05a19dce4903649e38680c7db3ffa9dca6ad",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "64d634f1d7993d94a75c7e4aca355d26f55c75b7"
+}
+,{
+    "testCaseDescription": "javascript-undefined-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                "Deleted the 'undefined' return statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "64d634f1d7993d94a75c7e4aca355d26f55c75b7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d28adf18a24eb20bc2caaeddf797caf5f924683c"
+}]

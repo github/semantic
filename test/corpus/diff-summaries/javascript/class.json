@@ -1,0 +1,126 @@
+[{
+    "testCaseDescription": "javascript-class-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Added the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "113297963da10f52091760ca956952f15b35ba51",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9148b4f9a222473762d0d6c67a40ac2c907986a5"
+}
+,{
+    "testCaseDescription": "javascript-class-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Added the 'Foo' class",
+                "Added the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "9148b4f9a222473762d0d6c67a40ac2c907986a5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a1a53afb9fb953bb16cf3915bd673dd2210df5e3"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Replaced the 'foo' identifier with the 'one' identifier in the one method of the 'Foo' class",
+                "Replaced the 'bar' identifier with the 'two' identifier in the two method of the 'Foo' class",
+                "Replaced the 'baz' identifier with the 'three' identifier in the three method of the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "a1a53afb9fb953bb16cf3915bd673dd2210df5e3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c30d02089fadff15504ab7eb24ec08ea54275adf"
+}
+,{
+    "testCaseDescription": "javascript-class-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Replaced the 'one' identifier with the 'foo' identifier in the foo method of the 'Foo' class",
+                "Replaced the 'two' identifier with the 'bar' identifier in the bar method of the 'Foo' class",
+                "Replaced the 'three' identifier with the 'baz' identifier in the baz method of the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "c30d02089fadff15504ab7eb24ec08ea54275adf",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b030bf052b6f7fa357abe4dbee065313f7edc80a"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Deleted the 'Foo' class",
+                "Deleted the 'Foo' class",
+                "Added the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "b030bf052b6f7fa357abe4dbee065313f7edc80a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0db81f0fc457bb2428e9573ed7efb7f09da8a87d"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Deleted the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "0db81f0fc457bb2428e9573ed7efb7f09da8a87d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6f32ee6b8596978e8971c32aa2d87f5ab8823d97"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                "Deleted the 'Foo' class"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "6f32ee6b8596978e8971c32aa2d87f5ab8823d97",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "dd7ca7adcacbe84df962afb2cacb889e9c36555e"
+}]

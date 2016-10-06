@@ -1,0 +1,122 @@
+[{
+    "testCaseDescription": "javascript-anonymous-parameterless-function-insert-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-parameterless-function.js": [
+                "Added an anonymous function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-parameterless-function.js"
+    ],
+    "sha1": "4fc6bdfea8bbd17d810f8687b2c6ffacc375b201",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5daf22f20c7d289bdbe321413e31069a6ea87076"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-parameterless-function-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-parameterless-function.js": [
+                "Added an anonymous function",
+                "Added an anonymous function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-parameterless-function.js"
+    ],
+    "sha1": "5daf22f20c7d289bdbe321413e31069a6ea87076",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3002a6ae8edbf89f70b807e942594466f5ddfdec"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-parameterless-function-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-parameterless-function.js": [
+                "Replaced the 'hello' string with the 'hi' string"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-parameterless-function.js"
+    ],
+    "sha1": "3002a6ae8edbf89f70b807e942594466f5ddfdec",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "87d4de08da4b84f7a9e8daca8c90e8a6ab081126"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-parameterless-function-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-parameterless-function.js": [
+                "Replaced the 'hi' string with the 'hello' string"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-parameterless-function.js"
+    ],
+    "sha1": "87d4de08da4b84f7a9e8daca8c90e8a6ab081126",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a1f6c1aed67d1ec8b248438a37ab62a2dcdb6cdc"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-parameterless-function-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-parameterless-function.js": [
+                "Deleted an anonymous function",
+                "Deleted an anonymous function",
+                "Added an anonymous function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-parameterless-function.js"
+    ],
+    "sha1": "a1f6c1aed67d1ec8b248438a37ab62a2dcdb6cdc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ae5fd8ad80227a1094660c48e32bda31c2921d1b"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-parameterless-function-delete-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-parameterless-function.js": [
+                "Deleted an anonymous function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-parameterless-function.js"
+    ],
+    "sha1": "ae5fd8ad80227a1094660c48e32bda31c2921d1b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a4ff0bbb32f90e6a1e58dd11cb9b1dee15edde15"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-parameterless-function-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-parameterless-function.js": [
+                "Deleted an anonymous function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-parameterless-function.js"
+    ],
+    "sha1": "a4ff0bbb32f90e6a1e58dd11cb9b1dee15edde15",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7451453939a71bed1ff4fdd7d49f1541b5250916"
+}]

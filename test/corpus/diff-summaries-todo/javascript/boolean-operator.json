@@ -1,0 +1,30 @@
+[{
+    "testCaseDescription": "javascript-boolean-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [ "Added the 'i || j' binary operator", "Deleted the 'i && j' binary operator" ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "c57d91166c3246b8e352252024dc21de6a42f707",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "244097ce5a74d6275f249d5159a6a14696a1eddf"
+}
+,{
+    "testCaseDescription": "javascript-boolean-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.js": [ "Added the 'i && j' binary operator", "Deleted the 'i || j' binary operator" ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.js"
+    ],
+    "sha1": "244097ce5a74d6275f249d5159a6a14696a1eddf",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0abfc815d9c5912259cfc25becb398a8f1444d40"
+}]

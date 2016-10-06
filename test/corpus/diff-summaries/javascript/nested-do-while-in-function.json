@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-nested-do-while-in-function-insert-test",
+    "expectedResult": {
+        "changes": {
+            "nested-do-while-in-function.js": [
+                "Added the 'f' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-do-while-in-function.js"
+    ],
+    "sha1": "5f0caac0c003c801c82f7c9e56a9f148aa084921",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1c011b9d40b75a103799c7d82a0e636110351f5b"
+}
+,{
+    "testCaseDescription": "javascript-nested-do-while-in-function-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "nested-do-while-in-function.js": [
+                "Added the 'f' function",
+                "Added the 'f' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-do-while-in-function.js"
+    ],
+    "sha1": "1c011b9d40b75a103799c7d82a0e636110351f5b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1525b189d2528f7cbe4756f8b613ea11c1de11a6"
+}
+,{
+    "testCaseDescription": "javascript-nested-do-while-in-function-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "nested-do-while-in-function.js": [
+                "Replaced the 'arg2' identifier with the 'arg1' identifier in the something(arg1) function call of the 'f' function",
+                "Replaced the 'arg1' identifier with the 'arg2' identifier in the arg2 do/while statement of the 'f' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-do-while-in-function.js"
+    ],
+    "sha1": "1525b189d2528f7cbe4756f8b613ea11c1de11a6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bb83be164494b707522cd2e4a6e3f4b1cfb0528d"
+}
+,{
+    "testCaseDescription": "javascript-nested-do-while-in-function-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "nested-do-while-in-function.js": [
+                "Replaced the 'arg1' identifier with the 'arg2' identifier in the something(arg2) function call of the 'f' function",
+                "Replaced the 'arg2' identifier with the 'arg1' identifier in the arg1 do/while statement of the 'f' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-do-while-in-function.js"
+    ],
+    "sha1": "bb83be164494b707522cd2e4a6e3f4b1cfb0528d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "972d8a054eed44281b7e2708e27204a06e1313cd"
+}
+,{
+    "testCaseDescription": "javascript-nested-do-while-in-function-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "nested-do-while-in-function.js": [
+                "Deleted the 'f' function",
+                "Deleted the 'f' function",
+                "Added the 'f' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-do-while-in-function.js"
+    ],
+    "sha1": "972d8a054eed44281b7e2708e27204a06e1313cd",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7617c3dcd781961121b9f150af160d397e9a0e2f"
+}
+,{
+    "testCaseDescription": "javascript-nested-do-while-in-function-delete-test",
+    "expectedResult": {
+        "changes": {
+            "nested-do-while-in-function.js": [
+                "Deleted the 'f' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-do-while-in-function.js"
+    ],
+    "sha1": "7617c3dcd781961121b9f150af160d397e9a0e2f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b6f538cb4037d49d9d6dd0a7cbfc3874175f0920"
+}
+,{
+    "testCaseDescription": "javascript-nested-do-while-in-function-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "nested-do-while-in-function.js": [
+                "Deleted the 'f' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-do-while-in-function.js"
+    ],
+    "sha1": "b6f538cb4037d49d9d6dd0a7cbfc3874175f0920",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4ec7dc112cd4ee7df857942392d9c0a9b1c73d25"
+}]

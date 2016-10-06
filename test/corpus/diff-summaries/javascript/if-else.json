@@ -1,0 +1,122 @@
+[{
+    "testCaseDescription": "javascript-if-else-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                "Added the 'x' if statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "bfae6e88638f5d666df985b1cf13188d68e9f8a8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c970023e9ca99aecbccd5ac8f39c6fa31ee5c3c2"
+}
+,{
+    "testCaseDescription": "javascript-if-else-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                "Added the 'a' if statement",
+                "Added the 'x' if statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "c970023e9ca99aecbccd5ac8f39c6fa31ee5c3c2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e0f1bb18b003fff7dff0e67ab8d66925d4554b20"
+}
+,{
+    "testCaseDescription": "javascript-if-else-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                "Replaced the 'a' if statement with the 'x' if statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "e0f1bb18b003fff7dff0e67ab8d66925d4554b20",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b1c0924e7d8fa080432463373d9044d6730729ed"
+}
+,{
+    "testCaseDescription": "javascript-if-else-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                "Replaced the 'x' if statement with the 'a' if statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "b1c0924e7d8fa080432463373d9044d6730729ed",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "33dee05f4038c5eec772d62a68cf3faf4b30388b"
+}
+,{
+    "testCaseDescription": "javascript-if-else-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                "Deleted the 'a' if statement",
+                "Deleted the 'x' if statement",
+                "Added the 'a' if statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "33dee05f4038c5eec772d62a68cf3faf4b30388b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "dc554678c1fd7e7c7f7ac7585e110e15fd710a78"
+}
+,{
+    "testCaseDescription": "javascript-if-else-delete-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                "Deleted the 'x' if statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "dc554678c1fd7e7c7f7ac7585e110e15fd710a78",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "82b3d3280883a01a5547f3a69d3b091a0d7dd93a"
+}
+,{
+    "testCaseDescription": "javascript-if-else-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                "Deleted the 'a' if statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "82b3d3280883a01a5547f3a69d3b091a0d7dd93a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4188720196d3437b1a745c6626692a903ba63b3b"
+}]

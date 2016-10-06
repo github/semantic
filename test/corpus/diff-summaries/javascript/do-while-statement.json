@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-do-while-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                "Added the 'true' do/while statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "d5cb38d1a4261f5dc4f97f8d7d0762f26dbd70e3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6c7dc6cd4f86a23d1794a455fa988dbde73e1e73"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                "Added the 'false' do/while statement",
+                "Added the 'true' do/while statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "6c7dc6cd4f86a23d1794a455fa988dbde73e1e73",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5bfc5393302aafd0335c4637da356c7eb3d6ee60"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                "Replaced the 'replacement' identifier with the 'insert' identifier in the console.log(insert) method call",
+                "Replaced 'false' with 'true' in the true do/while statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "5bfc5393302aafd0335c4637da356c7eb3d6ee60",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e1246a7d640685a86e828d7a13edcc8a05fab646"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                "Replaced the 'insert' identifier with the 'replacement' identifier in the console.log(replacement) method call",
+                "Replaced 'true' with 'false' in the false do/while statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "e1246a7d640685a86e828d7a13edcc8a05fab646",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c2d637ee7fa9d1895a11dcf3a69a2be95ef0696a"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                "Deleted the 'false' do/while statement",
+                "Deleted the 'true' do/while statement",
+                "Added the 'false' do/while statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "c2d637ee7fa9d1895a11dcf3a69a2be95ef0696a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5a98e1e09d3f5606b52042f940b02fa4cfe37a40"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                "Deleted the 'true' do/while statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "5a98e1e09d3f5606b52042f940b02fa4cfe37a40",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ba62765a2b3412b570f77b033b49247f45d8f57a"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                "Deleted the 'false' do/while statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "ba62765a2b3412b570f77b033b49247f45d8f57a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b36aa3066096eea1f721208040f74bc7cf9a3c9e"
+}]

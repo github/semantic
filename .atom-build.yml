@@ -7,7 +7,5 @@ targets:
   test:
     cmd: stack build :integration-test
     keymap: cmd-u
-  semantic-git-diff:
-    cmd: stack build :semantic-git-diff
 errorMatch:
 - \n(?<file>/[^:]+):(?<line>\d+):((?<col>\d+):)?
