@@ -1,6 +1,6 @@
 {-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables, DeriveAnyClass #-}
 
-module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo, isErrorSummary, JSONSummary) where
+module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo, isErrorSummary, JSONSummary(..)) where
 
 import Prologue hiding (intercalate)
 import Diff
@@ -54,7 +54,7 @@ identifiable term = isIdentifiable (unwrap term) term
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
                  | ErrorSummary { summary :: summary, span :: span }
-                 deriving (ToJSON, Generic)
+                 deriving (ToJSON, Generic, Eq, Show)
 
 isErrorSummary :: JSONSummary summary span -> Bool
 isErrorSummary ErrorSummary{} = True
