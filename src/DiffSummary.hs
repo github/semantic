@@ -187,7 +187,8 @@ toTermName source term = case unwrap term of
   S.Module identifier _ -> toTermName' identifier
   S.Import identifier _ -> toTermName' identifier
   S.Export Nothing expr -> intercalate ", " $ termNameFromSource <$> expr
-  S.Export (Just identifier) expr -> (intercalate ", " $ termNameFromSource <$> expr) <> " from " <> toTermName' identifier 
+  S.Export (Just identifier) [] -> toTermName' identifier
+  S.Export (Just identifier) expr -> (intercalate ", " $ termNameFromSource <$> expr) <> " from " <> toTermName' identifier
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
