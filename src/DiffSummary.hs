@@ -186,7 +186,8 @@ toTermName source term = case unwrap term of
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
   S.Import identifier _ -> toTermName' identifier
-  S.Export expr -> intercalate ", " $ termNameFromSource <$> expr
+  S.Export Nothing expr -> intercalate ", " $ termNameFromSource <$> expr
+  S.Export (Just identifier) expr -> (intercalate ", " $ termNameFromSource <$> expr) <> " from " <> toTermName' identifier 
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -196,8 +197,6 @@ toTermName source term = case unwrap term of
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
                           Unidentifiable _ -> "…"
-
-
 
 parentContexts :: [Either (Category, Text) (Category, Text)] -> Doc
 parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> contexts
