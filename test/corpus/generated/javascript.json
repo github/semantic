@@ -1,6 +1,6 @@
 [
   {
-    "repoPath": "test/corpus/diff-summaries/javascript",
+    "repoPath": "test/corpus/repos/javascript",
     "repoUrl": "https://github.com/rewinfrey/javascript.git",
     "language": "javascript",
     "syntaxes": [
