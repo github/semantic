@@ -21,20 +21,23 @@ import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.QuickCheck
 
+sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
+sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan "" (SourcePos s1 e1) (SourcePos s2 e2)
+
 arrayInfo :: Record '[Category, Range, SourceSpan]
-arrayInfo = ArrayLiteral .: Range 0 3 .: SourceSpan "" (SourcePos 1 0) (SourcePos 1 3) .: RNil
+arrayInfo = ArrayLiteral .: Range 0 3 .: sourceSpanBetween (1, 1) (1, 4) .: RNil
 
 literalInfo :: Record '[Category, Range, SourceSpan]
-literalInfo = StringLiteral .: Range 1 2 .: SourceSpan "" (SourcePos 1 2) (SourcePos 1 3) .: RNil
+literalInfo = StringLiteral .: Range 1 2 .: sourceSpanBetween (1, 2) (1, 3) .: RNil
 
 testDiff :: Diff (Syntax Text) (Record '[Category, Range, SourceSpan])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "\"a\"")) ])
 
 testSummary :: DiffSummary DiffInfo
-testSummary = DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotation = [] }
+testSummary = DiffSummary { patch = Insert (LeafInfo "string" "a" $ sourceSpanBetween (1,1) (1, 2)), parentAnnotation = [] }
 
 replacementSummary :: DiffSummary DiffInfo
-replacementSummary = DiffSummary { patch = Replace (LeafInfo "string" "a") (LeafInfo "symbol" "b"), parentAnnotation = [Left (Info.FunctionCall, "foo")] }
+replacementSummary = DiffSummary { patch = Replace (LeafInfo "string" "a" $ sourceSpanBetween (1,1) (1, 2)) (LeafInfo "symbol" "b" $ sourceSpanBetween (1,1) (1, 2)), parentAnnotation = [Left (Info.FunctionCall, "foo")] }
 
 blobs :: Both SourceBlob
 blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))
@@ -43,7 +46,7 @@ spec :: Spec
 spec = parallel $ do
   describe "diffSummaries" $ do
     it "outputs a diff summary" $ do
-      diffSummaries blobs testDiff `shouldBe` [ Right $ "Added the \"a\" string" ]
+      diffSummaries blobs testDiff `shouldBe` [ Right "Added the \"a\" string" ]
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = defaultFeatureVectorDecorator (category . headF) (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range, SourceSpan]))) in
