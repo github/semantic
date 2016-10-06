@@ -21,7 +21,7 @@ import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctua
 import qualified Text.PrettyPrint.Leijen.Text as P
 import SourceSpan
 import Source
-import Data.Aeson (ToJSON)
+import Data.Aeson as A
 
 data Annotatable a = Annotatable a | Unannotatable a
 
@@ -73,12 +73,15 @@ data DiffSummary a = DiffSummary {
 } deriving (Eq, Functor, Show, Generic)
 
 -- Returns a list of diff summary texts given two source blobs and a diff.
-diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary Text (These SourceSpan SourceSpan)]
+diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) =>
+                  Both SourceBlob ->
+                  SyntaxDiff leaf fields ->
+                  [JSONSummary Text SourceSpans]
 diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> blobs) diff
 
 -- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
 -- in that 'DiffSummary'.
-summaryToTexts :: DiffSummary DiffInfo -> [JSONSummary Text (These SourceSpan SourceSpan)]
+summaryToTexts :: DiffSummary DiffInfo -> [JSONSummary Text SourceSpans]
 summaryToTexts DiffSummary{..} = (\jsonSummary ->
   jsonSummary { summary = show $ summary jsonSummary <+> parentContexts parentAnnotation }) <$> summaries patch
 
@@ -100,25 +103,25 @@ diffToDiffSummaries sources = para $ \diff ->
     (beforeSource, afterSource) = runJoin sources
 
 -- Flattens a patch of diff infos into a list of docs, one for every 'LeafInfo' or `ErrorInfo` it contains.
-summaries :: Patch DiffInfo -> [JSONSummary Doc (These SourceSpan SourceSpan)]
+summaries :: Patch DiffInfo -> [JSONSummary Doc SourceSpans]
 summaries = \case
   p@(Replace i1 i2) -> zipWith (\a b ->
     JSONSummary
      {
       summary = summary (prefixWithPatch p This a) <+> "with" <+> determiner i1 <+> summary b
-    , span = These (span a) (span b)
+    , span = SourceSpans $ These (span a) (span b)
     }) (toLeafInfos i1) (toLeafInfos i2)
   p@(Insert info) -> prefixWithPatch p That <$> toLeafInfos info
   p@(Delete info) -> prefixWithPatch p This <$> toLeafInfos info
 
 -- Prefixes a given doc with the type of patch it represents.
-prefixWithPatch :: Patch DiffInfo -> (SourceSpan -> These SourceSpan SourceSpan) -> JSONSummary Doc SourceSpan -> JSONSummary Doc (These SourceSpan SourceSpan)
+prefixWithPatch :: Patch DiffInfo -> (SourceSpan -> These SourceSpan SourceSpan) -> JSONSummary Doc SourceSpan -> JSONSummary Doc SourceSpans
 prefixWithPatch patch constructor = prefixWithThe (patchToPrefix patch)
   where
     prefixWithThe prefix jsonSummary = jsonSummary
       {
         summary = prefix <+> determiner' patch <+> summary jsonSummary
-      , span = constructor (span jsonSummary)
+      , span = SourceSpans $ constructor (span jsonSummary)
       }
     patchToPrefix = \case
       (Replace _ _) -> "Replaced"

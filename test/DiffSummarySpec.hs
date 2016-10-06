@@ -47,7 +47,7 @@ spec :: Spec
 spec = parallel $ do
   describe "diffSummaries" $ do
     it "outputs a diff summary" $ do
-      diffSummaries blobs testDiff `shouldBe` [ JSONSummary "Added the \"a\" string" (That $ sourceSpanBetween (1, 2) (1, 4)) ]
+      diffSummaries blobs testDiff `shouldBe` [ JSONSummary "Added the \"a\" string" (SourceSpans . That $ sourceSpanBetween (1, 2) (1, 4)) ]
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = defaultFeatureVectorDecorator (category . headF) (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range, SourceSpan]))) in

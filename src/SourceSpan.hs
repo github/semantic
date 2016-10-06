@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, GeneralizedNewtypeDeriving #-}
 -- |
 -- Source position and span information
 -- Mostly taken from purescript's SourcePos definition.
@@ -9,6 +9,7 @@ import Prologue
 import Data.Aeson ((.=), (.:))
 import qualified Data.Aeson as A
 import Test.QuickCheck
+import Data.These
 import Data.Text.Arbitrary()
 
 -- |
@@ -73,6 +74,20 @@ instance A.FromJSON SourceSpan where
       o .: "name"  <*>
       o .: "start" <*>
       o .: "end"
+
+
+newtype SourceSpans = SourceSpans { unSourceSpans :: These SourceSpan SourceSpan }
+  deriving (Eq, Show)
+
+instance A.ToJSON SourceSpans where
+  toJSON (SourceSpans spans) = case spans of
+    (This span) -> A.object ["this" .= span]
+    (That span) -> A.object ["that" .= span]
+    (These span1 span2) -> A.object ["these" .= (span1, span2)]
+  toEncoding (SourceSpans spans) = case spans of
+    (This span) -> A.pairs $ "this" .= span
+    (That span) -> A.pairs $ "that" .= span
+    (These span1 span2) -> A.pairs $ "these" .= (span1, span2)
 
 instance Arbitrary SourcePos where
   arbitrary = SourcePos <$> arbitrary <*> arbitrary

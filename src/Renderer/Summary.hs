@@ -10,7 +10,6 @@ import DiffSummary
 import Data.Map as Map hiding (null)
 import Source
 import SourceSpan
-import Data.These
 import Data.Aeson
 import Data.List as List
 
@@ -22,6 +21,6 @@ summary blobs diff = SummaryOutput $ Map.fromList [
   where
     changes = if null changes' then mempty else Map.singleton summaryKey (toJSON <$> changes')
     errors = if null errors' then mempty else Map.singleton summaryKey (toJSON <$> errors')
-    (errors' :: [JSONSummary Text (These SourceSpan SourceSpan)], changes' :: [JSONSummary Text (These SourceSpan SourceSpan)]) = List.partition isErrorSummary summaries
+    (errors', changes') = List.partition isErrorSummary summaries
     summaryKey = toSummaryKey (path <$> blobs)
     summaries = diffSummaries blobs diff
