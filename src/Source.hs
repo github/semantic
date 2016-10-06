@@ -99,9 +99,9 @@ sourceSpanToRange source SourceSpan{..} = Range start end
         (leadingRanges, remainingRanges) = splitAt (line spanStart) (actualLineRanges (totalRange source) source)
         sumLengths = sum . fmap (\ Range{..} -> end - start)
 
-sourceRangeToSpan :: Source Char -> Text -> Range -> SourceSpan
-sourceRangeToSpan source name range@Range{} = SourceSpan name startPos endPos
-  where startPos = maybe (SourcePos 0 0) (toStartPos 0) (head lineRanges)
+rangeToSourceSpan :: Source Char -> Text -> Range -> SourceSpan
+rangeToSourceSpan source name range@Range{} = SourceSpan name startPos endPos
+  where startPos = maybe (SourcePos 1 1) (toStartPos 1) (head lineRanges)
         endPos = toEndPos (length lineRanges) (last lineRanges)
         lineRanges = actualLineRanges range source
         toStartPos line range = SourcePos line (start range)

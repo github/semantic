@@ -12,7 +12,7 @@ import Source
 import Syntax
 
 cmarkParser :: Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
-cmarkParser SourceBlob{..} = pure . toTerm (totalRange source) (sourceRangeToSpan source (toS path) $ totalRange source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
+cmarkParser SourceBlob{..} = pure . toTerm (totalRange source) (rangeToSourceSpan source (toS path) $ totalRange source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
   where toTerm :: Range -> SourceSpan -> Node -> Cofree (Syntax Text) (Record '[Range, Category, SourceSpan])
         toTerm within withinSpan (Node position t children) =
           let
