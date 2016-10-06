@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE DeriveAnyClass #-}
 -- |
 -- Source position and span information
 -- Mostly taken from purescript's SourcePos definition.
