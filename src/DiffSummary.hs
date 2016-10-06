@@ -134,7 +134,7 @@ toLeafInfos err@ErrorInfo{} = pure (pretty err)
 toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
   S.AnonymousFunction maybeParams _ -> "anonymous" <> maybe "" toParams maybeParams <> " function"
-    where toParams ps = " (" <> termNameFromSource ps <> ")"
+    where toParams ps = " " <> termNameFromSource ps
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
