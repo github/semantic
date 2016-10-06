@@ -46,7 +46,7 @@ main = do
 
 -- | Finds all JSON files within the generators directory.
 runFetchGeneratorFiles :: IO [FilePath]
-runFetchGeneratorFiles = globDir1 (compile "*.json") "tools/semantic-git-diff/test/corpus/generators"
+runFetchGeneratorFiles = globDir1 (compile "*.json") "test/corpus/generators"
 
 -- | First initialize the git submodule repository where commits will be made for the given metaRepo and its syntaxes.
 -- | Second generate the commits for each syntax and generate the associated JSONTestCase objects.
