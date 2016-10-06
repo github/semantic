@@ -67,7 +67,8 @@ termConstructor source sourceSpan name range children
     ("method_definition", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
     ("class", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
     ("class", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
-    ("import_statement", [ statements, identifier ] ) -> S.Import identifier statements
+    ("import_statement", [ statements, identifier ] ) -> S.Import identifier (toList (unwrap statements))
+    ("import_statement", [ identifier ] ) -> S.Import identifier []
     ("export_statement", [ statements ] ) -> S.Export (toList (unwrap statements))
     _ | name `elem` forStatements, Just (exprs, body) <- unsnoc children -> S.For exprs body
     _ | name `elem` operators -> S.Operator children
