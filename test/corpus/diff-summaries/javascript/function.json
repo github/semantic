@@ -3,7 +3,7 @@
     "expectedResult": {
         "changes": {
             "function.js": [
-                "Added an anonymous (arg1, arg2) function"
+                "Added an anonymous(arg1, arg2) function"
             ]
         },
         "errors": {}
@@ -20,8 +20,8 @@
     "expectedResult": {
         "changes": {
             "function.js": [
-                "Added an anonymous (arg1, arg2) function",
-                "Added an anonymous (arg1, arg2) function"
+                "Added an anonymous(arg1, arg2) function",
+                "Added an anonymous(arg1, arg2) function"
             ]
         },
         "errors": {}
@@ -72,9 +72,9 @@
     "expectedResult": {
         "changes": {
             "function.js": [
-                "Deleted an anonymous (arg1, arg2) function",
-                "Deleted an anonymous (arg1, arg2) function",
-                "Added an anonymous (arg1, arg2) function"
+                "Deleted an anonymous(arg1, arg2) function",
+                "Deleted an anonymous(arg1, arg2) function",
+                "Added an anonymous(arg1, arg2) function"
             ]
         },
         "errors": {}
@@ -91,7 +91,7 @@
     "expectedResult": {
         "changes": {
             "function.js": [
-                "Deleted an anonymous (arg1, arg2) function"
+                "Deleted an anonymous(arg1, arg2) function"
             ]
         },
         "errors": {}
@@ -108,7 +108,7 @@
     "expectedResult": {
         "changes": {
             "function.js": [
-                "Deleted an anonymous (arg1, arg2) function"
+                "Deleted an anonymous(arg1, arg2) function"
             ]
         },
         "errors": {}

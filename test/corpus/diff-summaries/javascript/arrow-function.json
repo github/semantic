@@ -3,7 +3,7 @@
     "expectedResult": {
         "changes": {
             "arrow-function.js": [
-                "Added an anonymous (f, g) function"
+                "Added an anonymous(f, g) function"
             ]
         },
         "errors": {}
@@ -20,8 +20,8 @@
     "expectedResult": {
         "changes": {
             "arrow-function.js": [
-                "Added an anonymous (f, g) function",
-                "Added an anonymous (f, g) function"
+                "Added an anonymous(f, g) function",
+                "Added an anonymous(f, g) function"
             ]
         },
         "errors": {}
@@ -72,9 +72,9 @@
     "expectedResult": {
         "changes": {
             "arrow-function.js": [
-                "Deleted an anonymous (f, g) function",
-                "Deleted an anonymous (f, g) function",
-                "Added an anonymous (f, g) function"
+                "Deleted an anonymous(f, g) function",
+                "Deleted an anonymous(f, g) function",
+                "Added an anonymous(f, g) function"
             ]
         },
         "errors": {}
@@ -91,7 +91,7 @@
     "expectedResult": {
         "changes": {
             "arrow-function.js": [
-                "Deleted an anonymous (f, g) function"
+                "Deleted an anonymous(f, g) function"
             ]
         },
         "errors": {}
@@ -108,7 +108,7 @@
     "expectedResult": {
         "changes": {
             "arrow-function.js": [
-                "Deleted an anonymous (f, g) function"
+                "Deleted an anonymous(f, g) function"
             ]
         },
         "errors": {}

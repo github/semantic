@@ -3,7 +3,7 @@
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Added an anonymous (a,b) function"
+                "Added an anonymous(a,b) function"
             ]
         },
         "errors": {}
@@ -20,8 +20,8 @@
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Added an anonymous (b,c) function",
-                "Added an anonymous (a,b) function"
+                "Added an anonymous(b,c) function",
+                "Added an anonymous(a,b) function"
             ]
         },
         "errors": {}
@@ -77,9 +77,9 @@
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Deleted an anonymous (b,c) function",
-                "Deleted an anonymous (a,b) function",
-                "Added an anonymous (b,c) function"
+                "Deleted an anonymous(b,c) function",
+                "Deleted an anonymous(a,b) function",
+                "Added an anonymous(b,c) function"
             ]
         },
         "errors": {}
@@ -96,7 +96,7 @@
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Deleted an anonymous (a,b) function"
+                "Deleted an anonymous(a,b) function"
             ]
         },
         "errors": {}
@@ -113,7 +113,7 @@
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Deleted an anonymous (b,c) function"
+                "Deleted an anonymous(b,c) function"
             ]
         },
         "errors": {}

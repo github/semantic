@@ -3,7 +3,7 @@
     "expectedResult": {
         "changes": {
             "anonymous-parameterless-function.js": [
-                "Added an anonymous function"
+                "Added an anonymous() function"
             ]
         },
         "errors": {}
@@ -20,8 +20,8 @@
     "expectedResult": {
         "changes": {
             "anonymous-parameterless-function.js": [
-                "Added an anonymous function",
-                "Added an anonymous function"
+                "Added an anonymous() function",
+                "Added an anonymous() function"
             ]
         },
         "errors": {}
@@ -72,9 +72,9 @@
     "expectedResult": {
         "changes": {
             "anonymous-parameterless-function.js": [
-                "Deleted an anonymous function",
-                "Deleted an anonymous function",
-                "Added an anonymous function"
+                "Deleted an anonymous() function",
+                "Deleted an anonymous() function",
+                "Added an anonymous() function"
             ]
         },
         "errors": {}
@@ -91,7 +91,7 @@
     "expectedResult": {
         "changes": {
             "anonymous-parameterless-function.js": [
-                "Deleted an anonymous function"
+                "Deleted an anonymous() function"
             ]
         },
         "errors": {}
@@ -108,7 +108,7 @@
     "expectedResult": {
         "changes": {
             "anonymous-parameterless-function.js": [
-                "Deleted an anonymous function"
+                "Deleted an anonymous() function"
             ]
         },
         "errors": {}
