@@ -49,6 +49,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Method{} -> Identifiable
           S.Leaf{} -> Identifiable
           S.DoWhile{} -> Identifiable
+          S.Import{} -> Identifiable
           _ -> Unidentifiable
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
@@ -184,6 +185,7 @@ toTermName source term = case unwrap term of
   S.Comment a -> toCategoryName a
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
+  S.Import identifier _ -> toTermName' identifier
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -307,6 +309,7 @@ instance HasCategory Category where
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
     C.Module -> "module statement"
+    C.Import -> "import statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
