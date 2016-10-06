@@ -50,6 +50,7 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Leaf{} -> Identifiable
           S.DoWhile{} -> Identifiable
           S.Import{} -> Identifiable
+          S.Export{} -> Identifiable
           _ -> Unidentifiable
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
