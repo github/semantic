@@ -67,6 +67,7 @@ termConstructor source sourceSpan name range children
     ("method_definition", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
     ("class", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
     ("class", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
+    ("import_statement", [ statements, identifier ] ) -> S.Import identifier statements
     _ | name `elem` forStatements, Just (exprs, body) <- unsnoc children -> S.For exprs body
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
@@ -142,6 +143,7 @@ categoryForJavaScriptProductionName name = case name of
   "comment" -> Comment
   "bitwise_op" -> BitwiseOperator
   "rel_op" -> RelationalOperator
+  "import_statement" -> Import
   _ -> Other name
 
 toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
