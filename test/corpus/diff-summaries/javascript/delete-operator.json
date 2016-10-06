@@ -11,9 +11,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "bc15aec1c4c4587cd5b4d204e3f00feec92121dc",
+    "sha1": "e21de869506a2a72943755153b5a36862ef80f6c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f22024cd7638d58322baf56ac7f4f92d4362ef72"
+    "sha2": "1f8d975bbb26e218e0ab717fa15e281d5113bed0"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-replacement-insert-test",
@@ -29,17 +29,16 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "f22024cd7638d58322baf56ac7f4f92d4362ef72",
+    "sha1": "1f8d975bbb26e218e0ab717fa15e281d5113bed0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9826ff64f0489fd1a68ff364565921c9963ebb1b"
+    "sha2": "26ab8336dfdf969e6b6f1101af8e0ce02c8194ae"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-insert-test",
     "expectedResult": {
         "changes": {
             "delete-operator.js": [
-                "Added the 'delete thing['prop']' operator",
-                "Deleted the 'delete thing.prop' operator"
+                "Replaced the 'delete thing.prop' operator with the 'delete thing['prop']' operator"
             ]
         },
         "errors": {}
@@ -47,17 +46,16 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "9826ff64f0489fd1a68ff364565921c9963ebb1b",
+    "sha1": "26ab8336dfdf969e6b6f1101af8e0ce02c8194ae",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "205aa4c322bbea472e7b9f2c304b095a228cd19f"
+    "sha2": "c5120a74c04555cb4b83147978a74e50f4316957"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-replacement-test",
     "expectedResult": {
         "changes": {
             "delete-operator.js": [
-                "Added the 'delete thing.prop' operator",
-                "Deleted the 'delete thing['prop']' operator"
+                "Replaced the 'delete thing['prop']' operator with the 'delete thing.prop' operator"
             ]
         },
         "errors": {}
@@ -65,9 +63,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "205aa4c322bbea472e7b9f2c304b095a228cd19f",
+    "sha1": "c5120a74c04555cb4b83147978a74e50f4316957",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "97b0347b390b2458f820f0b149068f9461a435cf"
+    "sha2": "27ff42b5e0ebb7e5e74b5469b7104ece2e703a61"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-replacement-test",
@@ -75,8 +73,8 @@
         "changes": {
             "delete-operator.js": [
                 "Deleted the 'delete thing.prop' operator",
-                "Added the 'delete thing.prop' operator",
-                "Deleted the 'delete thing['prop']' operator"
+                "Deleted the 'delete thing['prop']' operator",
+                "Added the 'delete thing.prop' operator"
             ]
         },
         "errors": {}
@@ -84,9 +82,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "97b0347b390b2458f820f0b149068f9461a435cf",
+    "sha1": "27ff42b5e0ebb7e5e74b5469b7104ece2e703a61",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6fa3a94c630696908821c630c84c2a88178435e0"
+    "sha2": "27d05d1fd6501544cb64fee600e5f9e4ce6cc8e8"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-test",
@@ -101,9 +99,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "6fa3a94c630696908821c630c84c2a88178435e0",
+    "sha1": "27d05d1fd6501544cb64fee600e5f9e4ce6cc8e8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0ef9281385ae4b7a3f66369a69804ad14f2da122"
+    "sha2": "346122ed1825595bf493f272828dfe9b0efbe029"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-rest-test",
@@ -118,7 +116,7 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "0ef9281385ae4b7a3f66369a69804ad14f2da122",
+    "sha1": "346122ed1825595bf493f272828dfe9b0efbe029",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0e5929ffe5c88dd824b05f48b9025ccfa67f9c04"
+    "sha2": "985f2a1f80a8f14a094977b3cb7b7954ea471f72"
 }]

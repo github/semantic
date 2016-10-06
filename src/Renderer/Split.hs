@@ -5,7 +5,6 @@ import Category as C
 import Data.Bifunctor.Join
 import Data.Foldable
 import Data.Functor.Both
-import Data.Functor.Foldable (cata)
 import Data.Record
 import qualified Data.Text.Lazy as TL
 import Data.These
@@ -81,6 +80,7 @@ styleName category = "category-" <> case category of
   C.Empty -> "empty_statement"
   C.CommaOperator -> "comma_operator"
   Other string -> string
+  C.Module -> "module_statement"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

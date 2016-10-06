@@ -11,9 +11,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "fa492d3a7bab9438e0b740da2a4dd00755e60ed0",
+    "sha1": "dd7ca7adcacbe84df962afb2cacb889e9c36555e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "05d8de78bd5583e935bb654f0226dce1b83b8259"
+    "sha2": "0418b13c26f0d7b4066fed6e2c96b7e4d7089ac3"
 }
 ,{
     "testCaseDescription": "javascript-array-replacement-insert-test",
@@ -29,17 +29,16 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "05d8de78bd5583e935bb654f0226dce1b83b8259",
+    "sha1": "0418b13c26f0d7b4066fed6e2c96b7e4d7089ac3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a27344fe896967558a81ca648f65064cefcfd96e"
+    "sha2": "0b4952dc07e32e0849db5543eee8abdb5b4248a7"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-insert-test",
     "expectedResult": {
         "changes": {
             "array.js": [
-                "Added the '[ \"item1\" ]' array",
-                "Deleted the '[ \"item1\", \"item2\" ]' array"
+                "Deleted the \"item2\" string"
             ]
         },
         "errors": {}
@@ -47,17 +46,16 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "a27344fe896967558a81ca648f65064cefcfd96e",
+    "sha1": "0b4952dc07e32e0849db5543eee8abdb5b4248a7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ec5039562b41e2b874996a4ceb3c11eb84996dec"
+    "sha2": "7ef888c9a5c940124390e379435f37177f9b4f4c"
 }
 ,{
     "testCaseDescription": "javascript-array-replacement-test",
     "expectedResult": {
         "changes": {
             "array.js": [
-                "Added the '[ \"item1\", \"item2\" ]' array",
-                "Deleted the '[ \"item1\" ]' array"
+                "Added the \"item2\" string"
             ]
         },
         "errors": {}
@@ -65,9 +63,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "ec5039562b41e2b874996a4ceb3c11eb84996dec",
+    "sha1": "7ef888c9a5c940124390e379435f37177f9b4f4c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a828418feb9848768acdd1281168900e7a2099d3"
+    "sha2": "0efeca94b446b67eee94d0bf04e7f8c2c026b22f"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-replacement-test",
@@ -75,8 +73,8 @@
         "changes": {
             "array.js": [
                 "Deleted the '[ \"item1\", \"item2\" ]' array",
-                "Added the '[ \"item1\", \"item2\" ]' array",
-                "Deleted the '[ \"item1\" ]' array"
+                "Deleted the '[ \"item1\" ]' array",
+                "Added the '[ \"item1\", \"item2\" ]' array"
             ]
         },
         "errors": {}
@@ -84,9 +82,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "a828418feb9848768acdd1281168900e7a2099d3",
+    "sha1": "0efeca94b446b67eee94d0bf04e7f8c2c026b22f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "97038c31b238efec98f41344cd0e7a7a4430c0a0"
+    "sha2": "6d22167393268e61aa06e0b171519476dc16bdac"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-test",
@@ -101,9 +99,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "97038c31b238efec98f41344cd0e7a7a4430c0a0",
+    "sha1": "6d22167393268e61aa06e0b171519476dc16bdac",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "97a0af9d53a6eec57cebc73ddc5f1187ed2278a7"
+    "sha2": "efff6458dae06c9af9ecb08c046fc0ff4f745337"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-rest-test",
@@ -118,7 +116,7 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "97a0af9d53a6eec57cebc73ddc5f1187ed2278a7",
+    "sha1": "efff6458dae06c9af9ecb08c046fc0ff4f745337",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7fac5d7a13b841bd9a3ff68f5cdbe6f20d2182ca"
+    "sha2": "95af18d8919ff9cfae6d2f0c604ed1a6ad724386"
 }]

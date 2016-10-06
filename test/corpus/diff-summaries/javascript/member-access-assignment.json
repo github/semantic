@@ -11,9 +11,9 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "38c11bda6a55b3c21ca0223aeef09c65d9e19b9e",
+    "sha1": "410d8b5edf1e9ab9fc842fe489424a7b03f57d1c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b46afa6e81c41a8e004dfe79ccdef1cd06e8f45c"
+    "sha2": "33f10ef6b48ab1750c301ae9ec5801e2e1ac7bb0"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-replacement-insert-test",
@@ -29,17 +29,16 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "b46afa6e81c41a8e004dfe79ccdef1cd06e8f45c",
+    "sha1": "33f10ef6b48ab1750c301ae9ec5801e2e1ac7bb0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0637e314252b495becd365b04d97b4b3bc0f5f7a"
+    "sha2": "1a66baf78f9ff509efee981032237f8a902f853f"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-insert-test",
     "expectedResult": {
         "changes": {
             "member-access-assignment.js": [
-                "Added the 'y.x' assignment",
-                "Deleted the 'y.x' assignment"
+                "Replaced '1' with '0' in an assignment to y.x"
             ]
         },
         "errors": {}
@@ -47,34 +46,15 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "0637e314252b495becd365b04d97b4b3bc0f5f7a",
+    "sha1": "1a66baf78f9ff509efee981032237f8a902f853f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "922e4ec1e5ae139002888cee60d3f0f5dfe6d9f3"
+    "sha2": "56c8d4ed17245e95530483c20ff39178de132a27"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-replacement-test",
     "expectedResult": {
         "changes": {
             "member-access-assignment.js": [
-                "Added the 'y.x' assignment",
-                "Deleted the 'y.x' assignment"
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "member-access-assignment.js"
-    ],
-    "sha1": "922e4ec1e5ae139002888cee60d3f0f5dfe6d9f3",
-    "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b09d6ac57a7d20925f7281847609b263f2e68ee0"
-}
-,{
-    "testCaseDescription": "javascript-member-access-assignment-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "member-access-assignment.js": [
-                "Deleted the 'y.x' assignment",
                 "Replaced '0' with '1' in an assignment to y.x"
             ]
         },
@@ -83,9 +63,28 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "b09d6ac57a7d20925f7281847609b263f2e68ee0",
+    "sha1": "56c8d4ed17245e95530483c20ff39178de132a27",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "83e944bd2dd963761c7b3196440edb39e23afbdb"
+    "sha2": "bdded1dcea4cbac1edcbac8fbc776a74023ac5e5"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                "Deleted the 'y.x' assignment",
+                "Deleted the 'y.x' assignment",
+                "Added the 'y.x' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "bdded1dcea4cbac1edcbac8fbc776a74023ac5e5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "135c30ec136738a0021672b8a2a26c42c0e14780"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-test",
@@ -100,9 +99,9 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "83e944bd2dd963761c7b3196440edb39e23afbdb",
+    "sha1": "135c30ec136738a0021672b8a2a26c42c0e14780",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "58251cccc750ed5e7583893dff8081da214b7705"
+    "sha2": "8b159e8f827652230408f94a29a6e07d29d5a3ad"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-rest-test",
@@ -117,7 +116,7 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "58251cccc750ed5e7583893dff8081da214b7705",
+    "sha1": "8b159e8f827652230408f94a29a6e07d29d5a3ad",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "438f0f07b1217fbbc2a04a4d6ea1cf9d37ee0b2e"
+    "sha2": "97557f6e2c5ca659902339f573aec1c7bc1bba6b"
 }]

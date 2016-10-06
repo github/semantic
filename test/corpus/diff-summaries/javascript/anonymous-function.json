@@ -11,9 +11,9 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "e8b2b7fe36d673849485d794fb1cbd70190d690d",
+    "sha1": "682c9bc7b6e0bdf863dcaa32f63278a65cbae946",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f236f9de5820f3ac23ff0e48b4f754fe5a320422"
+    "sha2": "73bf5733fae4a699c86b187a1bdb12c4877a4001"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-replacement-insert-test",
@@ -29,17 +29,18 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "f236f9de5820f3ac23ff0e48b4f754fe5a320422",
+    "sha1": "73bf5733fae4a699c86b187a1bdb12c4877a4001",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c5a550f71459ece7fff52e46bf861fd5532dfc54"
+    "sha2": "36e07108362ec6423e60b1d917917c3e09234360"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-insert-test",
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Added an anonymous (a,b) function",
-                "Deleted an anonymous (b,c) function"
+                "Replaced the 'c' identifier with the 'a' identifier",
+                "Replaced the 'b' identifier with the 'a' identifier",
+                "Replaced the 'c' identifier with the 'b' identifier"
             ]
         },
         "errors": {}
@@ -47,17 +48,19 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "c5a550f71459ece7fff52e46bf861fd5532dfc54",
+    "sha1": "36e07108362ec6423e60b1d917917c3e09234360",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8dfd0b811933dca1066fe42705a26bc5ba42f637"
+    "sha2": "84fcb25dc4d64a74bc654b68eb60c6de6bbe1d9e"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-replacement-test",
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Added an anonymous (b,c) function",
-                "Deleted an anonymous (a,b) function"
+                "Deleted the 'a' identifier",
+                "Added the 'c' identifier",
+                "Replaced the 'a' identifier with the 'b' identifier",
+                "Replaced the 'b' identifier with the 'c' identifier"
             ]
         },
         "errors": {}
@@ -65,9 +68,9 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "8dfd0b811933dca1066fe42705a26bc5ba42f637",
+    "sha1": "84fcb25dc4d64a74bc654b68eb60c6de6bbe1d9e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9bd1c3ac61ef7cb186edb551c3c91649fce7aca1"
+    "sha2": "e311f46d65600e45ad1c9d28741d7138a20cd84a"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-replacement-test",
@@ -75,8 +78,8 @@
         "changes": {
             "anonymous-function.js": [
                 "Deleted an anonymous (b,c) function",
-                "Added an anonymous (b,c) function",
-                "Deleted an anonymous (a,b) function"
+                "Deleted an anonymous (a,b) function",
+                "Added an anonymous (b,c) function"
             ]
         },
         "errors": {}
@@ -84,9 +87,9 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "9bd1c3ac61ef7cb186edb551c3c91649fce7aca1",
+    "sha1": "e311f46d65600e45ad1c9d28741d7138a20cd84a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "84818bdaa0e92224ebead33361dd3bd8b511087f"
+    "sha2": "02db7fdb98d56e46e5a10e10b3881339a881bf9a"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-test",
@@ -101,9 +104,9 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "84818bdaa0e92224ebead33361dd3bd8b511087f",
+    "sha1": "02db7fdb98d56e46e5a10e10b3881339a881bf9a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7bb16bfa674880adab88defb193b412f79c6ce76"
+    "sha2": "83545a313b0dcb2e84df65aa0e2a1a0ca0ecc5b7"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-rest-test",
@@ -118,7 +121,7 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "7bb16bfa674880adab88defb193b412f79c6ce76",
+    "sha1": "83545a313b0dcb2e84df65aa0e2a1a0ca0ecc5b7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ff4a6de884ce065c4e38bbed8c96ce7a09b777bb"
+    "sha2": "4fc6bdfea8bbd17d810f8687b2c6ffacc375b201"
 }]

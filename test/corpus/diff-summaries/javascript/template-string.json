@@ -11,9 +11,9 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "82ac9049dc6dcbfef96c1c8c65501872466b44fb",
+    "sha1": "4188720196d3437b1a745c6626692a903ba63b3b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "30d0936143b14b2d0e439300e5ef643315046887"
+    "sha2": "0afc56f69a9f501bff6a163ef287acd6e5cc6017"
 }
 ,{
     "testCaseDescription": "javascript-template-string-replacement-insert-test",
@@ -29,17 +29,16 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "30d0936143b14b2d0e439300e5ef643315046887",
+    "sha1": "0afc56f69a9f501bff6a163ef287acd6e5cc6017",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "699391b454f168a1eab35358bd1cf1a530bbf420"
+    "sha2": "779225b6216f83ca9bee4c7edafe0cc93e399c12"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-insert-test",
     "expectedResult": {
         "changes": {
             "template-string.js": [
-                "Added the '`one line`' template string",
-                "Deleted the '`multi line`' template string"
+                "Replaced the '`multi line`' template string with the '`one line`' template string"
             ]
         },
         "errors": {}
@@ -47,17 +46,16 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "699391b454f168a1eab35358bd1cf1a530bbf420",
+    "sha1": "779225b6216f83ca9bee4c7edafe0cc93e399c12",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b51c70761a973ea900d4b25a8f8b4ee662b76760"
+    "sha2": "ba16139069f94c58a140abef4a899b591097809b"
 }
 ,{
     "testCaseDescription": "javascript-template-string-replacement-test",
     "expectedResult": {
         "changes": {
             "template-string.js": [
-                "Added the '`multi line`' template string",
-                "Deleted the '`one line`' template string"
+                "Replaced the '`one line`' template string with the '`multi line`' template string"
             ]
         },
         "errors": {}
@@ -65,9 +63,9 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "b51c70761a973ea900d4b25a8f8b4ee662b76760",
+    "sha1": "ba16139069f94c58a140abef4a899b591097809b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f78f831fb49f207742537af6dfe28ae402f783ce"
+    "sha2": "d48d2ae27005bb939d502c8b8adeaadaeeef2e29"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-replacement-test",
@@ -75,8 +73,8 @@
         "changes": {
             "template-string.js": [
                 "Deleted the '`multi line`' template string",
-                "Added the '`multi line`' template string",
-                "Deleted the '`one line`' template string"
+                "Deleted the '`one line`' template string",
+                "Added the '`multi line`' template string"
             ]
         },
         "errors": {}
@@ -84,9 +82,9 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "f78f831fb49f207742537af6dfe28ae402f783ce",
+    "sha1": "d48d2ae27005bb939d502c8b8adeaadaeeef2e29",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "498cb72499d1f739e3a8a465049b5f0860fca989"
+    "sha2": "94133f22ddd0d83521dfcf914906d375a2d39495"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-test",
@@ -101,9 +99,9 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "498cb72499d1f739e3a8a465049b5f0860fca989",
+    "sha1": "94133f22ddd0d83521dfcf914906d375a2d39495",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a6b6a5b162e47aa8fe57774c3edb48547c2144e7"
+    "sha2": "83f7aee7416d2e8434af935fdb2409e946d1569a"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-rest-test",
@@ -118,7 +116,7 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "a6b6a5b162e47aa8fe57774c3edb48547c2144e7",
+    "sha1": "83f7aee7416d2e8434af935fdb2409e946d1569a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a49b3cc79bf0a423e6474f02d4f9b2deae2cf7aa"
+    "sha2": "ea2df743568a320252df57e60055d8d6e611d9e7"
 }]

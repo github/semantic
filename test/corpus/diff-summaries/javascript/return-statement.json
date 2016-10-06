@@ -11,9 +11,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "66eecf807ba1e2964d6937be2095ef24a1676269",
+    "sha1": "b36aa3066096eea1f721208040f74bc7cf9a3c9e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2f83da1cff87e975d21351f8cce6e819ebbb9f33"
+    "sha2": "2d6ae7a3e4cf4ac453028172ab43c0972962349a"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-replacement-insert-test",
@@ -29,17 +29,16 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "2f83da1cff87e975d21351f8cce6e819ebbb9f33",
+    "sha1": "2d6ae7a3e4cf4ac453028172ab43c0972962349a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d8ecdffd002b056579fc5aeccf8c62e4267f13b3"
+    "sha2": "fea108b7711b2ac7e9529b66095ccd8954d4ebb9"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-insert-test",
     "expectedResult": {
         "changes": {
             "return-statement.js": [
-                "Added the '5' return statement",
-                "Deleted the 'empty' return statement"
+                "Added '5'"
             ]
         },
         "errors": {}
@@ -47,17 +46,16 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "d8ecdffd002b056579fc5aeccf8c62e4267f13b3",
+    "sha1": "fea108b7711b2ac7e9529b66095ccd8954d4ebb9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3d2026e2cb6789ebe899e82b9912844a53b0720a"
+    "sha2": "15ee9363230ed17b62dd10311721436a0ae61b60"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-replacement-test",
     "expectedResult": {
         "changes": {
             "return-statement.js": [
-                "Added the 'empty' return statement",
-                "Deleted the '5' return statement"
+                "Deleted '5'"
             ]
         },
         "errors": {}
@@ -65,9 +63,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "3d2026e2cb6789ebe899e82b9912844a53b0720a",
+    "sha1": "15ee9363230ed17b62dd10311721436a0ae61b60",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "93a90e3df5860ca22d377db9b4d2a1ad9aebc0db"
+    "sha2": "f187b68543057279e9563a1bf472b3171f372ea3"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-replacement-test",
@@ -75,8 +73,8 @@
         "changes": {
             "return-statement.js": [
                 "Deleted the 'empty' return statement",
-                "Added the 'empty' return statement",
-                "Deleted the '5' return statement"
+                "Deleted the '5' return statement",
+                "Added the 'empty' return statement"
             ]
         },
         "errors": {}
@@ -84,9 +82,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "93a90e3df5860ca22d377db9b4d2a1ad9aebc0db",
+    "sha1": "f187b68543057279e9563a1bf472b3171f372ea3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "03875cdd139a3151cfbb1e992d18aa9ed2c73bf9"
+    "sha2": "54d03de6792762a085f460012ca64599fcb3b2f9"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-test",
@@ -101,9 +99,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "03875cdd139a3151cfbb1e992d18aa9ed2c73bf9",
+    "sha1": "54d03de6792762a085f460012ca64599fcb3b2f9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9590e51df3ff791b4060312b7b325d2ac1eedefa"
+    "sha2": "3eb1726ad9459097c9a74c3343805aae3effafb5"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-rest-test",
@@ -118,7 +116,7 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "9590e51df3ff791b4060312b7b325d2ac1eedefa",
+    "sha1": "3eb1726ad9459097c9a74c3343805aae3effafb5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5099a9bb7a28ce5fe5558ce9c69813cb91a62ac1"
+    "sha2": "6632dc9f20866349fbee9cca32096a38d676fd99"
 }]

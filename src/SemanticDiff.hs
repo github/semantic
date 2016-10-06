@@ -1,3 +1,4 @@
+{-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-warnings-deprecations -fno-warn-incomplete-patterns #-}
 module SemanticDiff (main, fetchDiff, fetchDiffs) where
 
@@ -23,6 +24,7 @@ import qualified Renderer as R
 import qualified Source
 import qualified Control.Concurrent.Async.Pool as Async
 import GHC.Conc (numCapabilities)
+import Development.GitRev
 
 main :: IO ()
 main = do
@@ -56,7 +58,7 @@ argumentsParser = info (version <*> helper <*> argumentsP)
           where regex = mkRegexWithOpts "([0-9a-f]{40})\\.\\.([0-9a-f]{40})" True False
 
 versionString :: String
-versionString = "semantic-diff version " <> showVersion Library.version
+versionString = "semantic-diff version " <> showVersion Library.version <> " (" <> $(gitHash) <> ")"
 
 version :: Parser (a -> a)
 version = infoOption versionString (long "version" <> short 'V' <> help "output the version of the program")

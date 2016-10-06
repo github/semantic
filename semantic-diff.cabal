@@ -89,6 +89,7 @@ library
                      , tree-sitter-parsers
                      , vector
                      , wl-pprint-text
+                     , gitrev
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, LambdaCase
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -fprof-auto -j

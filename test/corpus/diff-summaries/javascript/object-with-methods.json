@@ -11,9 +11,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "133af9a2d6a65f9f341f5450f0c0155ba7aaa5df",
+    "sha1": "7451453939a71bed1ff4fdd7d49f1541b5250916",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3ac968dd915ff4f32e7dc061c85a81466e583199"
+    "sha2": "12110da4178a42b0cf7e23a288a67bb4fc836f7f"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-replacement-insert-test",
@@ -29,17 +29,16 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "3ac968dd915ff4f32e7dc061c85a81466e583199",
+    "sha1": "12110da4178a42b0cf7e23a288a67bb4fc836f7f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "45c872a9d2bb1992f6b47c0da9ad9521dbbdf6b9"
+    "sha2": "27be86468793d9fb7d13a6037266d60dbf72796b"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-insert-test",
     "expectedResult": {
         "changes": {
             "objects-with-methods.js": [
-                "Added the '{ add }' object",
-                "Deleted the '{ subtract }' object"
+                "Replaced the 'subtract' identifier with the 'add' identifier in the add method"
             ]
         },
         "errors": {}
@@ -47,17 +46,16 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "45c872a9d2bb1992f6b47c0da9ad9521dbbdf6b9",
+    "sha1": "27be86468793d9fb7d13a6037266d60dbf72796b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ea32a9a4c57a89fe8757303b21c49a9695fb54f2"
+    "sha2": "4be0419ff54c3d540a5a640f240bd54eef319eb7"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-replacement-test",
     "expectedResult": {
         "changes": {
             "objects-with-methods.js": [
-                "Added the '{ subtract }' object",
-                "Deleted the '{ add }' object"
+                "Replaced the 'add' identifier with the 'subtract' identifier in the subtract method"
             ]
         },
         "errors": {}
@@ -65,9 +63,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "ea32a9a4c57a89fe8757303b21c49a9695fb54f2",
+    "sha1": "4be0419ff54c3d540a5a640f240bd54eef319eb7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ab5707b9ddc401cb1485e81785e77095f57aa8fe"
+    "sha2": "82b8d9898da0aa6cb1f9c29f8284e1fd55dd6e4e"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-replacement-test",
@@ -75,8 +73,8 @@
         "changes": {
             "objects-with-methods.js": [
                 "Deleted the '{ subtract }' object",
-                "Added the '{ subtract }' object",
-                "Deleted the '{ add }' object"
+                "Deleted the '{ add }' object",
+                "Added the '{ subtract }' object"
             ]
         },
         "errors": {}
@@ -84,9 +82,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "ab5707b9ddc401cb1485e81785e77095f57aa8fe",
+    "sha1": "82b8d9898da0aa6cb1f9c29f8284e1fd55dd6e4e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "64aba2b0d56f21d9a5642fafe707c1bc4322a3fd"
+    "sha2": "84044bf9e5e183457cd7941fb531f14de2fb1eb5"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-test",
@@ -101,9 +99,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "64aba2b0d56f21d9a5642fafe707c1bc4322a3fd",
+    "sha1": "84044bf9e5e183457cd7941fb531f14de2fb1eb5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5f09d5d470328401cb7f5b1ec4ed89435a2ed91e"
+    "sha2": "220fbff125f89c24de08fb1bfaadd0c663c88ae3"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-rest-test",
@@ -118,7 +116,7 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "5f09d5d470328401cb7f5b1ec4ed89435a2ed91e",
+    "sha1": "220fbff125f89c24de08fb1bfaadd0c663c88ae3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ab6a9bd2d5a2b7509e21e09bfcbd5a85291bf03c"
+    "sha2": "52cffc4738bafd83771b7e1718db8a6798f5fa29"
 }]

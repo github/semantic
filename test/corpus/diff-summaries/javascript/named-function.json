@@ -11,9 +11,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "1bb9688393fd59b59ff2f59c16fae5e032ede0ac",
+    "sha1": "2f747231adcd75d055ddc8b98d276039d1b5a094",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8e28e6cbd4437a3e81ad3442883c24a135895ed9"
+    "sha2": "95c12dc72b251772f817fe9279440c37c5a85638"
 }
 ,{
     "testCaseDescription": "javascript-named-function-replacement-insert-test",
@@ -29,17 +29,20 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "8e28e6cbd4437a3e81ad3442883c24a135895ed9",
+    "sha1": "95c12dc72b251772f817fe9279440c37c5a85638",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7a448b82de63a0c6fd18fe27b32262cac4445af1"
+    "sha2": "47b4934bdb04f55a694e21f35201a981c6124de5"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-insert-test",
     "expectedResult": {
         "changes": {
             "named-function.js": [
-                "Added the 'myFunction' function",
-                "Deleted the 'anotherFunction' function"
+                "Replaced the 'anotherFunction' identifier with the 'myFunction' identifier in the myFunction function",
+                "Added the 'arg1' identifier in the myFunction function",
+                "Added the 'arg2' identifier in the myFunction function",
+                "Added the 'arg2' identifier in the myFunction function",
+                "Deleted the 'false' return statement in the myFunction function"
             ]
         },
         "errors": {}
@@ -47,17 +50,20 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "7a448b82de63a0c6fd18fe27b32262cac4445af1",
+    "sha1": "47b4934bdb04f55a694e21f35201a981c6124de5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7df7ffb6fc3d8b07ee69e1cdf2a93f89d06b6c8e"
+    "sha2": "1a8525476fbea48b8a414ba7916620f2ac9fe5d9"
 }
 ,{
     "testCaseDescription": "javascript-named-function-replacement-test",
     "expectedResult": {
         "changes": {
             "named-function.js": [
-                "Added the 'anotherFunction' function",
-                "Deleted the 'myFunction' function"
+                "Replaced the 'myFunction' identifier with the 'anotherFunction' identifier in the myFunction function",
+                "Deleted the 'arg1' identifier in the myFunction function",
+                "Deleted the 'arg2' identifier in the myFunction function",
+                "Added the 'false' return statement in the myFunction function",
+                "Deleted the 'arg2' identifier in the myFunction function"
             ]
         },
         "errors": {}
@@ -65,9 +71,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "7df7ffb6fc3d8b07ee69e1cdf2a93f89d06b6c8e",
+    "sha1": "1a8525476fbea48b8a414ba7916620f2ac9fe5d9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5b082012ac17f548a754eb6864cf915baa55bbf2"
+    "sha2": "23b98195e5ad0d28ce93c966b1a318183457dd23"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-replacement-test",
@@ -75,8 +81,8 @@
         "changes": {
             "named-function.js": [
                 "Deleted the 'anotherFunction' function",
-                "Added the 'anotherFunction' function",
-                "Deleted the 'myFunction' function"
+                "Deleted the 'myFunction' function",
+                "Added the 'anotherFunction' function"
             ]
         },
         "errors": {}
@@ -84,9 +90,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "5b082012ac17f548a754eb6864cf915baa55bbf2",
+    "sha1": "23b98195e5ad0d28ce93c966b1a318183457dd23",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ee4115150e100ee5013c1f3cb2177bebf3e913ea"
+    "sha2": "1e24bf4a7f46014ebd6864d44b03f129671e3dfc"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-test",
@@ -101,9 +107,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "ee4115150e100ee5013c1f3cb2177bebf3e913ea",
+    "sha1": "1e24bf4a7f46014ebd6864d44b03f129671e3dfc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4fd0d6233f7ebc39edcaa80f159aad8fdcf7a298"
+    "sha2": "7c920ed7d74184e32974d7977dcc5fe0c9d35ca3"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-rest-test",
@@ -118,7 +124,7 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "4fd0d6233f7ebc39edcaa80f159aad8fdcf7a298",
+    "sha1": "7c920ed7d74184e32974d7977dcc5fe0c9d35ca3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "20a420167bbd93dbb126ff5173ccfea3f5b03a6c"
+    "sha2": "35191e787bea194267476a5eb4a43dc525bd28c3"
 }]

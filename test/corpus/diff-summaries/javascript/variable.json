@@ -11,9 +11,9 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "4ffbee0b722bbcfc9f9b52a9dd03e89aca5fea7c",
+    "sha1": "b0665d174f7073b730432253122aad996e5d8107",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "51c88e75a16178808c46ec33cb95c6aace91a5ba"
+    "sha2": "65b080b43d781c4d968431e2c1b5e003fa271ecc"
 }
 ,{
     "testCaseDescription": "javascript-variable-replacement-insert-test",
@@ -29,17 +29,16 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "51c88e75a16178808c46ec33cb95c6aace91a5ba",
+    "sha1": "65b080b43d781c4d968431e2c1b5e003fa271ecc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1f94cc9b8313d60de7b3f266ca068de340e40791"
+    "sha2": "3e0e939113069492829e74bc313211d7a128eb03"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-insert-test",
     "expectedResult": {
         "changes": {
             "variable.js": [
-                "Added the 'theVar' identifier",
-                "Deleted the 'theVar2' identifier"
+                "Replaced the 'theVar2' identifier with the 'theVar' identifier"
             ]
         },
         "errors": {}
@@ -47,34 +46,15 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "1f94cc9b8313d60de7b3f266ca068de340e40791",
+    "sha1": "3e0e939113069492829e74bc313211d7a128eb03",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "45d901f0e787a9b326b0cedce5d54106b402c02f"
+    "sha2": "bd17ce67d20168f3fd2f84b81d2b1477797e9697"
 }
 ,{
     "testCaseDescription": "javascript-variable-replacement-test",
     "expectedResult": {
         "changes": {
             "variable.js": [
-                "Added the 'theVar2' identifier",
-                "Deleted the 'theVar' identifier"
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "variable.js"
-    ],
-    "sha1": "45d901f0e787a9b326b0cedce5d54106b402c02f",
-    "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ae17407e97565ded44edbf19ece47699da4a968a"
-}
-,{
-    "testCaseDescription": "javascript-variable-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "variable.js": [
-                "Deleted the 'theVar2' identifier",
                 "Replaced the 'theVar' identifier with the 'theVar2' identifier"
             ]
         },
@@ -83,9 +63,28 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "ae17407e97565ded44edbf19ece47699da4a968a",
+    "sha1": "bd17ce67d20168f3fd2f84b81d2b1477797e9697",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1f515b44a4103591f92b87ad78790151646b74e7"
+    "sha2": "758e2f8e2e39c93a046cfe689be6db32cc598e31"
+}
+,{
+    "testCaseDescription": "javascript-variable-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                "Deleted the 'theVar2' identifier",
+                "Deleted the 'theVar' identifier",
+                "Added the 'theVar2' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "758e2f8e2e39c93a046cfe689be6db32cc598e31",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "57dc8212e58234b75d4bdb9b2c9f7a72ebd31a2b"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-test",
@@ -100,9 +99,9 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "1f515b44a4103591f92b87ad78790151646b74e7",
+    "sha1": "57dc8212e58234b75d4bdb9b2c9f7a72ebd31a2b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e57e0883f17c0132d8ef173b14aef230ccf9bd52"
+    "sha2": "4f1602caaa3a8783fc4c0f0d25b55ae01b133f3d"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-rest-test",
@@ -117,7 +116,7 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "e57e0883f17c0132d8ef173b14aef230ccf9bd52",
+    "sha1": "4f1602caaa3a8783fc4c0f0d25b55ae01b133f3d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f956fe4ea44f5d38071a3c8a5a5342259ff9bb28"
+    "sha2": "aab18e237ace91db31cea86a6c4c43aa094b446e"
 }]

@@ -11,9 +11,9 @@
     "filePaths": [
         "bitwise-operator.js"
     ],
-    "sha1": "cbe58e2de4353948478c7716d90fa22e6f430b3f",
+    "sha1": "64908cefe1f4a89c4491d3512ab5bb6fb4625096",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e00ee4c31366730302d1bd06e6359897dd94f02c"
+    "sha2": "b2c41648296aa2e03852bb5e91537514cc293b1c"
 }
 ,{
     "testCaseDescription": "javascript-bitwise-operator-replacement-insert-test",
@@ -29,17 +29,16 @@
     "filePaths": [
         "bitwise-operator.js"
     ],
-    "sha1": "e00ee4c31366730302d1bd06e6359897dd94f02c",
+    "sha1": "b2c41648296aa2e03852bb5e91537514cc293b1c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6724780ecdbfccbc419d351fd0104959a90200b2"
+    "sha2": "5375465c178bf87a3aea5871ee611c582f002a00"
 }
 ,{
     "testCaseDescription": "javascript-bitwise-operator-delete-insert-test",
     "expectedResult": {
         "changes": {
             "bitwise-operator.js": [
-                "Added the 'i >> j' bitwise operator",
-                "Deleted the 'i >> k' bitwise operator"
+                "Replaced the 'k' identifier with the 'j' identifier"
             ]
         },
         "errors": {}
@@ -47,34 +46,15 @@
     "filePaths": [
         "bitwise-operator.js"
     ],
-    "sha1": "6724780ecdbfccbc419d351fd0104959a90200b2",
+    "sha1": "5375465c178bf87a3aea5871ee611c582f002a00",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "83f1c96a797988568a6466a436d0ee8a1f95b054"
+    "sha2": "928612908dfa572b054105ff4bdb95a130d09264"
 }
 ,{
     "testCaseDescription": "javascript-bitwise-operator-replacement-test",
     "expectedResult": {
         "changes": {
             "bitwise-operator.js": [
-                "Added the 'i >> k' bitwise operator",
-                "Deleted the 'i >> j' bitwise operator"
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "bitwise-operator.js"
-    ],
-    "sha1": "83f1c96a797988568a6466a436d0ee8a1f95b054",
-    "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c546b433a881c30583010d2ac6b4186a2c30c4bb"
-}
-,{
-    "testCaseDescription": "javascript-bitwise-operator-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "bitwise-operator.js": [
-                "Deleted the 'i >> k' bitwise operator",
                 "Replaced the 'j' identifier with the 'k' identifier"
             ]
         },
@@ -83,9 +63,28 @@
     "filePaths": [
         "bitwise-operator.js"
     ],
-    "sha1": "c546b433a881c30583010d2ac6b4186a2c30c4bb",
+    "sha1": "928612908dfa572b054105ff4bdb95a130d09264",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "df100f5ba9f9c4901c42b1efce658b29e87ea029"
+    "sha2": "d4d3e2daa8fdef77b991876e30d2104299e22eca"
+}
+,{
+    "testCaseDescription": "javascript-bitwise-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "bitwise-operator.js": [
+                "Deleted the 'i >> k' bitwise operator",
+                "Deleted the 'i >> j' bitwise operator",
+                "Added the 'i >> k' bitwise operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "bitwise-operator.js"
+    ],
+    "sha1": "d4d3e2daa8fdef77b991876e30d2104299e22eca",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bf3663604c950ac71bf797dcd0cf66b091fef643"
 }
 ,{
     "testCaseDescription": "javascript-bitwise-operator-delete-test",
@@ -100,9 +99,9 @@
     "filePaths": [
         "bitwise-operator.js"
     ],
-    "sha1": "df100f5ba9f9c4901c42b1efce658b29e87ea029",
+    "sha1": "bf3663604c950ac71bf797dcd0cf66b091fef643",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3e368d25cc3a3fb92993c5561becf428f03ff75b"
+    "sha2": "399df95cd0f9607de8c8309c462996e5d3bfda59"
 }
 ,{
     "testCaseDescription": "javascript-bitwise-operator-delete-rest-test",
@@ -117,7 +116,7 @@
     "filePaths": [
         "bitwise-operator.js"
     ],
-    "sha1": "3e368d25cc3a3fb92993c5561becf428f03ff75b",
+    "sha1": "399df95cd0f9607de8c8309c462996e5d3bfda59",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2b3a648ff2420e7e577c6ac2909dfdf09ec6d3bd"
+    "sha2": "734a1520f6190913ebe3373ef3eaea2eb8fa32ac"
 }]

@@ -11,9 +11,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "7f626789377b5fd3eea7b354c6e5a1cc5fc2e265",
+    "sha1": "5849813ca5290325ffe39d290e78a99104035304",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8ab55b9d82f1413aa9575f42f301dabd079db78c"
+    "sha2": "ec72f4310f1d740528e1cb8971f5a44c99368910"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-insert-test",
@@ -29,17 +29,17 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "8ab55b9d82f1413aa9575f42f301dabd079db78c",
+    "sha1": "ec72f4310f1d740528e1cb8971f5a44c99368910",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4041641de1922c3898a8ee7cd196c558e7e69128"
+    "sha2": "8f77eb6febc2faeff938106f1ee0b4fec83b1926"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-insert-test",
     "expectedResult": {
         "changes": {
             "math-operator.js": [
-                "Added the 'i + j * 3 - j % 5' math operator",
-                "Deleted the 'i + j * 2 - j % 4' math operator"
+                "Replaced '2' with '3'",
+                "Replaced '4' with '5'"
             ]
         },
         "errors": {}
@@ -47,34 +47,15 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "4041641de1922c3898a8ee7cd196c558e7e69128",
+    "sha1": "8f77eb6febc2faeff938106f1ee0b4fec83b1926",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e8d325535d083a000ba8292202440a5495be8922"
+    "sha2": "0b5738f94a12baf7bebf8be4a2b5258140263e61"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-test",
     "expectedResult": {
         "changes": {
             "math-operator.js": [
-                "Added the 'i + j * 2 - j % 4' math operator",
-                "Deleted the 'i + j * 3 - j % 5' math operator"
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "math-operator.js"
-    ],
-    "sha1": "e8d325535d083a000ba8292202440a5495be8922",
-    "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9ca2993d5a9ace2a5028dff739736c6c39bae554"
-}
-,{
-    "testCaseDescription": "javascript-math-operator-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "math-operator.js": [
-                "Deleted the 'i + j * 2 - j % 4' math operator",
                 "Replaced '3' with '2'",
                 "Replaced '5' with '4'"
             ]
@@ -84,9 +65,28 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "9ca2993d5a9ace2a5028dff739736c6c39bae554",
+    "sha1": "0b5738f94a12baf7bebf8be4a2b5258140263e61",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "dccbc9a4d8485e3a097694ccd115e42062a7722e"
+    "sha2": "863e0bcea05ed4eef22b43a21c650e809672b8fa"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                "Deleted the 'i + j * 2 - j % 4' math operator",
+                "Deleted the 'i + j * 3 - j % 5' math operator",
+                "Added the 'i + j * 2 - j % 4' math operator"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "863e0bcea05ed4eef22b43a21c650e809672b8fa",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7c1c70d45bf38755d8451ee7d5ae6c8ce1f29e61"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-test",
@@ -101,9 +101,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "dccbc9a4d8485e3a097694ccd115e42062a7722e",
+    "sha1": "7c1c70d45bf38755d8451ee7d5ae6c8ce1f29e61",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "56d97a6e44e0d8ce307d0830658fd81a25eb172e"
+    "sha2": "c2a4bf1a1ee700292a059b3c02552d3534c1ab01"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-rest-test",
@@ -118,7 +118,7 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "56d97a6e44e0d8ce307d0830658fd81a25eb172e",
+    "sha1": "c2a4bf1a1ee700292a059b3c02552d3534c1ab01",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "431090fc86018346fe6fe6451088317d64412f5c"
+    "sha2": "59296bb55e2a8b7e4618367d4a796b089c2da907"
 }]

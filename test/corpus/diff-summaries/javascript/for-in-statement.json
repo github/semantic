@@ -11,9 +11,9 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "a49b3cc79bf0a423e6474f02d4f9b2deae2cf7aa",
+    "sha1": "ea2df743568a320252df57e60055d8d6e611d9e7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0a7c6659f5ec71c2b1fa3e6e2bb4496a93f32f61"
+    "sha2": "a5323182612a4cb0f0b9144c0d487138b7693844"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-replacement-insert-test",
@@ -29,17 +29,18 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "0a7c6659f5ec71c2b1fa3e6e2bb4496a93f32f61",
+    "sha1": "a5323182612a4cb0f0b9144c0d487138b7693844",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "99cf353eb02deb90fb186c3f329a08b0d4d8d6af"
+    "sha2": "b9a318024efbb6b16ef8a4cb62994e5cf53a9eed"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-delete-insert-test",
     "expectedResult": {
         "changes": {
             "for-in-statement.js": [
-                "Deleted the 'item in items' for statement",
-                "Added the 'thing in things' for statement"
+                "Replaced the 'item' identifier with the 'thing' identifier",
+                "Replaced the 'items' identifier with the 'things' identifier",
+                "Replaced the 'item' identifier with the 'thing' identifier in the thing() function call"
             ]
         },
         "errors": {}
@@ -47,17 +48,18 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "99cf353eb02deb90fb186c3f329a08b0d4d8d6af",
+    "sha1": "b9a318024efbb6b16ef8a4cb62994e5cf53a9eed",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f581d7c8f2909f9bbfd0bd22aa842d4f75024922"
+    "sha2": "ef9b68774aa78ba393bcde5e4eaa58ec5c62ebba"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-replacement-test",
     "expectedResult": {
         "changes": {
             "for-in-statement.js": [
-                "Added the 'item in items' for statement",
-                "Deleted the 'thing in things' for statement"
+                "Replaced the 'thing' identifier with the 'item' identifier",
+                "Replaced the 'things' identifier with the 'items' identifier",
+                "Replaced the 'thing' identifier with the 'item' identifier in the item() function call"
             ]
         },
         "errors": {}
@@ -65,9 +67,9 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "f581d7c8f2909f9bbfd0bd22aa842d4f75024922",
+    "sha1": "ef9b68774aa78ba393bcde5e4eaa58ec5c62ebba",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3d00da198e8cb46729d6731b25996989a2bbc861"
+    "sha2": "6a7c1aec72c990079fb74a2d88454879e0542b51"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-delete-replacement-test",
@@ -75,8 +77,8 @@
         "changes": {
             "for-in-statement.js": [
                 "Deleted the 'item in items' for statement",
-                "Added the 'item in items' for statement",
-                "Deleted the 'thing in things' for statement"
+                "Deleted the 'thing in things' for statement",
+                "Added the 'item in items' for statement"
             ]
         },
         "errors": {}
@@ -84,9 +86,9 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "3d00da198e8cb46729d6731b25996989a2bbc861",
+    "sha1": "6a7c1aec72c990079fb74a2d88454879e0542b51",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c89f407311b549fca61cbaf71bb56d3ee6dc7454"
+    "sha2": "c77ceb93acf79d639f3d5f9b965a7e72811ef9a2"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-delete-test",
@@ -101,9 +103,9 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "c89f407311b549fca61cbaf71bb56d3ee6dc7454",
+    "sha1": "c77ceb93acf79d639f3d5f9b965a7e72811ef9a2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "36ffd9416fc0678a6934d4b8669d19e7b9a6750b"
+    "sha2": "e66118e2e67e731d3ff9d5cbff85d6e598a8fc9e"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-delete-rest-test",
@@ -118,7 +120,7 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "36ffd9416fc0678a6934d4b8669d19e7b9a6750b",
+    "sha1": "e66118e2e67e731d3ff9d5cbff85d6e598a8fc9e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "12621d999238618e3a862f232779862ba803a778"
+    "sha2": "6798e4b37426ea6b88b61053b80ad8c9d1f52ab9"
 }]

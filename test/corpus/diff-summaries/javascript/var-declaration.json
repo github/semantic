@@ -11,9 +11,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "5099a9bb7a28ce5fe5558ce9c69813cb91a62ac1",
+    "sha1": "6632dc9f20866349fbee9cca32096a38d676fd99",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cfc3d6557f320bbb7e8c5b5fc9820db038bc2745"
+    "sha2": "68fbed5e0138cf9909be8249f5e56f4a601b105e"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-replacement-insert-test",
@@ -31,19 +31,18 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "cfc3d6557f320bbb7e8c5b5fc9820db038bc2745",
+    "sha1": "68fbed5e0138cf9909be8249f5e56f4a601b105e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "df50d8c3f4cc74a89cd0002dc42347a2c0c493ce"
+    "sha2": "a5bb584db7c76ad0fb098032dce44c6ab55068ca"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-insert-test",
     "expectedResult": {
         "changes": {
             "var-declaration.js": [
-                "Deleted the 'x' variable",
+                "Replaced the 'x' variable with the 'x' variable",
                 "Deleted the 'y' variable",
-                "Deleted the 'z' variable",
-                "Added the 'x' variable"
+                "Deleted the 'z' variable"
             ]
         },
         "errors": {}
@@ -51,19 +50,18 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "df50d8c3f4cc74a89cd0002dc42347a2c0c493ce",
+    "sha1": "a5bb584db7c76ad0fb098032dce44c6ab55068ca",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2397f594fe9a2f64c9d9b020e3887e464b988069"
+    "sha2": "b1f0bb9999d84d984ba7d9445e6846c36257b748"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-replacement-test",
     "expectedResult": {
         "changes": {
             "var-declaration.js": [
-                "Added the 'x' variable",
+                "Replaced the 'x' variable with the 'x' variable",
                 "Added the 'y' variable",
-                "Added the 'z' variable",
-                "Deleted the 'x' variable"
+                "Added the 'z' variable"
             ]
         },
         "errors": {}
@@ -71,9 +69,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "2397f594fe9a2f64c9d9b020e3887e464b988069",
+    "sha1": "b1f0bb9999d84d984ba7d9445e6846c36257b748",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "557258b247d3bc49b25f3213f42043b129511677"
+    "sha2": "3c606d3339e51b71968f7b00c08aea4177adb21e"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-replacement-test",
@@ -83,10 +81,10 @@
                 "Deleted the 'x' variable",
                 "Deleted the 'y' variable",
                 "Deleted the 'z' variable",
+                "Deleted the 'x' variable",
                 "Added the 'x' variable",
                 "Added the 'y' variable",
-                "Added the 'z' variable",
-                "Deleted the 'x' variable"
+                "Added the 'z' variable"
             ]
         },
         "errors": {}
@@ -94,9 +92,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "557258b247d3bc49b25f3213f42043b129511677",
+    "sha1": "3c606d3339e51b71968f7b00c08aea4177adb21e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b7d9d5c8847f99999a0d2136e592482db7a647b0"
+    "sha2": "318503c582b1ca270e3ad2ea23140699079c3d4c"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-test",
@@ -111,9 +109,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "b7d9d5c8847f99999a0d2136e592482db7a647b0",
+    "sha1": "318503c582b1ca270e3ad2ea23140699079c3d4c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "42e244fcd70a9dc599ab8a0031d2320e832ea0fe"
+    "sha2": "5df38338d708d301838ab06cf6df7c919a55d629"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-rest-test",
@@ -130,7 +128,7 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "42e244fcd70a9dc599ab8a0031d2320e832ea0fe",
+    "sha1": "5df38338d708d301838ab06cf6df7c919a55d629",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c367cef2a2ab4f6c19c197ff79c0e633b62e30b4"
+    "sha2": "e797ca2c748a6d42d67875240942d0876fd66cbc"
 }]

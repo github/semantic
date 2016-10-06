@@ -11,9 +11,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "c367cef2a2ab4f6c19c197ff79c0e633b62e30b4",
+    "sha1": "e797ca2c748a6d42d67875240942d0876fd66cbc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cddae3787c876d2d1422b1e8a20b70fff43ea791"
+    "sha2": "9b44781137dd99590dc0b1ee7f175d7554fc19c1"
 }
 ,{
     "testCaseDescription": "javascript-comment-replacement-insert-test",
@@ -29,17 +29,16 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "cddae3787c876d2d1422b1e8a20b70fff43ea791",
+    "sha1": "9b44781137dd99590dc0b1ee7f175d7554fc19c1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a92356ef5dd2872d9deca3ca0ccbc96acde7e7c9"
+    "sha2": "b7b5ac68f521105a55e5efbbc290762ae19e998a"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-insert-test",
     "expectedResult": {
         "changes": {
             "comment.js": [
-                "Deleted the '/*\n * This is a method\n*/' comment",
-                "Added the '// This is a property' comment"
+                "Replaced the '/*\n * This is a method\n*/' comment with the '// This is a property' comment"
             ]
         },
         "errors": {}
@@ -47,34 +46,15 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "a92356ef5dd2872d9deca3ca0ccbc96acde7e7c9",
+    "sha1": "b7b5ac68f521105a55e5efbbc290762ae19e998a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1b6142218dba998b1d8e30ff04ab3956af156d89"
+    "sha2": "f28812e795ef48e013b23d15cc250a11a65d1efb"
 }
 ,{
     "testCaseDescription": "javascript-comment-replacement-test",
     "expectedResult": {
         "changes": {
             "comment.js": [
-                "Added the '/*\n * This is a method\n*/' comment",
-                "Deleted the '// This is a property' comment"
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "comment.js"
-    ],
-    "sha1": "1b6142218dba998b1d8e30ff04ab3956af156d89",
-    "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8e72d96f78fe6aa854538e0ad4b905f847220637"
-}
-,{
-    "testCaseDescription": "javascript-comment-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "comment.js": [
-                "Deleted the '/*\n * This is a method\n*/' comment",
                 "Replaced the '// This is a property' comment with the '/*\n * This is a method\n*/' comment"
             ]
         },
@@ -83,9 +63,28 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "8e72d96f78fe6aa854538e0ad4b905f847220637",
+    "sha1": "f28812e795ef48e013b23d15cc250a11a65d1efb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "26d973746782342270438610ac35e6f88147e85a"
+    "sha2": "94d3258258fc5dda40f68012a4a29a0699ae7198"
+}
+,{
+    "testCaseDescription": "javascript-comment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "comment.js": [
+                "Deleted the '/*\n * This is a method\n*/' comment",
+                "Deleted the '// This is a property' comment",
+                "Added the '/*\n * This is a method\n*/' comment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.js"
+    ],
+    "sha1": "94d3258258fc5dda40f68012a4a29a0699ae7198",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "054b25777313237a3548f17e75ddf0036c8c4b97"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-test",
@@ -100,9 +99,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "26d973746782342270438610ac35e6f88147e85a",
+    "sha1": "054b25777313237a3548f17e75ddf0036c8c4b97",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0559ba4c7ac24ec74a05da45e9fc7c8d69af3604"
+    "sha2": "446ac1dc79acd4f137b6d2a6eb894cb3377f82a5"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-rest-test",
@@ -117,7 +116,7 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "0559ba4c7ac24ec74a05da45e9fc7c8d69af3604",
+    "sha1": "446ac1dc79acd4f137b6d2a6eb894cb3377f82a5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5b6687475c3b7f8c43a128b52e6c4e9220558a04"
+    "sha2": "e744226ef998687c390e01091951dba025d40dfd"
 }]

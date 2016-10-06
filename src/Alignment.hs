@@ -8,13 +8,10 @@ module Alignment
 , modifyJoin
 ) where
 
-import Control.Arrow ((***))
+import Prologue hiding (fst, snd)
 import Data.Align
-import Data.Biapplicative
 import Data.Bifunctor.Join
-import Data.Function
-import Data.Functor.Both as Both
-import Data.Functor.Foldable (hylo)
+import Data.Functor.Both
 import Data.List (partition)
 import Data.Maybe (fromJust)
 import Data.Record
@@ -22,7 +19,6 @@ import Data.These
 import Diff
 import Info
 import Patch
-import Prologue hiding (fst, snd)
 import Range
 import Source hiding (break, fromList, uncons)
 import SplitDiff

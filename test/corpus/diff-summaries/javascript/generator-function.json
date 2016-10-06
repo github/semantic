@@ -11,9 +11,9 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "2f2cf1310f873d0fd161b380b7eeded32ac59cb1",
+    "sha1": "907b5c72373793066771c9e049b754b7508f457a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0fa30a49bdc004ac54536ba644bb9c3aac277657"
+    "sha2": "76735cb4eb1cd6e7443621744a2dba2c3307c84a"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-replacement-insert-test",
@@ -29,17 +29,16 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "0fa30a49bdc004ac54536ba644bb9c3aac277657",
+    "sha1": "76735cb4eb1cd6e7443621744a2dba2c3307c84a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "66da496c2e4cd5cd2dfcd9e0e008d5935aa9447d"
+    "sha2": "ab11363b7988d0b8701ff9947e63542aff4bfc59"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-insert-test",
     "expectedResult": {
         "changes": {
             "generator-function.js": [
-                "Added the 'generateStuff' function",
-                "Deleted the 'generateNewStuff' function"
+                "Replaced the 'generateNewStuff' identifier with the 'generateStuff' identifier in the generateStuff function"
             ]
         },
         "errors": {}
@@ -47,17 +46,16 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "66da496c2e4cd5cd2dfcd9e0e008d5935aa9447d",
+    "sha1": "ab11363b7988d0b8701ff9947e63542aff4bfc59",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c3749812404d2b8ce48d858e6930a39c6205bb01"
+    "sha2": "29d9ab35ebd7a660cb6cf4f8922ce476897115f0"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-replacement-test",
     "expectedResult": {
         "changes": {
             "generator-function.js": [
-                "Added the 'generateNewStuff' function",
-                "Deleted the 'generateStuff' function"
+                "Replaced the 'generateStuff' identifier with the 'generateNewStuff' identifier in the generateNewStuff function"
             ]
         },
         "errors": {}
@@ -65,9 +63,9 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "c3749812404d2b8ce48d858e6930a39c6205bb01",
+    "sha1": "29d9ab35ebd7a660cb6cf4f8922ce476897115f0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "83f6cb79c4eb628b4c7233d417fa7cfa5fe368ec"
+    "sha2": "f7ed636c58a10ad0c2599286d900aa32dab6de84"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-replacement-test",
@@ -75,8 +73,8 @@
         "changes": {
             "generator-function.js": [
                 "Deleted the 'generateNewStuff' function",
-                "Added the 'generateNewStuff' function",
-                "Deleted the 'generateStuff' function"
+                "Deleted the 'generateStuff' function",
+                "Added the 'generateNewStuff' function"
             ]
         },
         "errors": {}
@@ -84,9 +82,9 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "83f6cb79c4eb628b4c7233d417fa7cfa5fe368ec",
+    "sha1": "f7ed636c58a10ad0c2599286d900aa32dab6de84",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9a2afda62b7bc547a118a77bc674115008af0a68"
+    "sha2": "c14290e3876039d5554c876ec1baf691ea27d9f1"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-test",
@@ -101,9 +99,9 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "9a2afda62b7bc547a118a77bc674115008af0a68",
+    "sha1": "c14290e3876039d5554c876ec1baf691ea27d9f1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5ed821780dd73b7b59ebd6f572a98362bafb10a1"
+    "sha2": "0b51402ced5dea069e07d8936c74081b021f6d1c"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-rest-test",
@@ -118,7 +116,7 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "5ed821780dd73b7b59ebd6f572a98362bafb10a1",
+    "sha1": "0b51402ced5dea069e07d8936c74081b021f6d1c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1bb9688393fd59b59ff2f59c16fae5e032ede0ac"
+    "sha2": "2f747231adcd75d055ddc8b98d276039d1b5a094"
 }]

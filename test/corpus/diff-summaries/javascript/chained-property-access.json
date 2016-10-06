@@ -11,9 +11,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "0d39978593de2568f3ab5b0db632c7091f305835",
+    "sha1": "2af71438d83e47601320a632ea6bc26ae90a70d8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "02e0c92e32e7486f7f3bfecb5ec7901a91b933c5"
+    "sha2": "d1bfac469e4c9509a14644ecdc1553b3b620e967"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-replacement-insert-test",
@@ -29,17 +29,17 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "02e0c92e32e7486f7f3bfecb5ec7901a91b933c5",
+    "sha1": "d1bfac469e4c9509a14644ecdc1553b3b620e967",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4982cbccacaa37f8b98eb05b041be31bf5297b7c"
+    "sha2": "9438bdffda260fe6e0c98656fa39e79b0bab8460"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-insert-test",
     "expectedResult": {
         "changes": {
             "chained-property-access.js": [
-                "Added the 'returned.promise().done(…).fail(…)' return statement",
-                "Deleted the 'returned.promise().done(…).fail(…)' return statement"
+                "Replaced the 'otherDefer' identifier with the 'newDefer' identifier in the returned.promise().done(…) method call",
+                "Replaced the 'otherDefer' identifier with the 'newDefer' identifier in the returned.promise().done(…).fail(…) method call"
             ]
         },
         "errors": {}
@@ -47,17 +47,17 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "4982cbccacaa37f8b98eb05b041be31bf5297b7c",
+    "sha1": "9438bdffda260fe6e0c98656fa39e79b0bab8460",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c8ab77841777008e7b161e300debf78e144756b0"
+    "sha2": "272aa7840bb81dbed31788bf0425e15e01e7a259"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-replacement-test",
     "expectedResult": {
         "changes": {
             "chained-property-access.js": [
-                "Added the 'returned.promise().done(…).fail(…)' return statement",
-                "Deleted the 'returned.promise().done(…).fail(…)' return statement"
+                "Replaced the 'newDefer' identifier with the 'otherDefer' identifier in the returned.promise().done(…) method call",
+                "Replaced the 'newDefer' identifier with the 'otherDefer' identifier in the returned.promise().done(…).fail(…) method call"
             ]
         },
         "errors": {}
@@ -65,9 +65,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "c8ab77841777008e7b161e300debf78e144756b0",
+    "sha1": "272aa7840bb81dbed31788bf0425e15e01e7a259",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7fb67a5e9a60e16d39e521fd3bad8727ed8db378"
+    "sha2": "c2a33ddcaab66990c1ff5e2aba103cb8a4c0fe3d"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-replacement-test",
@@ -75,8 +75,8 @@
         "changes": {
             "chained-property-access.js": [
                 "Deleted the 'returned.promise().done(…).fail(…)' return statement",
-                "Added the 'returned.promise().done(…).fail(…)' return statement",
-                "Deleted the 'returned.promise().done(…).fail(…)' return statement"
+                "Deleted the 'returned.promise().done(…).fail(…)' return statement",
+                "Added the 'returned.promise().done(…).fail(…)' return statement"
             ]
         },
         "errors": {}
@@ -84,9 +84,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "7fb67a5e9a60e16d39e521fd3bad8727ed8db378",
+    "sha1": "c2a33ddcaab66990c1ff5e2aba103cb8a4c0fe3d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ca4793d8cae63c39d45775e17541fe7a156c945b"
+    "sha2": "2b95977c9286201862d75802aa5404079a99c92c"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-test",
@@ -101,9 +101,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "ca4793d8cae63c39d45775e17541fe7a156c945b",
+    "sha1": "2b95977c9286201862d75802aa5404079a99c92c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "58f1fb0cc9f077dec7737a31e5bd120d70623a8d"
+    "sha2": "9b8f13b61dd23ca8cccd42bdb9756ab7d99e1141"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-rest-test",
@@ -118,7 +118,7 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "58f1fb0cc9f077dec7737a31e5bd120d70623a8d",
+    "sha1": "9b8f13b61dd23ca8cccd42bdb9756ab7d99e1141",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "298fb331dea64b4fe4323fbb01c0b2578a425bcc"
+    "sha2": "459e0f3fa51c5b79bdb6174e3a566f5075a7958c"
 }]

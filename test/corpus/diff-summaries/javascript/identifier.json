@@ -11,9 +11,9 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "f956fe4ea44f5d38071a3c8a5a5342259ff9bb28",
+    "sha1": "aab18e237ace91db31cea86a6c4c43aa094b446e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7a8561f6a6dc0c1933517957bc717928e70549e8"
+    "sha2": "fd4d19bc8ba9b24ad62d312ccccbd36784d461c1"
 }
 ,{
     "testCaseDescription": "javascript-identifier-replacement-insert-test",
@@ -29,17 +29,16 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "7a8561f6a6dc0c1933517957bc717928e70549e8",
+    "sha1": "fd4d19bc8ba9b24ad62d312ccccbd36784d461c1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "37d6e043b9a03b37499115414498d411e33e195f"
+    "sha2": "24eeb87fe06701d2cb3acd87b703bf64e753851b"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-insert-test",
     "expectedResult": {
         "changes": {
             "identifier.js": [
-                "Added the 'theVar' identifier",
-                "Deleted the 'theVar2' identifier"
+                "Replaced the 'theVar2' identifier with the 'theVar' identifier"
             ]
         },
         "errors": {}
@@ -47,34 +46,15 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "37d6e043b9a03b37499115414498d411e33e195f",
+    "sha1": "24eeb87fe06701d2cb3acd87b703bf64e753851b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f23bc64c441f0252c79fe653f2350a1564e96b3a"
+    "sha2": "3356de1e40fd9bd62fcc01d8434765f9c0b5d92c"
 }
 ,{
     "testCaseDescription": "javascript-identifier-replacement-test",
     "expectedResult": {
         "changes": {
             "identifier.js": [
-                "Added the 'theVar2' identifier",
-                "Deleted the 'theVar' identifier"
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "identifier.js"
-    ],
-    "sha1": "f23bc64c441f0252c79fe653f2350a1564e96b3a",
-    "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9d1235e2bd0d5bc32c1cf31ecb3e6ac711724551"
-}
-,{
-    "testCaseDescription": "javascript-identifier-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "identifier.js": [
-                "Deleted the 'theVar2' identifier",
                 "Replaced the 'theVar' identifier with the 'theVar2' identifier"
             ]
         },
@@ -83,9 +63,28 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "9d1235e2bd0d5bc32c1cf31ecb3e6ac711724551",
+    "sha1": "3356de1e40fd9bd62fcc01d8434765f9c0b5d92c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "78be36d91654fb90d935fd09bc3d0fc0e9a712ba"
+    "sha2": "40dbce8228310c17373b48e369fb69bc8409fd44"
+}
+,{
+    "testCaseDescription": "javascript-identifier-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "identifier.js": [
+                "Deleted the 'theVar2' identifier",
+                "Deleted the 'theVar' identifier",
+                "Added the 'theVar2' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "identifier.js"
+    ],
+    "sha1": "40dbce8228310c17373b48e369fb69bc8409fd44",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "99e8262330b4d53d0411590e0cfaaf9f427add77"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-test",
@@ -100,9 +99,9 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "78be36d91654fb90d935fd09bc3d0fc0e9a712ba",
+    "sha1": "99e8262330b4d53d0411590e0cfaaf9f427add77",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e686b19de26cd69e1c16aceaf22aebdcabf2f427"
+    "sha2": "8844ed7324501b20f347dc6d12e2a93d9e562bd0"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-rest-test",
@@ -117,7 +116,7 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "e686b19de26cd69e1c16aceaf22aebdcabf2f427",
+    "sha1": "8844ed7324501b20f347dc6d12e2a93d9e562bd0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d50748ed7b3cffe454cf051e79a391b70cb1f55d"
+    "sha2": "3b9b65c95588743484ed01e7158e8a2991302686"
 }]

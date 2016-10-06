@@ -11,9 +11,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "2311700298627f011623e053dcffce4d08fb2fa5",
+    "sha1": "18a76a9b126f1849934890e3d7fb7c7eda43e575",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3a034bfaf70eae77f3dc1e43d934f78c41104c7d"
+    "sha2": "10348b9625241c661ccbd03a8726a9ebe73f6840"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-replacement-insert-test",
@@ -29,17 +29,20 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "3a034bfaf70eae77f3dc1e43d934f78c41104c7d",
+    "sha1": "10348b9625241c661ccbd03a8726a9ebe73f6840",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d13bfcd449c3459e307247a4db7d139260efec5c"
+    "sha2": "a0b544891fbf2ce3e01b3afebee82ff7246dcc69"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-insert-test",
     "expectedResult": {
         "changes": {
             "function-call-args.js": [
-                "Added the 'someFunction(1, \"string\", …, true)' function call",
-                "Deleted the 'someFunction(1, \"otherString\", …, false)' function call"
+                "Replaced the \"otherString\" string with the \"string\" string in the someFunction(1, \"string\", …, true) function call",
+                "Replaced the 'c' identifier with the 'a' identifier in the someFunction(1, \"string\", …, true) function call",
+                "Replaced the 'b' identifier with the 'a' identifier in the console.log(a) method call",
+                "Replaced the 'c' identifier with the 'b' identifier in the someFunction(1, \"string\", …, true) function call",
+                "Replaced 'false' with 'true' in the someFunction(1, \"string\", …, true) function call"
             ]
         },
         "errors": {}
@@ -47,17 +50,21 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "d13bfcd449c3459e307247a4db7d139260efec5c",
+    "sha1": "a0b544891fbf2ce3e01b3afebee82ff7246dcc69",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "40bb22fddcf563e0466e11a6f7e8487f3542ac73"
+    "sha2": "825246b2d2173a0813666832fa499e6b9c278103"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-replacement-test",
     "expectedResult": {
         "changes": {
             "function-call-args.js": [
-                "Added the 'someFunction(1, \"otherString\", …, false)' function call",
-                "Deleted the 'someFunction(1, \"string\", …, true)' function call"
+                "Replaced the \"string\" string with the \"otherString\" string in the someFunction(1, \"otherString\", …, false) function call",
+                "Deleted the 'a' identifier in the someFunction(1, \"otherString\", …, false) function call",
+                "Added the 'c' identifier in the someFunction(1, \"otherString\", …, false) function call",
+                "Replaced the 'a' identifier with the 'b' identifier in the console.log(b) method call",
+                "Replaced the 'b' identifier with the 'c' identifier in the someFunction(1, \"otherString\", …, false) function call",
+                "Replaced 'true' with 'false' in the someFunction(1, \"otherString\", …, false) function call"
             ]
         },
         "errors": {}
@@ -65,9 +72,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "40bb22fddcf563e0466e11a6f7e8487f3542ac73",
+    "sha1": "825246b2d2173a0813666832fa499e6b9c278103",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "eeb76aed7b218d3838921ffb5ddf387c49d26a42"
+    "sha2": "c7a1f5a6f449f06ba4d4ad8bb0bfcefb715bee8d"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-replacement-test",
@@ -75,8 +82,8 @@
         "changes": {
             "function-call-args.js": [
                 "Deleted the 'someFunction(1, \"otherString\", …, false)' function call",
-                "Added the 'someFunction(1, \"otherString\", …, false)' function call",
-                "Deleted the 'someFunction(1, \"string\", …, true)' function call"
+                "Deleted the 'someFunction(1, \"string\", …, true)' function call",
+                "Added the 'someFunction(1, \"otherString\", …, false)' function call"
             ]
         },
         "errors": {}
@@ -84,9 +91,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "eeb76aed7b218d3838921ffb5ddf387c49d26a42",
+    "sha1": "c7a1f5a6f449f06ba4d4ad8bb0bfcefb715bee8d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f1809a2391fb4d96c2abc1285453ce4adfd85f38"
+    "sha2": "e41652451efb76e9fe1d64182dace55028eca25b"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-test",
@@ -101,9 +108,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "f1809a2391fb4d96c2abc1285453ce4adfd85f38",
+    "sha1": "e41652451efb76e9fe1d64182dace55028eca25b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "44f10969631864287c36cf61e20200c1a0b04033"
+    "sha2": "d8f988ca64a1d1156209947890d749bf80198285"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-rest-test",
@@ -118,7 +125,7 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "44f10969631864287c36cf61e20200c1a0b04033",
+    "sha1": "d8f988ca64a1d1156209947890d749bf80198285",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "56ac0498e3eca9490af686d48b36ddaaaf867dcc"
+    "sha2": "5aeda8deeda74b0668f87cbacb00781fd065df66"
 }]
