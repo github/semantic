@@ -54,41 +54,41 @@ library
                      , DiffSummary
                      , Prologue
                      , Paths_semantic_diff
-  build-depends:       aeson
-                     , base >= 4.8 && < 5
+  build-depends:       base >= 4.8 && < 5
+                     , async-pool
+                     , aeson
                      , bifunctors
                      , blaze-html
                      , blaze-markup
                      , bytestring
                      , cmark
+                     , comonad
                      , containers
                      , directory
                      , dlist
                      , filepath
+                     , free
+                     , gitlib
+                     , gitlib-libgit2
                      , hashable
                      , kdt
-                     , mtl
                      , MonadRandom
+                     , mtl
+                     , optparse-applicative
                      , pointed
+                     , protolude
                      , QuickCheck >= 2.8.1
+                     , quickcheck-instances
                      , quickcheck-text
+                     , recursion-schemes
+                     , regex-compat
                      , semigroups
                      , text >= 1.2.1.3
                      , text-icu
                      , these
                      , tree-sitter-parsers
                      , vector
-                     , recursion-schemes
-                     , free
-                     , comonad
-                     , protolude
                      , wl-pprint-text
-                     , quickcheck-instances
-                     , gitlib
-                     , gitlib-libgit2
-                     , async-pool
-                     , optparse-applicative
-                     , regex-compat
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, LambdaCase
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -fprof-auto -j
@@ -114,30 +114,14 @@ executable generate-test-cases
   build-depends:       base
                      , aeson
                      , aeson-pretty
-                     , bifunctors
                      , bytestring
                      , containers
-                     , deepseq
-                     , dlist
-                     , filepath
-                     , free
                      , Glob
-                    --  , hspec >= 2.1.10
-                    --  , hspec-expectations-pretty-diff
-                     , mtl
-                     , protolude
-                     , QuickCheck >= 2.8.1
-                     , quickcheck-text
-                     , recursion-schemes >= 4.1
-                     , semantic-diff
+                     , MissingH
+                     , optparse-applicative
+                     , process
                      , semantic-diff
                      , text >= 1.2.1.3
-                     , these
-                     , vector
-                     , wl-pprint-text
-                     , process
-                     , optparse-applicative
-                     , MissingH
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, LambdaCase
 
@@ -148,8 +132,8 @@ benchmark semantic-diff-bench
   other-modules:       SemanticDiffPar
   build-depends:       base
                      , criterion
-                     , monad-par
                      , directory
+                     , monad-par
                      , mtl
                      , QuickCheck >= 2.8.1
                      , semantic-diff
@@ -175,15 +159,13 @@ test-suite test
                      , TermSpec
   build-depends:       base
                      , bifunctors
-                     , bytestring
-                     , containers
                      , deepseq
-                     , dlist
                      , filepath
-                     , free
                      , Glob
                      , hspec >= 2.1.10
+                     , hspec-expectations-pretty-diff
                      , mtl
+                     , protolude
                      , QuickCheck >= 2.8.1
                      , quickcheck-text
                      , recursion-schemes >= 4.1
@@ -191,9 +173,6 @@ test-suite test
                      , text >= 1.2.1.3
                      , these
                      , vector
-                     , wl-pprint-text
-                     , protolude
-                     , hspec-expectations-pretty-diff
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -pgml=script/g++
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
@@ -204,22 +183,14 @@ test-suite integration-test
   main-is:             SpecIntegration.hs
   other-modules:       SemanticGitDiffSpec
                      , JSONTestCase
-  build-depends:       aeson
-                     , async-pool
-                     , base
+  build-depends:       base
+                     , aeson
                      , bytestring
-                     , filepath
-                     , gitlib
-                     , gitlib-libgit2
+                     , containers
                      , Glob
                      , hspec >= 2.1.10
-                     , optparse-applicative
-                     , semantic-diff
-                     , split
-                     , tagged
-                     , text
-                     , containers
                      , hspec-expectations-pretty-diff
+                     , semantic-diff
   ghc-options:       -threaded -rtsopts -with-rtsopts=-N -j -pgml=script/g++
   default-language:    Haskell2010
   default-extensions:  DeriveGeneric, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards
