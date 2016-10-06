@@ -35,8 +35,8 @@
       {
         "syntax": "string",
         "repoFilePath": "string.js",
-        "insert": "A string with \"double\" quotes;",
-        "replacement": "A different string with \"double\" quotes;",
+        "insert": "'A string with \"double\" quotes';",
+        "replacement": "'A different string with \"double\" quotes';",
         "testCaseFilePath": "test/corpus/diff-summaries/javascript/string.json"
       },
       {

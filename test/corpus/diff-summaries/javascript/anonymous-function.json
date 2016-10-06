@@ -3,7 +3,7 @@
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Added an anonymous (a,b) function"
+                "Added an anonymous(a, b) function"
             ]
         },
         "errors": {}
@@ -20,8 +20,8 @@
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Added an anonymous (b,c) function",
-                "Added an anonymous (a,b) function"
+                "Added an anonymous(b, c) function",
+                "Added an anonymous(a, b) function"
             ]
         },
         "errors": {}
@@ -38,7 +38,8 @@
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Replaced the 'c' identifier with the 'a' identifier",
+                "Replaced the 'b' identifier with the 'a' identifier",
+                "Replaced the 'c' identifier with the 'b' identifier",
                 "Replaced the 'b' identifier with the 'a' identifier",
                 "Replaced the 'c' identifier with the 'b' identifier"
             ]
@@ -57,8 +58,8 @@
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Deleted the 'a' identifier",
-                "Added the 'c' identifier",
+                "Replaced the 'a' identifier with the 'b' identifier",
+                "Replaced the 'b' identifier with the 'c' identifier",
                 "Replaced the 'a' identifier with the 'b' identifier",
                 "Replaced the 'b' identifier with the 'c' identifier"
             ]
@@ -77,9 +78,9 @@
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Deleted an anonymous (b,c) function",
-                "Deleted an anonymous (a,b) function",
-                "Added an anonymous (b,c) function"
+                "Deleted an anonymous(b, c) function",
+                "Deleted an anonymous(a, b) function",
+                "Added an anonymous(b, c) function"
             ]
         },
         "errors": {}
@@ -96,7 +97,7 @@
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Deleted an anonymous (a,b) function"
+                "Deleted an anonymous(a, b) function"
             ]
         },
         "errors": {}
@@ -113,7 +114,7 @@
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Deleted an anonymous (b,c) function"
+                "Deleted an anonymous(b, c) function"
             ]
         },
         "errors": {}

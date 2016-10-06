@@ -59,11 +59,11 @@
     "expectedResult": {
         "changes": {
             "named-function.js": [
-                "Replaced the 'myFunction' identifier with the 'anotherFunction' identifier in the myFunction function",
-                "Deleted the 'arg1' identifier in the myFunction function",
-                "Deleted the 'arg2' identifier in the myFunction function",
-                "Added the 'false' return statement in the myFunction function",
-                "Deleted the 'arg2' identifier in the myFunction function"
+                "Replaced the 'myFunction' identifier with the 'anotherFunction' identifier in the anotherFunction function",
+                "Deleted the 'arg1' identifier in the anotherFunction function",
+                "Deleted the 'arg2' identifier in the anotherFunction function",
+                "Added the 'false' return statement in the anotherFunction function",
+                "Deleted the 'arg2' identifier in the anotherFunction function"
             ]
         },
         "errors": {}

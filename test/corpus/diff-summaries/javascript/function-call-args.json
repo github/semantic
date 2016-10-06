@@ -39,7 +39,8 @@
         "changes": {
             "function-call-args.js": [
                 "Replaced the \"otherString\" string with the \"string\" string in the someFunction(1, \"string\", …, true) function call",
-                "Replaced the 'c' identifier with the 'a' identifier in the someFunction(1, \"string\", …, true) function call",
+                "Replaced the 'b' identifier with the 'a' identifier in the someFunction(1, \"string\", …, true) function call",
+                "Replaced the 'c' identifier with the 'b' identifier in the someFunction(1, \"string\", …, true) function call",
                 "Replaced the 'b' identifier with the 'a' identifier in the console.log(a) method call",
                 "Replaced the 'c' identifier with the 'b' identifier in the someFunction(1, \"string\", …, true) function call",
                 "Replaced 'false' with 'true' in the someFunction(1, \"string\", …, true) function call"
@@ -60,8 +61,8 @@
         "changes": {
             "function-call-args.js": [
                 "Replaced the \"string\" string with the \"otherString\" string in the someFunction(1, \"otherString\", …, false) function call",
-                "Deleted the 'a' identifier in the someFunction(1, \"otherString\", …, false) function call",
-                "Added the 'c' identifier in the someFunction(1, \"otherString\", …, false) function call",
+                "Replaced the 'a' identifier with the 'b' identifier in the someFunction(1, \"otherString\", …, false) function call",
+                "Replaced the 'b' identifier with the 'c' identifier in the someFunction(1, \"otherString\", …, false) function call",
                 "Replaced the 'a' identifier with the 'b' identifier in the console.log(b) method call",
                 "Replaced the 'b' identifier with the 'c' identifier in the someFunction(1, \"otherString\", …, false) function call",
                 "Replaced 'true' with 'false' in the someFunction(1, \"otherString\", …, false) function call"
