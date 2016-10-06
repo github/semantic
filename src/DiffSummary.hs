@@ -186,6 +186,7 @@ toTermName source term = case unwrap term of
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
   S.Import identifier _ -> toTermName' identifier
+  S.Export expr -> intercalate ", " $ termNameFromSource <$> expr
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -310,6 +311,7 @@ instance HasCategory Category where
     C.Empty -> "empty statement"
     C.Module -> "module statement"
     C.Import -> "import statement"
+    C.Export -> "export statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
