@@ -74,6 +74,8 @@ data Syntax a f
   | If f f (Maybe f)
   -- | A module with an identifier, and a list of syntaxes.
   | Module { moduleId:: f, moduleBody :: [f] }
+  | Import f [f]
+  | Export (Maybe f) [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 

@@ -49,6 +49,8 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Method{} -> Identifiable
           S.Leaf{} -> Identifiable
           S.DoWhile{} -> Identifiable
+          S.Import{} -> Identifiable
+          S.Export{} -> Identifiable
           _ -> Unidentifiable
 
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
@@ -126,6 +128,7 @@ toLeafInfos (LeafInfo "number" termName) = pure (squotes (toDoc termName))
 toLeafInfos (LeafInfo "boolean" termName) = pure (squotes (toDoc termName))
 toLeafInfos (LeafInfo "anonymous function" termName) = pure (toDoc termName)
 toLeafInfos (LeafInfo cName@"string" termName) = pure (toDoc termName <+> toDoc cName)
+toLeafInfos (LeafInfo cName@"export statement" termName) = pure (toDoc termName <+> toDoc cName)
 toLeafInfos LeafInfo{..} = pure (squotes (toDoc termName) <+> toDoc categoryName)
 toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{} = pure (pretty err)
@@ -183,6 +186,10 @@ toTermName source term = case unwrap term of
   S.Comment a -> toCategoryName a
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
+  S.Import identifier _ -> toTermName' identifier
+  S.Export Nothing expr -> intercalate ", " $ termNameFromSource <$> expr
+  S.Export (Just identifier) [] -> toTermName' identifier
+  S.Export (Just identifier) expr -> (intercalate ", " $ termNameFromSource <$> expr) <> " from " <> toTermName' identifier
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -193,8 +200,6 @@ toTermName source term = case unwrap term of
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
                           Unidentifiable _ -> "…"
-
-
 
 parentContexts :: [Either (Category, Text) (Category, Text)] -> Doc
 parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> contexts
@@ -307,6 +312,8 @@ instance HasCategory Category where
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
     C.Module -> "module statement"
+    C.Import -> "import statement"
+    C.Export -> "export statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

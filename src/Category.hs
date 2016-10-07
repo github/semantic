@@ -109,6 +109,10 @@ data Category
   | MathOperator
   -- | A module
   | Module
+  -- | An import
+  | Import
+  -- | An export
+  | Export
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -161,6 +165,8 @@ instance Arbitrary Category where
     , pure Class
     , pure Method
     , pure Module
+    , pure Import
+    , pure Export
     , Other <$> arbitrary
     ]
 
