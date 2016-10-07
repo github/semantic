@@ -1,0 +1,255 @@
+[{
+    "testCaseDescription": "javascript-export-insert-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                "Added the 'name1, name2, name3, nameN' export statement",
+                "Added the 'variable1 as name1, variable2 as name2, nameN' export statement",
+                "Added the 'name1, name2, nameN' export statement",
+                "Added the 'name1 = value1, name2 = value2, name3, nameN' export statement",
+                "Added the 'namedFunction' export statement",
+                "Added the 'anonymous function' export statement",
+                "Added the 'name1' export statement",
+                "Added the 'name1 as default' export statement",
+                "Added the ''foo'' export statement",
+                "Added the 'name1, name2, nameN from 'foo'' export statement",
+                "Added the 'import1 as name1, import2 as name2, nameN from 'bar'' export statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "c638621fba68755f220c04aae5e9fa82c12c013c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b7cdbf98892de1783e4cd9d20c14e5b6e4162394"
+}
+,{
+    "testCaseDescription": "javascript-export-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                "Added the 'name4, name5, name6, nameZ' export statement",
+                "Added the 'variable2 as name2, variable3 as name3, nameY' export statement",
+                "Added the 'name3, name4, nameT' export statement",
+                "Added the 'name2 = value2, name3 = value3, name4, nameO' export statement",
+                "Added the 'otherNamedFunction' export statement",
+                "Added the 'newName1' export statement",
+                "Added the 'anonymous function' export statement",
+                "Added the 'name2 as statement' export statement",
+                "Added the ''baz'' export statement",
+                "Added the 'name7, name8, nameP from 'buzz'' export statement",
+                "Added the 'import6 as name6, import7 as name7, nameB from 'fizz'' export statement",
+                "Added the 'name1, name2, name3, nameN' export statement",
+                "Added the 'variable1 as name1, variable2 as name2, nameN' export statement",
+                "Added the 'name1, name2, nameN' export statement",
+                "Added the 'name1 = value1, name2 = value2, name3, nameN' export statement",
+                "Added the 'namedFunction' export statement",
+                "Added the 'anonymous function' export statement",
+                "Added the 'name1' export statement",
+                "Added the 'name1 as default' export statement",
+                "Added the ''foo'' export statement",
+                "Added the 'name1, name2, nameN from 'foo'' export statement",
+                "Added the 'import1 as name1, import2 as name2, nameN from 'bar'' export statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "b7cdbf98892de1783e4cd9d20c14e5b6e4162394",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f9922b615f6400d1335d01888a1886c2d8bc8bf2"
+}
+,{
+    "testCaseDescription": "javascript-export-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                "Replaced the 'name4' identifier with the 'name1' identifier in the name1, name2, name3, nameN export statement",
+                "Replaced the 'name5' identifier with the 'name2' identifier in the name1, name2, name3, nameN export statement",
+                "Replaced the 'name6' identifier with the 'name3' identifier in the name1, name2, name3, nameN export statement",
+                "Replaced the 'nameZ' identifier with the 'nameN' identifier in the name1, name2, name3, nameN export statement",
+                "Replaced the 'variable2' identifier with the 'variable1' identifier in the variable1 as name1, variable2 as name2, nameN export statement",
+                "Replaced the 'name2' identifier with the 'name1' identifier in the variable1 as name1, variable2 as name2, nameN export statement",
+                "Replaced the 'variable3' identifier with the 'variable2' identifier in the variable1 as name1, variable2 as name2, nameN export statement",
+                "Replaced the 'name3' identifier with the 'name2' identifier in the variable1 as name1, variable2 as name2, nameN export statement",
+                "Replaced the 'nameY' identifier with the 'nameN' identifier in the variable1 as name1, variable2 as name2, nameN export statement",
+                "Replaced the 'name3' identifier with the 'name1' identifier in the name1, name2, nameN export statement",
+                "Replaced the 'name4' identifier with the 'name2' identifier in the name1, name2, nameN export statement",
+                "Replaced the 'nameT' identifier with the 'nameN' identifier in the name1, name2, nameN export statement",
+                "Replaced the 'name2' identifier with the 'name1' identifier in the name1 var assignment",
+                "Replaced the 'value2' identifier with the 'value1' identifier in the name1 var assignment",
+                "Replaced the 'name3' identifier with the 'name2' identifier in the name2 var assignment",
+                "Replaced the 'value3' identifier with the 'value2' identifier in the name2 var assignment",
+                "Replaced the 'name4' identifier with the 'name3' identifier in the name1 = value1, name2 = value2, name3, nameN export statement",
+                "Replaced the 'nameO' identifier with the 'nameN' identifier in the name1 = value1, name2 = value2, name3, nameN export statement",
+                "Replaced the 'otherNamedFunction' identifier with the 'namedFunction' identifier in the namedFunction export statement",
+                "Added the 'anonymous function' export statement",
+                "Added the 'name1' export statement",
+                "Added the 'name1 as default' export statement",
+                "Added the ''foo'' export statement",
+                "Added the 'name1, name2, nameN from 'foo'' export statement",
+                "Added the 'import1 as name1, import2 as name2, nameN from 'bar'' export statement",
+                "Deleted the 'newName1' export statement",
+                "Deleted the 'anonymous function' export statement",
+                "Deleted the 'name2 as statement' export statement",
+                "Deleted the ''baz'' export statement",
+                "Deleted the 'name7, name8, nameP from 'buzz'' export statement",
+                "Deleted the 'import6 as name6, import7 as name7, nameB from 'fizz'' export statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "f9922b615f6400d1335d01888a1886c2d8bc8bf2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "704ba99cc2f452fe4f1eb2e8f2741e9169d8ee20"
+}
+,{
+    "testCaseDescription": "javascript-export-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                "Replaced the 'name1' identifier with the 'name4' identifier in the name4, name5, name6, nameZ export statement",
+                "Replaced the 'name2' identifier with the 'name5' identifier in the name4, name5, name6, nameZ export statement",
+                "Replaced the 'name3' identifier with the 'name6' identifier in the name4, name5, name6, nameZ export statement",
+                "Replaced the 'nameN' identifier with the 'nameZ' identifier in the name4, name5, name6, nameZ export statement",
+                "Added the 'variable2 as name2, variable3 as name3, nameY' export statement",
+                "Added the 'name3, name4, nameT' export statement",
+                "Added the 'name2 = value2, name3 = value3, name4, nameO' export statement",
+                "Added the 'otherNamedFunction' export statement",
+                "Added the 'newName1' export statement",
+                "Added the 'anonymous function' export statement",
+                "Added the 'name2 as statement' export statement",
+                "Added the ''baz'' export statement",
+                "Added the 'name7, name8, nameP from 'buzz'' export statement",
+                "Added the 'import6 as name6, import7 as name7, nameB from 'fizz'' export statement",
+                "Deleted the 'variable1 as name1, variable2 as name2, nameN' export statement",
+                "Deleted the 'name1, name2, nameN' export statement",
+                "Deleted the 'name1 = value1, name2 = value2, name3, nameN' export statement",
+                "Deleted the 'namedFunction' export statement",
+                "Deleted the 'anonymous function' export statement",
+                "Deleted the 'name1' export statement",
+                "Deleted the 'name1 as default' export statement",
+                "Deleted the ''foo'' export statement",
+                "Deleted the 'name1, name2, nameN from 'foo'' export statement",
+                "Deleted the 'import1 as name1, import2 as name2, nameN from 'bar'' export statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "704ba99cc2f452fe4f1eb2e8f2741e9169d8ee20",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9382cc83e945c2651b24d614a19b55bc0f0d7c98"
+}
+,{
+    "testCaseDescription": "javascript-export-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                "Deleted the 'name4, name5, name6, nameZ' export statement",
+                "Deleted the 'variable2 as name2, variable3 as name3, nameY' export statement",
+                "Deleted the 'name3, name4, nameT' export statement",
+                "Deleted the 'name2 = value2, name3 = value3, name4, nameO' export statement",
+                "Deleted the 'otherNamedFunction' export statement",
+                "Deleted the 'newName1' export statement",
+                "Deleted the 'anonymous function' export statement",
+                "Deleted the 'name2 as statement' export statement",
+                "Deleted the ''baz'' export statement",
+                "Deleted the 'name7, name8, nameP from 'buzz'' export statement",
+                "Deleted the 'import6 as name6, import7 as name7, nameB from 'fizz'' export statement",
+                "Deleted the 'name1, name2, name3, nameN' export statement",
+                "Deleted the 'variable1 as name1, variable2 as name2, nameN' export statement",
+                "Deleted the 'name1, name2, nameN' export statement",
+                "Deleted the 'name1 = value1, name2 = value2, name3, nameN' export statement",
+                "Deleted the 'namedFunction' export statement",
+                "Deleted the 'anonymous function' export statement",
+                "Deleted the 'name1' export statement",
+                "Deleted the 'name1 as default' export statement",
+                "Deleted the ''foo'' export statement",
+                "Deleted the 'name1, name2, nameN from 'foo'' export statement",
+                "Deleted the 'import1 as name1, import2 as name2, nameN from 'bar'' export statement",
+                "Added the 'name4, name5, name6, nameZ' export statement",
+                "Added the 'variable2 as name2, variable3 as name3, nameY' export statement",
+                "Added the 'name3, name4, nameT' export statement",
+                "Added the 'name2 = value2, name3 = value3, name4, nameO' export statement",
+                "Added the 'otherNamedFunction' export statement",
+                "Added the 'newName1' export statement",
+                "Added the 'anonymous function' export statement",
+                "Added the 'name2 as statement' export statement",
+                "Added the ''baz'' export statement",
+                "Added the 'name7, name8, nameP from 'buzz'' export statement",
+                "Added the 'import6 as name6, import7 as name7, nameB from 'fizz'' export statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "9382cc83e945c2651b24d614a19b55bc0f0d7c98",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "06627b404ed1e8282d55b0be883e00b3f544a64a"
+}
+,{
+    "testCaseDescription": "javascript-export-delete-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                "Deleted the 'name1, name2, name3, nameN' export statement",
+                "Deleted the 'variable1 as name1, variable2 as name2, nameN' export statement",
+                "Deleted the 'name1, name2, nameN' export statement",
+                "Deleted the 'name1 = value1, name2 = value2, name3, nameN' export statement",
+                "Deleted the 'namedFunction' export statement",
+                "Deleted the 'anonymous function' export statement",
+                "Deleted the 'name1' export statement",
+                "Deleted the 'name1 as default' export statement",
+                "Deleted the ''foo'' export statement",
+                "Deleted the 'name1, name2, nameN from 'foo'' export statement",
+                "Deleted the 'import1 as name1, import2 as name2, nameN from 'bar'' export statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "06627b404ed1e8282d55b0be883e00b3f544a64a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "91ba0af4297ddc15593bdd91e34fff7473716e65"
+}
+,{
+    "testCaseDescription": "javascript-export-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                "Deleted the 'name4, name5, name6, nameZ' export statement",
+                "Deleted the 'variable2 as name2, variable3 as name3, nameY' export statement",
+                "Deleted the 'name3, name4, nameT' export statement",
+                "Deleted the 'name2 = value2, name3 = value3, name4, nameO' export statement",
+                "Deleted the 'otherNamedFunction' export statement",
+                "Deleted the 'newName1' export statement",
+                "Deleted the 'anonymous function' export statement",
+                "Deleted the 'name2 as statement' export statement",
+                "Deleted the ''baz'' export statement",
+                "Deleted the 'name7, name8, nameP from 'buzz'' export statement",
+                "Deleted the 'import6 as name6, import7 as name7, nameB from 'fizz'' export statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "91ba0af4297ddc15593bdd91e34fff7473716e65",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "fb064149615bbed414b5ecaaf882340f43131080"
+}]

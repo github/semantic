@@ -1,0 +1,214 @@
+[{
+    "testCaseDescription": "javascript-import-insert-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                "Added the '\"foo\"' import statement",
+                "Added the '\"aardvark\"' import statement",
+                "Added the '\"ant\"' import statement",
+                "Added the '\"antelope\"' import statement",
+                "Added the '\"ant-eater\"' import statement",
+                "Added the '\"anaconda\"' import statement",
+                "Added the '\"alligator\"' import statement",
+                "Added the '\"arctic-tern\"' import statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "d685b3cf57cbdd7f8768efbd4ec03fc5d81b4241",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "34c225bdf15010b290062b5ddab51cbcfc71b543"
+}
+,{
+    "testCaseDescription": "javascript-import-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                "Added the '\"babirusa\"' import statement",
+                "Added the '\"baboon\"' import statement",
+                "Added the '\"badger\"' import statement",
+                "Added the '\"bald-eagle\"' import statement",
+                "Added the '\"bandicoot\"' import statement",
+                "Added the '\"banteng\"' import statement",
+                "Added the '\"barbet\"' import statement",
+                "Added the '\"basilisk\"' import statement",
+                "Added the '\"foo\"' import statement",
+                "Added the '\"aardvark\"' import statement",
+                "Added the '\"ant\"' import statement",
+                "Added the '\"antelope\"' import statement",
+                "Added the '\"ant-eater\"' import statement",
+                "Added the '\"anaconda\"' import statement",
+                "Added the '\"alligator\"' import statement",
+                "Added the '\"arctic-tern\"' import statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "34c225bdf15010b290062b5ddab51cbcfc71b543",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "41b25e26f3d0aaa9dd1ada3a2eb2cbacfbe7c039"
+}
+,{
+    "testCaseDescription": "javascript-import-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                "Replaced the \"babirusa\" string with the \"foo\" string in the \"foo\" import statement",
+                "Replaced the \"baboon\" string with the \"aardvark\" string in the \"aardvark\" import statement",
+                "Replaced the 'otherName' identifier with the 'name' identifier in the \"aardvark\" import statement",
+                "Replaced the \"badger\" string with the \"ant\" string in the \"ant\" import statement",
+                "Replaced the 'element' identifier with the 'member' identifier in the \"ant\" import statement",
+                "Replaced the \"bald-eagle\" string with the \"antelope\" string in the \"antelope\" import statement",
+                "Replaced the 'element1' identifier with the 'member1' identifier in the \"antelope\" import statement",
+                "Replaced the 'element2' identifier with the 'member2' identifier in the \"antelope\" import statement",
+                "Replaced the \"bandicoot\" string with the \"ant-eater\" string in the \"ant-eater\" import statement",
+                "Replaced the 'element1' identifier with the 'member1' identifier in the \"ant-eater\" import statement",
+                "Replaced the 'element2' identifier with the 'member2' identifier in the \"ant-eater\" import statement",
+                "Replaced the 'elementAlias2' identifier with the 'alias2' identifier in the \"ant-eater\" import statement",
+                "Replaced the \"banteng\" string with the \"anaconda\" string in the \"anaconda\" import statement",
+                "Replaced the 'element1' identifier with the 'member1' identifier in the \"anaconda\" import statement",
+                "Replaced the 'element2' identifier with the 'member2' identifier in the \"anaconda\" import statement",
+                "Replaced the 'elementAlias2' identifier with the 'alias2' identifier in the \"anaconda\" import statement",
+                "Replaced the \"barbet\" string with the \"alligator\" string in the \"alligator\" import statement",
+                "Replaced the 'element' identifier with the 'name' identifier in the \"alligator\" import statement",
+                "Replaced the \"basilisk\" string with the \"arctic-tern\" string in the \"arctic-tern\" import statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "41b25e26f3d0aaa9dd1ada3a2eb2cbacfbe7c039",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a56cabf5afa66506c328a089ca529c04835a0571"
+}
+,{
+    "testCaseDescription": "javascript-import-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                "Replaced the \"foo\" string with the \"babirusa\" string in the \"babirusa\" import statement",
+                "Replaced the \"aardvark\" string with the \"baboon\" string in the \"baboon\" import statement",
+                "Replaced the 'name' identifier with the 'otherName' identifier in the \"baboon\" import statement",
+                "Replaced the \"ant\" string with the \"badger\" string in the \"badger\" import statement",
+                "Replaced the 'member' identifier with the 'element' identifier in the \"badger\" import statement",
+                "Replaced the \"antelope\" string with the \"bald-eagle\" string in the \"bald-eagle\" import statement",
+                "Replaced the 'member1' identifier with the 'element1' identifier in the \"bald-eagle\" import statement",
+                "Replaced the 'member2' identifier with the 'element2' identifier in the \"bald-eagle\" import statement",
+                "Replaced the \"ant-eater\" string with the \"bandicoot\" string in the \"bandicoot\" import statement",
+                "Replaced the 'member1' identifier with the 'element1' identifier in the \"bandicoot\" import statement",
+                "Replaced the 'member2' identifier with the 'element2' identifier in the \"bandicoot\" import statement",
+                "Replaced the 'alias2' identifier with the 'elementAlias2' identifier in the \"bandicoot\" import statement",
+                "Replaced the \"anaconda\" string with the \"banteng\" string in the \"banteng\" import statement",
+                "Replaced the 'member1' identifier with the 'element1' identifier in the \"banteng\" import statement",
+                "Replaced the 'member2' identifier with the 'element2' identifier in the \"banteng\" import statement",
+                "Replaced the 'alias2' identifier with the 'elementAlias2' identifier in the \"banteng\" import statement",
+                "Replaced the \"alligator\" string with the \"barbet\" string in the \"barbet\" import statement",
+                "Replaced the 'name' identifier with the 'element' identifier in the \"barbet\" import statement",
+                "Replaced the \"arctic-tern\" string with the \"basilisk\" string in the \"basilisk\" import statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "a56cabf5afa66506c328a089ca529c04835a0571",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c17186c7d0c948ecedf696bd0e87bf2cc14ebccf"
+}
+,{
+    "testCaseDescription": "javascript-import-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                "Deleted the '\"babirusa\"' import statement",
+                "Deleted the '\"baboon\"' import statement",
+                "Deleted the '\"badger\"' import statement",
+                "Deleted the '\"bald-eagle\"' import statement",
+                "Deleted the '\"bandicoot\"' import statement",
+                "Deleted the '\"banteng\"' import statement",
+                "Deleted the '\"barbet\"' import statement",
+                "Deleted the '\"basilisk\"' import statement",
+                "Deleted the '\"foo\"' import statement",
+                "Deleted the '\"aardvark\"' import statement",
+                "Deleted the '\"ant\"' import statement",
+                "Deleted the '\"antelope\"' import statement",
+                "Deleted the '\"ant-eater\"' import statement",
+                "Deleted the '\"anaconda\"' import statement",
+                "Deleted the '\"alligator\"' import statement",
+                "Deleted the '\"arctic-tern\"' import statement",
+                "Added the '\"babirusa\"' import statement",
+                "Added the '\"baboon\"' import statement",
+                "Added the '\"badger\"' import statement",
+                "Added the '\"bald-eagle\"' import statement",
+                "Added the '\"bandicoot\"' import statement",
+                "Added the '\"banteng\"' import statement",
+                "Added the '\"barbet\"' import statement",
+                "Added the '\"basilisk\"' import statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "c17186c7d0c948ecedf696bd0e87bf2cc14ebccf",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "621344d7e9aae96986e974fa4dcc62687751ed15"
+}
+,{
+    "testCaseDescription": "javascript-import-delete-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                "Deleted the '\"foo\"' import statement",
+                "Deleted the '\"aardvark\"' import statement",
+                "Deleted the '\"ant\"' import statement",
+                "Deleted the '\"antelope\"' import statement",
+                "Deleted the '\"ant-eater\"' import statement",
+                "Deleted the '\"anaconda\"' import statement",
+                "Deleted the '\"alligator\"' import statement",
+                "Deleted the '\"arctic-tern\"' import statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "621344d7e9aae96986e974fa4dcc62687751ed15",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c051b67ebe0d99d2c487b81603748f63a62a4d8b"
+}
+,{
+    "testCaseDescription": "javascript-import-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                "Deleted the '\"babirusa\"' import statement",
+                "Deleted the '\"baboon\"' import statement",
+                "Deleted the '\"badger\"' import statement",
+                "Deleted the '\"bald-eagle\"' import statement",
+                "Deleted the '\"bandicoot\"' import statement",
+                "Deleted the '\"banteng\"' import statement",
+                "Deleted the '\"barbet\"' import statement",
+                "Deleted the '\"basilisk\"' import statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "c051b67ebe0d99d2c487b81603748f63a62a4d8b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c638621fba68755f220c04aae5e9fa82c12c013c"
+}]
