@@ -1,0 +1,122 @@
+[{
+    "testCaseDescription": "javascript-member-access-assignment-insert-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                "Added the 'y.x' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "410d8b5edf1e9ab9fc842fe489424a7b03f57d1c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "33f10ef6b48ab1750c301ae9ec5801e2e1ac7bb0"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                "Added the 'y.x' assignment",
+                "Added the 'y.x' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "33f10ef6b48ab1750c301ae9ec5801e2e1ac7bb0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1a66baf78f9ff509efee981032237f8a902f853f"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                "Replaced '1' with '0' in an assignment to y.x"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "1a66baf78f9ff509efee981032237f8a902f853f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "56c8d4ed17245e95530483c20ff39178de132a27"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                "Replaced '0' with '1' in an assignment to y.x"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "56c8d4ed17245e95530483c20ff39178de132a27",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bdded1dcea4cbac1edcbac8fbc776a74023ac5e5"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                "Deleted the 'y.x' assignment",
+                "Deleted the 'y.x' assignment",
+                "Added the 'y.x' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "bdded1dcea4cbac1edcbac8fbc776a74023ac5e5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "135c30ec136738a0021672b8a2a26c42c0e14780"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-delete-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                "Deleted the 'y.x' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "135c30ec136738a0021672b8a2a26c42c0e14780",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8b159e8f827652230408f94a29a6e07d29d5a3ad"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                "Deleted the 'y.x' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "8b159e8f827652230408f94a29a6e07d29d5a3ad",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "97557f6e2c5ca659902339f573aec1c7bc1bba6b"
+}]

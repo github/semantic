@@ -1,0 +1,122 @@
+[{
+    "testCaseDescription": "javascript-variable-insert-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                "Added the 'theVar' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "b0665d174f7073b730432253122aad996e5d8107",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "65b080b43d781c4d968431e2c1b5e003fa271ecc"
+}
+,{
+    "testCaseDescription": "javascript-variable-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                "Added the 'theVar2' identifier",
+                "Added the 'theVar' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "65b080b43d781c4d968431e2c1b5e003fa271ecc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3e0e939113069492829e74bc313211d7a128eb03"
+}
+,{
+    "testCaseDescription": "javascript-variable-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                "Replaced the 'theVar2' identifier with the 'theVar' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "3e0e939113069492829e74bc313211d7a128eb03",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bd17ce67d20168f3fd2f84b81d2b1477797e9697"
+}
+,{
+    "testCaseDescription": "javascript-variable-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                "Replaced the 'theVar' identifier with the 'theVar2' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "bd17ce67d20168f3fd2f84b81d2b1477797e9697",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "758e2f8e2e39c93a046cfe689be6db32cc598e31"
+}
+,{
+    "testCaseDescription": "javascript-variable-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                "Deleted the 'theVar2' identifier",
+                "Deleted the 'theVar' identifier",
+                "Added the 'theVar2' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "758e2f8e2e39c93a046cfe689be6db32cc598e31",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "57dc8212e58234b75d4bdb9b2c9f7a72ebd31a2b"
+}
+,{
+    "testCaseDescription": "javascript-variable-delete-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                "Deleted the 'theVar' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "57dc8212e58234b75d4bdb9b2c9f7a72ebd31a2b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4f1602caaa3a8783fc4c0f0d25b55ae01b133f3d"
+}
+,{
+    "testCaseDescription": "javascript-variable-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                "Deleted the 'theVar2' identifier"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "4f1602caaa3a8783fc4c0f0d25b55ae01b133f3d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "aab18e237ace91db31cea86a6c4c43aa094b446e"
+}]

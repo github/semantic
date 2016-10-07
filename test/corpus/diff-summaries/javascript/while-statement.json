@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-while-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                "Added the 'a' while statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "sha1": "19910077ac4d4997c8d93c429177a77105905c9a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e923a70e7ff5488bf4a5ecced60feefff1ba772f"
+}
+,{
+    "testCaseDescription": "javascript-while-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                "Added the 'b' while statement",
+                "Added the 'a' while statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "sha1": "e923a70e7ff5488bf4a5ecced60feefff1ba772f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ae74e4e611b4ef018dd5faaf5075f99374d94140"
+}
+,{
+    "testCaseDescription": "javascript-while-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                "Replaced the 'b' identifier with the 'a' identifier",
+                "Replaced the 'a' identifier with the 'b' identifier in the b() function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "sha1": "ae74e4e611b4ef018dd5faaf5075f99374d94140",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "cafba614530550cd3432a9c630392e0ccd6fda10"
+}
+,{
+    "testCaseDescription": "javascript-while-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                "Replaced the 'a' identifier with the 'b' identifier",
+                "Replaced the 'b' identifier with the 'a' identifier in the a() function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "sha1": "cafba614530550cd3432a9c630392e0ccd6fda10",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "30971b690b530993deb4f9c6746e3662f9212a87"
+}
+,{
+    "testCaseDescription": "javascript-while-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                "Deleted the 'b' while statement",
+                "Deleted the 'a' while statement",
+                "Added the 'b' while statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "sha1": "30971b690b530993deb4f9c6746e3662f9212a87",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "88089b9e62c2640b78de0eb699fff2be72d42bb4"
+}
+,{
+    "testCaseDescription": "javascript-while-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                "Deleted the 'a' while statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "sha1": "88089b9e62c2640b78de0eb699fff2be72d42bb4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "aa6096fcbd54d1ecc0050ef69fce4ce98543b167"
+}
+,{
+    "testCaseDescription": "javascript-while-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "while-statement.js": [
+                "Deleted the 'b' while statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while-statement.js"
+    ],
+    "sha1": "aa6096fcbd54d1ecc0050ef69fce4ce98543b167",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d5cb38d1a4261f5dc4f97f8d7d0762f26dbd70e3"
+}]

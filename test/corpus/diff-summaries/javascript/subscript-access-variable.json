@@ -1,0 +1,122 @@
+[{
+    "testCaseDescription": "javascript-subscript-access-variable-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-variable.js": [
+                "Added the 'x[someVariable]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-variable.js"
+    ],
+    "sha1": "5798d58803038f4f8b339c71382da80ef0217925",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "beca23714191b0aaf5b5a1045f67f63422e30506"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-variable-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-variable.js": [
+                "Added the 'x[someOtherVariable]' subscript access",
+                "Added the 'x[someVariable]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-variable.js"
+    ],
+    "sha1": "beca23714191b0aaf5b5a1045f67f63422e30506",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3fe2accf4868e1fa807b18ba36ffcbfb8b89c5d3"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-variable-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-variable.js": [
+                "Replaced the 'someOtherVariable' identifier with the 'someVariable' identifier in the x[someVariable] subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-variable.js"
+    ],
+    "sha1": "3fe2accf4868e1fa807b18ba36ffcbfb8b89c5d3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6ec0dd79b7a1f17acf2098be3d62f6df341930b0"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-variable-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-variable.js": [
+                "Replaced the 'someVariable' identifier with the 'someOtherVariable' identifier in the x[someOtherVariable] subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-variable.js"
+    ],
+    "sha1": "6ec0dd79b7a1f17acf2098be3d62f6df341930b0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1ebab00124482446ea3dab401414dbd92a79f9c0"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-variable-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-variable.js": [
+                "Deleted the 'x[someOtherVariable]' subscript access",
+                "Deleted the 'x[someVariable]' subscript access",
+                "Added the 'x[someOtherVariable]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-variable.js"
+    ],
+    "sha1": "1ebab00124482446ea3dab401414dbd92a79f9c0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "15d8b4425517d34197b111c66da6f2d07d7c100a"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-variable-delete-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-variable.js": [
+                "Deleted the 'x[someVariable]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-variable.js"
+    ],
+    "sha1": "15d8b4425517d34197b111c66da6f2d07d7c100a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a0ac736713f16ba00f1b4a4862fa440a5caca4af"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-variable-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-variable.js": [
+                "Deleted the 'x[someOtherVariable]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-variable.js"
+    ],
+    "sha1": "a0ac736713f16ba00f1b4a4862fa440a5caca4af",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "818ac5b0ae1ee327fa800a38cb86b1943b95426d"
+}]

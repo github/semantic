@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-nested-functions-insert-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                "Added the 'parent' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "32b06c62f51ab2e697c248000f022a1d8dcda42f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6e7802c47309255a1436ce9f0b93915810a3d3a9"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                "Added the 'parent' function",
+                "Added the 'parent' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "6e7802c47309255a1436ce9f0b93915810a3d3a9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5dfc23d5164bb1961131c71377dbe9411beba038"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                "Replaced the 'arg1' identifier with the 'arg3' identifier in the console.log(arg3) method call of the 'child' function",
+                "Replaced the 'arg2' identifier with the 'arg4' identifier in the console.log(arg4) method call of the 'child' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "5dfc23d5164bb1961131c71377dbe9411beba038",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "80ac9fb88fa926c78e726f3c961990d9bf24bcc0"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                "Replaced the 'arg3' identifier with the 'arg1' identifier in the console.log(arg1) method call of the 'child' function",
+                "Replaced the 'arg4' identifier with the 'arg2' identifier in the console.log(arg2) method call of the 'child' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "80ac9fb88fa926c78e726f3c961990d9bf24bcc0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "112e5c3e8b571d65832db5e7cf1e9cd488034e89"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                "Deleted the 'parent' function",
+                "Deleted the 'parent' function",
+                "Added the 'parent' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "112e5c3e8b571d65832db5e7cf1e9cd488034e89",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3c9d8eadbe5aff49b4a5b957b123b178db815fd3"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-delete-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                "Deleted the 'parent' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "3c9d8eadbe5aff49b4a5b957b123b178db815fd3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e799ea13b51ab6f52a9ea4dda5b822fe4f915a82"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                "Deleted the 'parent' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "e799ea13b51ab6f52a9ea4dda5b822fe4f915a82",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "365c92f02ea0be34a31f77d20526cb16728446c5"
+}]

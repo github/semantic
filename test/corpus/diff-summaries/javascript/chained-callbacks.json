@@ -1,0 +1,126 @@
+[{
+    "testCaseDescription": "javascript-chained-callbacks-insert-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Added the 'this.map(…)' method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "459e0f3fa51c5b79bdb6174e3a566f5075a7958c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5fc6d187080f87e95d1c04da36d3fa6fa529d2da"
+}
+,{
+    "testCaseDescription": "javascript-chained-callbacks-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Added the 'this.reduce(…)' method call",
+                "Added the 'this.map(…)' method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "5fc6d187080f87e95d1c04da36d3fa6fa529d2da",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b255343a7bcf0e2428f408d49f2039300df13124"
+}
+,{
+    "testCaseDescription": "javascript-chained-callbacks-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Replaced the 'reduce' identifier with the 'map' identifier in the this.map(…) method call",
+                "Replaced the 'b' identifier with the 'a' identifier in the this.map(…) method call",
+                "Replaced the 'a' identifier with the 'b' identifier in the this.map(…) method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "b255343a7bcf0e2428f408d49f2039300df13124",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "426b1a7459cb38a7cca2a0f1253a716b87f138d6"
+}
+,{
+    "testCaseDescription": "javascript-chained-callbacks-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Replaced the 'map' identifier with the 'reduce' identifier in the this.reduce(…) method call",
+                "Replaced the 'a' identifier with the 'b' identifier in the this.reduce(…) method call",
+                "Replaced the 'b' identifier with the 'a' identifier in the this.reduce(…) method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "426b1a7459cb38a7cca2a0f1253a716b87f138d6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1332c6fba2a66240ab8f1796e14d47943f5a4ec5"
+}
+,{
+    "testCaseDescription": "javascript-chained-callbacks-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Deleted the 'this.reduce(…)' method call",
+                "Deleted the 'this.map(…)' method call",
+                "Added the 'this.reduce(…)' method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "1332c6fba2a66240ab8f1796e14d47943f5a4ec5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3df2da65bb58f3c7f30b820a26b2df8d05091c9b"
+}
+,{
+    "testCaseDescription": "javascript-chained-callbacks-delete-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Deleted the 'this.map(…)' method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "3df2da65bb58f3c7f30b820a26b2df8d05091c9b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6d3b3398548b6ced3ad120440b9d006cfdb01778"
+}
+,{
+    "testCaseDescription": "javascript-chained-callbacks-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "chained-callbacks.js": [
+                "Deleted the 'this.reduce(…)' method call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-callbacks.js"
+    ],
+    "sha1": "6d3b3398548b6ced3ad120440b9d006cfdb01778",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c65612605de8c1f239d5529a0761a1fbd88a5833"
+}]

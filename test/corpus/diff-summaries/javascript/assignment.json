@@ -1,0 +1,122 @@
+[{
+    "testCaseDescription": "javascript-assignment-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                "Added the 'x' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "6f17186b61d196c816fb294ce4cbc82afd93342f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2caf1b29d2e2e6e126c3dc4c463cc27467bebfcd"
+}
+,{
+    "testCaseDescription": "javascript-assignment-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                "Added the 'x' assignment",
+                "Added the 'x' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "2caf1b29d2e2e6e126c3dc4c463cc27467bebfcd",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9db73a5d30fff52a2d14d5b425798aae70c6e9c3"
+}
+,{
+    "testCaseDescription": "javascript-assignment-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                "Replaced '1' with '0' in an assignment to x"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "9db73a5d30fff52a2d14d5b425798aae70c6e9c3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "59a663d83db6ba1fefb255fed0d46489213e71c0"
+}
+,{
+    "testCaseDescription": "javascript-assignment-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                "Replaced '0' with '1' in an assignment to x"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "59a663d83db6ba1fefb255fed0d46489213e71c0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "74f9f78bafc2231891faf67ed1c6281936c6d562"
+}
+,{
+    "testCaseDescription": "javascript-assignment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                "Deleted the 'x' assignment",
+                "Deleted the 'x' assignment",
+                "Added the 'x' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "74f9f78bafc2231891faf67ed1c6281936c6d562",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c9c85158a4d11bf96e79b099cae6285171e680cc"
+}
+,{
+    "testCaseDescription": "javascript-assignment-delete-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                "Deleted the 'x' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "c9c85158a4d11bf96e79b099cae6285171e680cc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b30bb512e3ffe02430c904f2ad0f3d446db64776"
+}
+,{
+    "testCaseDescription": "javascript-assignment-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                "Deleted the 'x' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "b30bb512e3ffe02430c904f2ad0f3d446db64776",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "410d8b5edf1e9ab9fc842fe489424a7b03f57d1c"
+}]

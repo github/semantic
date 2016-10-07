@@ -1,0 +1,122 @@
+[{
+    "testCaseDescription": "javascript-subscript-access-string-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Added the 'x[\"some-string\"]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "818ac5b0ae1ee327fa800a38cb86b1943b95426d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f95ec1098eba2db8417ebc9bcd2e241696d24561"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Added the 'x[\"some-other-string\"]' subscript access",
+                "Added the 'x[\"some-string\"]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "f95ec1098eba2db8417ebc9bcd2e241696d24561",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4867184725c500cb960db3caa18e34f45d827183"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Replaced the \"some-other-string\" string with the \"some-string\" string in the x[\"some-string\"] subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "4867184725c500cb960db3caa18e34f45d827183",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "97831e9b2ee3bdbd54dbffd3dd682575f1866029"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Replaced the \"some-string\" string with the \"some-other-string\" string in the x[\"some-other-string\"] subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "97831e9b2ee3bdbd54dbffd3dd682575f1866029",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "882eb108ca6216b04d3dcdb5fa9e8fb9a66869bc"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Deleted the 'x[\"some-other-string\"]' subscript access",
+                "Deleted the 'x[\"some-string\"]' subscript access",
+                "Added the 'x[\"some-other-string\"]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "882eb108ca6216b04d3dcdb5fa9e8fb9a66869bc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "aec5cca9776e6b4fd0b2edadf63d6ca5b1e825b7"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Deleted the 'x[\"some-string\"]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "aec5cca9776e6b4fd0b2edadf63d6ca5b1e825b7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "826953e83bae8b879673210442db329beb060a25"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                "Deleted the 'x[\"some-other-string\"]' subscript access"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "826953e83bae8b879673210442db329beb060a25",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2af71438d83e47601320a632ea6bc26ae90a70d8"
+}]

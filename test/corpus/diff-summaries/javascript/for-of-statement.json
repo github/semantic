@@ -1,0 +1,126 @@
+[{
+    "testCaseDescription": "javascript-for-of-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Added the 'item of items' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "763e4c5cbb94150cd983bc1a0c9ecc2ff79a5bdf",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0913eaba361a34a9d301afe6645642399c068cb9"
+}
+,{
+    "testCaseDescription": "javascript-for-of-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Added the 'thing of things' for statement",
+                "Added the 'item of items' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "0913eaba361a34a9d301afe6645642399c068cb9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "cc040912f3d3c80c68d4990ae77549b0a71a6dd3"
+}
+,{
+    "testCaseDescription": "javascript-for-of-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Replaced the 'thing' identifier with the 'item' identifier",
+                "Replaced the 'things' identifier with the 'items' identifier",
+                "Replaced the 'thing' identifier with the 'item' identifier in the process(item) function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "cc040912f3d3c80c68d4990ae77549b0a71a6dd3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b13a4bc950c6f5ba1a9f04998781592aca56a92b"
+}
+,{
+    "testCaseDescription": "javascript-for-of-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Replaced the 'item' identifier with the 'thing' identifier",
+                "Replaced the 'items' identifier with the 'things' identifier",
+                "Replaced the 'item' identifier with the 'thing' identifier in the process(thing) function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "b13a4bc950c6f5ba1a9f04998781592aca56a92b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bc7c9f55c2f40743518f716dc418a2bdde62949b"
+}
+,{
+    "testCaseDescription": "javascript-for-of-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Deleted the 'thing of things' for statement",
+                "Deleted the 'item of items' for statement",
+                "Added the 'thing of things' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "bc7c9f55c2f40743518f716dc418a2bdde62949b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8d5e15d9514988f4bbce77f2ccb591bef09e1438"
+}
+,{
+    "testCaseDescription": "javascript-for-of-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Deleted the 'item of items' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "8d5e15d9514988f4bbce77f2ccb591bef09e1438",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "13d21b3c47462b8a61fe51cdaed557b1ca62b780"
+}
+,{
+    "testCaseDescription": "javascript-for-of-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "for-of-statement.js": [
+                "Deleted the 'thing of things' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-of-statement.js"
+    ],
+    "sha1": "13d21b3c47462b8a61fe51cdaed557b1ca62b780",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "19910077ac4d4997c8d93c429177a77105905c9a"
+}]

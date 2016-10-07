@@ -21,7 +21,7 @@ import Info
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
 treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax.Syntax Text) (Record '[Range, Category])
 treeSitterParser language grammar blob = do
-  document <- ts_document_make
+  document <- ts_document_new
   ts_document_set_language document grammar
   withCString (toString $ source blob) (\source -> do
     ts_document_set_input_string document source

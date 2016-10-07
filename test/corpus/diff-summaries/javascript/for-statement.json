@@ -1,0 +1,122 @@
+[{
+    "testCaseDescription": "javascript-for-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                "Added the 'i = 0, init(); i < 10; i++' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "2d85e84d4e6eb6192b5094b6934b9a76e854325b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9e13feb870cbb69188d12cb6eec660e77b7d5a9a"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                "Added the 'i = 0, init(); i < 100; i++' for statement",
+                "Added the 'i = 0, init(); i < 10; i++' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "9e13feb870cbb69188d12cb6eec660e77b7d5a9a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5e1392cb969e1c9acce6efef41c9cdcbbcaf17f0"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                "Replaced '100' with '10'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "5e1392cb969e1c9acce6efef41c9cdcbbcaf17f0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a4e59a211561d2ce6a4fd8b11e5d33f58081c08e"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                "Replaced '10' with '100'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "a4e59a211561d2ce6a4fd8b11e5d33f58081c08e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f4e6128f181cc5b4c23281999b335c778bd1f7fd"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                "Deleted the 'i = 0, init(); i < 100; i++' for statement",
+                "Deleted the 'i = 0, init(); i < 10; i++' for statement",
+                "Added the 'i = 0, init(); i < 100; i++' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "f4e6128f181cc5b4c23281999b335c778bd1f7fd",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "632d9badd2c08f84c89e54022539df87012dc47d"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                "Deleted the 'i = 0, init(); i < 10; i++' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "632d9badd2c08f84c89e54022539df87012dc47d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1325ae795a1a334f3a0bc6ce17b7b1d62ff4696a"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                "Deleted the 'i = 0, init(); i < 100; i++' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "1325ae795a1a334f3a0bc6ce17b7b1d62ff4696a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6f17186b61d196c816fb294ce4cbc82afd93342f"
+}]

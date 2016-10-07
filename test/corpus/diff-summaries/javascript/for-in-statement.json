@@ -1,0 +1,126 @@
+[{
+    "testCaseDescription": "javascript-for-in-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Added the 'thing in things' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "ea2df743568a320252df57e60055d8d6e611d9e7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a5323182612a4cb0f0b9144c0d487138b7693844"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Added the 'item in items' for statement",
+                "Added the 'thing in things' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "a5323182612a4cb0f0b9144c0d487138b7693844",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b9a318024efbb6b16ef8a4cb62994e5cf53a9eed"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Replaced the 'item' identifier with the 'thing' identifier",
+                "Replaced the 'items' identifier with the 'things' identifier",
+                "Replaced the 'item' identifier with the 'thing' identifier in the thing() function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "b9a318024efbb6b16ef8a4cb62994e5cf53a9eed",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ef9b68774aa78ba393bcde5e4eaa58ec5c62ebba"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Replaced the 'thing' identifier with the 'item' identifier",
+                "Replaced the 'things' identifier with the 'items' identifier",
+                "Replaced the 'thing' identifier with the 'item' identifier in the item() function call"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "ef9b68774aa78ba393bcde5e4eaa58ec5c62ebba",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6a7c1aec72c990079fb74a2d88454879e0542b51"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Deleted the 'item in items' for statement",
+                "Deleted the 'thing in things' for statement",
+                "Added the 'item in items' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "6a7c1aec72c990079fb74a2d88454879e0542b51",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c77ceb93acf79d639f3d5f9b965a7e72811ef9a2"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Deleted the 'thing in things' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "c77ceb93acf79d639f3d5f9b965a7e72811ef9a2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e66118e2e67e731d3ff9d5cbff85d6e598a8fc9e"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                "Deleted the 'item in items' for statement"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "e66118e2e67e731d3ff9d5cbff85d6e598a8fc9e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6798e4b37426ea6b88b61053b80ad8c9d1f52ab9"
+}]

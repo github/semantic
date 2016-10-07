@@ -1,0 +1,124 @@
+[{
+    "testCaseDescription": "javascript-ternary-insert-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                "Added the 'condition' ternary expression"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "6f2be827ecaee324c13a7571522397d699609382",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ffeb9c1c9867caf527dd78dbb18ddfa17ba347c8"
+}
+,{
+    "testCaseDescription": "javascript-ternary-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                "Added the 'x.y' assignment",
+                "Added the 'condition' ternary expression"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "ffeb9c1c9867caf527dd78dbb18ddfa17ba347c8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d3f99f9adefa2855bfff79b506875cdb00dd5f81"
+}
+,{
+    "testCaseDescription": "javascript-ternary-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                "Added the 'condition' ternary expression",
+                "Deleted the 'x.y' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "d3f99f9adefa2855bfff79b506875cdb00dd5f81",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5e6d34a0008ac45770ef5f5ed5a13b9c26732437"
+}
+,{
+    "testCaseDescription": "javascript-ternary-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                "Added the 'x.y' assignment",
+                "Deleted the 'condition' ternary expression"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "5e6d34a0008ac45770ef5f5ed5a13b9c26732437",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d3661843068779ae99558ca3993a93d664bd47be"
+}
+,{
+    "testCaseDescription": "javascript-ternary-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                "Deleted the 'x.y' assignment",
+                "Deleted the 'condition' ternary expression",
+                "Added the 'x.y' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "d3661843068779ae99558ca3993a93d664bd47be",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "aac9a05c1262172adc916dbc3598f5d1b8affa10"
+}
+,{
+    "testCaseDescription": "javascript-ternary-delete-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                "Deleted the 'condition' ternary expression"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "aac9a05c1262172adc916dbc3598f5d1b8affa10",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1693184ae80d84e025267dcdb4e5c5b732364b0b"
+}
+,{
+    "testCaseDescription": "javascript-ternary-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                "Deleted the 'x.y' assignment"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "1693184ae80d84e025267dcdb4e5c5b732364b0b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c218fb3f04f316af4d3665e071ab85f4245435f4"
+}]

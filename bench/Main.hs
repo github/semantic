@@ -10,11 +10,16 @@ import Patch
 import Prologue
 import SES
 import Test.QuickCheck hiding (Fixed)
+import Arguments
+import SemanticDiff (fetchDiffs)
+import qualified Renderer as R
+import qualified SemanticDiffPar
+import System.Directory (makeAbsolute)
 
 main :: IO ()
 main = do
   benchmarks <- sequenceA [ generativeBenchmarkWith "ses" 10 arbitrarySESInputs (uncurry ((*) `on` length)) (nf (uncurry benchmarkSES)) ]
-  defaultMain benchmarks
+  defaultMain (syncAsyncBenchmark : benchmarks)
   where arbitrarySESInputs = (,) <$> sized (`vectorOf` arbitrary) <*> sized (`vectorOf` arbitrary)
 
 benchmarkSES :: [String] -> [String] -> [Either String (Patch String)]
@@ -39,3 +44,31 @@ generativeBenchmarkWith name n generator metric benchmark = do
           let measurement = metric input
           pure $! (measurement, bench (show measurement) (benchmark input))
         defaultSize = 100
+
+syncAsyncBenchmark :: Benchmark
+syncAsyncBenchmark =
+  bgroup "async vs par" [
+      bench "async" . whnfIO $ SemanticDiff.fetchDiffs =<< theArgs,
+      bench "par" . whnfIO $ SemanticDiffPar.fetchDiffs =<< theArgs
+    ]
+
+theArgs :: IO Arguments
+theArgs = do
+  jqueryPath <- makeAbsolute "test/repos/jquery"
+  pure $ args jqueryPath sha1 sha2 files R.Patch
+  where
+    sha1 = "70526981916945dc4093e116a3de61b1777d4718"
+    sha2 = "e5ffcb0838c894e26f4ff32dfec162cf624d8d7d"
+    files = [
+            "src/manipulation/getAll.js",
+            "src/manipulation/support.js",
+            "src/manipulation/wrapMap.js",
+            "src/offset.js",
+            "test/unit/css.js",
+            "test/unit/deferred.js",
+            "test/unit/deprecated.js",
+            "test/unit/effects.js",
+            "test/unit/event.js",
+            "test/unit/offset.js",
+            "test/unit/wrap.js"
+            ]

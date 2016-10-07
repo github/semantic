@@ -1,0 +1,130 @@
+[{
+    "testCaseDescription": "javascript-named-function-insert-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Added the 'myFunction' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "2f747231adcd75d055ddc8b98d276039d1b5a094",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "95c12dc72b251772f817fe9279440c37c5a85638"
+}
+,{
+    "testCaseDescription": "javascript-named-function-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Added the 'anotherFunction' function",
+                "Added the 'myFunction' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "95c12dc72b251772f817fe9279440c37c5a85638",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "47b4934bdb04f55a694e21f35201a981c6124de5"
+}
+,{
+    "testCaseDescription": "javascript-named-function-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Replaced the 'anotherFunction' identifier with the 'myFunction' identifier in the myFunction function",
+                "Added the 'arg1' identifier in the myFunction function",
+                "Added the 'arg2' identifier in the myFunction function",
+                "Added the 'arg2' identifier in the myFunction function",
+                "Deleted the 'false' return statement in the myFunction function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "47b4934bdb04f55a694e21f35201a981c6124de5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1a8525476fbea48b8a414ba7916620f2ac9fe5d9"
+}
+,{
+    "testCaseDescription": "javascript-named-function-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Replaced the 'myFunction' identifier with the 'anotherFunction' identifier in the anotherFunction function",
+                "Deleted the 'arg1' identifier in the anotherFunction function",
+                "Deleted the 'arg2' identifier in the anotherFunction function",
+                "Added the 'false' return statement in the anotherFunction function",
+                "Deleted the 'arg2' identifier in the anotherFunction function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "1a8525476fbea48b8a414ba7916620f2ac9fe5d9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "23b98195e5ad0d28ce93c966b1a318183457dd23"
+}
+,{
+    "testCaseDescription": "javascript-named-function-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Deleted the 'anotherFunction' function",
+                "Deleted the 'myFunction' function",
+                "Added the 'anotherFunction' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "23b98195e5ad0d28ce93c966b1a318183457dd23",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1e24bf4a7f46014ebd6864d44b03f129671e3dfc"
+}
+,{
+    "testCaseDescription": "javascript-named-function-delete-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Deleted the 'myFunction' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "1e24bf4a7f46014ebd6864d44b03f129671e3dfc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7c920ed7d74184e32974d7977dcc5fe0c9d35ca3"
+}
+,{
+    "testCaseDescription": "javascript-named-function-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "named-function.js": [
+                "Deleted the 'anotherFunction' function"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "named-function.js"
+    ],
+    "sha1": "7c920ed7d74184e32974d7977dcc5fe0c9d35ca3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "35191e787bea194267476a5eb4a43dc525bd28c3"
+}]

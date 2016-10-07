@@ -1,0 +1,122 @@
+[{
+    "testCaseDescription": "javascript-number-insert-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                "Added '101'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "45d982332dc1dfb3ad8bb332d0b7c3c2c748fff3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "15e011219ec4d632a30c42bd6f1c4fc7972ea058"
+}
+,{
+    "testCaseDescription": "javascript-number-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                "Added '102'",
+                "Added '101'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "15e011219ec4d632a30c42bd6f1c4fc7972ea058",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "323296074b3d7a7448b7f68cd069df599654c450"
+}
+,{
+    "testCaseDescription": "javascript-number-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                "Replaced '102' with '101'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "323296074b3d7a7448b7f68cd069df599654c450",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "13c52dc686323f3e4cba0f2bc2393d0543f99d63"
+}
+,{
+    "testCaseDescription": "javascript-number-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                "Replaced '101' with '102'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "13c52dc686323f3e4cba0f2bc2393d0543f99d63",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "752d660054b18731ffae45bec428f8f4901071d8"
+}
+,{
+    "testCaseDescription": "javascript-number-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                "Deleted '102'",
+                "Deleted '101'",
+                "Added '102'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "752d660054b18731ffae45bec428f8f4901071d8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bb8075447a55be3944df38c6ec410eba10917e71"
+}
+,{
+    "testCaseDescription": "javascript-number-delete-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                "Deleted '101'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "bb8075447a55be3944df38c6ec410eba10917e71",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d2dfe23480732a42effe8933a2ad5736b503b531"
+}
+,{
+    "testCaseDescription": "javascript-number-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "number.js": [
+                "Deleted '102'"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "number.js"
+    ],
+    "sha1": "d2dfe23480732a42effe8933a2ad5736b503b531",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b0665d174f7073b730432253122aad996e5d8107"
+}]

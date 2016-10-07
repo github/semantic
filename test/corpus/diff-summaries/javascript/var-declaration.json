@@ -1,0 +1,134 @@
+[{
+    "testCaseDescription": "javascript-var-declaration-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Added the 'x' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "6632dc9f20866349fbee9cca32096a38d676fd99",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "68fbed5e0138cf9909be8249f5e56f4a601b105e"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Added the 'x' variable",
+                "Added the 'y' variable",
+                "Added the 'z' variable",
+                "Added the 'x' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "68fbed5e0138cf9909be8249f5e56f4a601b105e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a5bb584db7c76ad0fb098032dce44c6ab55068ca"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Replaced the 'x' variable with the 'x' variable",
+                "Deleted the 'y' variable",
+                "Deleted the 'z' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "a5bb584db7c76ad0fb098032dce44c6ab55068ca",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b1f0bb9999d84d984ba7d9445e6846c36257b748"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Replaced the 'x' variable with the 'x' variable",
+                "Added the 'y' variable",
+                "Added the 'z' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "b1f0bb9999d84d984ba7d9445e6846c36257b748",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3c606d3339e51b71968f7b00c08aea4177adb21e"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Deleted the 'x' variable",
+                "Deleted the 'y' variable",
+                "Deleted the 'z' variable",
+                "Deleted the 'x' variable",
+                "Added the 'x' variable",
+                "Added the 'y' variable",
+                "Added the 'z' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "3c606d3339e51b71968f7b00c08aea4177adb21e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "318503c582b1ca270e3ad2ea23140699079c3d4c"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-delete-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Deleted the 'x' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "318503c582b1ca270e3ad2ea23140699079c3d4c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5df38338d708d301838ab06cf6df7c919a55d629"
+}
+,{
+    "testCaseDescription": "javascript-var-declaration-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "var-declaration.js": [
+                "Deleted the 'x' variable",
+                "Deleted the 'y' variable",
+                "Deleted the 'z' variable"
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var-declaration.js"
+    ],
+    "sha1": "5df38338d708d301838ab06cf6df7c919a55d629",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e797ca2c748a6d42d67875240942d0876fd66cbc"
+}]
