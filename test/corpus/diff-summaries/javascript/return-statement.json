@@ -1,0 +1,282 @@
+[{
+    "testCaseDescription": "javascript-return-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "return-statement.js",
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '5' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "a6c49cc7711970d9b1fdcfeef8ea1b312bcf0ace",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "cce29acfef026dd830249e9d1336513f6e3c4304"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "return-statement.js",
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'empty' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "return-statement.js",
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the '5' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "cce29acfef026dd830249e9d1336513f6e3c4304",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c8de458d3d17e648dfbf1869bb0b1ce2e0979601"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "name": "return-statement.js",
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added '5'",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "c8de458d3d17e648dfbf1869bb0b1ce2e0979601",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1ec1da945159b2908ed73826fa61ed65680b7ab0"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "name": "return-statement.js",
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '5'",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "1ec1da945159b2908ed73826fa61ed65680b7ab0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d942adb626ca42c2407c698701c173fcf1215775"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "return-statement.js",
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'empty' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "return-statement.js",
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '5' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "return-statement.js",
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'empty' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "d942adb626ca42c2407c698701c173fcf1215775",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d4af520a89d43ed45e2ab60753d6b5e0542c2812"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "return-statement.js",
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '5' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "d4af520a89d43ed45e2ab60753d6b5e0542c2812",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "006d0dd9f64dfec01d6a4027448f81864951fc14"
+}
+,{
+    "testCaseDescription": "javascript-return-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "return-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "return-statement.js",
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'empty' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "return-statement.js"
+    ],
+    "sha1": "006d0dd9f64dfec01d6a4027448f81864951fc14",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a5fb0a1bf511cc98cae35a20ea3a6dad064448bc"
+}]

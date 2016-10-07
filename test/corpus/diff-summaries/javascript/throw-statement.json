@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-throw-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "throw-statement.js",
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'new Error(\"uh oh\")' throw statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "ef9e2caec95767f4944840fd5db7f43806b65d4e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e8ffd161fc105086e8c085de252fd15f1582df33"
+}
+,{
+    "testCaseDescription": "javascript-throw-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "throw-statement.js",
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'new Error(\"oooooops\")' throw statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "throw-statement.js",
+                            "end": [
+                                2,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'new Error(\"uh oh\")' throw statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "e8ffd161fc105086e8c085de252fd15f1582df33",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0ff2edba17e3040f87a6685ed6ea554a4f520254"
+}
+,{
+    "testCaseDescription": "javascript-throw-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "name": "throw-statement.js",
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "name": "throw-statement.js",
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"oooooops\" string with the \"uh oh\" string in the Error(\"uh oh\") function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "0ff2edba17e3040f87a6685ed6ea554a4f520254",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "911f32d28e0aa19e34646b9917cdcf6eb51b16f0"
+}
+,{
+    "testCaseDescription": "javascript-throw-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "name": "throw-statement.js",
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "name": "throw-statement.js",
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"uh oh\" string with the \"oooooops\" string in the Error(\"oooooops\") function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "911f32d28e0aa19e34646b9917cdcf6eb51b16f0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "441deaae5ebff81f6802d5e2f9f4ae276db41c3b"
+}
+,{
+    "testCaseDescription": "javascript-throw-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "throw-statement.js",
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'new Error(\"oooooops\")' throw statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "throw-statement.js",
+                            "end": [
+                                2,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'new Error(\"uh oh\")' throw statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "throw-statement.js",
+                            "end": [
+                                2,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'new Error(\"oooooops\")' throw statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "441deaae5ebff81f6802d5e2f9f4ae276db41c3b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "753074bc4ed4fbcc549b57307a13bc068a4dc0ff"
+}
+,{
+    "testCaseDescription": "javascript-throw-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "throw-statement.js",
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'new Error(\"uh oh\")' throw statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "753074bc4ed4fbcc549b57307a13bc068a4dc0ff",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "41cdf55b68dce5bdc74df0f541995f9603d2014d"
+}
+,{
+    "testCaseDescription": "javascript-throw-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "throw-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "throw-statement.js",
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'new Error(\"oooooops\")' throw statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "throw-statement.js"
+    ],
+    "sha1": "41cdf55b68dce5bdc74df0f541995f9603d2014d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8853e12eb348f42061f28c7a65748dd8c2b6cdda"
+}]

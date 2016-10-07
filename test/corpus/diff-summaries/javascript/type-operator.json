@@ -1,0 +1,282 @@
+[{
+    "testCaseDescription": "javascript-type-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "type-operator.js",
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'typeof x' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-operator.js"
+    ],
+    "sha1": "10e446483f5cfbc3b6a595cf22bcd8e5b4b7fa1f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e824baf85c2455f92ee90fc9344ac39d72a50a14"
+}
+,{
+    "testCaseDescription": "javascript-type-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "type-operator.js",
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x instanceof String' operator",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "type-operator.js",
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'typeof x' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-operator.js"
+    ],
+    "sha1": "e824baf85c2455f92ee90fc9344ac39d72a50a14",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4c4620dc49de1618fc2688d086a90b0c33b56172"
+}
+,{
+    "testCaseDescription": "javascript-type-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "type-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                14
+                            ],
+                            "name": "type-operator.js",
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'String' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-operator.js"
+    ],
+    "sha1": "4c4620dc49de1618fc2688d086a90b0c33b56172",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "cb84bfa2a54e105154cc4f64f3edbdec593da924"
+}
+,{
+    "testCaseDescription": "javascript-type-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "type-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                14
+                            ],
+                            "name": "type-operator.js",
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'String' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-operator.js"
+    ],
+    "sha1": "cb84bfa2a54e105154cc4f64f3edbdec593da924",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3906b75677e7e34461038b42a7d0eed388638d1a"
+}
+,{
+    "testCaseDescription": "javascript-type-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "type-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "type-operator.js",
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x instanceof String' operator",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "type-operator.js",
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'typeof x' operator",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "type-operator.js",
+                            "end": [
+                                2,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x instanceof String' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-operator.js"
+    ],
+    "sha1": "3906b75677e7e34461038b42a7d0eed388638d1a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "63321c3a8e510775ad5270c30d3f34d4c513363e"
+}
+,{
+    "testCaseDescription": "javascript-type-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "type-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "type-operator.js",
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'typeof x' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-operator.js"
+    ],
+    "sha1": "63321c3a8e510775ad5270c30d3f34d4c513363e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "553f6f8d42f3dbd74e01e1e8eb376f10010728c5"
+}
+,{
+    "testCaseDescription": "javascript-type-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "type-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "type-operator.js",
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x instanceof String' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "type-operator.js"
+    ],
+    "sha1": "553f6f8d42f3dbd74e01e1e8eb376f10010728c5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0014c5d8fc3e6f9d08e268ebbb2d42919d5b4991"
+}]

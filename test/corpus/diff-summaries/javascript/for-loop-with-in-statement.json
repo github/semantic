@@ -1,0 +1,368 @@
+[{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-loop-with-in-statement.js",
+                            "end": [
+                                1,
+                                63
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'key in something && i = 0; i < n; i++' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "faab59d023f70bb2d675e7d0671d36bc82dc9d0f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "184201b3796e0d955659a52b5d2b1624a9e68ef2"
+}
+,{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-loop-with-in-statement.js",
+                            "end": [
+                                1,
+                                73
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'otherKey in something && i = 0; i < n; i++' for statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "for-loop-with-in-statement.js",
+                            "end": [
+                                2,
+                                63
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'key in something && i = 0; i < n; i++' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "184201b3796e0d955659a52b5d2b1624a9e68ef2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "586a2c3efd9651e7be12ec5ef857b734daffea6a"
+}
+,{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "for-loop-with-in-statement.js",
+                                "end": [
+                                    1,
+                                    14
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "for-loop-with-in-statement.js",
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'otherKey' identifier with the 'key' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    52
+                                ],
+                                "name": "for-loop-with-in-statement.js",
+                                "end": [
+                                    1,
+                                    68
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    47
+                                ],
+                                "name": "for-loop-with-in-statement.js",
+                                "end": [
+                                    1,
+                                    58
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'doOtherSomething' identifier with the 'doSomething' identifier in the doSomething() function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "586a2c3efd9651e7be12ec5ef857b734daffea6a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "fd27e1f30fd033a46ad5102fdcb5505937975f3d"
+}
+,{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "for-loop-with-in-statement.js",
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "for-loop-with-in-statement.js",
+                                "end": [
+                                    1,
+                                    14
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'key' identifier with the 'otherKey' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    47
+                                ],
+                                "name": "for-loop-with-in-statement.js",
+                                "end": [
+                                    1,
+                                    58
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    52
+                                ],
+                                "name": "for-loop-with-in-statement.js",
+                                "end": [
+                                    1,
+                                    68
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'doSomething' identifier with the 'doOtherSomething' identifier in the doOtherSomething() function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "fd27e1f30fd033a46ad5102fdcb5505937975f3d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "39740a3c6176bf3db5c3574e1c6ca84608c315b1"
+}
+,{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-loop-with-in-statement.js",
+                            "end": [
+                                1,
+                                73
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'otherKey in something && i = 0; i < n; i++' for statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "for-loop-with-in-statement.js",
+                            "end": [
+                                2,
+                                63
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'key in something && i = 0; i < n; i++' for statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "for-loop-with-in-statement.js",
+                            "end": [
+                                2,
+                                73
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'otherKey in something && i = 0; i < n; i++' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "39740a3c6176bf3db5c3574e1c6ca84608c315b1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f438ed3707daff81f5e48c2726e9008707dd8a5a"
+}
+,{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-loop-with-in-statement.js",
+                            "end": [
+                                1,
+                                63
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'key in something && i = 0; i < n; i++' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "f438ed3707daff81f5e48c2726e9008707dd8a5a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "90ed63f4489e99976afa912f90bfe0a3d89a7389"
+}
+,{
+    "testCaseDescription": "javascript-for-loop-with-in-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "for-loop-with-in-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-loop-with-in-statement.js",
+                            "end": [
+                                1,
+                                73
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'otherKey in something && i = 0; i < n; i++' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-loop-with-in-statement.js"
+    ],
+    "sha1": "90ed63f4489e99976afa912f90bfe0a3d89a7389",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0ba7c6b1f1b67daa1a4bea6a573c1b80be0cfbbc"
+}]

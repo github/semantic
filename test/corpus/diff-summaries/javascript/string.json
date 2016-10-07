@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-string-insert-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "string.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'A string with \"double\" quotes' string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "71a215c337687c245da7c6eafcba311e3ba0e09b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "890f6940b147be1142451548897bb522f2cc0e0e"
+}
+,{
+    "testCaseDescription": "javascript-string-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "string.js",
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'A different string with \"double\" quotes' string",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "string.js",
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'A string with \"double\" quotes' string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "890f6940b147be1142451548897bb522f2cc0e0e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a1bd8ab3294f256b512c1c8f2e71e36f5382c5dc"
+}
+,{
+    "testCaseDescription": "javascript-string-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "string.js",
+                                "end": [
+                                    1,
+                                    42
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "string.js",
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'A different string with \"double\" quotes' string with the 'A string with \"double\" quotes' string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "a1bd8ab3294f256b512c1c8f2e71e36f5382c5dc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6965b973b84c4170ec98730272475e697686d29e"
+}
+,{
+    "testCaseDescription": "javascript-string-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "string.js",
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "string.js",
+                                "end": [
+                                    1,
+                                    42
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'A string with \"double\" quotes' string with the 'A different string with \"double\" quotes' string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "6965b973b84c4170ec98730272475e697686d29e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "92a860f5c70f4aa4da65a6919a026b01d717804c"
+}
+,{
+    "testCaseDescription": "javascript-string-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "string.js",
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'A different string with \"double\" quotes' string",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "string.js",
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'A string with \"double\" quotes' string",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "string.js",
+                            "end": [
+                                2,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'A different string with \"double\" quotes' string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "92a860f5c70f4aa4da65a6919a026b01d717804c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "27d40a59d34bcf26ccd02b06f857c20f85a9df41"
+}
+,{
+    "testCaseDescription": "javascript-string-delete-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "string.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'A string with \"double\" quotes' string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "27d40a59d34bcf26ccd02b06f857c20f85a9df41",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b18bf04fd766cc584977cd2ba38b84199ab2f62d"
+}
+,{
+    "testCaseDescription": "javascript-string-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "string.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "string.js",
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'A different string with \"double\" quotes' string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.js"
+    ],
+    "sha1": "b18bf04fd766cc584977cd2ba38b84199ab2f62d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6353fa1218bad4624b606cf46bfcd6c18d1e13c2"
+}]

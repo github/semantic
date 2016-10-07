@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-assignment-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "assignment.js",
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "e66aa2b6bacc2bbd796427540227b298518b1389",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3956fb4eec4f0bd0a62f4e0b55ccaf0125576854"
+}
+,{
+    "testCaseDescription": "javascript-assignment-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "assignment.js",
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "assignment.js",
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "3956fb4eec4f0bd0a62f4e0b55ccaf0125576854",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d1726bb6040b8c5f6358f7d1af2ebc11e7d96e9f"
+}
+,{
+    "testCaseDescription": "javascript-assignment-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "name": "assignment.js",
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "name": "assignment.js",
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '0' in an assignment to x",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "d1726bb6040b8c5f6358f7d1af2ebc11e7d96e9f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "01f04fbd4037191df6536ca1d542eb8f2678082d"
+}
+,{
+    "testCaseDescription": "javascript-assignment-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "name": "assignment.js",
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "name": "assignment.js",
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '0' with '1' in an assignment to x",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "01f04fbd4037191df6536ca1d542eb8f2678082d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "95e89035c2067fbcd267d77dfdd886961f91abeb"
+}
+,{
+    "testCaseDescription": "javascript-assignment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "assignment.js",
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "assignment.js",
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "assignment.js",
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "95e89035c2067fbcd267d77dfdd886961f91abeb",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8faa9a17a52e98b1ad0f1162f486efdfda8f8e5c"
+}
+,{
+    "testCaseDescription": "javascript-assignment-delete-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "assignment.js",
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "8faa9a17a52e98b1ad0f1162f486efdfda8f8e5c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9032da30a2fccadbd1e19d8d0d0636948a92e1e3"
+}
+,{
+    "testCaseDescription": "javascript-assignment-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "assignment.js",
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.js"
+    ],
+    "sha1": "9032da30a2fccadbd1e19d8d0d0636948a92e1e3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "24ea895fcb8c904a8d057c536eb56be4a8928e33"
+}]

@@ -16,3 +16,6 @@
 [submodule "test/repos/backbone"]
 	path = test/repos/backbone
 	url = https://github.com/jashkenas/backbone
+[submodule "test/corpus/repos/javascript"]
+	path = test/corpus/repos/javascript
+	url = https://github.com/rewinfrey/javascript

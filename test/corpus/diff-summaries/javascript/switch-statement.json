@@ -1,0 +1,368 @@
+[{
+    "testCaseDescription": "javascript-switch-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "switch-statement.js",
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '1' switch statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "df276ed5f435d4cf1363008ae573ea99ba39e175",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e906cd9ad5ab469f68df1fd23910bbe78a9f8cd1"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "switch-statement.js",
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '2' switch statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "switch-statement.js",
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '1' switch statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "e906cd9ad5ab469f68df1fd23910bbe78a9f8cd1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b5602de388c92c96c7f62e0fcf1cce07b403c185"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "name": "switch-statement.js",
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "name": "switch-statement.js",
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1'",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "name": "switch-statement.js",
+                                "end": [
+                                    1,
+                                    34
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "name": "switch-statement.js",
+                                "end": [
+                                    1,
+                                    34
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1'",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "b5602de388c92c96c7f62e0fcf1cce07b403c185",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "fa74d55721267c11d2be5de262e9eb3100ba91f0"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "name": "switch-statement.js",
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "name": "switch-statement.js",
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2'",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "name": "switch-statement.js",
+                                "end": [
+                                    1,
+                                    34
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "name": "switch-statement.js",
+                                "end": [
+                                    1,
+                                    34
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2'",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "fa74d55721267c11d2be5de262e9eb3100ba91f0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "14d176ab7a67005a68ef8e96781993f1e9e8aff0"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "switch-statement.js",
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '2' switch statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "switch-statement.js",
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '1' switch statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "switch-statement.js",
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '2' switch statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "14d176ab7a67005a68ef8e96781993f1e9e8aff0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f3c50550c25a6a350e336bcb4acb19efaee5784b"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "switch-statement.js",
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '1' switch statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "f3c50550c25a6a350e336bcb4acb19efaee5784b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "43e7f35abe631d346d4a6d0b20df2215a9844b2a"
+}
+,{
+    "testCaseDescription": "javascript-switch-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "switch-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "switch-statement.js",
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '2' switch statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "switch-statement.js"
+    ],
+    "sha1": "43e7f35abe631d346d4a6d0b20df2215a9844b2a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ef9e2caec95767f4944840fd5db7f43806b65d4e"
+}]

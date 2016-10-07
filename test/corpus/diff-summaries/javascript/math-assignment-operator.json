@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-math-assignment-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "math-assignment-operator.js",
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "sha1": "74f192419bb6a3a7ef68bb5eb4cf71e89e09b919",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d6da9771070c0da9787ae5e26c8914a45391d67b"
+}
+,{
+    "testCaseDescription": "javascript-math-assignment-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "math-assignment-operator.js",
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "math-assignment-operator.js",
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "sha1": "d6da9771070c0da9787ae5e26c8914a45391d67b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b817bac77a25047fc74bae958ac96e12e1f0a39e"
+}
+,{
+    "testCaseDescription": "javascript-math-assignment-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "math-assignment-operator.js",
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "math-assignment-operator.js",
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1' in the x math assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "sha1": "b817bac77a25047fc74bae958ac96e12e1f0a39e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4fe543b5777c4b39ffdeb2a4492405adc704d764"
+}
+,{
+    "testCaseDescription": "javascript-math-assignment-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "math-assignment-operator.js",
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "math-assignment-operator.js",
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2' in the x math assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "sha1": "4fe543b5777c4b39ffdeb2a4492405adc704d764",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "33afe3e3e1c77dabda9ec3e7b99f0c923bc23de5"
+}
+,{
+    "testCaseDescription": "javascript-math-assignment-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "math-assignment-operator.js",
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "math-assignment-operator.js",
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "math-assignment-operator.js",
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "sha1": "33afe3e3e1c77dabda9ec3e7b99f0c923bc23de5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3754066fb44624889e799c91af2a609fb1f1d27d"
+}
+,{
+    "testCaseDescription": "javascript-math-assignment-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "math-assignment-operator.js",
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "sha1": "3754066fb44624889e799c91af2a609fb1f1d27d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bd1b94d3f2bf9806becf43c7f18927e1ff3932ec"
+}
+,{
+    "testCaseDescription": "javascript-math-assignment-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "math-assignment-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "math-assignment-operator.js",
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-assignment-operator.js"
+    ],
+    "sha1": "bd1b94d3f2bf9806becf43c7f18927e1ff3932ec",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "faab59d023f70bb2d675e7d0671d36bc82dc9d0f"
+}]

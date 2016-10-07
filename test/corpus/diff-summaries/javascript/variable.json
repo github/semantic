@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-variable-insert-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "variable.js",
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'theVar' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "7cd0762fb1e84cad3dcf9a1c41b07c8112c888fd",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d997c1093fa0c616e4a65bdb9d406275cdd5802d"
+}
+,{
+    "testCaseDescription": "javascript-variable-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "variable.js",
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'theVar2' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "variable.js",
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'theVar' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "d997c1093fa0c616e4a65bdb9d406275cdd5802d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d53db14bcba93489810bcd1ac51b4b15306a1ae6"
+}
+,{
+    "testCaseDescription": "javascript-variable-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "variable.js",
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "variable.js",
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'theVar2' identifier with the 'theVar' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "d53db14bcba93489810bcd1ac51b4b15306a1ae6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3e07fecc10461c1d47c18a19bea04d61a0dfc83a"
+}
+,{
+    "testCaseDescription": "javascript-variable-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "variable.js",
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "variable.js",
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'theVar' identifier with the 'theVar2' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "3e07fecc10461c1d47c18a19bea04d61a0dfc83a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9a58027ba05317961196f113c79ea9ffad926b20"
+}
+,{
+    "testCaseDescription": "javascript-variable-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "variable.js",
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'theVar2' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "variable.js",
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'theVar' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "variable.js",
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'theVar2' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "9a58027ba05317961196f113c79ea9ffad926b20",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "eaebf72a40c5b5efa51afefa013498ddf1954821"
+}
+,{
+    "testCaseDescription": "javascript-variable-delete-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "variable.js",
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'theVar' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "eaebf72a40c5b5efa51afefa013498ddf1954821",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6a047726509cb5ca3ac81e6bff6d14f65205196b"
+}
+,{
+    "testCaseDescription": "javascript-variable-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "variable.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "variable.js",
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'theVar2' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "variable.js"
+    ],
+    "sha1": "6a047726509cb5ca3ac81e6bff6d14f65205196b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e117ae3f5e0945e0d8e971f7bbc0397229a45648"
+}]
