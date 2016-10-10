@@ -55,8 +55,8 @@ runGenerator :: GeneratorArgs -> JSONMetaRepo -> IO ()
 runGenerator opts metaRepo@JSONMetaRepo{..} = do
   runSetupGitRepo metaRepo
   runCommitsAndTestCasesGeneration opts metaRepo
-  runUpdateGitRemote repoPath
   runPullGitRemote repoUrl repoPath
+  runPushGitRemote repoPath
 
 -- | Upon successful test case generation for a generator file, move the file to the generated directory.
 -- | This prevents subsequence runs of the test generator from duplicating test cases and adding extraneous
@@ -233,8 +233,8 @@ runPullGitRemote repoUrl repoPath = do
           Prelude.putStrLn "Attempting to continue without pulling from the remote repository.\n"
 
 -- | Pushes git commits to the submodule repository's remote.
-runUpdateGitRemote :: FilePath -> IO ()
-runUpdateGitRemote repoPath = do
+runPushGitRemote :: FilePath -> IO ()
+runPushGitRemote repoPath = do
   Prelude.putStrLn "Updating git remote."
   _ <- executeCommand repoPath pushToGitRemoteCommand
   Prelude.putStrLn "Successfully updated git remote."
