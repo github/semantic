@@ -56,6 +56,7 @@ runGenerator opts metaRepo@JSONMetaRepo{..} = do
   runSetupGitRepo metaRepo
   runCommitsAndTestCasesGeneration opts metaRepo
   runUpdateGitRemote repoPath
+  runPullGitRemote repoUrl repoPath
 
 -- | Upon successful test case generation for a generator file, move the file to the generated directory.
 -- | This prevents subsequence runs of the test generator from duplicating test cases and adding extraneous
@@ -196,6 +197,41 @@ commands metaSyntax@JSONMetaSyntax{..} =
   where commaSeperator = "\n,"
         spaceSeperator = ""
 
+-- | Attempts to pull from the git repository's remote repository.
+-- | If the attempt fails, a naive attempt to update the remote repository
+-- | with possible unpushed changes is executed. If that fails, the error is
+-- | caught and computation proceeds without terminating the process.
+runPullGitRemote :: String -> FilePath -> IO ()
+runPullGitRemote repoUrl repoPath = do
+  Prelude.putStrLn "Attempting to fetch from the remote repository."
+  result <- attempt
+  handle result next errorHandler
+  where attempt :: IO (Either Prelude.IOError String)
+        attempt = try $ executeCommand repoPath pullFromRemoteCommand
+
+        handle :: Either Prelude.IOError String -> IO () -> (Prelude.IOError -> IO ()) -> IO ()
+        handle result success err = case (result :: Either Prelude.IOError String) of
+                                      Left error -> err error
+                                      Right _ -> success
+        next :: IO ()
+        next = Prelude.putStrLn "Remote repository successfully fetched.\n"
+
+        errorMessage :: Prelude.IOError -> IO ()
+        errorMessage err = Prelude.putStrLn $ "Pulling from the remote repository at " <> repoUrl <> " failed with: " <> show err <> ". " <> "Possible reason: remote repository has local changes not in the local repository. \nProceeding to the next step."
+
+        errorHandler :: Prelude.IOError -> IO ()
+        errorHandler err = do
+          errorMessage err
+          Prelude.putStrLn "Attempting to update the remote repository with local changes.\n"
+          _ <- runPushGitRemote repoPath
+          result <- attempt
+          handle result next continueHandler
+
+        continueHandler :: Prelude.IOError -> IO ()
+        continueHandler err = do
+          errorMessage err
+          Prelude.putStrLn "Attempting to continue without pulling from the remote repository.\n"
+
 -- | Pushes git commits to the submodule repository's remote.
 runUpdateGitRemote :: FilePath -> IO ()
 runUpdateGitRemote repoPath = do
@@ -217,6 +253,9 @@ addSubmoduleCommand repoUrl repoPath = "git submodule add " <> repoUrl <> " " <>
 
 getLastCommitShaCommand :: String
 getLastCommitShaCommand = "git log --pretty=format:\"%H\" -n 1;"
+
+pullFromRemoteCommand :: String
+pullFromRemoteCommand = "git pull origin master;"
 
 touchCommand :: FilePath -> String
 touchCommand repoFilePath = "touch " <> repoFilePath <> ";"
