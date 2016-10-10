@@ -11,9 +11,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "e797ca2c748a6d42d67875240942d0876fd66cbc",
+    "sha1": "1e9e9c532a442ba992f1f11678871a8ca32342d6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9b44781137dd99590dc0b1ee7f175d7554fc19c1"
+    "sha2": "a1a7f9a61653372e7c9a6151f082f4b4951886b8"
 }
 ,{
     "testCaseDescription": "javascript-comment-replacement-insert-test",
@@ -29,9 +29,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "9b44781137dd99590dc0b1ee7f175d7554fc19c1",
+    "sha1": "a1a7f9a61653372e7c9a6151f082f4b4951886b8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b7b5ac68f521105a55e5efbbc290762ae19e998a"
+    "sha2": "a510c1629b4682c845b57def41d27b2a42ced9fc"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-insert-test",
@@ -46,9 +46,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "b7b5ac68f521105a55e5efbbc290762ae19e998a",
+    "sha1": "a510c1629b4682c845b57def41d27b2a42ced9fc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f28812e795ef48e013b23d15cc250a11a65d1efb"
+    "sha2": "e9fe82d65c2232d56a1afa9bace1743ed6965dff"
 }
 ,{
     "testCaseDescription": "javascript-comment-replacement-test",
@@ -63,9 +63,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "f28812e795ef48e013b23d15cc250a11a65d1efb",
+    "sha1": "e9fe82d65c2232d56a1afa9bace1743ed6965dff",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "94d3258258fc5dda40f68012a4a29a0699ae7198"
+    "sha2": "45d61438ee20a47166fd61cf3bfd9e36355f8c11"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-replacement-test",
@@ -82,9 +82,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "94d3258258fc5dda40f68012a4a29a0699ae7198",
+    "sha1": "45d61438ee20a47166fd61cf3bfd9e36355f8c11",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "054b25777313237a3548f17e75ddf0036c8c4b97"
+    "sha2": "4512a3457ba0b0ff210dcdcc01012a1a14f58cc0"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-test",
@@ -99,9 +99,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "054b25777313237a3548f17e75ddf0036c8c4b97",
+    "sha1": "4512a3457ba0b0ff210dcdcc01012a1a14f58cc0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "446ac1dc79acd4f137b6d2a6eb894cb3377f82a5"
+    "sha2": "f5609df0cbda497f74506178b5895fbb4200b59c"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-rest-test",
@@ -116,7 +116,7 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "446ac1dc79acd4f137b6d2a6eb894cb3377f82a5",
+    "sha1": "f5609df0cbda497f74506178b5895fbb4200b59c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e744226ef998687c390e01091951dba025d40dfd"
+    "sha2": "8177da387f956248e188b0189c172a65fe566025"
 }]
