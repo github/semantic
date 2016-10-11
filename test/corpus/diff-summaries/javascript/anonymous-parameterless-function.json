@@ -5,7 +5,7 @@
             "anonymous-parameterless-function.js": [
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 1,
                                 1
@@ -27,9 +27,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "243878b6c3b6f74b080ea4f2188dffe5f3ca5517",
+    "sha1": "ab4f48bf9115a296943ba7b2304e674c7149c29d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "514143027c392e84ae25e96805949caab52f1561"
+    "sha2": "f43074bc2b6753a364b3b13cfc58818b23757002"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-replacement-insert-test",
@@ -38,7 +38,7 @@
             "anonymous-parameterless-function.js": [
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 1,
                                 1
@@ -55,7 +55,7 @@
                 },
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 2,
                                 1
@@ -77,9 +77,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "514143027c392e84ae25e96805949caab52f1561",
+    "sha1": "f43074bc2b6753a364b3b13cfc58818b23757002",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b563ad1a2f183b9aa3eeaebd30a4d8b19b9a7a11"
+    "sha2": "26e0b2b93bae701963cdefbc3a8c5398186e19e5"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-insert-test",
@@ -88,7 +88,7 @@
             "anonymous-parameterless-function.js": [
                 {
                     "span": {
-                        "these": [
+                        "replace": [
                             {
                                 "start": [
                                     1,
@@ -123,9 +123,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "b563ad1a2f183b9aa3eeaebd30a4d8b19b9a7a11",
+    "sha1": "26e0b2b93bae701963cdefbc3a8c5398186e19e5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f44fd8faf60a62826c1149b797d4c6de9758c2cb"
+    "sha2": "fd8dd926a95d09f8bc5ddd70f6332f70811861bd"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-replacement-test",
@@ -134,7 +134,7 @@
             "anonymous-parameterless-function.js": [
                 {
                     "span": {
-                        "these": [
+                        "replace": [
                             {
                                 "start": [
                                     1,
@@ -169,9 +169,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "f44fd8faf60a62826c1149b797d4c6de9758c2cb",
+    "sha1": "fd8dd926a95d09f8bc5ddd70f6332f70811861bd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "76bb7e8592f8fced41f61f81538c202b3c5fb3df"
+    "sha2": "e4cf93ae56fcf34133d7e449d6d32d543f47a39e"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-replacement-test",
@@ -180,7 +180,7 @@
             "anonymous-parameterless-function.js": [
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -197,7 +197,7 @@
                 },
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 2,
                                 1
@@ -214,7 +214,7 @@
                 },
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 2,
                                 1
@@ -236,9 +236,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "76bb7e8592f8fced41f61f81538c202b3c5fb3df",
+    "sha1": "e4cf93ae56fcf34133d7e449d6d32d543f47a39e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bcc25dd39ebe005c0282ddea0611c7039fc70ec8"
+    "sha2": "91f3b9d0e7f9a84e72e0d8d85f9ae10e65ab5c75"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-test",
@@ -247,7 +247,7 @@
             "anonymous-parameterless-function.js": [
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -269,9 +269,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "bcc25dd39ebe005c0282ddea0611c7039fc70ec8",
+    "sha1": "91f3b9d0e7f9a84e72e0d8d85f9ae10e65ab5c75",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "425b3995f55840eef8727deb5c9b6bf82b47dfbe"
+    "sha2": "17288c5650b4e44ed2b59fa8b3832f99c88af33c"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-rest-test",
@@ -280,7 +280,7 @@
             "anonymous-parameterless-function.js": [
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -302,7 +302,7 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "425b3995f55840eef8727deb5c9b6bf82b47dfbe",
+    "sha1": "17288c5650b4e44ed2b59fa8b3832f99c88af33c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "96217c240d7773372a78d2a23601a4a97459fcad"
+    "sha2": "613f8b8ea74085ab35b7398fe3f636eda7d63fa2"
 }]

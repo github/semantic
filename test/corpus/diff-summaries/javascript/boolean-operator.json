@@ -5,7 +5,7 @@
             "boolean-operator.js": [
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 1,
                                 1
@@ -27,9 +27,9 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "d8ca022a316c97349395e113ee5563dbfc64a120",
+    "sha1": "7e1caa9a941a609d09c734937d05d7b2414e8219",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8879f70952299b137792adc99277addb4dc9d8c2"
+    "sha2": "c0e2708f57e17a4ce2c1696e880ed30bad18ca26"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-replacement-insert-test",
@@ -38,7 +38,7 @@
             "boolean-operator.js": [
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 1,
                                 1
@@ -55,7 +55,7 @@
                 },
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 2,
                                 1
@@ -77,9 +77,9 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "8879f70952299b137792adc99277addb4dc9d8c2",
+    "sha1": "c0e2708f57e17a4ce2c1696e880ed30bad18ca26",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "db4908a1194a49d60ddb8e6e58a6a2f208db63b7"
+    "sha2": "0e87089f205a053aaba445030d07334a2f0a3c0d"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-delete-insert-test",
@@ -90,9 +90,9 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "db4908a1194a49d60ddb8e6e58a6a2f208db63b7",
+    "sha1": "0e87089f205a053aaba445030d07334a2f0a3c0d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bcdb6b772f14dadda64d51dbf62acc0f8f8ba2b8"
+    "sha2": "0e77f8929e9863a8750c2c783e827153e0f09ed5"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-replacement-test",
@@ -103,9 +103,9 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "bcdb6b772f14dadda64d51dbf62acc0f8f8ba2b8",
+    "sha1": "0e77f8929e9863a8750c2c783e827153e0f09ed5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ad89e401e551d28c64be54f8a25f60335e4f30cf"
+    "sha2": "7eb85e05ccbfe6f171137c8e5e0bd9574e4089f6"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-delete-replacement-test",
@@ -114,7 +114,7 @@
             "boolean-operator.js": [
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -136,9 +136,9 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "ad89e401e551d28c64be54f8a25f60335e4f30cf",
+    "sha1": "7eb85e05ccbfe6f171137c8e5e0bd9574e4089f6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "24fea035ee6cc6549225dc7975fa95a95aa1602b"
+    "sha2": "2c2f7fe0801ea179c43b3b4f8cdd228c792c7b79"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-delete-test",
@@ -147,7 +147,7 @@
             "boolean-operator.js": [
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -169,9 +169,9 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "24fea035ee6cc6549225dc7975fa95a95aa1602b",
+    "sha1": "2c2f7fe0801ea179c43b3b4f8cdd228c792c7b79",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "46299e80d6554a9d56ebe1c500e941627a5e6798"
+    "sha2": "868176abe9d7d38af9fa93baea780e56ecbedb28"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-delete-rest-test",
@@ -180,7 +180,7 @@
             "boolean-operator.js": [
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -202,7 +202,7 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "46299e80d6554a9d56ebe1c500e941627a5e6798",
+    "sha1": "868176abe9d7d38af9fa93baea780e56ecbedb28",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c9eeca7b41f404d72d81ffd3df9410d8c31ca047"
+    "sha2": "0a55bedb688b2d873dec7f8d898dcf6a7343e8bc"
 }]

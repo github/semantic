@@ -5,7 +5,7 @@
             "variable.js": [
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 1,
                                 1
@@ -27,9 +27,9 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "45a6d97047c9425f56128ec4e4400027be11cad7",
+    "sha1": "6539b8361c59312164d8321ca3888c0511fcf849",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9dad141263720dcf07ceb13d01029c69bcef38ea"
+    "sha2": "c0e6c0ded2a3dced105d1ab80857cc20258b07ae"
 }
 ,{
     "testCaseDescription": "javascript-variable-replacement-insert-test",
@@ -38,7 +38,7 @@
             "variable.js": [
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 1,
                                 1
@@ -55,7 +55,7 @@
                 },
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 2,
                                 1
@@ -77,9 +77,9 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "9dad141263720dcf07ceb13d01029c69bcef38ea",
+    "sha1": "c0e6c0ded2a3dced105d1ab80857cc20258b07ae",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4f6333428bf9465cdab6df21470f1787d3bff8d7"
+    "sha2": "2de090754d832844bf03836c5e571ab5cad2e084"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-insert-test",
@@ -88,7 +88,7 @@
             "variable.js": [
                 {
                     "span": {
-                        "these": [
+                        "replace": [
                             {
                                 "start": [
                                     1,
@@ -123,9 +123,9 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "4f6333428bf9465cdab6df21470f1787d3bff8d7",
+    "sha1": "2de090754d832844bf03836c5e571ab5cad2e084",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f5e4df4fc4b3baf6dabfad4aee94248f5ba36189"
+    "sha2": "0f970d0d8f050af10bc4c12aaf36ffa4f13f8b2d"
 }
 ,{
     "testCaseDescription": "javascript-variable-replacement-test",
@@ -134,7 +134,7 @@
             "variable.js": [
                 {
                     "span": {
-                        "these": [
+                        "replace": [
                             {
                                 "start": [
                                     1,
@@ -169,9 +169,9 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "f5e4df4fc4b3baf6dabfad4aee94248f5ba36189",
+    "sha1": "0f970d0d8f050af10bc4c12aaf36ffa4f13f8b2d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6c86ef3484ecc568dfff6dc7d6bf603ac8dc8fcd"
+    "sha2": "adf96a48ac5436cb72483251db0f21b1f6c0628e"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-replacement-test",
@@ -180,7 +180,7 @@
             "variable.js": [
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -197,7 +197,7 @@
                 },
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 2,
                                 1
@@ -214,7 +214,7 @@
                 },
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 2,
                                 1
@@ -236,9 +236,9 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "6c86ef3484ecc568dfff6dc7d6bf603ac8dc8fcd",
+    "sha1": "adf96a48ac5436cb72483251db0f21b1f6c0628e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a41e6666d1ea0ed4c08217d4aa16d53fcde04f5e"
+    "sha2": "51ba6b7b1c97e55fd7608918ac7bf9b5b4b986cd"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-test",
@@ -247,7 +247,7 @@
             "variable.js": [
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -269,9 +269,9 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "a41e6666d1ea0ed4c08217d4aa16d53fcde04f5e",
+    "sha1": "51ba6b7b1c97e55fd7608918ac7bf9b5b4b986cd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "dbf27da132fca11e0fd7163c0bc5583fdd85f37c"
+    "sha2": "04b1ca5574c5256d2d3db1d073308ff0ce040736"
 }
 ,{
     "testCaseDescription": "javascript-variable-delete-rest-test",
@@ -280,7 +280,7 @@
             "variable.js": [
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -302,7 +302,7 @@
     "filePaths": [
         "variable.js"
     ],
-    "sha1": "dbf27da132fca11e0fd7163c0bc5583fdd85f37c",
+    "sha1": "04b1ca5574c5256d2d3db1d073308ff0ce040736",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1917c441d2b5dc77f63539a5df1e3cd7f0df97f3"
+    "sha2": "e8164f9a5c7441db5367d1dee13694204e67e3ab"
 }]

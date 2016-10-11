@@ -5,7 +5,7 @@
             "ternary.js": [
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 1,
                                 1
@@ -27,9 +27,9 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "216c9ba07743064780c37d5f07af95a9dee2bf96",
+    "sha1": "62499db349bd96eba99a785f67d473de8d5b99e6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5a6f3092f70f211e165506d1c3196f24b065f67a"
+    "sha2": "bc7b9275011e872401a2c3a8c7c17903cdb56169"
 }
 ,{
     "testCaseDescription": "javascript-ternary-replacement-insert-test",
@@ -38,7 +38,7 @@
             "ternary.js": [
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 1,
                                 1
@@ -55,7 +55,7 @@
                 },
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 2,
                                 1
@@ -77,9 +77,9 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "5a6f3092f70f211e165506d1c3196f24b065f67a",
+    "sha1": "bc7b9275011e872401a2c3a8c7c17903cdb56169",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b0b8e37ca235cac0f4994d17eb1527cd14e4832b"
+    "sha2": "b8fea536dd918076cf850567797d069cb7bb324a"
 }
 ,{
     "testCaseDescription": "javascript-ternary-delete-insert-test",
@@ -88,7 +88,7 @@
             "ternary.js": [
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 1,
                                 1
@@ -105,7 +105,7 @@
                 },
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -127,9 +127,9 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "b0b8e37ca235cac0f4994d17eb1527cd14e4832b",
+    "sha1": "b8fea536dd918076cf850567797d069cb7bb324a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f7d548f311ce81e47facc215fefc7c734b32f131"
+    "sha2": "ed0eb4f64eb99a1de0578efbea21954d506b78ad"
 }
 ,{
     "testCaseDescription": "javascript-ternary-replacement-test",
@@ -138,7 +138,7 @@
             "ternary.js": [
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 1,
                                 1
@@ -155,7 +155,7 @@
                 },
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -177,9 +177,9 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "f7d548f311ce81e47facc215fefc7c734b32f131",
+    "sha1": "ed0eb4f64eb99a1de0578efbea21954d506b78ad",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "30da4a7ee5e6eba51591601b2b9ca9cc24d30494"
+    "sha2": "180368bb326efec93e24d19b6e544eb1c418573b"
 }
 ,{
     "testCaseDescription": "javascript-ternary-delete-replacement-test",
@@ -188,7 +188,7 @@
             "ternary.js": [
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -205,7 +205,7 @@
                 },
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 2,
                                 1
@@ -222,7 +222,7 @@
                 },
                 {
                     "span": {
-                        "that": {
+                        "insert": {
                             "start": [
                                 2,
                                 1
@@ -244,9 +244,9 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "30da4a7ee5e6eba51591601b2b9ca9cc24d30494",
+    "sha1": "180368bb326efec93e24d19b6e544eb1c418573b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9fa12d415964908e661b33756b867eb7616e3d94"
+    "sha2": "c01612a71ed85281bf9c055ad05b6b7ea76377d5"
 }
 ,{
     "testCaseDescription": "javascript-ternary-delete-test",
@@ -255,7 +255,7 @@
             "ternary.js": [
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -277,9 +277,9 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "9fa12d415964908e661b33756b867eb7616e3d94",
+    "sha1": "c01612a71ed85281bf9c055ad05b6b7ea76377d5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8e6ed77f360e132885b2b329a4d26492a32e0f94"
+    "sha2": "1d83e7224ad50fbbf8712b8cb674512319d379a0"
 }
 ,{
     "testCaseDescription": "javascript-ternary-delete-rest-test",
@@ -288,7 +288,7 @@
             "ternary.js": [
                 {
                     "span": {
-                        "this": {
+                        "delete": {
                             "start": [
                                 1,
                                 1
@@ -310,7 +310,7 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "8e6ed77f360e132885b2b329a4d26492a32e0f94",
+    "sha1": "1d83e7224ad50fbbf8712b8cb674512319d379a0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3a53bc319251c49799f5e1229514b74297ef88e4"
+    "sha2": "33ac8949dcc8f9f193b6aec3c6d9a5ef26e4bcfd"
 }]
