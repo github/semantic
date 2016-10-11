@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Added an anonymous(a, b) function"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(a, b) function"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "9da531dab73d3a68d171641dcc1913ad7225de16",
+    "sha1": "4eda6b0a46046cb99a4544fe3a4a9c23e702eeac",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cb573ed340766964b2770e7593f129d76afa624e"
+    "sha2": "0ae1cc9281ef60c31e19985b68713eb40fc2ad2c"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Added an anonymous(b, c) function",
-                "Added an anonymous(a, b) function"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(b, c) function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(a, b) function"
+                }
             ]
         },
         "errors": {}
@@ -29,19 +71,123 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "cb573ed340766964b2770e7593f129d76afa624e",
+    "sha1": "0ae1cc9281ef60c31e19985b68713eb40fc2ad2c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4986a49938baf1d287cb567f30c7b2ef9bdd04d0"
+    "sha2": "e13ea092e21306d5e46e6bf1a2a18566873475d2"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-insert-test",
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Replaced the 'b' identifier with the 'a' identifier",
-                "Replaced the 'c' identifier with the 'b' identifier",
-                "Replaced the 'b' identifier with the 'a' identifier",
-                "Replaced the 'c' identifier with the 'b' identifier"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    12
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    12
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    28
+                                ],
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    28
+                                ],
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'b' identifier"
+                }
             ]
         },
         "errors": {}
@@ -49,19 +195,123 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "4986a49938baf1d287cb567f30c7b2ef9bdd04d0",
+    "sha1": "e13ea092e21306d5e46e6bf1a2a18566873475d2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c74709199029bab1a3e7fd326a1b4332bc0b9381"
+    "sha2": "664b50f840363802e3fc974ae60831dc4e13d5c2"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-replacement-test",
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Replaced the 'a' identifier with the 'b' identifier",
-                "Replaced the 'b' identifier with the 'c' identifier",
-                "Replaced the 'a' identifier with the 'b' identifier",
-                "Replaced the 'b' identifier with the 'c' identifier"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    12
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    12
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    28
+                                ],
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    28
+                                ],
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier"
+                }
             ]
         },
         "errors": {}
@@ -69,18 +319,60 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "c74709199029bab1a3e7fd326a1b4332bc0b9381",
+    "sha1": "664b50f840363802e3fc974ae60831dc4e13d5c2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "745d8324b38294980b7a6b9e62914d330827cdb9"
+    "sha2": "f0b28a88b5b36ac5eb6770e80f5455c5c2ae3396"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Deleted an anonymous(b, c) function",
-                "Deleted an anonymous(a, b) function",
-                "Added an anonymous(b, c) function"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(b, c) function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(a, b) function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(b, c) function"
+                }
             ]
         },
         "errors": {}
@@ -88,16 +380,30 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "745d8324b38294980b7a6b9e62914d330827cdb9",
+    "sha1": "f0b28a88b5b36ac5eb6770e80f5455c5c2ae3396",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0a97bdf3ba54de75a633542c3baeea9a29ebfc74"
+    "sha2": "2e8bd85c462e82c1de6ad1d016dec89b8f6c7a94"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-test",
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Deleted an anonymous(a, b) function"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(a, b) function"
+                }
             ]
         },
         "errors": {}
@@ -105,16 +411,30 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "0a97bdf3ba54de75a633542c3baeea9a29ebfc74",
+    "sha1": "2e8bd85c462e82c1de6ad1d016dec89b8f6c7a94",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9128b09fb9d9aff67b25d32cb924dcec5023e9a5"
+    "sha2": "8730cf111655ff909dd1b3a43b8afb78bc05f7b5"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-rest-test",
     "expectedResult": {
         "changes": {
             "anonymous-function.js": [
-                "Deleted an anonymous(b, c) function"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(b, c) function"
+                }
             ]
         },
         "errors": {}
@@ -122,7 +442,7 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "9128b09fb9d9aff67b25d32cb924dcec5023e9a5",
+    "sha1": "8730cf111655ff909dd1b3a43b8afb78bc05f7b5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e5ac882c582e066b576adb9ad39da3ce6dc09be3"
+    "sha2": "0a29e7e55f31e31e4f830f33dd8b1a6231165888"
 }]

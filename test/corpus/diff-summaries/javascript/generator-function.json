@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "generator-function.js": [
-                "Added the 'generateStuff' function"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                59
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'generateStuff' function"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "5d09bd1d7981c0961505d816d5e38dbbc5abf108",
+    "sha1": "5190dfa16aab4d1416b5dad47a3f9cc704af1fae",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b055cb9d04d11e4a9bc2b022e9d99983a2780499"
+    "sha2": "d7eb5084f8ee88c7b9f3657c9c05d72e4329c5c7"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "generator-function.js": [
-                "Added the 'generateNewStuff' function",
-                "Added the 'generateStuff' function"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                62
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'generateNewStuff' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                59
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'generateStuff' function"
+                }
             ]
         },
         "errors": {}
@@ -29,16 +71,42 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "b055cb9d04d11e4a9bc2b022e9d99983a2780499",
+    "sha1": "d7eb5084f8ee88c7b9f3657c9c05d72e4329c5c7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e4fbac763d5e8f5f310a8a3d7a6f8d840619174e"
+    "sha2": "9a1ba4ab7ac42607d9eacb0e871763a2bfe06221"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-insert-test",
     "expectedResult": {
         "changes": {
             "generator-function.js": [
-                "Replaced the 'generateNewStuff' identifier with the 'generateStuff' identifier in the generateStuff function"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'generateNewStuff' identifier with the 'generateStuff' identifier in the generateStuff function"
+                }
             ]
         },
         "errors": {}
@@ -46,16 +114,42 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "e4fbac763d5e8f5f310a8a3d7a6f8d840619174e",
+    "sha1": "9a1ba4ab7ac42607d9eacb0e871763a2bfe06221",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "67675547b9d2599c68941be313ecd7b888932388"
+    "sha2": "7ed14c167f2304005ed80d19a4019dfe9b3d9818"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-replacement-test",
     "expectedResult": {
         "changes": {
             "generator-function.js": [
-                "Replaced the 'generateStuff' identifier with the 'generateNewStuff' identifier in the generateNewStuff function"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'generateStuff' identifier with the 'generateNewStuff' identifier in the generateNewStuff function"
+                }
             ]
         },
         "errors": {}
@@ -63,18 +157,60 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "67675547b9d2599c68941be313ecd7b888932388",
+    "sha1": "7ed14c167f2304005ed80d19a4019dfe9b3d9818",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f2eb336805f01fefe41442565fb61ac7fc5dd6d2"
+    "sha2": "fd15cd2ea8a79ab44aefbe49e0cefa5d77567210"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "generator-function.js": [
-                "Deleted the 'generateNewStuff' function",
-                "Deleted the 'generateStuff' function",
-                "Added the 'generateNewStuff' function"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                62
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'generateNewStuff' function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                59
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'generateStuff' function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                62
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'generateNewStuff' function"
+                }
             ]
         },
         "errors": {}
@@ -82,16 +218,30 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "f2eb336805f01fefe41442565fb61ac7fc5dd6d2",
+    "sha1": "fd15cd2ea8a79ab44aefbe49e0cefa5d77567210",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e11effe73e343fdac5157f9062aab8190ba1041c"
+    "sha2": "f7461e2154cb8c35bd33d73880ac8ce6fed13968"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-test",
     "expectedResult": {
         "changes": {
             "generator-function.js": [
-                "Deleted the 'generateStuff' function"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                59
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'generateStuff' function"
+                }
             ]
         },
         "errors": {}
@@ -99,16 +249,30 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "e11effe73e343fdac5157f9062aab8190ba1041c",
+    "sha1": "f7461e2154cb8c35bd33d73880ac8ce6fed13968",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6e14135d5d47798b0b683769a3269a4812ad15b9"
+    "sha2": "d6e72611d7be249f33d8283e3fd246ba10119a64"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-rest-test",
     "expectedResult": {
         "changes": {
             "generator-function.js": [
-                "Deleted the 'generateNewStuff' function"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                62
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'generateNewStuff' function"
+                }
             ]
         },
         "errors": {}
@@ -116,7 +280,7 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "6e14135d5d47798b0b683769a3269a4812ad15b9",
+    "sha1": "d6e72611d7be249f33d8283e3fd246ba10119a64",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "12ad7dc9f0bac8d9da1560cc4e1b965b0a04f159"
+    "sha2": "dac1b3637553f83bfd1567e914a0236f9b41b9ec"
 }]

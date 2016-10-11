@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "chained-callbacks.js": [
-                "Added the 'this.map(…)' method call"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this.map(…)' method call"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "5c91d0130fe9174fa613c361cae47758864ea1be",
+    "sha1": "13cc6ff656f24edfd27ef7cdbbf33198c415c712",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cb8ffbe64d35790639f795037044138216ff1861"
+    "sha2": "ba8ce3f9c7e869e67a2b1d9ad2b98ea18b349916"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "chained-callbacks.js": [
-                "Added the 'this.reduce(…)' method call",
-                "Added the 'this.map(…)' method call"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this.reduce(…)' method call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this.map(…)' method call"
+                }
             ]
         },
         "errors": {}
@@ -29,18 +71,96 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "cb8ffbe64d35790639f795037044138216ff1861",
+    "sha1": "ba8ce3f9c7e869e67a2b1d9ad2b98ea18b349916",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8fb4a1869c907d4ddc7dace26eb3063b03b0e26c"
+    "sha2": "d0276aee638ca8e24ee6d91a339544df8fb7eda3"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-insert-test",
     "expectedResult": {
         "changes": {
             "chained-callbacks.js": [
-                "Replaced the 'reduce' identifier with the 'map' identifier in the this.map(…) method call",
-                "Replaced the 'b' identifier with the 'a' identifier in the this.map(…) method call",
-                "Replaced the 'a' identifier with the 'b' identifier in the this.map(…) method call"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'reduce' identifier with the 'map' identifier in the this.map(…) method call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    32
+                                ],
+                                "end": [
+                                    1,
+                                    33
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the this.map(…) method call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    37
+                                ],
+                                "end": [
+                                    1,
+                                    38
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    34
+                                ],
+                                "end": [
+                                    1,
+                                    35
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the this.map(…) method call"
+                }
             ]
         },
         "errors": {}
@@ -48,18 +168,96 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "8fb4a1869c907d4ddc7dace26eb3063b03b0e26c",
+    "sha1": "d0276aee638ca8e24ee6d91a339544df8fb7eda3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "29724d79a9e1f798d8a12e5ac3fd2ca69071d8f7"
+    "sha2": "85f3727c68cea10835a214942b66e4d430b73a62"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-replacement-test",
     "expectedResult": {
         "changes": {
             "chained-callbacks.js": [
-                "Replaced the 'map' identifier with the 'reduce' identifier in the this.reduce(…) method call",
-                "Replaced the 'a' identifier with the 'b' identifier in the this.reduce(…) method call",
-                "Replaced the 'b' identifier with the 'a' identifier in the this.reduce(…) method call"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'map' identifier with the 'reduce' identifier in the this.reduce(…) method call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    32
+                                ],
+                                "end": [
+                                    1,
+                                    33
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the this.reduce(…) method call"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    34
+                                ],
+                                "end": [
+                                    1,
+                                    35
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    37
+                                ],
+                                "end": [
+                                    1,
+                                    38
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the this.reduce(…) method call"
+                }
             ]
         },
         "errors": {}
@@ -67,18 +265,60 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "29724d79a9e1f798d8a12e5ac3fd2ca69071d8f7",
+    "sha1": "85f3727c68cea10835a214942b66e4d430b73a62",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f7679f3881ef05c60a82c434f49e318b551e6609"
+    "sha2": "0726997ed14f742f2e3ad23f575cb88aaa5f4b98"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "chained-callbacks.js": [
-                "Deleted the 'this.reduce(…)' method call",
-                "Deleted the 'this.map(…)' method call",
-                "Added the 'this.reduce(…)' method call"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this.reduce(…)' method call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this.map(…)' method call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this.reduce(…)' method call"
+                }
             ]
         },
         "errors": {}
@@ -86,16 +326,30 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "f7679f3881ef05c60a82c434f49e318b551e6609",
+    "sha1": "0726997ed14f742f2e3ad23f575cb88aaa5f4b98",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "52968d06cb3206fcc667f141a58cf73ff8bbdd1d"
+    "sha2": "db6518a336784be0d8565f2ff963767dffbe22a0"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-test",
     "expectedResult": {
         "changes": {
             "chained-callbacks.js": [
-                "Deleted the 'this.map(…)' method call"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this.map(…)' method call"
+                }
             ]
         },
         "errors": {}
@@ -103,16 +357,30 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "52968d06cb3206fcc667f141a58cf73ff8bbdd1d",
+    "sha1": "db6518a336784be0d8565f2ff963767dffbe22a0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "db7a2bc4cf25fc633efa30adaa7510bcdb945d2d"
+    "sha2": "f150e07a04ef679de98aa6a19c4e4d534230f7cc"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-rest-test",
     "expectedResult": {
         "changes": {
             "chained-callbacks.js": [
-                "Deleted the 'this.reduce(…)' method call"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this.reduce(…)' method call"
+                }
             ]
         },
         "errors": {}
@@ -120,7 +388,7 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "db7a2bc4cf25fc633efa30adaa7510bcdb945d2d",
+    "sha1": "f150e07a04ef679de98aa6a19c4e4d534230f7cc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0a1a0379017da13731e94c9f3675fa6afefcb489"
+    "sha2": "6b7dd7946b24ba4d49e866944f3bef05c4e948a5"
 }]
