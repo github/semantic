@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "array.js": [
-                "Added the '[ \"item1\" ]' array"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ \"item1\" ]' array"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "fc9aaafb6c12a4fbc174f4a006525bb4b8179e40",
+    "sha1": "bc7b1f8621267ae931d598deec486fc92bccc736",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d2e6907dbac6e1b5c9c65902da46ad6e42e3b7ed"
+    "sha2": "1f5c0ab465c11956cade7def7f18df96c823d8d4"
 }
 ,{
     "testCaseDescription": "javascript-array-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "array.js": [
-                "Added the '[ \"item1\", \"item2\" ]' array",
-                "Added the '[ \"item1\" ]' array"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ \"item1\", \"item2\" ]' array"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ \"item1\" ]' array"
+                }
             ]
         },
         "errors": {}
@@ -29,16 +71,30 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "d2e6907dbac6e1b5c9c65902da46ad6e42e3b7ed",
+    "sha1": "1f5c0ab465c11956cade7def7f18df96c823d8d4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "74df5e1fcd58290d9b74e938efbd3ff72441f3af"
+    "sha2": "9eddf6e3cb0a349128bd8900cdf17e43492227da"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-insert-test",
     "expectedResult": {
         "changes": {
             "array.js": [
-                "Deleted the \"item2\" string"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                12
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"item2\" string"
+                }
             ]
         },
         "errors": {}
@@ -46,16 +102,30 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "74df5e1fcd58290d9b74e938efbd3ff72441f3af",
+    "sha1": "9eddf6e3cb0a349128bd8900cdf17e43492227da",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "eb6dc672f463287b9a8169a2c322274b49bd69ab"
+    "sha2": "b13b543138e791710292fdf81def6f8d528e8643"
 }
 ,{
     "testCaseDescription": "javascript-array-replacement-test",
     "expectedResult": {
         "changes": {
             "array.js": [
-                "Added the \"item2\" string"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                12
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"item2\" string"
+                }
             ]
         },
         "errors": {}
@@ -63,18 +133,60 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "eb6dc672f463287b9a8169a2c322274b49bd69ab",
+    "sha1": "b13b543138e791710292fdf81def6f8d528e8643",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4936710242fd5737047ea604a6008d2338ee99d8"
+    "sha2": "4dd191872b1355fdd5afeb5bc36f086b7a7cbd73"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "array.js": [
-                "Deleted the '[ \"item1\", \"item2\" ]' array",
-                "Deleted the '[ \"item1\" ]' array",
-                "Added the '[ \"item1\", \"item2\" ]' array"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ \"item1\", \"item2\" ]' array"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ \"item1\" ]' array"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ \"item1\", \"item2\" ]' array"
+                }
             ]
         },
         "errors": {}
@@ -82,16 +194,30 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "4936710242fd5737047ea604a6008d2338ee99d8",
+    "sha1": "4dd191872b1355fdd5afeb5bc36f086b7a7cbd73",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4656cfcfa8ae352e1a44eac1652741ef7a517f52"
+    "sha2": "5434cf6d92267f23a08cf961d1f715d9d67d7611"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-test",
     "expectedResult": {
         "changes": {
             "array.js": [
-                "Deleted the '[ \"item1\" ]' array"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ \"item1\" ]' array"
+                }
             ]
         },
         "errors": {}
@@ -99,16 +225,30 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "4656cfcfa8ae352e1a44eac1652741ef7a517f52",
+    "sha1": "5434cf6d92267f23a08cf961d1f715d9d67d7611",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e569fc68e8b4ab3f146846120a82e9bcfd4cb4d3"
+    "sha2": "d58141388b2aa0186ceb0db2deeeb7524540486a"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-rest-test",
     "expectedResult": {
         "changes": {
             "array.js": [
-                "Deleted the '[ \"item1\", \"item2\" ]' array"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ \"item1\", \"item2\" ]' array"
+                }
             ]
         },
         "errors": {}
@@ -116,7 +256,7 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "e569fc68e8b4ab3f146846120a82e9bcfd4cb4d3",
+    "sha1": "d58141388b2aa0186ceb0db2deeeb7524540486a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "86b3a85ea837b41398c1a2d19af1d017c68af6c9"
+    "sha2": "33c7a858a16464d6fe8e27c69fc09f986fb56dae"
 }]

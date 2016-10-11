@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "switch-statement.js": [
-                "Added the '1' switch statement"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '1' switch statement"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "9ee63cde4ca79fd99837bf8de8adcd8920b8752b",
+    "sha1": "d30e43ec820b535d256a20ed0964fba95c8764b3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "42967a58fd3321ea5a6de6db3154296f357c55f1"
+    "sha2": "6f28b051550ecf618c5ec1fc4109a47787a4da9c"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "switch-statement.js": [
-                "Added the '2' switch statement",
-                "Added the '1' switch statement"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '2' switch statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '1' switch statement"
+                }
             ]
         },
         "errors": {}
@@ -29,17 +71,69 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "42967a58fd3321ea5a6de6db3154296f357c55f1",
+    "sha1": "6f28b051550ecf618c5ec1fc4109a47787a4da9c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "41f5cdac0d7746084cd3fb0a8e160ca8f893d54b"
+    "sha2": "c7bbc680850439b171c5c39a1dbb8bf3f4b258f1"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-insert-test",
     "expectedResult": {
         "changes": {
             "switch-statement.js": [
-                "Replaced '2' with '1'",
-                "Replaced '2' with '1'"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1'"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    34
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    34
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1'"
+                }
             ]
         },
         "errors": {}
@@ -47,17 +141,69 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "41f5cdac0d7746084cd3fb0a8e160ca8f893d54b",
+    "sha1": "c7bbc680850439b171c5c39a1dbb8bf3f4b258f1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "df2369974616b0214995247c70734f44d0d12512"
+    "sha2": "e1abf04722dcc2abc2e741e80c3d9c5bbaf94ab6"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-replacement-test",
     "expectedResult": {
         "changes": {
             "switch-statement.js": [
-                "Replaced '1' with '2'",
-                "Replaced '1' with '2'"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2'"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    34
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "end": [
+                                    1,
+                                    34
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2'"
+                }
             ]
         },
         "errors": {}
@@ -65,18 +211,60 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "df2369974616b0214995247c70734f44d0d12512",
+    "sha1": "e1abf04722dcc2abc2e741e80c3d9c5bbaf94ab6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c7325fbbeedf0a427a6ce87cd26cf8031ad9bd99"
+    "sha2": "f3d3fb5a9daeccf22d32dbcf79e3e6db7e00ac2e"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "switch-statement.js": [
-                "Deleted the '2' switch statement",
-                "Deleted the '1' switch statement",
-                "Added the '2' switch statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '2' switch statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '1' switch statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the '2' switch statement"
+                }
             ]
         },
         "errors": {}
@@ -84,16 +272,30 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "c7325fbbeedf0a427a6ce87cd26cf8031ad9bd99",
+    "sha1": "f3d3fb5a9daeccf22d32dbcf79e3e6db7e00ac2e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ef998806acb4d21c1f65bb04b2090df5e757aa5b"
+    "sha2": "033f48b1db9de57690d1e8008aabb6435eb33732"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-test",
     "expectedResult": {
         "changes": {
             "switch-statement.js": [
-                "Deleted the '1' switch statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '1' switch statement"
+                }
             ]
         },
         "errors": {}
@@ -101,16 +303,30 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "ef998806acb4d21c1f65bb04b2090df5e757aa5b",
+    "sha1": "033f48b1db9de57690d1e8008aabb6435eb33732",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4413a2eb6b20759dedc9e8feeb5b384bec3781cc"
+    "sha2": "cf1d8915d86aa7b40cc64d3a1b48e4633a034465"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-rest-test",
     "expectedResult": {
         "changes": {
             "switch-statement.js": [
-                "Deleted the '2' switch statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '2' switch statement"
+                }
             ]
         },
         "errors": {}
@@ -118,7 +334,7 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "4413a2eb6b20759dedc9e8feeb5b384bec3781cc",
+    "sha1": "cf1d8915d86aa7b40cc64d3a1b48e4633a034465",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a86d0e4d4e3bb52c63e6f75a4501457a20f3c1a1"
+    "sha2": "e34cec33423018aab0fa290f745d2dcb89c93f0f"
 }]

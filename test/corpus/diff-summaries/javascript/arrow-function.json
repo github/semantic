@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "arrow-function.js": [
-                "Added an anonymous(f, g) function"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(f, g) function"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "4ce1f51b2e48780fc638cd0c98fc3106c6cde070",
+    "sha1": "b784ecef530da4646deff5aaff5d1263aa216ef3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "821703a22a07e2794ece2d82d2202f04a342e8fa"
+    "sha2": "b981ec4fb5850f454c25389b3cccdb678e94f626"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "arrow-function.js": [
-                "Added an anonymous(f, g) function",
-                "Added an anonymous(f, g) function"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(f, g) function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(f, g) function"
+                }
             ]
         },
         "errors": {}
@@ -29,16 +71,42 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "821703a22a07e2794ece2d82d2202f04a342e8fa",
+    "sha1": "b981ec4fb5850f454c25389b3cccdb678e94f626",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bac83bddfc4e4e8be9aa3d491bb3123ec7db5274"
+    "sha2": "419347ea5418439d6c4a0400799eef9ffe6ef5d2"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-delete-insert-test",
     "expectedResult": {
         "changes": {
             "arrow-function.js": [
-                "Replaced the 'g' identifier with the 'h' identifier"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g' identifier with the 'h' identifier"
+                }
             ]
         },
         "errors": {}
@@ -46,16 +114,42 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "bac83bddfc4e4e8be9aa3d491bb3123ec7db5274",
+    "sha1": "419347ea5418439d6c4a0400799eef9ffe6ef5d2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4c1ef521eae84257ee7e622902fb821e6d4d72fa"
+    "sha2": "c427f86b3d74e6605ac82591f26649df704049ce"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-replacement-test",
     "expectedResult": {
         "changes": {
             "arrow-function.js": [
-                "Replaced the 'h' identifier with the 'g' identifier"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'h' identifier with the 'g' identifier"
+                }
             ]
         },
         "errors": {}
@@ -63,18 +157,60 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "4c1ef521eae84257ee7e622902fb821e6d4d72fa",
+    "sha1": "c427f86b3d74e6605ac82591f26649df704049ce",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "55160b455f7a642e09025c89eb40f4f965c30d61"
+    "sha2": "89d1b4d2d18912e6cd8a0add7948ee3c8163a399"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "arrow-function.js": [
-                "Deleted an anonymous(f, g) function",
-                "Deleted an anonymous(f, g) function",
-                "Added an anonymous(f, g) function"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(f, g) function"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(f, g) function"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(f, g) function"
+                }
             ]
         },
         "errors": {}
@@ -82,16 +218,30 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "55160b455f7a642e09025c89eb40f4f965c30d61",
+    "sha1": "89d1b4d2d18912e6cd8a0add7948ee3c8163a399",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "796adf890c086e9762bd112d64b8918c12bf31f6"
+    "sha2": "a77f256f44bf9d478cea9072b568053dfdfd7ff6"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-delete-test",
     "expectedResult": {
         "changes": {
             "arrow-function.js": [
-                "Deleted an anonymous(f, g) function"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(f, g) function"
+                }
             ]
         },
         "errors": {}
@@ -99,16 +249,30 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "796adf890c086e9762bd112d64b8918c12bf31f6",
+    "sha1": "a77f256f44bf9d478cea9072b568053dfdfd7ff6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0e655070e204325433b5664e7d22071b7d7493ab"
+    "sha2": "aa0b9c6500c4e90003954f42846c897acd910558"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-delete-rest-test",
     "expectedResult": {
         "changes": {
             "arrow-function.js": [
-                "Deleted an anonymous(f, g) function"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(f, g) function"
+                }
             ]
         },
         "errors": {}
@@ -116,7 +280,7 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "0e655070e204325433b5664e7d22071b7d7493ab",
+    "sha1": "aa0b9c6500c4e90003954f42846c897acd910558",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5d09bd1d7981c0961505d816d5e38dbbc5abf108"
+    "sha2": "5a86b9e93eaf41a19163bf18d160b96b37245ee8"
 }]

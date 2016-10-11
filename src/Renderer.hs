@@ -20,7 +20,7 @@ data DiffArguments = DiffArguments { format :: Format, output :: Maybe FilePath 
 data Format = Split | Patch | JSON | Summary
   deriving (Show)
 
-data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value) | SummaryOutput (Map Text (Map Text [Text]))
+data Output = SplitOutput Text | PatchOutput Text | JSONOutput (Map Text Value) | SummaryOutput (Map Text (Map Text [Value]))
   deriving (Show)
 
 -- Returns a key representing the filename. If the filenames are different,
@@ -47,7 +47,7 @@ concatOutputs list | isJSON list = toS . encodingToLazyByteString . toEncoding $
     concatJSON _ = mempty
 concatOutputs list | isSummary list = toS . encodingToLazyByteString . toEncoding $ concatSummaries list
   where
-    concatSummaries :: [Output] -> Map Text (Map Text [Text])
+    concatSummaries :: [Output] -> Map Text (Map Text [Value])
     concatSummaries (SummaryOutput hash : rest) = Map.unionWith (Map.unionWith (<>)) hash (concatSummaries rest)
     concatSummaries _ = mempty
 concatOutputs list | isText list = T.intercalate "\n" (toText <$> list)

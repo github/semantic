@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "object.js": [
-                "Added the '{ \"key1\": … }' object"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ \"key1\": … }' object"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "f7d88a07b742fd7334d28806f01764ddfed94384",
+    "sha1": "aefeb00bb872d8308fb1f9989a0b30bee53f794e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "eaec8dce5b0e38f66b0d0672b3516041042aae43"
+    "sha2": "8d7f9432e5eccbac5a2dce503cb6e9aabe691f64"
 }
 ,{
     "testCaseDescription": "javascript-object-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "object.js": [
-                "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object",
-                "Added the '{ \"key1\": … }' object"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                54
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ \"key1\": … }' object"
+                }
             ]
         },
         "errors": {}
@@ -29,17 +71,45 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "eaec8dce5b0e38f66b0d0672b3516041042aae43",
+    "sha1": "8d7f9432e5eccbac5a2dce503cb6e9aabe691f64",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a21e93dc503d2b501a94157c2ac07e30bc169a0e"
+    "sha2": "d4b9e799adb79bd4cc813ce5b7a528e65956b227"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-insert-test",
     "expectedResult": {
         "changes": {
             "object.js": [
-                "Deleted the '\"key2\": …' pair",
-                "Deleted the '\"key3\": …' pair"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                21
+                            ],
+                            "end": [
+                                1,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"key2\": …' pair"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                39
+                            ],
+                            "end": [
+                                1,
+                                52
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"key3\": …' pair"
+                }
             ]
         },
         "errors": {}
@@ -47,17 +117,45 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "a21e93dc503d2b501a94157c2ac07e30bc169a0e",
+    "sha1": "d4b9e799adb79bd4cc813ce5b7a528e65956b227",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6935beb9977a9263697acd92b6e4e9ded0f6281e"
+    "sha2": "181fb7d0795181379db61ff3d91e73e17a7f0176"
 }
 ,{
     "testCaseDescription": "javascript-object-replacement-test",
     "expectedResult": {
         "changes": {
             "object.js": [
-                "Added the '\"key2\": …' pair",
-                "Added the '\"key3\": …' pair"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                21
+                            ],
+                            "end": [
+                                1,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"key2\": …' pair"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                39
+                            ],
+                            "end": [
+                                1,
+                                52
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"key3\": …' pair"
+                }
             ]
         },
         "errors": {}
@@ -65,18 +163,60 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "6935beb9977a9263697acd92b6e4e9ded0f6281e",
+    "sha1": "181fb7d0795181379db61ff3d91e73e17a7f0176",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bb314ca3df12137d4a1713e5a832235f3a83d1f8"
+    "sha2": "48b14e07a2432070ba8edc7a97b3a3f5744c4f95"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "object.js": [
-                "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object",
-                "Deleted the '{ \"key1\": … }' object",
-                "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                54
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ \"key1\": … }' object"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                54
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                }
             ]
         },
         "errors": {}
@@ -84,16 +224,30 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "bb314ca3df12137d4a1713e5a832235f3a83d1f8",
+    "sha1": "48b14e07a2432070ba8edc7a97b3a3f5744c4f95",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6ece14ab8fb09b7072c8d7f5c59a1fff5add4763"
+    "sha2": "76e45b38000091fee41bc0a0a9f3a5cd65c5492d"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-test",
     "expectedResult": {
         "changes": {
             "object.js": [
-                "Deleted the '{ \"key1\": … }' object"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ \"key1\": … }' object"
+                }
             ]
         },
         "errors": {}
@@ -101,16 +255,30 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "6ece14ab8fb09b7072c8d7f5c59a1fff5add4763",
+    "sha1": "76e45b38000091fee41bc0a0a9f3a5cd65c5492d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cdd370993bbd07183e162146c159e63c0df86618"
+    "sha2": "2a18894fa97cf6cfb430156aa4a2e0acee543c4c"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-rest-test",
     "expectedResult": {
         "changes": {
             "object.js": [
-                "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                54
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
+                }
             ]
         },
         "errors": {}
@@ -118,7 +286,7 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "cdd370993bbd07183e162146c159e63c0df86618",
+    "sha1": "2a18894fa97cf6cfb430156aa4a2e0acee543c4c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9da531dab73d3a68d171641dcc1913ad7225de16"
+    "sha2": "0f272e863d223922521e94218a6aace378859dde"
 }]

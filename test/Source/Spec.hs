@@ -21,7 +21,7 @@ spec = parallel $ do
   describe "sourceSpanToRange" $ do
     prop "computes single-line ranges" $
       \ s -> let source = fromList s
-                 spans = zipWith (\ i Range {..} -> SourceSpan "" (SourcePos i 0) (SourcePos i (end - start))) [0..] ranges
+                 spans = zipWith (\ i Range {..} -> SourceSpan (SourcePos i 0) (SourcePos i (end - start))) [0..] ranges
                  ranges = actualLineRanges (totalRange source) source in
         sourceSpanToRange source <$> spans `shouldBe` ranges
 
@@ -35,13 +35,13 @@ spec = parallel $ do
 
   describe "totalSpan" $ do
     prop "covers single lines" $
-      \ n -> totalSpan (fromList (replicate n '*')) `shouldBe` SourceSpan "" (SourcePos 0 0) (SourcePos 0 (max 0 n))
+      \ n -> totalSpan (fromList (replicate n '*')) `shouldBe` SourceSpan (SourcePos 0 0) (SourcePos 0 (max 0 n))
 
     prop "covers multiple lines" $
-      \ n -> totalSpan (fromList (intersperse '\n' (replicate n '*'))) `shouldBe` SourceSpan "" (SourcePos 0 0) (SourcePos (max 0 (pred n)) (if n > 0 then 1 else 0))
+      \ n -> totalSpan (fromList (intersperse '\n' (replicate n '*'))) `shouldBe` SourceSpan (SourcePos 0 0) (SourcePos (max 0 (pred n)) (if n > 0 then 1 else 0))
 
 totalSpan :: Source Char -> SourceSpan
-totalSpan source = SourceSpan "" (SourcePos 0 0) (SourcePos (pred (length ranges)) (end lastRange - start lastRange))
+totalSpan source = SourceSpan (SourcePos 0 0) (SourcePos (pred (length ranges)) (end lastRange - start lastRange))
   where ranges = actualLineRanges (totalRange source) source
         lastRange = Prelude.last ranges
 

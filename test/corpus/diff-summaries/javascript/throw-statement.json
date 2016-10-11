@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "throw-statement.js": [
-                "Added the 'new Error(\"uh oh\")' throw statement"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'new Error(\"uh oh\")' throw statement"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "a86d0e4d4e3bb52c63e6f75a4501457a20f3c1a1",
+    "sha1": "04ac626daa098bf596f572115ce36f8cf31b84df",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "176cbd788804f39e78b66dcd91ad46fc5f2e8228"
+    "sha2": "6504a2a9d3f565d5812bbd79e02f53609761fe92"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "throw-statement.js": [
-                "Added the 'new Error(\"oooooops\")' throw statement",
-                "Added the 'new Error(\"uh oh\")' throw statement"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'new Error(\"oooooops\")' throw statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'new Error(\"uh oh\")' throw statement"
+                }
             ]
         },
         "errors": {}
@@ -29,16 +71,42 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "176cbd788804f39e78b66dcd91ad46fc5f2e8228",
+    "sha1": "6504a2a9d3f565d5812bbd79e02f53609761fe92",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d7901e8a9c7bb031bd74f65627f9c7af19476d12"
+    "sha2": "5ea11da0cbfa31b113fe4c0c26a1949a6a2d12bd"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-insert-test",
     "expectedResult": {
         "changes": {
             "throw-statement.js": [
-                "Replaced the \"oooooops\" string with the \"uh oh\" string in the Error(\"uh oh\") function call"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"oooooops\" string with the \"uh oh\" string in the Error(\"uh oh\") function call"
+                }
             ]
         },
         "errors": {}
@@ -46,16 +114,42 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "d7901e8a9c7bb031bd74f65627f9c7af19476d12",
+    "sha1": "5ea11da0cbfa31b113fe4c0c26a1949a6a2d12bd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6edfd5e59f539bb0b5b4a5b8beafe213a8bc093a"
+    "sha2": "47633d9af7926f59a4a8555688683cc43c055266"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-replacement-test",
     "expectedResult": {
         "changes": {
             "throw-statement.js": [
-                "Replaced the \"uh oh\" string with the \"oooooops\" string in the Error(\"oooooops\") function call"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"uh oh\" string with the \"oooooops\" string in the Error(\"oooooops\") function call"
+                }
             ]
         },
         "errors": {}
@@ -63,18 +157,60 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "6edfd5e59f539bb0b5b4a5b8beafe213a8bc093a",
+    "sha1": "47633d9af7926f59a4a8555688683cc43c055266",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7010a5625bed7789454ae7ced5bf176463a3b269"
+    "sha2": "4e39f432c9e0d8a9f126b91f7ea54d21822c7c04"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "throw-statement.js": [
-                "Deleted the 'new Error(\"oooooops\")' throw statement",
-                "Deleted the 'new Error(\"uh oh\")' throw statement",
-                "Added the 'new Error(\"oooooops\")' throw statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'new Error(\"oooooops\")' throw statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'new Error(\"uh oh\")' throw statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'new Error(\"oooooops\")' throw statement"
+                }
             ]
         },
         "errors": {}
@@ -82,16 +218,30 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "7010a5625bed7789454ae7ced5bf176463a3b269",
+    "sha1": "4e39f432c9e0d8a9f126b91f7ea54d21822c7c04",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e5b90c94af0940d8772e800672a2a7b7b9000b26"
+    "sha2": "09ebd0d64a6252d651e35cf07c181750d7b1da40"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-test",
     "expectedResult": {
         "changes": {
             "throw-statement.js": [
-                "Deleted the 'new Error(\"uh oh\")' throw statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'new Error(\"uh oh\")' throw statement"
+                }
             ]
         },
         "errors": {}
@@ -99,16 +249,30 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "e5b90c94af0940d8772e800672a2a7b7b9000b26",
+    "sha1": "09ebd0d64a6252d651e35cf07c181750d7b1da40",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "897c91c3a049d9f5d30b14653969d7b30aebb132"
+    "sha2": "4da8a2dd13d1b62a139f102cf2d13ce0cf6f3bb7"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-rest-test",
     "expectedResult": {
         "changes": {
             "throw-statement.js": [
-                "Deleted the 'new Error(\"oooooops\")' throw statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'new Error(\"oooooops\")' throw statement"
+                }
             ]
         },
         "errors": {}
@@ -116,7 +280,7 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "897c91c3a049d9f5d30b14653969d7b30aebb132",
+    "sha1": "4da8a2dd13d1b62a139f102cf2d13ce0cf6f3bb7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bda19093cbfbd4a0e1242d45140912e077e0f04f"
+    "sha2": "5c30863954c846e6487626965891f282d42e6b84"
 }]

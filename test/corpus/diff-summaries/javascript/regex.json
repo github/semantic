@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "regex.js": [
-                "Added the '/one/g' regex"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/one/g' regex"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "0c5416c3cc4fe3d23080c580f0a962802b756bac",
+    "sha1": "af8dfb899e64bd94fbe9b1d763d771e5140c1334",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a63f4ce54a7fb98a84617b4dd94798d724824ee6"
+    "sha2": "5c553b5de509611f50d8cea38e7bc08712e40f84"
 }
 ,{
     "testCaseDescription": "javascript-regex-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "regex.js": [
-                "Added the '/on[^/]afe/gim' regex",
-                "Added the '/one/g' regex"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/on[^/]afe/gim' regex"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/one/g' regex"
+                }
             ]
         },
         "errors": {}
@@ -29,16 +71,42 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "a63f4ce54a7fb98a84617b4dd94798d724824ee6",
+    "sha1": "5c553b5de509611f50d8cea38e7bc08712e40f84",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "85bd846cc470b707c4ec1c48a6732d663fdb5a9a"
+    "sha2": "62fa5611314d347cba6ca512031b7e98d7ed9d29"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-insert-test",
     "expectedResult": {
         "changes": {
             "regex.js": [
-                "Replaced the '/on[^/]afe/gim' regex with the '/one/g' regex"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '/on[^/]afe/gim' regex with the '/one/g' regex"
+                }
             ]
         },
         "errors": {}
@@ -46,16 +114,42 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "85bd846cc470b707c4ec1c48a6732d663fdb5a9a",
+    "sha1": "62fa5611314d347cba6ca512031b7e98d7ed9d29",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a7f7cede434ad189327fa0e7fa685c49cdb95d50"
+    "sha2": "405e7ab802aa3db2bac92cdb20f99bf410c57dbc"
 }
 ,{
     "testCaseDescription": "javascript-regex-replacement-test",
     "expectedResult": {
         "changes": {
             "regex.js": [
-                "Replaced the '/one/g' regex with the '/on[^/]afe/gim' regex"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '/one/g' regex with the '/on[^/]afe/gim' regex"
+                }
             ]
         },
         "errors": {}
@@ -63,18 +157,60 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "a7f7cede434ad189327fa0e7fa685c49cdb95d50",
+    "sha1": "405e7ab802aa3db2bac92cdb20f99bf410c57dbc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5418e08318ecfe12758e4bdc646f3c6a2cbecea1"
+    "sha2": "4884de88825e39386b25a8e169e393739c8bce7f"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "regex.js": [
-                "Deleted the '/on[^/]afe/gim' regex",
-                "Deleted the '/one/g' regex",
-                "Added the '/on[^/]afe/gim' regex"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/on[^/]afe/gim' regex"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/one/g' regex"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/on[^/]afe/gim' regex"
+                }
             ]
         },
         "errors": {}
@@ -82,16 +218,30 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "5418e08318ecfe12758e4bdc646f3c6a2cbecea1",
+    "sha1": "4884de88825e39386b25a8e169e393739c8bce7f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6411dd0288384ca73b9777381c279c6c7f22419c"
+    "sha2": "6c23a5a1bd35e05cad7084429ae5cca16951c4dd"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-test",
     "expectedResult": {
         "changes": {
             "regex.js": [
-                "Deleted the '/one/g' regex"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/one/g' regex"
+                }
             ]
         },
         "errors": {}
@@ -99,16 +249,30 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "6411dd0288384ca73b9777381c279c6c7f22419c",
+    "sha1": "6c23a5a1bd35e05cad7084429ae5cca16951c4dd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7304eb7a6b3f45f80c964a7649a77c2dc0e8cd9e"
+    "sha2": "ab5b91f92abd2e34adfba5a1819cbe1c84ec0e65"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-rest-test",
     "expectedResult": {
         "changes": {
             "regex.js": [
-                "Deleted the '/on[^/]afe/gim' regex"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/on[^/]afe/gim' regex"
+                }
             ]
         },
         "errors": {}
@@ -116,7 +280,7 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "7304eb7a6b3f45f80c964a7649a77c2dc0e8cd9e",
+    "sha1": "ab5b91f92abd2e34adfba5a1819cbe1c84ec0e65",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "57c773af116921575b844893c03a256cc1464667"
+    "sha2": "b5b96ac96b0968b5b9d02ce5844f7274e13f3554"
 }]

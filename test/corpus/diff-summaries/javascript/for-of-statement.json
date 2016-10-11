@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "for-of-statement.js": [
-                "Added the 'item of items' for statement"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'item of items' for statement"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "6fe61c3b39db2dc0038614bb2c9163251c715ef2",
+    "sha1": "89db44a937a7093bce4f9707fef198d801d1df6c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a21ebf1ac344a3e9221d5832d8df2bf9c872fd01"
+    "sha2": "2446083ac07858819361d2b6f4d56e5acb211e1f"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "for-of-statement.js": [
-                "Added the 'thing of things' for statement",
-                "Added the 'item of items' for statement"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'thing of things' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'item of items' for statement"
+                }
             ]
         },
         "errors": {}
@@ -29,18 +71,96 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "a21ebf1ac344a3e9221d5832d8df2bf9c872fd01",
+    "sha1": "2446083ac07858819361d2b6f4d56e5acb211e1f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e151eb2bd36bc2d80087a35f04c129623e239d48"
+    "sha2": "3ef3da8fb378a9e3eb0481df414aeebd601a9c58"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-insert-test",
     "expectedResult": {
         "changes": {
             "for-of-statement.js": [
-                "Replaced the 'thing' identifier with the 'item' identifier",
-                "Replaced the 'things' identifier with the 'items' identifier",
-                "Replaced the 'thing' identifier with the 'item' identifier in the process(item) function call"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    14
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'thing' identifier with the 'item' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    19
+                                ],
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    18
+                                ],
+                                "end": [
+                                    1,
+                                    23
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'things' identifier with the 'items' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    37
+                                ],
+                                "end": [
+                                    1,
+                                    42
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "end": [
+                                    1,
+                                    39
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'thing' identifier with the 'item' identifier in the process(item) function call"
+                }
             ]
         },
         "errors": {}
@@ -48,18 +168,96 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "e151eb2bd36bc2d80087a35f04c129623e239d48",
+    "sha1": "3ef3da8fb378a9e3eb0481df414aeebd601a9c58",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3011260f1962c160b49d17e6145c52da647a7fcf"
+    "sha2": "27d445ebbe6a2d1428363a86b0d8a72f7c3a1fa7"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-replacement-test",
     "expectedResult": {
         "changes": {
             "for-of-statement.js": [
-                "Replaced the 'item' identifier with the 'thing' identifier",
-                "Replaced the 'items' identifier with the 'things' identifier",
-                "Replaced the 'item' identifier with the 'thing' identifier in the process(thing) function call"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    14
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'item' identifier with the 'thing' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    18
+                                ],
+                                "end": [
+                                    1,
+                                    23
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    19
+                                ],
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'items' identifier with the 'things' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "end": [
+                                    1,
+                                    39
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    37
+                                ],
+                                "end": [
+                                    1,
+                                    42
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'item' identifier with the 'thing' identifier in the process(thing) function call"
+                }
             ]
         },
         "errors": {}
@@ -67,18 +265,60 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "3011260f1962c160b49d17e6145c52da647a7fcf",
+    "sha1": "27d445ebbe6a2d1428363a86b0d8a72f7c3a1fa7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4a786f4efe07e3fc733c0d7f392633959513e0d0"
+    "sha2": "7c22bba4de0d72a6896a92034976544f0cf981d9"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "for-of-statement.js": [
-                "Deleted the 'thing of things' for statement",
-                "Deleted the 'item of items' for statement",
-                "Added the 'thing of things' for statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'thing of things' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'item of items' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'thing of things' for statement"
+                }
             ]
         },
         "errors": {}
@@ -86,16 +326,30 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "4a786f4efe07e3fc733c0d7f392633959513e0d0",
+    "sha1": "7c22bba4de0d72a6896a92034976544f0cf981d9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b9b6c4b4ee6e649242b53dddfc502842493b478d"
+    "sha2": "9a4e4fb16b79c73d23f19d5e01de22370f426681"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-test",
     "expectedResult": {
         "changes": {
             "for-of-statement.js": [
-                "Deleted the 'item of items' for statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'item of items' for statement"
+                }
             ]
         },
         "errors": {}
@@ -103,16 +357,30 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "b9b6c4b4ee6e649242b53dddfc502842493b478d",
+    "sha1": "9a4e4fb16b79c73d23f19d5e01de22370f426681",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e933f875ee956545db127c64851708b47c5d7404"
+    "sha2": "cf9946632e343e7067c51a06f3e18f62fabbdb54"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-rest-test",
     "expectedResult": {
         "changes": {
             "for-of-statement.js": [
-                "Deleted the 'thing of things' for statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'thing of things' for statement"
+                }
             ]
         },
         "errors": {}
@@ -120,7 +388,7 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "e933f875ee956545db127c64851708b47c5d7404",
+    "sha1": "cf9946632e343e7067c51a06f3e18f62fabbdb54",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "194fb9e98c554553e25a4f30b4bb5d1fe67a8d21"
+    "sha2": "67ef9e8da7b64fdbdf370b43e4c780e28ae9efdf"
 }]
