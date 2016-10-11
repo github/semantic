@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '[ \"item1\" ]' array",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '[ \"item1\" ]' array"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "2eae8fefa77d6a4d6f762811f764fb0194e0c694",
+    "sha1": "bc7b1f8621267ae931d598deec486fc92bccc736",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a0220a9f702e60c8fc2a51af41d6c44fb0caef87"
+    "sha2": "1f5c0ab465c11956cade7def7f18df96c823d8d4"
 }
 ,{
     "testCaseDescription": "javascript-array-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '[ \"item1\", \"item2\" ]' array",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '[ \"item1\", \"item2\" ]' array"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '[ \"item1\" ]' array",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '[ \"item1\" ]' array"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "a0220a9f702e60c8fc2a51af41d6c44fb0caef87",
+    "sha1": "1f5c0ab465c11956cade7def7f18df96c823d8d4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4a15d2534dd78648fdb6d009ac7d300366a3fcd1"
+    "sha2": "9eddf6e3cb0a349128bd8900cdf17e43492227da"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-insert-test",
@@ -96,8 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the \"item2\" string",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the \"item2\" string"
                 }
             ]
         },
@@ -106,9 +102,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "4a15d2534dd78648fdb6d009ac7d300366a3fcd1",
+    "sha1": "9eddf6e3cb0a349128bd8900cdf17e43492227da",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d88be4ec5b1f423eb9e9f43d8bc330029c45d46e"
+    "sha2": "b13b543138e791710292fdf81def6f8d528e8643"
 }
 ,{
     "testCaseDescription": "javascript-array-replacement-test",
@@ -128,8 +124,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the \"item2\" string",
-                    "tag": "JSONSummary"
+                    "summary": "Added the \"item2\" string"
                 }
             ]
         },
@@ -138,9 +133,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "d88be4ec5b1f423eb9e9f43d8bc330029c45d46e",
+    "sha1": "b13b543138e791710292fdf81def6f8d528e8643",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b59e1420e44e05650233fd4d4d8de7d800209108"
+    "sha2": "4dd191872b1355fdd5afeb5bc36f086b7a7cbd73"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-replacement-test",
@@ -160,8 +155,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '[ \"item1\", \"item2\" ]' array",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '[ \"item1\", \"item2\" ]' array"
                 },
                 {
                     "span": {
@@ -176,8 +170,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '[ \"item1\" ]' array",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '[ \"item1\" ]' array"
                 },
                 {
                     "span": {
@@ -192,8 +185,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '[ \"item1\", \"item2\" ]' array",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '[ \"item1\", \"item2\" ]' array"
                 }
             ]
         },
@@ -202,9 +194,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "b59e1420e44e05650233fd4d4d8de7d800209108",
+    "sha1": "4dd191872b1355fdd5afeb5bc36f086b7a7cbd73",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "793c9c44d26a5d2cf79c81a10ac7efdba52feb3a"
+    "sha2": "5434cf6d92267f23a08cf961d1f715d9d67d7611"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-test",
@@ -224,8 +216,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '[ \"item1\" ]' array",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '[ \"item1\" ]' array"
                 }
             ]
         },
@@ -234,9 +225,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "793c9c44d26a5d2cf79c81a10ac7efdba52feb3a",
+    "sha1": "5434cf6d92267f23a08cf961d1f715d9d67d7611",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c618daa36f536027c9d7f6e46a90ec22076fdcbf"
+    "sha2": "d58141388b2aa0186ceb0db2deeeb7524540486a"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-rest-test",
@@ -256,8 +247,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '[ \"item1\", \"item2\" ]' array",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '[ \"item1\", \"item2\" ]' array"
                 }
             ]
         },
@@ -266,7 +256,7 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "c618daa36f536027c9d7f6e46a90ec22076fdcbf",
+    "sha1": "d58141388b2aa0186ceb0db2deeeb7524540486a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1a2d64688174370f61c0962a2cd96be5f1758ccc"
+    "sha2": "33c7a858a16464d6fe8e27c69fc09f986fb56dae"
 }]

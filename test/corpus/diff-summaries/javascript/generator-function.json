@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'generateStuff' function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'generateStuff' function"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "4e58cc6cacea1897b6ba0b9d766f0ba965b0c8fa",
+    "sha1": "5190dfa16aab4d1416b5dad47a3f9cc704af1fae",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "18a0e0a3a3ce01a9032d344cc27e74ceb4ca309f"
+    "sha2": "d7eb5084f8ee88c7b9f3657c9c05d72e4329c5c7"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'generateNewStuff' function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'generateNewStuff' function"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'generateStuff' function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'generateStuff' function"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "18a0e0a3a3ce01a9032d344cc27e74ceb4ca309f",
+    "sha1": "d7eb5084f8ee88c7b9f3657c9c05d72e4329c5c7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "23285112861e1d2fe617efdb23c5d51bf4075224"
+    "sha2": "9a1ba4ab7ac42607d9eacb0e871763a2bfe06221"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'generateNewStuff' identifier with the 'generateStuff' identifier in the generateStuff function",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'generateNewStuff' identifier with the 'generateStuff' identifier in the generateStuff function"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "23285112861e1d2fe617efdb23c5d51bf4075224",
+    "sha1": "9a1ba4ab7ac42607d9eacb0e871763a2bfe06221",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3cd99e8cbe1ba540886b65b6921ec1cf01fb79ca"
+    "sha2": "7ed14c167f2304005ed80d19a4019dfe9b3d9818"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'generateStuff' identifier with the 'generateNewStuff' identifier in the generateNewStuff function",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'generateStuff' identifier with the 'generateNewStuff' identifier in the generateNewStuff function"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "3cd99e8cbe1ba540886b65b6921ec1cf01fb79ca",
+    "sha1": "7ed14c167f2304005ed80d19a4019dfe9b3d9818",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "afe62cf42a38e09a30d1e289c2197445039c4d8b"
+    "sha2": "fd15cd2ea8a79ab44aefbe49e0cefa5d77567210"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'generateNewStuff' function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'generateNewStuff' function"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'generateStuff' function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'generateStuff' function"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'generateNewStuff' function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'generateNewStuff' function"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "afe62cf42a38e09a30d1e289c2197445039c4d8b",
+    "sha1": "fd15cd2ea8a79ab44aefbe49e0cefa5d77567210",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b8554280a32f48d22eff39b921432c8148f2e602"
+    "sha2": "f7461e2154cb8c35bd33d73880ac8ce6fed13968"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'generateStuff' function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'generateStuff' function"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "b8554280a32f48d22eff39b921432c8148f2e602",
+    "sha1": "f7461e2154cb8c35bd33d73880ac8ce6fed13968",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "015cdf9ee2145bcf4de97926d0df3d30f5f4b23e"
+    "sha2": "d6e72611d7be249f33d8283e3fd246ba10119a64"
 }
 ,{
     "testCaseDescription": "javascript-generator-function-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'generateNewStuff' function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'generateNewStuff' function"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "generator-function.js"
     ],
-    "sha1": "015cdf9ee2145bcf4de97926d0df3d30f5f4b23e",
+    "sha1": "d6e72611d7be249f33d8283e3fd246ba10119a64",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bb0f797d0ecd6410261347f4bb4a9d7ec2dbd9e8"
+    "sha2": "dac1b3637553f83bfd1567e914a0236f9b41b9ec"
 }]

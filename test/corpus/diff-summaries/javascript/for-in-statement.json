@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'thing in things' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'thing in things' for statement"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "12a3949b01e7ecc688735f731b84ba631a80c1c1",
+    "sha1": "1e9729897fa1da1617386fa8da290df973dadc93",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "568db4c6d69437c83ad4d9eece85fb2d40203527"
+    "sha2": "e5d8b7d6f07410e2fa00bbec5718bbdf061166fa"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'item in items' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'item in items' for statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'thing in things' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'thing in things' for statement"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "568db4c6d69437c83ad4d9eece85fb2d40203527",
+    "sha1": "e5d8b7d6f07410e2fa00bbec5718bbdf061166fa",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "424256ee4d0b8003e66b38b569c8a5200616560e"
+    "sha2": "6c8ba52447c2faf8fed1eba65cd64c643003461f"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'item' identifier with the 'thing' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'item' identifier with the 'thing' identifier"
                 },
                 {
                     "span": {
@@ -136,8 +132,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'items' identifier with the 'things' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'items' identifier with the 'things' identifier"
                 },
                 {
                     "span": {
@@ -164,8 +159,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'item' identifier with the 'thing' identifier in the thing() function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'item' identifier with the 'thing' identifier in the thing() function call"
                 }
             ]
         },
@@ -174,9 +168,9 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "424256ee4d0b8003e66b38b569c8a5200616560e",
+    "sha1": "6c8ba52447c2faf8fed1eba65cd64c643003461f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e57446ddf477ccf71ad7f59e4a935f2fb09bdad9"
+    "sha2": "bc392f77e718987c79b53126053665c245b163ac"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-replacement-test",
@@ -208,8 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'thing' identifier with the 'item' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'thing' identifier with the 'item' identifier"
                 },
                 {
                     "span": {
@@ -236,8 +229,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'things' identifier with the 'items' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'things' identifier with the 'items' identifier"
                 },
                 {
                     "span": {
@@ -264,8 +256,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'thing' identifier with the 'item' identifier in the item() function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'thing' identifier with the 'item' identifier in the item() function call"
                 }
             ]
         },
@@ -274,9 +265,9 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "e57446ddf477ccf71ad7f59e4a935f2fb09bdad9",
+    "sha1": "bc392f77e718987c79b53126053665c245b163ac",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e652cb33755d7d6c916910cdec530b0608efc157"
+    "sha2": "da2eb693e4cc262362cb81c3fdd040af92eecc42"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-delete-replacement-test",
@@ -296,8 +287,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'item in items' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'item in items' for statement"
                 },
                 {
                     "span": {
@@ -312,8 +302,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'thing in things' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'thing in things' for statement"
                 },
                 {
                     "span": {
@@ -328,8 +317,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'item in items' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'item in items' for statement"
                 }
             ]
         },
@@ -338,9 +326,9 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "e652cb33755d7d6c916910cdec530b0608efc157",
+    "sha1": "da2eb693e4cc262362cb81c3fdd040af92eecc42",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f7bdd90fd30fb31f8b8c9e2c2ccfd43f327cb9cf"
+    "sha2": "210a8ed2aa30b91ca470694492daa7412c616d58"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-delete-test",
@@ -360,8 +348,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'thing in things' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'thing in things' for statement"
                 }
             ]
         },
@@ -370,9 +357,9 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "f7bdd90fd30fb31f8b8c9e2c2ccfd43f327cb9cf",
+    "sha1": "210a8ed2aa30b91ca470694492daa7412c616d58",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2f59732701f26c61644d9cfde92375851a7d6ec4"
+    "sha2": "89852450722771842d4365c760a1403957fc7c96"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-delete-rest-test",
@@ -392,8 +379,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'item in items' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'item in items' for statement"
                 }
             ]
         },
@@ -402,7 +388,7 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "2f59732701f26c61644d9cfde92375851a7d6ec4",
+    "sha1": "89852450722771842d4365c760a1403957fc7c96",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "92dce519bc0a25951a62cfcf3a1069969a20938c"
+    "sha2": "e572fcdd9abd2fa13fdff57a3afd8b3c43a6c6a0"
 }]

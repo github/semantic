@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous() function",
-                    "tag": "JSONSummary"
+                    "summary": "Added an anonymous() function"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "22b6b91906964ec80192f4d30f12125b99e1cad4",
+    "sha1": "972c476a86993546e4da7dd3f2c488b455ff24db",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e41f44ca896e7de4bffa968df9bbf1b1caea1e04"
+    "sha2": "3e2289ebea24250dc463db0603223b2ad7233e39"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous() function",
-                    "tag": "JSONSummary"
+                    "summary": "Added an anonymous() function"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous() function",
-                    "tag": "JSONSummary"
+                    "summary": "Added an anonymous() function"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "e41f44ca896e7de4bffa968df9bbf1b1caea1e04",
+    "sha1": "3e2289ebea24250dc463db0603223b2ad7233e39",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "213068fb89e1381ab15b652ee2f6e16994a6ac16"
+    "sha2": "281d67dce183a41f664372f47fce3f51b32cdb3a"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'hello' string with the 'hi' string",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'hello' string with the 'hi' string"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "213068fb89e1381ab15b652ee2f6e16994a6ac16",
+    "sha1": "281d67dce183a41f664372f47fce3f51b32cdb3a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e32940ed8b6044088622ac48c96708bac78d9fe2"
+    "sha2": "7c730f2014c719d3a12b578babf30f6c2c56c966"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'hi' string with the 'hello' string",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'hi' string with the 'hello' string"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "e32940ed8b6044088622ac48c96708bac78d9fe2",
+    "sha1": "7c730f2014c719d3a12b578babf30f6c2c56c966",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7ff2f9753b8b8a5c06187ba407bddb72742d4d2b"
+    "sha2": "2917edeb872ab9a847651f3df4d3fe0707f410a8"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous() function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted an anonymous() function"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous() function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted an anonymous() function"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous() function",
-                    "tag": "JSONSummary"
+                    "summary": "Added an anonymous() function"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "7ff2f9753b8b8a5c06187ba407bddb72742d4d2b",
+    "sha1": "2917edeb872ab9a847651f3df4d3fe0707f410a8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7aff9964814159468da7f26875cf415b3558eee4"
+    "sha2": "1cc8d6469e2bb265ac93a2c5e75c5a692cf37610"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous() function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted an anonymous() function"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "7aff9964814159468da7f26875cf415b3558eee4",
+    "sha1": "1cc8d6469e2bb265ac93a2c5e75c5a692cf37610",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "68beb683ce57c3149995ad763f201f4a6836ce2b"
+    "sha2": "844cb44d31f4dfae4a7f6d71c968c1f7ed98a728"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous() function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted an anonymous() function"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "68beb683ce57c3149995ad763f201f4a6836ce2b",
+    "sha1": "844cb44d31f4dfae4a7f6d71c968c1f7ed98a728",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b0658b075e567097a50079f320b747eb442b7fe6"
+    "sha2": "99592bbf904b69053a764508c8b7e2113f456e77"
 }]

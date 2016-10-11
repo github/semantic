@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'item of items' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'item of items' for statement"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "5079af56f5049cde622a571fb286589b471549e5",
+    "sha1": "89db44a937a7093bce4f9707fef198d801d1df6c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7897caa7d3f395e6fc8421235775076903bfeea3"
+    "sha2": "2446083ac07858819361d2b6f4d56e5acb211e1f"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'thing of things' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'thing of things' for statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'item of items' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'item of items' for statement"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "7897caa7d3f395e6fc8421235775076903bfeea3",
+    "sha1": "2446083ac07858819361d2b6f4d56e5acb211e1f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "764b4aec6e49bf027190ab1e5083bdd35a055279"
+    "sha2": "3ef3da8fb378a9e3eb0481df414aeebd601a9c58"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'thing' identifier with the 'item' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'thing' identifier with the 'item' identifier"
                 },
                 {
                     "span": {
@@ -136,8 +132,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'things' identifier with the 'items' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'things' identifier with the 'items' identifier"
                 },
                 {
                     "span": {
@@ -164,8 +159,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'thing' identifier with the 'item' identifier in the process(item) function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'thing' identifier with the 'item' identifier in the process(item) function call"
                 }
             ]
         },
@@ -174,9 +168,9 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "764b4aec6e49bf027190ab1e5083bdd35a055279",
+    "sha1": "3ef3da8fb378a9e3eb0481df414aeebd601a9c58",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ed8939173ee392ec35dd13ff8fee4d4c6f93f985"
+    "sha2": "27d445ebbe6a2d1428363a86b0d8a72f7c3a1fa7"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-replacement-test",
@@ -208,8 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'item' identifier with the 'thing' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'item' identifier with the 'thing' identifier"
                 },
                 {
                     "span": {
@@ -236,8 +229,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'items' identifier with the 'things' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'items' identifier with the 'things' identifier"
                 },
                 {
                     "span": {
@@ -264,8 +256,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'item' identifier with the 'thing' identifier in the process(thing) function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'item' identifier with the 'thing' identifier in the process(thing) function call"
                 }
             ]
         },
@@ -274,9 +265,9 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "ed8939173ee392ec35dd13ff8fee4d4c6f93f985",
+    "sha1": "27d445ebbe6a2d1428363a86b0d8a72f7c3a1fa7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8be63f36f0484ba36f2de2a06801fe411b1b6bbc"
+    "sha2": "7c22bba4de0d72a6896a92034976544f0cf981d9"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-replacement-test",
@@ -296,8 +287,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'thing of things' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'thing of things' for statement"
                 },
                 {
                     "span": {
@@ -312,8 +302,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'item of items' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'item of items' for statement"
                 },
                 {
                     "span": {
@@ -328,8 +317,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'thing of things' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'thing of things' for statement"
                 }
             ]
         },
@@ -338,9 +326,9 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "8be63f36f0484ba36f2de2a06801fe411b1b6bbc",
+    "sha1": "7c22bba4de0d72a6896a92034976544f0cf981d9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ae793daccac506e88da2f1d9e5bbe6a63f0c57e8"
+    "sha2": "9a4e4fb16b79c73d23f19d5e01de22370f426681"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-test",
@@ -360,8 +348,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'item of items' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'item of items' for statement"
                 }
             ]
         },
@@ -370,9 +357,9 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "ae793daccac506e88da2f1d9e5bbe6a63f0c57e8",
+    "sha1": "9a4e4fb16b79c73d23f19d5e01de22370f426681",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "99cbdc5330a41c478311d2cdf679409e67ebb255"
+    "sha2": "cf9946632e343e7067c51a06f3e18f62fabbdb54"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-rest-test",
@@ -392,8 +379,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'thing of things' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'thing of things' for statement"
                 }
             ]
         },
@@ -402,7 +388,7 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "99cbdc5330a41c478311d2cdf679409e67ebb255",
+    "sha1": "cf9946632e343e7067c51a06f3e18f62fabbdb54",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c1166aa59e4b025c51e2a166a47413eba325ff1d"
+    "sha2": "67ef9e8da7b64fdbdf370b43e4c780e28ae9efdf"
 }]

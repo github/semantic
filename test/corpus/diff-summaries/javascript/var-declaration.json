@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' variable"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "9cb880c6d183e0ff29f5a379bf6bfe8a91ea75f0",
+    "sha1": "6f8397f676d372fb7cc681c6170eab3f00a5508b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9be12afcd6174bb4ccbb9e4e203ff9c2ebd05c2f"
+    "sha2": "a0b5c84fbb211d943917ca1b033d0f4d69e99fab"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' variable"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'y' variable"
                 },
                 {
                     "span": {
@@ -80,8 +77,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'z' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'z' variable"
                 },
                 {
                     "span": {
@@ -96,8 +92,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' variable"
                 }
             ]
         },
@@ -106,9 +101,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "9be12afcd6174bb4ccbb9e4e203ff9c2ebd05c2f",
+    "sha1": "a0b5c84fbb211d943917ca1b033d0f4d69e99fab",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ed055ea2c0cdae06c2679c7febe33ea291ab50af"
+    "sha2": "b29aa1c8b4ce011908b5fcb146722a7415615b61"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-insert-test",
@@ -140,8 +135,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' variable with the 'x' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'x' variable with the 'x' variable"
                 },
                 {
                     "span": {
@@ -156,8 +150,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'y' variable"
                 },
                 {
                     "span": {
@@ -172,8 +165,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'z' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'z' variable"
                 }
             ]
         },
@@ -182,9 +174,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "ed055ea2c0cdae06c2679c7febe33ea291ab50af",
+    "sha1": "b29aa1c8b4ce011908b5fcb146722a7415615b61",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "58c6d08bf25620f6b3be0ce0bde34968aa8731cb"
+    "sha2": "121898865a4153fdee7af490b7f95e63dfecd245"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-replacement-test",
@@ -216,8 +208,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' variable with the 'x' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'x' variable with the 'x' variable"
                 },
                 {
                     "span": {
@@ -232,8 +223,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'y' variable"
                 },
                 {
                     "span": {
@@ -248,8 +238,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'z' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'z' variable"
                 }
             ]
         },
@@ -258,9 +247,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "58c6d08bf25620f6b3be0ce0bde34968aa8731cb",
+    "sha1": "121898865a4153fdee7af490b7f95e63dfecd245",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b342a171c3b2487402c335c5073c5b3e9a6d9c28"
+    "sha2": "4f800595767d306adf1001a3e532c0f49c77549b"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-replacement-test",
@@ -280,8 +269,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' variable"
                 },
                 {
                     "span": {
@@ -296,8 +284,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'y' variable"
                 },
                 {
                     "span": {
@@ -312,8 +299,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'z' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'z' variable"
                 },
                 {
                     "span": {
@@ -328,8 +314,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' variable"
                 },
                 {
                     "span": {
@@ -344,8 +329,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' variable"
                 },
                 {
                     "span": {
@@ -360,8 +344,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'y' variable"
                 },
                 {
                     "span": {
@@ -376,8 +359,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'z' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'z' variable"
                 }
             ]
         },
@@ -386,9 +368,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "b342a171c3b2487402c335c5073c5b3e9a6d9c28",
+    "sha1": "4f800595767d306adf1001a3e532c0f49c77549b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e7b32730438255bab8de8b0c76f204ef5d5517ec"
+    "sha2": "a62c5f0ceea3f103315aab7f595f0fc257690f46"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-test",
@@ -408,8 +390,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' variable"
                 }
             ]
         },
@@ -418,9 +399,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "e7b32730438255bab8de8b0c76f204ef5d5517ec",
+    "sha1": "a62c5f0ceea3f103315aab7f595f0fc257690f46",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9de9b7db92e589ace7505ab9b4db1c40ec631165"
+    "sha2": "a1ce7a96169c9034dbc16807e754c5a58df0c0f8"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-rest-test",
@@ -440,8 +421,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' variable"
                 },
                 {
                     "span": {
@@ -456,8 +436,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'y' variable"
                 },
                 {
                     "span": {
@@ -472,8 +451,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'z' variable",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'z' variable"
                 }
             ]
         },
@@ -482,7 +460,7 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "9de9b7db92e589ace7505ab9b4db1c40ec631165",
+    "sha1": "a1ce7a96169c9034dbc16807e754c5a58df0c0f8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f3566e32792c678aaed037ccd4998275a9c111f6"
+    "sha2": "538d0fcee9f9f1163338901d5c7ec3035da370c4"
 }]

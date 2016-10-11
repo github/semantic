@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '5' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '5' return statement"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "72327cf998fb96cc493108b069500422561c0d1d",
+    "sha1": "f6aaca47eff83aa2dd6a8ce2e41b14394977d9b3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e23ed05e0a1eea7ef2688e138b8bbb0bd10fb04e"
+    "sha2": "524d62d049c00b51a2cea985dfb7ce08c0b6d073"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'empty' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'empty' return statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '5' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '5' return statement"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "e23ed05e0a1eea7ef2688e138b8bbb0bd10fb04e",
+    "sha1": "524d62d049c00b51a2cea985dfb7ce08c0b6d073",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4e05c84099b05aad16ab8d737c17122625fcaf49"
+    "sha2": "8041d77efbe04a7cd0f2ba66793621e61e0c74e3"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-insert-test",
@@ -96,8 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '5'",
-                    "tag": "JSONSummary"
+                    "summary": "Added '5'"
                 }
             ]
         },
@@ -106,9 +102,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "4e05c84099b05aad16ab8d737c17122625fcaf49",
+    "sha1": "8041d77efbe04a7cd0f2ba66793621e61e0c74e3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "36f5ecef5e20cfad01f4b5612458ee7d1994fce4"
+    "sha2": "62102491107e2639f888bcb06ba212d8697cbbaf"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-replacement-test",
@@ -128,8 +124,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '5'",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted '5'"
                 }
             ]
         },
@@ -138,9 +133,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "36f5ecef5e20cfad01f4b5612458ee7d1994fce4",
+    "sha1": "62102491107e2639f888bcb06ba212d8697cbbaf",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "20288d9df5198cd8c73654f4a897f0ed9a60aaa2"
+    "sha2": "a9ab5b797c44abed96f142adcfe1da66f0b1a5d4"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-replacement-test",
@@ -160,8 +155,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'empty' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'empty' return statement"
                 },
                 {
                     "span": {
@@ -176,8 +170,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '5' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '5' return statement"
                 },
                 {
                     "span": {
@@ -192,8 +185,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'empty' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'empty' return statement"
                 }
             ]
         },
@@ -202,9 +194,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "20288d9df5198cd8c73654f4a897f0ed9a60aaa2",
+    "sha1": "a9ab5b797c44abed96f142adcfe1da66f0b1a5d4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "af618a971319f4d867380cbf2582056e05413159"
+    "sha2": "86d283e41d3acb1a891c8212466478d832e7cf4f"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-test",
@@ -224,8 +216,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '5' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '5' return statement"
                 }
             ]
         },
@@ -234,9 +225,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "af618a971319f4d867380cbf2582056e05413159",
+    "sha1": "86d283e41d3acb1a891c8212466478d832e7cf4f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5b70922a7bd2b32e0f89e752523055823e55579b"
+    "sha2": "5f60834d911eb278ea13e451d5c62e658f8dd7c4"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-rest-test",
@@ -256,8 +247,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'empty' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'empty' return statement"
                 }
             ]
         },
@@ -266,7 +256,7 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "5b70922a7bd2b32e0f89e752523055823e55579b",
+    "sha1": "5f60834d911eb278ea13e451d5c62e658f8dd7c4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "937643815a14601103a1ba1fcf99a82306f52ace"
+    "sha2": "c94930423eb6a6e61d369ac9025d969d2d2e6c1a"
 }]

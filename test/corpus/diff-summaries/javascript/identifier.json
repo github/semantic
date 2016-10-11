@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'theVar' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'theVar' identifier"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "326c0b42a3c17cfb9c231515f4cbe3c81c621f1c",
+    "sha1": "49074a4800a61fa651152d1ed712c66519fafbeb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "820fa9e9590b2599eceae072c5f58cdbdb9a537c"
+    "sha2": "7c6643be086c41a5cd376fbf7b36e2f7d33bc1bf"
 }
 ,{
     "testCaseDescription": "javascript-identifier-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'theVar2' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'theVar2' identifier"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'theVar' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'theVar' identifier"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "820fa9e9590b2599eceae072c5f58cdbdb9a537c",
+    "sha1": "7c6643be086c41a5cd376fbf7b36e2f7d33bc1bf",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2d5f6d80071c263cbc273856778d3251ce74517f"
+    "sha2": "9714f432aec25fb2318e2dab9f9b2a78fc5cb22f"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'theVar2' identifier with the 'theVar' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'theVar2' identifier with the 'theVar' identifier"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "2d5f6d80071c263cbc273856778d3251ce74517f",
+    "sha1": "9714f432aec25fb2318e2dab9f9b2a78fc5cb22f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3f31f4a9c07a65eb2798133713f2f34fcee799c8"
+    "sha2": "93fd36c156a2e1bd23e2e5777f4b5b7e7a82c7cb"
 }
 ,{
     "testCaseDescription": "javascript-identifier-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'theVar' identifier with the 'theVar2' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'theVar' identifier with the 'theVar2' identifier"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "3f31f4a9c07a65eb2798133713f2f34fcee799c8",
+    "sha1": "93fd36c156a2e1bd23e2e5777f4b5b7e7a82c7cb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fd58b769ec4b48c0bee68cfe834c8bb1adcdb516"
+    "sha2": "cfb79cbb2bcd620edb55c909983e5e631a08c863"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'theVar2' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'theVar2' identifier"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'theVar' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'theVar' identifier"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'theVar2' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'theVar2' identifier"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "fd58b769ec4b48c0bee68cfe834c8bb1adcdb516",
+    "sha1": "cfb79cbb2bcd620edb55c909983e5e631a08c863",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2a566f75e47f4106c9d875d7090b32ba869ed332"
+    "sha2": "106dff12bfb07dc175748db3ce6f8a6ace4a561a"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'theVar' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'theVar' identifier"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "2a566f75e47f4106c9d875d7090b32ba869ed332",
+    "sha1": "106dff12bfb07dc175748db3ce6f8a6ace4a561a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ebe92c64b9f8a0a4b422493d741cff603d82974b"
+    "sha2": "947a90cdedee234b01c85052f7bb112fb1e7eae0"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'theVar2' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'theVar2' identifier"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "ebe92c64b9f8a0a4b422493d741cff603d82974b",
+    "sha1": "947a90cdedee234b01c85052f7bb112fb1e7eae0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "35dca27c6725f2defede78609517066c5e1b30dc"
+    "sha2": "d7c66b2feea9aa25c92f9e3005737bcd96679136"
 }]

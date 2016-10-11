@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' assignment"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "e1b8eb2bcd67f643f76a7eb820f49a2ef4f1774c",
+    "sha1": "a561bcb5c9e49680fd9c162c616048bfa100277a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3a7df001a06d312b1befb24699e3f60a41e07c09"
+    "sha2": "3305579204370d2000328a15830609cd1a3cc048"
 }
 ,{
     "testCaseDescription": "javascript-assignment-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' assignment"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' assignment"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "3a7df001a06d312b1befb24699e3f60a41e07c09",
+    "sha1": "3305579204370d2000328a15830609cd1a3cc048",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6142fd5f7cc7d6882b4d2682beb6ab487f37221f"
+    "sha2": "6df94e140941a17e62fc44b5695a49949169bfb1"
 }
 ,{
     "testCaseDescription": "javascript-assignment-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in an assignment to x",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '1' with '0' in an assignment to x"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "6142fd5f7cc7d6882b4d2682beb6ab487f37221f",
+    "sha1": "6df94e140941a17e62fc44b5695a49949169bfb1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ccd4b8841a4c1ac1e93e7b6937b085ca9c589f45"
+    "sha2": "18468291d2bfbfce6c55fd4786eccde87ccb31f0"
 }
 ,{
     "testCaseDescription": "javascript-assignment-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in an assignment to x",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '0' with '1' in an assignment to x"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "ccd4b8841a4c1ac1e93e7b6937b085ca9c589f45",
+    "sha1": "18468291d2bfbfce6c55fd4786eccde87ccb31f0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e50c3b804fe956a8d66c615ce341d23949b1e0bc"
+    "sha2": "f9256802deb7eee30f243cbf5e99688511ae989e"
 }
 ,{
     "testCaseDescription": "javascript-assignment-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' assignment"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' assignment"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' assignment"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "e50c3b804fe956a8d66c615ce341d23949b1e0bc",
+    "sha1": "f9256802deb7eee30f243cbf5e99688511ae989e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9a82a708b3f1e537ea6580f22e1c61a39c0e56f2"
+    "sha2": "ce267e2a4a95c57f1ccfbc0fb6d86c846a492757"
 }
 ,{
     "testCaseDescription": "javascript-assignment-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' assignment"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "9a82a708b3f1e537ea6580f22e1c61a39c0e56f2",
+    "sha1": "ce267e2a4a95c57f1ccfbc0fb6d86c846a492757",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8ca532d1c838722ab652073a5052a0bb58bba456"
+    "sha2": "d7d26936a69a2962d5ec0b7b30ce6672df042253"
 }
 ,{
     "testCaseDescription": "javascript-assignment-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' assignment"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "assignment.js"
     ],
-    "sha1": "8ca532d1c838722ab652073a5052a0bb58bba456",
+    "sha1": "d7d26936a69a2962d5ec0b7b30ce6672df042253",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "db6bbfe82747173a73c33bab9da91003e1fe0634"
+    "sha2": "3b9571c33eac180e0dcf502ffe6eb68757aa50f2"
 }]

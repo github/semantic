@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' if statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' if statement"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "9791d662a9cbd0fe8d9219fcf7550a3417954956",
+    "sha1": "177b3db7ca070dc750876553a0cd7fde8b5df54c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7af553e3a57c0d33f2c020598c2f05db9398f594"
+    "sha2": "fd499e58d749df1da475f0d6033825f265734210"
 }
 ,{
     "testCaseDescription": "javascript-if-else-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' if statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'a' if statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' if statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' if statement"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "7af553e3a57c0d33f2c020598c2f05db9398f594",
+    "sha1": "fd499e58d749df1da475f0d6033825f265734210",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "651c15bb59c428793be04e7072f6d137832df250"
+    "sha2": "1f6c19a2b78ca415ac6e06f69c051ba6c23a250e"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' if statement with the 'x' if statement",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'a' if statement with the 'x' if statement"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "651c15bb59c428793be04e7072f6d137832df250",
+    "sha1": "1f6c19a2b78ca415ac6e06f69c051ba6c23a250e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "15b975c4d4e28f674c65de1da47ba66daafc29bf"
+    "sha2": "946c2d3269de0a2f284a9922b8da111323729827"
 }
 ,{
     "testCaseDescription": "javascript-if-else-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' if statement with the 'a' if statement",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'x' if statement with the 'a' if statement"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "15b975c4d4e28f674c65de1da47ba66daafc29bf",
+    "sha1": "946c2d3269de0a2f284a9922b8da111323729827",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2ee5946e894b4aa6269be6efb6f47f568208cbba"
+    "sha2": "71792b4ff0291e41c9e3ec3157abfea9cd67daa7"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' if statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'a' if statement"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' if statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' if statement"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' if statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'a' if statement"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "2ee5946e894b4aa6269be6efb6f47f568208cbba",
+    "sha1": "71792b4ff0291e41c9e3ec3157abfea9cd67daa7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "afba47fff506da21a377692c35e52c9777ffa56b"
+    "sha2": "95edd1d597a111bbe508c047a0f75d0342b35cea"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' if statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' if statement"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "afba47fff506da21a377692c35e52c9777ffa56b",
+    "sha1": "95edd1d597a111bbe508c047a0f75d0342b35cea",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b8cf4deac8a619ffabbbb6619640509d2a12f6af"
+    "sha2": "58fd81ed8b29ab258997ccdcb2a0602e64748fc8"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' if statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'a' if statement"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "b8cf4deac8a619ffabbbb6619640509d2a12f6af",
+    "sha1": "58fd81ed8b29ab258997ccdcb2a0602e64748fc8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2d5d9ee14704ef70452e42e144662eceacdb562d"
+    "sha2": "73e8a48299a8c408fadbf83077ab1e56ea81b5b0"
 }]

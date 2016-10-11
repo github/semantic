@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '/one/g' regex",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '/one/g' regex"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "8e70c5571d07dc7e882e979cd7432bc275ddb4d2",
+    "sha1": "af8dfb899e64bd94fbe9b1d763d771e5140c1334",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4c83ca78814534d5a2bc1b79686682eb348ce742"
+    "sha2": "5c553b5de509611f50d8cea38e7bc08712e40f84"
 }
 ,{
     "testCaseDescription": "javascript-regex-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '/on[^/]afe/gim' regex",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '/on[^/]afe/gim' regex"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '/one/g' regex",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '/one/g' regex"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "4c83ca78814534d5a2bc1b79686682eb348ce742",
+    "sha1": "5c553b5de509611f50d8cea38e7bc08712e40f84",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7fa1b99e3e5b9c27a8d17d12149674474c053109"
+    "sha2": "62fa5611314d347cba6ca512031b7e98d7ed9d29"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '/on[^/]afe/gim' regex with the '/one/g' regex",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the '/on[^/]afe/gim' regex with the '/one/g' regex"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "7fa1b99e3e5b9c27a8d17d12149674474c053109",
+    "sha1": "62fa5611314d347cba6ca512031b7e98d7ed9d29",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a4e9e5c8515b7454ffddd1033ed36517bbeddeb9"
+    "sha2": "405e7ab802aa3db2bac92cdb20f99bf410c57dbc"
 }
 ,{
     "testCaseDescription": "javascript-regex-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '/one/g' regex with the '/on[^/]afe/gim' regex",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the '/one/g' regex with the '/on[^/]afe/gim' regex"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "a4e9e5c8515b7454ffddd1033ed36517bbeddeb9",
+    "sha1": "405e7ab802aa3db2bac92cdb20f99bf410c57dbc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a2874c1175ad7bf7afe04fae6708c46648ec94c9"
+    "sha2": "4884de88825e39386b25a8e169e393739c8bce7f"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '/on[^/]afe/gim' regex",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '/on[^/]afe/gim' regex"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '/one/g' regex",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '/one/g' regex"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '/on[^/]afe/gim' regex",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '/on[^/]afe/gim' regex"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "a2874c1175ad7bf7afe04fae6708c46648ec94c9",
+    "sha1": "4884de88825e39386b25a8e169e393739c8bce7f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5360c30a93987c13ebaa73a3836e2574d7f62911"
+    "sha2": "6c23a5a1bd35e05cad7084429ae5cca16951c4dd"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '/one/g' regex",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '/one/g' regex"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "5360c30a93987c13ebaa73a3836e2574d7f62911",
+    "sha1": "6c23a5a1bd35e05cad7084429ae5cca16951c4dd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1ae109a0e48e288712ef93815129152e6bcf1098"
+    "sha2": "ab5b91f92abd2e34adfba5a1819cbe1c84ec0e65"
 }
 ,{
     "testCaseDescription": "javascript-regex-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '/on[^/]afe/gim' regex",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '/on[^/]afe/gim' regex"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "regex.js"
     ],
-    "sha1": "1ae109a0e48e288712ef93815129152e6bcf1098",
+    "sha1": "ab5b91f92abd2e34adfba5a1819cbe1c84ec0e65",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4c21f4aa629b89eee95c9af81f90075ffda6d99f"
+    "sha2": "b5b96ac96b0968b5b9d02ce5844f7274e13f3554"
 }]

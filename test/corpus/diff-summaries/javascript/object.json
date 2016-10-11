@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ \"key1\": … }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '{ \"key1\": … }' object"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "f58cfc7947653db85574d1569f494d8b11791ad1",
+    "sha1": "aefeb00bb872d8308fb1f9989a0b30bee53f794e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6f20c6eb26c60838e377075ef27fe3b76b98dd26"
+    "sha2": "8d7f9432e5eccbac5a2dce503cb6e9aabe691f64"
 }
 ,{
     "testCaseDescription": "javascript-object-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ \"key1\": … }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '{ \"key1\": … }' object"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "6f20c6eb26c60838e377075ef27fe3b76b98dd26",
+    "sha1": "8d7f9432e5eccbac5a2dce503cb6e9aabe691f64",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "32fccdccdc5ff2d5c4878563744f146e423e812d"
+    "sha2": "d4b9e799adb79bd4cc813ce5b7a528e65956b227"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-insert-test",
@@ -96,8 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '\"key2\": …' pair",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '\"key2\": …' pair"
                 },
                 {
                     "span": {
@@ -112,8 +108,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '\"key3\": …' pair",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '\"key3\": …' pair"
                 }
             ]
         },
@@ -122,9 +117,9 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "32fccdccdc5ff2d5c4878563744f146e423e812d",
+    "sha1": "d4b9e799adb79bd4cc813ce5b7a528e65956b227",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "af8db674db1087a5f2953ccfe17ba15b840f6e76"
+    "sha2": "181fb7d0795181379db61ff3d91e73e17a7f0176"
 }
 ,{
     "testCaseDescription": "javascript-object-replacement-test",
@@ -144,8 +139,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '\"key2\": …' pair",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '\"key2\": …' pair"
                 },
                 {
                     "span": {
@@ -160,8 +154,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '\"key3\": …' pair",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '\"key3\": …' pair"
                 }
             ]
         },
@@ -170,9 +163,9 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "af8db674db1087a5f2953ccfe17ba15b840f6e76",
+    "sha1": "181fb7d0795181379db61ff3d91e73e17a7f0176",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "684501429d36cd64a92cbec1c777560cad857469"
+    "sha2": "48b14e07a2432070ba8edc7a97b3a3f5744c4f95"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-replacement-test",
@@ -192,8 +185,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
                 },
                 {
                     "span": {
@@ -208,8 +200,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ \"key1\": … }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '{ \"key1\": … }' object"
                 },
                 {
                     "span": {
@@ -224,8 +215,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
                 }
             ]
         },
@@ -234,9 +224,9 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "684501429d36cd64a92cbec1c777560cad857469",
+    "sha1": "48b14e07a2432070ba8edc7a97b3a3f5744c4f95",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b1a8ced66b7504d887f621ef64db91e3ec0d5674"
+    "sha2": "76e45b38000091fee41bc0a0a9f3a5cd65c5492d"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-test",
@@ -256,8 +246,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ \"key1\": … }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '{ \"key1\": … }' object"
                 }
             ]
         },
@@ -266,9 +255,9 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "b1a8ced66b7504d887f621ef64db91e3ec0d5674",
+    "sha1": "76e45b38000091fee41bc0a0a9f3a5cd65c5492d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "02afb244f44208b28e12483be548a9b8478bb5ec"
+    "sha2": "2a18894fa97cf6cfb430156aa4a2e0acee543c4c"
 }
 ,{
     "testCaseDescription": "javascript-object-delete-rest-test",
@@ -288,8 +277,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '{ \"key1\": …, \"key2\": …, \"key3\": … }' object"
                 }
             ]
         },
@@ -298,7 +286,7 @@
     "filePaths": [
         "object.js"
     ],
-    "sha1": "02afb244f44208b28e12483be548a9b8478bb5ec",
+    "sha1": "2a18894fa97cf6cfb430156aa4a2e0acee543c4c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4f744373cdf308bd96fa3eec09679a7f6461d5aa"
+    "sha2": "0f272e863d223922521e94218a6aace378859dde"
 }]

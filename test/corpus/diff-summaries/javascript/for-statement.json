@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i = 0, init(); i < 10; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'i = 0, init(); i < 10; i++' for statement"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "758306debb6130fc8710a0ff09833d692791db56",
+    "sha1": "de443cf00be9a98ac907413bfb98ae7b8db27831",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "00bf00e6840e200b9b83516547c531a2ff3898b1"
+    "sha2": "ee7de8213f031a170e082ef6e72ed09cb1c78ddd"
 }
 ,{
     "testCaseDescription": "javascript-for-statement-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i = 0, init(); i < 100; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'i = 0, init(); i < 100; i++' for statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i = 0, init(); i < 10; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'i = 0, init(); i < 10; i++' for statement"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "00bf00e6840e200b9b83516547c531a2ff3898b1",
+    "sha1": "ee7de8213f031a170e082ef6e72ed09cb1c78ddd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0b2091d8a227a635eb9bb3aa3ce14b284b77180a"
+    "sha2": "3561a122a3823f4dae34a38b8308a08c84dd96f8"
 }
 ,{
     "testCaseDescription": "javascript-for-statement-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '100' with '10'",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '100' with '10'"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "0b2091d8a227a635eb9bb3aa3ce14b284b77180a",
+    "sha1": "3561a122a3823f4dae34a38b8308a08c84dd96f8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "27c0f25dae543a46ab393cf49fc8202434805502"
+    "sha2": "45cc625c20823056b697a08119111b3849855d04"
 }
 ,{
     "testCaseDescription": "javascript-for-statement-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '10' with '100'",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '10' with '100'"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "27c0f25dae543a46ab393cf49fc8202434805502",
+    "sha1": "45cc625c20823056b697a08119111b3849855d04",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7696ee1c7f9e18ee1117c40c2d37d07a11f1f5df"
+    "sha2": "634af4fd56a8cb4fb227f1505cad159b0aab1036"
 }
 ,{
     "testCaseDescription": "javascript-for-statement-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i = 0, init(); i < 100; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'i = 0, init(); i < 100; i++' for statement"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i = 0, init(); i < 10; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'i = 0, init(); i < 10; i++' for statement"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i = 0, init(); i < 100; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'i = 0, init(); i < 100; i++' for statement"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "7696ee1c7f9e18ee1117c40c2d37d07a11f1f5df",
+    "sha1": "634af4fd56a8cb4fb227f1505cad159b0aab1036",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4a93852bc579797f9f5de1e47fce59cfc8b2497f"
+    "sha2": "ae4347d2058f6cd47934f4b95215446aaa82b749"
 }
 ,{
     "testCaseDescription": "javascript-for-statement-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i = 0, init(); i < 10; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'i = 0, init(); i < 10; i++' for statement"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "4a93852bc579797f9f5de1e47fce59cfc8b2497f",
+    "sha1": "ae4347d2058f6cd47934f4b95215446aaa82b749",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c1968c262d5b3c83c9187948709acbbc9f620462"
+    "sha2": "aa911951d4d68356f23d3090ab0bddf3d9f5c6f1"
 }
 ,{
     "testCaseDescription": "javascript-for-statement-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i = 0, init(); i < 100; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'i = 0, init(); i < 100; i++' for statement"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "for-statement.js"
     ],
-    "sha1": "c1968c262d5b3c83c9187948709acbbc9f620462",
+    "sha1": "aa911951d4d68356f23d3090ab0bddf3d9f5c6f1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d7c7a2ed324c7355ba6fc63705b6b879afd92c14"
+    "sha2": "4e9ef9bf5e742b75d10cac3498f637ab763b6c99"
 }]

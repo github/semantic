@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'delete thing['prop']' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'delete thing['prop']' operator"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "34d611dc6839b42bba50f800508e3c1eed940690",
+    "sha1": "660d4f31a366c484dcf287cc129d2236e0064639",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9c01dfb007ff3853c71c2ed944ccf83ae4a4899e"
+    "sha2": "dcdf4363cc41756d111762831febfeb2bc5c3561"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'delete thing.prop' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'delete thing.prop' operator"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'delete thing['prop']' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'delete thing['prop']' operator"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "9c01dfb007ff3853c71c2ed944ccf83ae4a4899e",
+    "sha1": "dcdf4363cc41756d111762831febfeb2bc5c3561",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fcd04c63372795e232f0ab1dc003078a11e23348"
+    "sha2": "b9195fb8317d07798a424a3ad5897669cf2fec4d"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'delete thing.prop' operator with the 'delete thing['prop']' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'delete thing.prop' operator with the 'delete thing['prop']' operator"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "fcd04c63372795e232f0ab1dc003078a11e23348",
+    "sha1": "b9195fb8317d07798a424a3ad5897669cf2fec4d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "54acda735d0aa3817a65ab8bae18ac9c3249299f"
+    "sha2": "b1aa406089e4aafef90ec5732ba443d1031f561e"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'delete thing['prop']' operator with the 'delete thing.prop' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'delete thing['prop']' operator with the 'delete thing.prop' operator"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "54acda735d0aa3817a65ab8bae18ac9c3249299f",
+    "sha1": "b1aa406089e4aafef90ec5732ba443d1031f561e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "16e956f11b3ecc44abf81b4c33cddbd36c9222a7"
+    "sha2": "3d47f770de2c100cdd3f5cfcb8bc43f582e4a368"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'delete thing.prop' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'delete thing.prop' operator"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'delete thing['prop']' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'delete thing['prop']' operator"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'delete thing.prop' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'delete thing.prop' operator"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "16e956f11b3ecc44abf81b4c33cddbd36c9222a7",
+    "sha1": "3d47f770de2c100cdd3f5cfcb8bc43f582e4a368",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "91fc755fdc45f6c82da10cdb9078ff2d8ec66c9c"
+    "sha2": "79ed3766548499729284c8eb3ff3cecfaed80a4c"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'delete thing['prop']' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'delete thing['prop']' operator"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "91fc755fdc45f6c82da10cdb9078ff2d8ec66c9c",
+    "sha1": "79ed3766548499729284c8eb3ff3cecfaed80a4c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "dadef7d3a1d78afcdb53140c1c32f0bd93f75580"
+    "sha2": "3b8b6b7c801a89beb229c8f9b705be4d4465b622"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'delete thing.prop' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'delete thing.prop' operator"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "dadef7d3a1d78afcdb53140c1c32f0bd93f75580",
+    "sha1": "3b8b6b7c801a89beb229c8f9b705be4d4465b622",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d14d7b09c6761ab1a14c5aeda0a105d44c520617"
+    "sha2": "8f71c3ee15ecf75d5d1aa9d7f9e82346c26b78e1"
 }]

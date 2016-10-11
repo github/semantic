@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y[\"x\"]' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'y[\"x\"]' assignment"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "subscript-access-assignment.js"
     ],
-    "sha1": "017dd08471859c04fa5958753782e80f6b974bb4",
+    "sha1": "64a9a65e90cf48c435d6c1c46b80cf7935b26413",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cc4a86eba8cdee2e08e6cff2030c5d2b7e677d8b"
+    "sha2": "0148ee834e361c93f645aa32ac05516803f56d3d"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y[\"x\"]' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'y[\"x\"]' assignment"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y[\"x\"]' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'y[\"x\"]' assignment"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "subscript-access-assignment.js"
     ],
-    "sha1": "cc4a86eba8cdee2e08e6cff2030c5d2b7e677d8b",
+    "sha1": "0148ee834e361c93f645aa32ac05516803f56d3d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3705016f2c59cf2a7362e51f25a691619e63b0ef"
+    "sha2": "bcdee486f71016fc693985b4f6a5d0d472e8c5ff"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in an assignment to y[\"x\"]",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '1' with '0' in an assignment to y[\"x\"]"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "subscript-access-assignment.js"
     ],
-    "sha1": "3705016f2c59cf2a7362e51f25a691619e63b0ef",
+    "sha1": "bcdee486f71016fc693985b4f6a5d0d472e8c5ff",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fd2d02ddfc93fb1668a6c5baf512b71ef369ea18"
+    "sha2": "7f3bc8ffdd75c0bfba679d28e3d16105a50eb9f8"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in an assignment to y[\"x\"]",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '0' with '1' in an assignment to y[\"x\"]"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "subscript-access-assignment.js"
     ],
-    "sha1": "fd2d02ddfc93fb1668a6c5baf512b71ef369ea18",
+    "sha1": "7f3bc8ffdd75c0bfba679d28e3d16105a50eb9f8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e4665c506aad21e4dcc6a8b7062581abe3bf62a0"
+    "sha2": "c3aff9f350cd0e8260f4a384b249bf7a94e7acb1"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y[\"x\"]' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'y[\"x\"]' assignment"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y[\"x\"]' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'y[\"x\"]' assignment"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y[\"x\"]' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'y[\"x\"]' assignment"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "subscript-access-assignment.js"
     ],
-    "sha1": "e4665c506aad21e4dcc6a8b7062581abe3bf62a0",
+    "sha1": "c3aff9f350cd0e8260f4a384b249bf7a94e7acb1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6bfa39fdfcb071bc8fb75a5fd05494f69a160100"
+    "sha2": "f31563441a2e6ad63ed5a261a4f7be1a11b82eac"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y[\"x\"]' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'y[\"x\"]' assignment"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "subscript-access-assignment.js"
     ],
-    "sha1": "6bfa39fdfcb071bc8fb75a5fd05494f69a160100",
+    "sha1": "f31563441a2e6ad63ed5a261a4f7be1a11b82eac",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5d2d00d3e46ea666a3a9b5c03696bd67cf6c731e"
+    "sha2": "6d226d202513c5c50d0ceb3f3fd85f8d303fcf74"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-assignment-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y[\"x\"]' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'y[\"x\"]' assignment"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "subscript-access-assignment.js"
     ],
-    "sha1": "5d2d00d3e46ea666a3a9b5c03696bd67cf6c731e",
+    "sha1": "6d226d202513c5c50d0ceb3f3fd85f8d303fcf74",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7bc80d411bdd18724ae9d923e005035511ffc430"
+    "sha2": "acc75ec053faa10bfebdd149cbf41d414f3089fb"
 }]

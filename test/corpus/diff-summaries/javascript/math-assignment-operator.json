@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' math assignment"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "2ca5d30b5fd1ebde9a1a664d1b82909706d83564",
+    "sha1": "20c9fcd2968854089edd9800a50d5c4a92d8e07b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c77665677c2dd3b83ba7fefcc63b1d827ffdcce8"
+    "sha2": "44a0ac752ed04f0db713416a4b71465fcb6791e5"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' math assignment"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' math assignment"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "c77665677c2dd3b83ba7fefcc63b1d827ffdcce8",
+    "sha1": "44a0ac752ed04f0db713416a4b71465fcb6791e5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c2ba4903792d6930abf7ebb660bed06435c39849"
+    "sha2": "9186895045b5796889b609b6804f3ca92d100c37"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '1' in the x math assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '2' with '1' in the x math assignment"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "c2ba4903792d6930abf7ebb660bed06435c39849",
+    "sha1": "9186895045b5796889b609b6804f3ca92d100c37",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c96c70294daa06c57e6f14cb42372b346066a52e"
+    "sha2": "708ef787fa29646989c2a62e3a38224c6e54150a"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '2' in the x math assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '1' with '2' in the x math assignment"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "c96c70294daa06c57e6f14cb42372b346066a52e",
+    "sha1": "708ef787fa29646989c2a62e3a38224c6e54150a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4d6fe1c4cb15bf7b1801b95862c70203b5134321"
+    "sha2": "dba9d03bc3f05c75c64261dc7980015b55215097"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' math assignment"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' math assignment"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x' math assignment"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "4d6fe1c4cb15bf7b1801b95862c70203b5134321",
+    "sha1": "dba9d03bc3f05c75c64261dc7980015b55215097",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7ac20dbefc8263eb02d522920b8ddb59fdd0b6f3"
+    "sha2": "4b9bb90264994d44abe5f4178554cbc9364b3fac"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' math assignment"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "7ac20dbefc8263eb02d522920b8ddb59fdd0b6f3",
+    "sha1": "4b9bb90264994d44abe5f4178554cbc9364b3fac",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8a2ae9688bfc32aab39c26627746cc570e7b65f1"
+    "sha2": "c6ca546f3e99646514f92e89805309dc8ee3a519"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x' math assignment"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "8a2ae9688bfc32aab39c26627746cc570e7b65f1",
+    "sha1": "c6ca546f3e99646514f92e89805309dc8ee3a519",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4c3640ed0b5a448eb803d90898cfa643a6dd4b71"
+    "sha2": "296397df0f0e65c6e8ab7e4962469076b890cd66"
 }]

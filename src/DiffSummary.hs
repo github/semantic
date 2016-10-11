@@ -56,7 +56,11 @@ identifiable term = isIdentifiable (unwrap term) term
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
                  | ErrorSummary { summary :: summary, span :: span }
-                 deriving (ToJSON, Generic, Eq, Show)
+                 deriving (Generic, Eq, Show)
+
+instance (ToJSON summary, ToJSON span) => ToJSON (JSONSummary summary span) where
+  toJSON JSONSummary{..} = object [ "summary" .= summary, "span" .= span ]
+  toJSON ErrorSummary{..} = object [ "summary" .= summary, "span" .= span ]
 
 isErrorSummary :: JSONSummary summary span -> Bool
 isErrorSummary ErrorSummary{} = True

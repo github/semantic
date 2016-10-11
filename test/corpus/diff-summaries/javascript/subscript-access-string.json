@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x[\"some-string\"]' subscript access",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x[\"some-string\"]' subscript access"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "subscript-access-string.js"
     ],
-    "sha1": "055309ae7840b70d0f2d4d43ae7d46457f14ab9d",
+    "sha1": "5fb1a0314101669d4cfd005c86d42e20fe86d7c9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3f459d64b1020d0ca06e2f100b75f9f73c494a47"
+    "sha2": "fa043ac413c9b7b75a82168891b6d00eee678b92"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-string-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x[\"some-other-string\"]' subscript access",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x[\"some-other-string\"]' subscript access"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x[\"some-string\"]' subscript access",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x[\"some-string\"]' subscript access"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "subscript-access-string.js"
     ],
-    "sha1": "3f459d64b1020d0ca06e2f100b75f9f73c494a47",
+    "sha1": "fa043ac413c9b7b75a82168891b6d00eee678b92",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "01f74ece7b9229fc2dfd67d4d81dd7fa0c48b6ca"
+    "sha2": "08a7b1b79627d5ecf2f6c2a44d1c2096d659e096"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-string-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"some-other-string\" string with the \"some-string\" string in the x[\"some-string\"] subscript access",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the \"some-other-string\" string with the \"some-string\" string in the x[\"some-string\"] subscript access"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "subscript-access-string.js"
     ],
-    "sha1": "01f74ece7b9229fc2dfd67d4d81dd7fa0c48b6ca",
+    "sha1": "08a7b1b79627d5ecf2f6c2a44d1c2096d659e096",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "44e5b5a6ab3131846486eea2f5c9b6fd07cd78f9"
+    "sha2": "f95d1cff9be9bd90156ccd975f57021c1f8eefaa"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-string-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"some-string\" string with the \"some-other-string\" string in the x[\"some-other-string\"] subscript access",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the \"some-string\" string with the \"some-other-string\" string in the x[\"some-other-string\"] subscript access"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "subscript-access-string.js"
     ],
-    "sha1": "44e5b5a6ab3131846486eea2f5c9b6fd07cd78f9",
+    "sha1": "f95d1cff9be9bd90156ccd975f57021c1f8eefaa",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c0709672fa207a2ceffe8c206b7bd7fa62f47f31"
+    "sha2": "b9a70f9be8d0f10a65ec1c067062f2cb065a7f4a"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-string-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x[\"some-other-string\"]' subscript access",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x[\"some-other-string\"]' subscript access"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x[\"some-string\"]' subscript access",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x[\"some-string\"]' subscript access"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x[\"some-other-string\"]' subscript access",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x[\"some-other-string\"]' subscript access"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "subscript-access-string.js"
     ],
-    "sha1": "c0709672fa207a2ceffe8c206b7bd7fa62f47f31",
+    "sha1": "b9a70f9be8d0f10a65ec1c067062f2cb065a7f4a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1b7e1b1f1f8ceb744c0dd33891f3450b959244ec"
+    "sha2": "ea9a6faa38a6630a573c055d81b574d5c9bbc033"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-string-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x[\"some-string\"]' subscript access",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x[\"some-string\"]' subscript access"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "subscript-access-string.js"
     ],
-    "sha1": "1b7e1b1f1f8ceb744c0dd33891f3450b959244ec",
+    "sha1": "ea9a6faa38a6630a573c055d81b574d5c9bbc033",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e20ee48f0142390f566a98632a95bd2b359d6ee9"
+    "sha2": "f49f652c070f4bf8a8a3950fe588b2e0039e5cc4"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-string-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x[\"some-other-string\"]' subscript access",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x[\"some-other-string\"]' subscript access"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "subscript-access-string.js"
     ],
-    "sha1": "e20ee48f0142390f566a98632a95bd2b359d6ee9",
+    "sha1": "f49f652c070f4bf8a8a3950fe588b2e0039e5cc4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "14ac6caff6e171f4fac4e19d763b702382e888f0"
+    "sha2": "b934ce54bbf5097cc87a64591e51df2b0139a940"
 }]

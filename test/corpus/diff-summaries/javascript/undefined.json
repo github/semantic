@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'undefined' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'undefined' identifier"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "3e883f3c905964aa9c04a836721989934f251368",
+    "sha1": "49e91b55ab4d34df9d10e18a357ecb3f9129d38b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "24616410c732e4ed0d2bdd366a9b7c65f1350ab9"
+    "sha2": "670251c94df41dfcbe8b26ad37cf7b723051a348"
 }
 ,{
     "testCaseDescription": "javascript-undefined-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'undefined' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'undefined' return statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'undefined' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'undefined' identifier"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "24616410c732e4ed0d2bdd366a9b7c65f1350ab9",
+    "sha1": "670251c94df41dfcbe8b26ad37cf7b723051a348",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "65b072d0a6fc020645b06825f6575c2b445e88fe"
+    "sha2": "1cc3532b64f1b7f19e3676f8625a2b12cfe2630b"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-insert-test",
@@ -96,8 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'undefined' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'undefined' identifier"
                 },
                 {
                     "span": {
@@ -112,8 +108,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'undefined' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'undefined' return statement"
                 }
             ]
         },
@@ -122,9 +117,9 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "65b072d0a6fc020645b06825f6575c2b445e88fe",
+    "sha1": "1cc3532b64f1b7f19e3676f8625a2b12cfe2630b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "844f980e3cd0425b33d6750fd10f33a7c2e52ad5"
+    "sha2": "db10576ffb9656dcaaba5532089eb76acf5d489f"
 }
 ,{
     "testCaseDescription": "javascript-undefined-replacement-test",
@@ -144,8 +139,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'undefined' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'undefined' return statement"
                 },
                 {
                     "span": {
@@ -160,8 +154,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'undefined' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'undefined' identifier"
                 }
             ]
         },
@@ -170,9 +163,9 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "844f980e3cd0425b33d6750fd10f33a7c2e52ad5",
+    "sha1": "db10576ffb9656dcaaba5532089eb76acf5d489f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0908d4dfcb1c0b86f4ca20bd055670ebbe0e9dac"
+    "sha2": "fd6f48b2d37f71c4e9155b4fe875371543a92961"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-replacement-test",
@@ -192,8 +185,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'undefined' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'undefined' return statement"
                 },
                 {
                     "span": {
@@ -208,8 +200,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'undefined' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'undefined' identifier"
                 },
                 {
                     "span": {
@@ -224,8 +215,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'undefined' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'undefined' return statement"
                 }
             ]
         },
@@ -234,9 +224,9 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "0908d4dfcb1c0b86f4ca20bd055670ebbe0e9dac",
+    "sha1": "fd6f48b2d37f71c4e9155b4fe875371543a92961",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3439b9b0f4daba5fb029403dcc7d37d7d5f147de"
+    "sha2": "5a182f3d30775c47d619dea99fb6912f14460f86"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-test",
@@ -256,8 +246,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'undefined' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'undefined' identifier"
                 }
             ]
         },
@@ -266,9 +255,9 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "3439b9b0f4daba5fb029403dcc7d37d7d5f147de",
+    "sha1": "5a182f3d30775c47d619dea99fb6912f14460f86",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fd6bea53f81c603df1baa77d61048b0c7162d3ed"
+    "sha2": "58439f1bf80a8b82fae2f08eb8bfc1d1a96c4a7e"
 }
 ,{
     "testCaseDescription": "javascript-undefined-delete-rest-test",
@@ -288,8 +277,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'undefined' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'undefined' return statement"
                 }
             ]
         },
@@ -298,7 +286,7 @@
     "filePaths": [
         "undefined.js"
     ],
-    "sha1": "fd6bea53f81c603df1baa77d61048b0c7162d3ed",
+    "sha1": "58439f1bf80a8b82fae2f08eb8bfc1d1a96c4a7e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3e1c52cdcfb175a8271723e1584824e78861caa0"
+    "sha2": "a36b31965536bd78704978e111fd017722054b27"
 }]

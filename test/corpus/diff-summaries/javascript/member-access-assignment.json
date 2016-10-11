@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y.x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'y.x' assignment"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "fe1724a351896c9096078d5bc7dfa8e89539cddb",
+    "sha1": "372f806f1ac14eeaef4f8dd5ae1f081823efe483",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ac71d5f2e73babcd37c24cb8fade58d08652beae"
+    "sha2": "a1055cc31a158a5fa654aa40427592b3d6b10c88"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y.x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'y.x' assignment"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y.x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'y.x' assignment"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "ac71d5f2e73babcd37c24cb8fade58d08652beae",
+    "sha1": "a1055cc31a158a5fa654aa40427592b3d6b10c88",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "45817a82720c40b2e12c4e53e11e3a405e840783"
+    "sha2": "639b924cdb7df8d54c5accd88915cc8843556868"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in an assignment to y.x",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '1' with '0' in an assignment to y.x"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "45817a82720c40b2e12c4e53e11e3a405e840783",
+    "sha1": "639b924cdb7df8d54c5accd88915cc8843556868",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0b254a3f1120d1cee678a827d0bf5bfb6b57156b"
+    "sha2": "21f1f660aaa494d71f21feebf996dee749004e74"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in an assignment to y.x",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '0' with '1' in an assignment to y.x"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "0b254a3f1120d1cee678a827d0bf5bfb6b57156b",
+    "sha1": "21f1f660aaa494d71f21feebf996dee749004e74",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "24e43482adbbe8bdbb56191bc3b2ac1387049f77"
+    "sha2": "62c47a061654573bb752aae3bd9ef9bcceaddf20"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y.x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'y.x' assignment"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y.x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'y.x' assignment"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'y.x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'y.x' assignment"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "24e43482adbbe8bdbb56191bc3b2ac1387049f77",
+    "sha1": "62c47a061654573bb752aae3bd9ef9bcceaddf20",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ec5bc8a34cb2ac731d35de1a1ef2a41f479d9085"
+    "sha2": "19c82c7fd6b8e019cf970ad495af8c0998610f6f"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y.x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'y.x' assignment"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "ec5bc8a34cb2ac731d35de1a1ef2a41f479d9085",
+    "sha1": "19c82c7fd6b8e019cf970ad495af8c0998610f6f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "17c753388d910dee728182ae1a1f3ad9fdce2616"
+    "sha2": "c87076b2cfb63f72f222f023fe8aa0d28927632a"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y.x' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'y.x' assignment"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "17c753388d910dee728182ae1a1f3ad9fdce2616",
+    "sha1": "c87076b2cfb63f72f222f023fe8aa0d28927632a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "43c155e0e1c235f4a7a66d19b55ec670aa456167"
+    "sha2": "9ca89bc6c9066b34bc18aecce4f646208c65c907"
 }]

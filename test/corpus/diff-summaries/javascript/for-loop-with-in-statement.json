@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'key in something && i = 0; i < n; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'key in something && i = 0; i < n; i++' for statement"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "2762aadfb1df20b18044fd4529c8cd573d357cc9",
+    "sha1": "954a81d340fc574299386d998fb6cd667fe875ce",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "adad02fe14bb8fefc9437fed0725b7b49b837d04"
+    "sha2": "8e7957d2f5b2ec1db4345678a2abc67205202d7f"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'otherKey in something && i = 0; i < n; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'otherKey in something && i = 0; i < n; i++' for statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'key in something && i = 0; i < n; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'key in something && i = 0; i < n; i++' for statement"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "adad02fe14bb8fefc9437fed0725b7b49b837d04",
+    "sha1": "8e7957d2f5b2ec1db4345678a2abc67205202d7f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1f3fc5b85a5281e578b3304181604b65217349e9"
+    "sha2": "8aafa0ba7361d24eecc7b67f364b96fb0e1783d9"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'otherKey' identifier with the 'key' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'otherKey' identifier with the 'key' identifier"
                 },
                 {
                     "span": {
@@ -136,8 +132,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'doOtherSomething' identifier with the 'doSomething' identifier in the doSomething() function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'doOtherSomething' identifier with the 'doSomething' identifier in the doSomething() function call"
                 }
             ]
         },
@@ -146,9 +141,9 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "1f3fc5b85a5281e578b3304181604b65217349e9",
+    "sha1": "8aafa0ba7361d24eecc7b67f364b96fb0e1783d9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "14938b92d64697c66364baabc4277e0cd925f9d9"
+    "sha2": "ba14e6d7fb2d573306e97d6440a31bfd4ba358f7"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-replacement-test",
@@ -180,8 +175,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'key' identifier with the 'otherKey' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'key' identifier with the 'otherKey' identifier"
                 },
                 {
                     "span": {
@@ -208,8 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'doSomething' identifier with the 'doOtherSomething' identifier in the doOtherSomething() function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'doSomething' identifier with the 'doOtherSomething' identifier in the doOtherSomething() function call"
                 }
             ]
         },
@@ -218,9 +211,9 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "14938b92d64697c66364baabc4277e0cd925f9d9",
+    "sha1": "ba14e6d7fb2d573306e97d6440a31bfd4ba358f7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "44b34c087ea7c44395cd8fc72818925eeb24b67e"
+    "sha2": "99930dbd3a9f28d37aeda9c4746c210df0912e72"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-replacement-test",
@@ -240,8 +233,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'otherKey in something && i = 0; i < n; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'otherKey in something && i = 0; i < n; i++' for statement"
                 },
                 {
                     "span": {
@@ -256,8 +248,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'key in something && i = 0; i < n; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'key in something && i = 0; i < n; i++' for statement"
                 },
                 {
                     "span": {
@@ -272,8 +263,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'otherKey in something && i = 0; i < n; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'otherKey in something && i = 0; i < n; i++' for statement"
                 }
             ]
         },
@@ -282,9 +272,9 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "44b34c087ea7c44395cd8fc72818925eeb24b67e",
+    "sha1": "99930dbd3a9f28d37aeda9c4746c210df0912e72",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8db9fc5ca6b6b08b797cf0954a326b1d72e32657"
+    "sha2": "eb0f914082b22114ac7e3a487bec4dae17770ebc"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-test",
@@ -304,8 +294,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'key in something && i = 0; i < n; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'key in something && i = 0; i < n; i++' for statement"
                 }
             ]
         },
@@ -314,9 +303,9 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "8db9fc5ca6b6b08b797cf0954a326b1d72e32657",
+    "sha1": "eb0f914082b22114ac7e3a487bec4dae17770ebc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4c3269d570707ef8b45c8660494d318fa4e49614"
+    "sha2": "d5ae13f5b72c809e77f06665c3eae01cfcf76533"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-rest-test",
@@ -336,8 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'otherKey in something && i = 0; i < n; i++' for statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'otherKey in something && i = 0; i < n; i++' for statement"
                 }
             ]
         },
@@ -346,7 +334,7 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "4c3269d570707ef8b45c8660494d318fa4e49614",
+    "sha1": "d5ae13f5b72c809e77f06665c3eae01cfcf76533",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ca4c516f2d2c350b12fd36007d5c8ec2f5d6fe42"
+    "sha2": "65cf271429cfd2f26c112bf377c0fc4f8d79cba4"
 }]

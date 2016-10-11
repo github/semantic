@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'module.Klass(1, \"two\")' constructor",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'module.Klass(1, \"two\")' constructor"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "37b9064285baa63e16cc6b1c4b5128fed52fa082",
+    "sha1": "d338b275731ec3d9b527339e1ac1b99f43ea5ea2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b8f33f052773b435e5d29e89aeaf9cf8b3a9e8a6"
+    "sha2": "07f0e420ba82a7a88edead9753bf001dc427c900"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'module.Klass(1, \"three\")' constructor",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'module.Klass(1, \"three\")' constructor"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'module.Klass(1, \"two\")' constructor",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'module.Klass(1, \"two\")' constructor"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "b8f33f052773b435e5d29e89aeaf9cf8b3a9e8a6",
+    "sha1": "07f0e420ba82a7a88edead9753bf001dc427c900",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fa501924dbaed310d84435b0c33ef97a068653e4"
+    "sha2": "0ead57e4c68d3441874607df82f10cfae180871c"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"three\" string with the \"two\" string in the module.Klass(1, \"two\") method call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the \"three\" string with the \"two\" string in the module.Klass(1, \"two\") method call"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "fa501924dbaed310d84435b0c33ef97a068653e4",
+    "sha1": "0ead57e4c68d3441874607df82f10cfae180871c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9c7fb90945f08ad72efbcd243221cef5ce8d9732"
+    "sha2": "5312cfad6882b93031aaa4aa6bf94db1cb6097a1"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"two\" string with the \"three\" string in the module.Klass(1, \"three\") method call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the \"two\" string with the \"three\" string in the module.Klass(1, \"three\") method call"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "9c7fb90945f08ad72efbcd243221cef5ce8d9732",
+    "sha1": "5312cfad6882b93031aaa4aa6bf94db1cb6097a1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bb66b026044f3944a08fec17c572b7b8867decda"
+    "sha2": "d1ce2f7e01d8a6fb58e25e00612be76b5a92129b"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'module.Klass(1, \"three\")' constructor",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'module.Klass(1, \"three\")' constructor"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'module.Klass(1, \"two\")' constructor",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'module.Klass(1, \"two\")' constructor"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'module.Klass(1, \"three\")' constructor",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'module.Klass(1, \"three\")' constructor"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "bb66b026044f3944a08fec17c572b7b8867decda",
+    "sha1": "d1ce2f7e01d8a6fb58e25e00612be76b5a92129b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3669aebc1d501fba80efddd2a0b53b669b045ffa"
+    "sha2": "f2947ecde2c4966ba63934c2bf9fadb1bf9494a5"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'module.Klass(1, \"two\")' constructor",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'module.Klass(1, \"two\")' constructor"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "3669aebc1d501fba80efddd2a0b53b669b045ffa",
+    "sha1": "f2947ecde2c4966ba63934c2bf9fadb1bf9494a5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "aada0c4456c077928d7b286809c61323c9315147"
+    "sha2": "3f2450813b57ef20f48fafa20ec30d660a296e5c"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'module.Klass(1, \"three\")' constructor",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'module.Klass(1, \"three\")' constructor"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "aada0c4456c077928d7b286809c61323c9315147",
+    "sha1": "3f2450813b57ef20f48fafa20ec30d660a296e5c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "770dfcd929f8deaec3cf8028327930c422ee1814"
+    "sha2": "d6f65326cb55e5d2b83057d59ae062b3f4bc778e"
 }]

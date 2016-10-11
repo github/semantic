@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ f; }' try statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '{ f; }' try statement"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "edf461750d55ec70810d768af2bc471f00736c6f",
+    "sha1": "b908a6724f0ad01f8801ea57866f313307e6b319",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "dd72da3c12c1af00ba82506f288d1e07e0329005"
+    "sha2": "d3adba31d9e7e79d07e703ad2a6967562b220f6b"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ f; }' try statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '{ f; }' try statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ f; }' try statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '{ f; }' try statement"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "dd72da3c12c1af00ba82506f288d1e07e0329005",
+    "sha1": "d3adba31d9e7e79d07e703ad2a6967562b220f6b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "aef5631ddb1eadeea819782d6cad5ebaa3267263"
+    "sha2": "c1fc74cb0f5db63aee48f72adcd8abccccbc931c"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'h' identifier with the 'g' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'h' identifier with the 'g' identifier"
                 },
                 {
                     "span": {
@@ -136,8 +132,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g' identifier with the 'h' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'g' identifier with the 'h' identifier"
                 }
             ]
         },
@@ -146,9 +141,9 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "aef5631ddb1eadeea819782d6cad5ebaa3267263",
+    "sha1": "c1fc74cb0f5db63aee48f72adcd8abccccbc931c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ed026d2a79ed7e2935aa2c6654802265cfd1e277"
+    "sha2": "18a5e0f40787e268714e8c7bd3e1641d76d78319"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-replacement-test",
@@ -180,8 +175,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'g' identifier with the 'h' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'g' identifier with the 'h' identifier"
                 },
                 {
                     "span": {
@@ -208,8 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'h' identifier with the 'g' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'h' identifier with the 'g' identifier"
                 }
             ]
         },
@@ -218,9 +211,9 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "ed026d2a79ed7e2935aa2c6654802265cfd1e277",
+    "sha1": "18a5e0f40787e268714e8c7bd3e1641d76d78319",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7e2d4a57ded708e456a65e74de6aa306f109e7f1"
+    "sha2": "f836874a0d43f61e721d253cf3f97fd0a83cb6e7"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-delete-replacement-test",
@@ -240,8 +233,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ f; }' try statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '{ f; }' try statement"
                 },
                 {
                     "span": {
@@ -256,8 +248,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ f; }' try statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '{ f; }' try statement"
                 },
                 {
                     "span": {
@@ -272,8 +263,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ f; }' try statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '{ f; }' try statement"
                 }
             ]
         },
@@ -282,9 +272,9 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "7e2d4a57ded708e456a65e74de6aa306f109e7f1",
+    "sha1": "f836874a0d43f61e721d253cf3f97fd0a83cb6e7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a08334179979e507269d2d4d225b43fabdf08231"
+    "sha2": "8776c024182abad3bb3f5f68e999e1172fd0bce0"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-delete-test",
@@ -304,8 +294,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ f; }' try statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '{ f; }' try statement"
                 }
             ]
         },
@@ -314,9 +303,9 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "a08334179979e507269d2d4d225b43fabdf08231",
+    "sha1": "8776c024182abad3bb3f5f68e999e1172fd0bce0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6375ef5c9ef95bc52a4f4d0b27b25a45ee6d4ad0"
+    "sha2": "fb43fddce814a12e5f3a96d13a6a533ea965218c"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-delete-rest-test",
@@ -336,8 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ f; }' try statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '{ f; }' try statement"
                 }
             ]
         },
@@ -346,7 +334,7 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "6375ef5c9ef95bc52a4f4d0b27b25a45ee6d4ad0",
+    "sha1": "fb43fddce814a12e5f3a96d13a6a533ea965218c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d1920048204583b13ae78843de8cb2aceb164574"
+    "sha2": "f03ea63f2c081eb44cc3094034c2320fa50f8520"
 }]

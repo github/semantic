@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '101'",
-                    "tag": "JSONSummary"
+                    "summary": "Added '101'"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "ca76e71a73a3fb506699ae2ab0b98373e649850c",
+    "sha1": "f5a546c68e4e82d0b350e3e9674659e65c938c55",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bca56807756346d5d207d0cf13f370ad60138dd3"
+    "sha2": "47960ec40f3ccbcb1153c70f228c9938575ab8ad"
 }
 ,{
     "testCaseDescription": "javascript-number-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '102'",
-                    "tag": "JSONSummary"
+                    "summary": "Added '102'"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '101'",
-                    "tag": "JSONSummary"
+                    "summary": "Added '101'"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "bca56807756346d5d207d0cf13f370ad60138dd3",
+    "sha1": "47960ec40f3ccbcb1153c70f228c9938575ab8ad",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9e399dcad95c785376aecfb4c06c940f505ed776"
+    "sha2": "06220f52068d26a6bcf0d23f6be481825f7923a4"
 }
 ,{
     "testCaseDescription": "javascript-number-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '102' with '101'",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '102' with '101'"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "9e399dcad95c785376aecfb4c06c940f505ed776",
+    "sha1": "06220f52068d26a6bcf0d23f6be481825f7923a4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6333d7aab6347646f5411a86be2d868c9c19f715"
+    "sha2": "404abb4553e8356df1399600d506705c6c9b3ab6"
 }
 ,{
     "testCaseDescription": "javascript-number-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '101' with '102'",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '101' with '102'"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "6333d7aab6347646f5411a86be2d868c9c19f715",
+    "sha1": "404abb4553e8356df1399600d506705c6c9b3ab6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cfd5fe8a3286eccda307f09fc25a504539b1cf7e"
+    "sha2": "7036f73a00a5222e5d9d889fe5b47ef4d77478b9"
 }
 ,{
     "testCaseDescription": "javascript-number-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '102'",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted '102'"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '101'",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted '101'"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added '102'",
-                    "tag": "JSONSummary"
+                    "summary": "Added '102'"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "cfd5fe8a3286eccda307f09fc25a504539b1cf7e",
+    "sha1": "7036f73a00a5222e5d9d889fe5b47ef4d77478b9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fe9b3523d02afb88ae0bddf29eab6d2af8f135fa"
+    "sha2": "20984d5e617ddcbc04c1e539365976b48ba4c5e2"
 }
 ,{
     "testCaseDescription": "javascript-number-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '101'",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted '101'"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "fe9b3523d02afb88ae0bddf29eab6d2af8f135fa",
+    "sha1": "20984d5e617ddcbc04c1e539365976b48ba4c5e2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5f00cbbdbcc8c05786b5aa95f9b909fd0f3652cf"
+    "sha2": "a2dd3c4c8887c73ef3ade2a1e819266cf421eca5"
 }
 ,{
     "testCaseDescription": "javascript-number-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted '102'",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted '102'"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "number.js"
     ],
-    "sha1": "5f00cbbdbcc8c05786b5aa95f9b909fd0f3652cf",
+    "sha1": "a2dd3c4c8887c73ef3ade2a1e819266cf421eca5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9f0cec39421594e76f56c7843f9902d1e840dcaa"
+    "sha2": "743cb64f1ee8a3d9f0b4ea142f1a7e8447757885"
 }]
