@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "false.js": [
-                "Added 'false'"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added 'false'"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "b8860daa68624499e345ce91a8701d70785b2d4e",
+    "sha1": "6f781fd1c75a5c824323b66e61fb2717755b4753",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "935939abc13ca010fed3c7a42fb22e5eefb20c83"
+    "sha2": "4973cc5fa83113e784f59efc0e9e2bee97ac8a4d"
 }
 ,{
     "testCaseDescription": "javascript-false-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "false.js": [
-                "Added the 'false' return statement",
-                "Added 'false'"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'false' return statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added 'false'"
+                }
             ]
         },
         "errors": {}
@@ -29,17 +71,45 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "935939abc13ca010fed3c7a42fb22e5eefb20c83",
+    "sha1": "4973cc5fa83113e784f59efc0e9e2bee97ac8a4d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "eb745427af9f88cc5188ffbf490c17bcc0992604"
+    "sha2": "6bd0e7e033d1921b69c9740f08c5575c7e5e6ee1"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-insert-test",
     "expectedResult": {
         "changes": {
             "false.js": [
-                "Added 'false'",
-                "Deleted the 'false' return statement"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added 'false'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'false' return statement"
+                }
             ]
         },
         "errors": {}
@@ -47,17 +117,45 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "eb745427af9f88cc5188ffbf490c17bcc0992604",
+    "sha1": "6bd0e7e033d1921b69c9740f08c5575c7e5e6ee1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a24851e3e5ded666dca356d08dd559c1eaf6e202"
+    "sha2": "b2db9c4bb0b3a8d6b68d683e8513b2f6efedb44b"
 }
 ,{
     "testCaseDescription": "javascript-false-replacement-test",
     "expectedResult": {
         "changes": {
             "false.js": [
-                "Added the 'false' return statement",
-                "Deleted 'false'"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'false' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'false'"
+                }
             ]
         },
         "errors": {}
@@ -65,18 +163,60 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "a24851e3e5ded666dca356d08dd559c1eaf6e202",
+    "sha1": "b2db9c4bb0b3a8d6b68d683e8513b2f6efedb44b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "90544cf47a2e57f5a8fb4729b5c302ab8405ada5"
+    "sha2": "dd9ec604931ffffba1b6c7bd4773ec8ac5418804"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "false.js": [
-                "Deleted the 'false' return statement",
-                "Deleted 'false'",
-                "Added the 'false' return statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'false' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'false'"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'false' return statement"
+                }
             ]
         },
         "errors": {}
@@ -84,16 +224,30 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "90544cf47a2e57f5a8fb4729b5c302ab8405ada5",
+    "sha1": "dd9ec604931ffffba1b6c7bd4773ec8ac5418804",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b3e9f46d88ccfa1baab5f8f6b4473374b80b9d6d"
+    "sha2": "4b8dddf41a7b9ac76de8ff5eb1327fb0bd1f8dcb"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-test",
     "expectedResult": {
         "changes": {
             "false.js": [
-                "Deleted 'false'"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'false'"
+                }
             ]
         },
         "errors": {}
@@ -101,16 +255,30 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "b3e9f46d88ccfa1baab5f8f6b4473374b80b9d6d",
+    "sha1": "4b8dddf41a7b9ac76de8ff5eb1327fb0bd1f8dcb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "03ecbd1c9b932527c1cf5cc5fd7219a44d37fa5b"
+    "sha2": "2f2527a35cc4511ba3e91e4360f61e56f20d9c3e"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-rest-test",
     "expectedResult": {
         "changes": {
             "false.js": [
-                "Deleted the 'false' return statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'false' return statement"
+                }
             ]
         },
         "errors": {}
@@ -118,7 +286,7 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "03ecbd1c9b932527c1cf5cc5fd7219a44d37fa5b",
+    "sha1": "2f2527a35cc4511ba3e91e4360f61e56f20d9c3e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b7f4a89900323bf29bbf4a77720b6321ed5650b0"
+    "sha2": "7f7c1c904ffcc4ea539925a1d336147d84fd90b8"
 }]

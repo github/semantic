@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "boolean-operator.js": [
-                "Added the 'i || j' boolean operator"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i || j' boolean operator"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "5e4697c7ee184c7dfdecd9059fc2c5058131cf05",
+    "sha1": "faaff0e5dd144b090a540e45f9a534c1cceb3ad1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6c02a1fd47fbf3bd8b21ea5fc04bc032c943c23c"
+    "sha2": "d6e10ec4014abbcb6b6b338b66eb6f995a232d67"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "boolean-operator.js": [
-                "Added the 'i && j' boolean operator",
-                "Added the 'i || j' boolean operator"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i && j' boolean operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i || j' boolean operator"
+                }
             ]
         },
         "errors": {}
@@ -29,9 +71,9 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "6c02a1fd47fbf3bd8b21ea5fc04bc032c943c23c",
+    "sha1": "d6e10ec4014abbcb6b6b338b66eb6f995a232d67",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6040990552afe9c82791b6c97136b1c008110d96"
+    "sha2": "b09e021bfef5da21754a88b63145c80bc8613308"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-delete-insert-test",
@@ -42,9 +84,9 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "6040990552afe9c82791b6c97136b1c008110d96",
+    "sha1": "b09e021bfef5da21754a88b63145c80bc8613308",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "442aeeee3507edad01551f339664c9b98165888b"
+    "sha2": "3958808a1800344b293b9bc9d432b68041ff5d87"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-replacement-test",
@@ -55,16 +97,30 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "442aeeee3507edad01551f339664c9b98165888b",
+    "sha1": "3958808a1800344b293b9bc9d432b68041ff5d87",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ba78e28d7b41fb827b99a5bcadcf2fcfcbc1e400"
+    "sha2": "1625b72ec355c939829455d5397838e0328e6f39"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "boolean-operator.js": [
-                "Deleted the 'i && j' boolean operator"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i && j' boolean operator"
+                }
             ]
         },
         "errors": {}
@@ -72,16 +128,30 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "ba78e28d7b41fb827b99a5bcadcf2fcfcbc1e400",
+    "sha1": "1625b72ec355c939829455d5397838e0328e6f39",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ba414b1d960c417802af54e2b76ce81c272c3474"
+    "sha2": "a4f53d533f7359d95917a22771bc125f137dd311"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-delete-test",
     "expectedResult": {
         "changes": {
             "boolean-operator.js": [
-                "Deleted the 'i || j' boolean operator"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i || j' boolean operator"
+                }
             ]
         },
         "errors": {}
@@ -89,16 +159,30 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "ba414b1d960c417802af54e2b76ce81c272c3474",
+    "sha1": "a4f53d533f7359d95917a22771bc125f137dd311",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bbe07786ae29080753f8e23ada87b82abf2b84e7"
+    "sha2": "a1e71d859792a4497b9438fe57d0b17847b53184"
 }
 ,{
     "testCaseDescription": "javascript-boolean-operator-delete-rest-test",
     "expectedResult": {
         "changes": {
             "boolean-operator.js": [
-                "Deleted the 'i && j' boolean operator"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i && j' boolean operator"
+                }
             ]
         },
         "errors": {}
@@ -106,7 +190,7 @@
     "filePaths": [
         "boolean-operator.js"
     ],
-    "sha1": "bbe07786ae29080753f8e23ada87b82abf2b84e7",
+    "sha1": "a1e71d859792a4497b9438fe57d0b17847b53184",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0284df48ea6629058a726fcc6df0ab843518cf02"
+    "sha2": "e1dc429edadeaaff5ea72c53fefab478501bdc07"
 }]

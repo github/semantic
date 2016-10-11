@@ -133,7 +133,7 @@ runCommitAndTestCaseGeneration :: GeneratorArgs -> String -> FilePath -> JSONMet
 runCommitAndTestCaseGeneration opts language repoPath metaSyntax@JSONMetaSyntax{..} =
    traverse_ (runGenerateCommitAndTestCase opts language repoPath) (commands metaSyntax)
 
-maybeMapSummary :: [R.Output] -> [Maybe (Map Text (Map Text [Text]))]
+maybeMapSummary :: [R.Output] -> [Maybe (Map Text (Map Text [Value]))]
 maybeMapSummary = fmap $ \case
     R.SummaryOutput output -> Just output
     _ -> Nothing
@@ -172,7 +172,7 @@ runGenerateCommitAndTestCase opts language repoPath (JSONMetaSyntax{..}, descrip
 -- | Conditionally generate the diff summaries for the given shas and file path based
 -- | on the -g | --generate flag. By default diff summaries are not generated when
 -- | constructing test cases, and the tuple (Nothing, Nothing) is returned.
-runMaybeSummaries :: String -> String -> FilePath -> FilePath -> GeneratorArgs -> IO (Maybe (Map Text [Text]), Maybe (Map Text [Text]))
+runMaybeSummaries :: String -> String -> FilePath -> FilePath -> GeneratorArgs -> IO (Maybe (Map Text [Value]), Maybe (Map Text [Value]))
 runMaybeSummaries beforeSha afterSha repoPath repoFilePath GeneratorArgs{..}
   | generateResults = do
       diffs <- fetchDiffs $ args repoPath beforeSha afterSha [repoFilePath] R.Summary

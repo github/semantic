@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "type-operator.js": [
-                "Added the 'typeof x' operator"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'typeof x' operator"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "c035407749e02f5dee9c3947118cd25095b28446",
+    "sha1": "6eeb048dd356c28a76842bafe0ff471aca4fc709",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ba4599ba8153ddf393c28166e5c3682ca695c3c0"
+    "sha2": "ae302058d381bfe2242f8af75707d16d9bc5f9c6"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "type-operator.js": [
-                "Added the 'x instanceof String' operator",
-                "Added the 'typeof x' operator"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x instanceof String' operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'typeof x' operator"
+                }
             ]
         },
         "errors": {}
@@ -29,16 +71,30 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "ba4599ba8153ddf393c28166e5c3682ca695c3c0",
+    "sha1": "ae302058d381bfe2242f8af75707d16d9bc5f9c6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a6b0e4e444389879aca8497b3f91ae9b5a8d8db9"
+    "sha2": "70ff969d615bb1e12f9c83a34430c4eecf5e1423"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-insert-test",
     "expectedResult": {
         "changes": {
             "type-operator.js": [
-                "Deleted the 'String' identifier"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                14
+                            ],
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'String' identifier"
+                }
             ]
         },
         "errors": {}
@@ -46,16 +102,30 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "a6b0e4e444389879aca8497b3f91ae9b5a8d8db9",
+    "sha1": "70ff969d615bb1e12f9c83a34430c4eecf5e1423",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "68e72b46ca8515ca2d89106454d244f13498d6a7"
+    "sha2": "4e7d94a429cfea4cfb43bee17420bdf2cf31857e"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-replacement-test",
     "expectedResult": {
         "changes": {
             "type-operator.js": [
-                "Added the 'String' identifier"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                14
+                            ],
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'String' identifier"
+                }
             ]
         },
         "errors": {}
@@ -63,18 +133,60 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "68e72b46ca8515ca2d89106454d244f13498d6a7",
+    "sha1": "4e7d94a429cfea4cfb43bee17420bdf2cf31857e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "033e0f3408966f10835fe6e9b288161f66ce04cc"
+    "sha2": "5f0e7b153777bb043786fa66aee9e38978d66762"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "type-operator.js": [
-                "Deleted the 'x instanceof String' operator",
-                "Deleted the 'typeof x' operator",
-                "Added the 'x instanceof String' operator"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x instanceof String' operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'typeof x' operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x instanceof String' operator"
+                }
             ]
         },
         "errors": {}
@@ -82,16 +194,30 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "033e0f3408966f10835fe6e9b288161f66ce04cc",
+    "sha1": "5f0e7b153777bb043786fa66aee9e38978d66762",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "703588929b2883da6546fb1fe911ec45f9445aa7"
+    "sha2": "9aaacd568854471edc874364923b43b5a65f6caf"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-test",
     "expectedResult": {
         "changes": {
             "type-operator.js": [
-                "Deleted the 'typeof x' operator"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'typeof x' operator"
+                }
             ]
         },
         "errors": {}
@@ -99,16 +225,30 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "703588929b2883da6546fb1fe911ec45f9445aa7",
+    "sha1": "9aaacd568854471edc874364923b43b5a65f6caf",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5a0bb75f3ce6baba9ecc2516deaa8a515c7f422d"
+    "sha2": "b91ec6770bb9eed6aa7f9a0b24c65d6460ba825d"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-rest-test",
     "expectedResult": {
         "changes": {
             "type-operator.js": [
-                "Deleted the 'x instanceof String' operator"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                20
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x instanceof String' operator"
+                }
             ]
         },
         "errors": {}
@@ -116,7 +256,7 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "5a0bb75f3ce6baba9ecc2516deaa8a515c7f422d",
+    "sha1": "b91ec6770bb9eed6aa7f9a0b24c65d6460ba825d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "29bb6e3625ec9c3bbd58c6ba514d9f7ebce67705"
+    "sha2": "1d96325511c74b433e0a9c675a1e9c1a368bf222"
 }]
