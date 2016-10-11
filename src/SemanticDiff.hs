@@ -49,6 +49,7 @@ argumentsParser = info (version <*> helper <*> argumentsP)
       <*> optional (strOption (long "output" <> short 'o' <> help "output directory for split diffs, defaults to stdout if unspecified"))
       <*> switch (long "no-index" <> help "compare two paths on the filesystem")
       <*> some (argument (eitherReader parseShasAndFiles) (metavar "SHA_A..SHAB FILES..."))
+      <*> switch (long "development" <> short 'd' <> help "set development mode which prevents timeout behavior by default")
       where
         parseShasAndFiles :: String -> Either String ExtraArg
         parseShasAndFiles s = case matchRegex regex s of
@@ -66,8 +67,12 @@ version = infoOption versionString (long "version" <> short 'V' <> help "output 
 -- | Compare changes between two commits.
 diffCommits :: Arguments -> IO ()
 diffCommits args@Arguments{..} = do
-  ts <- Timeout.timeout timeoutInMicroseconds (fetchDiffs args)
+  ts <- fetchTerms args
   writeToOutput output (maybe mempty R.concatOutputs ts)
+  where fetchTerms args = if developmentMode
+                            then Just <$> fetchDiffs args
+                            else Timeout.timeout timeoutInMicroseconds (fetchDiffs args)
+
 
 -- | Compare two paths on the filesystem (compariable to git diff --no-index).
 diffPaths :: Arguments -> Both FilePath -> IO ()
@@ -99,14 +104,17 @@ fetchDiff' Arguments{..} filepath = do
 
   let sources = fromMaybe (Source.emptySourceBlob filepath) <$> sourcesAndOids
   let sourceBlobs = Source.idOrEmptySourceBlob <$> sources
-
   let textDiff = D.textDiff (parserForFilepath filepath) diffArguments sourceBlobs
-  text <- liftIO $ Timeout.timeout timeoutInMicroseconds textDiff
 
+  text <- fetchText textDiff
   truncatedPatch <- liftIO $ D.truncatedDiff diffArguments sourceBlobs
   pure $ fromMaybe truncatedPatch text
   where
     diffArguments = R.DiffArguments { format = format, output = output }
+    fetchText textDiff = if developmentMode
+                          then liftIO $ Timeout.timeout timeoutInMicroseconds textDiff
+                          else liftIO $ Just <$> textDiff
+
 
 pathsToDiff :: Arguments -> Both String -> IO [FilePath]
 pathsToDiff Arguments{..} shas = withRepository lgFactory gitDir $ do
