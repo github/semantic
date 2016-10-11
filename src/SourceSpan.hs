@@ -81,13 +81,13 @@ newtype SourceSpans = SourceSpans { unSourceSpans :: These SourceSpan SourceSpan
 
 instance A.ToJSON SourceSpans where
   toJSON (SourceSpans spans) = case spans of
-    (This span) -> A.object ["this" .= span]
-    (That span) -> A.object ["that" .= span]
-    (These span1 span2) -> A.object ["these" .= (span1, span2)]
+    (This span) -> A.object ["delete" .= span]
+    (That span) -> A.object ["insert" .= span]
+    (These span1 span2) -> A.object ["replace" .= (span1, span2)]
   toEncoding (SourceSpans spans) = case spans of
-    (This span) -> A.pairs $ "this" .= span
-    (That span) -> A.pairs $ "that" .= span
-    (These span1 span2) -> A.pairs $ "these" .= (span1, span2)
+    (This span) -> A.pairs $ "delete" .= span
+    (That span) -> A.pairs $ "insert" .= span
+    (These span1 span2) -> A.pairs $ "replace" .= (span1, span2)
 
 instance Arbitrary SourcePos where
   arbitrary = SourcePos <$> arbitrary <*> arbitrary
