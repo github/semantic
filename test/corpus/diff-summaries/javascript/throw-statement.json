@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "throw-statement.js",
                             "end": [
                                 1,
                                 26
@@ -27,9 +26,9 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "87ee63679cf89692a390eb921ae462b11b4a06e0",
+    "sha1": "4703a7002d32db2234780ed17ed8bf95a45569ca",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f14dd81890ac415d276801c1571ae13d4ddc96af"
+    "sha2": "2518b94568794c2a248421a57291d345fc132b7f"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "throw-statement.js",
                             "end": [
                                 1,
                                 29
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "throw-statement.js",
                             "end": [
                                 2,
                                 26
@@ -77,9 +74,9 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "f14dd81890ac415d276801c1571ae13d4ddc96af",
+    "sha1": "2518b94568794c2a248421a57291d345fc132b7f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f40e06699f4c62cbe28402a49217a50745d4951a"
+    "sha2": "18284196ba4ca0689123160a21accbfc055487bb"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     17
                                 ],
-                                "filepath": "throw-statement.js",
                                 "end": [
                                     1,
                                     27
@@ -105,7 +101,6 @@
                                     1,
                                     17
                                 ],
-                                "filepath": "throw-statement.js",
                                 "end": [
                                     1,
                                     24
@@ -123,9 +118,9 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "f40e06699f4c62cbe28402a49217a50745d4951a",
+    "sha1": "18284196ba4ca0689123160a21accbfc055487bb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e419aef46115c692e1dce0182e889d147bab900b"
+    "sha2": "1de92de9bdc5fa85de0e9b5b5dc5c23590ac2566"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-replacement-test",
@@ -140,7 +135,6 @@
                                     1,
                                     17
                                 ],
-                                "filepath": "throw-statement.js",
                                 "end": [
                                     1,
                                     24
@@ -151,7 +145,6 @@
                                     1,
                                     17
                                 ],
-                                "filepath": "throw-statement.js",
                                 "end": [
                                     1,
                                     27
@@ -169,9 +162,9 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "e419aef46115c692e1dce0182e889d147bab900b",
+    "sha1": "1de92de9bdc5fa85de0e9b5b5dc5c23590ac2566",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "456b9d703a0897c3ae7ffcccb88b633d24d6e772"
+    "sha2": "d48e3de54842bdfb75cd8abeb4cebdcd43b877a4"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-replacement-test",
@@ -185,7 +178,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "throw-statement.js",
                             "end": [
                                 1,
                                 29
@@ -202,7 +194,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "throw-statement.js",
                             "end": [
                                 2,
                                 26
@@ -219,7 +210,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "throw-statement.js",
                             "end": [
                                 2,
                                 29
@@ -236,9 +226,9 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "456b9d703a0897c3ae7ffcccb88b633d24d6e772",
+    "sha1": "d48e3de54842bdfb75cd8abeb4cebdcd43b877a4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a0241ec11741dd48f4789522c53554a6c0e51ec5"
+    "sha2": "7968d5456d2cae631c2ad1a3541972e8b3fbec42"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-test",
@@ -252,7 +242,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "throw-statement.js",
                             "end": [
                                 1,
                                 26
@@ -269,9 +258,9 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "a0241ec11741dd48f4789522c53554a6c0e51ec5",
+    "sha1": "7968d5456d2cae631c2ad1a3541972e8b3fbec42",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9f6bb83269360c82b0a7d8f0876db24bec390b09"
+    "sha2": "b2a674bd06b1fd6701d58556d05daf118bd513fc"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-rest-test",
@@ -285,7 +274,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "throw-statement.js",
                             "end": [
                                 1,
                                 29
@@ -302,7 +290,7 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "9f6bb83269360c82b0a7d8f0876db24bec390b09",
+    "sha1": "b2a674bd06b1fd6701d58556d05daf118bd513fc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5886a80268586c2725f1f8be03d2dea099ba0bd2"
+    "sha2": "a11797b72e3d4338dc9efc6183177921bc93609e"
 }]

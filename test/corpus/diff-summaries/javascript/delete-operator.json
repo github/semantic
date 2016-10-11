@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "delete-operator.js",
                             "end": [
                                 1,
                                 21
@@ -27,9 +26,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "d7d8b169c8385f3a91f99dd299e5ebb566e5a346",
+    "sha1": "34d611dc6839b42bba50f800508e3c1eed940690",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6c6e619841b05739ffd85569a1328aabe62f84a6"
+    "sha2": "9c01dfb007ff3853c71c2ed944ccf83ae4a4899e"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "delete-operator.js",
                             "end": [
                                 1,
                                 18
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "delete-operator.js",
                             "end": [
                                 2,
                                 21
@@ -77,9 +74,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "6c6e619841b05739ffd85569a1328aabe62f84a6",
+    "sha1": "9c01dfb007ff3853c71c2ed944ccf83ae4a4899e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b0ff0d9a3df842084c04a09dea21d8d18c70a35a"
+    "sha2": "fcd04c63372795e232f0ab1dc003078a11e23348"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     1
                                 ],
-                                "filepath": "delete-operator.js",
                                 "end": [
                                     1,
                                     18
@@ -105,7 +101,6 @@
                                     1,
                                     1
                                 ],
-                                "filepath": "delete-operator.js",
                                 "end": [
                                     1,
                                     21
@@ -123,9 +118,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "b0ff0d9a3df842084c04a09dea21d8d18c70a35a",
+    "sha1": "fcd04c63372795e232f0ab1dc003078a11e23348",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "da51d558c50a3b77f771324583cc0d7550a8e515"
+    "sha2": "54acda735d0aa3817a65ab8bae18ac9c3249299f"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-replacement-test",
@@ -140,7 +135,6 @@
                                     1,
                                     1
                                 ],
-                                "filepath": "delete-operator.js",
                                 "end": [
                                     1,
                                     21
@@ -151,7 +145,6 @@
                                     1,
                                     1
                                 ],
-                                "filepath": "delete-operator.js",
                                 "end": [
                                     1,
                                     18
@@ -169,9 +162,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "da51d558c50a3b77f771324583cc0d7550a8e515",
+    "sha1": "54acda735d0aa3817a65ab8bae18ac9c3249299f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "061a6799cac8f6e7d6daff84708dd2b9d2f1a124"
+    "sha2": "16e956f11b3ecc44abf81b4c33cddbd36c9222a7"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-replacement-test",
@@ -185,7 +178,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "delete-operator.js",
                             "end": [
                                 1,
                                 18
@@ -202,7 +194,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "delete-operator.js",
                             "end": [
                                 2,
                                 21
@@ -219,7 +210,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "delete-operator.js",
                             "end": [
                                 2,
                                 18
@@ -236,9 +226,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "061a6799cac8f6e7d6daff84708dd2b9d2f1a124",
+    "sha1": "16e956f11b3ecc44abf81b4c33cddbd36c9222a7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b5fd60da6d762332b03e0d20e55f81cf4436ee5f"
+    "sha2": "91fc755fdc45f6c82da10cdb9078ff2d8ec66c9c"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-test",
@@ -252,7 +242,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "delete-operator.js",
                             "end": [
                                 1,
                                 21
@@ -269,9 +258,9 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "b5fd60da6d762332b03e0d20e55f81cf4436ee5f",
+    "sha1": "91fc755fdc45f6c82da10cdb9078ff2d8ec66c9c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7fac635a01cb2cde4cf5830e93551808729258c8"
+    "sha2": "dadef7d3a1d78afcdb53140c1c32f0bd93f75580"
 }
 ,{
     "testCaseDescription": "javascript-delete-operator-delete-rest-test",
@@ -285,7 +274,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "delete-operator.js",
                             "end": [
                                 1,
                                 18
@@ -302,7 +290,7 @@
     "filePaths": [
         "delete-operator.js"
     ],
-    "sha1": "7fac635a01cb2cde4cf5830e93551808729258c8",
+    "sha1": "dadef7d3a1d78afcdb53140c1c32f0bd93f75580",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f6b6a39365ea495fba9ad72496f299b47250db15"
+    "sha2": "d14d7b09c6761ab1a14c5aeda0a105d44c520617"
 }]

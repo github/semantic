@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "if.js",
                             "end": [
                                 1,
                                 19
@@ -27,9 +26,9 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "41251fa1af46b7fe46270fa62626832e6d95fb19",
+    "sha1": "019ed2c1f543531ab1678c9fcd7dd223ad5ca8b2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2296d132422661e0653447473e8f4403e48291f5"
+    "sha2": "a4b4113212a03138f0546396dfb35170538bb846"
 }
 ,{
     "testCaseDescription": "javascript-if-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "if.js",
                             "end": [
                                 1,
                                 24
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "if.js",
                             "end": [
                                 2,
                                 19
@@ -77,9 +74,9 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "2296d132422661e0653447473e8f4403e48291f5",
+    "sha1": "a4b4113212a03138f0546396dfb35170538bb846",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4946660306dd1613763a3878ac416172a16bf096"
+    "sha2": "874a29b843b633497b98f99ab606daa42e02402f"
 }
 ,{
     "testCaseDescription": "javascript-if-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     1
                                 ],
-                                "filepath": "if.js",
                                 "end": [
                                     1,
                                     24
@@ -105,7 +101,6 @@
                                     1,
                                     1
                                 ],
-                                "filepath": "if.js",
                                 "end": [
                                     1,
                                     19
@@ -123,9 +118,9 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "4946660306dd1613763a3878ac416172a16bf096",
+    "sha1": "874a29b843b633497b98f99ab606daa42e02402f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f434fd9424b590cbd12ee33a6e94cda6aa6d294f"
+    "sha2": "16128f22ec566f5acbb690d0ef838d6227cdd402"
 }
 ,{
     "testCaseDescription": "javascript-if-replacement-test",
@@ -140,7 +135,6 @@
                                     1,
                                     1
                                 ],
-                                "filepath": "if.js",
                                 "end": [
                                     1,
                                     19
@@ -151,7 +145,6 @@
                                     1,
                                     1
                                 ],
-                                "filepath": "if.js",
                                 "end": [
                                     1,
                                     24
@@ -169,9 +162,9 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "f434fd9424b590cbd12ee33a6e94cda6aa6d294f",
+    "sha1": "16128f22ec566f5acbb690d0ef838d6227cdd402",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "17b87e95a0d8e4e7b0aec67a484ffdcbebf57569"
+    "sha2": "9fd01fbbfa583c431e65fa74fb11ab8bfce478a5"
 }
 ,{
     "testCaseDescription": "javascript-if-delete-replacement-test",
@@ -185,7 +178,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "if.js",
                             "end": [
                                 1,
                                 24
@@ -202,7 +194,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "if.js",
                             "end": [
                                 2,
                                 19
@@ -219,7 +210,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "if.js",
                             "end": [
                                 2,
                                 24
@@ -236,9 +226,9 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "17b87e95a0d8e4e7b0aec67a484ffdcbebf57569",
+    "sha1": "9fd01fbbfa583c431e65fa74fb11ab8bfce478a5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0dcfdf6fe232a9e637d3dc0497ba871a901a8ee0"
+    "sha2": "e7e84a047077fb4d105e58efd5866b2ac0a4d12a"
 }
 ,{
     "testCaseDescription": "javascript-if-delete-test",
@@ -252,7 +242,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "if.js",
                             "end": [
                                 1,
                                 19
@@ -269,9 +258,9 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "0dcfdf6fe232a9e637d3dc0497ba871a901a8ee0",
+    "sha1": "e7e84a047077fb4d105e58efd5866b2ac0a4d12a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f6518bfc5eb2595212cf06ebd298df9b349c0c1b"
+    "sha2": "c026ca9c14269cbdaa6e276375c1e6a635e93067"
 }
 ,{
     "testCaseDescription": "javascript-if-delete-rest-test",
@@ -285,7 +274,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "if.js",
                             "end": [
                                 1,
                                 24
@@ -302,7 +290,7 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "f6518bfc5eb2595212cf06ebd298df9b349c0c1b",
+    "sha1": "c026ca9c14269cbdaa6e276375c1e6a635e93067",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b5989e3686427410aa40bbed9fb40c02cfd7f744"
+    "sha2": "cb6ecdcdc2f19afb8b09b417b7b3789de92bbe2c"
 }]

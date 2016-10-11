@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "arrow-function.js",
                             "end": [
                                 1,
                                 24
@@ -27,9 +26,9 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "15ff2677dbf6ef4e724df21936b1dec373b4c087",
+    "sha1": "1cb91e98d1764fe8fb5c2a7798c9173523abdb1b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6c285606ff4e7906dd63ae09d70e6de2664cde79"
+    "sha2": "cabe717d9de437bbcf599b358c40bd1a9f7497c5"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "arrow-function.js",
                             "end": [
                                 1,
                                 24
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "arrow-function.js",
                             "end": [
                                 2,
                                 24
@@ -77,9 +74,9 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "6c285606ff4e7906dd63ae09d70e6de2664cde79",
+    "sha1": "cabe717d9de437bbcf599b358c40bd1a9f7497c5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5bbcfd065e3917b0302fdbc15cda5fab2f8cf9b3"
+    "sha2": "81833f1dfc5306bdf83101de4a514162c004f133"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     20
                                 ],
-                                "filepath": "arrow-function.js",
                                 "end": [
                                     1,
                                     21
@@ -105,7 +101,6 @@
                                     1,
                                     20
                                 ],
-                                "filepath": "arrow-function.js",
                                 "end": [
                                     1,
                                     21
@@ -123,9 +118,9 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "5bbcfd065e3917b0302fdbc15cda5fab2f8cf9b3",
+    "sha1": "81833f1dfc5306bdf83101de4a514162c004f133",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "01c89dedc801d910448f2fccc4c199f2ceb3e525"
+    "sha2": "1477c3eb5d6b3fb17e658851e597548a27e9aee5"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-replacement-test",
@@ -140,7 +135,6 @@
                                     1,
                                     20
                                 ],
-                                "filepath": "arrow-function.js",
                                 "end": [
                                     1,
                                     21
@@ -151,7 +145,6 @@
                                     1,
                                     20
                                 ],
-                                "filepath": "arrow-function.js",
                                 "end": [
                                     1,
                                     21
@@ -169,9 +162,9 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "01c89dedc801d910448f2fccc4c199f2ceb3e525",
+    "sha1": "1477c3eb5d6b3fb17e658851e597548a27e9aee5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "053a09f7e19214d7ea75ccf77313da71c8e163db"
+    "sha2": "792510a28547ef00fb3f427f0588a350070b78c8"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-delete-replacement-test",
@@ -185,7 +178,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "arrow-function.js",
                             "end": [
                                 1,
                                 24
@@ -202,7 +194,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "arrow-function.js",
                             "end": [
                                 2,
                                 24
@@ -219,7 +210,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "arrow-function.js",
                             "end": [
                                 2,
                                 24
@@ -236,9 +226,9 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "053a09f7e19214d7ea75ccf77313da71c8e163db",
+    "sha1": "792510a28547ef00fb3f427f0588a350070b78c8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "20adb0c98028b1baa8115b40036e39b8f437561a"
+    "sha2": "43d4dec7b3f7190611127a9184ba1b8c7ef95581"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-delete-test",
@@ -252,7 +242,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "arrow-function.js",
                             "end": [
                                 1,
                                 24
@@ -269,9 +258,9 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "20adb0c98028b1baa8115b40036e39b8f437561a",
+    "sha1": "43d4dec7b3f7190611127a9184ba1b8c7ef95581",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cb5d85e27b0dad945694e07131ae9d9b09dd0c09"
+    "sha2": "614d74c2b78fee8293f461aa293c56622049c72b"
 }
 ,{
     "testCaseDescription": "javascript-arrow-function-delete-rest-test",
@@ -285,7 +274,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "arrow-function.js",
                             "end": [
                                 1,
                                 24
@@ -302,7 +290,7 @@
     "filePaths": [
         "arrow-function.js"
     ],
-    "sha1": "cb5d85e27b0dad945694e07131ae9d9b09dd0c09",
+    "sha1": "614d74c2b78fee8293f461aa293c56622049c72b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "64732c38069cc70ee3bea66306d966d902444b68"
+    "sha2": "9a88415672c0d83242b643e750b77540103e14c1"
 }]

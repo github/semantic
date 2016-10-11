@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "anonymous-function.js",
                             "end": [
                                 1,
                                 32
@@ -27,9 +26,9 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "b33f47fbe6d253fd1ee502cda8ef5cd4bd771b42",
+    "sha1": "9a3c8e5bfb1ca123cfbbeefbe9069ecc0bb85fa4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "864f71e7429b9e61840bded79c38a88a497f0a30"
+    "sha2": "499d32d46d3eb5785dbb27e3b56a0894823ee9dd"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "anonymous-function.js",
                             "end": [
                                 1,
                                 32
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "anonymous-function.js",
                             "end": [
                                 2,
                                 32
@@ -77,9 +74,9 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "864f71e7429b9e61840bded79c38a88a497f0a30",
+    "sha1": "499d32d46d3eb5785dbb27e3b56a0894823ee9dd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d03a926d4d05c1a255a7a0cfc9b56d47d78ae9bb"
+    "sha2": "20922f45f08fe649a067e60016ed60a67c2c1c7e"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     10
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     11
@@ -105,7 +101,6 @@
                                     1,
                                     10
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     11
@@ -124,7 +119,6 @@
                                     1,
                                     12
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     13
@@ -135,7 +129,6 @@
                                     1,
                                     12
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     13
@@ -154,7 +147,6 @@
                                     1,
                                     24
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     25
@@ -165,7 +157,6 @@
                                     1,
                                     24
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     25
@@ -184,7 +175,6 @@
                                     1,
                                     28
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     29
@@ -195,7 +185,6 @@
                                     1,
                                     28
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     29
@@ -213,9 +202,9 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "d03a926d4d05c1a255a7a0cfc9b56d47d78ae9bb",
+    "sha1": "20922f45f08fe649a067e60016ed60a67c2c1c7e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "17f190c1e1d695127ad44863ac2d576475829a7a"
+    "sha2": "6fc93b6614e4cfff72463ca12e9987c14fb24c6f"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-replacement-test",
@@ -230,7 +219,6 @@
                                     1,
                                     10
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     11
@@ -241,7 +229,6 @@
                                     1,
                                     10
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     11
@@ -260,7 +247,6 @@
                                     1,
                                     12
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     13
@@ -271,7 +257,6 @@
                                     1,
                                     12
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     13
@@ -290,7 +275,6 @@
                                     1,
                                     24
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     25
@@ -301,7 +285,6 @@
                                     1,
                                     24
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     25
@@ -320,7 +303,6 @@
                                     1,
                                     28
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     29
@@ -331,7 +313,6 @@
                                     1,
                                     28
                                 ],
-                                "filepath": "anonymous-function.js",
                                 "end": [
                                     1,
                                     29
@@ -349,9 +330,9 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "17f190c1e1d695127ad44863ac2d576475829a7a",
+    "sha1": "6fc93b6614e4cfff72463ca12e9987c14fb24c6f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5220b599e5b17fd314a8dc74edca84ba8281599a"
+    "sha2": "c6ba2db9ae426f80263c615cc53d465d3e20417b"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-replacement-test",
@@ -365,7 +346,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "anonymous-function.js",
                             "end": [
                                 1,
                                 32
@@ -382,7 +362,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "anonymous-function.js",
                             "end": [
                                 2,
                                 32
@@ -399,7 +378,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "anonymous-function.js",
                             "end": [
                                 2,
                                 32
@@ -416,9 +394,9 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "5220b599e5b17fd314a8dc74edca84ba8281599a",
+    "sha1": "c6ba2db9ae426f80263c615cc53d465d3e20417b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0988f0cf1f9e846e520a14e4dc888a20066ea290"
+    "sha2": "95ca98c8ae2cc3b0eac592b39529678fbc60cb5e"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-test",
@@ -432,7 +410,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "anonymous-function.js",
                             "end": [
                                 1,
                                 32
@@ -449,9 +426,9 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "0988f0cf1f9e846e520a14e4dc888a20066ea290",
+    "sha1": "95ca98c8ae2cc3b0eac592b39529678fbc60cb5e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "17e45825eb444ba6321dc4048296cb5e573d413d"
+    "sha2": "fdc9c77b584391d5efc4ee112d766985422eccc3"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-function-delete-rest-test",
@@ -465,7 +442,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "anonymous-function.js",
                             "end": [
                                 1,
                                 32
@@ -482,7 +458,7 @@
     "filePaths": [
         "anonymous-function.js"
     ],
-    "sha1": "17e45825eb444ba6321dc4048296cb5e573d413d",
+    "sha1": "fdc9c77b584391d5efc4ee112d766985422eccc3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9cc9092ea7c2d10872eda86185bbb47582e25811"
+    "sha2": "d4b2414c028e39dae3876a16e6b0b213320be351"
 }]

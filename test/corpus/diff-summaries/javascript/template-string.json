@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "template-string.js",
                             "end": [
                                 1,
                                 11
@@ -27,9 +26,9 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "5e0220ed7ac30b0db50a637fd48230ca14da8570",
+    "sha1": "d4e864dd49194a81638843e841ec695be0760a6d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d98871e92febc329462bedc8c688840cd259b849"
+    "sha2": "0d94ff9667630ffc860f5cb5333f5f26852ae555"
 }
 ,{
     "testCaseDescription": "javascript-template-string-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "template-string.js",
                             "end": [
                                 1,
                                 13
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "template-string.js",
                             "end": [
                                 2,
                                 11
@@ -77,9 +74,9 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "d98871e92febc329462bedc8c688840cd259b849",
+    "sha1": "0d94ff9667630ffc860f5cb5333f5f26852ae555",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d67750ecf5b9269bbc3761c93b5c94eae1023f48"
+    "sha2": "72faa91275c8937b1126145609c84a63ab46fbae"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     1
                                 ],
-                                "filepath": "template-string.js",
                                 "end": [
                                     1,
                                     13
@@ -105,7 +101,6 @@
                                     1,
                                     1
                                 ],
-                                "filepath": "template-string.js",
                                 "end": [
                                     1,
                                     11
@@ -123,9 +118,9 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "d67750ecf5b9269bbc3761c93b5c94eae1023f48",
+    "sha1": "72faa91275c8937b1126145609c84a63ab46fbae",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "08d7aeef769e43372e65c79fa7df7b7875d9e16f"
+    "sha2": "db2725ffb5682a26cd55df80bd00aec08cbd0a43"
 }
 ,{
     "testCaseDescription": "javascript-template-string-replacement-test",
@@ -140,7 +135,6 @@
                                     1,
                                     1
                                 ],
-                                "filepath": "template-string.js",
                                 "end": [
                                     1,
                                     11
@@ -151,7 +145,6 @@
                                     1,
                                     1
                                 ],
-                                "filepath": "template-string.js",
                                 "end": [
                                     1,
                                     13
@@ -169,9 +162,9 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "08d7aeef769e43372e65c79fa7df7b7875d9e16f",
+    "sha1": "db2725ffb5682a26cd55df80bd00aec08cbd0a43",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7a66036cf1dc2d97b8768216a05eff379a082bc0"
+    "sha2": "90298bc75cf5d9c6227abf73fad97faae4e47c59"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-replacement-test",
@@ -185,7 +178,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "template-string.js",
                             "end": [
                                 1,
                                 13
@@ -202,7 +194,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "template-string.js",
                             "end": [
                                 2,
                                 11
@@ -219,7 +210,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "template-string.js",
                             "end": [
                                 2,
                                 13
@@ -236,9 +226,9 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "7a66036cf1dc2d97b8768216a05eff379a082bc0",
+    "sha1": "90298bc75cf5d9c6227abf73fad97faae4e47c59",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cfcad838fe06df4b8d40bbf9b52d4d83d7dda07c"
+    "sha2": "8769cac2a58027e4e04e72860fa8d37db5752dac"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-test",
@@ -252,7 +242,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "template-string.js",
                             "end": [
                                 1,
                                 11
@@ -269,9 +258,9 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "cfcad838fe06df4b8d40bbf9b52d4d83d7dda07c",
+    "sha1": "8769cac2a58027e4e04e72860fa8d37db5752dac",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "de8088ab3587f3bd19611beaf5bfd61f981c2d1e"
+    "sha2": "7e0fb2d00a7df954f0b8f7c8ec3f5473fa04df97"
 }
 ,{
     "testCaseDescription": "javascript-template-string-delete-rest-test",
@@ -285,7 +274,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "template-string.js",
                             "end": [
                                 1,
                                 13
@@ -302,7 +290,7 @@
     "filePaths": [
         "template-string.js"
     ],
-    "sha1": "de8088ab3587f3bd19611beaf5bfd61f981c2d1e",
+    "sha1": "7e0fb2d00a7df954f0b8f7c8ec3f5473fa04df97",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e9fcb09c83fad74eddeca9ca622366a53a55888b"
+    "sha2": "85d810a0c973ca0394d96cd18baacac324ce884f"
 }]

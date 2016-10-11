@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "this-expression.js",
                             "end": [
                                 1,
                                 5
@@ -27,9 +26,9 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "a0b31feb22c899b106e153d1abbe125b102e7ddb",
+    "sha1": "7b97e72d7c0e6b3898be9d1deb06da6b7ea09764",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "753cb180424907bbe0888abdc02a401f46ef4ce4"
+    "sha2": "a2a8fb25467bf9403e4de37a8f434852ed8f848b"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "this-expression.js",
                             "end": [
                                 1,
                                 13
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "this-expression.js",
                             "end": [
                                 2,
                                 5
@@ -77,9 +74,9 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "753cb180424907bbe0888abdc02a401f46ef4ce4",
+    "sha1": "a2a8fb25467bf9403e4de37a8f434852ed8f848b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "654307c95dc0c80c6a5233c515c3ccc417c5b8dd"
+    "sha2": "6625c63c5f06e702ef97f2fdc3a25ff525e70e4f"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-delete-insert-test",
@@ -93,7 +90,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "this-expression.js",
                             "end": [
                                 1,
                                 5
@@ -110,7 +106,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "this-expression.js",
                             "end": [
                                 1,
                                 13
@@ -127,9 +122,9 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "654307c95dc0c80c6a5233c515c3ccc417c5b8dd",
+    "sha1": "6625c63c5f06e702ef97f2fdc3a25ff525e70e4f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c8908ed9d5b7f834e930ca5af7efa45daaa9140b"
+    "sha2": "ffbed3418a24653fbd26b4cd35deb23988f30198"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-replacement-test",
@@ -143,7 +138,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "this-expression.js",
                             "end": [
                                 1,
                                 13
@@ -160,7 +154,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "this-expression.js",
                             "end": [
                                 1,
                                 5
@@ -177,9 +170,9 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "c8908ed9d5b7f834e930ca5af7efa45daaa9140b",
+    "sha1": "ffbed3418a24653fbd26b4cd35deb23988f30198",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1119408a872e348a53b96c9cb58ce45ae9644581"
+    "sha2": "7db7900eb04a66af0196e73999687ba83b168947"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-delete-replacement-test",
@@ -193,7 +186,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "this-expression.js",
                             "end": [
                                 1,
                                 13
@@ -210,7 +202,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "this-expression.js",
                             "end": [
                                 2,
                                 5
@@ -227,7 +218,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "this-expression.js",
                             "end": [
                                 2,
                                 13
@@ -244,9 +234,9 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "1119408a872e348a53b96c9cb58ce45ae9644581",
+    "sha1": "7db7900eb04a66af0196e73999687ba83b168947",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1425f90993e565bc6d65d94cad9827980243879b"
+    "sha2": "220159fc73518eb2ba3c195c9d230c523137fb9d"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-delete-test",
@@ -260,7 +250,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "this-expression.js",
                             "end": [
                                 1,
                                 5
@@ -277,9 +266,9 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "1425f90993e565bc6d65d94cad9827980243879b",
+    "sha1": "220159fc73518eb2ba3c195c9d230c523137fb9d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b41ef9cf7c33890dcf4b8af86f5cfe3b760467d3"
+    "sha2": "3594ddd1cbf054031d468b2ce85d2c617ac5bd51"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-delete-rest-test",
@@ -293,7 +282,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "this-expression.js",
                             "end": [
                                 1,
                                 13
@@ -310,7 +298,7 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "b41ef9cf7c33890dcf4b8af86f5cfe3b760467d3",
+    "sha1": "3594ddd1cbf054031d468b2ce85d2c617ac5bd51",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0778d978feeb2e6973ff377ef502edef0f0ad001"
+    "sha2": "72aab09a49d2096eccd1ff0f785ef1b2d9283961"
 }]

@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "type-operator.js",
                             "end": [
                                 1,
                                 9
@@ -27,9 +26,9 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "36d39106df17e7d991fd60224e3c0189505fe9a7",
+    "sha1": "184d21574db41e0343ee9e0ebe166495b6205fff",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f433383cd8dd14593d8a18d0779a49270638a7c9"
+    "sha2": "720e0e4fb3fd308a3a024852f65dccb5a3159645"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "type-operator.js",
                             "end": [
                                 1,
                                 20
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "type-operator.js",
                             "end": [
                                 2,
                                 9
@@ -77,9 +74,9 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "f433383cd8dd14593d8a18d0779a49270638a7c9",
+    "sha1": "720e0e4fb3fd308a3a024852f65dccb5a3159645",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5ec3eddcb180a6def3bf030be54b77050c2b20e6"
+    "sha2": "ba9af83b00f98272bde1cab0c624397e934650c0"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-insert-test",
@@ -93,7 +90,6 @@
                                 1,
                                 14
                             ],
-                            "filepath": "type-operator.js",
                             "end": [
                                 1,
                                 20
@@ -110,9 +106,9 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "5ec3eddcb180a6def3bf030be54b77050c2b20e6",
+    "sha1": "ba9af83b00f98272bde1cab0c624397e934650c0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b4fd8c7c8da20719c150f97209d8a00a946b47b9"
+    "sha2": "71d60e89b4137fd4a2e0cc552789f9cfc04264c3"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-replacement-test",
@@ -126,7 +122,6 @@
                                 1,
                                 14
                             ],
-                            "filepath": "type-operator.js",
                             "end": [
                                 1,
                                 20
@@ -143,9 +138,9 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "b4fd8c7c8da20719c150f97209d8a00a946b47b9",
+    "sha1": "71d60e89b4137fd4a2e0cc552789f9cfc04264c3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bd42bc71c775872fa957a75c9c726143e95c581a"
+    "sha2": "1c735c0485ca5c653addd5814e52595ac5787cdb"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-replacement-test",
@@ -159,7 +154,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "type-operator.js",
                             "end": [
                                 1,
                                 20
@@ -176,7 +170,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "type-operator.js",
                             "end": [
                                 2,
                                 9
@@ -193,7 +186,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "type-operator.js",
                             "end": [
                                 2,
                                 20
@@ -210,9 +202,9 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "bd42bc71c775872fa957a75c9c726143e95c581a",
+    "sha1": "1c735c0485ca5c653addd5814e52595ac5787cdb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "561a8e99f9c5a2a2c8e1c0fcbfca58522b922d16"
+    "sha2": "c85218016394b93295e0cef901de2755be8e901c"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-test",
@@ -226,7 +218,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "type-operator.js",
                             "end": [
                                 1,
                                 9
@@ -243,9 +234,9 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "561a8e99f9c5a2a2c8e1c0fcbfca58522b922d16",
+    "sha1": "c85218016394b93295e0cef901de2755be8e901c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9df4658d7424a8a103978f23bb2eb6e55219c9ce"
+    "sha2": "2928891cdd48936b69827f3ae19220bbb30d3b6e"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-rest-test",
@@ -259,7 +250,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "type-operator.js",
                             "end": [
                                 1,
                                 20
@@ -276,7 +266,7 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "9df4658d7424a8a103978f23bb2eb6e55219c9ce",
+    "sha1": "2928891cdd48936b69827f3ae19220bbb30d3b6e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d7d8b169c8385f3a91f99dd299e5ebb566e5a346"
+    "sha2": "50c9fb7f60331db7c4a5580663122bf6c875340c"
 }]

@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "false.js",
                             "end": [
                                 1,
                                 6
@@ -27,9 +26,9 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "4bdbc3b261a181ab8a66d17f1946997d7cf9e70c",
+    "sha1": "bc59c08d8b5b00715bbf8e852bee86bfed8d5f03",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "291d22d3328572cc0ba03c8fe6f2cd251829f4ad"
+    "sha2": "0e8162ddf892bf944707eefa68da4d8c3097ee5e"
 }
 ,{
     "testCaseDescription": "javascript-false-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "false.js",
                             "end": [
                                 1,
                                 14
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "false.js",
                             "end": [
                                 2,
                                 6
@@ -77,9 +74,9 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "291d22d3328572cc0ba03c8fe6f2cd251829f4ad",
+    "sha1": "0e8162ddf892bf944707eefa68da4d8c3097ee5e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b2e1de5041bb2f680f34ecbc6e03a85995718a84"
+    "sha2": "827e84992521a53a4672e7487814a3d904570c3c"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-insert-test",
@@ -93,7 +90,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "false.js",
                             "end": [
                                 1,
                                 6
@@ -110,7 +106,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "false.js",
                             "end": [
                                 1,
                                 14
@@ -127,9 +122,9 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "b2e1de5041bb2f680f34ecbc6e03a85995718a84",
+    "sha1": "827e84992521a53a4672e7487814a3d904570c3c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8cad66c7d19c61e0de7f8616a842ee3d2319bef5"
+    "sha2": "8ad16f2c510212119c87a32df1d0661c7f091533"
 }
 ,{
     "testCaseDescription": "javascript-false-replacement-test",
@@ -143,7 +138,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "false.js",
                             "end": [
                                 1,
                                 14
@@ -160,7 +154,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "false.js",
                             "end": [
                                 1,
                                 6
@@ -177,9 +170,9 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "8cad66c7d19c61e0de7f8616a842ee3d2319bef5",
+    "sha1": "8ad16f2c510212119c87a32df1d0661c7f091533",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "618390d2b227652f399804f8c1e01c26d7054d0a"
+    "sha2": "5665bce4ee27c2b5f56afbc88b0ca17f85902c6a"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-replacement-test",
@@ -193,7 +186,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "false.js",
                             "end": [
                                 1,
                                 14
@@ -210,7 +202,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "false.js",
                             "end": [
                                 2,
                                 6
@@ -227,7 +218,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "false.js",
                             "end": [
                                 2,
                                 14
@@ -244,9 +234,9 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "618390d2b227652f399804f8c1e01c26d7054d0a",
+    "sha1": "5665bce4ee27c2b5f56afbc88b0ca17f85902c6a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9d0f2ba31db2545c092de8d363d26ecd09f8f5d1"
+    "sha2": "5e7609a2a963055a420461b6743e96adb7cf9b88"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-test",
@@ -260,7 +250,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "false.js",
                             "end": [
                                 1,
                                 6
@@ -277,9 +266,9 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "9d0f2ba31db2545c092de8d363d26ecd09f8f5d1",
+    "sha1": "5e7609a2a963055a420461b6743e96adb7cf9b88",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7ae3334729126248117acf5177540fbe52f5c4b3"
+    "sha2": "1a3f66f5555eef7dbe41dd82451d089a5c3648d6"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-rest-test",
@@ -293,7 +282,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "false.js",
                             "end": [
                                 1,
                                 14
@@ -310,7 +298,7 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "7ae3334729126248117acf5177540fbe52f5c4b3",
+    "sha1": "1a3f66f5555eef7dbe41dd82451d089a5c3648d6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "70901cee54467ad046311d039d1dca528a0a7111"
+    "sha2": "87ef7d96585dfee34d9371968cd3cbec7f8a1d97"
 }]

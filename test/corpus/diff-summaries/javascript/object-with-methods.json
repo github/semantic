@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "objects-with-methods.js",
                             "end": [
                                 1,
                                 32
@@ -27,9 +26,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "f9fa9489012e03e0ba9e457e290b45d3876c02e6",
+    "sha1": "f13aef7dcdfe65826b6d93b4b371afe29a12f21f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6108fee4a861880a4b02bf5fb1e9f5ed096d24a4"
+    "sha2": "96b548baab802a6e28144b588e564b28ff84ac55"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "objects-with-methods.js",
                             "end": [
                                 1,
                                 37
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "objects-with-methods.js",
                             "end": [
                                 2,
                                 32
@@ -77,9 +74,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "6108fee4a861880a4b02bf5fb1e9f5ed096d24a4",
+    "sha1": "96b548baab802a6e28144b588e564b28ff84ac55",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "372855e063f5f8949765f4223648b489e3472637"
+    "sha2": "1293592160bd09b7bc12a75581a7496a70bb8f81"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     3
                                 ],
-                                "filepath": "objects-with-methods.js",
                                 "end": [
                                     1,
                                     11
@@ -105,7 +101,6 @@
                                     1,
                                     3
                                 ],
-                                "filepath": "objects-with-methods.js",
                                 "end": [
                                     1,
                                     6
@@ -123,9 +118,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "372855e063f5f8949765f4223648b489e3472637",
+    "sha1": "1293592160bd09b7bc12a75581a7496a70bb8f81",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1813d1915cb03d8fec802134aab74575e9e2fbec"
+    "sha2": "ee09bff08bb2a4467e2d2733db38fdc35a91fa01"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-replacement-test",
@@ -140,7 +135,6 @@
                                     1,
                                     3
                                 ],
-                                "filepath": "objects-with-methods.js",
                                 "end": [
                                     1,
                                     6
@@ -151,7 +145,6 @@
                                     1,
                                     3
                                 ],
-                                "filepath": "objects-with-methods.js",
                                 "end": [
                                     1,
                                     11
@@ -169,9 +162,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "1813d1915cb03d8fec802134aab74575e9e2fbec",
+    "sha1": "ee09bff08bb2a4467e2d2733db38fdc35a91fa01",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "28f4990c4ff3b9c0f7c4b5c846d2fcc0008ad7c4"
+    "sha2": "70c38b12df93c18958a2ff94145a5c1b8f64e0d1"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-replacement-test",
@@ -185,7 +178,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "objects-with-methods.js",
                             "end": [
                                 1,
                                 37
@@ -202,7 +194,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "objects-with-methods.js",
                             "end": [
                                 2,
                                 32
@@ -219,7 +210,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "objects-with-methods.js",
                             "end": [
                                 2,
                                 37
@@ -236,9 +226,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "28f4990c4ff3b9c0f7c4b5c846d2fcc0008ad7c4",
+    "sha1": "70c38b12df93c18958a2ff94145a5c1b8f64e0d1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f5fe20d829ca8e47eba06cdac286cd542d4d1a41"
+    "sha2": "c9f20856166b00c740c53d34289d5bdafcfe73f8"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-test",
@@ -252,7 +242,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "objects-with-methods.js",
                             "end": [
                                 1,
                                 32
@@ -269,9 +258,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "f5fe20d829ca8e47eba06cdac286cd542d4d1a41",
+    "sha1": "c9f20856166b00c740c53d34289d5bdafcfe73f8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "380c12fa56e7333f635d55f5a9a1f476990ec6a2"
+    "sha2": "f8a7132e504b1bf9154a8946db3bc7a412c3e983"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-rest-test",
@@ -285,7 +274,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "objects-with-methods.js",
                             "end": [
                                 1,
                                 37
@@ -302,7 +290,7 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "380c12fa56e7333f635d55f5a9a1f476990ec6a2",
+    "sha1": "f8a7132e504b1bf9154a8946db3bc7a412c3e983",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b7ff6b2fd2253011bcaadd23ed546003c4bbd5b3"
+    "sha2": "179d020d71ae2d25e7da3fa6af1db307411db219"
 }]

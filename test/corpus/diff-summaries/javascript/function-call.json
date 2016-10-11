@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "function-call.js",
                             "end": [
                                 1,
                                 27
@@ -27,9 +26,9 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "4eca89a41a58f273d4b0819fde38f18c1f8e8021",
+    "sha1": "2920543b3620bcf0c44e9f14e9b9173b7ffaaf74",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "92c1472cd33095ff48619ee70f121124b0824982"
+    "sha2": "7fb60101d44227f815b26e0ddf7192c814147c0a"
 }
 ,{
     "testCaseDescription": "javascript-function-call-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "function-call.js",
                             "end": [
                                 1,
                                 27
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "function-call.js",
                             "end": [
                                 2,
                                 27
@@ -77,9 +74,9 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "92c1472cd33095ff48619ee70f121124b0824982",
+    "sha1": "7fb60101d44227f815b26e0ddf7192c814147c0a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3d1432206f287820e06179320645a20bc044e0cd"
+    "sha2": "b8ef71202991eb150947127c3d627dfefbfb9cbd"
 }
 ,{
     "testCaseDescription": "javascript-function-call-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     20
                                 ],
-                                "filepath": "function-call.js",
                                 "end": [
                                     1,
                                     26
@@ -105,7 +101,6 @@
                                     1,
                                     20
                                 ],
-                                "filepath": "function-call.js",
                                 "end": [
                                     1,
                                     26
@@ -123,9 +118,9 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "3d1432206f287820e06179320645a20bc044e0cd",
+    "sha1": "b8ef71202991eb150947127c3d627dfefbfb9cbd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d12a8afd790463d0f757c83c263cf0edd9d827c7"
+    "sha2": "1c6634e5803e9eae248fb104c87d95b7ca4911f3"
 }
 ,{
     "testCaseDescription": "javascript-function-call-replacement-test",
@@ -140,7 +135,6 @@
                                     1,
                                     20
                                 ],
-                                "filepath": "function-call.js",
                                 "end": [
                                     1,
                                     26
@@ -151,7 +145,6 @@
                                     1,
                                     20
                                 ],
-                                "filepath": "function-call.js",
                                 "end": [
                                     1,
                                     26
@@ -169,9 +162,9 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "d12a8afd790463d0f757c83c263cf0edd9d827c7",
+    "sha1": "1c6634e5803e9eae248fb104c87d95b7ca4911f3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6587722b506d7a8ceae803f9e5f7b0d8f0958401"
+    "sha2": "89d68d8b51fcfcf79005c5616ee95351c6eb9d61"
 }
 ,{
     "testCaseDescription": "javascript-function-call-delete-replacement-test",
@@ -185,7 +178,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "function-call.js",
                             "end": [
                                 1,
                                 27
@@ -202,7 +194,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "function-call.js",
                             "end": [
                                 2,
                                 27
@@ -219,7 +210,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "function-call.js",
                             "end": [
                                 2,
                                 27
@@ -236,9 +226,9 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "6587722b506d7a8ceae803f9e5f7b0d8f0958401",
+    "sha1": "89d68d8b51fcfcf79005c5616ee95351c6eb9d61",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c54c453d06597281a9e92b21dadc3a6672f717ad"
+    "sha2": "25b62ac788457989d53e49e35e947be2120e91d4"
 }
 ,{
     "testCaseDescription": "javascript-function-call-delete-test",
@@ -252,7 +242,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "function-call.js",
                             "end": [
                                 1,
                                 27
@@ -269,9 +258,9 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "c54c453d06597281a9e92b21dadc3a6672f717ad",
+    "sha1": "25b62ac788457989d53e49e35e947be2120e91d4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "11d88c653401dab427534d1e417f80aadf14db77"
+    "sha2": "d67336b7b60950bf99ef6777a6d25cd8a6cb57a6"
 }
 ,{
     "testCaseDescription": "javascript-function-call-delete-rest-test",
@@ -285,7 +274,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "function-call.js",
                             "end": [
                                 1,
                                 27
@@ -302,7 +290,7 @@
     "filePaths": [
         "function-call.js"
     ],
-    "sha1": "11d88c653401dab427534d1e417f80aadf14db77",
+    "sha1": "d67336b7b60950bf99ef6777a6d25cd8a6cb57a6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d1d52518c72665ed2a4fee18636ce01a6be5ad1b"
+    "sha2": "b0e9ef95e61d208d86142a5e5682fe30ceb18c8b"
 }]
