@@ -10,7 +10,7 @@
                                 1,
                                 1
                             ],
-                            "name": "class.js",
+                            "filepath": "class.js",
                             "end": [
                                 1,
                                 87
@@ -27,9 +27,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "a73251e778f05b8cbe501d5f6ea0c483640ced20",
+    "sha1": "a77ec4befeb4574a4433a062878d43b231a916bc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d14f6c7cb29e72223e5d2c7170379f99f8a893b2"
+    "sha2": "41dc947bf0ee187b5783d62de471d6c74cdf6df2"
 }
 ,{
     "testCaseDescription": "javascript-class-replacement-insert-test",
@@ -43,7 +43,7 @@
                                 1,
                                 1
                             ],
-                            "name": "class.js",
+                            "filepath": "class.js",
                             "end": [
                                 1,
                                 85
@@ -60,7 +60,7 @@
                                 2,
                                 1
                             ],
-                            "name": "class.js",
+                            "filepath": "class.js",
                             "end": [
                                 2,
                                 87
@@ -77,9 +77,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "d14f6c7cb29e72223e5d2c7170379f99f8a893b2",
+    "sha1": "41dc947bf0ee187b5783d62de471d6c74cdf6df2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7c73aea04cb45042bf232a448d426be9ae888a9b"
+    "sha2": "ad979810f114bac8db323d00a003eff85983f777"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-insert-test",
@@ -94,7 +94,7 @@
                                     1,
                                     20
                                 ],
-                                "name": "class.js",
+                                "filepath": "class.js",
                                 "end": [
                                     1,
                                     23
@@ -105,7 +105,7 @@
                                     1,
                                     20
                                 ],
-                                "name": "class.js",
+                                "filepath": "class.js",
                                 "end": [
                                     1,
                                     23
@@ -124,7 +124,7 @@
                                     1,
                                     42
                                 ],
-                                "name": "class.js",
+                                "filepath": "class.js",
                                 "end": [
                                     1,
                                     45
@@ -135,7 +135,7 @@
                                     1,
                                     42
                                 ],
-                                "name": "class.js",
+                                "filepath": "class.js",
                                 "end": [
                                     1,
                                     45
@@ -154,7 +154,7 @@
                                     1,
                                     63
                                 ],
-                                "name": "class.js",
+                                "filepath": "class.js",
                                 "end": [
                                     1,
                                     66
@@ -165,7 +165,7 @@
                                     1,
                                     63
                                 ],
-                                "name": "class.js",
+                                "filepath": "class.js",
                                 "end": [
                                     1,
                                     68
@@ -183,9 +183,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "7c73aea04cb45042bf232a448d426be9ae888a9b",
+    "sha1": "ad979810f114bac8db323d00a003eff85983f777",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "aecfbbcd53407a567f46a40cad9270e0bf22458a"
+    "sha2": "fcb3d418dbb3440d98664e22a3ce8ed40ccfb8a6"
 }
 ,{
     "testCaseDescription": "javascript-class-replacement-test",
@@ -200,7 +200,7 @@
                                     1,
                                     20
                                 ],
-                                "name": "class.js",
+                                "filepath": "class.js",
                                 "end": [
                                     1,
                                     23
@@ -211,7 +211,7 @@
                                     1,
                                     20
                                 ],
-                                "name": "class.js",
+                                "filepath": "class.js",
                                 "end": [
                                     1,
                                     23
@@ -230,7 +230,7 @@
                                     1,
                                     42
                                 ],
-                                "name": "class.js",
+                                "filepath": "class.js",
                                 "end": [
                                     1,
                                     45
@@ -241,7 +241,7 @@
                                     1,
                                     42
                                 ],
-                                "name": "class.js",
+                                "filepath": "class.js",
                                 "end": [
                                     1,
                                     45
@@ -260,7 +260,7 @@
                                     1,
                                     63
                                 ],
-                                "name": "class.js",
+                                "filepath": "class.js",
                                 "end": [
                                     1,
                                     68
@@ -271,7 +271,7 @@
                                     1,
                                     63
                                 ],
-                                "name": "class.js",
+                                "filepath": "class.js",
                                 "end": [
                                     1,
                                     66
@@ -289,9 +289,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "aecfbbcd53407a567f46a40cad9270e0bf22458a",
+    "sha1": "fcb3d418dbb3440d98664e22a3ce8ed40ccfb8a6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f35ad41e7a506af4049a99149a8f42fe403fd3c2"
+    "sha2": "bb881c2e2459f032b76724998560c185e8282c51"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-replacement-test",
@@ -305,7 +305,7 @@
                                 1,
                                 1
                             ],
-                            "name": "class.js",
+                            "filepath": "class.js",
                             "end": [
                                 1,
                                 85
@@ -322,7 +322,7 @@
                                 2,
                                 1
                             ],
-                            "name": "class.js",
+                            "filepath": "class.js",
                             "end": [
                                 2,
                                 87
@@ -339,7 +339,7 @@
                                 2,
                                 1
                             ],
-                            "name": "class.js",
+                            "filepath": "class.js",
                             "end": [
                                 2,
                                 85
@@ -356,9 +356,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "f35ad41e7a506af4049a99149a8f42fe403fd3c2",
+    "sha1": "bb881c2e2459f032b76724998560c185e8282c51",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "408c1f0028eff597ce2334d8b98a0692fbc32ee2"
+    "sha2": "6b97add2716043508dd60d4ab6d35399d708a603"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-test",
@@ -372,7 +372,7 @@
                                 1,
                                 1
                             ],
-                            "name": "class.js",
+                            "filepath": "class.js",
                             "end": [
                                 1,
                                 87
@@ -389,9 +389,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "408c1f0028eff597ce2334d8b98a0692fbc32ee2",
+    "sha1": "6b97add2716043508dd60d4ab6d35399d708a603",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1414ce434ca9fe4f8b0cdfb16e7e50bcdd12055f"
+    "sha2": "1508d11e42bb6de8bdabee2f19e7f90bf2b8925c"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-rest-test",
@@ -405,7 +405,7 @@
                                 1,
                                 1
                             ],
-                            "name": "class.js",
+                            "filepath": "class.js",
                             "end": [
                                 1,
                                 85
@@ -422,7 +422,7 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "1414ce434ca9fe4f8b0cdfb16e7e50bcdd12055f",
+    "sha1": "1508d11e42bb6de8bdabee2f19e7f90bf2b8925c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "04b681e1190310f6148595f3d80260ae13299d43"
+    "sha2": "a6be8db7f10bd0797e3bcfbbfa28b19f82697dfe"
 }]

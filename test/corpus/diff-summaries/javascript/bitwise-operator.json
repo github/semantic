@@ -10,7 +10,7 @@
                                 1,
                                 1
                             ],
-                            "name": "bitwise-operator.js",
+                            "filepath": "bitwise-operator.js",
                             "end": [
                                 1,
                                 7
@@ -27,9 +27,9 @@
     "filePaths": [
         "bitwise-operator.js"
     ],
-    "sha1": "8a735ff7a31a77424b93ff74548a5ca81e1dba3f",
+    "sha1": "1eec94ffb9b040257cafa5072d19b25f14a33263",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4e79490e2d815ab0f81dd5cec2022bf83f3ed235"
+    "sha2": "30f68d7dd11df4d82141aa25e30bf22e944b7e8c"
 }
 ,{
     "testCaseDescription": "javascript-bitwise-operator-replacement-insert-test",
@@ -43,7 +43,7 @@
                                 1,
                                 1
                             ],
-                            "name": "bitwise-operator.js",
+                            "filepath": "bitwise-operator.js",
                             "end": [
                                 1,
                                 7
@@ -60,7 +60,7 @@
                                 2,
                                 1
                             ],
-                            "name": "bitwise-operator.js",
+                            "filepath": "bitwise-operator.js",
                             "end": [
                                 2,
                                 7
@@ -77,9 +77,9 @@
     "filePaths": [
         "bitwise-operator.js"
     ],
-    "sha1": "4e79490e2d815ab0f81dd5cec2022bf83f3ed235",
+    "sha1": "30f68d7dd11df4d82141aa25e30bf22e944b7e8c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "72d4748300623514be5fd407a75cff6b3378b955"
+    "sha2": "8f3714e23c1c45e4ea0f0ca881ec61587847bc28"
 }
 ,{
     "testCaseDescription": "javascript-bitwise-operator-delete-insert-test",
@@ -94,7 +94,7 @@
                                     1,
                                     6
                                 ],
-                                "name": "bitwise-operator.js",
+                                "filepath": "bitwise-operator.js",
                                 "end": [
                                     1,
                                     7
@@ -105,7 +105,7 @@
                                     1,
                                     6
                                 ],
-                                "name": "bitwise-operator.js",
+                                "filepath": "bitwise-operator.js",
                                 "end": [
                                     1,
                                     7
@@ -123,9 +123,9 @@
     "filePaths": [
         "bitwise-operator.js"
     ],
-    "sha1": "72d4748300623514be5fd407a75cff6b3378b955",
+    "sha1": "8f3714e23c1c45e4ea0f0ca881ec61587847bc28",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "69b73f68b68e2ab525a929d74e3a43df64ef88b4"
+    "sha2": "741a0c2e36a58dd74d2ebe88649be45b8599461e"
 }
 ,{
     "testCaseDescription": "javascript-bitwise-operator-replacement-test",
@@ -140,7 +140,7 @@
                                     1,
                                     6
                                 ],
-                                "name": "bitwise-operator.js",
+                                "filepath": "bitwise-operator.js",
                                 "end": [
                                     1,
                                     7
@@ -151,7 +151,7 @@
                                     1,
                                     6
                                 ],
-                                "name": "bitwise-operator.js",
+                                "filepath": "bitwise-operator.js",
                                 "end": [
                                     1,
                                     7
@@ -169,9 +169,9 @@
     "filePaths": [
         "bitwise-operator.js"
     ],
-    "sha1": "69b73f68b68e2ab525a929d74e3a43df64ef88b4",
+    "sha1": "741a0c2e36a58dd74d2ebe88649be45b8599461e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c12333aa2b749340791848b0f57610a5c6b52faf"
+    "sha2": "e2fc526fde736efe55c5827a911a530485a15004"
 }
 ,{
     "testCaseDescription": "javascript-bitwise-operator-delete-replacement-test",
@@ -185,7 +185,7 @@
                                 1,
                                 1
                             ],
-                            "name": "bitwise-operator.js",
+                            "filepath": "bitwise-operator.js",
                             "end": [
                                 1,
                                 7
@@ -202,7 +202,7 @@
                                 2,
                                 1
                             ],
-                            "name": "bitwise-operator.js",
+                            "filepath": "bitwise-operator.js",
                             "end": [
                                 2,
                                 7
@@ -219,7 +219,7 @@
                                 2,
                                 1
                             ],
-                            "name": "bitwise-operator.js",
+                            "filepath": "bitwise-operator.js",
                             "end": [
                                 2,
                                 7
@@ -236,9 +236,9 @@
     "filePaths": [
         "bitwise-operator.js"
     ],
-    "sha1": "c12333aa2b749340791848b0f57610a5c6b52faf",
+    "sha1": "e2fc526fde736efe55c5827a911a530485a15004",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1e669bdb2a1cd74b9f08dd9b1aa43014973a1f8c"
+    "sha2": "45721058bcdb26087b7c87c506315bb6e07007a8"
 }
 ,{
     "testCaseDescription": "javascript-bitwise-operator-delete-test",
@@ -252,7 +252,7 @@
                                 1,
                                 1
                             ],
-                            "name": "bitwise-operator.js",
+                            "filepath": "bitwise-operator.js",
                             "end": [
                                 1,
                                 7
@@ -269,9 +269,9 @@
     "filePaths": [
         "bitwise-operator.js"
     ],
-    "sha1": "1e669bdb2a1cd74b9f08dd9b1aa43014973a1f8c",
+    "sha1": "45721058bcdb26087b7c87c506315bb6e07007a8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ac8d1c7f04041084bdee5e5d66b09735976372c2"
+    "sha2": "fa89fd128d8f8480cfabfc30e39c1bab2ccd090e"
 }
 ,{
     "testCaseDescription": "javascript-bitwise-operator-delete-rest-test",
@@ -285,7 +285,7 @@
                                 1,
                                 1
                             ],
-                            "name": "bitwise-operator.js",
+                            "filepath": "bitwise-operator.js",
                             "end": [
                                 1,
                                 7
@@ -302,7 +302,7 @@
     "filePaths": [
         "bitwise-operator.js"
     ],
-    "sha1": "ac8d1c7f04041084bdee5e5d66b09735976372c2",
+    "sha1": "fa89fd128d8f8480cfabfc30e39c1bab2ccd090e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "088c27d2d4e2150bac4bff85c129df8d90a407c2"
+    "sha2": "024f82fddfdef0b3d3e3778c756268054fa2918b"
 }]

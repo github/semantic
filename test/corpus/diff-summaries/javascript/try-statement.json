@@ -10,7 +10,7 @@
                                 1,
                                 1
                             ],
-                            "name": "try-statement.js",
+                            "filepath": "try-statement.js",
                             "end": [
                                 1,
                                 39
@@ -27,9 +27,9 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "37116a9b6cbef2a356805bbeaf6ab65cdcac7749",
+    "sha1": "60a8828fc9bf6d94594def1279d1bec1e2d57e26",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a4e8b07dddedfa2d15a61dbb4b3141e2d9f990e2"
+    "sha2": "054a281f018e2e09cc4f2d90effaf656688a7768"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-replacement-insert-test",
@@ -43,7 +43,7 @@
                                 1,
                                 1
                             ],
-                            "name": "try-statement.js",
+                            "filepath": "try-statement.js",
                             "end": [
                                 1,
                                 39
@@ -60,7 +60,7 @@
                                 2,
                                 1
                             ],
-                            "name": "try-statement.js",
+                            "filepath": "try-statement.js",
                             "end": [
                                 2,
                                 39
@@ -77,9 +77,9 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "a4e8b07dddedfa2d15a61dbb4b3141e2d9f990e2",
+    "sha1": "054a281f018e2e09cc4f2d90effaf656688a7768",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b7d82c2afa8c802c9cc1f12bf9b1482355e78a72"
+    "sha2": "c495c552becd1ac3f95a5ee8d86e6bb098513b0d"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-delete-insert-test",
@@ -94,7 +94,7 @@
                                     1,
                                     20
                                 ],
-                                "name": "try-statement.js",
+                                "filepath": "try-statement.js",
                                 "end": [
                                     1,
                                     21
@@ -105,7 +105,7 @@
                                     1,
                                     20
                                 ],
-                                "name": "try-statement.js",
+                                "filepath": "try-statement.js",
                                 "end": [
                                     1,
                                     21
@@ -124,7 +124,7 @@
                                     1,
                                     35
                                 ],
-                                "name": "try-statement.js",
+                                "filepath": "try-statement.js",
                                 "end": [
                                     1,
                                     36
@@ -135,7 +135,7 @@
                                     1,
                                     35
                                 ],
-                                "name": "try-statement.js",
+                                "filepath": "try-statement.js",
                                 "end": [
                                     1,
                                     36
@@ -153,9 +153,9 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "b7d82c2afa8c802c9cc1f12bf9b1482355e78a72",
+    "sha1": "c495c552becd1ac3f95a5ee8d86e6bb098513b0d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d226c84d231a5589a524dfefebf69c7f768bdb07"
+    "sha2": "51b70762a3831d9681da7d8e5ef7dc1d845b0e69"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-replacement-test",
@@ -170,7 +170,7 @@
                                     1,
                                     20
                                 ],
-                                "name": "try-statement.js",
+                                "filepath": "try-statement.js",
                                 "end": [
                                     1,
                                     21
@@ -181,7 +181,7 @@
                                     1,
                                     20
                                 ],
-                                "name": "try-statement.js",
+                                "filepath": "try-statement.js",
                                 "end": [
                                     1,
                                     21
@@ -200,7 +200,7 @@
                                     1,
                                     35
                                 ],
-                                "name": "try-statement.js",
+                                "filepath": "try-statement.js",
                                 "end": [
                                     1,
                                     36
@@ -211,7 +211,7 @@
                                     1,
                                     35
                                 ],
-                                "name": "try-statement.js",
+                                "filepath": "try-statement.js",
                                 "end": [
                                     1,
                                     36
@@ -229,9 +229,9 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "d226c84d231a5589a524dfefebf69c7f768bdb07",
+    "sha1": "51b70762a3831d9681da7d8e5ef7dc1d845b0e69",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1f2a4307a65b7dfee0c12be6a32d321219823032"
+    "sha2": "b71fb894809567ac50335c2d2e052dd0e5795749"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-delete-replacement-test",
@@ -245,7 +245,7 @@
                                 1,
                                 1
                             ],
-                            "name": "try-statement.js",
+                            "filepath": "try-statement.js",
                             "end": [
                                 1,
                                 39
@@ -262,7 +262,7 @@
                                 2,
                                 1
                             ],
-                            "name": "try-statement.js",
+                            "filepath": "try-statement.js",
                             "end": [
                                 2,
                                 39
@@ -279,7 +279,7 @@
                                 2,
                                 1
                             ],
-                            "name": "try-statement.js",
+                            "filepath": "try-statement.js",
                             "end": [
                                 2,
                                 39
@@ -296,9 +296,9 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "1f2a4307a65b7dfee0c12be6a32d321219823032",
+    "sha1": "b71fb894809567ac50335c2d2e052dd0e5795749",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8c44248e45552ea0890d9af4d83c529c367f0962"
+    "sha2": "81b001520df1f6fba7bcbe6bf3d40dc2a5e460ee"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-delete-test",
@@ -312,7 +312,7 @@
                                 1,
                                 1
                             ],
-                            "name": "try-statement.js",
+                            "filepath": "try-statement.js",
                             "end": [
                                 1,
                                 39
@@ -329,9 +329,9 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "8c44248e45552ea0890d9af4d83c529c367f0962",
+    "sha1": "81b001520df1f6fba7bcbe6bf3d40dc2a5e460ee",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1cfe73a72235d8cddd34b3b206764bb83c2af7bd"
+    "sha2": "c2bef7133d32ac9f30150f1e83b35ed095ea220d"
 }
 ,{
     "testCaseDescription": "javascript-try-statement-delete-rest-test",
@@ -345,7 +345,7 @@
                                 1,
                                 1
                             ],
-                            "name": "try-statement.js",
+                            "filepath": "try-statement.js",
                             "end": [
                                 1,
                                 39
@@ -362,7 +362,7 @@
     "filePaths": [
         "try-statement.js"
     ],
-    "sha1": "1cfe73a72235d8cddd34b3b206764bb83c2af7bd",
+    "sha1": "c2bef7133d32ac9f30150f1e83b35ed095ea220d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a2484cda906ab54500ff1a38755f0f7a37c85d77"
+    "sha2": "a23e0dc447ad61483fbbc0ad63e7d394d7d51dea"
 }]

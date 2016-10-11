@@ -10,7 +10,7 @@
                                 1,
                                 1
                             ],
-                            "name": "array.js",
+                            "filepath": "array.js",
                             "end": [
                                 1,
                                 12
@@ -27,9 +27,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "04b681e1190310f6148595f3d80260ae13299d43",
+    "sha1": "17086d6403b7d2b299f9fb62681b786baee0e6bd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f764a79ec733a7f8fd0cb4016f918b2eefa89b51"
+    "sha2": "1acecd849e5ebb797243d4ab053d43a9f249ec75"
 }
 ,{
     "testCaseDescription": "javascript-array-replacement-insert-test",
@@ -43,7 +43,7 @@
                                 1,
                                 1
                             ],
-                            "name": "array.js",
+                            "filepath": "array.js",
                             "end": [
                                 1,
                                 21
@@ -60,7 +60,7 @@
                                 2,
                                 1
                             ],
-                            "name": "array.js",
+                            "filepath": "array.js",
                             "end": [
                                 2,
                                 12
@@ -77,9 +77,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "f764a79ec733a7f8fd0cb4016f918b2eefa89b51",
+    "sha1": "1acecd849e5ebb797243d4ab053d43a9f249ec75",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5a2f8c9043ef76d04634f22dd120f3c950711887"
+    "sha2": "8ec642fbb15429c3bad4ce7fcbc8e539ad0b669f"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-insert-test",
@@ -93,7 +93,7 @@
                                 1,
                                 12
                             ],
-                            "name": "array.js",
+                            "filepath": "array.js",
                             "end": [
                                 1,
                                 19
@@ -110,9 +110,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "5a2f8c9043ef76d04634f22dd120f3c950711887",
+    "sha1": "8ec642fbb15429c3bad4ce7fcbc8e539ad0b669f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5c1725c772ad618a734f78ba80bc29990a06f8a1"
+    "sha2": "e53fecade391ea96be94a251b3ec03790a63b71b"
 }
 ,{
     "testCaseDescription": "javascript-array-replacement-test",
@@ -126,7 +126,7 @@
                                 1,
                                 12
                             ],
-                            "name": "array.js",
+                            "filepath": "array.js",
                             "end": [
                                 1,
                                 19
@@ -143,9 +143,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "5c1725c772ad618a734f78ba80bc29990a06f8a1",
+    "sha1": "e53fecade391ea96be94a251b3ec03790a63b71b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "779013762c7bcb016f2ec80ab3caed4384fc4113"
+    "sha2": "c5882f5220ba2b16310ee4fb99aa13ee2daa1c31"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-replacement-test",
@@ -159,7 +159,7 @@
                                 1,
                                 1
                             ],
-                            "name": "array.js",
+                            "filepath": "array.js",
                             "end": [
                                 1,
                                 21
@@ -176,7 +176,7 @@
                                 2,
                                 1
                             ],
-                            "name": "array.js",
+                            "filepath": "array.js",
                             "end": [
                                 2,
                                 12
@@ -193,7 +193,7 @@
                                 2,
                                 1
                             ],
-                            "name": "array.js",
+                            "filepath": "array.js",
                             "end": [
                                 2,
                                 21
@@ -210,9 +210,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "779013762c7bcb016f2ec80ab3caed4384fc4113",
+    "sha1": "c5882f5220ba2b16310ee4fb99aa13ee2daa1c31",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "daf668c7bbccb5e2a70cd5e6d081ea35dfddb879"
+    "sha2": "d8513ea06d23b115c1d4414eebe84bed39b3eb8e"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-test",
@@ -226,7 +226,7 @@
                                 1,
                                 1
                             ],
-                            "name": "array.js",
+                            "filepath": "array.js",
                             "end": [
                                 1,
                                 12
@@ -243,9 +243,9 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "daf668c7bbccb5e2a70cd5e6d081ea35dfddb879",
+    "sha1": "d8513ea06d23b115c1d4414eebe84bed39b3eb8e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6e471401fdfac17a93fa8e5fb87924864dd4b07b"
+    "sha2": "6170bb216fc1ced5e9707690e5bbf8a63b33d593"
 }
 ,{
     "testCaseDescription": "javascript-array-delete-rest-test",
@@ -259,7 +259,7 @@
                                 1,
                                 1
                             ],
-                            "name": "array.js",
+                            "filepath": "array.js",
                             "end": [
                                 1,
                                 21
@@ -276,7 +276,7 @@
     "filePaths": [
         "array.js"
     ],
-    "sha1": "6e471401fdfac17a93fa8e5fb87924864dd4b07b",
+    "sha1": "6170bb216fc1ced5e9707690e5bbf8a63b33d593",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0921c7be9afb30bdf6fa3861d12c20a87ae67736"
+    "sha2": "b391c180ba171aa1ebfe29dde8a2d4a9caa09424"
 }]

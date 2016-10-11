@@ -10,7 +10,7 @@
                                 1,
                                 1
                             ],
-                            "name": "chained-property-access.js",
+                            "filepath": "chained-property-access.js",
                             "end": [
                                 2,
                                 1
@@ -27,9 +27,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "9dc1c8722d84e3f245688e90b8cf7155c95f446f",
+    "sha1": "235008297e273479683591ad4b1f46b69655f0e8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8afef92d997e837342429dbbacb19365f39eb7b4"
+    "sha2": "b0e7d678e5314b2147723f6147dc047f5443a230"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-replacement-insert-test",
@@ -43,7 +43,7 @@
                                 1,
                                 1
                             ],
-                            "name": "chained-property-access.js",
+                            "filepath": "chained-property-access.js",
                             "end": [
                                 2,
                                 1
@@ -60,7 +60,7 @@
                                 2,
                                 1
                             ],
-                            "name": "chained-property-access.js",
+                            "filepath": "chained-property-access.js",
                             "end": [
                                 3,
                                 1
@@ -77,9 +77,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "8afef92d997e837342429dbbacb19365f39eb7b4",
+    "sha1": "b0e7d678e5314b2147723f6147dc047f5443a230",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4475e0d7eb0e590853f495dd1db81601b6bc9dd3"
+    "sha2": "a1a002230ad2e478d4aa03a58947035fa3be411f"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-insert-test",
@@ -94,7 +94,7 @@
                                     1,
                                     33
                                 ],
-                                "name": "chained-property-access.js",
+                                "filepath": "chained-property-access.js",
                                 "end": [
                                     1,
                                     43
@@ -105,7 +105,7 @@
                                     1,
                                     33
                                 ],
-                                "name": "chained-property-access.js",
+                                "filepath": "chained-property-access.js",
                                 "end": [
                                     1,
                                     41
@@ -124,7 +124,7 @@
                                     1,
                                     60
                                 ],
-                                "name": "chained-property-access.js",
+                                "filepath": "chained-property-access.js",
                                 "end": [
                                     1,
                                     70
@@ -135,7 +135,7 @@
                                     1,
                                     58
                                 ],
-                                "name": "chained-property-access.js",
+                                "filepath": "chained-property-access.js",
                                 "end": [
                                     1,
                                     66
@@ -153,9 +153,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "4475e0d7eb0e590853f495dd1db81601b6bc9dd3",
+    "sha1": "a1a002230ad2e478d4aa03a58947035fa3be411f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "030352703839b25bbdacac36ddeabb1a831ad05a"
+    "sha2": "86087e1f8e29b4e961baa7debe02cdc1fc1befb1"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-replacement-test",
@@ -170,7 +170,7 @@
                                     1,
                                     33
                                 ],
-                                "name": "chained-property-access.js",
+                                "filepath": "chained-property-access.js",
                                 "end": [
                                     1,
                                     41
@@ -181,7 +181,7 @@
                                     1,
                                     33
                                 ],
-                                "name": "chained-property-access.js",
+                                "filepath": "chained-property-access.js",
                                 "end": [
                                     1,
                                     43
@@ -200,7 +200,7 @@
                                     1,
                                     58
                                 ],
-                                "name": "chained-property-access.js",
+                                "filepath": "chained-property-access.js",
                                 "end": [
                                     1,
                                     66
@@ -211,7 +211,7 @@
                                     1,
                                     60
                                 ],
-                                "name": "chained-property-access.js",
+                                "filepath": "chained-property-access.js",
                                 "end": [
                                     1,
                                     70
@@ -229,9 +229,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "030352703839b25bbdacac36ddeabb1a831ad05a",
+    "sha1": "86087e1f8e29b4e961baa7debe02cdc1fc1befb1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "59dd2644428d0c34aa9181e402e1bb4e823ea8de"
+    "sha2": "611cf1de89471aa50d852eb2da70f9d657c286e1"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-replacement-test",
@@ -245,7 +245,7 @@
                                 1,
                                 1
                             ],
-                            "name": "chained-property-access.js",
+                            "filepath": "chained-property-access.js",
                             "end": [
                                 2,
                                 1
@@ -262,7 +262,7 @@
                                 2,
                                 1
                             ],
-                            "name": "chained-property-access.js",
+                            "filepath": "chained-property-access.js",
                             "end": [
                                 3,
                                 1
@@ -279,7 +279,7 @@
                                 2,
                                 1
                             ],
-                            "name": "chained-property-access.js",
+                            "filepath": "chained-property-access.js",
                             "end": [
                                 3,
                                 1
@@ -296,9 +296,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "59dd2644428d0c34aa9181e402e1bb4e823ea8de",
+    "sha1": "611cf1de89471aa50d852eb2da70f9d657c286e1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bad1b125972f03fd282dbf26f9adfa1315031ca7"
+    "sha2": "ee3cfec8a54e6491d694db9019b1adcd976bb6ba"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-test",
@@ -312,7 +312,7 @@
                                 1,
                                 1
                             ],
-                            "name": "chained-property-access.js",
+                            "filepath": "chained-property-access.js",
                             "end": [
                                 2,
                                 1
@@ -329,9 +329,9 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "bad1b125972f03fd282dbf26f9adfa1315031ca7",
+    "sha1": "ee3cfec8a54e6491d694db9019b1adcd976bb6ba",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cf0b7cc3662ba96a6efe6d01c4baf13e04e1a789"
+    "sha2": "341ec07cbdf4549bbe01e28bd6f21ff53fe1495c"
 }
 ,{
     "testCaseDescription": "javascript-chained-property-access-delete-rest-test",
@@ -345,7 +345,7 @@
                                 1,
                                 1
                             ],
-                            "name": "chained-property-access.js",
+                            "filepath": "chained-property-access.js",
                             "end": [
                                 2,
                                 1
@@ -362,7 +362,7 @@
     "filePaths": [
         "chained-property-access.js"
     ],
-    "sha1": "cf0b7cc3662ba96a6efe6d01c4baf13e04e1a789",
+    "sha1": "341ec07cbdf4549bbe01e28bd6f21ff53fe1495c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "20bc26cc8af9efd835b023b026250f920bf1cc88"
+    "sha2": "dbe7e1fb21efaf093196c76c7153bb2fbc3b7143"
 }]

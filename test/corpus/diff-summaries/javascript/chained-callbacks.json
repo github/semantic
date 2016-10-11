@@ -10,7 +10,7 @@
                                 1,
                                 1
                             ],
-                            "name": "chained-callbacks.js",
+                            "filepath": "chained-callbacks.js",
                             "end": [
                                 1,
                                 39
@@ -27,9 +27,9 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "20bc26cc8af9efd835b023b026250f920bf1cc88",
+    "sha1": "3c18b9342d8e60bf5c240ca798986c380dcf3110",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8c05a8c012b065745a2da67a5a6e1bce328fd6b6"
+    "sha2": "ef9e7888e6ba75fa08ff3a4884ec12b07aeac1d0"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-replacement-insert-test",
@@ -43,7 +43,7 @@
                                 1,
                                 1
                             ],
-                            "name": "chained-callbacks.js",
+                            "filepath": "chained-callbacks.js",
                             "end": [
                                 1,
                                 42
@@ -60,7 +60,7 @@
                                 2,
                                 1
                             ],
-                            "name": "chained-callbacks.js",
+                            "filepath": "chained-callbacks.js",
                             "end": [
                                 2,
                                 39
@@ -77,9 +77,9 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "8c05a8c012b065745a2da67a5a6e1bce328fd6b6",
+    "sha1": "ef9e7888e6ba75fa08ff3a4884ec12b07aeac1d0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6869215944dfc529db1c0e731d0640f9a85d1040"
+    "sha2": "5fe5195d5f0b8416e5863a91cc91675c1a043c76"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-insert-test",
@@ -94,7 +94,7 @@
                                     1,
                                     6
                                 ],
-                                "name": "chained-callbacks.js",
+                                "filepath": "chained-callbacks.js",
                                 "end": [
                                     1,
                                     12
@@ -105,7 +105,7 @@
                                     1,
                                     6
                                 ],
-                                "name": "chained-callbacks.js",
+                                "filepath": "chained-callbacks.js",
                                 "end": [
                                     1,
                                     9
@@ -124,7 +124,7 @@
                                     1,
                                     35
                                 ],
-                                "name": "chained-callbacks.js",
+                                "filepath": "chained-callbacks.js",
                                 "end": [
                                     1,
                                     36
@@ -135,7 +135,7 @@
                                     1,
                                     32
                                 ],
-                                "name": "chained-callbacks.js",
+                                "filepath": "chained-callbacks.js",
                                 "end": [
                                     1,
                                     33
@@ -154,7 +154,7 @@
                                     1,
                                     37
                                 ],
-                                "name": "chained-callbacks.js",
+                                "filepath": "chained-callbacks.js",
                                 "end": [
                                     1,
                                     38
@@ -165,7 +165,7 @@
                                     1,
                                     34
                                 ],
-                                "name": "chained-callbacks.js",
+                                "filepath": "chained-callbacks.js",
                                 "end": [
                                     1,
                                     35
@@ -183,9 +183,9 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "6869215944dfc529db1c0e731d0640f9a85d1040",
+    "sha1": "5fe5195d5f0b8416e5863a91cc91675c1a043c76",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4c964599e2c3f646a49bd3c5a0ad7f28bb4e76f8"
+    "sha2": "e1ad8c6994e5e3e475b0450190c14a830621f2e8"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-replacement-test",
@@ -200,7 +200,7 @@
                                     1,
                                     6
                                 ],
-                                "name": "chained-callbacks.js",
+                                "filepath": "chained-callbacks.js",
                                 "end": [
                                     1,
                                     9
@@ -211,7 +211,7 @@
                                     1,
                                     6
                                 ],
-                                "name": "chained-callbacks.js",
+                                "filepath": "chained-callbacks.js",
                                 "end": [
                                     1,
                                     12
@@ -230,7 +230,7 @@
                                     1,
                                     32
                                 ],
-                                "name": "chained-callbacks.js",
+                                "filepath": "chained-callbacks.js",
                                 "end": [
                                     1,
                                     33
@@ -241,7 +241,7 @@
                                     1,
                                     35
                                 ],
-                                "name": "chained-callbacks.js",
+                                "filepath": "chained-callbacks.js",
                                 "end": [
                                     1,
                                     36
@@ -260,7 +260,7 @@
                                     1,
                                     34
                                 ],
-                                "name": "chained-callbacks.js",
+                                "filepath": "chained-callbacks.js",
                                 "end": [
                                     1,
                                     35
@@ -271,7 +271,7 @@
                                     1,
                                     37
                                 ],
-                                "name": "chained-callbacks.js",
+                                "filepath": "chained-callbacks.js",
                                 "end": [
                                     1,
                                     38
@@ -289,9 +289,9 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "4c964599e2c3f646a49bd3c5a0ad7f28bb4e76f8",
+    "sha1": "e1ad8c6994e5e3e475b0450190c14a830621f2e8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "20c8a9a737d91e365f686ac9ef3ea3ece6bcf5ed"
+    "sha2": "be21199a2c109eaf01d8964f7dceb5242bd94c5c"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-replacement-test",
@@ -305,7 +305,7 @@
                                 1,
                                 1
                             ],
-                            "name": "chained-callbacks.js",
+                            "filepath": "chained-callbacks.js",
                             "end": [
                                 1,
                                 42
@@ -322,7 +322,7 @@
                                 2,
                                 1
                             ],
-                            "name": "chained-callbacks.js",
+                            "filepath": "chained-callbacks.js",
                             "end": [
                                 2,
                                 39
@@ -339,7 +339,7 @@
                                 2,
                                 1
                             ],
-                            "name": "chained-callbacks.js",
+                            "filepath": "chained-callbacks.js",
                             "end": [
                                 2,
                                 42
@@ -356,9 +356,9 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "20c8a9a737d91e365f686ac9ef3ea3ece6bcf5ed",
+    "sha1": "be21199a2c109eaf01d8964f7dceb5242bd94c5c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "883ffc29d09b541a5c4d9e4674d5c04f876a40a2"
+    "sha2": "a0cca877bad5d1aa7a3e0ebf9d9c04cf828e4176"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-test",
@@ -372,7 +372,7 @@
                                 1,
                                 1
                             ],
-                            "name": "chained-callbacks.js",
+                            "filepath": "chained-callbacks.js",
                             "end": [
                                 1,
                                 39
@@ -389,9 +389,9 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "883ffc29d09b541a5c4d9e4674d5c04f876a40a2",
+    "sha1": "a0cca877bad5d1aa7a3e0ebf9d9c04cf828e4176",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "76d7d961c5ea2ade3fdd136a056c683732a81a25"
+    "sha2": "052b9850290f471a3fefc219133f72d90ddf7c9d"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-rest-test",
@@ -405,7 +405,7 @@
                                 1,
                                 1
                             ],
-                            "name": "chained-callbacks.js",
+                            "filepath": "chained-callbacks.js",
                             "end": [
                                 1,
                                 42
@@ -422,7 +422,7 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "76d7d961c5ea2ade3fdd136a056c683732a81a25",
+    "sha1": "052b9850290f471a3fefc219133f72d90ddf7c9d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bd29fccbe38961789cd724a6537993e68f491091"
+    "sha2": "3c341577267bfb8873272dbf6be1d4727516b67a"
 }]

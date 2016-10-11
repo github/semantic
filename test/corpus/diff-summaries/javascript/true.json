@@ -10,7 +10,7 @@
                                 1,
                                 1
                             ],
-                            "name": "true.js",
+                            "filepath": "true.js",
                             "end": [
                                 1,
                                 5
@@ -27,9 +27,9 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "33c5c1f9cf953a752cbffb621c3f049a1da56ef6",
+    "sha1": "6e5ff43b1afae6cdf404ae5541d1cebb71974ed4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a6ced4af62125992db2e4d0bf35e64a1ac2edec9"
+    "sha2": "1307d15440fa6d4dd856e699f1f622d81cc458b7"
 }
 ,{
     "testCaseDescription": "javascript-true-replacement-insert-test",
@@ -43,7 +43,7 @@
                                 1,
                                 1
                             ],
-                            "name": "true.js",
+                            "filepath": "true.js",
                             "end": [
                                 1,
                                 13
@@ -60,7 +60,7 @@
                                 2,
                                 1
                             ],
-                            "name": "true.js",
+                            "filepath": "true.js",
                             "end": [
                                 2,
                                 5
@@ -77,9 +77,9 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "a6ced4af62125992db2e4d0bf35e64a1ac2edec9",
+    "sha1": "1307d15440fa6d4dd856e699f1f622d81cc458b7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "67c9f34040f63e7c6665a72b86ed606060accbad"
+    "sha2": "2fba2ffbf87727b963767962ffc08ca0833a0b9b"
 }
 ,{
     "testCaseDescription": "javascript-true-delete-insert-test",
@@ -93,7 +93,7 @@
                                 1,
                                 1
                             ],
-                            "name": "true.js",
+                            "filepath": "true.js",
                             "end": [
                                 1,
                                 5
@@ -110,7 +110,7 @@
                                 1,
                                 1
                             ],
-                            "name": "true.js",
+                            "filepath": "true.js",
                             "end": [
                                 1,
                                 13
@@ -127,9 +127,9 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "67c9f34040f63e7c6665a72b86ed606060accbad",
+    "sha1": "2fba2ffbf87727b963767962ffc08ca0833a0b9b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "67f2af6013b86b0ba91f58ea0bb156ab8fef63d9"
+    "sha2": "5bcf27a7d59100e290749764b879c34588c9f026"
 }
 ,{
     "testCaseDescription": "javascript-true-replacement-test",
@@ -143,7 +143,7 @@
                                 1,
                                 1
                             ],
-                            "name": "true.js",
+                            "filepath": "true.js",
                             "end": [
                                 1,
                                 13
@@ -160,7 +160,7 @@
                                 1,
                                 1
                             ],
-                            "name": "true.js",
+                            "filepath": "true.js",
                             "end": [
                                 1,
                                 5
@@ -177,9 +177,9 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "67f2af6013b86b0ba91f58ea0bb156ab8fef63d9",
+    "sha1": "5bcf27a7d59100e290749764b879c34588c9f026",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "20e525bfe23a51c65b7fb2ab38d615b8b79158de"
+    "sha2": "e9fecdea0ced5209f1bea0141d19c60feb098283"
 }
 ,{
     "testCaseDescription": "javascript-true-delete-replacement-test",
@@ -193,7 +193,7 @@
                                 1,
                                 1
                             ],
-                            "name": "true.js",
+                            "filepath": "true.js",
                             "end": [
                                 1,
                                 13
@@ -210,7 +210,7 @@
                                 2,
                                 1
                             ],
-                            "name": "true.js",
+                            "filepath": "true.js",
                             "end": [
                                 2,
                                 5
@@ -227,7 +227,7 @@
                                 2,
                                 1
                             ],
-                            "name": "true.js",
+                            "filepath": "true.js",
                             "end": [
                                 2,
                                 13
@@ -244,9 +244,9 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "20e525bfe23a51c65b7fb2ab38d615b8b79158de",
+    "sha1": "e9fecdea0ced5209f1bea0141d19c60feb098283",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "613d3c0edaec792150189c91ad97cc262e325d67"
+    "sha2": "4c34ae852747f30b9a84a3552152596876080bcb"
 }
 ,{
     "testCaseDescription": "javascript-true-delete-test",
@@ -260,7 +260,7 @@
                                 1,
                                 1
                             ],
-                            "name": "true.js",
+                            "filepath": "true.js",
                             "end": [
                                 1,
                                 5
@@ -277,9 +277,9 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "613d3c0edaec792150189c91ad97cc262e325d67",
+    "sha1": "4c34ae852747f30b9a84a3552152596876080bcb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1d1cf06b41782094ca5aeef9ba6af038f3a58cf8"
+    "sha2": "f42d40c8860045ca5056d8f459e4f972eb4f23eb"
 }
 ,{
     "testCaseDescription": "javascript-true-delete-rest-test",
@@ -293,7 +293,7 @@
                                 1,
                                 1
                             ],
-                            "name": "true.js",
+                            "filepath": "true.js",
                             "end": [
                                 1,
                                 13
@@ -310,7 +310,7 @@
     "filePaths": [
         "true.js"
     ],
-    "sha1": "1d1cf06b41782094ca5aeef9ba6af038f3a58cf8",
+    "sha1": "f42d40c8860045ca5056d8f459e4f972eb4f23eb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d72ebc215a9377983c2463fd424f608320626141"
+    "sha2": "0c49509069b9b1a2dad80bcf2611f5c1b87f07f9"
 }]

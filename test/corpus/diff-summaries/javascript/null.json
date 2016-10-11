@@ -10,7 +10,7 @@
                                 1,
                                 1
                             ],
-                            "name": "null.js",
+                            "filepath": "null.js",
                             "end": [
                                 1,
                                 5
@@ -27,9 +27,9 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "71b405a91807f07e6c1c55a71a93c78d07b0b4ab",
+    "sha1": "8540d7af721429195043bd3005c00e3713220c39",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "40b103a73134c60adc6ee3ae4902918373b060cf"
+    "sha2": "93c72c64eca26a667db90a211a096d676bf318fb"
 }
 ,{
     "testCaseDescription": "javascript-null-replacement-insert-test",
@@ -43,7 +43,7 @@
                                 1,
                                 1
                             ],
-                            "name": "null.js",
+                            "filepath": "null.js",
                             "end": [
                                 1,
                                 13
@@ -60,7 +60,7 @@
                                 2,
                                 1
                             ],
-                            "name": "null.js",
+                            "filepath": "null.js",
                             "end": [
                                 2,
                                 5
@@ -77,9 +77,9 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "40b103a73134c60adc6ee3ae4902918373b060cf",
+    "sha1": "93c72c64eca26a667db90a211a096d676bf318fb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "39f88f076256d48c52a7b49d2e2a4dbb33b65e1a"
+    "sha2": "eecf7bbf0e848b23e01ae924b14a60efb17196b4"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-insert-test",
@@ -93,7 +93,7 @@
                                 1,
                                 1
                             ],
-                            "name": "null.js",
+                            "filepath": "null.js",
                             "end": [
                                 1,
                                 5
@@ -110,7 +110,7 @@
                                 1,
                                 1
                             ],
-                            "name": "null.js",
+                            "filepath": "null.js",
                             "end": [
                                 1,
                                 13
@@ -127,9 +127,9 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "39f88f076256d48c52a7b49d2e2a4dbb33b65e1a",
+    "sha1": "eecf7bbf0e848b23e01ae924b14a60efb17196b4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a0b7643968ebb1985deac3297be5a63e84c87ec5"
+    "sha2": "18073d45e88081955aa5da86dfaac3141c7b593d"
 }
 ,{
     "testCaseDescription": "javascript-null-replacement-test",
@@ -143,7 +143,7 @@
                                 1,
                                 1
                             ],
-                            "name": "null.js",
+                            "filepath": "null.js",
                             "end": [
                                 1,
                                 13
@@ -160,7 +160,7 @@
                                 1,
                                 1
                             ],
-                            "name": "null.js",
+                            "filepath": "null.js",
                             "end": [
                                 1,
                                 5
@@ -177,9 +177,9 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "a0b7643968ebb1985deac3297be5a63e84c87ec5",
+    "sha1": "18073d45e88081955aa5da86dfaac3141c7b593d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b398a1a9095f31c9f49eb70f76ab7775e0e0b912"
+    "sha2": "198209e9c0f93699ad53dc47e775cd90c2d88b35"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-replacement-test",
@@ -193,7 +193,7 @@
                                 1,
                                 1
                             ],
-                            "name": "null.js",
+                            "filepath": "null.js",
                             "end": [
                                 1,
                                 13
@@ -210,7 +210,7 @@
                                 2,
                                 1
                             ],
-                            "name": "null.js",
+                            "filepath": "null.js",
                             "end": [
                                 2,
                                 5
@@ -227,7 +227,7 @@
                                 2,
                                 1
                             ],
-                            "name": "null.js",
+                            "filepath": "null.js",
                             "end": [
                                 2,
                                 13
@@ -244,9 +244,9 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "b398a1a9095f31c9f49eb70f76ab7775e0e0b912",
+    "sha1": "198209e9c0f93699ad53dc47e775cd90c2d88b35",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9eef1322e7b1b0997a712803355e071fd0cb12da"
+    "sha2": "7b43f93904a6162c4f9b61d4959d1cce8d33348d"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-test",
@@ -260,7 +260,7 @@
                                 1,
                                 1
                             ],
-                            "name": "null.js",
+                            "filepath": "null.js",
                             "end": [
                                 1,
                                 5
@@ -277,9 +277,9 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "9eef1322e7b1b0997a712803355e071fd0cb12da",
+    "sha1": "7b43f93904a6162c4f9b61d4959d1cce8d33348d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "48fea5e1448dcc23d6a626649dec8cdedc67a029"
+    "sha2": "9d63dd64268183fbb85c550dc1fb462923c695da"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-rest-test",
@@ -293,7 +293,7 @@
                                 1,
                                 1
                             ],
-                            "name": "null.js",
+                            "filepath": "null.js",
                             "end": [
                                 1,
                                 13
@@ -310,7 +310,7 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "48fea5e1448dcc23d6a626649dec8cdedc67a029",
+    "sha1": "9d63dd64268183fbb85c550dc1fb462923c695da",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b12ee7f9618c46965c38b2ba972b8dc99f4db063"
+    "sha2": "c416941f9ad227e04563dc7724f287893f6a1189"
 }]

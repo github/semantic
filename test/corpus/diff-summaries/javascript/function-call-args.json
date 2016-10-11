@@ -10,7 +10,7 @@
                                 1,
                                 1
                             ],
-                            "name": "function-call-args.js",
+                            "filepath": "function-call-args.js",
                             "end": [
                                 1,
                                 77
@@ -27,9 +27,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "90687f3994b4645e5db5b97ec4da3502fbe9053d",
+    "sha1": "e834dcf08a889d6a14fee6a80a53109e2794c8f8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "aaad24da26976a73c6d19f8663d8b1643c4465b5"
+    "sha2": "3411414b4a6da0a0dd500b1560d5e9e460980e93"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-replacement-insert-test",
@@ -43,7 +43,7 @@
                                 1,
                                 1
                             ],
-                            "name": "function-call-args.js",
+                            "filepath": "function-call-args.js",
                             "end": [
                                 1,
                                 83
@@ -60,7 +60,7 @@
                                 2,
                                 1
                             ],
-                            "name": "function-call-args.js",
+                            "filepath": "function-call-args.js",
                             "end": [
                                 2,
                                 77
@@ -77,9 +77,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "aaad24da26976a73c6d19f8663d8b1643c4465b5",
+    "sha1": "3411414b4a6da0a0dd500b1560d5e9e460980e93",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d461ca4c5b99ac714342ba5a97a8b19822abf355"
+    "sha2": "bcb9e9c202d8e29a3cf33bd48661e7743926fb80"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-insert-test",
@@ -94,7 +94,7 @@
                                     1,
                                     17
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     30
@@ -105,7 +105,7 @@
                                     1,
                                     17
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     25
@@ -124,7 +124,7 @@
                                     1,
                                     41
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     42
@@ -135,7 +135,7 @@
                                     1,
                                     36
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     37
@@ -154,7 +154,7 @@
                                     1,
                                     43
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     44
@@ -165,7 +165,7 @@
                                     1,
                                     38
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     39
@@ -184,7 +184,7 @@
                                     1,
                                     60
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     61
@@ -195,7 +195,7 @@
                                     1,
                                     55
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     56
@@ -214,7 +214,7 @@
                                     1,
                                     71
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     72
@@ -225,7 +225,7 @@
                                     1,
                                     66
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     67
@@ -244,7 +244,7 @@
                                     1,
                                     77
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     82
@@ -255,7 +255,7 @@
                                     1,
                                     72
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     76
@@ -273,9 +273,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "d461ca4c5b99ac714342ba5a97a8b19822abf355",
+    "sha1": "bcb9e9c202d8e29a3cf33bd48661e7743926fb80",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5f1e05fcea9ea246eced001a88fb7872c1ae5923"
+    "sha2": "a4c89b79d352f733e430d75f970cb999677f27f5"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-replacement-test",
@@ -290,7 +290,7 @@
                                     1,
                                     17
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     25
@@ -301,7 +301,7 @@
                                     1,
                                     17
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     30
@@ -320,7 +320,7 @@
                                     1,
                                     36
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     37
@@ -331,7 +331,7 @@
                                     1,
                                     41
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     42
@@ -350,7 +350,7 @@
                                     1,
                                     38
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     39
@@ -361,7 +361,7 @@
                                     1,
                                     43
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     44
@@ -380,7 +380,7 @@
                                     1,
                                     55
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     56
@@ -391,7 +391,7 @@
                                     1,
                                     60
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     61
@@ -410,7 +410,7 @@
                                     1,
                                     66
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     67
@@ -421,7 +421,7 @@
                                     1,
                                     71
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     72
@@ -440,7 +440,7 @@
                                     1,
                                     72
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     76
@@ -451,7 +451,7 @@
                                     1,
                                     77
                                 ],
-                                "name": "function-call-args.js",
+                                "filepath": "function-call-args.js",
                                 "end": [
                                     1,
                                     82
@@ -469,9 +469,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "5f1e05fcea9ea246eced001a88fb7872c1ae5923",
+    "sha1": "a4c89b79d352f733e430d75f970cb999677f27f5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ec8b293cdef0a7d4fce7791690c010b170e64c87"
+    "sha2": "3091a06bd0f54664d9af8ca81912d11053770867"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-replacement-test",
@@ -485,7 +485,7 @@
                                 1,
                                 1
                             ],
-                            "name": "function-call-args.js",
+                            "filepath": "function-call-args.js",
                             "end": [
                                 1,
                                 83
@@ -502,7 +502,7 @@
                                 2,
                                 1
                             ],
-                            "name": "function-call-args.js",
+                            "filepath": "function-call-args.js",
                             "end": [
                                 2,
                                 77
@@ -519,7 +519,7 @@
                                 2,
                                 1
                             ],
-                            "name": "function-call-args.js",
+                            "filepath": "function-call-args.js",
                             "end": [
                                 2,
                                 83
@@ -536,9 +536,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "ec8b293cdef0a7d4fce7791690c010b170e64c87",
+    "sha1": "3091a06bd0f54664d9af8ca81912d11053770867",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "36858f5bcf436b803282fedf78c4c997ce3562a7"
+    "sha2": "75ed223e42469c6619a6e1c4dc582bd709ceb391"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-test",
@@ -552,7 +552,7 @@
                                 1,
                                 1
                             ],
-                            "name": "function-call-args.js",
+                            "filepath": "function-call-args.js",
                             "end": [
                                 1,
                                 77
@@ -569,9 +569,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "36858f5bcf436b803282fedf78c4c997ce3562a7",
+    "sha1": "75ed223e42469c6619a6e1c4dc582bd709ceb391",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d31e105c5f3e4c14ac404da8d6ee605cebd47126"
+    "sha2": "0554bafc40337500d565c66e7d2e4adcbc2f6dbd"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-rest-test",
@@ -585,7 +585,7 @@
                                 1,
                                 1
                             ],
-                            "name": "function-call-args.js",
+                            "filepath": "function-call-args.js",
                             "end": [
                                 1,
                                 83
@@ -602,7 +602,7 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "d31e105c5f3e4c14ac404da8d6ee605cebd47126",
+    "sha1": "0554bafc40337500d565c66e7d2e4adcbc2f6dbd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f110a993d59a58f31e4b09bd46734026c4fdcc60"
+    "sha2": "6bac47f01ea270d54850d73f02855a9b88d9e85a"
 }]

@@ -10,7 +10,7 @@
                                 1,
                                 1
                             ],
-                            "name": "for-loop-with-in-statement.js",
+                            "filepath": "for-loop-with-in-statement.js",
                             "end": [
                                 1,
                                 63
@@ -27,9 +27,9 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "b0363eb07d0284130aab04183573dcd31fa7f221",
+    "sha1": "2713efa83046b111f22730202b3db5213732e388",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bd70642d89f84aa72ff6781a2b22c82b345ac1d5"
+    "sha2": "d0d4e80ab5e1000adc85ca2ae3ef5c308ba058e5"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-replacement-insert-test",
@@ -43,7 +43,7 @@
                                 1,
                                 1
                             ],
-                            "name": "for-loop-with-in-statement.js",
+                            "filepath": "for-loop-with-in-statement.js",
                             "end": [
                                 1,
                                 73
@@ -60,7 +60,7 @@
                                 2,
                                 1
                             ],
-                            "name": "for-loop-with-in-statement.js",
+                            "filepath": "for-loop-with-in-statement.js",
                             "end": [
                                 2,
                                 63
@@ -77,9 +77,9 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "bd70642d89f84aa72ff6781a2b22c82b345ac1d5",
+    "sha1": "d0d4e80ab5e1000adc85ca2ae3ef5c308ba058e5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "337a282c5bfdde568b4b1431a6259fd1e187d897"
+    "sha2": "22b27eed20a4708f57655fac41373782e765bdd9"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-insert-test",
@@ -94,7 +94,7 @@
                                     1,
                                     6
                                 ],
-                                "name": "for-loop-with-in-statement.js",
+                                "filepath": "for-loop-with-in-statement.js",
                                 "end": [
                                     1,
                                     14
@@ -105,7 +105,7 @@
                                     1,
                                     6
                                 ],
-                                "name": "for-loop-with-in-statement.js",
+                                "filepath": "for-loop-with-in-statement.js",
                                 "end": [
                                     1,
                                     9
@@ -124,7 +124,7 @@
                                     1,
                                     52
                                 ],
-                                "name": "for-loop-with-in-statement.js",
+                                "filepath": "for-loop-with-in-statement.js",
                                 "end": [
                                     1,
                                     68
@@ -135,7 +135,7 @@
                                     1,
                                     47
                                 ],
-                                "name": "for-loop-with-in-statement.js",
+                                "filepath": "for-loop-with-in-statement.js",
                                 "end": [
                                     1,
                                     58
@@ -153,9 +153,9 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "337a282c5bfdde568b4b1431a6259fd1e187d897",
+    "sha1": "22b27eed20a4708f57655fac41373782e765bdd9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b6039e1333c1772e592e7dc27a94de22b1323bb5"
+    "sha2": "752138dea1fa4b37d532668dfdb80c1de9dbe984"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-replacement-test",
@@ -170,7 +170,7 @@
                                     1,
                                     6
                                 ],
-                                "name": "for-loop-with-in-statement.js",
+                                "filepath": "for-loop-with-in-statement.js",
                                 "end": [
                                     1,
                                     9
@@ -181,7 +181,7 @@
                                     1,
                                     6
                                 ],
-                                "name": "for-loop-with-in-statement.js",
+                                "filepath": "for-loop-with-in-statement.js",
                                 "end": [
                                     1,
                                     14
@@ -200,7 +200,7 @@
                                     1,
                                     47
                                 ],
-                                "name": "for-loop-with-in-statement.js",
+                                "filepath": "for-loop-with-in-statement.js",
                                 "end": [
                                     1,
                                     58
@@ -211,7 +211,7 @@
                                     1,
                                     52
                                 ],
-                                "name": "for-loop-with-in-statement.js",
+                                "filepath": "for-loop-with-in-statement.js",
                                 "end": [
                                     1,
                                     68
@@ -229,9 +229,9 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "b6039e1333c1772e592e7dc27a94de22b1323bb5",
+    "sha1": "752138dea1fa4b37d532668dfdb80c1de9dbe984",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0a764d4fa36759c678501ca540fc99713b41420a"
+    "sha2": "d4746a1fc6b915b1f3039637c8525ddd1fe3e7ea"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-replacement-test",
@@ -245,7 +245,7 @@
                                 1,
                                 1
                             ],
-                            "name": "for-loop-with-in-statement.js",
+                            "filepath": "for-loop-with-in-statement.js",
                             "end": [
                                 1,
                                 73
@@ -262,7 +262,7 @@
                                 2,
                                 1
                             ],
-                            "name": "for-loop-with-in-statement.js",
+                            "filepath": "for-loop-with-in-statement.js",
                             "end": [
                                 2,
                                 63
@@ -279,7 +279,7 @@
                                 2,
                                 1
                             ],
-                            "name": "for-loop-with-in-statement.js",
+                            "filepath": "for-loop-with-in-statement.js",
                             "end": [
                                 2,
                                 73
@@ -296,9 +296,9 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "0a764d4fa36759c678501ca540fc99713b41420a",
+    "sha1": "d4746a1fc6b915b1f3039637c8525ddd1fe3e7ea",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9fa99c92ac72ad519a3b1f2b5d93a5537d435a92"
+    "sha2": "175e3c87a4f60bcc38fa14c26df38f489e34d707"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-test",
@@ -312,7 +312,7 @@
                                 1,
                                 1
                             ],
-                            "name": "for-loop-with-in-statement.js",
+                            "filepath": "for-loop-with-in-statement.js",
                             "end": [
                                 1,
                                 63
@@ -329,9 +329,9 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "9fa99c92ac72ad519a3b1f2b5d93a5537d435a92",
+    "sha1": "175e3c87a4f60bcc38fa14c26df38f489e34d707",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cbc52bfd4415f0b6ade8e057dc28ea23bb4525de"
+    "sha2": "d683d2247eafa64957f62abd7cf4bddeccba9e48"
 }
 ,{
     "testCaseDescription": "javascript-for-loop-with-in-statement-delete-rest-test",
@@ -345,7 +345,7 @@
                                 1,
                                 1
                             ],
-                            "name": "for-loop-with-in-statement.js",
+                            "filepath": "for-loop-with-in-statement.js",
                             "end": [
                                 1,
                                 73
@@ -362,7 +362,7 @@
     "filePaths": [
         "for-loop-with-in-statement.js"
     ],
-    "sha1": "cbc52bfd4415f0b6ade8e057dc28ea23bb4525de",
+    "sha1": "d683d2247eafa64957f62abd7cf4bddeccba9e48",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "78d8fd6fdf97f596e0c6c4c7f4a6661bc3ffa357"
+    "sha2": "1775d9c8a22836c57a2a9883aac27bb0d16f14c4"
 }]

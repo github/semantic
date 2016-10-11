@@ -10,7 +10,7 @@
                                 1,
                                 1
                             ],
-                            "name": "switch-statement.js",
+                            "filepath": "switch-statement.js",
                             "end": [
                                 1,
                                 48
@@ -27,9 +27,9 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "7d081d5591b64adba332f89a0a3aeba494aa1b0e",
+    "sha1": "e2a9bd90f6bdbd15c5b8a354953f27b8ea76dd9a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "810a8ba269ce2c084bdd064eb49b2f48e0d9a623"
+    "sha2": "df3c3be78ac29aa905f1440e9a2b9c25450a3550"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-replacement-insert-test",
@@ -43,7 +43,7 @@
                                 1,
                                 1
                             ],
-                            "name": "switch-statement.js",
+                            "filepath": "switch-statement.js",
                             "end": [
                                 1,
                                 48
@@ -60,7 +60,7 @@
                                 2,
                                 1
                             ],
-                            "name": "switch-statement.js",
+                            "filepath": "switch-statement.js",
                             "end": [
                                 2,
                                 48
@@ -77,9 +77,9 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "810a8ba269ce2c084bdd064eb49b2f48e0d9a623",
+    "sha1": "df3c3be78ac29aa905f1440e9a2b9c25450a3550",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ab54c903bdfdd5daba8364e3500bc6c49b39be5c"
+    "sha2": "33e9d4f2a337a5555bea2dfe141b7bde76706286"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-insert-test",
@@ -94,7 +94,7 @@
                                     1,
                                     9
                                 ],
-                                "name": "switch-statement.js",
+                                "filepath": "switch-statement.js",
                                 "end": [
                                     1,
                                     10
@@ -105,7 +105,7 @@
                                     1,
                                     9
                                 ],
-                                "name": "switch-statement.js",
+                                "filepath": "switch-statement.js",
                                 "end": [
                                     1,
                                     10
@@ -124,7 +124,7 @@
                                     1,
                                     33
                                 ],
-                                "name": "switch-statement.js",
+                                "filepath": "switch-statement.js",
                                 "end": [
                                     1,
                                     34
@@ -135,7 +135,7 @@
                                     1,
                                     33
                                 ],
-                                "name": "switch-statement.js",
+                                "filepath": "switch-statement.js",
                                 "end": [
                                     1,
                                     34
@@ -153,9 +153,9 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "ab54c903bdfdd5daba8364e3500bc6c49b39be5c",
+    "sha1": "33e9d4f2a337a5555bea2dfe141b7bde76706286",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5739e34c49d07d0c4f4796d50bc226e410898aa5"
+    "sha2": "506fcdd7fd3b630a3f017d87247caca79e4f1e41"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-replacement-test",
@@ -170,7 +170,7 @@
                                     1,
                                     9
                                 ],
-                                "name": "switch-statement.js",
+                                "filepath": "switch-statement.js",
                                 "end": [
                                     1,
                                     10
@@ -181,7 +181,7 @@
                                     1,
                                     9
                                 ],
-                                "name": "switch-statement.js",
+                                "filepath": "switch-statement.js",
                                 "end": [
                                     1,
                                     10
@@ -200,7 +200,7 @@
                                     1,
                                     33
                                 ],
-                                "name": "switch-statement.js",
+                                "filepath": "switch-statement.js",
                                 "end": [
                                     1,
                                     34
@@ -211,7 +211,7 @@
                                     1,
                                     33
                                 ],
-                                "name": "switch-statement.js",
+                                "filepath": "switch-statement.js",
                                 "end": [
                                     1,
                                     34
@@ -229,9 +229,9 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "5739e34c49d07d0c4f4796d50bc226e410898aa5",
+    "sha1": "506fcdd7fd3b630a3f017d87247caca79e4f1e41",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5ede9d3d51ac8a5d2b5b82baca9ee75cdca1dd00"
+    "sha2": "52687fb608acb2914550ed85deaa27582380bec4"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-replacement-test",
@@ -245,7 +245,7 @@
                                 1,
                                 1
                             ],
-                            "name": "switch-statement.js",
+                            "filepath": "switch-statement.js",
                             "end": [
                                 1,
                                 48
@@ -262,7 +262,7 @@
                                 2,
                                 1
                             ],
-                            "name": "switch-statement.js",
+                            "filepath": "switch-statement.js",
                             "end": [
                                 2,
                                 48
@@ -279,7 +279,7 @@
                                 2,
                                 1
                             ],
-                            "name": "switch-statement.js",
+                            "filepath": "switch-statement.js",
                             "end": [
                                 2,
                                 48
@@ -296,9 +296,9 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "5ede9d3d51ac8a5d2b5b82baca9ee75cdca1dd00",
+    "sha1": "52687fb608acb2914550ed85deaa27582380bec4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d156d794fda50ada98b7825eebd0f3e420785a6b"
+    "sha2": "cde751ef7a519c64c0060699db2c1c8766256b81"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-test",
@@ -312,7 +312,7 @@
                                 1,
                                 1
                             ],
-                            "name": "switch-statement.js",
+                            "filepath": "switch-statement.js",
                             "end": [
                                 1,
                                 48
@@ -329,9 +329,9 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "d156d794fda50ada98b7825eebd0f3e420785a6b",
+    "sha1": "cde751ef7a519c64c0060699db2c1c8766256b81",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9fa78cd32cd480820b95fbb40ea837dae8d98019"
+    "sha2": "7ad46fe9d54b3b84d57d387e72f13777834a0c04"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-rest-test",
@@ -345,7 +345,7 @@
                                 1,
                                 1
                             ],
-                            "name": "switch-statement.js",
+                            "filepath": "switch-statement.js",
                             "end": [
                                 1,
                                 48
@@ -362,7 +362,7 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "9fa78cd32cd480820b95fbb40ea837dae8d98019",
+    "sha1": "7ad46fe9d54b3b84d57d387e72f13777834a0c04",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d3cabdc9dab4bc3c11777bbc5a792d76b819c732"
+    "sha2": "002bab7c41e8650a1bd8d725e583ee98e187b92a"
 }]

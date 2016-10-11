@@ -10,7 +10,7 @@
                                 1,
                                 1
                             ],
-                            "name": "math-operator.js",
+                            "filepath": "math-operator.js",
                             "end": [
                                 1,
                                 18
@@ -27,9 +27,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "952d18ccd1d4413a1252458befbb6593253aa794",
+    "sha1": "b3c83533a75769c4c1381c9ff0ac6600f525c9c3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0f5f7cf116643cca9937c190200836a873710883"
+    "sha2": "9bba3bf5ddfcae9cad9d4cc6e1e820cdf4a38d86"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-insert-test",
@@ -43,7 +43,7 @@
                                 1,
                                 1
                             ],
-                            "name": "math-operator.js",
+                            "filepath": "math-operator.js",
                             "end": [
                                 1,
                                 18
@@ -60,7 +60,7 @@
                                 2,
                                 1
                             ],
-                            "name": "math-operator.js",
+                            "filepath": "math-operator.js",
                             "end": [
                                 2,
                                 18
@@ -77,9 +77,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "0f5f7cf116643cca9937c190200836a873710883",
+    "sha1": "9bba3bf5ddfcae9cad9d4cc6e1e820cdf4a38d86",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1da37893a9e9441662973874ed47dd77654338fb"
+    "sha2": "2f8acf49d3eb7880a853354235179426fb10419d"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-insert-test",
@@ -94,7 +94,7 @@
                                     1,
                                     9
                                 ],
-                                "name": "math-operator.js",
+                                "filepath": "math-operator.js",
                                 "end": [
                                     1,
                                     10
@@ -105,7 +105,7 @@
                                     1,
                                     9
                                 ],
-                                "name": "math-operator.js",
+                                "filepath": "math-operator.js",
                                 "end": [
                                     1,
                                     10
@@ -124,7 +124,7 @@
                                     1,
                                     17
                                 ],
-                                "name": "math-operator.js",
+                                "filepath": "math-operator.js",
                                 "end": [
                                     1,
                                     18
@@ -135,7 +135,7 @@
                                     1,
                                     17
                                 ],
-                                "name": "math-operator.js",
+                                "filepath": "math-operator.js",
                                 "end": [
                                     1,
                                     18
@@ -153,9 +153,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "1da37893a9e9441662973874ed47dd77654338fb",
+    "sha1": "2f8acf49d3eb7880a853354235179426fb10419d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "aac275442430a4112052e502188bdc77cb31dc58"
+    "sha2": "95e60cde18a627b93d31cefe0db7a9cf76097cdd"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-test",
@@ -170,7 +170,7 @@
                                     1,
                                     9
                                 ],
-                                "name": "math-operator.js",
+                                "filepath": "math-operator.js",
                                 "end": [
                                     1,
                                     10
@@ -181,7 +181,7 @@
                                     1,
                                     9
                                 ],
-                                "name": "math-operator.js",
+                                "filepath": "math-operator.js",
                                 "end": [
                                     1,
                                     10
@@ -200,7 +200,7 @@
                                     1,
                                     17
                                 ],
-                                "name": "math-operator.js",
+                                "filepath": "math-operator.js",
                                 "end": [
                                     1,
                                     18
@@ -211,7 +211,7 @@
                                     1,
                                     17
                                 ],
-                                "name": "math-operator.js",
+                                "filepath": "math-operator.js",
                                 "end": [
                                     1,
                                     18
@@ -229,9 +229,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "aac275442430a4112052e502188bdc77cb31dc58",
+    "sha1": "95e60cde18a627b93d31cefe0db7a9cf76097cdd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a42e5df3587157b8b86c4613a0460af6ac0d9477"
+    "sha2": "9cb20ba0bc191365715b6d16c5deffc0a6b1bfc9"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-replacement-test",
@@ -245,7 +245,7 @@
                                 1,
                                 1
                             ],
-                            "name": "math-operator.js",
+                            "filepath": "math-operator.js",
                             "end": [
                                 1,
                                 18
@@ -262,7 +262,7 @@
                                 2,
                                 1
                             ],
-                            "name": "math-operator.js",
+                            "filepath": "math-operator.js",
                             "end": [
                                 2,
                                 18
@@ -279,7 +279,7 @@
                                 2,
                                 1
                             ],
-                            "name": "math-operator.js",
+                            "filepath": "math-operator.js",
                             "end": [
                                 2,
                                 18
@@ -296,9 +296,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "a42e5df3587157b8b86c4613a0460af6ac0d9477",
+    "sha1": "9cb20ba0bc191365715b6d16c5deffc0a6b1bfc9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "646e506df8f4ace3fda519ad69f21f13f34aa408"
+    "sha2": "cb9a6cbcbc723642b15197aeca53b95721097596"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-test",
@@ -312,7 +312,7 @@
                                 1,
                                 1
                             ],
-                            "name": "math-operator.js",
+                            "filepath": "math-operator.js",
                             "end": [
                                 1,
                                 18
@@ -329,9 +329,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "646e506df8f4ace3fda519ad69f21f13f34aa408",
+    "sha1": "cb9a6cbcbc723642b15197aeca53b95721097596",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d261c59941740a794efd74dd3bd3e1b88df1d436"
+    "sha2": "56333e8f5e6c30f22fc4b324fcdde287f4b75d91"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-rest-test",
@@ -345,7 +345,7 @@
                                 1,
                                 1
                             ],
-                            "name": "math-operator.js",
+                            "filepath": "math-operator.js",
                             "end": [
                                 1,
                                 18
@@ -362,7 +362,7 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "d261c59941740a794efd74dd3bd3e1b88df1d436",
+    "sha1": "56333e8f5e6c30f22fc4b324fcdde287f4b75d91",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4a00f98e1f34850ca8d14b8f33de4f8a0fcb7c40"
+    "sha2": "82e37684278e3bac7d2eb9df508781b1207aa1cd"
 }]

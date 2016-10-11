@@ -10,7 +10,7 @@
                                 1,
                                 1
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 1,
                                 42
@@ -27,9 +27,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "2757c3a3cfdea7d078af6cd6c05b4355fff8b112",
+    "sha1": "a699687c18c611424c73eb488ef4d648c874c12d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "661e1891e62dd3ea75b4ba1f716cf5ac3244b54a"
+    "sha2": "888a5f9374f9aebd626f8d17ef4258a6621402d0"
 }
 ,{
     "testCaseDescription": "javascript-named-function-replacement-insert-test",
@@ -43,7 +43,7 @@
                                 1,
                                 1
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 1,
                                 45
@@ -60,7 +60,7 @@
                                 2,
                                 1
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 2,
                                 42
@@ -77,9 +77,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "661e1891e62dd3ea75b4ba1f716cf5ac3244b54a",
+    "sha1": "888a5f9374f9aebd626f8d17ef4258a6621402d0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "10d7a7acaf524aaf2538b4cf464b62ad3bb8cb73"
+    "sha2": "2b1f5bd40a042946419f4c114b501d6414ba0ecf"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-insert-test",
@@ -94,7 +94,7 @@
                                     1,
                                     10
                                 ],
-                                "name": "named-function.js",
+                                "filepath": "named-function.js",
                                 "end": [
                                     1,
                                     25
@@ -105,7 +105,7 @@
                                     1,
                                     10
                                 ],
-                                "name": "named-function.js",
+                                "filepath": "named-function.js",
                                 "end": [
                                     1,
                                     20
@@ -123,7 +123,7 @@
                                 1,
                                 21
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 1,
                                 25
@@ -140,7 +140,7 @@
                                 1,
                                 27
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 1,
                                 31
@@ -157,7 +157,7 @@
                                 1,
                                 35
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 1,
                                 39
@@ -174,7 +174,7 @@
                                 1,
                                 30
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 1,
                                 43
@@ -191,9 +191,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "10d7a7acaf524aaf2538b4cf464b62ad3bb8cb73",
+    "sha1": "2b1f5bd40a042946419f4c114b501d6414ba0ecf",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4fe44583a5a229765f67c4550e2e2a44fe5b910d"
+    "sha2": "eb792f3c86f13c0c49d6532cfeabd0317948d1ab"
 }
 ,{
     "testCaseDescription": "javascript-named-function-replacement-test",
@@ -208,7 +208,7 @@
                                     1,
                                     10
                                 ],
-                                "name": "named-function.js",
+                                "filepath": "named-function.js",
                                 "end": [
                                     1,
                                     20
@@ -219,7 +219,7 @@
                                     1,
                                     10
                                 ],
-                                "name": "named-function.js",
+                                "filepath": "named-function.js",
                                 "end": [
                                     1,
                                     25
@@ -237,7 +237,7 @@
                                 1,
                                 21
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 1,
                                 25
@@ -254,7 +254,7 @@
                                 1,
                                 27
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 1,
                                 31
@@ -271,7 +271,7 @@
                                 1,
                                 30
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 1,
                                 43
@@ -288,7 +288,7 @@
                                 1,
                                 35
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 1,
                                 39
@@ -305,9 +305,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "4fe44583a5a229765f67c4550e2e2a44fe5b910d",
+    "sha1": "eb792f3c86f13c0c49d6532cfeabd0317948d1ab",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cfb65cb4c10bef064b3811d6d74daa567401b303"
+    "sha2": "f51ac41939b86e1c17478a7febdc011720a423a1"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-replacement-test",
@@ -321,7 +321,7 @@
                                 1,
                                 1
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 1,
                                 45
@@ -338,7 +338,7 @@
                                 2,
                                 1
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 2,
                                 42
@@ -355,7 +355,7 @@
                                 2,
                                 1
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 2,
                                 45
@@ -372,9 +372,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "cfb65cb4c10bef064b3811d6d74daa567401b303",
+    "sha1": "f51ac41939b86e1c17478a7febdc011720a423a1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1fee1c5ce1f374dd5f6fc565a5a95e51c849368f"
+    "sha2": "16e0a14cde4c464e72035bd8822c4afb4ed4678b"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-test",
@@ -388,7 +388,7 @@
                                 1,
                                 1
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 1,
                                 42
@@ -405,9 +405,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "1fee1c5ce1f374dd5f6fc565a5a95e51c849368f",
+    "sha1": "16e0a14cde4c464e72035bd8822c4afb4ed4678b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f4a8c0642e5045127f2f450d9762276ffcb136b2"
+    "sha2": "ccb988d6c2d99f622210bcffe2ba546e92169d92"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-rest-test",
@@ -421,7 +421,7 @@
                                 1,
                                 1
                             ],
-                            "name": "named-function.js",
+                            "filepath": "named-function.js",
                             "end": [
                                 1,
                                 45
@@ -438,7 +438,7 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "f4a8c0642e5045127f2f450d9762276ffcb136b2",
+    "sha1": "ccb988d6c2d99f622210bcffe2ba546e92169d92",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "035ebadb21075a55367b83c380264365799ac421"
+    "sha2": "e5bc155d380e9bf97868b601622f7c6eab1c99c8"
 }]
