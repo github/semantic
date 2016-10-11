@@ -11,9 +11,9 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "18eba2a2005fccb4180d29e1c9e9329d5e6df917",
+    "sha1": "0b57e3c9e5f144a1cce790a12432819561d9d3d3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b7ef3f4db4cf3279e15ca8b8b39225db70cb5e4e"
+    "sha2": "f5efaa42bad7ca2cdde01ab615ab4798b4ee5be8"
 }
 ,{
     "testCaseDescription": "javascript-ternary-replacement-insert-test",
@@ -29,9 +29,9 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "b7ef3f4db4cf3279e15ca8b8b39225db70cb5e4e",
+    "sha1": "f5efaa42bad7ca2cdde01ab615ab4798b4ee5be8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "caacd3ddbc6d1eb39818cfe4f2d39ec65c2df23f"
+    "sha2": "cf05224706f16d817159a2a1f8879e952f4eea7b"
 }
 ,{
     "testCaseDescription": "javascript-ternary-delete-insert-test",
@@ -47,9 +47,9 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "caacd3ddbc6d1eb39818cfe4f2d39ec65c2df23f",
+    "sha1": "cf05224706f16d817159a2a1f8879e952f4eea7b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "45d942106d3d53569be3eb0b18abc7637c6812d0"
+    "sha2": "f5c9e30a15bdd3584010288ddc03d56250cca120"
 }
 ,{
     "testCaseDescription": "javascript-ternary-replacement-test",
@@ -65,9 +65,9 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "45d942106d3d53569be3eb0b18abc7637c6812d0",
+    "sha1": "f5c9e30a15bdd3584010288ddc03d56250cca120",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8c70ff55c9a315fb024a03be6dd698cc23deb66d"
+    "sha2": "fbe27b1ffc5ac5e9af355ed01a212caa8a7e15ea"
 }
 ,{
     "testCaseDescription": "javascript-ternary-delete-replacement-test",
@@ -84,9 +84,9 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "8c70ff55c9a315fb024a03be6dd698cc23deb66d",
+    "sha1": "fbe27b1ffc5ac5e9af355ed01a212caa8a7e15ea",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "23595bb1706b80fe2e0dbec4974b1841641ef3d6"
+    "sha2": "7def2175d2590de16ad09041c44816612e9b7ec1"
 }
 ,{
     "testCaseDescription": "javascript-ternary-delete-test",
@@ -101,9 +101,9 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "23595bb1706b80fe2e0dbec4974b1841641ef3d6",
+    "sha1": "7def2175d2590de16ad09041c44816612e9b7ec1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4183c5a4b6e00ecc9b3c44ac27a8df57daa1dec4"
+    "sha2": "2cd8b4a647361be100257e21017c12d9064e1d1f"
 }
 ,{
     "testCaseDescription": "javascript-ternary-delete-rest-test",
@@ -118,7 +118,7 @@
     "filePaths": [
         "ternary.js"
     ],
-    "sha1": "4183c5a4b6e00ecc9b3c44ac27a8df57daa1dec4",
+    "sha1": "2cd8b4a647361be100257e21017c12d9064e1d1f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a1b31fd02913708ebe790b9d93822d8853676c7f"
+    "sha2": "c035407749e02f5dee9c3947118cd25095b28446"
 }]
