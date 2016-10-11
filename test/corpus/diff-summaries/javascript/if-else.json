@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-if-else-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "if-else.js",
+                            "end": [
+                                1,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' if statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "a6070e9c94930a94f1913e69bef6da80923cbfde",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e6b1c046a9f61b81b0646a0d24ce02db7f461209"
+}
+,{
+    "testCaseDescription": "javascript-if-else-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "if-else.js",
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' if statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "if-else.js",
+                            "end": [
+                                2,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' if statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "e6b1c046a9f61b81b0646a0d24ce02db7f461209",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8c1d085746a786b9f1f97a1df047a777ba9958f6"
+}
+,{
+    "testCaseDescription": "javascript-if-else-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "if-else.js",
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "if-else.js",
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' if statement with the 'x' if statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "8c1d085746a786b9f1f97a1df047a777ba9958f6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a4a9d189ba9f43fb4e56f0c5c7d26b8f24bd8fb9"
+}
+,{
+    "testCaseDescription": "javascript-if-else-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "if-else.js",
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "if-else.js",
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' if statement with the 'a' if statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "a4a9d189ba9f43fb4e56f0c5c7d26b8f24bd8fb9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b279cca2a52da34fc8487e65af5f74d2e3d156ee"
+}
+,{
+    "testCaseDescription": "javascript-if-else-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "if-else.js",
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' if statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "if-else.js",
+                            "end": [
+                                2,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' if statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "if-else.js",
+                            "end": [
+                                2,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' if statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "b279cca2a52da34fc8487e65af5f74d2e3d156ee",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "13a7419cb57d66ff977bcee43d8a447cb77977ed"
+}
+,{
+    "testCaseDescription": "javascript-if-else-delete-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "if-else.js",
+                            "end": [
+                                1,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' if statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "13a7419cb57d66ff977bcee43d8a447cb77977ed",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "38ed00f0237ad854471e13f9a859abf746712590"
+}
+,{
+    "testCaseDescription": "javascript-if-else-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "if-else.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "if-else.js",
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' if statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-else.js"
+    ],
+    "sha1": "38ed00f0237ad854471e13f9a859abf746712590",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8626ab02829f07b2f15f25da58eb41b69afd53e3"
+}]

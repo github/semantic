@@ -1,0 +1,316 @@
+[{
+    "testCaseDescription": "javascript-false-insert-test",
+    "expectedResult": {
+        "changes": {
+            "false.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "false.js",
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added 'false'",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "false.js"
+    ],
+    "sha1": "9c5eadaa5e35756fff0d96ba9830a7e0dbf30fd7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9d32877cdcecf69747e88be24da7b721a64d27ac"
+}
+,{
+    "testCaseDescription": "javascript-false-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "false.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "false.js",
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'false' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "false.js",
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added 'false'",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "false.js"
+    ],
+    "sha1": "9d32877cdcecf69747e88be24da7b721a64d27ac",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4e71c4594699213f53e0b4a77b2623b6f8494ace"
+}
+,{
+    "testCaseDescription": "javascript-false-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "false.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "false.js",
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added 'false'",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "false.js",
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'false' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "false.js"
+    ],
+    "sha1": "4e71c4594699213f53e0b4a77b2623b6f8494ace",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b048ef1312ed02ee53c84180a16525a67ad70242"
+}
+,{
+    "testCaseDescription": "javascript-false-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "false.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "false.js",
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'false' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "false.js",
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'false'",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "false.js"
+    ],
+    "sha1": "b048ef1312ed02ee53c84180a16525a67ad70242",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "15d1111d0020c65e3fca9491cb735534fb26e5a9"
+}
+,{
+    "testCaseDescription": "javascript-false-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "false.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "false.js",
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'false' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "false.js",
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'false'",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "false.js",
+                            "end": [
+                                2,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'false' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "false.js"
+    ],
+    "sha1": "15d1111d0020c65e3fca9491cb735534fb26e5a9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "15884b8d34208b933c4319248220797995363a4c"
+}
+,{
+    "testCaseDescription": "javascript-false-delete-test",
+    "expectedResult": {
+        "changes": {
+            "false.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "false.js",
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted 'false'",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "false.js"
+    ],
+    "sha1": "15884b8d34208b933c4319248220797995363a4c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a85e48b940d5259b7690df8c59df1a5bb6052d16"
+}
+,{
+    "testCaseDescription": "javascript-false-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "false.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "false.js",
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'false' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "false.js"
+    ],
+    "sha1": "a85e48b940d5259b7690df8c59df1a5bb6052d16",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3c4c5929ba3cb9bc23b211787745791de8774d2d"
+}]

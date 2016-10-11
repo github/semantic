@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-arrow-function-insert-test",
+    "expectedResult": {
+        "changes": {
+            "arrow-function.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "arrow-function.js",
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(f, g) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "arrow-function.js"
+    ],
+    "sha1": "1331d4ffb544aebfa16c17c9c2ebbab19e6f422a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4d09b922ad63a1acd3b6afe3d68dd6dc22ba78c8"
+}
+,{
+    "testCaseDescription": "javascript-arrow-function-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "arrow-function.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "arrow-function.js",
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(f, g) function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "arrow-function.js",
+                            "end": [
+                                2,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(f, g) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "arrow-function.js"
+    ],
+    "sha1": "4d09b922ad63a1acd3b6afe3d68dd6dc22ba78c8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6d4a9c5fe2f6ae81f03bf761385238d96409cd5c"
+}
+,{
+    "testCaseDescription": "javascript-arrow-function-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "arrow-function.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "arrow-function.js",
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "arrow-function.js",
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g' identifier with the 'h' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "arrow-function.js"
+    ],
+    "sha1": "6d4a9c5fe2f6ae81f03bf761385238d96409cd5c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "955047d8cae03944863fe0457dab999410da00ee"
+}
+,{
+    "testCaseDescription": "javascript-arrow-function-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "arrow-function.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "arrow-function.js",
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "arrow-function.js",
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'h' identifier with the 'g' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "arrow-function.js"
+    ],
+    "sha1": "955047d8cae03944863fe0457dab999410da00ee",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4f886505083883d5ce313d51ae222b05044cb464"
+}
+,{
+    "testCaseDescription": "javascript-arrow-function-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "arrow-function.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "arrow-function.js",
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(f, g) function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "arrow-function.js",
+                            "end": [
+                                2,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(f, g) function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "arrow-function.js",
+                            "end": [
+                                2,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(f, g) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "arrow-function.js"
+    ],
+    "sha1": "4f886505083883d5ce313d51ae222b05044cb464",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3f81a39022968106428052245cf475419ec283b6"
+}
+,{
+    "testCaseDescription": "javascript-arrow-function-delete-test",
+    "expectedResult": {
+        "changes": {
+            "arrow-function.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "arrow-function.js",
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(f, g) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "arrow-function.js"
+    ],
+    "sha1": "3f81a39022968106428052245cf475419ec283b6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d75e2c071c454713f7824114e29f4d99427c43f5"
+}
+,{
+    "testCaseDescription": "javascript-arrow-function-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "arrow-function.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "arrow-function.js",
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(f, g) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "arrow-function.js"
+    ],
+    "sha1": "d75e2c071c454713f7824114e29f4d99427c43f5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4d63196a05b9443aebe166c10eaf31d60a162f7e"
+}]

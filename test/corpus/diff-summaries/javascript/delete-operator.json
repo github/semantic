@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-delete-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "delete-operator.js",
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'delete thing['prop']' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "c012557afb55395556a9209537f977c480c9cfa2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6b1159e64aeea120283214debcf6b90846dd2d25"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "delete-operator.js",
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'delete thing.prop' operator",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "delete-operator.js",
+                            "end": [
+                                2,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'delete thing['prop']' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "6b1159e64aeea120283214debcf6b90846dd2d25",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "30def9e5c20b4b581b85c5fa83ce538254f9cf92"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "delete-operator.js",
+                                "end": [
+                                    1,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "delete-operator.js",
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'delete thing.prop' operator with the 'delete thing['prop']' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "30def9e5c20b4b581b85c5fa83ce538254f9cf92",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f5f742849965b8ac6d6ddac053ae7ad8638d3f56"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "delete-operator.js",
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "delete-operator.js",
+                                "end": [
+                                    1,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'delete thing['prop']' operator with the 'delete thing.prop' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "f5f742849965b8ac6d6ddac053ae7ad8638d3f56",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "28436cc38cd7b95a4f00bb6764bb77f5d7ae3e63"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "delete-operator.js",
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'delete thing.prop' operator",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "delete-operator.js",
+                            "end": [
+                                2,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'delete thing['prop']' operator",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "delete-operator.js",
+                            "end": [
+                                2,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'delete thing.prop' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "28436cc38cd7b95a4f00bb6764bb77f5d7ae3e63",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "24b9fc05822bbc3b202fbe797de7daab301bf045"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "delete-operator.js",
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'delete thing['prop']' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "24b9fc05822bbc3b202fbe797de7daab301bf045",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "16b0f30eb7f79f324a914ab14940e3ebb1e0f376"
+}
+,{
+    "testCaseDescription": "javascript-delete-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "delete-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "delete-operator.js",
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'delete thing.prop' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delete-operator.js"
+    ],
+    "sha1": "16b0f30eb7f79f324a914ab14940e3ebb1e0f376",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4c9359461db3f23921b2af834190b8c9966fa455"
+}]

@@ -1,0 +1,368 @@
+[{
+    "testCaseDescription": "javascript-nested-functions-insert-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "nested-functions.js",
+                            "end": [
+                                1,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'parent' function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "1ad3455503bfb6621a6b418f015349c2bd2a957d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a895199ca338b56967e3a62869616c333b677551"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "nested-functions.js",
+                            "end": [
+                                1,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'parent' function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "nested-functions.js",
+                            "end": [
+                                2,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'parent' function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "a895199ca338b56967e3a62869616c333b677551",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "801ab172957b72d8babcda5c151b009325b97d46"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    74
+                                ],
+                                "name": "nested-functions.js",
+                                "end": [
+                                    1,
+                                    78
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    74
+                                ],
+                                "name": "nested-functions.js",
+                                "end": [
+                                    1,
+                                    78
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'arg1' identifier with the 'arg3' identifier in the console.log(arg3) method call of the 'child' function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    93
+                                ],
+                                "name": "nested-functions.js",
+                                "end": [
+                                    1,
+                                    97
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    93
+                                ],
+                                "name": "nested-functions.js",
+                                "end": [
+                                    1,
+                                    97
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'arg2' identifier with the 'arg4' identifier in the console.log(arg4) method call of the 'child' function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "801ab172957b72d8babcda5c151b009325b97d46",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e8b1e1efe706cf565df615f0cd9cc3514881ea82"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    74
+                                ],
+                                "name": "nested-functions.js",
+                                "end": [
+                                    1,
+                                    78
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    74
+                                ],
+                                "name": "nested-functions.js",
+                                "end": [
+                                    1,
+                                    78
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'arg3' identifier with the 'arg1' identifier in the console.log(arg1) method call of the 'child' function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    93
+                                ],
+                                "name": "nested-functions.js",
+                                "end": [
+                                    1,
+                                    97
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    93
+                                ],
+                                "name": "nested-functions.js",
+                                "end": [
+                                    1,
+                                    97
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'arg4' identifier with the 'arg2' identifier in the console.log(arg2) method call of the 'child' function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "e8b1e1efe706cf565df615f0cd9cc3514881ea82",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "50489ea764a308d499766e2c3e0da4215ce5ac34"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "nested-functions.js",
+                            "end": [
+                                1,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'parent' function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "nested-functions.js",
+                            "end": [
+                                2,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'parent' function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "nested-functions.js",
+                            "end": [
+                                2,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'parent' function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "50489ea764a308d499766e2c3e0da4215ce5ac34",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9d53457b894350de4b09b86914c8dbcc04f999ab"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-delete-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "nested-functions.js",
+                            "end": [
+                                1,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'parent' function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "9d53457b894350de4b09b86914c8dbcc04f999ab",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4b43d1d5ce4632f57879d9021bae72e01ef78234"
+}
+,{
+    "testCaseDescription": "javascript-nested-functions-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "nested-functions.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "nested-functions.js",
+                            "end": [
+                                1,
+                                103
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'parent' function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "nested-functions.js"
+    ],
+    "sha1": "4b43d1d5ce4632f57879d9021bae72e01ef78234",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6c18f0fbe80bb95f6642653913241b9065181591"
+}]

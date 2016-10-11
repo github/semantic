@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-template-string-insert-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "template-string.js",
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the '`one line`' template string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "8626ab02829f07b2f15f25da58eb41b69afd53e3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d01fd0596a0ab6b147d7424546f7b0996adc1fba"
+}
+,{
+    "testCaseDescription": "javascript-template-string-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "template-string.js",
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the '`multi line`' template string",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "template-string.js",
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the '`one line`' template string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "d01fd0596a0ab6b147d7424546f7b0996adc1fba",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6e7f81c46d45fea5206a006ceaa2d82ec8f78f61"
+}
+,{
+    "testCaseDescription": "javascript-template-string-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "template-string.js",
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "template-string.js",
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '`multi line`' template string with the '`one line`' template string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "6e7f81c46d45fea5206a006ceaa2d82ec8f78f61",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "edb72e08b538368a53cf59d2267434e98cc07b0b"
+}
+,{
+    "testCaseDescription": "javascript-template-string-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "template-string.js",
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "template-string.js",
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '`one line`' template string with the '`multi line`' template string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "edb72e08b538368a53cf59d2267434e98cc07b0b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4d026aa2de0873035dae443cf69517b3e587cb49"
+}
+,{
+    "testCaseDescription": "javascript-template-string-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "template-string.js",
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '`multi line`' template string",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "template-string.js",
+                            "end": [
+                                2,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '`one line`' template string",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "template-string.js",
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the '`multi line`' template string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "4d026aa2de0873035dae443cf69517b3e587cb49",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6eeca042e59e8a58d11b6e4829af1da4f297a099"
+}
+,{
+    "testCaseDescription": "javascript-template-string-delete-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "template-string.js",
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '`one line`' template string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "6eeca042e59e8a58d11b6e4829af1da4f297a099",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c37aba59f9d510463c64e52a14eb1da928d668ee"
+}
+,{
+    "testCaseDescription": "javascript-template-string-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "template-string.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "template-string.js",
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '`multi line`' template string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "template-string.js"
+    ],
+    "sha1": "c37aba59f9d510463c64e52a14eb1da928d668ee",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "215eb7570ac9ccb686598ee7a6c1ddc9c0562224"
+}]

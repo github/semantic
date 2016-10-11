@@ -1,0 +1,488 @@
+[{
+    "testCaseDescription": "javascript-anonymous-function-insert-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "anonymous-function.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(a, b) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "a0404e9e7b61466d953a033ff444c10691cea549",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1961f9a7fb461c1318e0b6c46b61fc897fa1560b"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-function-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "anonymous-function.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(b, c) function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "anonymous-function.js",
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(a, b) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "1961f9a7fb461c1318e0b6c46b61fc897fa1560b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a87c5f91d1af023c750e53541117a0d019b49ed9"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-function-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    12
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    12
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'b' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    28
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    28
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'b' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "a87c5f91d1af023c750e53541117a0d019b49ed9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ae9ec1df052f843a7f32f581fa51fecfee985b33"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-function-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    12
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    12
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    28
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    28
+                                ],
+                                "name": "anonymous-function.js",
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "ae9ec1df052f843a7f32f581fa51fecfee985b33",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "97a65badadc090ac8798ea1710c611c32c6521fa"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-function-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "anonymous-function.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(b, c) function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "anonymous-function.js",
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(a, b) function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "anonymous-function.js",
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(b, c) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "97a65badadc090ac8798ea1710c611c32c6521fa",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7aa2ca6547621b95a8648317f5824a147b42ab6c"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-function-delete-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "anonymous-function.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(a, b) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "7aa2ca6547621b95a8648317f5824a147b42ab6c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "77a404dd843047629e7c0f3d1e7e59b97dc14278"
+}
+,{
+    "testCaseDescription": "javascript-anonymous-function-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "anonymous-function.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "anonymous-function.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(b, c) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "anonymous-function.js"
+    ],
+    "sha1": "77a404dd843047629e7c0f3d1e7e59b97dc14278",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "cbe8e933001ed566c983447bd68c559b8a0ce299"
+}]

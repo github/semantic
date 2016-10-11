@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-member-access-assignment-insert-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "member-access-assignment.js",
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y.x' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "6882106e2e1564145c50f664a6446f6c37b1ab3f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e25f5c9031b1c4881133070ab71fd755d165ead5"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "member-access-assignment.js",
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y.x' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "member-access-assignment.js",
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y.x' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "e25f5c9031b1c4881133070ab71fd755d165ead5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9d9f04beab9f8d927ddbf0d4939d5651055d1577"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "name": "member-access-assignment.js",
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "name": "member-access-assignment.js",
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '0' in an assignment to y.x",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "9d9f04beab9f8d927ddbf0d4939d5651055d1577",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bb31011c60ec572395dbe73bb48dd13be1cd6bb3"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "name": "member-access-assignment.js",
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "name": "member-access-assignment.js",
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '0' with '1' in an assignment to y.x",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "bb31011c60ec572395dbe73bb48dd13be1cd6bb3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7706b38694acad8dd246351a7623409cf63685ae"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "member-access-assignment.js",
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y.x' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "member-access-assignment.js",
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y.x' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "member-access-assignment.js",
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y.x' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "7706b38694acad8dd246351a7623409cf63685ae",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "75dcf600f84cc516ba6e606ae623217e558da992"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-delete-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "member-access-assignment.js",
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y.x' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "75dcf600f84cc516ba6e606ae623217e558da992",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "003aa769197d4440824e267b4cc77c0f57a73561"
+}
+,{
+    "testCaseDescription": "javascript-member-access-assignment-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "member-access-assignment.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "member-access-assignment.js",
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y.x' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "member-access-assignment.js"
+    ],
+    "sha1": "003aa769197d4440824e267b4cc77c0f57a73561",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9b3e79687880bf10eac28404f1b0de7e74e0ba44"
+}]

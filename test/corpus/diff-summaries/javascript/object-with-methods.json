@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-objects-with-methods-insert-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "objects-with-methods.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ add }' object",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "sha1": "a7028eef7c56f7ba5c5dda0faadcfffe205d5a40",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3006c2d8134eb46077d39614fdcb4521dbdb0b17"
+}
+,{
+    "testCaseDescription": "javascript-objects-with-methods-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "objects-with-methods.js",
+                            "end": [
+                                1,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ subtract }' object",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "objects-with-methods.js",
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ add }' object",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "sha1": "3006c2d8134eb46077d39614fdcb4521dbdb0b17",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8c983c007eb95af974dfe614c7d1d00e09518f71"
+}
+,{
+    "testCaseDescription": "javascript-objects-with-methods-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "name": "objects-with-methods.js",
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "name": "objects-with-methods.js",
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'subtract' identifier with the 'add' identifier in the add method",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "sha1": "8c983c007eb95af974dfe614c7d1d00e09518f71",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "55dcede10e26e4cf3b859b592a42217948b92144"
+}
+,{
+    "testCaseDescription": "javascript-objects-with-methods-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "name": "objects-with-methods.js",
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "name": "objects-with-methods.js",
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'add' identifier with the 'subtract' identifier in the subtract method",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "sha1": "55dcede10e26e4cf3b859b592a42217948b92144",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e2d692987dd8c6a20ac236a754dff49468cc37ef"
+}
+,{
+    "testCaseDescription": "javascript-objects-with-methods-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "objects-with-methods.js",
+                            "end": [
+                                1,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ subtract }' object",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "objects-with-methods.js",
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ add }' object",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "objects-with-methods.js",
+                            "end": [
+                                2,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ subtract }' object",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "sha1": "e2d692987dd8c6a20ac236a754dff49468cc37ef",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "96aea9adf4dd98dad9f18a880cc77865485780b7"
+}
+,{
+    "testCaseDescription": "javascript-objects-with-methods-delete-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "objects-with-methods.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ add }' object",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "sha1": "96aea9adf4dd98dad9f18a880cc77865485780b7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4f77fa590f5ec5abbe9af2cdf0e933c1f7930dbb"
+}
+,{
+    "testCaseDescription": "javascript-objects-with-methods-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "objects-with-methods.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "objects-with-methods.js",
+                            "end": [
+                                1,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ subtract }' object",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "objects-with-methods.js"
+    ],
+    "sha1": "4f77fa590f5ec5abbe9af2cdf0e933c1f7930dbb",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b2c18e39f6754f6fbc0ce238ea24ee7386d7b34f"
+}]

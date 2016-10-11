@@ -1,0 +1,316 @@
+[{
+    "testCaseDescription": "javascript-ternary-insert-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "ternary.js",
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'condition' ternary expression",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "7086396295d14f41207e8fbae4d350f2672a77dd",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8a1fe236a211694d9fb84e254d894597ddaa0cd6"
+}
+,{
+    "testCaseDescription": "javascript-ternary-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "ternary.js",
+                            "end": [
+                                1,
+                                51
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x.y' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "ternary.js",
+                            "end": [
+                                2,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'condition' ternary expression",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "8a1fe236a211694d9fb84e254d894597ddaa0cd6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6ac46b3a4b87fb3a90150d336ad4a8ae1f1b63f7"
+}
+,{
+    "testCaseDescription": "javascript-ternary-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "ternary.js",
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'condition' ternary expression",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "ternary.js",
+                            "end": [
+                                1,
+                                51
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x.y' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "6ac46b3a4b87fb3a90150d336ad4a8ae1f1b63f7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f3c918ef30afcdad6de0e05fa3886964a72b0029"
+}
+,{
+    "testCaseDescription": "javascript-ternary-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "ternary.js",
+                            "end": [
+                                1,
+                                51
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x.y' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "ternary.js",
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'condition' ternary expression",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "f3c918ef30afcdad6de0e05fa3886964a72b0029",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "eda16e19b40607bb335535a7c03378dfb511c030"
+}
+,{
+    "testCaseDescription": "javascript-ternary-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "ternary.js",
+                            "end": [
+                                1,
+                                51
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x.y' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "ternary.js",
+                            "end": [
+                                2,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'condition' ternary expression",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "ternary.js",
+                            "end": [
+                                2,
+                                51
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x.y' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "eda16e19b40607bb335535a7c03378dfb511c030",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "63a42f2ef52ae2fdb8545cc7153c9b833cee6860"
+}
+,{
+    "testCaseDescription": "javascript-ternary-delete-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "ternary.js",
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'condition' ternary expression",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "63a42f2ef52ae2fdb8545cc7153c9b833cee6860",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4490621208793b8eefec135b9971666038456188"
+}
+,{
+    "testCaseDescription": "javascript-ternary-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "ternary.js",
+                            "end": [
+                                1,
+                                51
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x.y' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.js"
+    ],
+    "sha1": "4490621208793b8eefec135b9971666038456188",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f01711cd334d609eaf2763a3694e94c771e37f3e"
+}]

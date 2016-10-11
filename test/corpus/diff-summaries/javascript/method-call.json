@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-method-call-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-call.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "method-call.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'object.someMethod(arg1, \"arg2\")' method call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-call.js"
+    ],
+    "sha1": "bde44008cfb326f395ddb1071a073fc1113ffb3d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "80d9e1c3f364424fd85eb3ee59e8790187596cba"
+}
+,{
+    "testCaseDescription": "javascript-method-call-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-call.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "method-call.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'object.someMethod(arg1, \"arg3\")' method call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "method-call.js",
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'object.someMethod(arg1, \"arg2\")' method call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-call.js"
+    ],
+    "sha1": "80d9e1c3f364424fd85eb3ee59e8790187596cba",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d3da8ea868cfb41cfd38f8264933c2b7271c7734"
+}
+,{
+    "testCaseDescription": "javascript-method-call-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-call.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "name": "method-call.js",
+                                "end": [
+                                    1,
+                                    31
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "name": "method-call.js",
+                                "end": [
+                                    1,
+                                    31
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"arg3\" string with the \"arg2\" string in the object.someMethod(arg1, \"arg2\") method call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-call.js"
+    ],
+    "sha1": "d3da8ea868cfb41cfd38f8264933c2b7271c7734",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "262dfb0009e74472f2064911509300f17714002d"
+}
+,{
+    "testCaseDescription": "javascript-method-call-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-call.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "name": "method-call.js",
+                                "end": [
+                                    1,
+                                    31
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "name": "method-call.js",
+                                "end": [
+                                    1,
+                                    31
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"arg2\" string with the \"arg3\" string in the object.someMethod(arg1, \"arg3\") method call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-call.js"
+    ],
+    "sha1": "262dfb0009e74472f2064911509300f17714002d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6be53135abf6f6b89c6111798030e91721826c59"
+}
+,{
+    "testCaseDescription": "javascript-method-call-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-call.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "method-call.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'object.someMethod(arg1, \"arg3\")' method call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "method-call.js",
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'object.someMethod(arg1, \"arg2\")' method call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "method-call.js",
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'object.someMethod(arg1, \"arg3\")' method call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-call.js"
+    ],
+    "sha1": "6be53135abf6f6b89c6111798030e91721826c59",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ee8b6a26e5f54845b632bdbf0543d81b6da15700"
+}
+,{
+    "testCaseDescription": "javascript-method-call-delete-test",
+    "expectedResult": {
+        "changes": {
+            "method-call.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "method-call.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'object.someMethod(arg1, \"arg2\")' method call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-call.js"
+    ],
+    "sha1": "ee8b6a26e5f54845b632bdbf0543d81b6da15700",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1129af20d307473ea4e2d4d577ea53c7bdaed636"
+}
+,{
+    "testCaseDescription": "javascript-method-call-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "method-call.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "method-call.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'object.someMethod(arg1, \"arg3\")' method call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-call.js"
+    ],
+    "sha1": "1129af20d307473ea4e2d4d577ea53c7bdaed636",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7a9cdc6c356ec1e7fe6e47c923898d3e2e6a32cc"
+}]

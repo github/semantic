@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-regex-insert-test",
+    "expectedResult": {
+        "changes": {
+            "regex.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "regex.js",
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/one/g' regex",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "0578f24cf85fce35bd787e60e1b210b79f462858",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f58477ae790a5642d28917f80ce0eef50d3942f8"
+}
+,{
+    "testCaseDescription": "javascript-regex-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "regex.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "regex.js",
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/on[^/]afe/gim' regex",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "regex.js",
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/one/g' regex",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "f58477ae790a5642d28917f80ce0eef50d3942f8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2a69523d4cbd85210fb91e34d2e3d780edadb84a"
+}
+,{
+    "testCaseDescription": "javascript-regex-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "regex.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "regex.js",
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "regex.js",
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '/on[^/]afe/gim' regex with the '/one/g' regex",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "2a69523d4cbd85210fb91e34d2e3d780edadb84a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0db3f4dd27fec529d440a8e90b5f163017d6d1e8"
+}
+,{
+    "testCaseDescription": "javascript-regex-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "regex.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "regex.js",
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "regex.js",
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '/one/g' regex with the '/on[^/]afe/gim' regex",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "0db3f4dd27fec529d440a8e90b5f163017d6d1e8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "dfb43e551c9e2376cf3b7de60e4ab10aa24a1cd1"
+}
+,{
+    "testCaseDescription": "javascript-regex-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "regex.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "regex.js",
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/on[^/]afe/gim' regex",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "regex.js",
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/one/g' regex",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "regex.js",
+                            "end": [
+                                2,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/on[^/]afe/gim' regex",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "dfb43e551c9e2376cf3b7de60e4ab10aa24a1cd1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a6a36758433fd19118cd451bc078fff428925b0f"
+}
+,{
+    "testCaseDescription": "javascript-regex-delete-test",
+    "expectedResult": {
+        "changes": {
+            "regex.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "regex.js",
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/one/g' regex",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "a6a36758433fd19118cd451bc078fff428925b0f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "098252dc18d9aad40432ffc927069d1a61e76ce9"
+}
+,{
+    "testCaseDescription": "javascript-regex-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "regex.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "regex.js",
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/on[^/]afe/gim' regex",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.js"
+    ],
+    "sha1": "098252dc18d9aad40432ffc927069d1a61e76ce9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1fbd44cbdd925bb727f5b07af974a37db31b3ea0"
+}]

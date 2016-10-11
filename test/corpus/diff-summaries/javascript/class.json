@@ -1,0 +1,428 @@
+[{
+    "testCaseDescription": "javascript-class-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "class.js",
+                            "end": [
+                                1,
+                                87
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' class",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "3c4c5929ba3cb9bc23b211787745791de8774d2d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b728e40d8d1a035c46c62d3edc01f1e30d06bf59"
+}
+,{
+    "testCaseDescription": "javascript-class-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "class.js",
+                            "end": [
+                                1,
+                                85
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' class",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "class.js",
+                            "end": [
+                                2,
+                                87
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' class",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "b728e40d8d1a035c46c62d3edc01f1e30d06bf59",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e4a75438dfa8e247778fa6e8319ccc35fa9cdcb3"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "class.js",
+                                "end": [
+                                    1,
+                                    23
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "class.js",
+                                "end": [
+                                    1,
+                                    23
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'one' identifier in the one method of the 'Foo' class",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "name": "class.js",
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "name": "class.js",
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'bar' identifier with the 'two' identifier in the two method of the 'Foo' class",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "name": "class.js",
+                                "end": [
+                                    1,
+                                    66
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "name": "class.js",
+                                "end": [
+                                    1,
+                                    68
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'baz' identifier with the 'three' identifier in the three method of the 'Foo' class",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "e4a75438dfa8e247778fa6e8319ccc35fa9cdcb3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a2cd250b0659258473156b0ad3bad3d081b8f047"
+}
+,{
+    "testCaseDescription": "javascript-class-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "class.js",
+                                "end": [
+                                    1,
+                                    23
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "class.js",
+                                "end": [
+                                    1,
+                                    23
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'one' identifier with the 'foo' identifier in the foo method of the 'Foo' class",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "name": "class.js",
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "name": "class.js",
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'two' identifier with the 'bar' identifier in the bar method of the 'Foo' class",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "name": "class.js",
+                                "end": [
+                                    1,
+                                    68
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "name": "class.js",
+                                "end": [
+                                    1,
+                                    66
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'three' identifier with the 'baz' identifier in the baz method of the 'Foo' class",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "a2cd250b0659258473156b0ad3bad3d081b8f047",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0558a17e26ea263027bc60b26ca6f9b40c923746"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "class.js",
+                            "end": [
+                                1,
+                                85
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "class.js",
+                            "end": [
+                                2,
+                                87
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "class.js",
+                            "end": [
+                                2,
+                                85
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' class",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "0558a17e26ea263027bc60b26ca6f9b40c923746",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4247bf279aca71be7ae67e8853a46e56ecc1bcdc"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "class.js",
+                            "end": [
+                                1,
+                                87
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "4247bf279aca71be7ae67e8853a46e56ecc1bcdc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8724757eda59b1c3a89ac88298c706023d3480e5"
+}
+,{
+    "testCaseDescription": "javascript-class-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "class.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "class.js",
+                            "end": [
+                                1,
+                                85
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.js"
+    ],
+    "sha1": "8724757eda59b1c3a89ac88298c706023d3480e5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6c3b6d5c7d426a657e90d97cdfd248b2453bc087"
+}]

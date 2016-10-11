@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-function-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function.js",
+                            "end": [
+                                1,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(arg1, arg2) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function.js"
+    ],
+    "sha1": "7421caaeb3a46acf3fd36871e3fd56e4409df4c1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9eb28dc8e67375a2846a0a2baa6f91de7a54e3fc"
+}
+,{
+    "testCaseDescription": "javascript-function-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function.js",
+                            "end": [
+                                1,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(arg1, arg2) function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "function.js",
+                            "end": [
+                                2,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(arg1, arg2) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function.js"
+    ],
+    "sha1": "9eb28dc8e67375a2846a0a2baa6f91de7a54e3fc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f80644c146243f36bc8d53bd88b463f88fb56148"
+}
+,{
+    "testCaseDescription": "javascript-function-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "name": "function.js",
+                                "end": [
+                                    1,
+                                    28
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "name": "function.js",
+                                "end": [
+                                    1,
+                                    28
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'arg1' identifier with the 'arg2' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function.js"
+    ],
+    "sha1": "f80644c146243f36bc8d53bd88b463f88fb56148",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "16e3dd70bc83125385a9b3f952e77b24b15558cd"
+}
+,{
+    "testCaseDescription": "javascript-function-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "name": "function.js",
+                                "end": [
+                                    1,
+                                    28
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "name": "function.js",
+                                "end": [
+                                    1,
+                                    28
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'arg2' identifier with the 'arg1' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function.js"
+    ],
+    "sha1": "16e3dd70bc83125385a9b3f952e77b24b15558cd",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "610b235fd79ed384ca2ed512957629b75fdaec56"
+}
+,{
+    "testCaseDescription": "javascript-function-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function.js",
+                            "end": [
+                                1,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(arg1, arg2) function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "function.js",
+                            "end": [
+                                2,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(arg1, arg2) function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "function.js",
+                            "end": [
+                                2,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added an anonymous(arg1, arg2) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function.js"
+    ],
+    "sha1": "610b235fd79ed384ca2ed512957629b75fdaec56",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c11cac612eb21c4dd32f29b5fdcbb77431bc1478"
+}
+,{
+    "testCaseDescription": "javascript-function-delete-test",
+    "expectedResult": {
+        "changes": {
+            "function.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function.js",
+                            "end": [
+                                1,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(arg1, arg2) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function.js"
+    ],
+    "sha1": "c11cac612eb21c4dd32f29b5fdcbb77431bc1478",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "dfa9a3bf7f53d0621d490ae446682bcf37e6c2b9"
+}
+,{
+    "testCaseDescription": "javascript-function-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "function.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function.js",
+                            "end": [
+                                1,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(arg1, arg2) function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function.js"
+    ],
+    "sha1": "dfa9a3bf7f53d0621d490ae446682bcf37e6c2b9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1331d4ffb544aebfa16c17c9c2ebbab19e6f422a"
+}]

@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-comment-insert-test",
+    "expectedResult": {
+        "changes": {
+            "comment.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comment.js",
+                            "end": [
+                                1,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the '// This is a property' comment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.js"
+    ],
+    "sha1": "a67c36dee6afa77efd8005ab23227f683239d35e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7d283c6fbe1d5b29e2ab629ee8d18e668b206e80"
+}
+,{
+    "testCaseDescription": "javascript-comment-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "comment.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comment.js",
+                            "end": [
+                                3,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/*\n * This is a method\n*/' comment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "name": "comment.js",
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the '// This is a property' comment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.js"
+    ],
+    "sha1": "7d283c6fbe1d5b29e2ab629ee8d18e668b206e80",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7368c3a098046a807d136e1e86467f6c2b6ec81a"
+}
+,{
+    "testCaseDescription": "javascript-comment-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "comment.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "comment.js",
+                                "end": [
+                                    3,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "comment.js",
+                                "end": [
+                                    1,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '/*\n * This is a method\n*/' comment with the '// This is a property' comment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.js"
+    ],
+    "sha1": "7368c3a098046a807d136e1e86467f6c2b6ec81a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1cf6f98c7f88af7a9a75863c4fd38202308014ea"
+}
+,{
+    "testCaseDescription": "javascript-comment-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "comment.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "comment.js",
+                                "end": [
+                                    1,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "name": "comment.js",
+                                "end": [
+                                    3,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '// This is a property' comment with the '/*\n * This is a method\n*/' comment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.js"
+    ],
+    "sha1": "1cf6f98c7f88af7a9a75863c4fd38202308014ea",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "aafd41680947235874cd0070f3970a712f140f79"
+}
+,{
+    "testCaseDescription": "javascript-comment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "comment.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comment.js",
+                            "end": [
+                                3,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/*\n * This is a method\n*/' comment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "name": "comment.js",
+                            "end": [
+                                4,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '// This is a property' comment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "comment.js",
+                            "end": [
+                                4,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/*\n * This is a method\n*/' comment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.js"
+    ],
+    "sha1": "aafd41680947235874cd0070f3970a712f140f79",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6b6457fbd3a6977f7041f32f5cbb59d86f82853a"
+}
+,{
+    "testCaseDescription": "javascript-comment-delete-test",
+    "expectedResult": {
+        "changes": {
+            "comment.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comment.js",
+                            "end": [
+                                1,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '// This is a property' comment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.js"
+    ],
+    "sha1": "6b6457fbd3a6977f7041f32f5cbb59d86f82853a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1f1632420d5cb8f7794652942c29badb4b2ea481"
+}
+,{
+    "testCaseDescription": "javascript-comment-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "comment.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comment.js",
+                            "end": [
+                                3,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/*\n * This is a method\n*/' comment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comment.js"
+    ],
+    "sha1": "1f1632420d5cb8f7794652942c29badb4b2ea481",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9edcc470495aad2ae2b395a18179ec07829ad591"
+}]

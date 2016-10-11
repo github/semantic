@@ -1,0 +1,428 @@
+[{
+    "testCaseDescription": "javascript-for-in-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-in-statement.js",
+                            "end": [
+                                1,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'thing in things' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "215eb7570ac9ccb686598ee7a6c1ddc9c0562224",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a2be2a6bc55d7d2613d647e725e39fe79fd1ca21"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-in-statement.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'item in items' for statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "for-in-statement.js",
+                            "end": [
+                                2,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'thing in things' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "a2be2a6bc55d7d2613d647e725e39fe79fd1ca21",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "aa607b9e541223522cd47ab5d98b1289df8033db"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "for-in-statement.js",
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "for-in-statement.js",
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'item' identifier with the 'thing' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    14
+                                ],
+                                "name": "for-in-statement.js",
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    15
+                                ],
+                                "name": "for-in-statement.js",
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'items' identifier with the 'things' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    23
+                                ],
+                                "name": "for-in-statement.js",
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "name": "for-in-statement.js",
+                                "end": [
+                                    1,
+                                    30
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'item' identifier with the 'thing' identifier in the thing() function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "aa607b9e541223522cd47ab5d98b1289df8033db",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "eaa14214e9d18894bf7f44347a1edc4a95966930"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "for-in-statement.js",
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "for-in-statement.js",
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'thing' identifier with the 'item' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    15
+                                ],
+                                "name": "for-in-statement.js",
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    14
+                                ],
+                                "name": "for-in-statement.js",
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'things' identifier with the 'items' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "name": "for-in-statement.js",
+                                "end": [
+                                    1,
+                                    30
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    23
+                                ],
+                                "name": "for-in-statement.js",
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'thing' identifier with the 'item' identifier in the item() function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "eaa14214e9d18894bf7f44347a1edc4a95966930",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6007528cd72aa56e2f887a611c1b30ab2d922894"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-in-statement.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'item in items' for statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "for-in-statement.js",
+                            "end": [
+                                2,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'thing in things' for statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "for-in-statement.js",
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'item in items' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "6007528cd72aa56e2f887a611c1b30ab2d922894",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9055c5f91ede476dde3667d3beabfc9e6ec1aa10"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-in-statement.js",
+                            "end": [
+                                1,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'thing in things' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "9055c5f91ede476dde3667d3beabfc9e6ec1aa10",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "735ef2f75ff02bc497757685245f4fdc59422392"
+}
+,{
+    "testCaseDescription": "javascript-for-in-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "for-in-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-in-statement.js",
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'item in items' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-in-statement.js"
+    ],
+    "sha1": "735ef2f75ff02bc497757685245f4fdc59422392",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1ad3455503bfb6621a6b418f015349c2bd2a957d"
+}]

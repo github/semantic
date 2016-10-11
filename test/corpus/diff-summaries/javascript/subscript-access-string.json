@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-subscript-access-string-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "subscript-access-string.js",
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[\"some-string\"]' subscript access",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "cbebbe0cb3d24a7adb492b88b6b5769c9b895654",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b3cdd00f14a2880dee975305faf0a8268c700ca4"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "subscript-access-string.js",
+                            "end": [
+                                1,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[\"some-other-string\"]' subscript access",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "subscript-access-string.js",
+                            "end": [
+                                2,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[\"some-string\"]' subscript access",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "b3cdd00f14a2880dee975305faf0a8268c700ca4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "874fe50a89cdc77032efc2fb67e29ed8c3fbc66c"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "name": "subscript-access-string.js",
+                                "end": [
+                                    1,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "name": "subscript-access-string.js",
+                                "end": [
+                                    1,
+                                    16
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"some-other-string\" string with the \"some-string\" string in the x[\"some-string\"] subscript access",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "874fe50a89cdc77032efc2fb67e29ed8c3fbc66c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "86756c297918a1e4812fb77db3970d43979df6cd"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "name": "subscript-access-string.js",
+                                "end": [
+                                    1,
+                                    16
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    3
+                                ],
+                                "name": "subscript-access-string.js",
+                                "end": [
+                                    1,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"some-string\" string with the \"some-other-string\" string in the x[\"some-other-string\"] subscript access",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "86756c297918a1e4812fb77db3970d43979df6cd",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a536d6f573c0c3763b9dc6f4795362d33515ba6f"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "subscript-access-string.js",
+                            "end": [
+                                1,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[\"some-other-string\"]' subscript access",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "subscript-access-string.js",
+                            "end": [
+                                2,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[\"some-string\"]' subscript access",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "subscript-access-string.js",
+                            "end": [
+                                2,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x[\"some-other-string\"]' subscript access",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "a536d6f573c0c3763b9dc6f4795362d33515ba6f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e9eec0492107b1e1a88b908a99081ed82cd0ac71"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "subscript-access-string.js",
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[\"some-string\"]' subscript access",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "e9eec0492107b1e1a88b908a99081ed82cd0ac71",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bd4c80248676d64aea1381b767de1d9db079caa1"
+}
+,{
+    "testCaseDescription": "javascript-subscript-access-string-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "subscript-access-string.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "subscript-access-string.js",
+                            "end": [
+                                1,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x[\"some-other-string\"]' subscript access",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "subscript-access-string.js"
+    ],
+    "sha1": "bd4c80248676d64aea1381b767de1d9db079caa1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5172568a010252e98966d57a1c3fc1ade326f9ab"
+}]

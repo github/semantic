@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-generator-function-insert-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "generator-function.js",
+                            "end": [
+                                1,
+                                59
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'generateStuff' function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "4d63196a05b9443aebe166c10eaf31d60a162f7e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "36b15111da4c3d7db3722d53889c04ec06472bf7"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "generator-function.js",
+                            "end": [
+                                1,
+                                62
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'generateNewStuff' function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "generator-function.js",
+                            "end": [
+                                2,
+                                59
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'generateStuff' function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "36b15111da4c3d7db3722d53889c04ec06472bf7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4c88f30a1529bc19cf1c5f0e96db7046c3020301"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "name": "generator-function.js",
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "name": "generator-function.js",
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'generateNewStuff' identifier with the 'generateStuff' identifier in the generateStuff function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "4c88f30a1529bc19cf1c5f0e96db7046c3020301",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a688e4e430dca4e71ee900724635db302ea27a0a"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "name": "generator-function.js",
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    11
+                                ],
+                                "name": "generator-function.js",
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'generateStuff' identifier with the 'generateNewStuff' identifier in the generateNewStuff function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "a688e4e430dca4e71ee900724635db302ea27a0a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "39e1e3960d0368f451e694779a82ef34e1a9270b"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "generator-function.js",
+                            "end": [
+                                1,
+                                62
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'generateNewStuff' function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "generator-function.js",
+                            "end": [
+                                2,
+                                59
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'generateStuff' function",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "generator-function.js",
+                            "end": [
+                                2,
+                                62
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'generateNewStuff' function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "39e1e3960d0368f451e694779a82ef34e1a9270b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "782a8e72f3f39f9557c1b5653ddec71dcdd5fb56"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "generator-function.js",
+                            "end": [
+                                1,
+                                59
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'generateStuff' function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "782a8e72f3f39f9557c1b5653ddec71dcdd5fb56",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f88a7087ddff6c06546b3e0124f7ca8d94d409f8"
+}
+,{
+    "testCaseDescription": "javascript-generator-function-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "generator-function.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "generator-function.js",
+                            "end": [
+                                1,
+                                62
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'generateNewStuff' function",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "generator-function.js"
+    ],
+    "sha1": "f88a7087ddff6c06546b3e0124f7ca8d94d409f8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5fe4477fe4c9d164946d8aaf8fe66f107b0901b4"
+}]

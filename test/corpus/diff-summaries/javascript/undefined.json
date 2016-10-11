@@ -1,0 +1,316 @@
+[{
+    "testCaseDescription": "javascript-undefined-insert-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "undefined.js",
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'undefined' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "c4cbb6a4ff71852691d643f686d8231c9a3989a4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "fcd961d200815be0e5df9acbd6d7948232c2cff8"
+}
+,{
+    "testCaseDescription": "javascript-undefined-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "undefined.js",
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'undefined' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "undefined.js",
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'undefined' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "fcd961d200815be0e5df9acbd6d7948232c2cff8",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "80316664f17060feb76cb3394afce3e4bb645e32"
+}
+,{
+    "testCaseDescription": "javascript-undefined-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "undefined.js",
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'undefined' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "undefined.js",
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'undefined' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "80316664f17060feb76cb3394afce3e4bb645e32",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4f95a9bf9510322e9a6bf79636e45b35a0480a7c"
+}
+,{
+    "testCaseDescription": "javascript-undefined-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "undefined.js",
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'undefined' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "undefined.js",
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'undefined' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "4f95a9bf9510322e9a6bf79636e45b35a0480a7c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "994be2b836b9ef3f76478f77e08fbcae2db003c2"
+}
+,{
+    "testCaseDescription": "javascript-undefined-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "undefined.js",
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'undefined' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "undefined.js",
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'undefined' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "undefined.js",
+                            "end": [
+                                2,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'undefined' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "994be2b836b9ef3f76478f77e08fbcae2db003c2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "cd8d3a76c8a21b9cd938996afa84066513b5292c"
+}
+,{
+    "testCaseDescription": "javascript-undefined-delete-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "undefined.js",
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'undefined' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "cd8d3a76c8a21b9cd938996afa84066513b5292c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e202ac5fe4d20d33ab4e89cc92d6e0a70f685811"
+}
+,{
+    "testCaseDescription": "javascript-undefined-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "undefined.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "undefined.js",
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'undefined' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "undefined.js"
+    ],
+    "sha1": "e202ac5fe4d20d33ab4e89cc92d6e0a70f685811",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "230a472f82fce3b0be97b48298c0b3db54007c5c"
+}]

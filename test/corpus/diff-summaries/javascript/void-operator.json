@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-void-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "void-operator.js",
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'void b()' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "4c9359461db3f23921b2af834190b8c9966fa455",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0d445752b33202f03c21c0f575075b54b75d594f"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "void-operator.js",
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'void c()' operator",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "void-operator.js",
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'void b()' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "0d445752b33202f03c21c0f575075b54b75d594f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6084c7a622486376a750e062b57485ba15ce33d7"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "void-operator.js",
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "void-operator.js",
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'b' identifier in the b() function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "6084c7a622486376a750e062b57485ba15ce33d7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bd8157de0083725f324c0b07300ab40b761faf9a"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "void-operator.js",
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "name": "void-operator.js",
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the c() function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "bd8157de0083725f324c0b07300ab40b761faf9a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "822356e36fe70b7e90fde40d96cf3ea636f80238"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "void-operator.js",
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'void c()' operator",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "void-operator.js",
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'void b()' operator",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "void-operator.js",
+                            "end": [
+                                2,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'void c()' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "822356e36fe70b7e90fde40d96cf3ea636f80238",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d7082a08524da8cf4d379c767819b756b9970d34"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "void-operator.js",
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'void b()' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "d7082a08524da8cf4d379c767819b756b9970d34",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "19112b8b21566d018b1fbb073d3e3211067d653c"
+}
+,{
+    "testCaseDescription": "javascript-void-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "void-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "void-operator.js",
+                            "end": [
+                                1,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'void c()' operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "void-operator.js"
+    ],
+    "sha1": "19112b8b21566d018b1fbb073d3e3211067d653c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "de1bc70d66645688aab217b87e9d472a34e42bd1"
+}]

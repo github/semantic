@@ -1,0 +1,368 @@
+[{
+    "testCaseDescription": "javascript-do-while-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "do-while-statement.js",
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'true' do/while statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "2991c8cdbe1144d3164c0fc0075cb5388e06583b",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "fc1fd9e059e6088b851598dc684d5408adbf0168"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "do-while-statement.js",
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'false' do/while statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "do-while-statement.js",
+                            "end": [
+                                2,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'true' do/while statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "fc1fd9e059e6088b851598dc684d5408adbf0168",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "324526a23b5490a9859a781516afa5e58a66d774"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    18
+                                ],
+                                "name": "do-while-statement.js",
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    18
+                                ],
+                                "name": "do-while-statement.js",
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'replacement' identifier with the 'insert' identifier in the console.log(insert) method call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    41
+                                ],
+                                "name": "do-while-statement.js",
+                                "end": [
+                                    1,
+                                    46
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    36
+                                ],
+                                "name": "do-while-statement.js",
+                                "end": [
+                                    1,
+                                    40
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced 'false' with 'true' in the true do/while statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "324526a23b5490a9859a781516afa5e58a66d774",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6163229e116d6f51f04f0865b21705630e6e4329"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    18
+                                ],
+                                "name": "do-while-statement.js",
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    18
+                                ],
+                                "name": "do-while-statement.js",
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'insert' identifier with the 'replacement' identifier in the console.log(replacement) method call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    36
+                                ],
+                                "name": "do-while-statement.js",
+                                "end": [
+                                    1,
+                                    40
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    41
+                                ],
+                                "name": "do-while-statement.js",
+                                "end": [
+                                    1,
+                                    46
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced 'true' with 'false' in the false do/while statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "6163229e116d6f51f04f0865b21705630e6e4329",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6cfc9a2d6fdbcd14d80a9519e5c9e3d66092950e"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "do-while-statement.js",
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'false' do/while statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "do-while-statement.js",
+                            "end": [
+                                2,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'true' do/while statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "do-while-statement.js",
+                            "end": [
+                                2,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'false' do/while statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "6cfc9a2d6fdbcd14d80a9519e5c9e3d66092950e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "9b5e3c1beb3f77b171aa0d6fcf01af966d96978a"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "do-while-statement.js",
+                            "end": [
+                                1,
+                                42
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'true' do/while statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "9b5e3c1beb3f77b171aa0d6fcf01af966d96978a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b4a3e1ab3c7306658c103f007c53334d8b27783c"
+}
+,{
+    "testCaseDescription": "javascript-do-while-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "do-while-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "do-while-statement.js",
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'false' do/while statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "do-while-statement.js"
+    ],
+    "sha1": "b4a3e1ab3c7306658c103f007c53334d8b27783c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "11ce49dc14d6c3b4c0baef54a2456d4bc667b992"
+}]

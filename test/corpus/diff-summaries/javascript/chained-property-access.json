@@ -1,0 +1,368 @@
+[{
+    "testCaseDescription": "javascript-chained-property-access-insert-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "chained-property-access.js",
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'returned.promise().done(…).fail(…)' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "5172568a010252e98966d57a1c3fc1ade326f9ab",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f59315119ff60b7a5eec00c298a3dbaced0b59d4"
+}
+,{
+    "testCaseDescription": "javascript-chained-property-access-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "chained-property-access.js",
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'returned.promise().done(…).fail(…)' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "chained-property-access.js",
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'returned.promise().done(…).fail(…)' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "f59315119ff60b7a5eec00c298a3dbaced0b59d4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8bda63987dd989d6e42ddc5661fe2b22bb0cec77"
+}
+,{
+    "testCaseDescription": "javascript-chained-property-access-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "name": "chained-property-access.js",
+                                "end": [
+                                    1,
+                                    43
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "name": "chained-property-access.js",
+                                "end": [
+                                    1,
+                                    41
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'otherDefer' identifier with the 'newDefer' identifier in the returned.promise().done(…) method call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    60
+                                ],
+                                "name": "chained-property-access.js",
+                                "end": [
+                                    1,
+                                    70
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    58
+                                ],
+                                "name": "chained-property-access.js",
+                                "end": [
+                                    1,
+                                    66
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'otherDefer' identifier with the 'newDefer' identifier in the returned.promise().done(…).fail(…) method call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "8bda63987dd989d6e42ddc5661fe2b22bb0cec77",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "49366eb9b5adfc0372d1b58a87acd15c8052a606"
+}
+,{
+    "testCaseDescription": "javascript-chained-property-access-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "name": "chained-property-access.js",
+                                "end": [
+                                    1,
+                                    41
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    33
+                                ],
+                                "name": "chained-property-access.js",
+                                "end": [
+                                    1,
+                                    43
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'newDefer' identifier with the 'otherDefer' identifier in the returned.promise().done(…) method call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    58
+                                ],
+                                "name": "chained-property-access.js",
+                                "end": [
+                                    1,
+                                    66
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    60
+                                ],
+                                "name": "chained-property-access.js",
+                                "end": [
+                                    1,
+                                    70
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'newDefer' identifier with the 'otherDefer' identifier in the returned.promise().done(…).fail(…) method call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "49366eb9b5adfc0372d1b58a87acd15c8052a606",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "301c255bc3e410697be6bb102e8b9e9d107666a0"
+}
+,{
+    "testCaseDescription": "javascript-chained-property-access-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "chained-property-access.js",
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'returned.promise().done(…).fail(…)' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "chained-property-access.js",
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'returned.promise().done(…).fail(…)' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "chained-property-access.js",
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'returned.promise().done(…).fail(…)' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "301c255bc3e410697be6bb102e8b9e9d107666a0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "49ea61cc98251e249f226f8787bbee08511fe9e9"
+}
+,{
+    "testCaseDescription": "javascript-chained-property-access-delete-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "chained-property-access.js",
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'returned.promise().done(…).fail(…)' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "49ea61cc98251e249f226f8787bbee08511fe9e9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8b1e3d552a64cdd2e542affda6527af005ebcb45"
+}
+,{
+    "testCaseDescription": "javascript-chained-property-access-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "chained-property-access.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "chained-property-access.js",
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'returned.promise().done(…).fail(…)' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "chained-property-access.js"
+    ],
+    "sha1": "8b1e3d552a64cdd2e542affda6527af005ebcb45",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "26f941c6191463416b1c6a56314b19dfe5d09221"
+}]

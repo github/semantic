@@ -1,0 +1,418 @@
+[{
+    "testCaseDescription": "javascript-comma-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "25e371a5c0ef7434f562af7ca9a9bfab5a157932",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1c93fcbaca04d643a2ddeabe0b6e5d322df2a4fb"
+}
+,{
+    "testCaseDescription": "javascript-comma-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                1,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "1c93fcbaca04d643a2ddeabe0b6e5d322df2a4fb",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "331db399698c11dfc5b4ff49f72b77e3910d5f01"
+}
+,{
+    "testCaseDescription": "javascript-comma-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                1,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "331db399698c11dfc5b4ff49f72b77e3910d5f01",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d82e3a6dffefade301dbda072bf59931587b9196"
+}
+,{
+    "testCaseDescription": "javascript-comma-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                1,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "d82e3a6dffefade301dbda072bf59931587b9196",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bcb931f34cdfe5d7f167afd79d1d1196284f9587"
+}
+,{
+    "testCaseDescription": "javascript-comma-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                1,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                8
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                2,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "bcb931f34cdfe5d7f167afd79d1d1196284f9587",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "59f0b3ae2045827b2be7200f3ae10d13daef566e"
+}
+,{
+    "testCaseDescription": "javascript-comma-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "59f0b3ae2045827b2be7200f3ae10d13daef566e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8f59d35152aa46577234e3fd8c00122b9182574d"
+}
+,{
+    "testCaseDescription": "javascript-comma-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "comma-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "comma-operator.js",
+                            "end": [
+                                1,
+                                23
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' assignment",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comma-operator.js"
+    ],
+    "sha1": "8f59d35152aa46577234e3fd8c00122b9182574d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7086396295d14f41207e8fbae4d350f2672a77dd"
+}]

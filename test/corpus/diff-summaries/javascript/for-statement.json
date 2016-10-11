@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-for-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-statement.js",
+                            "end": [
+                                1,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i = 0, init(); i < 10; i++' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "8c6579c037e31738b4decb4405d7a17824524ca3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8acb9b3de3ca8787d948acb4a99f00d03cee5b3e"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-statement.js",
+                            "end": [
+                                1,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i = 0, init(); i < 100; i++' for statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "for-statement.js",
+                            "end": [
+                                2,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i = 0, init(); i < 10; i++' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "8acb9b3de3ca8787d948acb4a99f00d03cee5b3e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8e51e424b4a6aca62377fa98a82aeaa8e9ddce55"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "name": "for-statement.js",
+                                "end": [
+                                    1,
+                                    28
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "name": "for-statement.js",
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '100' with '10'",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "8e51e424b4a6aca62377fa98a82aeaa8e9ddce55",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c0acf9cf01a97524f0c44297d9f448881a381f67"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "name": "for-statement.js",
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "name": "for-statement.js",
+                                "end": [
+                                    1,
+                                    28
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '10' with '100'",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "c0acf9cf01a97524f0c44297d9f448881a381f67",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5253024f0a55122448f8b16a6869686fcb3b9fa1"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-statement.js",
+                            "end": [
+                                1,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i = 0, init(); i < 100; i++' for statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "for-statement.js",
+                            "end": [
+                                2,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i = 0, init(); i < 10; i++' for statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "for-statement.js",
+                            "end": [
+                                2,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i = 0, init(); i < 100; i++' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "5253024f0a55122448f8b16a6869686fcb3b9fa1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3a720565a0493ccf4374590f8b8314b29d642fa0"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-statement.js",
+                            "end": [
+                                1,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i = 0, init(); i < 10; i++' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "3a720565a0493ccf4374590f8b8314b29d642fa0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2fbfe01a9a42d1f7bc719d35bc67e51164dfac6c"
+}
+,{
+    "testCaseDescription": "javascript-for-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "for-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "for-statement.js",
+                            "end": [
+                                1,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i = 0, init(); i < 100; i++' for statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for-statement.js"
+    ],
+    "sha1": "2fbfe01a9a42d1f7bc719d35bc67e51164dfac6c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1689419def381340a06222171173117f80ab169e"
+}]

@@ -1,0 +1,282 @@
+[{
+    "testCaseDescription": "javascript-array-insert-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "array.js",
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ \"item1\" ]' array",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "sha1": "6c3b6d5c7d426a657e90d97cdfd248b2453bc087",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3445abbd9210b7d4d23872fdf2614b77c3e464bd"
+}
+,{
+    "testCaseDescription": "javascript-array-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "array.js",
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ \"item1\", \"item2\" ]' array",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "array.js",
+                            "end": [
+                                2,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ \"item1\" ]' array",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "sha1": "3445abbd9210b7d4d23872fdf2614b77c3e464bd",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7d3cd095cf340ccda50bd7dae0405288a27d6a28"
+}
+,{
+    "testCaseDescription": "javascript-array-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                12
+                            ],
+                            "name": "array.js",
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"item2\" string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "sha1": "7d3cd095cf340ccda50bd7dae0405288a27d6a28",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7d1d0e7c6052a06a9bf764a04ca06acff78dffca"
+}
+,{
+    "testCaseDescription": "javascript-array-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                12
+                            ],
+                            "name": "array.js",
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"item2\" string",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "sha1": "7d1d0e7c6052a06a9bf764a04ca06acff78dffca",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "aac7a79ab7aecf3345aea24ea4f38b4915921d8a"
+}
+,{
+    "testCaseDescription": "javascript-array-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "array.js",
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ \"item1\", \"item2\" ]' array",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "array.js",
+                            "end": [
+                                2,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ \"item1\" ]' array",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "array.js",
+                            "end": [
+                                2,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the '[ \"item1\", \"item2\" ]' array",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "sha1": "aac7a79ab7aecf3345aea24ea4f38b4915921d8a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "24c35a10f9dae3da5d9c331e50fe66b8be896736"
+}
+,{
+    "testCaseDescription": "javascript-array-delete-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "array.js",
+                            "end": [
+                                1,
+                                12
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ \"item1\" ]' array",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "sha1": "24c35a10f9dae3da5d9c331e50fe66b8be896736",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "84b4a8728ce89f0768b5ea0dcce540a133772e59"
+}
+,{
+    "testCaseDescription": "javascript-array-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "array.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "array.js",
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '[ \"item1\", \"item2\" ]' array",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "array.js"
+    ],
+    "sha1": "84b4a8728ce89f0768b5ea0dcce540a133772e59",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7421caaeb3a46acf3fd36871e3fd56e4409df4c1"
+}]

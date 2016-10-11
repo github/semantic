@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-constructor-call-insert-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "constructor-call.js",
+                            "end": [
+                                1,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'module.Klass(1, \"two\")' constructor",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "e67227e82c01378ae1102d7579e52a47e06ef16a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "86912d55ecac17b3ce2c8370e06b361daa72a63d"
+}
+,{
+    "testCaseDescription": "javascript-constructor-call-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "constructor-call.js",
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'module.Klass(1, \"three\")' constructor",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "constructor-call.js",
+                            "end": [
+                                2,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'module.Klass(1, \"two\")' constructor",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "86912d55ecac17b3ce2c8370e06b361daa72a63d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "eec1530d637fa82ada4aaf549e576f8f4530b458"
+}
+,{
+    "testCaseDescription": "javascript-constructor-call-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    21
+                                ],
+                                "name": "constructor-call.js",
+                                "end": [
+                                    1,
+                                    28
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    21
+                                ],
+                                "name": "constructor-call.js",
+                                "end": [
+                                    1,
+                                    26
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"three\" string with the \"two\" string in the module.Klass(1, \"two\") method call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "eec1530d637fa82ada4aaf549e576f8f4530b458",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "6823bb31a08af05908b3276127c191d5bdfd89b6"
+}
+,{
+    "testCaseDescription": "javascript-constructor-call-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    21
+                                ],
+                                "name": "constructor-call.js",
+                                "end": [
+                                    1,
+                                    26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    21
+                                ],
+                                "name": "constructor-call.js",
+                                "end": [
+                                    1,
+                                    28
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"two\" string with the \"three\" string in the module.Klass(1, \"three\") method call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "6823bb31a08af05908b3276127c191d5bdfd89b6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0d42b2f3722e4f1bd33f10099a2b9b92368ea62e"
+}
+,{
+    "testCaseDescription": "javascript-constructor-call-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "constructor-call.js",
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'module.Klass(1, \"three\")' constructor",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "constructor-call.js",
+                            "end": [
+                                2,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'module.Klass(1, \"two\")' constructor",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "constructor-call.js",
+                            "end": [
+                                2,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'module.Klass(1, \"three\")' constructor",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "0d42b2f3722e4f1bd33f10099a2b9b92368ea62e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b17ad17aa14e02fd6c5a6593e7c9e1b6be2ace5d"
+}
+,{
+    "testCaseDescription": "javascript-constructor-call-delete-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "constructor-call.js",
+                            "end": [
+                                1,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'module.Klass(1, \"two\")' constructor",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "b17ad17aa14e02fd6c5a6593e7c9e1b6be2ace5d",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "c228196872cbf218531b4e3bd82250e2bce507da"
+}
+,{
+    "testCaseDescription": "javascript-constructor-call-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "constructor-call.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "constructor-call.js",
+                            "end": [
+                                1,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'module.Klass(1, \"three\")' constructor",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "constructor-call.js"
+    ],
+    "sha1": "c228196872cbf218531b4e3bd82250e2bce507da",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "31ae73e147d1cd8cf95cfdf871344f18fdc91fa2"
+}]

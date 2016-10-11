@@ -1,0 +1,368 @@
+[{
+    "testCaseDescription": "javascript-math-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "math-operator.js",
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i + j * 3 - j % 5' math operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "31ae73e147d1cd8cf95cfdf871344f18fdc91fa2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f8be46c403f576d3c18c1f3815f7480443755610"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "math-operator.js",
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i + j * 2 - j % 4' math operator",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "math-operator.js",
+                            "end": [
+                                2,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i + j * 3 - j % 5' math operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "f8be46c403f576d3c18c1f3815f7480443755610",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2e407188cd18f565b68b11613a8dce6cb8400b1a"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "name": "math-operator.js",
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "name": "math-operator.js",
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '3'",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "name": "math-operator.js",
+                                "end": [
+                                    1,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "name": "math-operator.js",
+                                "end": [
+                                    1,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '4' with '5'",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "2e407188cd18f565b68b11613a8dce6cb8400b1a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "80659409cc4250f823846584dc62802c9a1e6c01"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "name": "math-operator.js",
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "name": "math-operator.js",
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '3' with '2'",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "name": "math-operator.js",
+                                "end": [
+                                    1,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "name": "math-operator.js",
+                                "end": [
+                                    1,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '5' with '4'",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "80659409cc4250f823846584dc62802c9a1e6c01",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f1878a2a74738ad67fb08d40334f351d4238e023"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "math-operator.js",
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i + j * 2 - j % 4' math operator",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "math-operator.js",
+                            "end": [
+                                2,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i + j * 3 - j % 5' math operator",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "math-operator.js",
+                            "end": [
+                                2,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i + j * 2 - j % 4' math operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "f1878a2a74738ad67fb08d40334f351d4238e023",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2eb48e213a12b09d764a5f58eec7d90985a9c66c"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "math-operator.js",
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i + j * 3 - j % 5' math operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "2eb48e213a12b09d764a5f58eec7d90985a9c66c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e653a346a34e6374ab80a527dbbb777ec05f986c"
+}
+,{
+    "testCaseDescription": "javascript-math-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "math-operator.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "math-operator.js",
+                            "end": [
+                                1,
+                                18
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i + j * 2 - j % 4' math operator",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math-operator.js"
+    ],
+    "sha1": "e653a346a34e6374ab80a527dbbb777ec05f986c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "cb37f95870629005756c374dade2599850dc09d3"
+}]

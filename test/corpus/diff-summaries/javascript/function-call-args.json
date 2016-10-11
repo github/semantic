@@ -1,0 +1,608 @@
+[{
+    "testCaseDescription": "javascript-function-call-args-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function-call-args.js",
+                            "end": [
+                                1,
+                                77
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'someFunction(1, \"string\", …, true)' function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "7a9cdc6c356ec1e7fe6e47c923898d3e2e6a32cc",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "183f0fed6e757160eafedb9d7740cdfdb28bec21"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function-call-args.js",
+                            "end": [
+                                1,
+                                83
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'someFunction(1, \"otherString\", …, false)' function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "function-call-args.js",
+                            "end": [
+                                2,
+                                77
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'someFunction(1, \"string\", …, true)' function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "183f0fed6e757160eafedb9d7740cdfdb28bec21",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b30012eb0ae7cdbcb6a55ce2ada5ead28b4d09d5"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    30
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"otherString\" string with the \"string\" string in the someFunction(1, \"string\", …, true) function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    41
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    42
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    36
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    37
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the someFunction(1, \"string\", …, true) function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    43
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    44
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    38
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    39
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'b' identifier in the someFunction(1, \"string\", …, true) function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    60
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    61
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    55
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    56
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the console.log(a) method call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    71
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    72
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    66
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    67
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'b' identifier in the someFunction(1, \"string\", …, true) function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    77
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    82
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    72
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    76
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced 'false' with 'true' in the someFunction(1, \"string\", …, true) function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "b30012eb0ae7cdbcb6a55ce2ada5ead28b4d09d5",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1f00971ae667503452bec939433970cf2f5a1ef9"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    30
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"string\" string with the \"otherString\" string in the someFunction(1, \"otherString\", …, false) function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    36
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    37
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    41
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    42
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the someFunction(1, \"otherString\", …, false) function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    38
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    39
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    43
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    44
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the someFunction(1, \"otherString\", …, false) function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    55
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    56
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    60
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    61
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the console.log(b) method call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    66
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    67
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    71
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    72
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the someFunction(1, \"otherString\", …, false) function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    72
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    76
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    77
+                                ],
+                                "name": "function-call-args.js",
+                                "end": [
+                                    1,
+                                    82
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced 'true' with 'false' in the someFunction(1, \"otherString\", …, false) function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "1f00971ae667503452bec939433970cf2f5a1ef9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "7f80f26bf5f8baacf47c9d7ad830572b46738b56"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function-call-args.js",
+                            "end": [
+                                1,
+                                83
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'someFunction(1, \"otherString\", …, false)' function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "function-call-args.js",
+                            "end": [
+                                2,
+                                77
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'someFunction(1, \"string\", …, true)' function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "function-call-args.js",
+                            "end": [
+                                2,
+                                83
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'someFunction(1, \"otherString\", …, false)' function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "7f80f26bf5f8baacf47c9d7ad830572b46738b56",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3e16e4bb994195b7c5a841f3e585c332c7aaf578"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-delete-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function-call-args.js",
+                            "end": [
+                                1,
+                                77
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'someFunction(1, \"string\", …, true)' function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "3e16e4bb994195b7c5a841f3e585c332c7aaf578",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "091f7c6596e348e44e3679375e57eddc657a73a3"
+}
+,{
+    "testCaseDescription": "javascript-function-call-args-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "function-call-args.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function-call-args.js",
+                            "end": [
+                                1,
+                                83
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'someFunction(1, \"otherString\", …, false)' function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call-args.js"
+    ],
+    "sha1": "091f7c6596e348e44e3679375e57eddc657a73a3",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e67227e82c01378ae1102d7579e52a47e06ef16a"
+}]

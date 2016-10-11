@@ -1,0 +1,316 @@
+[{
+    "testCaseDescription": "javascript-this-expression-insert-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "this-expression.js",
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "7a8a0da7d72fa0fc4f17e0877fbf7991771801e4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "4e68235a410989b6668d753c43e95d7ea82a20ab"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "this-expression.js",
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "this-expression.js",
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "4e68235a410989b6668d753c43e95d7ea82a20ab",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "1eaabc425a7661277a9ac52b3e5189db025ad881"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "this-expression.js",
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "this-expression.js",
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "1eaabc425a7661277a9ac52b3e5189db025ad881",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "ebdf7cb1b6e208ba778abad19c2cbf3ca29266ed"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "this-expression.js",
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "this-expression.js",
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "ebdf7cb1b6e208ba778abad19c2cbf3ca29266ed",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f7f8f21aeaebe6a982a1f3a21fcdf54bb9015b88"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "this-expression.js",
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this' return statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "this-expression.js",
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "this-expression.js",
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'this' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "f7f8f21aeaebe6a982a1f3a21fcdf54bb9015b88",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "d93d9eecbb0719107fe145d07a5ce4acd1e38e2a"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-delete-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "this-expression.js",
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "d93d9eecbb0719107fe145d07a5ce4acd1e38e2a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2cde04d533ec65accf0c7a86021a2f40b593135c"
+}
+,{
+    "testCaseDescription": "javascript-this-expression-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "this-expression.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "this-expression.js",
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'this' return statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "this-expression.js"
+    ],
+    "sha1": "2cde04d533ec65accf0c7a86021a2f40b593135c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e876cda8f0a6a14bd8518d84e985c6616b2f5548"
+}]

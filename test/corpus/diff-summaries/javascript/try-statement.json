@@ -1,0 +1,368 @@
+[{
+    "testCaseDescription": "javascript-try-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "try-statement.js",
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ f; }' try statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "5044aaf60e72175bafaddfb99e8e548b34647376",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "934746aee66c0c2cb37cb4affbb09ff6c9c896e4"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "try-statement.js",
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ f; }' try statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "try-statement.js",
+                            "end": [
+                                2,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ f; }' try statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "934746aee66c0c2cb37cb4affbb09ff6c9c896e4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3ca670bfa75c6a1708e8cbefcf5709baf85165b9"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "try-statement.js",
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "try-statement.js",
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'h' identifier with the 'g' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "name": "try-statement.js",
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "name": "try-statement.js",
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g' identifier with the 'h' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "3ca670bfa75c6a1708e8cbefcf5709baf85165b9",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "e509b6253596a24c3c4d49f53e7354d5415f6406"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "try-statement.js",
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "try-statement.js",
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g' identifier with the 'h' identifier",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "name": "try-statement.js",
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "name": "try-statement.js",
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'h' identifier with the 'g' identifier",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "e509b6253596a24c3c4d49f53e7354d5415f6406",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5539c67fd84c944d395de1bc1d849cdbc54508f4"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "try-statement.js",
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ f; }' try statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "try-statement.js",
+                            "end": [
+                                2,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ f; }' try statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "try-statement.js",
+                            "end": [
+                                2,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the '{ f; }' try statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "5539c67fd84c944d395de1bc1d849cdbc54508f4",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "159cfefd0e09b1a6cfdce7f7d7707aeff6837fd6"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "try-statement.js",
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ f; }' try statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "159cfefd0e09b1a6cfdce7f7d7707aeff6837fd6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5063e245f1b1e2359cd10f7c01c184d103371810"
+}
+,{
+    "testCaseDescription": "javascript-try-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "try-statement.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "try-statement.js",
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '{ f; }' try statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "try-statement.js"
+    ],
+    "sha1": "5063e245f1b1e2359cd10f7c01c184d103371810",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "0578f24cf85fce35bd787e60e1b210b79f462858"
+}]

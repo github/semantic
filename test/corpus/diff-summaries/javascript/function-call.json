@@ -1,0 +1,308 @@
+[{
+    "testCaseDescription": "javascript-function-call-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function-call.js",
+                            "end": [
+                                1,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'someFunction(arg1, \"arg2\")' function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "66f76d6c6d3a517f3f4c016d8e03d3497cf724c6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "04ae6b563749c2b0fcca12174eb5398356c67a8e"
+}
+,{
+    "testCaseDescription": "javascript-function-call-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.js": [
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function-call.js",
+                            "end": [
+                                1,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'someFunction(arg1, \"arg3\")' function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "function-call.js",
+                            "end": [
+                                2,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'someFunction(arg1, \"arg2\")' function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "04ae6b563749c2b0fcca12174eb5398356c67a8e",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f6af23e39ba5fd5b1d1733db2141a70d65534f41"
+}
+,{
+    "testCaseDescription": "javascript-function-call-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "function-call.js",
+                                "end": [
+                                    1,
+                                    26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "function-call.js",
+                                "end": [
+                                    1,
+                                    26
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"arg3\" string with the \"arg2\" string in the someFunction(arg1, \"arg2\") function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "f6af23e39ba5fd5b1d1733db2141a70d65534f41",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "f6c31c3c422ab05b2d0bba725022eeabcaa3739f"
+}
+,{
+    "testCaseDescription": "javascript-function-call-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.js": [
+                {
+                    "span": {
+                        "these": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "function-call.js",
+                                "end": [
+                                    1,
+                                    26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "name": "function-call.js",
+                                "end": [
+                                    1,
+                                    26
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"arg2\" string with the \"arg3\" string in the someFunction(arg1, \"arg3\") function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "f6c31c3c422ab05b2d0bba725022eeabcaa3739f",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "14e9613f11bf3b30e519ca68df0c2f4a9f153c40"
+}
+,{
+    "testCaseDescription": "javascript-function-call-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function-call.js",
+                            "end": [
+                                1,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'someFunction(arg1, \"arg3\")' function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "function-call.js",
+                            "end": [
+                                2,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'someFunction(arg1, \"arg2\")' function call",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "that": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "name": "function-call.js",
+                            "end": [
+                                2,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'someFunction(arg1, \"arg3\")' function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "14e9613f11bf3b30e519ca68df0c2f4a9f153c40",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "b8c0d83eeb28bd56aacfca81580c8e3217da7345"
+}
+,{
+    "testCaseDescription": "javascript-function-call-delete-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function-call.js",
+                            "end": [
+                                1,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'someFunction(arg1, \"arg2\")' function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "b8c0d83eeb28bd56aacfca81580c8e3217da7345",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "27dba7ea895c481db1cd34b80cf0ef484c718882"
+}
+,{
+    "testCaseDescription": "javascript-function-call-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "function-call.js": [
+                {
+                    "span": {
+                        "this": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "name": "function-call.js",
+                            "end": [
+                                1,
+                                27
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'someFunction(arg1, \"arg3\")' function call",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "function-call.js"
+    ],
+    "sha1": "27dba7ea895c481db1cd34b80cf0ef484c718882",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bde44008cfb326f395ddb1071a073fc1113ffb3d"
+}]
