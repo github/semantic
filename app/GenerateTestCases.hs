@@ -204,6 +204,7 @@ commands metaSyntax@JSONMetaSyntax{..} =
 runPullGitRemote :: String -> FilePath -> IO ()
 runPullGitRemote repoUrl repoPath = do
   Prelude.putStrLn "Attempting to fetch from the remote repository."
+  _ <- executeCommand repoPath checkoutMasterCommand
   result <- attempt
   handle result next errorHandler
   where attempt :: IO (Either Prelude.IOError String)
@@ -255,6 +256,9 @@ addSubmoduleCommand repoUrl repoPath = "git submodule add " <> repoUrl <> " " <>
 
 getLastCommitShaCommand :: String
 getLastCommitShaCommand = "git log --pretty=format:\"%H\" -n 1;"
+
+checkoutMasterCommand :: String
+checkoutMasterCommand = "git checkout master;"
 
 pullFromRemoteCommand :: String
 pullFromRemoteCommand = "git pull origin master;"
