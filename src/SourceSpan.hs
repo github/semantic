@@ -41,13 +41,9 @@ instance A.FromJSON SourcePos where
 
 data SourceSpan = SourceSpan
   { -- |
-    -- Source name
-    --
-    spanName :: !Text
-    -- |
     -- Start of the span
     --
-  , spanStart :: !SourcePos
+   spanStart :: !SourcePos
     -- End of the span
     --
   , spanEnd :: !SourcePos
@@ -57,21 +53,15 @@ displayStartEndPos :: SourceSpan -> Text
 displayStartEndPos sp =
   displaySourcePos (spanStart sp) <> " - " <> displaySourcePos (spanEnd sp)
 
-displaySourceSpan :: SourceSpan -> Text
-displaySourceSpan sp =
-  spanName sp <> " " <> displayStartEndPos sp
-
 instance A.ToJSON SourceSpan where
   toJSON SourceSpan{..} =
-    A.object [ "filepath" .= spanName
-             , "start" .= spanStart
+    A.object [ "start" .= spanStart
              , "end" .= spanEnd
              ]
 
 instance A.FromJSON SourceSpan where
   parseJSON = A.withObject "SourceSpan" $ \o ->
     SourceSpan <$>
-      o .: "filepath" <*>
       o .: "start" <*>
       o .: "end"
 
@@ -94,5 +84,5 @@ instance Arbitrary SourcePos where
   shrink = genericShrink
 
 instance Arbitrary SourceSpan where
-  arbitrary = SourceSpan <$> arbitrary <*> arbitrary <*> arbitrary
+  arbitrary = SourceSpan <$> arbitrary <*> arbitrary
   shrink = genericShrink
