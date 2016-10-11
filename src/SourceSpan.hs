@@ -63,15 +63,15 @@ displaySourceSpan sp =
 
 instance A.ToJSON SourceSpan where
   toJSON SourceSpan{..} =
-    A.object [ "name"  .= spanName
+    A.object [ "filepath" .= spanName
              , "start" .= spanStart
-             , "end"   .= spanEnd
+             , "end" .= spanEnd
              ]
 
 instance A.FromJSON SourceSpan where
   parseJSON = A.withObject "SourceSpan" $ \o ->
-    SourceSpan     <$>
-      o .: "name"  <*>
+    SourceSpan <$>
+      o .: "filepath" <*>
       o .: "start" <*>
       o .: "end"
 
