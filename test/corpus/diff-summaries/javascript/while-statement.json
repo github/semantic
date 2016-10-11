@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'a' while statement"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "126641b1c820ff0a55da55b367554ff1698a4fc3",
+    "sha1": "1476b59a288eafecf5ddd48696a3e207754a9668",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9c434e0c6b44a4e60ca5b0bed09dbaef6224bc86"
+    "sha2": "f23284bfe8af3aeae4cd0de9ff318f5c0bb1117a"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b' while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'b' while statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'a' while statement"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "9c434e0c6b44a4e60ca5b0bed09dbaef6224bc86",
+    "sha1": "f23284bfe8af3aeae4cd0de9ff318f5c0bb1117a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0c64c82fc19f9a9f7598962e6a629eda732414c4"
+    "sha2": "0187cf96aade757c54df567264bce2b15c5d2bde"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'a' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier"
                 },
                 {
                     "span": {
@@ -136,8 +132,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the b() function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the b() function call"
                 }
             ]
         },
@@ -146,9 +141,9 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "0c64c82fc19f9a9f7598962e6a629eda732414c4",
+    "sha1": "0187cf96aade757c54df567264bce2b15c5d2bde",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ebc38db083a37927879c8a7896d84c6ad670bd41"
+    "sha2": "ea3cd5cf3a270d94a6fb64540f5d15c3a862d7db"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-replacement-test",
@@ -180,8 +175,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'b' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier"
                 },
                 {
                     "span": {
@@ -208,8 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the a() function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the a() function call"
                 }
             ]
         },
@@ -218,9 +211,9 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "ebc38db083a37927879c8a7896d84c6ad670bd41",
+    "sha1": "ea3cd5cf3a270d94a6fb64540f5d15c3a862d7db",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a2a000e2b77ba785dc25df73cc387a4fff5fd6ce"
+    "sha2": "201605c6796eb154347d09577ba30c428ff8a2fe"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-delete-replacement-test",
@@ -240,8 +233,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'b' while statement"
                 },
                 {
                     "span": {
@@ -256,8 +248,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'a' while statement"
                 },
                 {
                     "span": {
@@ -272,8 +263,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b' while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'b' while statement"
                 }
             ]
         },
@@ -282,9 +272,9 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "a2a000e2b77ba785dc25df73cc387a4fff5fd6ce",
+    "sha1": "201605c6796eb154347d09577ba30c428ff8a2fe",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1766bc7de3028114c029d58d8dad57d1b224b56f"
+    "sha2": "b6a9d4096d663c0a0095d75e9ceb4dacf5bbee39"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-delete-test",
@@ -304,8 +294,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'a' while statement"
                 }
             ]
         },
@@ -314,9 +303,9 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "1766bc7de3028114c029d58d8dad57d1b224b56f",
+    "sha1": "b6a9d4096d663c0a0095d75e9ceb4dacf5bbee39",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7acae0fbb45845daa0c4054e20d30aff3f37b872"
+    "sha2": "a82434bad4b9b59f0d6df675bc4fadfa97b992b4"
 }
 ,{
     "testCaseDescription": "javascript-while-statement-delete-rest-test",
@@ -336,8 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'b' while statement"
                 }
             ]
         },
@@ -346,7 +334,7 @@
     "filePaths": [
         "while-statement.js"
     ],
-    "sha1": "7acae0fbb45845daa0c4054e20d30aff3f37b872",
+    "sha1": "a82434bad4b9b59f0d6df675bc4fadfa97b992b4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ae76dbf085fd365417c914186052f77fec683519"
+    "sha2": "ff624cef881f79c1f5e43043657a490eb7d137e2"
 }]

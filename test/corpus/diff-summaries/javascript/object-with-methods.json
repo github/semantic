@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ add }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '{ add }' object"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "f13aef7dcdfe65826b6d93b4b371afe29a12f21f",
+    "sha1": "9dbca3237fd8109ff6cad0cb5060962d58f10b6c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "96b548baab802a6e28144b588e564b28ff84ac55"
+    "sha2": "394896ec5ce46aa45a7fc7410424fd8682a2a70c"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ subtract }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '{ subtract }' object"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ add }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '{ add }' object"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "96b548baab802a6e28144b588e564b28ff84ac55",
+    "sha1": "394896ec5ce46aa45a7fc7410424fd8682a2a70c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1293592160bd09b7bc12a75581a7496a70bb8f81"
+    "sha2": "e560db785a8c18a5f977a29c818a72926c4650ad"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'subtract' identifier with the 'add' identifier in the add method",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'subtract' identifier with the 'add' identifier in the add method"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "1293592160bd09b7bc12a75581a7496a70bb8f81",
+    "sha1": "e560db785a8c18a5f977a29c818a72926c4650ad",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ee09bff08bb2a4467e2d2733db38fdc35a91fa01"
+    "sha2": "62fd8c060f49723f91a0f405b48fe9590f519db8"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'add' identifier with the 'subtract' identifier in the subtract method",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'add' identifier with the 'subtract' identifier in the subtract method"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "ee09bff08bb2a4467e2d2733db38fdc35a91fa01",
+    "sha1": "62fd8c060f49723f91a0f405b48fe9590f519db8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "70c38b12df93c18958a2ff94145a5c1b8f64e0d1"
+    "sha2": "381f0d3aa4e0c53b425eb42b9f3216c07aa5c3bb"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ subtract }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '{ subtract }' object"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ add }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '{ add }' object"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '{ subtract }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '{ subtract }' object"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "70c38b12df93c18958a2ff94145a5c1b8f64e0d1",
+    "sha1": "381f0d3aa4e0c53b425eb42b9f3216c07aa5c3bb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c9f20856166b00c740c53d34289d5bdafcfe73f8"
+    "sha2": "e86ec26bc3f4e22c3bef80eae7f4afbe9c3b641d"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ add }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '{ add }' object"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "c9f20856166b00c740c53d34289d5bdafcfe73f8",
+    "sha1": "e86ec26bc3f4e22c3bef80eae7f4afbe9c3b641d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f8a7132e504b1bf9154a8946db3bc7a412c3e983"
+    "sha2": "04fb0de0a79aef0c8d6160504a7489dae59b7322"
 }
 ,{
     "testCaseDescription": "javascript-objects-with-methods-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '{ subtract }' object",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '{ subtract }' object"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "objects-with-methods.js"
     ],
-    "sha1": "f8a7132e504b1bf9154a8946db3bc7a412c3e983",
+    "sha1": "04fb0de0a79aef0c8d6160504a7489dae59b7322",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "179d020d71ae2d25e7da3fa6af1db307411db219"
+    "sha2": "f10a454e09922f6b39b73d7a2d1c490a2a4b6179"
 }]

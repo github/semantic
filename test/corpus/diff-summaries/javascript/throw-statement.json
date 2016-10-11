@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'new Error(\"uh oh\")' throw statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'new Error(\"uh oh\")' throw statement"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "4703a7002d32db2234780ed17ed8bf95a45569ca",
+    "sha1": "04ac626daa098bf596f572115ce36f8cf31b84df",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2518b94568794c2a248421a57291d345fc132b7f"
+    "sha2": "6504a2a9d3f565d5812bbd79e02f53609761fe92"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'new Error(\"oooooops\")' throw statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'new Error(\"oooooops\")' throw statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'new Error(\"uh oh\")' throw statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'new Error(\"uh oh\")' throw statement"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "2518b94568794c2a248421a57291d345fc132b7f",
+    "sha1": "6504a2a9d3f565d5812bbd79e02f53609761fe92",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "18284196ba4ca0689123160a21accbfc055487bb"
+    "sha2": "5ea11da0cbfa31b113fe4c0c26a1949a6a2d12bd"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"oooooops\" string with the \"uh oh\" string in the Error(\"uh oh\") function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the \"oooooops\" string with the \"uh oh\" string in the Error(\"uh oh\") function call"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "18284196ba4ca0689123160a21accbfc055487bb",
+    "sha1": "5ea11da0cbfa31b113fe4c0c26a1949a6a2d12bd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1de92de9bdc5fa85de0e9b5b5dc5c23590ac2566"
+    "sha2": "47633d9af7926f59a4a8555688683cc43c055266"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"uh oh\" string with the \"oooooops\" string in the Error(\"oooooops\") function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the \"uh oh\" string with the \"oooooops\" string in the Error(\"oooooops\") function call"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "1de92de9bdc5fa85de0e9b5b5dc5c23590ac2566",
+    "sha1": "47633d9af7926f59a4a8555688683cc43c055266",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d48e3de54842bdfb75cd8abeb4cebdcd43b877a4"
+    "sha2": "4e39f432c9e0d8a9f126b91f7ea54d21822c7c04"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'new Error(\"oooooops\")' throw statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'new Error(\"oooooops\")' throw statement"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'new Error(\"uh oh\")' throw statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'new Error(\"uh oh\")' throw statement"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'new Error(\"oooooops\")' throw statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'new Error(\"oooooops\")' throw statement"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "d48e3de54842bdfb75cd8abeb4cebdcd43b877a4",
+    "sha1": "4e39f432c9e0d8a9f126b91f7ea54d21822c7c04",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7968d5456d2cae631c2ad1a3541972e8b3fbec42"
+    "sha2": "09ebd0d64a6252d651e35cf07c181750d7b1da40"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'new Error(\"uh oh\")' throw statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'new Error(\"uh oh\")' throw statement"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "7968d5456d2cae631c2ad1a3541972e8b3fbec42",
+    "sha1": "09ebd0d64a6252d651e35cf07c181750d7b1da40",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b2a674bd06b1fd6701d58556d05daf118bd513fc"
+    "sha2": "4da8a2dd13d1b62a139f102cf2d13ce0cf6f3bb7"
 }
 ,{
     "testCaseDescription": "javascript-throw-statement-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'new Error(\"oooooops\")' throw statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'new Error(\"oooooops\")' throw statement"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "throw-statement.js"
     ],
-    "sha1": "b2a674bd06b1fd6701d58556d05daf118bd513fc",
+    "sha1": "4da8a2dd13d1b62a139f102cf2d13ce0cf6f3bb7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a11797b72e3d4338dc9efc6183177921bc93609e"
+    "sha2": "5c30863954c846e6487626965891f282d42e6b84"
 }]

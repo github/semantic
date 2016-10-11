@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'true' do/while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'true' do/while statement"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "3dadf24ea6dd60cf63f2599d16951764a34aea81",
+    "sha1": "c5a33a05e7c473051b69c27b5268f7e73d9f9818",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5ac1a1a4fe9eda5e5fd161253a6d91501f1b3ce1"
+    "sha2": "f6d13c24db646eabb87a5569fab5dc059397cd41"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'false' do/while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'false' do/while statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'true' do/while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'true' do/while statement"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "5ac1a1a4fe9eda5e5fd161253a6d91501f1b3ce1",
+    "sha1": "f6d13c24db646eabb87a5569fab5dc059397cd41",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ba86b912e5954ec48b6e49bca4c6bf3f24debf71"
+    "sha2": "b97e52feb5f9b94c2f7c035a5c0b741ab2709c11"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'replacement' identifier with the 'insert' identifier in the console.log(insert) method call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'replacement' identifier with the 'insert' identifier in the console.log(insert) method call"
                 },
                 {
                     "span": {
@@ -136,8 +132,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced 'false' with 'true' in the true do/while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced 'false' with 'true' in the true do/while statement"
                 }
             ]
         },
@@ -146,9 +141,9 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "ba86b912e5954ec48b6e49bca4c6bf3f24debf71",
+    "sha1": "b97e52feb5f9b94c2f7c035a5c0b741ab2709c11",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "224a8c099bc7a1282813dd3f2d4ed7d8c87a3f0f"
+    "sha2": "618521ec11773660442d22c09e5616569ee0d4d6"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-replacement-test",
@@ -180,8 +175,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'insert' identifier with the 'replacement' identifier in the console.log(replacement) method call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'insert' identifier with the 'replacement' identifier in the console.log(replacement) method call"
                 },
                 {
                     "span": {
@@ -208,8 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced 'true' with 'false' in the false do/while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced 'true' with 'false' in the false do/while statement"
                 }
             ]
         },
@@ -218,9 +211,9 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "224a8c099bc7a1282813dd3f2d4ed7d8c87a3f0f",
+    "sha1": "618521ec11773660442d22c09e5616569ee0d4d6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1363c42479d68b43b946500050acea6a3ec19511"
+    "sha2": "b058c2ef89ec07779649681bb0867d7ca642a924"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-delete-replacement-test",
@@ -240,8 +233,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'false' do/while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'false' do/while statement"
                 },
                 {
                     "span": {
@@ -256,8 +248,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'true' do/while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'true' do/while statement"
                 },
                 {
                     "span": {
@@ -272,8 +263,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'false' do/while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'false' do/while statement"
                 }
             ]
         },
@@ -282,9 +272,9 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "1363c42479d68b43b946500050acea6a3ec19511",
+    "sha1": "b058c2ef89ec07779649681bb0867d7ca642a924",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "feb5169e88f28961b09f7527b8af6819931f39f3"
+    "sha2": "29a60219132b7497d5f2f2da75cd6fad3583ea3e"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-delete-test",
@@ -304,8 +294,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'true' do/while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'true' do/while statement"
                 }
             ]
         },
@@ -314,9 +303,9 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "feb5169e88f28961b09f7527b8af6819931f39f3",
+    "sha1": "29a60219132b7497d5f2f2da75cd6fad3583ea3e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e6b31e8c000b83aef153563e940ba6753a81aa13"
+    "sha2": "2c0695fb799f92e9549bea04968f0a7db55e5084"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-delete-rest-test",
@@ -336,8 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'false' do/while statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'false' do/while statement"
                 }
             ]
         },
@@ -346,7 +334,7 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "e6b31e8c000b83aef153563e940ba6753a81aa13",
+    "sha1": "2c0695fb799f92e9549bea04968f0a7db55e5084",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a61175fe3edb3376731a61e36fbe795857288cb2"
+    "sha2": "64789b8e632a3b70997ef3abb4ce031bb19cbedb"
 }]

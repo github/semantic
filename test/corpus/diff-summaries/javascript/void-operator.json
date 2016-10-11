@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'void b()' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'void b()' operator"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "void-operator.js"
     ],
-    "sha1": "a34d26b577d45eb717e1fe5106677325581d96fb",
+    "sha1": "7ba29898c7f45897e7de7f1191e0c6b7f9fac35e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "509b527807b92bc977ea4d76352167537a31e59a"
+    "sha2": "04efcf66ddcaa70558821725988f42c1af11f3cc"
 }
 ,{
     "testCaseDescription": "javascript-void-operator-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'void c()' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'void c()' operator"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'void b()' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'void b()' operator"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "void-operator.js"
     ],
-    "sha1": "509b527807b92bc977ea4d76352167537a31e59a",
+    "sha1": "04efcf66ddcaa70558821725988f42c1af11f3cc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "94643283de3ca9031814c2686d6981d061ea39e5"
+    "sha2": "2cfcfeb87a2b4a0db7905bc74d3a7e1be38cbf5a"
 }
 ,{
     "testCaseDescription": "javascript-void-operator-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'b' identifier in the b() function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'c' identifier with the 'b' identifier in the b() function call"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "void-operator.js"
     ],
-    "sha1": "94643283de3ca9031814c2686d6981d061ea39e5",
+    "sha1": "2cfcfeb87a2b4a0db7905bc74d3a7e1be38cbf5a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "da299cf12b29b9a9e4c160c899a5a99f775db019"
+    "sha2": "cd22e88db42b827ae56fb6ca9edeb221c67f038d"
 }
 ,{
     "testCaseDescription": "javascript-void-operator-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the c() function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the c() function call"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "void-operator.js"
     ],
-    "sha1": "da299cf12b29b9a9e4c160c899a5a99f775db019",
+    "sha1": "cd22e88db42b827ae56fb6ca9edeb221c67f038d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f7257d8cc48c28fa362ac35b2ffe8a289ccda5b3"
+    "sha2": "0b81ec59795d14187d78eb1f48b8b5e8acb0c748"
 }
 ,{
     "testCaseDescription": "javascript-void-operator-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'void c()' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'void c()' operator"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'void b()' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'void b()' operator"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'void c()' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'void c()' operator"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "void-operator.js"
     ],
-    "sha1": "f7257d8cc48c28fa362ac35b2ffe8a289ccda5b3",
+    "sha1": "0b81ec59795d14187d78eb1f48b8b5e8acb0c748",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "eba77c9ca2f30769e008be446ac51602d8774949"
+    "sha2": "9860d6a2ad25819e82ac0848010b5d6f7e1b5b76"
 }
 ,{
     "testCaseDescription": "javascript-void-operator-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'void b()' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'void b()' operator"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "void-operator.js"
     ],
-    "sha1": "eba77c9ca2f30769e008be446ac51602d8774949",
+    "sha1": "9860d6a2ad25819e82ac0848010b5d6f7e1b5b76",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e2d838d6c0797077d1197573fcb31dab223f299b"
+    "sha2": "df7dcb8b1dbc8cd8d7044c0ea75c825e95f55279"
 }
 ,{
     "testCaseDescription": "javascript-void-operator-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'void c()' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'void c()' operator"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "void-operator.js"
     ],
-    "sha1": "e2d838d6c0797077d1197573fcb31dab223f299b",
+    "sha1": "df7dcb8b1dbc8cd8d7044c0ea75c825e95f55279",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f79e1375ce21269c7d54de075cbed5f40ea1b501"
+    "sha2": "85ef535e2b1570133c3be4bddaffc8513555ad2c"
 }]

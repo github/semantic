@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'A string with \"double\" quotes' string",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'A string with \"double\" quotes' string"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "string.js"
     ],
-    "sha1": "b8f8704eac31cd6cb8a2d60bc6432cd69336e7ca",
+    "sha1": "2c57559d605a6fe81e465c7fab6c70b3ed995911",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1eac803d3d86b8fa340350c56d2eb7d39d6d7342"
+    "sha2": "63d3e81fd7d64a832830e004ea516b53f8781779"
 }
 ,{
     "testCaseDescription": "javascript-string-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'A different string with \"double\" quotes' string",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'A different string with \"double\" quotes' string"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'A string with \"double\" quotes' string",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'A string with \"double\" quotes' string"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "string.js"
     ],
-    "sha1": "1eac803d3d86b8fa340350c56d2eb7d39d6d7342",
+    "sha1": "63d3e81fd7d64a832830e004ea516b53f8781779",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "350a048f1d418381f48bdf81e353496de8248e0d"
+    "sha2": "51fa8e3cc925686b215735182f750faa5820479b"
 }
 ,{
     "testCaseDescription": "javascript-string-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'A different string with \"double\" quotes' string with the 'A string with \"double\" quotes' string",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'A different string with \"double\" quotes' string with the 'A string with \"double\" quotes' string"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "string.js"
     ],
-    "sha1": "350a048f1d418381f48bdf81e353496de8248e0d",
+    "sha1": "51fa8e3cc925686b215735182f750faa5820479b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "74081edf9644d5f3e98ccf41140ebda1f2b82bc6"
+    "sha2": "fd50f8ac493b23fe746ee14b683b6c51af6503ec"
 }
 ,{
     "testCaseDescription": "javascript-string-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'A string with \"double\" quotes' string with the 'A different string with \"double\" quotes' string",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'A string with \"double\" quotes' string with the 'A different string with \"double\" quotes' string"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "string.js"
     ],
-    "sha1": "74081edf9644d5f3e98ccf41140ebda1f2b82bc6",
+    "sha1": "fd50f8ac493b23fe746ee14b683b6c51af6503ec",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "67dce6ee4390c8826050dbb0dcd1afb9e0c5ff38"
+    "sha2": "890a07342ca69ed4057e75883d8b42275147405d"
 }
 ,{
     "testCaseDescription": "javascript-string-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'A different string with \"double\" quotes' string",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'A different string with \"double\" quotes' string"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'A string with \"double\" quotes' string",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'A string with \"double\" quotes' string"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'A different string with \"double\" quotes' string",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'A different string with \"double\" quotes' string"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "string.js"
     ],
-    "sha1": "67dce6ee4390c8826050dbb0dcd1afb9e0c5ff38",
+    "sha1": "890a07342ca69ed4057e75883d8b42275147405d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "965488ad061223b589ff8388f3da6e539b60709a"
+    "sha2": "93afe1101fa2f097436cdbf596d0d8f1f8857999"
 }
 ,{
     "testCaseDescription": "javascript-string-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'A string with \"double\" quotes' string",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'A string with \"double\" quotes' string"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "string.js"
     ],
-    "sha1": "965488ad061223b589ff8388f3da6e539b60709a",
+    "sha1": "93afe1101fa2f097436cdbf596d0d8f1f8857999",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a53c564049237a36c0a19ae56698cb5587edcef9"
+    "sha2": "77450417d7c60d4c5e9027dbe758092098a51ad1"
 }
 ,{
     "testCaseDescription": "javascript-string-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'A different string with \"double\" quotes' string",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'A different string with \"double\" quotes' string"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "string.js"
     ],
-    "sha1": "a53c564049237a36c0a19ae56698cb5587edcef9",
+    "sha1": "77450417d7c60d4c5e9027dbe758092098a51ad1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ba4af0c2eb2e6c815e957def7e452a8f06765f94"
+    "sha2": "2bdf24d58c9431fd69cc73d80180388bb579a170"
 }]

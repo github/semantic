@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'a' assignment"
                 },
                 {
                     "span": {
@@ -32,8 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'b' assignment"
                 }
             ]
         },
@@ -42,9 +40,9 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "c376ba3379a36f234ec18e27404102b3ec9c0794",
+    "sha1": "93d092557623a476afac612ad5053ab3e5a63d69",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "31e90b6b1c5c3dc917da063eaf26d247b75b5c46"
+    "sha2": "925d714e520d236f773fd66415cc85d568567c28"
 }
 ,{
     "testCaseDescription": "javascript-comma-operator-replacement-insert-test",
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'c' assignment"
                 },
                 {
                     "span": {
@@ -80,8 +77,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'a' assignment"
                 },
                 {
                     "span": {
@@ -96,8 +92,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'b' assignment"
                 }
             ]
         },
@@ -106,9 +101,9 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "31e90b6b1c5c3dc917da063eaf26d247b75b5c46",
+    "sha1": "925d714e520d236f773fd66415cc85d568567c28",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "80531ffeb669b96cf79ad6c9ad2324d4c238e2a4"
+    "sha2": "62b94cc1adb6550f6cc3d5487fa0b2fb98f7f64a"
 }
 ,{
     "testCaseDescription": "javascript-comma-operator-delete-insert-test",
@@ -128,8 +123,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'a' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'a' assignment"
                 },
                 {
                     "span": {
@@ -144,8 +138,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'b' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'b' assignment"
                 },
                 {
                     "span": {
@@ -160,8 +153,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'c' assignment"
                 }
             ]
         },
@@ -170,9 +162,9 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "80531ffeb669b96cf79ad6c9ad2324d4c238e2a4",
+    "sha1": "62b94cc1adb6550f6cc3d5487fa0b2fb98f7f64a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8a61a54a5e569eb053d0bbdf9f2aa8093b66ffdc"
+    "sha2": "a4b777d2bcbeb98a22c575be5aed21065915ca25"
 }
 ,{
     "testCaseDescription": "javascript-comma-operator-replacement-test",
@@ -192,8 +184,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'c' assignment"
                 },
                 {
                     "span": {
@@ -208,8 +199,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'a' assignment"
                 },
                 {
                     "span": {
@@ -224,8 +214,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'b' assignment"
                 }
             ]
         },
@@ -234,9 +223,9 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "8a61a54a5e569eb053d0bbdf9f2aa8093b66ffdc",
+    "sha1": "a4b777d2bcbeb98a22c575be5aed21065915ca25",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4de76b87e19fa641bbde82250f5c1448582adde0"
+    "sha2": "0044976b6fe9bc1a88363179b05c9164d020d6e0"
 }
 ,{
     "testCaseDescription": "javascript-comma-operator-delete-replacement-test",
@@ -256,8 +245,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'c' assignment"
                 },
                 {
                     "span": {
@@ -272,8 +260,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'a' assignment"
                 },
                 {
                     "span": {
@@ -288,8 +275,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'b' assignment"
                 },
                 {
                     "span": {
@@ -304,8 +290,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'c' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'c' assignment"
                 }
             ]
         },
@@ -314,9 +299,9 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "4de76b87e19fa641bbde82250f5c1448582adde0",
+    "sha1": "0044976b6fe9bc1a88363179b05c9164d020d6e0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "358a64dfe4454828ab1cd7632ea33aabf8791031"
+    "sha2": "437b6ad23f402553fa54eabc101e1009fe7e90f7"
 }
 ,{
     "testCaseDescription": "javascript-comma-operator-delete-test",
@@ -336,8 +321,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'a' assignment"
                 },
                 {
                     "span": {
@@ -352,8 +336,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'b' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'b' assignment"
                 }
             ]
         },
@@ -362,9 +345,9 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "358a64dfe4454828ab1cd7632ea33aabf8791031",
+    "sha1": "437b6ad23f402553fa54eabc101e1009fe7e90f7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c7bc8d4656be920af42145c1ff818668ad25bcaa"
+    "sha2": "cf7b30999c40f435c936f1ca0dafda480f24624b"
 }
 ,{
     "testCaseDescription": "javascript-comma-operator-delete-rest-test",
@@ -384,8 +367,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'c' assignment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'c' assignment"
                 }
             ]
         },
@@ -394,7 +376,7 @@
     "filePaths": [
         "comma-operator.js"
     ],
-    "sha1": "c7bc8d4656be920af42145c1ff818668ad25bcaa",
+    "sha1": "cf7b30999c40f435c936f1ca0dafda480f24624b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2a1ddb9a8c6d84924131fb18113f31eeade50718"
+    "sha2": "b0f399ee205a0929d5082717bdff84b949f064b3"
 }]

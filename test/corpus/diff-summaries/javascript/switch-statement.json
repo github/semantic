@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '1' switch statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '1' switch statement"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "185540018fb2ec8f53780e07b2dfbf4a2f1236e3",
+    "sha1": "d30e43ec820b535d256a20ed0964fba95c8764b3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e7f419c35bf0a7ee9762ed82ccc1f2186c76ae73"
+    "sha2": "6f28b051550ecf618c5ec1fc4109a47787a4da9c"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '2' switch statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '2' switch statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '1' switch statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '1' switch statement"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "e7f419c35bf0a7ee9762ed82ccc1f2186c76ae73",
+    "sha1": "6f28b051550ecf618c5ec1fc4109a47787a4da9c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d64d1ff1bfae7d772398045eb64f6af967f9e873"
+    "sha2": "c7bbc680850439b171c5c39a1dbb8bf3f4b258f1"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '1'",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '2' with '1'"
                 },
                 {
                     "span": {
@@ -136,8 +132,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '1'",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '2' with '1'"
                 }
             ]
         },
@@ -146,9 +141,9 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "d64d1ff1bfae7d772398045eb64f6af967f9e873",
+    "sha1": "c7bbc680850439b171c5c39a1dbb8bf3f4b258f1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6115f065ab997428c6bccc9e5127b10bc064878b"
+    "sha2": "e1abf04722dcc2abc2e741e80c3d9c5bbaf94ab6"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-replacement-test",
@@ -180,8 +175,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '2'",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '1' with '2'"
                 },
                 {
                     "span": {
@@ -208,8 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '2'",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '1' with '2'"
                 }
             ]
         },
@@ -218,9 +211,9 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "6115f065ab997428c6bccc9e5127b10bc064878b",
+    "sha1": "e1abf04722dcc2abc2e741e80c3d9c5bbaf94ab6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fe697bb20735d00750474bb1c1d11cf7de7d5584"
+    "sha2": "f3d3fb5a9daeccf22d32dbcf79e3e6db7e00ac2e"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-replacement-test",
@@ -240,8 +233,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '2' switch statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '2' switch statement"
                 },
                 {
                     "span": {
@@ -256,8 +248,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '1' switch statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '1' switch statement"
                 },
                 {
                     "span": {
@@ -272,8 +263,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '2' switch statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '2' switch statement"
                 }
             ]
         },
@@ -282,9 +272,9 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "fe697bb20735d00750474bb1c1d11cf7de7d5584",
+    "sha1": "f3d3fb5a9daeccf22d32dbcf79e3e6db7e00ac2e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a526798e6a2479b18ad0c9e44f6e9ccc22123a0d"
+    "sha2": "033f48b1db9de57690d1e8008aabb6435eb33732"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-test",
@@ -304,8 +294,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '1' switch statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '1' switch statement"
                 }
             ]
         },
@@ -314,9 +303,9 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "a526798e6a2479b18ad0c9e44f6e9ccc22123a0d",
+    "sha1": "033f48b1db9de57690d1e8008aabb6435eb33732",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6b094744d7e483c03d2bf75a86ae72d45045fe5a"
+    "sha2": "cf1d8915d86aa7b40cc64d3a1b48e4633a034465"
 }
 ,{
     "testCaseDescription": "javascript-switch-statement-delete-rest-test",
@@ -336,8 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '2' switch statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '2' switch statement"
                 }
             ]
         },
@@ -346,7 +334,7 @@
     "filePaths": [
         "switch-statement.js"
     ],
-    "sha1": "6b094744d7e483c03d2bf75a86ae72d45045fe5a",
+    "sha1": "cf1d8915d86aa7b40cc64d3a1b48e4633a034465",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "70cb9ad4daaaabe8cba879105f1fa77141f6fa7c"
+    "sha2": "e34cec33423018aab0fa290f745d2dcb89c93f0f"
 }]

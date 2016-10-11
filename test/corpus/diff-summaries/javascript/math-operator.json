@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i + j * 3 - j % 5' math operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'i + j * 3 - j % 5' math operator"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "c8a29a317ded4687f422bf074dfc78c3780f2ded",
+    "sha1": "94851cf65efff14a5d6caad6c5ec3055d75f6891",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "135b3432e0d4822c6691f908127689ddaf48bd21"
+    "sha2": "5154551d7bb3028e34b78c57ef6e8251941c5e24"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i + j * 2 - j % 4' math operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'i + j * 2 - j % 4' math operator"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i + j * 3 - j % 5' math operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'i + j * 3 - j % 5' math operator"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "135b3432e0d4822c6691f908127689ddaf48bd21",
+    "sha1": "5154551d7bb3028e34b78c57ef6e8251941c5e24",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3bef0fdd5c4f40c4a5842980e32ea9c294e7c1a6"
+    "sha2": "fc5286a2ab8fbc26558fc824e1673af4c9444af0"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '2' with '3'",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '2' with '3'"
                 },
                 {
                     "span": {
@@ -136,8 +132,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '4' with '5'",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '4' with '5'"
                 }
             ]
         },
@@ -146,9 +141,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "3bef0fdd5c4f40c4a5842980e32ea9c294e7c1a6",
+    "sha1": "fc5286a2ab8fbc26558fc824e1673af4c9444af0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2a1f800e6611e6552c0cc03a075a948be66d821b"
+    "sha2": "20ff08f05738054ae97a55afe187f062018e7b4a"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-test",
@@ -180,8 +175,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '3' with '2'",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '3' with '2'"
                 },
                 {
                     "span": {
@@ -208,8 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced '5' with '4'",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced '5' with '4'"
                 }
             ]
         },
@@ -218,9 +211,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "2a1f800e6611e6552c0cc03a075a948be66d821b",
+    "sha1": "20ff08f05738054ae97a55afe187f062018e7b4a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "83d548b2ea37b6ff82a5d4934403fcb33b62de2b"
+    "sha2": "b633411825d8d0d6e48285da3ac8a127bb5b833f"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-replacement-test",
@@ -240,8 +233,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i + j * 2 - j % 4' math operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'i + j * 2 - j % 4' math operator"
                 },
                 {
                     "span": {
@@ -256,8 +248,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i + j * 3 - j % 5' math operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'i + j * 3 - j % 5' math operator"
                 },
                 {
                     "span": {
@@ -272,8 +263,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'i + j * 2 - j % 4' math operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'i + j * 2 - j % 4' math operator"
                 }
             ]
         },
@@ -282,9 +272,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "83d548b2ea37b6ff82a5d4934403fcb33b62de2b",
+    "sha1": "b633411825d8d0d6e48285da3ac8a127bb5b833f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ccc69e5cabb4346d9e6e78a680419433965bcaff"
+    "sha2": "5fba7f8da7725787273fb9fdff3650ee0572bfcd"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-test",
@@ -304,8 +294,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i + j * 3 - j % 5' math operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'i + j * 3 - j % 5' math operator"
                 }
             ]
         },
@@ -314,9 +303,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "ccc69e5cabb4346d9e6e78a680419433965bcaff",
+    "sha1": "5fba7f8da7725787273fb9fdff3650ee0572bfcd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e12a6e350ec50729b2c8392702dea68bc4f25e19"
+    "sha2": "971b37d42e25cdfa61a5023a7fbbef5321f2848a"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-rest-test",
@@ -336,8 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'i + j * 2 - j % 4' math operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'i + j * 2 - j % 4' math operator"
                 }
             ]
         },
@@ -346,7 +334,7 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "e12a6e350ec50729b2c8392702dea68bc4f25e19",
+    "sha1": "971b37d42e25cdfa61a5023a7fbbef5321f2848a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a93c385a37621e58b24c3192ac242f152296869b"
+    "sha2": "86115e374d32bc9d7b6c8dd347d7ec900b501880"
 }]

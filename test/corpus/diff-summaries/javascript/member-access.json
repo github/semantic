@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x.someProperty' member access",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x.someProperty' member access"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "34dda706308957a43236571644aff6e35d5ed5c8",
+    "sha1": "8c89ac29c02f4714dc946e2824152d320b623e36",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "229478a3867e3a976746a8e8e30e79ed9383d47b"
+    "sha2": "7819fe045b5f19ee470b8f0d2371d9344f6c183a"
 }
 ,{
     "testCaseDescription": "javascript-member-access-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x.someOtherProperty' member access",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x.someOtherProperty' member access"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x.someProperty' member access",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x.someProperty' member access"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "229478a3867e3a976746a8e8e30e79ed9383d47b",
+    "sha1": "7819fe045b5f19ee470b8f0d2371d9344f6c183a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "77a6c524dc810aef2a026ada74ae51db6401d399"
+    "sha2": "823d52271b2d99c48216948e20cec0ba6b9d1e6e"
 }
 ,{
     "testCaseDescription": "javascript-member-access-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'someOtherProperty' identifier with the 'someProperty' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'someOtherProperty' identifier with the 'someProperty' identifier"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "77a6c524dc810aef2a026ada74ae51db6401d399",
+    "sha1": "823d52271b2d99c48216948e20cec0ba6b9d1e6e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a24d2c73c061cc1124a76c8d53d324f6d8d56b1b"
+    "sha2": "dd0030c04fcaf1e5784706aee9760bd9904495b8"
 }
 ,{
     "testCaseDescription": "javascript-member-access-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'someProperty' identifier with the 'someOtherProperty' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'someProperty' identifier with the 'someOtherProperty' identifier"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "a24d2c73c061cc1124a76c8d53d324f6d8d56b1b",
+    "sha1": "dd0030c04fcaf1e5784706aee9760bd9904495b8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "397d55476cc1b66ae98e4f258055a0a5a6860f4c"
+    "sha2": "88e2ad3ffa0cca807aeb6e2ea97562c04034a954"
 }
 ,{
     "testCaseDescription": "javascript-member-access-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x.someOtherProperty' member access",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x.someOtherProperty' member access"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x.someProperty' member access",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x.someProperty' member access"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x.someOtherProperty' member access",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x.someOtherProperty' member access"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "397d55476cc1b66ae98e4f258055a0a5a6860f4c",
+    "sha1": "88e2ad3ffa0cca807aeb6e2ea97562c04034a954",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5677ae58e398c0c1918513007208da0fdf21e181"
+    "sha2": "2aaeaae2047b4dea6cb7f6a0851e0314b682b856"
 }
 ,{
     "testCaseDescription": "javascript-member-access-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x.someProperty' member access",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x.someProperty' member access"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "5677ae58e398c0c1918513007208da0fdf21e181",
+    "sha1": "2aaeaae2047b4dea6cb7f6a0851e0314b682b856",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9b5bb8a95ace1c7bf6b2017bacaaf538c41508b5"
+    "sha2": "5ee7c25fc11122ae36f4a585fafbe0d0f69ed1b9"
 }
 ,{
     "testCaseDescription": "javascript-member-access-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x.someOtherProperty' member access",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x.someOtherProperty' member access"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "member-access.js"
     ],
-    "sha1": "9b5bb8a95ace1c7bf6b2017bacaaf538c41508b5",
+    "sha1": "5ee7c25fc11122ae36f4a585fafbe0d0f69ed1b9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "13bf09743306aea0c956273f7ead3bc1759bcee5"
+    "sha2": "b5aeb51a21b78d1547cc65d09bad74c4e27f68c6"
 }]

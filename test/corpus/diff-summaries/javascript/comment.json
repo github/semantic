@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '// This is a property' comment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '// This is a property' comment"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "9ed8066a32b8ac3bc857ec9ffb963f12322f5224",
+    "sha1": "9966bf3346783a8e39f77cc3b61f8c24f851b0ed",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cbdd13e093a8640ad08ec76174b68cf07600c1ea"
+    "sha2": "0b532cc7ac2078fb6421efad2fba431eebf8b079"
 }
 ,{
     "testCaseDescription": "javascript-comment-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '/*\n * This is a method\n*/' comment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '/*\n * This is a method\n*/' comment"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '// This is a property' comment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '// This is a property' comment"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "cbdd13e093a8640ad08ec76174b68cf07600c1ea",
+    "sha1": "0b532cc7ac2078fb6421efad2fba431eebf8b079",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f5a91dac7a4f5f86c7a7cf2c69c5e988fb408712"
+    "sha2": "22391ec032d8cf2569c2c79daf9edd535fd5ae1f"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '/*\n * This is a method\n*/' comment with the '// This is a property' comment",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the '/*\n * This is a method\n*/' comment with the '// This is a property' comment"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "f5a91dac7a4f5f86c7a7cf2c69c5e988fb408712",
+    "sha1": "22391ec032d8cf2569c2c79daf9edd535fd5ae1f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c8bd2718371b28040fa981ce35a138725b120aad"
+    "sha2": "d2e01036c8e33e37b082368f832c642e1498419d"
 }
 ,{
     "testCaseDescription": "javascript-comment-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '// This is a property' comment with the '/*\n * This is a method\n*/' comment",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the '// This is a property' comment with the '/*\n * This is a method\n*/' comment"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "c8bd2718371b28040fa981ce35a138725b120aad",
+    "sha1": "d2e01036c8e33e37b082368f832c642e1498419d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f638e783e9d0ee750f8f201471d4b1b9e9f3f9a3"
+    "sha2": "53dd565d968e321c83e7d55a640b941ec039ae9d"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '/*\n * This is a method\n*/' comment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '/*\n * This is a method\n*/' comment"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '// This is a property' comment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '// This is a property' comment"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the '/*\n * This is a method\n*/' comment",
-                    "tag": "JSONSummary"
+                    "summary": "Added the '/*\n * This is a method\n*/' comment"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "f638e783e9d0ee750f8f201471d4b1b9e9f3f9a3",
+    "sha1": "53dd565d968e321c83e7d55a640b941ec039ae9d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "48711051e73107b9a44cf4c146dbdbdcafea224f"
+    "sha2": "f44bdb127231af5416f02054c41452de18136eb1"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '// This is a property' comment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '// This is a property' comment"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "48711051e73107b9a44cf4c146dbdbdcafea224f",
+    "sha1": "f44bdb127231af5416f02054c41452de18136eb1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8446a2ada4c302787a76d6f8654f66e0f14e9fa6"
+    "sha2": "4d5c2aa9348d27a4efe63e93dd6ea597d1ab60f0"
 }
 ,{
     "testCaseDescription": "javascript-comment-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the '/*\n * This is a method\n*/' comment",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the '/*\n * This is a method\n*/' comment"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "comment.js"
     ],
-    "sha1": "8446a2ada4c302787a76d6f8654f66e0f14e9fa6",
+    "sha1": "4d5c2aa9348d27a4efe63e93dd6ea597d1ab60f0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "af31bc75c5b7a9054f10c295c885d0cc2c5d1d06"
+    "sha2": "d0223efd366c0d9b703a6edf4b9961fa26add3cb"
 }]

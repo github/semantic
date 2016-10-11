@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'parent' function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'parent' function"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "d0057ff388e8070743e2f2922cff0d9b3a2ad5de",
+    "sha1": "af0eafa72dc7a6795507858b2c2f9ceee614de07",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4ac6b2869a5665de7edc7342598666e37dd1a139"
+    "sha2": "71935f67586876686341a26b8cb2a41794820a6f"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'parent' function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'parent' function"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'parent' function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'parent' function"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "4ac6b2869a5665de7edc7342598666e37dd1a139",
+    "sha1": "71935f67586876686341a26b8cb2a41794820a6f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "394a62ade20d4d86615aec875b6e77b67c610af0"
+    "sha2": "4ea4f4876b9375f13a68d7254ad672d07b722fdf"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'arg1' identifier with the 'arg3' identifier in the console.log(arg3) method call of the 'child' function",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'arg1' identifier with the 'arg3' identifier in the console.log(arg3) method call of the 'child' function"
                 },
                 {
                     "span": {
@@ -136,8 +132,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'arg2' identifier with the 'arg4' identifier in the console.log(arg4) method call of the 'child' function",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'arg2' identifier with the 'arg4' identifier in the console.log(arg4) method call of the 'child' function"
                 }
             ]
         },
@@ -146,9 +141,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "394a62ade20d4d86615aec875b6e77b67c610af0",
+    "sha1": "4ea4f4876b9375f13a68d7254ad672d07b722fdf",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7904f2aa3a357840ae49cbeb09842f4483d5b928"
+    "sha2": "be32782b7ddcfa08396ac01c82e30bf7b1df40e7"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-replacement-test",
@@ -180,8 +175,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'arg3' identifier with the 'arg1' identifier in the console.log(arg1) method call of the 'child' function",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'arg3' identifier with the 'arg1' identifier in the console.log(arg1) method call of the 'child' function"
                 },
                 {
                     "span": {
@@ -208,8 +202,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'arg4' identifier with the 'arg2' identifier in the console.log(arg2) method call of the 'child' function",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'arg4' identifier with the 'arg2' identifier in the console.log(arg2) method call of the 'child' function"
                 }
             ]
         },
@@ -218,9 +211,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "7904f2aa3a357840ae49cbeb09842f4483d5b928",
+    "sha1": "be32782b7ddcfa08396ac01c82e30bf7b1df40e7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f967788b85cc219d33d64545d8f1168ba3b43344"
+    "sha2": "550a976d210674327b23b298e527abe2b58dec79"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-replacement-test",
@@ -240,8 +233,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'parent' function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'parent' function"
                 },
                 {
                     "span": {
@@ -256,8 +248,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'parent' function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'parent' function"
                 },
                 {
                     "span": {
@@ -272,8 +263,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'parent' function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'parent' function"
                 }
             ]
         },
@@ -282,9 +272,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "f967788b85cc219d33d64545d8f1168ba3b43344",
+    "sha1": "550a976d210674327b23b298e527abe2b58dec79",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a2a9a7ac4e107169142641d24a73e66725e9db9b"
+    "sha2": "cfd77d1d21ca5a1425846fe50bc154ce78ad5e6f"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-test",
@@ -304,8 +294,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'parent' function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'parent' function"
                 }
             ]
         },
@@ -314,9 +303,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "a2a9a7ac4e107169142641d24a73e66725e9db9b",
+    "sha1": "cfd77d1d21ca5a1425846fe50bc154ce78ad5e6f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "49fdec7315d09e2ed03e0ae78e59593952d0b6d4"
+    "sha2": "75785663836095672233edd2495ec92237d0dbcc"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-rest-test",
@@ -336,8 +325,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'parent' function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'parent' function"
                 }
             ]
         },
@@ -346,7 +334,7 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "49fdec7315d09e2ed03e0ae78e59593952d0b6d4",
+    "sha1": "75785663836095672233edd2495ec92237d0dbcc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f49e31811346eb6451409e09e36f417aeeda390a"
+    "sha2": "02b2a7bb2b9b4d27a06afbe6d147ca70e6eccf1a"
 }]

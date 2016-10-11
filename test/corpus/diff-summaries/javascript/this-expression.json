@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'this' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'this' identifier"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "7b97e72d7c0e6b3898be9d1deb06da6b7ea09764",
+    "sha1": "6a44e531842b97c2a60eb0fb38c57fe35035cf16",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a2a8fb25467bf9403e4de37a8f434852ed8f848b"
+    "sha2": "915f0a11edc274872a8147949183e8b07c9fad4b"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'this' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'this' return statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'this' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'this' identifier"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "a2a8fb25467bf9403e4de37a8f434852ed8f848b",
+    "sha1": "915f0a11edc274872a8147949183e8b07c9fad4b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6625c63c5f06e702ef97f2fdc3a25ff525e70e4f"
+    "sha2": "adb919fd11be97d945483b00e4d2f37856e483b6"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-delete-insert-test",
@@ -96,8 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'this' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'this' identifier"
                 },
                 {
                     "span": {
@@ -112,8 +108,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'this' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'this' return statement"
                 }
             ]
         },
@@ -122,9 +117,9 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "6625c63c5f06e702ef97f2fdc3a25ff525e70e4f",
+    "sha1": "adb919fd11be97d945483b00e4d2f37856e483b6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ffbed3418a24653fbd26b4cd35deb23988f30198"
+    "sha2": "877ee8b57e204cd9e3569f3adaad096ec8a970dd"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-replacement-test",
@@ -144,8 +139,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'this' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'this' return statement"
                 },
                 {
                     "span": {
@@ -160,8 +154,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'this' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'this' identifier"
                 }
             ]
         },
@@ -170,9 +163,9 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "ffbed3418a24653fbd26b4cd35deb23988f30198",
+    "sha1": "877ee8b57e204cd9e3569f3adaad096ec8a970dd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7db7900eb04a66af0196e73999687ba83b168947"
+    "sha2": "2a193071c5327473bc0e781d94e32a64495884eb"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-delete-replacement-test",
@@ -192,8 +185,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'this' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'this' return statement"
                 },
                 {
                     "span": {
@@ -208,8 +200,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'this' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'this' identifier"
                 },
                 {
                     "span": {
@@ -224,8 +215,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'this' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'this' return statement"
                 }
             ]
         },
@@ -234,9 +224,9 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "7db7900eb04a66af0196e73999687ba83b168947",
+    "sha1": "2a193071c5327473bc0e781d94e32a64495884eb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "220159fc73518eb2ba3c195c9d230c523137fb9d"
+    "sha2": "916921ca606d1206fa980e030ed31cd87966e946"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-delete-test",
@@ -256,8 +246,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'this' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'this' identifier"
                 }
             ]
         },
@@ -266,9 +255,9 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "220159fc73518eb2ba3c195c9d230c523137fb9d",
+    "sha1": "916921ca606d1206fa980e030ed31cd87966e946",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3594ddd1cbf054031d468b2ce85d2c617ac5bd51"
+    "sha2": "ccf1e1fa57208cdefeb650390c4153ba13d60b23"
 }
 ,{
     "testCaseDescription": "javascript-this-expression-delete-rest-test",
@@ -288,8 +277,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'this' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'this' return statement"
                 }
             ]
         },
@@ -298,7 +286,7 @@
     "filePaths": [
         "this-expression.js"
     ],
-    "sha1": "3594ddd1cbf054031d468b2ce85d2c617ac5bd51",
+    "sha1": "ccf1e1fa57208cdefeb650390c4153ba13d60b23",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "72aab09a49d2096eccd1ff0f785ef1b2d9283961"
+    "sha2": "027732543c3974844a2f660a3ee74c0837a5b055"
 }]

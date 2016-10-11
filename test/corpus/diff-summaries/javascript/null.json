@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'null' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'null' identifier"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "e56eea84017cd965ac9d95cdc5c5e95a89d7d4e4",
+    "sha1": "0eb0a48a27bc6b8d01a210eea8cbccab5c6823f7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3c20e1e7979eb2887701b29dc8774624e2a26aad"
+    "sha2": "921a57a0891031baea0fa0ebfc5c1270751eb7c3"
 }
 ,{
     "testCaseDescription": "javascript-null-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'null' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'null' return statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'null' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'null' identifier"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "3c20e1e7979eb2887701b29dc8774624e2a26aad",
+    "sha1": "921a57a0891031baea0fa0ebfc5c1270751eb7c3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "889e6f6a91e48a97e5c6f56aedecbffe19b74576"
+    "sha2": "1f137a24235834a5454a98078d3abb07cbdf1063"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-insert-test",
@@ -96,8 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'null' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'null' identifier"
                 },
                 {
                     "span": {
@@ -112,8 +108,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'null' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'null' return statement"
                 }
             ]
         },
@@ -122,9 +117,9 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "889e6f6a91e48a97e5c6f56aedecbffe19b74576",
+    "sha1": "1f137a24235834a5454a98078d3abb07cbdf1063",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3b8e6eab1f7a1c5ed97eecc60850b73900c79d85"
+    "sha2": "1a76251123795db3deefceda4488e44d2eb80193"
 }
 ,{
     "testCaseDescription": "javascript-null-replacement-test",
@@ -144,8 +139,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'null' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'null' return statement"
                 },
                 {
                     "span": {
@@ -160,8 +154,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'null' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'null' identifier"
                 }
             ]
         },
@@ -170,9 +163,9 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "3b8e6eab1f7a1c5ed97eecc60850b73900c79d85",
+    "sha1": "1a76251123795db3deefceda4488e44d2eb80193",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "93e4edaad54b8a1afce14e4540858e2f48b70f1f"
+    "sha2": "a7adbf72c2079adee39b2dbcc46a29447cc5b452"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-replacement-test",
@@ -192,8 +185,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'null' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'null' return statement"
                 },
                 {
                     "span": {
@@ -208,8 +200,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'null' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'null' identifier"
                 },
                 {
                     "span": {
@@ -224,8 +215,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'null' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'null' return statement"
                 }
             ]
         },
@@ -234,9 +224,9 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "93e4edaad54b8a1afce14e4540858e2f48b70f1f",
+    "sha1": "a7adbf72c2079adee39b2dbcc46a29447cc5b452",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7401e97a5ae37d195acae99c6ca3f506ccc992db"
+    "sha2": "72144a33117dda641088c950e9ba56808c39d69d"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-test",
@@ -256,8 +246,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'null' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'null' identifier"
                 }
             ]
         },
@@ -266,9 +255,9 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "7401e97a5ae37d195acae99c6ca3f506ccc992db",
+    "sha1": "72144a33117dda641088c950e9ba56808c39d69d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b44818542eea7ad12dd6644f2443f2df779d02d6"
+    "sha2": "7985243cb79eac510cc068710b58cff711ca4df7"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-rest-test",
@@ -288,8 +277,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'null' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'null' return statement"
                 }
             ]
         },
@@ -298,7 +286,7 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "b44818542eea7ad12dd6644f2443f2df779d02d6",
+    "sha1": "7985243cb79eac510cc068710b58cff711ca4df7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "330c4f8e410be65c3db4b801d5ca2e08094db242"
+    "sha2": "0785f1ff3205013dcbd5f5ca4d172e25f57b5969"
 }]

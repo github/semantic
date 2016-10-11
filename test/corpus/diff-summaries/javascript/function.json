@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous(arg1, arg2) function",
-                    "tag": "JSONSummary"
+                    "summary": "Added an anonymous(arg1, arg2) function"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "function.js"
     ],
-    "sha1": "67cbf8843e0286f8dda242b238d30efab57d6790",
+    "sha1": "9cd120dd3b152d83f8eea69dfe22940d1acbf177",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2717b5aa509e14dfd94842eea00ca66111a015be"
+    "sha2": "654ce2cc1260f48fb82edbd0cc5926f11c877700"
 }
 ,{
     "testCaseDescription": "javascript-function-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous(arg1, arg2) function",
-                    "tag": "JSONSummary"
+                    "summary": "Added an anonymous(arg1, arg2) function"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous(arg1, arg2) function",
-                    "tag": "JSONSummary"
+                    "summary": "Added an anonymous(arg1, arg2) function"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "function.js"
     ],
-    "sha1": "2717b5aa509e14dfd94842eea00ca66111a015be",
+    "sha1": "654ce2cc1260f48fb82edbd0cc5926f11c877700",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f98962b37651faa3154d25fe2828a12df02992d8"
+    "sha2": "d935758b74f8e47e1475010591b39e545d5ecc7a"
 }
 ,{
     "testCaseDescription": "javascript-function-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'arg1' identifier with the 'arg2' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'arg1' identifier with the 'arg2' identifier"
                 }
             ]
         },
@@ -118,9 +114,9 @@
     "filePaths": [
         "function.js"
     ],
-    "sha1": "f98962b37651faa3154d25fe2828a12df02992d8",
+    "sha1": "d935758b74f8e47e1475010591b39e545d5ecc7a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2b9d37d0871a1c8f0a50842e50cab572f55d07db"
+    "sha2": "8c1abbc8823d22df989efd04e0bcc27c2342b00d"
 }
 ,{
     "testCaseDescription": "javascript-function-replacement-test",
@@ -152,8 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'arg2' identifier with the 'arg1' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'arg2' identifier with the 'arg1' identifier"
                 }
             ]
         },
@@ -162,9 +157,9 @@
     "filePaths": [
         "function.js"
     ],
-    "sha1": "2b9d37d0871a1c8f0a50842e50cab572f55d07db",
+    "sha1": "8c1abbc8823d22df989efd04e0bcc27c2342b00d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1bec33037691d4c4d97117aa1a1550a1a0d3113f"
+    "sha2": "0dbbe59af8673a1a5d7ef30f3feed1d050360f91"
 }
 ,{
     "testCaseDescription": "javascript-function-delete-replacement-test",
@@ -184,8 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous(arg1, arg2) function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted an anonymous(arg1, arg2) function"
                 },
                 {
                     "span": {
@@ -200,8 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous(arg1, arg2) function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted an anonymous(arg1, arg2) function"
                 },
                 {
                     "span": {
@@ -216,8 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous(arg1, arg2) function",
-                    "tag": "JSONSummary"
+                    "summary": "Added an anonymous(arg1, arg2) function"
                 }
             ]
         },
@@ -226,9 +218,9 @@
     "filePaths": [
         "function.js"
     ],
-    "sha1": "1bec33037691d4c4d97117aa1a1550a1a0d3113f",
+    "sha1": "0dbbe59af8673a1a5d7ef30f3feed1d050360f91",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "189c17d7869e4ec45865288472d5616e6f934389"
+    "sha2": "aae7da5266e45976f3617b3d9068bbba2b814869"
 }
 ,{
     "testCaseDescription": "javascript-function-delete-test",
@@ -248,8 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous(arg1, arg2) function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted an anonymous(arg1, arg2) function"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "function.js"
     ],
-    "sha1": "189c17d7869e4ec45865288472d5616e6f934389",
+    "sha1": "aae7da5266e45976f3617b3d9068bbba2b814869",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "54e8366ab2c4558cf28dd50f6939ae84738caa6c"
+    "sha2": "183393122ec9e9b0bc8b67482c0435aec3fa76a6"
 }
 ,{
     "testCaseDescription": "javascript-function-delete-rest-test",
@@ -280,8 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous(arg1, arg2) function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted an anonymous(arg1, arg2) function"
                 }
             ]
         },
@@ -290,7 +280,7 @@
     "filePaths": [
         "function.js"
     ],
-    "sha1": "54e8366ab2c4558cf28dd50f6939ae84738caa6c",
+    "sha1": "183393122ec9e9b0bc8b67482c0435aec3fa76a6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ea75c493779d6c65e44c59733f6073e0be814d0b"
+    "sha2": "f0f1ee84b62e5f9e91523c1e29c3469ab06fefdf"
 }]

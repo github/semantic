@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'false'",
-                    "tag": "JSONSummary"
+                    "summary": "Added 'false'"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "bc59c08d8b5b00715bbf8e852bee86bfed8d5f03",
+    "sha1": "6f781fd1c75a5c824323b66e61fb2717755b4753",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0e8162ddf892bf944707eefa68da4d8c3097ee5e"
+    "sha2": "4973cc5fa83113e784f59efc0e9e2bee97ac8a4d"
 }
 ,{
     "testCaseDescription": "javascript-false-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'false' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'false' return statement"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'false'",
-                    "tag": "JSONSummary"
+                    "summary": "Added 'false'"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "0e8162ddf892bf944707eefa68da4d8c3097ee5e",
+    "sha1": "4973cc5fa83113e784f59efc0e9e2bee97ac8a4d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "827e84992521a53a4672e7487814a3d904570c3c"
+    "sha2": "6bd0e7e033d1921b69c9740f08c5575c7e5e6ee1"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-insert-test",
@@ -96,8 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Added 'false'",
-                    "tag": "JSONSummary"
+                    "summary": "Added 'false'"
                 },
                 {
                     "span": {
@@ -112,8 +108,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'false' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'false' return statement"
                 }
             ]
         },
@@ -122,9 +117,9 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "827e84992521a53a4672e7487814a3d904570c3c",
+    "sha1": "6bd0e7e033d1921b69c9740f08c5575c7e5e6ee1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8ad16f2c510212119c87a32df1d0661c7f091533"
+    "sha2": "b2db9c4bb0b3a8d6b68d683e8513b2f6efedb44b"
 }
 ,{
     "testCaseDescription": "javascript-false-replacement-test",
@@ -144,8 +139,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'false' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'false' return statement"
                 },
                 {
                     "span": {
@@ -160,8 +154,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'false'",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted 'false'"
                 }
             ]
         },
@@ -170,9 +163,9 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "8ad16f2c510212119c87a32df1d0661c7f091533",
+    "sha1": "b2db9c4bb0b3a8d6b68d683e8513b2f6efedb44b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5665bce4ee27c2b5f56afbc88b0ca17f85902c6a"
+    "sha2": "dd9ec604931ffffba1b6c7bd4773ec8ac5418804"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-replacement-test",
@@ -192,8 +185,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'false' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'false' return statement"
                 },
                 {
                     "span": {
@@ -208,8 +200,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'false'",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted 'false'"
                 },
                 {
                     "span": {
@@ -224,8 +215,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'false' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'false' return statement"
                 }
             ]
         },
@@ -234,9 +224,9 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "5665bce4ee27c2b5f56afbc88b0ca17f85902c6a",
+    "sha1": "dd9ec604931ffffba1b6c7bd4773ec8ac5418804",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5e7609a2a963055a420461b6743e96adb7cf9b88"
+    "sha2": "4b8dddf41a7b9ac76de8ff5eb1327fb0bd1f8dcb"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-test",
@@ -256,8 +246,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'false'",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted 'false'"
                 }
             ]
         },
@@ -266,9 +255,9 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "5e7609a2a963055a420461b6743e96adb7cf9b88",
+    "sha1": "4b8dddf41a7b9ac76de8ff5eb1327fb0bd1f8dcb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1a3f66f5555eef7dbe41dd82451d089a5c3648d6"
+    "sha2": "2f2527a35cc4511ba3e91e4360f61e56f20d9c3e"
 }
 ,{
     "testCaseDescription": "javascript-false-delete-rest-test",
@@ -288,8 +277,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'false' return statement",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'false' return statement"
                 }
             ]
         },
@@ -298,7 +286,7 @@
     "filePaths": [
         "false.js"
     ],
-    "sha1": "1a3f66f5555eef7dbe41dd82451d089a5c3648d6",
+    "sha1": "2f2527a35cc4511ba3e91e4360f61e56f20d9c3e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "87ef7d96585dfee34d9371968cd3cbec7f8a1d97"
+    "sha2": "7f7c1c904ffcc4ea539925a1d336147d84fd90b8"
 }]

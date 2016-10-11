@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'someFunction(1, \"string\", …, true)' function call",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'someFunction(1, \"string\", …, true)' function call"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "39371fc387de287b5fed01670ecb6d42834d9558",
+    "sha1": "667c51b29a73971928a1be313c249304f3828099",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b7a3a181908a1f263066ded0b6ffd54f76caf38f"
+    "sha2": "192575f8455ac438aa0cbfab74d84d4183377778"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'someFunction(1, \"otherString\", …, false)' function call",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'someFunction(1, \"otherString\", …, false)' function call"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'someFunction(1, \"string\", …, true)' function call",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'someFunction(1, \"string\", …, true)' function call"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "b7a3a181908a1f263066ded0b6ffd54f76caf38f",
+    "sha1": "192575f8455ac438aa0cbfab74d84d4183377778",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c0233e25160450709ba8e3b1e9b3c728816e329f"
+    "sha2": "1acb1db7befa63bf81039b1201e46d1c93f89aa6"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"otherString\" string with the \"string\" string in the someFunction(1, \"string\", …, true) function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the \"otherString\" string with the \"string\" string in the someFunction(1, \"string\", …, true) function call"
                 },
                 {
                     "span": {
@@ -136,8 +132,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the someFunction(1, \"string\", …, true) function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the someFunction(1, \"string\", …, true) function call"
                 },
                 {
                     "span": {
@@ -164,8 +159,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'b' identifier in the someFunction(1, \"string\", …, true) function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'c' identifier with the 'b' identifier in the someFunction(1, \"string\", …, true) function call"
                 },
                 {
                     "span": {
@@ -192,8 +186,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the console.log(a) method call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'b' identifier with the 'a' identifier in the console.log(a) method call"
                 },
                 {
                     "span": {
@@ -220,8 +213,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'c' identifier with the 'b' identifier in the someFunction(1, \"string\", …, true) function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'c' identifier with the 'b' identifier in the someFunction(1, \"string\", …, true) function call"
                 },
                 {
                     "span": {
@@ -248,8 +240,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced 'false' with 'true' in the someFunction(1, \"string\", …, true) function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced 'false' with 'true' in the someFunction(1, \"string\", …, true) function call"
                 }
             ]
         },
@@ -258,9 +249,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "c0233e25160450709ba8e3b1e9b3c728816e329f",
+    "sha1": "1acb1db7befa63bf81039b1201e46d1c93f89aa6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ec2a13df058c25b9f4e873aeef08c968213e3a30"
+    "sha2": "1ef1f93e8742c827b5e36dce1b2a58d084940f00"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-replacement-test",
@@ -292,8 +283,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"string\" string with the \"otherString\" string in the someFunction(1, \"otherString\", …, false) function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the \"string\" string with the \"otherString\" string in the someFunction(1, \"otherString\", …, false) function call"
                 },
                 {
                     "span": {
@@ -320,8 +310,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the someFunction(1, \"otherString\", …, false) function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the someFunction(1, \"otherString\", …, false) function call"
                 },
                 {
                     "span": {
@@ -348,8 +337,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the someFunction(1, \"otherString\", …, false) function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the someFunction(1, \"otherString\", …, false) function call"
                 },
                 {
                     "span": {
@@ -376,8 +364,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the console.log(b) method call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'a' identifier with the 'b' identifier in the console.log(b) method call"
                 },
                 {
                     "span": {
@@ -404,8 +391,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the someFunction(1, \"otherString\", …, false) function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'b' identifier with the 'c' identifier in the someFunction(1, \"otherString\", …, false) function call"
                 },
                 {
                     "span": {
@@ -432,8 +418,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced 'true' with 'false' in the someFunction(1, \"otherString\", …, false) function call",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced 'true' with 'false' in the someFunction(1, \"otherString\", …, false) function call"
                 }
             ]
         },
@@ -442,9 +427,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "ec2a13df058c25b9f4e873aeef08c968213e3a30",
+    "sha1": "1ef1f93e8742c827b5e36dce1b2a58d084940f00",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2a065e7cc65868acd59182dd9ee7aa71f581be6f"
+    "sha2": "9610dd7ef8edff8b65d81c889cb22aa5efb67019"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-replacement-test",
@@ -464,8 +449,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'someFunction(1, \"otherString\", …, false)' function call",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'someFunction(1, \"otherString\", …, false)' function call"
                 },
                 {
                     "span": {
@@ -480,8 +464,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'someFunction(1, \"string\", …, true)' function call",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'someFunction(1, \"string\", …, true)' function call"
                 },
                 {
                     "span": {
@@ -496,8 +479,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'someFunction(1, \"otherString\", …, false)' function call",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'someFunction(1, \"otherString\", …, false)' function call"
                 }
             ]
         },
@@ -506,9 +488,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "2a065e7cc65868acd59182dd9ee7aa71f581be6f",
+    "sha1": "9610dd7ef8edff8b65d81c889cb22aa5efb67019",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b56a80a0b9ce5ff95b4ec2417ff4770ac5d7d5b5"
+    "sha2": "ad2d4d347fb4551d07b8970a27634569e6f9b789"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-test",
@@ -528,8 +510,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'someFunction(1, \"string\", …, true)' function call",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'someFunction(1, \"string\", …, true)' function call"
                 }
             ]
         },
@@ -538,9 +519,9 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "b56a80a0b9ce5ff95b4ec2417ff4770ac5d7d5b5",
+    "sha1": "ad2d4d347fb4551d07b8970a27634569e6f9b789",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "202a515a4ca63fa61a58a82ea1d5bcd10515da8c"
+    "sha2": "953921a66be0d1ed61bf4db6884cd0ad0a057f07"
 }
 ,{
     "testCaseDescription": "javascript-function-call-args-delete-rest-test",
@@ -560,8 +541,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'someFunction(1, \"otherString\", …, false)' function call",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'someFunction(1, \"otherString\", …, false)' function call"
                 }
             ]
         },
@@ -570,7 +550,7 @@
     "filePaths": [
         "function-call-args.js"
     ],
-    "sha1": "202a515a4ca63fa61a58a82ea1d5bcd10515da8c",
+    "sha1": "953921a66be0d1ed61bf4db6884cd0ad0a057f07",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "989abe2f89480b24702666d42becea8aa3dd9356"
+    "sha2": "6f3b3d0ccb1f85f9dd79220ea588b11e540d7290"
 }]

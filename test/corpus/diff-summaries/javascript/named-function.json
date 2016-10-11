@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'myFunction' function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'myFunction' function"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "9e9c5e08a862128a46c888405ef29a584da0e923",
+    "sha1": "caeacf57ee751440e4f9b9f606df460c17499bdd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f31cd7b33a288a75aa8d5b0d3488c0de723cb5dd"
+    "sha2": "742ee12fc034748905977d3e1ba7818df34b9b66"
 }
 ,{
     "testCaseDescription": "javascript-named-function-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'anotherFunction' function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'anotherFunction' function"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'myFunction' function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'myFunction' function"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "f31cd7b33a288a75aa8d5b0d3488c0de723cb5dd",
+    "sha1": "742ee12fc034748905977d3e1ba7818df34b9b66",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a4e9ee32075f16e11f34bef7a33851a493f688ee"
+    "sha2": "05f7b98428d31fa7ae97f65b6c901b8b392764f7"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-insert-test",
@@ -108,8 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'anotherFunction' identifier with the 'myFunction' identifier in the myFunction function",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'anotherFunction' identifier with the 'myFunction' identifier in the myFunction function"
                 },
                 {
                     "span": {
@@ -124,8 +120,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'arg1' identifier in the myFunction function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'arg1' identifier in the myFunction function"
                 },
                 {
                     "span": {
@@ -140,8 +135,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'arg2' identifier in the myFunction function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'arg2' identifier in the myFunction function"
                 },
                 {
                     "span": {
@@ -156,8 +150,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'arg2' identifier in the myFunction function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'arg2' identifier in the myFunction function"
                 },
                 {
                     "span": {
@@ -172,8 +165,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'false' return statement in the myFunction function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'false' return statement in the myFunction function"
                 }
             ]
         },
@@ -182,9 +174,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "a4e9ee32075f16e11f34bef7a33851a493f688ee",
+    "sha1": "05f7b98428d31fa7ae97f65b6c901b8b392764f7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4de27cb3698e46c8c941c58e677cfe3d8ab48078"
+    "sha2": "e60e4118dca7f21ef5d06d668e6f6961f94ece60"
 }
 ,{
     "testCaseDescription": "javascript-named-function-replacement-test",
@@ -216,8 +208,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'myFunction' identifier with the 'anotherFunction' identifier in the anotherFunction function",
-                    "tag": "JSONSummary"
+                    "summary": "Replaced the 'myFunction' identifier with the 'anotherFunction' identifier in the anotherFunction function"
                 },
                 {
                     "span": {
@@ -232,8 +223,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'arg1' identifier in the anotherFunction function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'arg1' identifier in the anotherFunction function"
                 },
                 {
                     "span": {
@@ -248,8 +238,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'arg2' identifier in the anotherFunction function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'arg2' identifier in the anotherFunction function"
                 },
                 {
                     "span": {
@@ -264,8 +253,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'false' return statement in the anotherFunction function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'false' return statement in the anotherFunction function"
                 },
                 {
                     "span": {
@@ -280,8 +268,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'arg2' identifier in the anotherFunction function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'arg2' identifier in the anotherFunction function"
                 }
             ]
         },
@@ -290,9 +277,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "4de27cb3698e46c8c941c58e677cfe3d8ab48078",
+    "sha1": "e60e4118dca7f21ef5d06d668e6f6961f94ece60",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c947b40e91668836ccb2dcb0aa705ae25b5c9509"
+    "sha2": "0d662b70bd31f4c7a957db6e3c874f0e117d81ec"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-replacement-test",
@@ -312,8 +299,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'anotherFunction' function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'anotherFunction' function"
                 },
                 {
                     "span": {
@@ -328,8 +314,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'myFunction' function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'myFunction' function"
                 },
                 {
                     "span": {
@@ -344,8 +329,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'anotherFunction' function",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'anotherFunction' function"
                 }
             ]
         },
@@ -354,9 +338,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "c947b40e91668836ccb2dcb0aa705ae25b5c9509",
+    "sha1": "0d662b70bd31f4c7a957db6e3c874f0e117d81ec",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2e880b7e68923075fc2c7c8b61534af7afa3ea44"
+    "sha2": "2751fd48810beeaf43dbb897d5687e7bb4605ee8"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-test",
@@ -376,8 +360,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'myFunction' function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'myFunction' function"
                 }
             ]
         },
@@ -386,9 +369,9 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "2e880b7e68923075fc2c7c8b61534af7afa3ea44",
+    "sha1": "2751fd48810beeaf43dbb897d5687e7bb4605ee8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a298f3ad3bab2182e5d50a6908514d6ad210d5a9"
+    "sha2": "71fbb6e60978e220e6e2f91e426df58fc0fd8317"
 }
 ,{
     "testCaseDescription": "javascript-named-function-delete-rest-test",
@@ -408,8 +391,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'anotherFunction' function",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'anotherFunction' function"
                 }
             ]
         },
@@ -418,7 +400,7 @@
     "filePaths": [
         "named-function.js"
     ],
-    "sha1": "a298f3ad3bab2182e5d50a6908514d6ad210d5a9",
+    "sha1": "71fbb6e60978e220e6e2f91e426df58fc0fd8317",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "00345376742839aaf8cdbefbe8cb10795489044a"
+    "sha2": "224d24020b3b8d08a8f3aced4b83b49a5779ba41"
 }]

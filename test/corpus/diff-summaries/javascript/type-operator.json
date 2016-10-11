@@ -16,8 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'typeof x' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'typeof x' operator"
                 }
             ]
         },
@@ -26,9 +25,9 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "184d21574db41e0343ee9e0ebe166495b6205fff",
+    "sha1": "6eeb048dd356c28a76842bafe0ff471aca4fc709",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "720e0e4fb3fd308a3a024852f65dccb5a3159645"
+    "sha2": "ae302058d381bfe2242f8af75707d16d9bc5f9c6"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-replacement-insert-test",
@@ -48,8 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x instanceof String' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x instanceof String' operator"
                 },
                 {
                     "span": {
@@ -64,8 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'typeof x' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'typeof x' operator"
                 }
             ]
         },
@@ -74,9 +71,9 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "720e0e4fb3fd308a3a024852f65dccb5a3159645",
+    "sha1": "ae302058d381bfe2242f8af75707d16d9bc5f9c6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ba9af83b00f98272bde1cab0c624397e934650c0"
+    "sha2": "70ff969d615bb1e12f9c83a34430c4eecf5e1423"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-insert-test",
@@ -96,8 +93,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'String' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'String' identifier"
                 }
             ]
         },
@@ -106,9 +102,9 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "ba9af83b00f98272bde1cab0c624397e934650c0",
+    "sha1": "70ff969d615bb1e12f9c83a34430c4eecf5e1423",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "71d60e89b4137fd4a2e0cc552789f9cfc04264c3"
+    "sha2": "4e7d94a429cfea4cfb43bee17420bdf2cf31857e"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-replacement-test",
@@ -128,8 +124,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'String' identifier",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'String' identifier"
                 }
             ]
         },
@@ -138,9 +133,9 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "71d60e89b4137fd4a2e0cc552789f9cfc04264c3",
+    "sha1": "4e7d94a429cfea4cfb43bee17420bdf2cf31857e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1c735c0485ca5c653addd5814e52595ac5787cdb"
+    "sha2": "5f0e7b153777bb043786fa66aee9e38978d66762"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-replacement-test",
@@ -160,8 +155,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x instanceof String' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x instanceof String' operator"
                 },
                 {
                     "span": {
@@ -176,8 +170,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'typeof x' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'typeof x' operator"
                 },
                 {
                     "span": {
@@ -192,8 +185,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x instanceof String' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Added the 'x instanceof String' operator"
                 }
             ]
         },
@@ -202,9 +194,9 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "1c735c0485ca5c653addd5814e52595ac5787cdb",
+    "sha1": "5f0e7b153777bb043786fa66aee9e38978d66762",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c85218016394b93295e0cef901de2755be8e901c"
+    "sha2": "9aaacd568854471edc874364923b43b5a65f6caf"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-test",
@@ -224,8 +216,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'typeof x' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'typeof x' operator"
                 }
             ]
         },
@@ -234,9 +225,9 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "c85218016394b93295e0cef901de2755be8e901c",
+    "sha1": "9aaacd568854471edc874364923b43b5a65f6caf",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2928891cdd48936b69827f3ae19220bbb30d3b6e"
+    "sha2": "b91ec6770bb9eed6aa7f9a0b24c65d6460ba825d"
 }
 ,{
     "testCaseDescription": "javascript-type-operator-delete-rest-test",
@@ -256,8 +247,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x instanceof String' operator",
-                    "tag": "JSONSummary"
+                    "summary": "Deleted the 'x instanceof String' operator"
                 }
             ]
         },
@@ -266,7 +256,7 @@
     "filePaths": [
         "type-operator.js"
     ],
-    "sha1": "2928891cdd48936b69827f3ae19220bbb30d3b6e",
+    "sha1": "b91ec6770bb9eed6aa7f9a0b24c65d6460ba825d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "50c9fb7f60331db7c4a5580663122bf6c875340c"
+    "sha2": "1d96325511c74b433e0a9c675a1e9c1a368bf222"
 }]
