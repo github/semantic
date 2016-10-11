@@ -236,8 +236,10 @@ runPullGitRemote repoUrl repoPath = do
 runPushGitRemote :: FilePath -> IO ()
 runPushGitRemote repoPath = do
   Prelude.putStrLn "Updating git remote."
-  _ <- executeCommand repoPath pushToGitRemoteCommand
-  Prelude.putStrLn "Successfully updated git remote."
+  result <- try $ executeCommand repoPath pushToGitRemoteCommand
+  case (result :: Either Prelude.IOError String) of
+    Left err -> die $ "Failed to push to remote repository: " <> show err
+    Right _ -> Prelude.putStrLn "Successfully updated git remote."
 
 -- | Closes the JSON array and closes the test case file.
 runCloseTestCaseFile :: JSONMetaSyntax -> IO ()
