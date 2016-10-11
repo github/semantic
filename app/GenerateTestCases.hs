@@ -55,7 +55,8 @@ runGenerator :: GeneratorArgs -> JSONMetaRepo -> IO ()
 runGenerator opts metaRepo@JSONMetaRepo{..} = do
   runSetupGitRepo metaRepo
   runCommitsAndTestCasesGeneration opts metaRepo
-  runUpdateGitRemote repoPath
+  runPullGitRemote repoUrl repoPath
+  runPushGitRemote repoPath
 
 -- | Upon successful test case generation for a generator file, move the file to the generated directory.
 -- | This prevents subsequence runs of the test generator from duplicating test cases and adding extraneous
@@ -196,12 +197,35 @@ commands metaSyntax@JSONMetaSyntax{..} =
   where commaSeperator = "\n,"
         spaceSeperator = ""
 
+-- | Attempts to pull from the git repository's remote repository.
+-- | If the pull fails, the exception is caught and continues to the next step.
+runPullGitRemote :: String -> FilePath -> IO ()
+runPullGitRemote repoUrl repoPath = do
+  Prelude.putStrLn "Attempting to fetch from the remote repository."
+  _ <- executeCommand repoPath checkoutMasterCommand
+  result <- attempt
+  handle result next errorMessage
+  where attempt :: IO (Either Prelude.IOError String)
+        attempt = try $ executeCommand repoPath pullFromRemoteCommand
+
+        handle :: Either Prelude.IOError String -> IO () -> (Prelude.IOError -> IO ()) -> IO ()
+        handle result success err = case (result :: Either Prelude.IOError String) of
+                                      Left error -> err error
+                                      Right _ -> success
+        next :: IO ()
+        next = Prelude.putStrLn "Remote repository successfully fetched.\n"
+
+        errorMessage :: Prelude.IOError -> IO ()
+        errorMessage err = Prelude.putStrLn $ "Pulling from the remote repository at " <> repoUrl <> " failed with: " <> show err <> ". Proceeding to the next step.\n"
+
 -- | Pushes git commits to the submodule repository's remote.
-runUpdateGitRemote :: FilePath -> IO ()
-runUpdateGitRemote repoPath = do
+runPushGitRemote :: FilePath -> IO ()
+runPushGitRemote repoPath = do
   Prelude.putStrLn "Updating git remote."
-  _ <- executeCommand repoPath pushToGitRemoteCommand
-  Prelude.putStrLn "Successfully updated git remote."
+  result <- try $ executeCommand repoPath pushToGitRemoteCommand
+  case (result :: Either Prelude.IOError String) of
+    Left err -> die $ "Failed to push to remote repository: " <> show err
+    Right _ -> Prelude.putStrLn "Successfully updated git remote."
 
 -- | Closes the JSON array and closes the test case file.
 runCloseTestCaseFile :: JSONMetaSyntax -> IO ()
@@ -217,6 +241,12 @@ addSubmoduleCommand repoUrl repoPath = "git submodule add " <> repoUrl <> " " <>
 
 getLastCommitShaCommand :: String
 getLastCommitShaCommand = "git log --pretty=format:\"%H\" -n 1;"
+
+checkoutMasterCommand :: String
+checkoutMasterCommand = "git checkout master;"
+
+pullFromRemoteCommand :: String
+pullFromRemoteCommand = "git pull origin master;"
 
 touchCommand :: FilePath -> String
 touchCommand repoFilePath = "touch " <> repoFilePath <> ";"

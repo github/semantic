@@ -11,9 +11,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "113297963da10f52091760ca956952f15b35ba51",
+    "sha1": "b7f4a89900323bf29bbf4a77720b6321ed5650b0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9148b4f9a222473762d0d6c67a40ac2c907986a5"
+    "sha2": "247f8e94e99abd7611aa7a3438d605387a85a43b"
 }
 ,{
     "testCaseDescription": "javascript-class-replacement-insert-test",
@@ -29,9 +29,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "9148b4f9a222473762d0d6c67a40ac2c907986a5",
+    "sha1": "247f8e94e99abd7611aa7a3438d605387a85a43b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a1a53afb9fb953bb16cf3915bd673dd2210df5e3"
+    "sha2": "4a86897e166419fc0641e9fb78236fd1db2e6e06"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-insert-test",
@@ -48,9 +48,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "a1a53afb9fb953bb16cf3915bd673dd2210df5e3",
+    "sha1": "4a86897e166419fc0641e9fb78236fd1db2e6e06",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c30d02089fadff15504ab7eb24ec08ea54275adf"
+    "sha2": "1cc0602d324ac83a8e48bb21015ee4e49b1518b9"
 }
 ,{
     "testCaseDescription": "javascript-class-replacement-test",
@@ -67,9 +67,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "c30d02089fadff15504ab7eb24ec08ea54275adf",
+    "sha1": "1cc0602d324ac83a8e48bb21015ee4e49b1518b9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b030bf052b6f7fa357abe4dbee065313f7edc80a"
+    "sha2": "2c3cc094d7b46e0d2e0d283aeb649d7b27aed6ae"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-replacement-test",
@@ -86,9 +86,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "b030bf052b6f7fa357abe4dbee065313f7edc80a",
+    "sha1": "2c3cc094d7b46e0d2e0d283aeb649d7b27aed6ae",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0db81f0fc457bb2428e9573ed7efb7f09da8a87d"
+    "sha2": "e00c85dfe0c63832afc250f883071e5ee865319a"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-test",
@@ -103,9 +103,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "0db81f0fc457bb2428e9573ed7efb7f09da8a87d",
+    "sha1": "e00c85dfe0c63832afc250f883071e5ee865319a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6f32ee6b8596978e8971c32aa2d87f5ab8823d97"
+    "sha2": "4741b4a33fe2892275562d2c900cbd49075737e1"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-rest-test",
@@ -120,7 +120,7 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "6f32ee6b8596978e8971c32aa2d87f5ab8823d97",
+    "sha1": "4741b4a33fe2892275562d2c900cbd49075737e1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "dd7ca7adcacbe84df962afb2cacb889e9c36555e"
+    "sha2": "fc9aaafb6c12a4fbc174f4a006525bb4b8179e40"
 }]
