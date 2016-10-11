@@ -198,15 +198,13 @@ commands metaSyntax@JSONMetaSyntax{..} =
         spaceSeperator = ""
 
 -- | Attempts to pull from the git repository's remote repository.
--- | If the attempt fails, a naive attempt to update the remote repository
--- | with possible unpushed changes is executed. If that fails, the error is
--- | caught and computation proceeds without terminating the process.
+-- | If the pull fails, the exception is caught and continues to the next step.
 runPullGitRemote :: String -> FilePath -> IO ()
 runPullGitRemote repoUrl repoPath = do
   Prelude.putStrLn "Attempting to fetch from the remote repository."
   _ <- executeCommand repoPath checkoutMasterCommand
   result <- attempt
-  handle result next errorHandler
+  handle result next errorMessage
   where attempt :: IO (Either Prelude.IOError String)
         attempt = try $ executeCommand repoPath pullFromRemoteCommand
 
@@ -218,20 +216,7 @@ runPullGitRemote repoUrl repoPath = do
         next = Prelude.putStrLn "Remote repository successfully fetched.\n"
 
         errorMessage :: Prelude.IOError -> IO ()
-        errorMessage err = Prelude.putStrLn $ "Pulling from the remote repository at " <> repoUrl <> " failed with: " <> show err <> ". " <> "Possible reason: remote repository has local changes not in the local repository. \nProceeding to the next step."
-
-        errorHandler :: Prelude.IOError -> IO ()
-        errorHandler err = do
-          errorMessage err
-          Prelude.putStrLn "Attempting to update the remote repository with local changes.\n"
-          _ <- runPushGitRemote repoPath
-          result <- attempt
-          handle result next continueHandler
-
-        continueHandler :: Prelude.IOError -> IO ()
-        continueHandler err = do
-          errorMessage err
-          Prelude.putStrLn "Attempting to continue without pulling from the remote repository.\n"
+        errorMessage err = Prelude.putStrLn $ "Pulling from the remote repository at " <> repoUrl <> " failed with: " <> show err <> ". Proceeding to the next step.\n"
 
 -- | Pushes git commits to the submodule repository's remote.
 runPushGitRemote :: FilePath -> IO ()
