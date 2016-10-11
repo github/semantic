@@ -27,9 +27,9 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "26f941c6191463416b1c6a56314b19dfe5d09221",
+    "sha1": "a8e5ca2f57c1c13f0d18a94196e0cafb7cbc2c39",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1feed1cf1d95ca3dd414517b6209f4b939f9a424"
+    "sha2": "34242f9f044c914ae73dc24605730efb2dee3cdc"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-replacement-insert-test",
@@ -77,9 +77,9 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "1feed1cf1d95ca3dd414517b6209f4b939f9a424",
+    "sha1": "34242f9f044c914ae73dc24605730efb2dee3cdc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "07ee33b6378c5521565478ca27a988226db043bc"
+    "sha2": "e184d436519216be917d2238ff36e28ef57aa462"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-insert-test",
@@ -183,9 +183,9 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "07ee33b6378c5521565478ca27a988226db043bc",
+    "sha1": "e184d436519216be917d2238ff36e28ef57aa462",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cde3100134b868aee4b00d1f76df2be1acced6d0"
+    "sha2": "d43987311e8c43612449d11670c9edab65f935e5"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-replacement-test",
@@ -289,9 +289,9 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "cde3100134b868aee4b00d1f76df2be1acced6d0",
+    "sha1": "d43987311e8c43612449d11670c9edab65f935e5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6442a64e98e7f30d16e22ee22bcf2586b4cf03a4"
+    "sha2": "2512d2e3685d8121ce3a83482ccd6f0e62211ba6"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-replacement-test",
@@ -356,9 +356,9 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "6442a64e98e7f30d16e22ee22bcf2586b4cf03a4",
+    "sha1": "2512d2e3685d8121ce3a83482ccd6f0e62211ba6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3bcdf485f97763d63d4c0031d2f780c1a17c014f"
+    "sha2": "9588d6d52f5beaf2f6d2f7191713872815b69d94"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-test",
@@ -389,9 +389,9 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "3bcdf485f97763d63d4c0031d2f780c1a17c014f",
+    "sha1": "9588d6d52f5beaf2f6d2f7191713872815b69d94",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "77aa8df2f2a53b78df109832b331ac606d4eaa30"
+    "sha2": "269c6e87ad867ae1efcf0c64e487e506299e5c54"
 }
 ,{
     "testCaseDescription": "javascript-chained-callbacks-delete-rest-test",
@@ -422,7 +422,7 @@
     "filePaths": [
         "chained-callbacks.js"
     ],
-    "sha1": "77aa8df2f2a53b78df109832b331ac606d4eaa30",
+    "sha1": "269c6e87ad867ae1efcf0c64e487e506299e5c54",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "66f76d6c6d3a517f3f4c016d8e03d3497cf724c6"
+    "sha2": "adef6baf8b5eef8703844039dc7001ac32c9ce46"
 }]
