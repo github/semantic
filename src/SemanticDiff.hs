@@ -112,8 +112,8 @@ fetchDiff' Arguments{..} filepath = do
   where
     diffArguments = R.DiffArguments { format = format, output = output }
     fetchText textDiff = if developmentMode
-                          then liftIO $ Timeout.timeout timeoutInMicroseconds textDiff
-                          else liftIO $ Just <$> textDiff
+                          then liftIO $ Just <$> textDiff
+                          else liftIO $ Timeout.timeout timeoutInMicroseconds textDiff
 
 
 pathsToDiff :: Arguments -> Both String -> IO [FilePath]
