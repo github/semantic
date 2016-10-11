@@ -1,0 +1,2842 @@
+[{
+    "testCaseDescription": "javascript-export-insert-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1, name2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Added the variable1 as name1, variable2 as name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1, name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1 = value1, name2 = value2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                5,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the namedFunction export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                6,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the anonymous() function export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                7,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1 export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                8,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1 as default export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                10,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1, name2, nameN from 'foo' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                11,
+                                65
+                            ]
+                        }
+                    },
+                    "summary": "Added the import1 as name1, import2 as name2, nameN from 'bar' export statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "a5cbd53d1d80069c2a2569cb7b54e87a94157893",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "aa70a259619bb125f7fa05c185e0a23dc41e818a"
+}
+,{
+    "testCaseDescription": "javascript-export-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the name4, name5, name6, nameZ export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Added the variable2 as name2, variable3 as name3, nameY export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the name3, name4, nameT export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the name2 = value2, name3 = value3, name4, nameO export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                5,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the otherNamedFunction export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                6,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the newName1 export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                7,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the anonymous() function export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                8,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the name2 as statement export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'baz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                10,
+                                44
+                            ]
+                        }
+                    },
+                    "summary": "Added the name7, name8, nameP from 'buzz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                11,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Added the import6 as name6, import7 as name7, nameB from 'fizz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                12,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1, name2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                13,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Added the variable1 as name1, variable2 as name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                14,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1, name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                15,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1 = value1, name2 = value2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                16,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the namedFunction export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                17,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the anonymous() function export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                18,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1 export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                19,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1 as default export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                20,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                20,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                21,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1, name2, nameN from 'foo' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                22,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                22,
+                                65
+                            ]
+                        }
+                    },
+                    "summary": "Added the import1 as name1, import2 as name2, nameN from 'bar' export statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "aa70a259619bb125f7fa05c185e0a23dc41e818a",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "8080542e661c8c62e1c0830f485e297b5187a8c2"
+}
+,{
+    "testCaseDescription": "javascript-export-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name4' identifier with the 'name1' identifier in the name1, name2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name5' identifier with the 'name2' identifier in the name1, name2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name6' identifier with the 'name3' identifier in the name1, name2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    31
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    31
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'nameZ' identifier with the 'nameN' identifier in the name1, name2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    10
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    2,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    10
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    2,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'variable2' identifier with the 'variable1' identifier in the variable1 as name1, variable2 as name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    23
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    2,
+                                    28
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    23
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    2,
+                                    28
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name2' identifier with the 'name1' identifier in the variable1 as name1, variable2 as name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    30
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    2,
+                                    39
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    30
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    2,
+                                    39
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'variable3' identifier with the 'variable2' identifier in the variable1 as name1, variable2 as name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    43
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    2,
+                                    48
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    43
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    2,
+                                    48
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name3' identifier with the 'name2' identifier in the variable1 as name1, variable2 as name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    50
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    2,
+                                    55
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    50
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    2,
+                                    55
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'nameY' identifier with the 'nameN' identifier in the variable1 as name1, variable2 as name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    12
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    3,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    12
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    3,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name3' identifier with the 'name1' identifier in the name1, name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    19
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    3,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    19
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    3,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name4' identifier with the 'name2' identifier in the name1, name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    26
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    3,
+                                    31
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    26
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    3,
+                                    31
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'nameT' identifier with the 'nameN' identifier in the name1, name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    12
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    4,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    12
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    4,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name2' identifier with the 'name1' identifier in the name1 var assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    20
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    4,
+                                    26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    20
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    4,
+                                    26
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'value2' identifier with the 'value1' identifier in the name1 var assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    28
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    4,
+                                    33
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    28
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    4,
+                                    33
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name3' identifier with the 'name2' identifier in the name2 var assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    36
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    4,
+                                    42
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    36
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    4,
+                                    42
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'value3' identifier with the 'value2' identifier in the name2 var assignment",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    44
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    4,
+                                    49
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    44
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    4,
+                                    49
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name4' identifier with the 'name3' identifier in the name1 = value1, name2 = value2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    51
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    4,
+                                    56
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    51
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    4,
+                                    56
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'nameO' identifier with the 'nameN' identifier in the name1 = value1, name2 = value2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    16
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    5,
+                                    34
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    16
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    5,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'otherNamedFunction' identifier with the 'namedFunction' identifier in the namedFunction export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                6,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the anonymous() function export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                7,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1 export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                8,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1 as default export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                10,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Added the name1, name2, nameN from 'foo' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                11,
+                                65
+                            ]
+                        }
+                    },
+                    "summary": "Added the import1 as name1, import2 as name2, nameN from 'bar' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                6,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the newName1 export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                7,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the anonymous() function export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                8,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name2 as statement export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'baz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                10,
+                                44
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name7, name8, nameP from 'buzz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                11,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the import6 as name6, import7 as name7, nameB from 'fizz' export statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "8080542e661c8c62e1c0830f485e297b5187a8c2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "677b8c31a22bf2ae4a664a71efcc3ab08aa2ff99"
+}
+,{
+    "testCaseDescription": "javascript-export-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    10
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name1' identifier with the 'name4' identifier in the name4, name5, name6, nameZ export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    17
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name2' identifier with the 'name5' identifier in the name4, name5, name6, nameZ export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    24
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name3' identifier with the 'name6' identifier in the name4, name5, name6, nameZ export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    31
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    31
+                                ],
+                                "filepath": "export.js",
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'nameN' identifier with the 'nameZ' identifier in the name4, name5, name6, nameZ export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Added the variable2 as name2, variable3 as name3, nameY export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the name3, name4, nameT export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the name2 = value2, name3 = value3, name4, nameO export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                5,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the otherNamedFunction export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                6,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the newName1 export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                7,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the anonymous() function export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                8,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the name2 as statement export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'baz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                10,
+                                44
+                            ]
+                        }
+                    },
+                    "summary": "Added the name7, name8, nameP from 'buzz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                11,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Added the import6 as name6, import7 as name7, nameB from 'fizz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the variable1 as name1, variable2 as name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1, name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1 = value1, name2 = value2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                5,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the namedFunction export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                6,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the anonymous() function export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                7,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1 export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                8,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1 as default export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                10,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1, name2, nameN from 'foo' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                11,
+                                65
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the import1 as name1, import2 as name2, nameN from 'bar' export statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "677b8c31a22bf2ae4a664a71efcc3ab08aa2ff99",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "3323a81331df2355890b6c599ded7fda43137561"
+}
+,{
+    "testCaseDescription": "javascript-export-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name4, name5, name6, nameZ export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the variable2 as name2, variable3 as name3, nameY export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name3, name4, nameT export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name2 = value2, name3 = value3, name4, nameO export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                5,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the otherNamedFunction export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                6,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the newName1 export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                7,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the anonymous() function export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                8,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name2 as statement export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'baz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                10,
+                                44
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name7, name8, nameP from 'buzz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                11,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the import6 as name6, import7 as name7, nameB from 'fizz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                12,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1, name2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                13,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the variable1 as name1, variable2 as name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                14,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1, name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                15,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1 = value1, name2 = value2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                16,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the namedFunction export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                17,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                17,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the anonymous() function export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                18,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                18,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1 export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                19,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1 as default export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                20,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                20,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                21,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                21,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1, name2, nameN from 'foo' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                22,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                22,
+                                65
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the import1 as name1, import2 as name2, nameN from 'bar' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                12,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the name4, name5, name6, nameZ export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                13,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Added the variable2 as name2, variable3 as name3, nameY export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                14,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the name3, name4, nameT export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                15,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the name2 = value2, name3 = value3, name4, nameO export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                16,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the otherNamedFunction export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                17,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                17,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Added the newName1 export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                18,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                18,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the anonymous() function export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                19,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                19,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the name2 as statement export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                20,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                20,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'baz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                21,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                21,
+                                44
+                            ]
+                        }
+                    },
+                    "summary": "Added the name7, name8, nameP from 'buzz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                22,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                22,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Added the import6 as name6, import7 as name7, nameB from 'fizz' export statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "3323a81331df2355890b6c599ded7fda43137561",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "2cab123e6ec7bbca286ced8d7f2d151d33f0b0db"
+}
+,{
+    "testCaseDescription": "javascript-export-delete-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1, name2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the variable1 as name1, variable2 as name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1, name2, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1 = value1, name2 = value2, name3, nameN export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                5,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the namedFunction export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                6,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the anonymous() function export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                7,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1 export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                8,
+                                29
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1 as default export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                10,
+                                43
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name1, name2, nameN from 'foo' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                11,
+                                65
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the import1 as name1, import2 as name2, nameN from 'bar' export statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "2cab123e6ec7bbca286ced8d7f2d151d33f0b0db",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "aa415fd98f8f0fb76a5e2f26d115b348e5f27e35"
+}
+,{
+    "testCaseDescription": "javascript-export-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "export.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                1,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name4, name5, name6, nameZ export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                2,
+                                58
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the variable2 as name2, variable3 as name3, nameY export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                3,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name3, name4, nameT export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                4,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name2 = value2, name3 = value3, name4, nameO export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                5,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the otherNamedFunction export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                6,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the newName1 export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                7,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the anonymous() function export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                8,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name2 as statement export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                9,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'baz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                10,
+                                44
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the name7, name8, nameP from 'buzz' export statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "filepath": "export.js",
+                            "end": [
+                                11,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the import6 as name6, import7 as name7, nameB from 'fizz' export statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "export.js"
+    ],
+    "sha1": "aa415fd98f8f0fb76a5e2f26d115b348e5f27e35",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "725a0ee6c4535512f82e53d65edf151cc8f724eb"
+}]

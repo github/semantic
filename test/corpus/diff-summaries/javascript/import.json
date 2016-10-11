@@ -1,0 +1,2340 @@
+[{
+    "testCaseDescription": "javascript-import-insert-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                1,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"foo\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                2,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"aardvark\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                3,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"ant\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                4,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"antelope\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                5,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"ant-eater\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                6,
+                                70
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"anaconda\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"alligator\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                8,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"arctic-tern\"' import statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "1f335e06f911822dae7567bc5b0c2d07c78e08d7",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "5e8b10bc0227ed241ed8ab30e5a15a183707edd6"
+}
+,{
+    "testCaseDescription": "javascript-import-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                1,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"babirusa\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                2,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"baboon\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                3,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"badger\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                4,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"bald-eagle\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                5,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"bandicoot\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                6,
+                                78
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"banteng\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"barbet\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                8,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"basilisk\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                9,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"foo\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                10,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"aardvark\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                11,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"ant\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                12,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"antelope\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                13,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"ant-eater\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                14,
+                                70
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"anaconda\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                15,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"alligator\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                16,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"arctic-tern\"' import statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "5e8b10bc0227ed241ed8ab30e5a15a183707edd6",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "faa56959b912ba2a79d43c329d9934720e4d282c"
+}
+,{
+    "testCaseDescription": "javascript-import-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    1,
+                                    37
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"babirusa\" string with the \"foo\" string in the \"foo\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    28
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    2,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    23
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    2,
+                                    33
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"baboon\" string with the \"aardvark\" string in the \"aardvark\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    2,
+                                    22
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    2,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'otherName' identifier with the 'name' identifier in the \"aardvark\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    25
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    3,
+                                    33
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    24
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    3,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"badger\" string with the \"ant\" string in the \"ant\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    10
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    3,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    10
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    3,
+                                    16
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'element' identifier with the 'member' identifier in the \"ant\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    37
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    4,
+                                    49
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    35
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    4,
+                                    45
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"bald-eagle\" string with the \"antelope\" string in the \"antelope\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    10
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    4,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    10
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    4,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'element1' identifier with the 'member1' identifier in the \"antelope\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    21
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    4,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    20
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    4,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'element2' identifier with the 'member2' identifier in the \"antelope\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    54
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    65
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    45
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    56
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"bandicoot\" string with the \"ant-eater\" string in the \"ant-eater\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    10
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    10
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'element1' identifier with the 'member1' identifier in the \"ant-eater\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    21
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    20
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'element2' identifier with the 'member2' identifier in the \"ant-eater\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    33
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    46
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    31
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    37
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'elementAlias2' identifier with the 'alias2' identifier in the \"ant-eater\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    68
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    77
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    59
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    69
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"banteng\" string with the \"anaconda\" string in the \"anaconda\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    25
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    33
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    25
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    32
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'element1' identifier with the 'member1' identifier in the \"anaconda\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    35
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    43
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    34
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    41
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'element2' identifier with the 'member2' identifier in the \"anaconda\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    47
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    60
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    45
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    51
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'elementAlias2' identifier with the 'alias2' identifier in the \"anaconda\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    41
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    7,
+                                    49
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    38
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    7,
+                                    49
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"barbet\" string with the \"alligator\" string in the \"alligator\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    28
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    7,
+                                    35
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    28
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    7,
+                                    32
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'element' identifier with the 'name' identifier in the \"alligator\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    8
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    8,
+                                    18
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    8
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    8,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"basilisk\" string with the \"arctic-tern\" string in the \"arctic-tern\" import statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "faa56959b912ba2a79d43c329d9934720e4d282c",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "caa4826fd6304b8c918cc23708255da3318468e2"
+}
+,{
+    "testCaseDescription": "javascript-import-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    27
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    1,
+                                    37
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"foo\" string with the \"babirusa\" string in the \"babirusa\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    23
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    2,
+                                    33
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    28
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    2,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"aardvark\" string with the \"baboon\" string in the \"baboon\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    2,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    2,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name' identifier with the 'otherName' identifier in the \"baboon\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    24
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    3,
+                                    29
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    25
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    3,
+                                    33
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"ant\" string with the \"badger\" string in the \"badger\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    10
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    3,
+                                    16
+                                ]
+                            },
+                            {
+                                "start": [
+                                    3,
+                                    10
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    3,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'member' identifier with the 'element' identifier in the \"badger\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    35
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    4,
+                                    45
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    37
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    4,
+                                    49
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"antelope\" string with the \"bald-eagle\" string in the \"bald-eagle\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    10
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    4,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    10
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    4,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'member1' identifier with the 'element1' identifier in the \"bald-eagle\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    20
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    4,
+                                    27
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    21
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    4,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'member2' identifier with the 'element2' identifier in the \"bald-eagle\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    45
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    56
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    54
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    65
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"ant-eater\" string with the \"bandicoot\" string in the \"bandicoot\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    10
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    10
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'member1' identifier with the 'element1' identifier in the \"bandicoot\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    20
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    27
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    21
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    29
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'member2' identifier with the 'element2' identifier in the \"bandicoot\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    5,
+                                    31
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    37
+                                ]
+                            },
+                            {
+                                "start": [
+                                    5,
+                                    33
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    5,
+                                    46
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'alias2' identifier with the 'elementAlias2' identifier in the \"bandicoot\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    59
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    69
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    68
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    77
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"anaconda\" string with the \"banteng\" string in the \"banteng\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    25
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    32
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    25
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    33
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'member1' identifier with the 'element1' identifier in the \"banteng\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    34
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    41
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    35
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    43
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'member2' identifier with the 'element2' identifier in the \"banteng\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    45
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    51
+                                ]
+                            },
+                            {
+                                "start": [
+                                    6,
+                                    47
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    6,
+                                    60
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'alias2' identifier with the 'elementAlias2' identifier in the \"banteng\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    38
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    7,
+                                    49
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    41
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    7,
+                                    49
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"alligator\" string with the \"barbet\" string in the \"barbet\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    7,
+                                    28
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    7,
+                                    32
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    28
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    7,
+                                    35
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'name' identifier with the 'element' identifier in the \"barbet\" import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    8,
+                                    8
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    8,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    8,
+                                    8
+                                ],
+                                "filepath": "import.js",
+                                "end": [
+                                    8,
+                                    18
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"arctic-tern\" string with the \"basilisk\" string in the \"basilisk\" import statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "caa4826fd6304b8c918cc23708255da3318468e2",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "db616e2f957db4d05d9a710268e9d8bf826b7b99"
+}
+,{
+    "testCaseDescription": "javascript-import-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                1,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"babirusa\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                2,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"baboon\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                3,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"badger\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                4,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"bald-eagle\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                5,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"bandicoot\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                6,
+                                78
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"banteng\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"barbet\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                8,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"basilisk\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                9,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"foo\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                10,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"aardvark\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                11,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"ant\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                12,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"antelope\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                13,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"ant-eater\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                14,
+                                70
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"anaconda\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                15,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"alligator\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                16,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"arctic-tern\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                9,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"babirusa\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                10,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"baboon\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                11,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                11,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"badger\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                12,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                12,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"bald-eagle\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                13,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                13,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"bandicoot\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                14,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                14,
+                                78
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"banteng\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                15,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                15,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"barbet\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                16,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                16,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"basilisk\"' import statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "db616e2f957db4d05d9a710268e9d8bf826b7b99",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "bf70d2b51a4872cd42ebd2b274ca80cb002041d0"
+}
+,{
+    "testCaseDescription": "javascript-import-delete-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                1,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"foo\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                2,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"aardvark\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                3,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"ant\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                4,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"antelope\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                5,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"ant-eater\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                6,
+                                70
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"anaconda\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"alligator\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                8,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"arctic-tern\"' import statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "bf70d2b51a4872cd42ebd2b274ca80cb002041d0",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "07c7bdcbe8b8df8ca4b6a73abb42e8180e7c99b1"
+}
+,{
+    "testCaseDescription": "javascript-import-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "import.js": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                1,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"babirusa\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                2,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"baboon\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                3,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"badger\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                4,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"bald-eagle\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                5,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"bandicoot\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                6,
+                                78
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"banteng\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"barbet\"' import statement",
+                    "tag": "JSONSummary"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "filepath": "import.js",
+                            "end": [
+                                8,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"basilisk\"' import statement",
+                    "tag": "JSONSummary"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "import.js"
+    ],
+    "sha1": "07c7bdcbe8b8df8ca4b6a73abb42e8180e7c99b1",
+    "gitDir": "test/corpus/repos/javascript",
+    "sha2": "a38a53d0bc89ceb5a135e55a161b8f18004b3a09"
+}]
