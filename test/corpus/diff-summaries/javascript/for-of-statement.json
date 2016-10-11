@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "for-of-statement.js",
                             "end": [
                                 1,
                                 43
@@ -27,9 +26,9 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "e7588cafe7a823a1dce9ddba49bcb503476dc672",
+    "sha1": "5079af56f5049cde622a571fb286589b471549e5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c37d0cae68a2013dfd17781ac2ff2d8b669ab9d7"
+    "sha2": "7897caa7d3f395e6fc8421235775076903bfeea3"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "for-of-statement.js",
                             "end": [
                                 1,
                                 46
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "for-of-statement.js",
                             "end": [
                                 2,
                                 43
@@ -77,9 +74,9 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "c37d0cae68a2013dfd17781ac2ff2d8b669ab9d7",
+    "sha1": "7897caa7d3f395e6fc8421235775076903bfeea3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cf9ed207fbbfb8cb068aedf35c5a7d1c95440d06"
+    "sha2": "764b4aec6e49bf027190ab1e5083bdd35a055279"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     10
                                 ],
-                                "filepath": "for-of-statement.js",
                                 "end": [
                                     1,
                                     15
@@ -105,7 +101,6 @@
                                     1,
                                     10
                                 ],
-                                "filepath": "for-of-statement.js",
                                 "end": [
                                     1,
                                     14
@@ -124,7 +119,6 @@
                                     1,
                                     19
                                 ],
-                                "filepath": "for-of-statement.js",
                                 "end": [
                                     1,
                                     25
@@ -135,7 +129,6 @@
                                     1,
                                     18
                                 ],
-                                "filepath": "for-of-statement.js",
                                 "end": [
                                     1,
                                     23
@@ -154,7 +147,6 @@
                                     1,
                                     37
                                 ],
-                                "filepath": "for-of-statement.js",
                                 "end": [
                                     1,
                                     42
@@ -165,7 +157,6 @@
                                     1,
                                     35
                                 ],
-                                "filepath": "for-of-statement.js",
                                 "end": [
                                     1,
                                     39
@@ -183,9 +174,9 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "cf9ed207fbbfb8cb068aedf35c5a7d1c95440d06",
+    "sha1": "764b4aec6e49bf027190ab1e5083bdd35a055279",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "303102430bf2d88d6da7137cc5571aeef5f93224"
+    "sha2": "ed8939173ee392ec35dd13ff8fee4d4c6f93f985"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-replacement-test",
@@ -200,7 +191,6 @@
                                     1,
                                     10
                                 ],
-                                "filepath": "for-of-statement.js",
                                 "end": [
                                     1,
                                     14
@@ -211,7 +201,6 @@
                                     1,
                                     10
                                 ],
-                                "filepath": "for-of-statement.js",
                                 "end": [
                                     1,
                                     15
@@ -230,7 +219,6 @@
                                     1,
                                     18
                                 ],
-                                "filepath": "for-of-statement.js",
                                 "end": [
                                     1,
                                     23
@@ -241,7 +229,6 @@
                                     1,
                                     19
                                 ],
-                                "filepath": "for-of-statement.js",
                                 "end": [
                                     1,
                                     25
@@ -260,7 +247,6 @@
                                     1,
                                     35
                                 ],
-                                "filepath": "for-of-statement.js",
                                 "end": [
                                     1,
                                     39
@@ -271,7 +257,6 @@
                                     1,
                                     37
                                 ],
-                                "filepath": "for-of-statement.js",
                                 "end": [
                                     1,
                                     42
@@ -289,9 +274,9 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "303102430bf2d88d6da7137cc5571aeef5f93224",
+    "sha1": "ed8939173ee392ec35dd13ff8fee4d4c6f93f985",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "01a95973305ffa51292ab7a8a0970f690c1937e3"
+    "sha2": "8be63f36f0484ba36f2de2a06801fe411b1b6bbc"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-replacement-test",
@@ -305,7 +290,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "for-of-statement.js",
                             "end": [
                                 1,
                                 46
@@ -322,7 +306,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "for-of-statement.js",
                             "end": [
                                 2,
                                 43
@@ -339,7 +322,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "for-of-statement.js",
                             "end": [
                                 2,
                                 46
@@ -356,9 +338,9 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "01a95973305ffa51292ab7a8a0970f690c1937e3",
+    "sha1": "8be63f36f0484ba36f2de2a06801fe411b1b6bbc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "84ebc837b7c11ee0b16b688e1029a411a3fd7327"
+    "sha2": "ae793daccac506e88da2f1d9e5bbe6a63f0c57e8"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-test",
@@ -372,7 +354,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "for-of-statement.js",
                             "end": [
                                 1,
                                 43
@@ -389,9 +370,9 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "84ebc837b7c11ee0b16b688e1029a411a3fd7327",
+    "sha1": "ae793daccac506e88da2f1d9e5bbe6a63f0c57e8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "710ddea57e61c8fe5d105dd26e5192efa8bd3e52"
+    "sha2": "99cbdc5330a41c478311d2cdf679409e67ebb255"
 }
 ,{
     "testCaseDescription": "javascript-for-of-statement-delete-rest-test",
@@ -405,7 +386,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "for-of-statement.js",
                             "end": [
                                 1,
                                 46
@@ -422,7 +402,7 @@
     "filePaths": [
         "for-of-statement.js"
     ],
-    "sha1": "710ddea57e61c8fe5d105dd26e5192efa8bd3e52",
+    "sha1": "99cbdc5330a41c478311d2cdf679409e67ebb255",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9f4f05255cc1f41d2c7dcbe4a450082306db1db1"
+    "sha2": "c1166aa59e4b025c51e2a166a47413eba325ff1d"
 }]

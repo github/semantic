@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "nested-functions.js",
                             "end": [
                                 1,
                                 103
@@ -27,9 +26,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "aa8be129d06030fa7cb344ba9e16f5ad9eff8e47",
+    "sha1": "d0057ff388e8070743e2f2922cff0d9b3a2ad5de",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f07812ff3c1415768f6a45b0cb12483fd96b81af"
+    "sha2": "4ac6b2869a5665de7edc7342598666e37dd1a139"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "nested-functions.js",
                             "end": [
                                 1,
                                 103
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "nested-functions.js",
                             "end": [
                                 2,
                                 103
@@ -77,9 +74,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "f07812ff3c1415768f6a45b0cb12483fd96b81af",
+    "sha1": "4ac6b2869a5665de7edc7342598666e37dd1a139",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "663e4b64a04136d3a85d2b1095313feae62b8ee2"
+    "sha2": "394a62ade20d4d86615aec875b6e77b67c610af0"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     74
                                 ],
-                                "filepath": "nested-functions.js",
                                 "end": [
                                     1,
                                     78
@@ -105,7 +101,6 @@
                                     1,
                                     74
                                 ],
-                                "filepath": "nested-functions.js",
                                 "end": [
                                     1,
                                     78
@@ -124,7 +119,6 @@
                                     1,
                                     93
                                 ],
-                                "filepath": "nested-functions.js",
                                 "end": [
                                     1,
                                     97
@@ -135,7 +129,6 @@
                                     1,
                                     93
                                 ],
-                                "filepath": "nested-functions.js",
                                 "end": [
                                     1,
                                     97
@@ -153,9 +146,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "663e4b64a04136d3a85d2b1095313feae62b8ee2",
+    "sha1": "394a62ade20d4d86615aec875b6e77b67c610af0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5264f63751b2830a3156bc9466b96b327c28268c"
+    "sha2": "7904f2aa3a357840ae49cbeb09842f4483d5b928"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-replacement-test",
@@ -170,7 +163,6 @@
                                     1,
                                     74
                                 ],
-                                "filepath": "nested-functions.js",
                                 "end": [
                                     1,
                                     78
@@ -181,7 +173,6 @@
                                     1,
                                     74
                                 ],
-                                "filepath": "nested-functions.js",
                                 "end": [
                                     1,
                                     78
@@ -200,7 +191,6 @@
                                     1,
                                     93
                                 ],
-                                "filepath": "nested-functions.js",
                                 "end": [
                                     1,
                                     97
@@ -211,7 +201,6 @@
                                     1,
                                     93
                                 ],
-                                "filepath": "nested-functions.js",
                                 "end": [
                                     1,
                                     97
@@ -229,9 +218,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "5264f63751b2830a3156bc9466b96b327c28268c",
+    "sha1": "7904f2aa3a357840ae49cbeb09842f4483d5b928",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "386ca91fda91b11ea0302eb7ccf1fa23b32599c9"
+    "sha2": "f967788b85cc219d33d64545d8f1168ba3b43344"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-replacement-test",
@@ -245,7 +234,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "nested-functions.js",
                             "end": [
                                 1,
                                 103
@@ -262,7 +250,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "nested-functions.js",
                             "end": [
                                 2,
                                 103
@@ -279,7 +266,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "nested-functions.js",
                             "end": [
                                 2,
                                 103
@@ -296,9 +282,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "386ca91fda91b11ea0302eb7ccf1fa23b32599c9",
+    "sha1": "f967788b85cc219d33d64545d8f1168ba3b43344",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "02f7dd997d356724a49f41006ba705ce714add97"
+    "sha2": "a2a9a7ac4e107169142641d24a73e66725e9db9b"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-test",
@@ -312,7 +298,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "nested-functions.js",
                             "end": [
                                 1,
                                 103
@@ -329,9 +314,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "02f7dd997d356724a49f41006ba705ce714add97",
+    "sha1": "a2a9a7ac4e107169142641d24a73e66725e9db9b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8e0ffb4e5f360207a86e6b7030a08985f51fb244"
+    "sha2": "49fdec7315d09e2ed03e0ae78e59593952d0b6d4"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-rest-test",
@@ -345,7 +330,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "nested-functions.js",
                             "end": [
                                 1,
                                 103
@@ -362,7 +346,7 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "8e0ffb4e5f360207a86e6b7030a08985f51fb244",
+    "sha1": "49fdec7315d09e2ed03e0ae78e59593952d0b6d4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b164e3140b16e2db3539cc769b9c60b0cc40912b"
+    "sha2": "f49e31811346eb6451409e09e36f417aeeda390a"
 }]

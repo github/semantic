@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "constructor-call.js",
                             "end": [
                                 1,
                                 27
@@ -27,9 +26,9 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "e77e93003c7650329a3f14274c85d9ce07ba9273",
+    "sha1": "37b9064285baa63e16cc6b1c4b5128fed52fa082",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e282305b5c7dbd64df634b662d6e69e151904e41"
+    "sha2": "b8f33f052773b435e5d29e89aeaf9cf8b3a9e8a6"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "constructor-call.js",
                             "end": [
                                 1,
                                 29
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "constructor-call.js",
                             "end": [
                                 2,
                                 27
@@ -77,9 +74,9 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "e282305b5c7dbd64df634b662d6e69e151904e41",
+    "sha1": "b8f33f052773b435e5d29e89aeaf9cf8b3a9e8a6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "206d378ae7bafc88a7cf46b917757761914ce46c"
+    "sha2": "fa501924dbaed310d84435b0c33ef97a068653e4"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     21
                                 ],
-                                "filepath": "constructor-call.js",
                                 "end": [
                                     1,
                                     28
@@ -105,7 +101,6 @@
                                     1,
                                     21
                                 ],
-                                "filepath": "constructor-call.js",
                                 "end": [
                                     1,
                                     26
@@ -123,9 +118,9 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "206d378ae7bafc88a7cf46b917757761914ce46c",
+    "sha1": "fa501924dbaed310d84435b0c33ef97a068653e4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2a7d4a7d282cb4595bbf27ff91b5efeae2076479"
+    "sha2": "9c7fb90945f08ad72efbcd243221cef5ce8d9732"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-replacement-test",
@@ -140,7 +135,6 @@
                                     1,
                                     21
                                 ],
-                                "filepath": "constructor-call.js",
                                 "end": [
                                     1,
                                     26
@@ -151,7 +145,6 @@
                                     1,
                                     21
                                 ],
-                                "filepath": "constructor-call.js",
                                 "end": [
                                     1,
                                     28
@@ -169,9 +162,9 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "2a7d4a7d282cb4595bbf27ff91b5efeae2076479",
+    "sha1": "9c7fb90945f08ad72efbcd243221cef5ce8d9732",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b389ea9f4bb4258e145bcd9e5ee65339bdb5ca81"
+    "sha2": "bb66b026044f3944a08fec17c572b7b8867decda"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-delete-replacement-test",
@@ -185,7 +178,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "constructor-call.js",
                             "end": [
                                 1,
                                 29
@@ -202,7 +194,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "constructor-call.js",
                             "end": [
                                 2,
                                 27
@@ -219,7 +210,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "constructor-call.js",
                             "end": [
                                 2,
                                 29
@@ -236,9 +226,9 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "b389ea9f4bb4258e145bcd9e5ee65339bdb5ca81",
+    "sha1": "bb66b026044f3944a08fec17c572b7b8867decda",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "11fe2e13ee306e5fa1bcf3257f0e29f2d4ed5335"
+    "sha2": "3669aebc1d501fba80efddd2a0b53b669b045ffa"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-delete-test",
@@ -252,7 +242,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "constructor-call.js",
                             "end": [
                                 1,
                                 27
@@ -269,9 +258,9 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "11fe2e13ee306e5fa1bcf3257f0e29f2d4ed5335",
+    "sha1": "3669aebc1d501fba80efddd2a0b53b669b045ffa",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fb8da2e7dd3c3248beb53c9b9a33ab28c9966d78"
+    "sha2": "aada0c4456c077928d7b286809c61323c9315147"
 }
 ,{
     "testCaseDescription": "javascript-constructor-call-delete-rest-test",
@@ -285,7 +274,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "constructor-call.js",
                             "end": [
                                 1,
                                 29
@@ -302,7 +290,7 @@
     "filePaths": [
         "constructor-call.js"
     ],
-    "sha1": "fb8da2e7dd3c3248beb53c9b9a33ab28c9966d78",
+    "sha1": "aada0c4456c077928d7b286809c61323c9315147",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2583ff8eb54838a4bae616ec1c051ebfc0c6b21c"
+    "sha2": "770dfcd929f8deaec3cf8028327930c422ee1814"
 }]

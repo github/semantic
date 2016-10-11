@@ -341,4 +341,4 @@ instance Arbitrary a => Arbitrary (DiffSummary a) where
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> string (toSL categoryName)
   pretty BranchInfo{..} = mconcat $ punctuate (string "," P.<> space) (pretty <$> branches)
-  pretty ErrorInfo{..} = squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)
+  pretty ErrorInfo{..} = squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan)

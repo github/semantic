@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 1,
                                 39
@@ -27,7 +26,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 2,
                                 58
@@ -44,7 +42,6 @@
                                 3,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 3,
                                 32
@@ -61,7 +58,6 @@
                                 4,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 4,
                                 57
@@ -78,7 +74,6 @@
                                 5,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 5,
                                 30
@@ -95,7 +90,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 6,
                                 32
@@ -112,7 +106,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 7,
                                 37
@@ -129,7 +122,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 8,
                                 29
@@ -146,7 +138,6 @@
                                 9,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 9,
                                 21
@@ -163,7 +154,6 @@
                                 10,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 10,
                                 43
@@ -180,7 +170,6 @@
                                 11,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 11,
                                 65
@@ -197,9 +186,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "a5cbd53d1d80069c2a2569cb7b54e87a94157893",
+    "sha1": "cf784ad9d8d9843aa79915afc98e7c8c7def3bce",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "aa70a259619bb125f7fa05c185e0a23dc41e818a"
+    "sha2": "6a61c15ee9b892ad6fb99edf5ed4fddaaf1668cd"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-insert-test",
@@ -213,7 +202,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 1,
                                 39
@@ -230,7 +218,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 2,
                                 58
@@ -247,7 +234,6 @@
                                 3,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 3,
                                 32
@@ -264,7 +250,6 @@
                                 4,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 4,
                                 57
@@ -281,7 +266,6 @@
                                 5,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 5,
                                 35
@@ -298,7 +282,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 6,
                                 39
@@ -315,7 +298,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 7,
                                 31
@@ -332,7 +314,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 8,
                                 31
@@ -349,7 +330,6 @@
                                 9,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 9,
                                 21
@@ -366,7 +346,6 @@
                                 10,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 10,
                                 44
@@ -383,7 +362,6 @@
                                 11,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 11,
                                 66
@@ -400,7 +378,6 @@
                                 12,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 12,
                                 39
@@ -417,7 +394,6 @@
                                 13,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 13,
                                 58
@@ -434,7 +410,6 @@
                                 14,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 14,
                                 32
@@ -451,7 +426,6 @@
                                 15,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 15,
                                 57
@@ -468,7 +442,6 @@
                                 16,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 16,
                                 30
@@ -485,7 +458,6 @@
                                 17,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 17,
                                 32
@@ -502,7 +474,6 @@
                                 18,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 18,
                                 37
@@ -519,7 +490,6 @@
                                 19,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 19,
                                 29
@@ -536,7 +506,6 @@
                                 20,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 20,
                                 21
@@ -553,7 +522,6 @@
                                 21,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 21,
                                 43
@@ -570,7 +538,6 @@
                                 22,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 22,
                                 65
@@ -587,9 +554,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "aa70a259619bb125f7fa05c185e0a23dc41e818a",
+    "sha1": "6a61c15ee9b892ad6fb99edf5ed4fddaaf1668cd",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8080542e661c8c62e1c0830f485e297b5187a8c2"
+    "sha2": "8b44c437b4f4230802f75d171dfe1e45a5131045"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-insert-test",
@@ -604,7 +571,6 @@
                                     1,
                                     10
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     15
@@ -615,7 +581,6 @@
                                     1,
                                     10
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     15
@@ -634,7 +599,6 @@
                                     1,
                                     17
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     22
@@ -645,7 +609,6 @@
                                     1,
                                     17
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     22
@@ -664,7 +627,6 @@
                                     1,
                                     24
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     29
@@ -675,7 +637,6 @@
                                     1,
                                     24
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     29
@@ -694,7 +655,6 @@
                                     1,
                                     31
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     36
@@ -705,7 +665,6 @@
                                     1,
                                     31
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     36
@@ -724,7 +683,6 @@
                                     2,
                                     10
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     2,
                                     19
@@ -735,7 +693,6 @@
                                     2,
                                     10
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     2,
                                     19
@@ -754,7 +711,6 @@
                                     2,
                                     23
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     2,
                                     28
@@ -765,7 +721,6 @@
                                     2,
                                     23
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     2,
                                     28
@@ -784,7 +739,6 @@
                                     2,
                                     30
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     2,
                                     39
@@ -795,7 +749,6 @@
                                     2,
                                     30
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     2,
                                     39
@@ -814,7 +767,6 @@
                                     2,
                                     43
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     2,
                                     48
@@ -825,7 +777,6 @@
                                     2,
                                     43
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     2,
                                     48
@@ -844,7 +795,6 @@
                                     2,
                                     50
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     2,
                                     55
@@ -855,7 +805,6 @@
                                     2,
                                     50
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     2,
                                     55
@@ -874,7 +823,6 @@
                                     3,
                                     12
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     3,
                                     17
@@ -885,7 +833,6 @@
                                     3,
                                     12
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     3,
                                     17
@@ -904,7 +851,6 @@
                                     3,
                                     19
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     3,
                                     24
@@ -915,7 +861,6 @@
                                     3,
                                     19
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     3,
                                     24
@@ -934,7 +879,6 @@
                                     3,
                                     26
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     3,
                                     31
@@ -945,7 +889,6 @@
                                     3,
                                     26
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     3,
                                     31
@@ -964,7 +907,6 @@
                                     4,
                                     12
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     4,
                                     17
@@ -975,7 +917,6 @@
                                     4,
                                     12
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     4,
                                     17
@@ -994,7 +935,6 @@
                                     4,
                                     20
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     4,
                                     26
@@ -1005,7 +945,6 @@
                                     4,
                                     20
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     4,
                                     26
@@ -1024,7 +963,6 @@
                                     4,
                                     28
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     4,
                                     33
@@ -1035,7 +973,6 @@
                                     4,
                                     28
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     4,
                                     33
@@ -1054,7 +991,6 @@
                                     4,
                                     36
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     4,
                                     42
@@ -1065,7 +1001,6 @@
                                     4,
                                     36
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     4,
                                     42
@@ -1084,7 +1019,6 @@
                                     4,
                                     44
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     4,
                                     49
@@ -1095,7 +1029,6 @@
                                     4,
                                     44
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     4,
                                     49
@@ -1114,7 +1047,6 @@
                                     4,
                                     51
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     4,
                                     56
@@ -1125,7 +1057,6 @@
                                     4,
                                     51
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     4,
                                     56
@@ -1144,7 +1075,6 @@
                                     5,
                                     16
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     5,
                                     34
@@ -1155,7 +1085,6 @@
                                     5,
                                     16
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     5,
                                     29
@@ -1173,7 +1102,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 6,
                                 32
@@ -1190,7 +1118,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 7,
                                 37
@@ -1207,7 +1134,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 8,
                                 29
@@ -1224,7 +1150,6 @@
                                 9,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 9,
                                 21
@@ -1241,7 +1166,6 @@
                                 10,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 10,
                                 43
@@ -1258,7 +1182,6 @@
                                 11,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 11,
                                 65
@@ -1275,7 +1198,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 6,
                                 39
@@ -1292,7 +1214,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 7,
                                 31
@@ -1309,7 +1230,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 8,
                                 31
@@ -1326,7 +1246,6 @@
                                 9,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 9,
                                 21
@@ -1343,7 +1262,6 @@
                                 10,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 10,
                                 44
@@ -1360,7 +1278,6 @@
                                 11,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 11,
                                 66
@@ -1377,9 +1294,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "8080542e661c8c62e1c0830f485e297b5187a8c2",
+    "sha1": "8b44c437b4f4230802f75d171dfe1e45a5131045",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "677b8c31a22bf2ae4a664a71efcc3ab08aa2ff99"
+    "sha2": "a785e114db03c32878ca52d5eb63919ab6a2157e"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-test",
@@ -1394,7 +1311,6 @@
                                     1,
                                     10
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     15
@@ -1405,7 +1321,6 @@
                                     1,
                                     10
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     15
@@ -1424,7 +1339,6 @@
                                     1,
                                     17
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     22
@@ -1435,7 +1349,6 @@
                                     1,
                                     17
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     22
@@ -1454,7 +1367,6 @@
                                     1,
                                     24
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     29
@@ -1465,7 +1377,6 @@
                                     1,
                                     24
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     29
@@ -1484,7 +1395,6 @@
                                     1,
                                     31
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     36
@@ -1495,7 +1405,6 @@
                                     1,
                                     31
                                 ],
-                                "filepath": "export.js",
                                 "end": [
                                     1,
                                     36
@@ -1513,7 +1422,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 2,
                                 58
@@ -1530,7 +1438,6 @@
                                 3,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 3,
                                 32
@@ -1547,7 +1454,6 @@
                                 4,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 4,
                                 57
@@ -1564,7 +1470,6 @@
                                 5,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 5,
                                 35
@@ -1581,7 +1486,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 6,
                                 39
@@ -1598,7 +1502,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 7,
                                 31
@@ -1615,7 +1518,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 8,
                                 31
@@ -1632,7 +1534,6 @@
                                 9,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 9,
                                 21
@@ -1649,7 +1550,6 @@
                                 10,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 10,
                                 44
@@ -1666,7 +1566,6 @@
                                 11,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 11,
                                 66
@@ -1683,7 +1582,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 2,
                                 58
@@ -1700,7 +1598,6 @@
                                 3,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 3,
                                 32
@@ -1717,7 +1614,6 @@
                                 4,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 4,
                                 57
@@ -1734,7 +1630,6 @@
                                 5,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 5,
                                 30
@@ -1751,7 +1646,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 6,
                                 32
@@ -1768,7 +1662,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 7,
                                 37
@@ -1785,7 +1678,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 8,
                                 29
@@ -1802,7 +1694,6 @@
                                 9,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 9,
                                 21
@@ -1819,7 +1710,6 @@
                                 10,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 10,
                                 43
@@ -1836,7 +1726,6 @@
                                 11,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 11,
                                 65
@@ -1853,9 +1742,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "677b8c31a22bf2ae4a664a71efcc3ab08aa2ff99",
+    "sha1": "a785e114db03c32878ca52d5eb63919ab6a2157e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3323a81331df2355890b6c599ded7fda43137561"
+    "sha2": "630f93e2ef51a3dbf92c5d9070fb2c8d4e77cbe0"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-replacement-test",
@@ -1869,7 +1758,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 1,
                                 39
@@ -1886,7 +1774,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 2,
                                 58
@@ -1903,7 +1790,6 @@
                                 3,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 3,
                                 32
@@ -1920,7 +1806,6 @@
                                 4,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 4,
                                 57
@@ -1937,7 +1822,6 @@
                                 5,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 5,
                                 35
@@ -1954,7 +1838,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 6,
                                 39
@@ -1971,7 +1854,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 7,
                                 31
@@ -1988,7 +1870,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 8,
                                 31
@@ -2005,7 +1886,6 @@
                                 9,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 9,
                                 21
@@ -2022,7 +1902,6 @@
                                 10,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 10,
                                 44
@@ -2039,7 +1918,6 @@
                                 11,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 11,
                                 66
@@ -2056,7 +1934,6 @@
                                 12,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 12,
                                 39
@@ -2073,7 +1950,6 @@
                                 13,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 13,
                                 58
@@ -2090,7 +1966,6 @@
                                 14,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 14,
                                 32
@@ -2107,7 +1982,6 @@
                                 15,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 15,
                                 57
@@ -2124,7 +1998,6 @@
                                 16,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 16,
                                 30
@@ -2141,7 +2014,6 @@
                                 17,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 17,
                                 32
@@ -2158,7 +2030,6 @@
                                 18,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 18,
                                 37
@@ -2175,7 +2046,6 @@
                                 19,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 19,
                                 29
@@ -2192,7 +2062,6 @@
                                 20,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 20,
                                 21
@@ -2209,7 +2078,6 @@
                                 21,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 21,
                                 43
@@ -2226,7 +2094,6 @@
                                 22,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 22,
                                 65
@@ -2243,7 +2110,6 @@
                                 12,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 12,
                                 39
@@ -2260,7 +2126,6 @@
                                 13,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 13,
                                 58
@@ -2277,7 +2142,6 @@
                                 14,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 14,
                                 32
@@ -2294,7 +2158,6 @@
                                 15,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 15,
                                 57
@@ -2311,7 +2174,6 @@
                                 16,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 16,
                                 35
@@ -2328,7 +2190,6 @@
                                 17,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 17,
                                 39
@@ -2345,7 +2206,6 @@
                                 18,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 18,
                                 31
@@ -2362,7 +2222,6 @@
                                 19,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 19,
                                 31
@@ -2379,7 +2238,6 @@
                                 20,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 20,
                                 21
@@ -2396,7 +2254,6 @@
                                 21,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 21,
                                 44
@@ -2413,7 +2270,6 @@
                                 22,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 22,
                                 66
@@ -2430,9 +2286,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "3323a81331df2355890b6c599ded7fda43137561",
+    "sha1": "630f93e2ef51a3dbf92c5d9070fb2c8d4e77cbe0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2cab123e6ec7bbca286ced8d7f2d151d33f0b0db"
+    "sha2": "4dc68416478b18e5ab4d0cb03d1be06129ffde31"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-test",
@@ -2446,7 +2302,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 1,
                                 39
@@ -2463,7 +2318,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 2,
                                 58
@@ -2480,7 +2334,6 @@
                                 3,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 3,
                                 32
@@ -2497,7 +2350,6 @@
                                 4,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 4,
                                 57
@@ -2514,7 +2366,6 @@
                                 5,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 5,
                                 30
@@ -2531,7 +2382,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 6,
                                 32
@@ -2548,7 +2398,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 7,
                                 37
@@ -2565,7 +2414,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 8,
                                 29
@@ -2582,7 +2430,6 @@
                                 9,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 9,
                                 21
@@ -2599,7 +2446,6 @@
                                 10,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 10,
                                 43
@@ -2616,7 +2462,6 @@
                                 11,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 11,
                                 65
@@ -2633,9 +2478,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "2cab123e6ec7bbca286ced8d7f2d151d33f0b0db",
+    "sha1": "4dc68416478b18e5ab4d0cb03d1be06129ffde31",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "aa415fd98f8f0fb76a5e2f26d115b348e5f27e35"
+    "sha2": "11d28b7ee48f99ad7e371a3ff7a3afcb482ecac5"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-rest-test",
@@ -2649,7 +2494,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 1,
                                 39
@@ -2666,7 +2510,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 2,
                                 58
@@ -2683,7 +2526,6 @@
                                 3,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 3,
                                 32
@@ -2700,7 +2542,6 @@
                                 4,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 4,
                                 57
@@ -2717,7 +2558,6 @@
                                 5,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 5,
                                 35
@@ -2734,7 +2574,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 6,
                                 39
@@ -2751,7 +2590,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 7,
                                 31
@@ -2768,7 +2606,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 8,
                                 31
@@ -2785,7 +2622,6 @@
                                 9,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 9,
                                 21
@@ -2802,7 +2638,6 @@
                                 10,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 10,
                                 44
@@ -2819,7 +2654,6 @@
                                 11,
                                 1
                             ],
-                            "filepath": "export.js",
                             "end": [
                                 11,
                                 66
@@ -2836,7 +2670,7 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "aa415fd98f8f0fb76a5e2f26d115b348e5f27e35",
+    "sha1": "11d28b7ee48f99ad7e371a3ff7a3afcb482ecac5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "725a0ee6c4535512f82e53d65edf151cc8f724eb"
+    "sha2": "a1ec5326a248592c7deb7a7e3b3ece00b97506bb"
 }]

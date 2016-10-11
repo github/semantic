@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 1,
                                 33
@@ -27,7 +26,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 2,
                                 34
@@ -44,7 +42,6 @@
                                 3,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 3,
                                 30
@@ -61,7 +58,6 @@
                                 4,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 4,
                                 46
@@ -78,7 +74,6 @@
                                 5,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 5,
                                 57
@@ -95,7 +90,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 6,
                                 70
@@ -112,7 +106,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 7,
                                 50
@@ -129,7 +122,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 8,
                                 22
@@ -146,9 +138,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "1f335e06f911822dae7567bc5b0c2d07c78e08d7",
+    "sha1": "79e42f5e2d2b5990e809542916065fbb29e4ec4d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5e8b10bc0227ed241ed8ab30e5a15a183707edd6"
+    "sha2": "fee3454c33f7cd5eab32dc5aa7e9735a955ace4f"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-insert-test",
@@ -162,7 +154,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 1,
                                 38
@@ -179,7 +170,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 2,
                                 37
@@ -196,7 +186,6 @@
                                 3,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 3,
                                 34
@@ -213,7 +202,6 @@
                                 4,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 4,
                                 50
@@ -230,7 +218,6 @@
                                 5,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 5,
                                 66
@@ -247,7 +234,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 6,
                                 78
@@ -264,7 +250,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 7,
                                 50
@@ -281,7 +266,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 8,
                                 19
@@ -298,7 +282,6 @@
                                 9,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 9,
                                 33
@@ -315,7 +298,6 @@
                                 10,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 10,
                                 34
@@ -332,7 +314,6 @@
                                 11,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 11,
                                 30
@@ -349,7 +330,6 @@
                                 12,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 12,
                                 46
@@ -366,7 +346,6 @@
                                 13,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 13,
                                 57
@@ -383,7 +362,6 @@
                                 14,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 14,
                                 70
@@ -400,7 +378,6 @@
                                 15,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 15,
                                 50
@@ -417,7 +394,6 @@
                                 16,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 16,
                                 22
@@ -434,9 +410,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "5e8b10bc0227ed241ed8ab30e5a15a183707edd6",
+    "sha1": "fee3454c33f7cd5eab32dc5aa7e9735a955ace4f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "faa56959b912ba2a79d43c329d9934720e4d282c"
+    "sha2": "c28f080d1c93051935cf781db3adc4d790fdd8ed"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-insert-test",
@@ -451,7 +427,6 @@
                                     1,
                                     27
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     1,
                                     37
@@ -462,7 +437,6 @@
                                     1,
                                     27
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     1,
                                     32
@@ -481,7 +455,6 @@
                                     2,
                                     28
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     2,
                                     36
@@ -492,7 +465,6 @@
                                     2,
                                     23
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     2,
                                     33
@@ -511,7 +483,6 @@
                                     2,
                                     13
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     2,
                                     22
@@ -522,7 +493,6 @@
                                     2,
                                     13
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     2,
                                     17
@@ -541,7 +511,6 @@
                                     3,
                                     25
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     3,
                                     33
@@ -552,7 +521,6 @@
                                     3,
                                     24
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     3,
                                     29
@@ -571,7 +539,6 @@
                                     3,
                                     10
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     3,
                                     17
@@ -582,7 +549,6 @@
                                     3,
                                     10
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     3,
                                     16
@@ -601,7 +567,6 @@
                                     4,
                                     37
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     4,
                                     49
@@ -612,7 +577,6 @@
                                     4,
                                     35
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     4,
                                     45
@@ -631,7 +595,6 @@
                                     4,
                                     10
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     4,
                                     18
@@ -642,7 +605,6 @@
                                     4,
                                     10
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     4,
                                     17
@@ -661,7 +623,6 @@
                                     4,
                                     21
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     4,
                                     29
@@ -672,7 +633,6 @@
                                     4,
                                     20
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     4,
                                     27
@@ -691,7 +651,6 @@
                                     5,
                                     54
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     65
@@ -702,7 +661,6 @@
                                     5,
                                     45
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     56
@@ -721,7 +679,6 @@
                                     5,
                                     10
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     18
@@ -732,7 +689,6 @@
                                     5,
                                     10
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     17
@@ -751,7 +707,6 @@
                                     5,
                                     21
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     29
@@ -762,7 +717,6 @@
                                     5,
                                     20
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     27
@@ -781,7 +735,6 @@
                                     5,
                                     33
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     46
@@ -792,7 +745,6 @@
                                     5,
                                     31
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     37
@@ -811,7 +763,6 @@
                                     6,
                                     68
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     77
@@ -822,7 +773,6 @@
                                     6,
                                     59
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     69
@@ -841,7 +791,6 @@
                                     6,
                                     25
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     33
@@ -852,7 +801,6 @@
                                     6,
                                     25
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     32
@@ -871,7 +819,6 @@
                                     6,
                                     35
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     43
@@ -882,7 +829,6 @@
                                     6,
                                     34
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     41
@@ -901,7 +847,6 @@
                                     6,
                                     47
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     60
@@ -912,7 +857,6 @@
                                     6,
                                     45
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     51
@@ -931,7 +875,6 @@
                                     7,
                                     41
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     7,
                                     49
@@ -942,7 +885,6 @@
                                     7,
                                     38
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     7,
                                     49
@@ -961,7 +903,6 @@
                                     7,
                                     28
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     7,
                                     35
@@ -972,7 +913,6 @@
                                     7,
                                     28
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     7,
                                     32
@@ -991,7 +931,6 @@
                                     8,
                                     8
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     8,
                                     18
@@ -1002,7 +941,6 @@
                                     8,
                                     8
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     8,
                                     21
@@ -1020,9 +958,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "faa56959b912ba2a79d43c329d9934720e4d282c",
+    "sha1": "c28f080d1c93051935cf781db3adc4d790fdd8ed",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "caa4826fd6304b8c918cc23708255da3318468e2"
+    "sha2": "26fd9db0c145d7d502593173826c0f1ad31dc8d6"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-test",
@@ -1037,7 +975,6 @@
                                     1,
                                     27
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     1,
                                     32
@@ -1048,7 +985,6 @@
                                     1,
                                     27
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     1,
                                     37
@@ -1067,7 +1003,6 @@
                                     2,
                                     23
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     2,
                                     33
@@ -1078,7 +1013,6 @@
                                     2,
                                     28
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     2,
                                     36
@@ -1097,7 +1031,6 @@
                                     2,
                                     13
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     2,
                                     17
@@ -1108,7 +1041,6 @@
                                     2,
                                     13
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     2,
                                     22
@@ -1127,7 +1059,6 @@
                                     3,
                                     24
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     3,
                                     29
@@ -1138,7 +1069,6 @@
                                     3,
                                     25
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     3,
                                     33
@@ -1157,7 +1087,6 @@
                                     3,
                                     10
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     3,
                                     16
@@ -1168,7 +1097,6 @@
                                     3,
                                     10
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     3,
                                     17
@@ -1187,7 +1115,6 @@
                                     4,
                                     35
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     4,
                                     45
@@ -1198,7 +1125,6 @@
                                     4,
                                     37
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     4,
                                     49
@@ -1217,7 +1143,6 @@
                                     4,
                                     10
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     4,
                                     17
@@ -1228,7 +1153,6 @@
                                     4,
                                     10
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     4,
                                     18
@@ -1247,7 +1171,6 @@
                                     4,
                                     20
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     4,
                                     27
@@ -1258,7 +1181,6 @@
                                     4,
                                     21
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     4,
                                     29
@@ -1277,7 +1199,6 @@
                                     5,
                                     45
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     56
@@ -1288,7 +1209,6 @@
                                     5,
                                     54
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     65
@@ -1307,7 +1227,6 @@
                                     5,
                                     10
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     17
@@ -1318,7 +1237,6 @@
                                     5,
                                     10
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     18
@@ -1337,7 +1255,6 @@
                                     5,
                                     20
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     27
@@ -1348,7 +1265,6 @@
                                     5,
                                     21
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     29
@@ -1367,7 +1283,6 @@
                                     5,
                                     31
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     37
@@ -1378,7 +1293,6 @@
                                     5,
                                     33
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     5,
                                     46
@@ -1397,7 +1311,6 @@
                                     6,
                                     59
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     69
@@ -1408,7 +1321,6 @@
                                     6,
                                     68
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     77
@@ -1427,7 +1339,6 @@
                                     6,
                                     25
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     32
@@ -1438,7 +1349,6 @@
                                     6,
                                     25
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     33
@@ -1457,7 +1367,6 @@
                                     6,
                                     34
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     41
@@ -1468,7 +1377,6 @@
                                     6,
                                     35
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     43
@@ -1487,7 +1395,6 @@
                                     6,
                                     45
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     51
@@ -1498,7 +1405,6 @@
                                     6,
                                     47
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     6,
                                     60
@@ -1517,7 +1423,6 @@
                                     7,
                                     38
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     7,
                                     49
@@ -1528,7 +1433,6 @@
                                     7,
                                     41
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     7,
                                     49
@@ -1547,7 +1451,6 @@
                                     7,
                                     28
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     7,
                                     32
@@ -1558,7 +1461,6 @@
                                     7,
                                     28
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     7,
                                     35
@@ -1577,7 +1479,6 @@
                                     8,
                                     8
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     8,
                                     21
@@ -1588,7 +1489,6 @@
                                     8,
                                     8
                                 ],
-                                "filepath": "import.js",
                                 "end": [
                                     8,
                                     18
@@ -1606,9 +1506,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "caa4826fd6304b8c918cc23708255da3318468e2",
+    "sha1": "26fd9db0c145d7d502593173826c0f1ad31dc8d6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "db616e2f957db4d05d9a710268e9d8bf826b7b99"
+    "sha2": "4847728b759c2df8061704204aeb1b24c3d9e5f4"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-replacement-test",
@@ -1622,7 +1522,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 1,
                                 38
@@ -1639,7 +1538,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 2,
                                 37
@@ -1656,7 +1554,6 @@
                                 3,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 3,
                                 34
@@ -1673,7 +1570,6 @@
                                 4,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 4,
                                 50
@@ -1690,7 +1586,6 @@
                                 5,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 5,
                                 66
@@ -1707,7 +1602,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 6,
                                 78
@@ -1724,7 +1618,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 7,
                                 50
@@ -1741,7 +1634,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 8,
                                 19
@@ -1758,7 +1650,6 @@
                                 9,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 9,
                                 33
@@ -1775,7 +1666,6 @@
                                 10,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 10,
                                 34
@@ -1792,7 +1682,6 @@
                                 11,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 11,
                                 30
@@ -1809,7 +1698,6 @@
                                 12,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 12,
                                 46
@@ -1826,7 +1714,6 @@
                                 13,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 13,
                                 57
@@ -1843,7 +1730,6 @@
                                 14,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 14,
                                 70
@@ -1860,7 +1746,6 @@
                                 15,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 15,
                                 50
@@ -1877,7 +1762,6 @@
                                 16,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 16,
                                 22
@@ -1894,7 +1778,6 @@
                                 9,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 9,
                                 38
@@ -1911,7 +1794,6 @@
                                 10,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 10,
                                 37
@@ -1928,7 +1810,6 @@
                                 11,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 11,
                                 34
@@ -1945,7 +1826,6 @@
                                 12,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 12,
                                 50
@@ -1962,7 +1842,6 @@
                                 13,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 13,
                                 66
@@ -1979,7 +1858,6 @@
                                 14,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 14,
                                 78
@@ -1996,7 +1874,6 @@
                                 15,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 15,
                                 50
@@ -2013,7 +1890,6 @@
                                 16,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 16,
                                 19
@@ -2030,9 +1906,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "db616e2f957db4d05d9a710268e9d8bf826b7b99",
+    "sha1": "4847728b759c2df8061704204aeb1b24c3d9e5f4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bf70d2b51a4872cd42ebd2b274ca80cb002041d0"
+    "sha2": "c4905d598dec191b7fd2b15c8d4345ffd7077818"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-test",
@@ -2046,7 +1922,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 1,
                                 33
@@ -2063,7 +1938,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 2,
                                 34
@@ -2080,7 +1954,6 @@
                                 3,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 3,
                                 30
@@ -2097,7 +1970,6 @@
                                 4,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 4,
                                 46
@@ -2114,7 +1986,6 @@
                                 5,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 5,
                                 57
@@ -2131,7 +2002,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 6,
                                 70
@@ -2148,7 +2018,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 7,
                                 50
@@ -2165,7 +2034,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 8,
                                 22
@@ -2182,9 +2050,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "bf70d2b51a4872cd42ebd2b274ca80cb002041d0",
+    "sha1": "c4905d598dec191b7fd2b15c8d4345ffd7077818",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "07c7bdcbe8b8df8ca4b6a73abb42e8180e7c99b1"
+    "sha2": "2aefc12e72888e28a1b4fbc7129a1446eb798bc9"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-rest-test",
@@ -2198,7 +2066,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 1,
                                 38
@@ -2215,7 +2082,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 2,
                                 37
@@ -2232,7 +2098,6 @@
                                 3,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 3,
                                 34
@@ -2249,7 +2114,6 @@
                                 4,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 4,
                                 50
@@ -2266,7 +2130,6 @@
                                 5,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 5,
                                 66
@@ -2283,7 +2146,6 @@
                                 6,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 6,
                                 78
@@ -2300,7 +2162,6 @@
                                 7,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 7,
                                 50
@@ -2317,7 +2178,6 @@
                                 8,
                                 1
                             ],
-                            "filepath": "import.js",
                             "end": [
                                 8,
                                 19
@@ -2334,7 +2194,7 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "07c7bdcbe8b8df8ca4b6a73abb42e8180e7c99b1",
+    "sha1": "2aefc12e72888e28a1b4fbc7129a1446eb798bc9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a38a53d0bc89ceb5a135e55a161b8f18004b3a09"
+    "sha2": "baeaa709caa4158226fe70b8121ab16a18b17da7"
 }]

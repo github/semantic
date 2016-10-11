@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "subscript-access-variable.js",
                             "end": [
                                 1,
                                 16
@@ -27,9 +26,9 @@
     "filePaths": [
         "subscript-access-variable.js"
     ],
-    "sha1": "559c6157818131001576dffc43aefab616ea53e2",
+    "sha1": "df2335a693daaeb905d9cefae31682611df78425",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3a31bb316fc3f7cd51d7983e18e618397842d2c0"
+    "sha2": "52bab682e3cf604bcd61e8caaa224d7ef8a86e68"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-variable-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "subscript-access-variable.js",
                             "end": [
                                 1,
                                 21
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "subscript-access-variable.js",
                             "end": [
                                 2,
                                 16
@@ -77,9 +74,9 @@
     "filePaths": [
         "subscript-access-variable.js"
     ],
-    "sha1": "3a31bb316fc3f7cd51d7983e18e618397842d2c0",
+    "sha1": "52bab682e3cf604bcd61e8caaa224d7ef8a86e68",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b0b94cd0accf04b33000d705358c25fae4b51f86"
+    "sha2": "01e3f51dfa5b83ed2f37105cc7360e3eca5316a6"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-variable-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     3
                                 ],
-                                "filepath": "subscript-access-variable.js",
                                 "end": [
                                     1,
                                     20
@@ -105,7 +101,6 @@
                                     1,
                                     3
                                 ],
-                                "filepath": "subscript-access-variable.js",
                                 "end": [
                                     1,
                                     15
@@ -123,9 +118,9 @@
     "filePaths": [
         "subscript-access-variable.js"
     ],
-    "sha1": "b0b94cd0accf04b33000d705358c25fae4b51f86",
+    "sha1": "01e3f51dfa5b83ed2f37105cc7360e3eca5316a6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d0f79c7b167b25e0557023dee05e6f08ac374e0e"
+    "sha2": "38aec4dba28e276cc9993f4e333b8f3a5083ccdc"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-variable-replacement-test",
@@ -140,7 +135,6 @@
                                     1,
                                     3
                                 ],
-                                "filepath": "subscript-access-variable.js",
                                 "end": [
                                     1,
                                     15
@@ -151,7 +145,6 @@
                                     1,
                                     3
                                 ],
-                                "filepath": "subscript-access-variable.js",
                                 "end": [
                                     1,
                                     20
@@ -169,9 +162,9 @@
     "filePaths": [
         "subscript-access-variable.js"
     ],
-    "sha1": "d0f79c7b167b25e0557023dee05e6f08ac374e0e",
+    "sha1": "38aec4dba28e276cc9993f4e333b8f3a5083ccdc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "db72df41f5251046b5b2545e98241a07955d19f4"
+    "sha2": "8117127e7003788daf170172249a9e3aa7017d65"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-variable-delete-replacement-test",
@@ -185,7 +178,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "subscript-access-variable.js",
                             "end": [
                                 1,
                                 21
@@ -202,7 +194,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "subscript-access-variable.js",
                             "end": [
                                 2,
                                 16
@@ -219,7 +210,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "subscript-access-variable.js",
                             "end": [
                                 2,
                                 21
@@ -236,9 +226,9 @@
     "filePaths": [
         "subscript-access-variable.js"
     ],
-    "sha1": "db72df41f5251046b5b2545e98241a07955d19f4",
+    "sha1": "8117127e7003788daf170172249a9e3aa7017d65",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c3c3710593bed5c01e614163d6529293655fab16"
+    "sha2": "797904d3a94beb332c011c660c738e2715d89065"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-variable-delete-test",
@@ -252,7 +242,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "subscript-access-variable.js",
                             "end": [
                                 1,
                                 16
@@ -269,9 +258,9 @@
     "filePaths": [
         "subscript-access-variable.js"
     ],
-    "sha1": "c3c3710593bed5c01e614163d6529293655fab16",
+    "sha1": "797904d3a94beb332c011c660c738e2715d89065",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9fd084881a40e1487bae956f71c0ce8f5a56aef5"
+    "sha2": "f20978a2f5d640425cabb0269559ffc12d458b10"
 }
 ,{
     "testCaseDescription": "javascript-subscript-access-variable-delete-rest-test",
@@ -285,7 +274,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "subscript-access-variable.js",
                             "end": [
                                 1,
                                 21
@@ -302,7 +290,7 @@
     "filePaths": [
         "subscript-access-variable.js"
     ],
-    "sha1": "9fd084881a40e1487bae956f71c0ce8f5a56aef5",
+    "sha1": "f20978a2f5d640425cabb0269559ffc12d458b10",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "83b00b36c23202837381eadc552ae978ef57f0f5"
+    "sha2": "0bc2b022a5e932ce5bf00c8ebc18b4facc9c1920"
 }]

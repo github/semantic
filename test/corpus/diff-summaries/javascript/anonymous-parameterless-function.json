@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "anonymous-parameterless-function.js",
                             "end": [
                                 1,
                                 28
@@ -27,9 +26,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "9cc9092ea7c2d10872eda86185bbb47582e25811",
+    "sha1": "22b6b91906964ec80192f4d30f12125b99e1cad4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "197672a97e83d4934bfbd64977acbeeeb3029f4d"
+    "sha2": "e41f44ca896e7de4bffa968df9bbf1b1caea1e04"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "anonymous-parameterless-function.js",
                             "end": [
                                 1,
                                 31
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "anonymous-parameterless-function.js",
                             "end": [
                                 2,
                                 28
@@ -77,9 +74,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "197672a97e83d4934bfbd64977acbeeeb3029f4d",
+    "sha1": "e41f44ca896e7de4bffa968df9bbf1b1caea1e04",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e9d899eb8a32fef19e6527564fdeaa799d7861d3"
+    "sha2": "213068fb89e1381ab15b652ee2f6e16994a6ac16"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     21
                                 ],
-                                "filepath": "anonymous-parameterless-function.js",
                                 "end": [
                                     1,
                                     28
@@ -105,7 +101,6 @@
                                     1,
                                     21
                                 ],
-                                "filepath": "anonymous-parameterless-function.js",
                                 "end": [
                                     1,
                                     25
@@ -123,9 +118,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "e9d899eb8a32fef19e6527564fdeaa799d7861d3",
+    "sha1": "213068fb89e1381ab15b652ee2f6e16994a6ac16",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "375ca89d8b6c78f6e58c13caecc05f6e6fb5c086"
+    "sha2": "e32940ed8b6044088622ac48c96708bac78d9fe2"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-replacement-test",
@@ -140,7 +135,6 @@
                                     1,
                                     21
                                 ],
-                                "filepath": "anonymous-parameterless-function.js",
                                 "end": [
                                     1,
                                     25
@@ -151,7 +145,6 @@
                                     1,
                                     21
                                 ],
-                                "filepath": "anonymous-parameterless-function.js",
                                 "end": [
                                     1,
                                     28
@@ -169,9 +162,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "375ca89d8b6c78f6e58c13caecc05f6e6fb5c086",
+    "sha1": "e32940ed8b6044088622ac48c96708bac78d9fe2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9a74f1d5b3a08c8a13477626bb5e14624a215266"
+    "sha2": "7ff2f9753b8b8a5c06187ba407bddb72742d4d2b"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-replacement-test",
@@ -185,7 +178,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "anonymous-parameterless-function.js",
                             "end": [
                                 1,
                                 31
@@ -202,7 +194,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "anonymous-parameterless-function.js",
                             "end": [
                                 2,
                                 28
@@ -219,7 +210,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "anonymous-parameterless-function.js",
                             "end": [
                                 2,
                                 31
@@ -236,9 +226,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "9a74f1d5b3a08c8a13477626bb5e14624a215266",
+    "sha1": "7ff2f9753b8b8a5c06187ba407bddb72742d4d2b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "03aa91ccd77862d7a2000366fd907e8a48534fce"
+    "sha2": "7aff9964814159468da7f26875cf415b3558eee4"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-test",
@@ -252,7 +242,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "anonymous-parameterless-function.js",
                             "end": [
                                 1,
                                 28
@@ -269,9 +258,9 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "03aa91ccd77862d7a2000366fd907e8a48534fce",
+    "sha1": "7aff9964814159468da7f26875cf415b3558eee4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2c667f3b75540474988bd1e2a9268d622de8b12b"
+    "sha2": "68beb683ce57c3149995ad763f201f4a6836ce2b"
 }
 ,{
     "testCaseDescription": "javascript-anonymous-parameterless-function-delete-rest-test",
@@ -285,7 +274,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "anonymous-parameterless-function.js",
                             "end": [
                                 1,
                                 31
@@ -302,7 +290,7 @@
     "filePaths": [
         "anonymous-parameterless-function.js"
     ],
-    "sha1": "2c667f3b75540474988bd1e2a9268d622de8b12b",
+    "sha1": "68beb683ce57c3149995ad763f201f4a6836ce2b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f9fa9489012e03e0ba9e457e290b45d3876c02e6"
+    "sha2": "b0658b075e567097a50079f320b747eb442b7fe6"
 }]

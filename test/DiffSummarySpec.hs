@@ -23,7 +23,7 @@ import Test.Hspec.QuickCheck
 import Data.These
 
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
-sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan "" (SourcePos s1 e1) (SourcePos s2 e2)
+sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
 
 arrayInfo :: Record '[Category, Range, SourceSpan]
 arrayInfo = ArrayLiteral .: Range 0 3 .: sourceSpanBetween (1, 1) (1, 5) .: RNil

@@ -10,7 +10,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "do-while-statement.js",
                             "end": [
                                 1,
                                 42
@@ -27,9 +26,9 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "1dfeac8c9e51379d4ffcbc1b381c7a6b88ce13bf",
+    "sha1": "3dadf24ea6dd60cf63f2599d16951764a34aea81",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "bd4c404c2241fa600f63d20dd599545f7c31b45f"
+    "sha2": "5ac1a1a4fe9eda5e5fd161253a6d91501f1b3ce1"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-replacement-insert-test",
@@ -43,7 +42,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "do-while-statement.js",
                             "end": [
                                 1,
                                 48
@@ -60,7 +58,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "do-while-statement.js",
                             "end": [
                                 2,
                                 42
@@ -77,9 +74,9 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "bd4c404c2241fa600f63d20dd599545f7c31b45f",
+    "sha1": "5ac1a1a4fe9eda5e5fd161253a6d91501f1b3ce1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d47acaaff3e391d7973dfed79c545312a92b1201"
+    "sha2": "ba86b912e5954ec48b6e49bca4c6bf3f24debf71"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-delete-insert-test",
@@ -94,7 +91,6 @@
                                     1,
                                     18
                                 ],
-                                "filepath": "do-while-statement.js",
                                 "end": [
                                     1,
                                     29
@@ -105,7 +101,6 @@
                                     1,
                                     18
                                 ],
-                                "filepath": "do-while-statement.js",
                                 "end": [
                                     1,
                                     24
@@ -124,7 +119,6 @@
                                     1,
                                     41
                                 ],
-                                "filepath": "do-while-statement.js",
                                 "end": [
                                     1,
                                     46
@@ -135,7 +129,6 @@
                                     1,
                                     36
                                 ],
-                                "filepath": "do-while-statement.js",
                                 "end": [
                                     1,
                                     40
@@ -153,9 +146,9 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "d47acaaff3e391d7973dfed79c545312a92b1201",
+    "sha1": "ba86b912e5954ec48b6e49bca4c6bf3f24debf71",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1472e9658b3468f31af838a42dbc4fca21e588d7"
+    "sha2": "224a8c099bc7a1282813dd3f2d4ed7d8c87a3f0f"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-replacement-test",
@@ -170,7 +163,6 @@
                                     1,
                                     18
                                 ],
-                                "filepath": "do-while-statement.js",
                                 "end": [
                                     1,
                                     24
@@ -181,7 +173,6 @@
                                     1,
                                     18
                                 ],
-                                "filepath": "do-while-statement.js",
                                 "end": [
                                     1,
                                     29
@@ -200,7 +191,6 @@
                                     1,
                                     36
                                 ],
-                                "filepath": "do-while-statement.js",
                                 "end": [
                                     1,
                                     40
@@ -211,7 +201,6 @@
                                     1,
                                     41
                                 ],
-                                "filepath": "do-while-statement.js",
                                 "end": [
                                     1,
                                     46
@@ -229,9 +218,9 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "1472e9658b3468f31af838a42dbc4fca21e588d7",
+    "sha1": "224a8c099bc7a1282813dd3f2d4ed7d8c87a3f0f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7a91cddb5ade8ebac85bd9a9e45a22b1f8e17f0e"
+    "sha2": "1363c42479d68b43b946500050acea6a3ec19511"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-delete-replacement-test",
@@ -245,7 +234,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "do-while-statement.js",
                             "end": [
                                 1,
                                 48
@@ -262,7 +250,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "do-while-statement.js",
                             "end": [
                                 2,
                                 42
@@ -279,7 +266,6 @@
                                 2,
                                 1
                             ],
-                            "filepath": "do-while-statement.js",
                             "end": [
                                 2,
                                 48
@@ -296,9 +282,9 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "7a91cddb5ade8ebac85bd9a9e45a22b1f8e17f0e",
+    "sha1": "1363c42479d68b43b946500050acea6a3ec19511",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "57869194a0812835d5ac9ebb903d3b15f6da4265"
+    "sha2": "feb5169e88f28961b09f7527b8af6819931f39f3"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-delete-test",
@@ -312,7 +298,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "do-while-statement.js",
                             "end": [
                                 1,
                                 42
@@ -329,9 +314,9 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "57869194a0812835d5ac9ebb903d3b15f6da4265",
+    "sha1": "feb5169e88f28961b09f7527b8af6819931f39f3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6432a7bc0783629c3afe32c6b61b577d1bb77aea"
+    "sha2": "e6b31e8c000b83aef153563e940ba6753a81aa13"
 }
 ,{
     "testCaseDescription": "javascript-do-while-statement-delete-rest-test",
@@ -345,7 +330,6 @@
                                 1,
                                 1
                             ],
-                            "filepath": "do-while-statement.js",
                             "end": [
                                 1,
                                 48
@@ -362,7 +346,7 @@
     "filePaths": [
         "do-while-statement.js"
     ],
-    "sha1": "6432a7bc0783629c3afe32c6b61b577d1bb77aea",
+    "sha1": "e6b31e8c000b83aef153563e940ba6753a81aa13",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4b2b35f5d9900e04b167abcf83c279790a555fa4"
+    "sha2": "a61175fe3edb3376731a61e36fbe795857288cb2"
 }]
