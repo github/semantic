@@ -50,6 +50,8 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Method{} -> Identifiable
           S.Leaf{} -> Identifiable
           S.DoWhile{} -> Identifiable
+          S.Import{} -> Identifiable
+          S.Export{} -> Identifiable
           _ -> Unidentifiable
 
 data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
@@ -138,13 +140,16 @@ determiner (BranchInfo bs _ _) = determiner (last bs)
 determiner _ = "the"
 
 toLeafInfos :: DiffInfo -> [JSONSummary Doc SourceSpan]
-toLeafInfos (LeafInfo "number" termName sourceSpan) = pure $ JSONSummary (squotes $ toDoc termName) sourceSpan
-toLeafInfos (LeafInfo "boolean" termName sourceSpan) = pure $ JSONSummary (squotes $ toDoc termName) sourceSpan
-toLeafInfos (LeafInfo "anonymous function" termName sourceSpan) = pure $ JSONSummary (toDoc termName) sourceSpan
-toLeafInfos (LeafInfo cName@"string" termName sourceSpan) = pure $ JSONSummary (toDoc termName <+> toDoc cName) sourceSpan
-toLeafInfos LeafInfo{..} = pure $ JSONSummary (squotes (toDoc termName) <+> toDoc categoryName) sourceSpan
-toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
 toLeafInfos err@ErrorInfo{..} = pure $ ErrorSummary (pretty err) errorSpan
+toLeafInfos BranchInfo{..} = branches >>= toLeafInfos
+toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
+  (LeafInfo "number" termName _) -> squotes $ toDoc termName
+  (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
+  (LeafInfo "anonymous function" termName _) -> toDoc termName
+  (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
+  (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
+  LeafInfo{..} -> squotes (toDoc termName) <+> toDoc categoryName
+  node -> panic $ "Expected a leaf info but got a: " <> show node
 
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> Text
@@ -199,6 +204,10 @@ toTermName source term = case unwrap term of
   S.Comment a -> toCategoryName a
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
+  S.Import identifier _ -> toTermName' identifier
+  S.Export Nothing expr -> intercalate ", " $ termNameFromSource <$> expr
+  S.Export (Just identifier) [] -> toTermName' identifier
+  S.Export (Just identifier) expr -> (intercalate ", " $ termNameFromSource <$> expr) <> " from " <> toTermName' identifier
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -209,8 +218,6 @@ toTermName source term = case unwrap term of
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
                           Unidentifiable _ -> "…"
-
-
 
 parentContexts :: [Either (Category, Text) (Category, Text)] -> Doc
 parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> contexts
@@ -317,6 +324,8 @@ instance HasCategory Category where
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
     C.Module -> "module statement"
+    C.Import -> "import statement"
+    C.Export -> "export statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract
