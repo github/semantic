@@ -8,7 +8,6 @@ import Data.Functor.Both
 import Data.RandomWalkSimilarity as RWS
 import Data.Record
 import Data.These
-import qualified Data.Vector as Vector
 import Diff
 import Info
 import Patch

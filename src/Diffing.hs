@@ -5,13 +5,11 @@ import Prologue hiding (fst, snd)
 import Category
 import qualified Data.ByteString.Char8 as B1
 import Data.Functor.Both
-import Data.RandomWalkSimilarity
 import Data.Record
 import qualified Data.Text.IO as TextIO
 import qualified Data.Text.ICU.Detect as Detect
 import qualified Data.Text.ICU.Convert as Convert
 import Data.These
-import qualified Data.Vector as Vector
 import Diff
 import Info
 import Interpreter
