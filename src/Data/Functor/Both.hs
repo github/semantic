@@ -1,3 +1,4 @@
+{-# LANGUAGE StrictData #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Data.Functor.Both (Both,both, runBothWith, fst, snd, module X) where
 

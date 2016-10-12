@@ -1,3 +1,4 @@
+{-# LANGUAGE StrictData #-}
 module Arguments (Arguments(..), CmdLineOptions(..), DiffMode(..), ExtraArg(..), programArguments, args) where
 
 import Data.Functor.Both

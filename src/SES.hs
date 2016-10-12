@@ -1,3 +1,4 @@
+{-# LANGUAGE Strict #-}
 module SES where
 
 import qualified Data.Map as Map

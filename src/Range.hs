@@ -1,3 +1,4 @@
+{-# LANGUAGE StrictData #-}
 module Range where
 
 import qualified Data.Char as Char

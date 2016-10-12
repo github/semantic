@@ -1,3 +1,4 @@
+{-# LANGUAGE StrictData #-}
 module Patch
 ( Patch(..)
 , replacing

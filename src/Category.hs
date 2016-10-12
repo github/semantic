@@ -1,3 +1,4 @@
+{-# LANGUAGE StrictData #-}
 module Category where
 
 import Prologue

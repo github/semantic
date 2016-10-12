@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds, StrictData #-}
 module Language where
 
 import Data.Record

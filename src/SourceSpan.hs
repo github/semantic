@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveAnyClass, StrictData #-}
 -- |
 -- Source position and span information
 -- Mostly taken from purescript's SourcePos definition.
@@ -19,11 +19,11 @@ data SourcePos = SourcePos
   { -- |
     -- Line number
     --
-    line :: !Int
+    line :: Int
     -- |
     -- Column number
     --
-  , column :: !Int
+  , column :: Int
   } deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
 displaySourcePos :: SourcePos -> Text
@@ -43,10 +43,10 @@ data SourceSpan = SourceSpan
   { -- |
     -- Start of the span
     --
-   spanStart :: !SourcePos
+   spanStart :: SourcePos
     -- End of the span
     --
-  , spanEnd :: !SourcePos
+  , spanEnd :: SourcePos
   } deriving (Show, Read, Eq, Ord, Generic, Hashable)
 
 displayStartEndPos :: SourceSpan -> Text

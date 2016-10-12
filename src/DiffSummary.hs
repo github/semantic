@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables, DeriveAnyClass #-}
+{-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables, DeriveAnyClass, StrictData #-}
 
 module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo, isErrorSummary, JSONSummary(..)) where
 

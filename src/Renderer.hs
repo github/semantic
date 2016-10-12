@@ -1,3 +1,4 @@
+{-# LANGUAGE StrictData #-}
 module Renderer (Renderer, DiffArguments(..), Output(..), concatOutputs, toSummaryKey, Format(..)) where
 
 import Data.Aeson (Value, toEncoding)
