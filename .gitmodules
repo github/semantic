@@ -19,3 +19,6 @@
 [submodule "test/corpus/repos/javascript"]
 	path = test/corpus/repos/javascript
 	url = https://github.com/rewinfrey/javascript
+[submodule "vendor/hspec-expectations-pretty-diff"]
+	path = vendor/hspec-expectations-pretty-diff
+	url = https://github.com/rewinfrey/hspec-expectations-pretty-diff
