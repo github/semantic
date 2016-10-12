@@ -3,10 +3,11 @@ module Language.JavaScript where
 
 import Data.Record
 import Info
-import Prologue
+import Prologue hiding (head)
 import Source
 import qualified Syntax as S
 import Term
+import Data.List (head)
 
 operators :: [Text]
 operators = [ "op", "bool_op", "math_op", "delete_op", "type_op", "void_op", "rel_op", "bitwise_op" ]
@@ -159,7 +160,12 @@ toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) 
 toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl child
 
 toElseIf :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
-toElseIf child = cofree $ setCategory (extract child) If :< S.If child child []
+toElseIf child = case unwrap child of
+  S.If expr thenClause [] -> cofree $ setCategory (extract child) If :< S.If expr thenClause []
+  S.If expr thenClause elseClause -> case unwrap . head $ elseClause of
+                                       S.If{} -> cofree $ setCategory (extract child) If :< S.If expr thenClause (toElseIf <$> elseClause)
+                                       _ -> cofree $ setCategory (extract child) If :< S.If expr thenClause []
+  _ -> cofree $ setCategory (extract child) If :< S.If child child []
 
 toTuple :: Term (S.Syntax Text) (Record fields) -> [Term (S.Syntax Text) (Record fields)]
 toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
