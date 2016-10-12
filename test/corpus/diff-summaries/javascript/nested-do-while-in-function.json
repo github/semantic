@@ -175,9 +175,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "325e137487dbe6b99e8736817eaf2d7b25572dc8",
+    "sha1": "90c40d6b9d264c5ccacb7f69012bd0579bfe2467",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5cc80139b82de7b04677ae393b72bfb45d5c2a15"
+    "sha2": "c3ac63e01f7de31b9164d7fa0eeb4602e7f6f1d3"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-insert-test",
@@ -521,9 +521,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "5cc80139b82de7b04677ae393b72bfb45d5c2a15",
+    "sha1": "c3ac63e01f7de31b9164d7fa0eeb4602e7f6f1d3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4a8a60bc1bf98a633b4c92368a075c7990b983d7"
+    "sha2": "971363f4200f3624e6501f6f0fdeb9dc50f166a7"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-insert-test",
@@ -1060,18 +1060,57 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                37
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    25
+                                ],
+                                "end": [
+                                    6,
+                                    33
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    25
+                                ],
+                                "end": [
+                                    7,
+                                    30
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the name1 export statement"
+                    "summary": "Replaced the 'newName1' identifier with the 'name1' identifier in the name1 function"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    6,
+                                    36
+                                ],
+                                "end": [
+                                    6,
+                                    38
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    33
+                                ],
+                                "end": [
+                                    7,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '{}' expression statements with the '{ }' expression statements in the name1 function"
                 },
                 {
                     "span": {
@@ -1132,21 +1171,6 @@
                         }
                     },
                     "summary": "Added the import1 as name1, import2 as name2, nameN from 'bar' export statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                39
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the newName1 export statement"
                 },
                 {
                     "span": {
@@ -1230,9 +1254,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "4a8a60bc1bf98a633b4c92368a075c7990b983d7",
+    "sha1": "971363f4200f3624e6501f6f0fdeb9dc50f166a7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4ffb72f4091bf1dec741647f5d9e804f0565eea6"
+    "sha2": "6852e31635573f80077c4099ddfc8e9c9e492b1e"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-test",
@@ -1654,9 +1678,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "4ffb72f4091bf1dec741647f5d9e804f0565eea6",
+    "sha1": "6852e31635573f80077c4099ddfc8e9c9e492b1e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "57d6396d5040e085e1fd7693bc553a64ca4f9820"
+    "sha2": "f4b385dd047f80ff108460681b819cfa7ac74fd6"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-replacement-test",
@@ -2165,9 +2189,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "57d6396d5040e085e1fd7693bc553a64ca4f9820",
+    "sha1": "f4b385dd047f80ff108460681b819cfa7ac74fd6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "228b95ad00efa68297972f82297fa541da06bcef"
+    "sha2": "8e1d1776a385d2f8aed58cec173dc19337fa3acb"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-test",
@@ -2346,9 +2370,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "228b95ad00efa68297972f82297fa541da06bcef",
+    "sha1": "8e1d1776a385d2f8aed58cec173dc19337fa3acb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "dd4e4ff10f7dda7b7bc1852747ca61eac91d9de7"
+    "sha2": "874a664f50d4f2bed77efe31df4121efbcb7e9c8"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-rest-test",
@@ -2527,7 +2551,7 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "dd4e4ff10f7dda7b7bc1852747ca61eac91d9de7",
+    "sha1": "874a664f50d4f2bed77efe31df4121efbcb7e9c8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "dce5b472e5bcc43861e65b412644c7931f12d313"
+    "sha2": "3483bf17f1fdb86e4b583fba80d44d9d11f682fd"
 }]

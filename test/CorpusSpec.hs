@@ -7,7 +7,6 @@ import Data.Functor.Both
 import Data.List (union)
 import Data.Record
 import qualified Data.Text as T
-import qualified Data.Vector as Vector
 import Diffing
 import GHC.Show (Show(..))
 import Info
