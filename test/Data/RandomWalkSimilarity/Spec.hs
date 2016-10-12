@@ -11,6 +11,7 @@ import Patch
 import Prologue
 import Syntax
 import Term
+import Diffing
 import Term.Arbitrary
 import Test.Hspec
 import Test.Hspec.QuickCheck
@@ -36,12 +37,12 @@ spec = parallel $ do
       \ (as, bs) -> let tas = toTerm' <$> (as :: [ArbitraryTerm Text (Record '[Category])])
                         tbs = toTerm' <$> (bs :: [ArbitraryTerm Text (Record '[Category])])
                         root = cofree . ((Program .: RNil) :<) . Indexed
-                        diff = wrap (pure (Program .: RNil) :< Indexed (stripDiff <$> rws compare tas tbs)) in
+                        diff = wrap (pure (Program .: RNil) :< Indexed (stripDiff <$> rws compare getLabel tas tbs)) in
         (beforeTerm diff, afterTerm diff) `shouldBe` (Just (root (stripTerm <$> tas)), Just (root (stripTerm <$> tbs)))
 
     it "produces unbiased insertions within branches" $
       let (a, b) = (decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf ("a" :: Text)) ])), decorate (cofree ((StringLiteral .: RNil) :< Indexed [ cofree ((StringLiteral .: RNil) :< Leaf "b") ]))) in
-      fmap stripDiff (rws compare [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, copying b ]
+      fmap stripDiff (rws compare getLabel [ b ] [ a, b ]) `shouldBe` fmap stripDiff [ inserting a, copying b ]
 
   where compare :: (HasField fields Category, Functor f, Eq (Cofree f Category)) => Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))
         compare a b | (category <$> a) == (category <$> b) = Just (copying b)

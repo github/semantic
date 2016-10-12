@@ -43,6 +43,10 @@ replacementSummary = DiffSummary { patch = Replace (LeafInfo "string" "a" $ sour
 blobs :: Both SourceBlob
 blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))
 
+getLabel (h :< t) = (category h, case t of
+  Leaf s -> Just s
+  _ -> Nothing)
+
 spec :: Spec
 spec = parallel $ do
   describe "diffSummaries" $ do
@@ -51,7 +55,7 @@ spec = parallel $ do
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = defaultFeatureVectorDecorator (category . headF) (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range, SourceSpan]))) in
-        diffSummaries blobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
+        diffSummaries blobs (diffTerms wrap (==) diffCost getLabel term term) `shouldBe` []
 
   describe "DiffInfo" $ do
     prop "patches in summaries match the patches in diffs" $

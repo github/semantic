@@ -61,9 +61,10 @@ diffFiles parser renderer sourceBlobs = do
         getCost diff = case runFree diff of
           Free (info :< _) -> cost <$> info
           Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
-        getLabel (h :< t) = (category h, case t of
-          Leaf s -> Just s
-          _ -> Nothing)
+
+getLabel (h :< t) = (category h, case t of
+  Leaf s -> Just s
+  _ -> Nothing)
 
 -- | Return a parser based on the file extension (including the ".").
 parserForType :: Text -> Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
