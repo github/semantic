@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveAnyClass, StrictData #-}
+{-# OPTIONS_GHC -funbox-strict-fields #-}
 -- |
 -- Source position and span information
 -- Mostly taken from purescript's SourcePos definition.

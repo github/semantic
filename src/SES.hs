@@ -46,7 +46,6 @@ diffAt diffTerms cost (i, j) as bs
     best = minimumBy (comparing costOf)
     recur = diffAt diffTerms cost
 
-
 -- | Prepend an edit script and the cumulative cost onto the edit script.
 consWithCost :: Cost edit -> edit -> [(edit, Int)] -> [(edit, Int)]
 consWithCost cost edit rest = (edit, cost edit + maybe 0 snd (fst <$> uncons rest)) : rest

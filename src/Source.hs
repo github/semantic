@@ -1,4 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, StrictData #-}
+{-# OPTIONS_GHC -funbox-strict-fields #-}
 module Source where
 
 import Prologue hiding (uncons)
