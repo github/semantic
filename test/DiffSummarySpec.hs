@@ -21,6 +21,7 @@ import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.QuickCheck
 import Data.These
+import Diffing (getLabel)
 
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
 sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
@@ -42,10 +43,6 @@ replacementSummary = DiffSummary { patch = Replace (LeafInfo "string" "a" $ sour
 
 blobs :: Both SourceBlob
 blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))
-
-getLabel (h :< t) = (category h, case t of
-  Leaf s -> Just s
-  _ -> Nothing)
 
 spec :: Spec
 spec = parallel $ do
