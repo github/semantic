@@ -58,7 +58,7 @@ data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
  | ErrorInfo { errorSpan :: SourceSpan, termName :: Text }
  deriving (Eq, Show)
 
-data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
+data Branch = BIndexed | BFixed | BCommented | BIf deriving (Show, Eq, Generic)
 
 data DiffSummary a = DiffSummary {
   patch :: Patch a,
@@ -173,7 +173,9 @@ toTermName source term = case unwrap term of
   S.Pair a _ -> toTermName' a <> ": …"
   S.Return expr -> maybe "empty" toTermName' expr
   S.Error _ _ -> termNameFromSource term
-  S.If expr _ _ -> termNameFromSource expr
+--  S.If expr _ _ -> termNameFromSource expr
+  S.If expr _ Nothing -> termNameFromSource expr
+  S.If expr _ (Just expr') -> termNameFromSource expr
   S.For clauses _ -> termNameFromChildren term clauses
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
@@ -221,6 +223,7 @@ termToDiffInfo blob term = case unwrap term of
   S.AnonymousFunction _ _ -> LeafInfo "anonymous function" (toTermName' term)
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
   S.Error sourceSpan _ -> ErrorInfo sourceSpan (toTermName' term)
+  -- S.If expr _ (Just expr') -> BranchInfo [(termToDiffInfo' expr), (termToDiffInfo' expr')] (toCategoryName term) BIf
   _ -> LeafInfo (toCategoryName term) (toTermName' term)
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob
