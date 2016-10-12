@@ -159,12 +159,19 @@ categoryForJavaScriptProductionName name = case name of
 toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
 toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl child
 
+-- | Convert a If Term to If Syntax. This handles nested else-if clauses recursively,
+-- | and satisfies arbitrarily long else-if clauses.
 toElseIf :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
 toElseIf child = case unwrap child of
+  -- Base case, this stops the recursive toElseIf calls.
   S.If expr thenClause [] -> cofree $ setCategory (extract child) If :< S.If expr thenClause []
+  -- For each If term, determine if the else clause contains another If term.
+  -- For each nested If term, recursively construct If Syntaxes until the else clause
+  -- is empty, or the else clause is not a nested If term.
   S.If expr thenClause elseClause -> case unwrap . head $ elseClause of
                                        S.If{} -> cofree $ setCategory (extract child) If :< S.If expr thenClause (toElseIf <$> elseClause)
                                        _ -> cofree $ setCategory (extract child) If :< S.If expr thenClause []
+  -- This is bottom, to satisfy exhuastive pattern matching.
   _ -> cofree $ setCategory (extract child) If :< S.If child child []
 
 toTuple :: Term (S.Syntax Text) (Record fields) -> [Term (S.Syntax Text) (Record fields)]
