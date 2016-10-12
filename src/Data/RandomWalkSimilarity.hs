@@ -11,6 +11,7 @@ module Data.RandomWalkSimilarity
 , stripDiff
 , stripTerm
 , Gram(..)
+, Label
 ) where
 
 import Control.Applicative
@@ -34,23 +35,26 @@ import Data.Align.Generic
 import Data.These
 import Diff
 
+type Label f fields label = forall b. TermF f (Record fields) b -> label
+
 -- | Given a function comparing two terms recursively,
 -- a function to compute a Hashable label from an unpacked term, and two lists of terms,
 -- compute the diff of a pair of lists of terms using a random walk similarity metric,
 -- which completes in log-linear time.
 --
 -- This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: forall f fields.
+rws :: forall f fields label.
     (GAlign f,
      Traversable f,
      Eq (f (Term f Category)),
-     HasField fields Category,
-     HasField fields (Vector.Vector Double))
+     Hashable label,
+     HasField fields Category)
     => (Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))) -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
+    -> Label f fields label
     -> [Term f (Record fields)] -- ^ The list of old terms.
     -> [Term f (Record fields)] -- ^ The list of new terms.
     -> [Diff f (Record fields)] -- ^ The resulting list of similarity-matched diffs.
-rws compare as bs
+rws compare getLabel as bs
   | null as, null bs = []
   | null as = inserting <$> bs
   | null bs = deleting <$> as
@@ -163,7 +167,8 @@ rws compare as bs
     kdas = KdTree.build (Vector.toList . feature) featurizedAs
     kdbs = KdTree.build (Vector.toList . feature) featurizedBs
 
-    featurize index term = UnmappedTerm index (getField (extract term)) term
+    featurize :: Int -> Term f (Record fields) -> UnmappedTerm f fields
+    featurize index term = UnmappedTerm index (getField . extract $ defaultFeatureVectorDecorator getLabel term) term
 
     toMap = IntMap.fromList . fmap (termIndex &&& identity)
 

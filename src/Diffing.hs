@@ -43,18 +43,18 @@ import Data.Aeson.Encoding (encodingToLazyByteString)
 -- | with respect to other IO actions.
 diffFiles :: (HasField fields Category, HasField fields Cost)
           => Parser (Syntax Text) (Record fields)
-          -> Renderer (Record (Vector.Vector Double ': fields))
+          -> Renderer (Record fields)
           -> Both SourceBlob
           -> IO Output
 diffFiles parser renderer sourceBlobs = do
-  terms <- traverse (fmap (defaultFeatureVectorDecorator getLabel) . parser) sourceBlobs
+  terms <- traverse parser sourceBlobs
 
   let areNullOids = runBothWith (\a b -> (oid a == nullOid || null (source a), oid b == nullOid || null (source b))) sourceBlobs
   let textDiff = case areNullOids of
         (True, False) -> pure $ Insert (snd terms)
         (False, True) -> pure $ Delete (fst terms)
         (_, _) ->
-          runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts) terms
+          runBothWith (diffTerms construct compareCategoryEq diffCostWithCachedTermCosts getLabel) terms
 
   pure $! renderer sourceBlobs textDiff
 
