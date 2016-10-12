@@ -11,12 +11,57 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                25
+                                2,
+                                1
                             ]
                         }
                     },
                     "summary": "Added the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                31
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                46
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'e' if statement"
                 }
             ]
         },
@@ -25,9 +70,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "177b3db7ca070dc750876553a0cd7fde8b5df54c",
+    "sha1": "ce33777b1fadcab50214296b9a9207ef9d901987",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fd499e58d749df1da475f0d6033825f265734210"
+    "sha2": "840236a7547f74664f3418e52d71af8012b24460"
 }
 ,{
     "testCaseDescription": "javascript-if-else-replacement-insert-test",
@@ -42,8 +87,83 @@
                                 1
                             ],
                             "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'g' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
                                 1,
-                                29
+                                16
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                35
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'k' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                50
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'm' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                3,
+                                1
                             ]
                         }
                     },
@@ -54,15 +174,30 @@
                         "insert": {
                             "start": [
                                 2,
-                                1
+                                31
                             ],
                             "end": [
-                                2,
-                                25
+                                3,
+                                1
                             ]
                         }
                     },
-                    "summary": "Added the 'x' if statement"
+                    "summary": "Added the 'c' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                46
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'e' if statement"
                 }
             ]
         },
@@ -71,9 +206,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "fd499e58d749df1da475f0d6033825f265734210",
+    "sha1": "840236a7547f74664f3418e52d71af8012b24460",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1f6c19a2b78ca415ac6e06f69c051ba6c23a250e"
+    "sha2": "189ebb6708f47ab75e37645b2b751199241c907c"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-insert-test",
@@ -86,26 +221,221 @@
                             {
                                 "start": [
                                     1,
-                                    1
+                                    5
                                 ],
                                 "end": [
                                     1,
-                                    29
+                                    6
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    1
+                                    5
                                 ],
                                 "end": [
                                     1,
-                                    25
+                                    6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'a' if statement with the 'x' if statement"
+                    "summary": "Replaced the 'g' identifier with the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'h' identifier with the 'y' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i' identifier with the 'a' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                23
+                            ],
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                25
+                            ],
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'j' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    39
+                                ],
+                                "end": [
+                                    1,
+                                    40
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'k' identifier with the 'c' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    43
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    38
+                                ],
+                                "end": [
+                                    1,
+                                    39
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'l' identifier with the 'd' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    54
+                                ],
+                                "end": [
+                                    1,
+                                    55
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    50
+                                ],
+                                "end": [
+                                    1,
+                                    51
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'm' identifier with the 'e' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                53
+                            ],
+                            "end": [
+                                1,
+                                54
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'f' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                59
+                            ],
+                            "end": [
+                                1,
+                                60
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'n' identifier"
                 }
             ]
         },
@@ -114,9 +444,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "1f6c19a2b78ca415ac6e06f69c051ba6c23a250e",
+    "sha1": "189ebb6708f47ab75e37645b2b751199241c907c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "946c2d3269de0a2f284a9922b8da111323729827"
+    "sha2": "9ff856699be8300fc54028028dd8984ec9dbe985"
 }
 ,{
     "testCaseDescription": "javascript-if-else-replacement-test",
@@ -129,26 +459,221 @@
                             {
                                 "start": [
                                     1,
-                                    1
+                                    5
                                 ],
                                 "end": [
                                     1,
-                                    25
+                                    6
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    1
+                                    5
                                 ],
                                 "end": [
                                     1,
-                                    29
+                                    6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' if statement with the 'a' if statement"
+                    "summary": "Replaced the 'x' identifier with the 'g' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'y' identifier with the 'h' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    20
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a' identifier with the 'i' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                25
+                            ],
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'j' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                23
+                            ],
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'b' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "end": [
+                                    1,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    39
+                                ],
+                                "end": [
+                                    1,
+                                    40
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'c' identifier with the 'k' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    38
+                                ],
+                                "end": [
+                                    1,
+                                    39
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    43
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'd' identifier with the 'l' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    50
+                                ],
+                                "end": [
+                                    1,
+                                    51
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    54
+                                ],
+                                "end": [
+                                    1,
+                                    55
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'e' identifier with the 'm' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                59
+                            ],
+                            "end": [
+                                1,
+                                60
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'n' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                53
+                            ],
+                            "end": [
+                                1,
+                                54
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'f' identifier"
                 }
             ]
         },
@@ -157,9 +682,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "946c2d3269de0a2f284a9922b8da111323729827",
+    "sha1": "9ff856699be8300fc54028028dd8984ec9dbe985",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "71792b4ff0291e41c9e3ec3157abfea9cd67daa7"
+    "sha2": "0a9be6ebc48c3d58a76a5bb95043b9c0d02307b3"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-replacement-test",
@@ -174,8 +699,83 @@
                                 1
                             ],
                             "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'g' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
                                 1,
-                                29
+                                16
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                35
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'k' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                50
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'm' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                3,
+                                1
                             ]
                         }
                     },
@@ -186,15 +786,30 @@
                         "delete": {
                             "start": [
                                 2,
-                                1
+                                31
                             ],
                             "end": [
-                                2,
-                                25
+                                3,
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' if statement"
+                    "summary": "Deleted the 'c' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                46
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'e' if statement"
                 },
                 {
                     "span": {
@@ -204,12 +819,57 @@
                                 1
                             ],
                             "end": [
-                                2,
-                                29
+                                3,
+                                1
                             ]
                         }
                     },
-                    "summary": "Added the 'a' if statement"
+                    "summary": "Added the 'g' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                16
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                35
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'k' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                50
+                            ],
+                            "end": [
+                                3,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'm' if statement"
                 }
             ]
         },
@@ -218,9 +878,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "71792b4ff0291e41c9e3ec3157abfea9cd67daa7",
+    "sha1": "0a9be6ebc48c3d58a76a5bb95043b9c0d02307b3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "95edd1d597a111bbe508c047a0f75d0342b35cea"
+    "sha2": "f6f6cc50166c8003c2d4c4b164d0bd54860ac4b1"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-test",
@@ -235,12 +895,57 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                25
+                                2,
+                                1
                             ]
                         }
                     },
                     "summary": "Deleted the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                31
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'c' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                46
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'e' if statement"
                 }
             ]
         },
@@ -249,9 +954,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "95edd1d597a111bbe508c047a0f75d0342b35cea",
+    "sha1": "f6f6cc50166c8003c2d4c4b164d0bd54860ac4b1",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "58fd81ed8b29ab258997ccdcb2a0602e64748fc8"
+    "sha2": "685c144290a73c4cc3a884b027020ece337e977e"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-rest-test",
@@ -266,12 +971,57 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                29
+                                2,
+                                1
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a' if statement"
+                    "summary": "Deleted the 'g' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                16
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                35
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'k' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                50
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'm' if statement"
                 }
             ]
         },
@@ -280,7 +1030,7 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "58fd81ed8b29ab258997ccdcb2a0602e64748fc8",
+    "sha1": "685c144290a73c4cc3a884b027020ece337e977e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "73e8a48299a8c408fadbf83077ab1e56ea81b5b0"
+    "sha2": "fff6323d021499933be7ea2e85391d2d8bb9a65a"
 }]
