@@ -20,14 +20,14 @@ catchException = handle errorHandler
   where errorHandler :: (SomeException -> IO [Text])
         errorHandler exception = return [toS . encode $ ["Crashed: " <> Prologue.show exception :: Text]]
 
-assertDiffSummary :: JSONTestCase -> Format -> (Either String (Map Text (Map Text [Text])) -> Either String (Map Text (Map Text [Text])) -> Expectation) -> Expectation
+assertDiffSummary :: JSONTestCase -> Format -> (Either String (Map Text (Map Text [Value])) -> Either String (Map Text (Map Text [Value])) -> Expectation) -> Expectation
 assertDiffSummary JSONTestCase {..} format matcher = do
   diffs <- fetchDiffs $ args gitDir sha1 sha2 filePaths format
   result <- catchException . pure . pure . concatOutputs $ diffs
   let actual = eitherDecode . DL.fromStrict . encodeUtf8 . fromJust $ listToMaybe result
   matcher actual (Right expectedResult)
 
-runTestsIn :: [FilePath] -> Format -> (Either String (Map Text (Map Text [Text])) -> Either String (Map Text (Map Text [Text])) -> Expectation) -> SpecWith ()
+runTestsIn :: [FilePath] -> Format -> (Either String (Map Text (Map Text [Value])) -> Either String (Map Text (Map Text [Value])) -> Expectation) -> SpecWith ()
 runTestsIn filePaths format matcher = do
   contents <- runIO $ traverse DL.readFile filePaths
   let filePathContents = zip filePaths contents

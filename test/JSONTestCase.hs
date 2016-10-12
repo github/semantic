@@ -24,7 +24,7 @@ data JSONTestCase = JSONTestCase { gitDir :: !String
                                  , filePaths :: ![String]
                                  , sha1 :: !String
                                  , sha2 :: !String
-                                 , expectedResult :: !(Map Text (Map Text [Text]))
+                                 , expectedResult :: !(Map Text (Map Text [Value]))
                                  } deriving (Show, Generic, FromJSON)
 
 instance ToJSON JSONTestCase where

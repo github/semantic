@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "null.js": [
-                "Added the 'null' identifier"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'null' identifier"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "a089d3a69cf2a56aa770c7f9446691ddd6edfac2",
+    "sha1": "0eb0a48a27bc6b8d01a210eea8cbccab5c6823f7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "733e761309034c88fb17a205a5f18e9871b69ae0"
+    "sha2": "921a57a0891031baea0fa0ebfc5c1270751eb7c3"
 }
 ,{
     "testCaseDescription": "javascript-null-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "null.js": [
-                "Added the 'null' return statement",
-                "Added the 'null' identifier"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'null' return statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'null' identifier"
+                }
             ]
         },
         "errors": {}
@@ -29,17 +71,45 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "733e761309034c88fb17a205a5f18e9871b69ae0",
+    "sha1": "921a57a0891031baea0fa0ebfc5c1270751eb7c3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "da1b3ff9d481281fb04e00f1d0fd09096b871ae2"
+    "sha2": "1f137a24235834a5454a98078d3abb07cbdf1063"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-insert-test",
     "expectedResult": {
         "changes": {
             "null.js": [
-                "Added the 'null' identifier",
-                "Deleted the 'null' return statement"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'null' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'null' return statement"
+                }
             ]
         },
         "errors": {}
@@ -47,17 +117,45 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "da1b3ff9d481281fb04e00f1d0fd09096b871ae2",
+    "sha1": "1f137a24235834a5454a98078d3abb07cbdf1063",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "08bfb6ab2fce2f4f85195451db434fa8944c9148"
+    "sha2": "1a76251123795db3deefceda4488e44d2eb80193"
 }
 ,{
     "testCaseDescription": "javascript-null-replacement-test",
     "expectedResult": {
         "changes": {
             "null.js": [
-                "Added the 'null' return statement",
-                "Deleted the 'null' identifier"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'null' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'null' identifier"
+                }
             ]
         },
         "errors": {}
@@ -65,18 +163,60 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "08bfb6ab2fce2f4f85195451db434fa8944c9148",
+    "sha1": "1a76251123795db3deefceda4488e44d2eb80193",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6b61c03a858b3a67fba6cf4a83ff90d1495c54f2"
+    "sha2": "a7adbf72c2079adee39b2dbcc46a29447cc5b452"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "null.js": [
-                "Deleted the 'null' return statement",
-                "Deleted the 'null' identifier",
-                "Added the 'null' return statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'null' return statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'null' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'null' return statement"
+                }
             ]
         },
         "errors": {}
@@ -84,16 +224,30 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "6b61c03a858b3a67fba6cf4a83ff90d1495c54f2",
+    "sha1": "a7adbf72c2079adee39b2dbcc46a29447cc5b452",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ac37dc48832d3f1c14c44a84525808a1aea69c42"
+    "sha2": "72144a33117dda641088c950e9ba56808c39d69d"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-test",
     "expectedResult": {
         "changes": {
             "null.js": [
-                "Deleted the 'null' identifier"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'null' identifier"
+                }
             ]
         },
         "errors": {}
@@ -101,16 +255,30 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "ac37dc48832d3f1c14c44a84525808a1aea69c42",
+    "sha1": "72144a33117dda641088c950e9ba56808c39d69d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "32134cb9c8d4e36e48b8453a331dfeb2e611746f"
+    "sha2": "7985243cb79eac510cc068710b58cff711ca4df7"
 }
 ,{
     "testCaseDescription": "javascript-null-delete-rest-test",
     "expectedResult": {
         "changes": {
             "null.js": [
-                "Deleted the 'null' return statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'null' return statement"
+                }
             ]
         },
         "errors": {}
@@ -118,7 +286,7 @@
     "filePaths": [
         "null.js"
     ],
-    "sha1": "32134cb9c8d4e36e48b8453a331dfeb2e611746f",
+    "sha1": "7985243cb79eac510cc068710b58cff711ca4df7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "baaf540faedf1f9d3d4dbb4da81b68f94cdd18f4"
+    "sha2": "0785f1ff3205013dcbd5f5ca4d172e25f57b5969"
 }]

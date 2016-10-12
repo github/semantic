@@ -9,19 +9,23 @@ import Parser
 import Prologue
 import Range
 import Source
-import SourceSpan
 import Syntax
 
-cmarkParser :: Parser (Syntax Text) (Record '[Range, Category])
-cmarkParser SourceBlob{..} = pure . toTerm (totalRange source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
-  where toTerm :: Range -> Node -> Cofree (Syntax Text) (Record '[Range, Category])
-        toTerm within (Node position t children) = let range = maybe within (sourceSpanToRange source . toSpan) position in cofree $ (range .: toCategory t .: RNil) :< case t of
+cmarkParser :: Parser (Syntax Text) (Record '[Range, Category, SourceSpan])
+cmarkParser SourceBlob{..} = pure . toTerm (totalRange source) (rangeToSourceSpan source $ totalRange source) $ commonmarkToNode [ optSourcePos, optSafe ] (toText source)
+  where toTerm :: Range -> SourceSpan -> Node -> Cofree (Syntax Text) (Record '[Range, Category, SourceSpan])
+        toTerm within withinSpan (Node position t children) =
+          let
+            range = maybe within (sourceSpanToRange source . toSpan) position
+            span = maybe withinSpan toSpan position
+          in
+            cofree $ (range .: toCategory t .: span .: RNil) :< case t of
           -- Leaves
           CODE text -> Leaf text
           TEXT text -> Leaf text
           CODE_BLOCK _ text -> Leaf text
           -- Branches
-          _ -> Indexed (toTerm range <$> children)
+          _ -> Indexed (toTerm range span <$> children)
 
         toCategory :: NodeType -> Category
         toCategory (TEXT _) = Other "text"
@@ -29,10 +33,10 @@ cmarkParser SourceBlob{..} = pure . toTerm (totalRange source) $ commonmarkToNod
         toCategory (HTML_BLOCK _) = Other "html"
         toCategory (HTML_INLINE _) = Other "html"
         toCategory (HEADING _) = Other "heading"
-        toCategory (LIST (ListAttributes{..})) = Other $ case listType of
+        toCategory (LIST ListAttributes{..}) = Other $ case listType of
           BULLET_LIST -> "unordered list"
           ORDERED_LIST -> "ordered list"
-        toCategory (LINK{}) = Other "link"
-        toCategory (IMAGE{}) = Other "image"
+        toCategory LINK{} = Other "link"
+        toCategory IMAGE{} = Other "image"
         toCategory t = Other (show t)
-        toSpan PosInfo{..} = SourceSpan "" (SourcePos (pred startLine) (pred startColumn)) (SourcePos (pred endLine) endColumn)
+        toSpan PosInfo{..} = SourceSpan (SourcePos (pred startLine) (pred startColumn)) (SourcePos (pred endLine) endColumn)

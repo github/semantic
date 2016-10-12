@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "for-in-statement.js": [
-                "Added the 'thing in things' for statement"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'thing in things' for statement"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "d595e5cb7bd31790842877e1f7c6f8aee6e2b036",
+    "sha1": "1e9729897fa1da1617386fa8da290df973dadc93",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f7a3b0774dd21933e462eef6ca1920fb17582c22"
+    "sha2": "e5d8b7d6f07410e2fa00bbec5718bbdf061166fa"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "for-in-statement.js": [
-                "Added the 'item in items' for statement",
-                "Added the 'thing in things' for statement"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'item in items' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'thing in things' for statement"
+                }
             ]
         },
         "errors": {}
@@ -29,18 +71,96 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "f7a3b0774dd21933e462eef6ca1920fb17582c22",
+    "sha1": "e5d8b7d6f07410e2fa00bbec5718bbdf061166fa",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7691d04f6704167f72f70e5013fbb9d4d150330b"
+    "sha2": "6c8ba52447c2faf8fed1eba65cd64c643003461f"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-delete-insert-test",
     "expectedResult": {
         "changes": {
             "for-in-statement.js": [
-                "Replaced the 'item' identifier with the 'thing' identifier",
-                "Replaced the 'items' identifier with the 'things' identifier",
-                "Replaced the 'item' identifier with the 'thing' identifier in the thing() function call"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'item' identifier with the 'thing' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    14
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    15
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'items' identifier with the 'things' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    23
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "end": [
+                                    1,
+                                    30
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'item' identifier with the 'thing' identifier in the thing() function call"
+                }
             ]
         },
         "errors": {}
@@ -48,18 +168,96 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "7691d04f6704167f72f70e5013fbb9d4d150330b",
+    "sha1": "6c8ba52447c2faf8fed1eba65cd64c643003461f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c7457d71148c21ac115cdb6e913ec9e995e7c435"
+    "sha2": "bc392f77e718987c79b53126053665c245b163ac"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-replacement-test",
     "expectedResult": {
         "changes": {
             "for-in-statement.js": [
-                "Replaced the 'thing' identifier with the 'item' identifier",
-                "Replaced the 'things' identifier with the 'items' identifier",
-                "Replaced the 'thing' identifier with the 'item' identifier in the item() function call"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'thing' identifier with the 'item' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    15
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    14
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'things' identifier with the 'items' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "end": [
+                                    1,
+                                    30
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    23
+                                ],
+                                "end": [
+                                    1,
+                                    27
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'thing' identifier with the 'item' identifier in the item() function call"
+                }
             ]
         },
         "errors": {}
@@ -67,18 +265,60 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "c7457d71148c21ac115cdb6e913ec9e995e7c435",
+    "sha1": "bc392f77e718987c79b53126053665c245b163ac",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1ecb81a174ba8d39619da5e9a68911ead263b1a3"
+    "sha2": "da2eb693e4cc262362cb81c3fdd040af92eecc42"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "for-in-statement.js": [
-                "Deleted the 'item in items' for statement",
-                "Deleted the 'thing in things' for statement",
-                "Added the 'item in items' for statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'item in items' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'thing in things' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'item in items' for statement"
+                }
             ]
         },
         "errors": {}
@@ -86,16 +326,30 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "1ecb81a174ba8d39619da5e9a68911ead263b1a3",
+    "sha1": "da2eb693e4cc262362cb81c3fdd040af92eecc42",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "840f3c93ce21ad3025198d721677a2f85da778c0"
+    "sha2": "210a8ed2aa30b91ca470694492daa7412c616d58"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-delete-test",
     "expectedResult": {
         "changes": {
             "for-in-statement.js": [
-                "Deleted the 'thing in things' for statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                35
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'thing in things' for statement"
+                }
             ]
         },
         "errors": {}
@@ -103,16 +357,30 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "840f3c93ce21ad3025198d721677a2f85da778c0",
+    "sha1": "210a8ed2aa30b91ca470694492daa7412c616d58",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b3df6fec9afc59a894ae120888b0799b178447b8"
+    "sha2": "89852450722771842d4365c760a1403957fc7c96"
 }
 ,{
     "testCaseDescription": "javascript-for-in-statement-delete-rest-test",
     "expectedResult": {
         "changes": {
             "for-in-statement.js": [
-                "Deleted the 'item in items' for statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'item in items' for statement"
+                }
             ]
         },
         "errors": {}
@@ -120,7 +388,7 @@
     "filePaths": [
         "for-in-statement.js"
     ],
-    "sha1": "b3df6fec9afc59a894ae120888b0799b178447b8",
+    "sha1": "89852450722771842d4365c760a1403957fc7c96",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5138a3d72bd9c399737de105fe3d5672dc109bc0"
+    "sha2": "e572fcdd9abd2fa13fdff57a3afd8b3c43a6c6a0"
 }]

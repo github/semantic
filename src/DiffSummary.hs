@@ -1,6 +1,6 @@
-{-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables #-}
+{-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables, DeriveAnyClass #-}
 
-module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo) where
+module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo, isErrorSummary, JSONSummary(..)) where
 
 import Prologue hiding (intercalate)
 import Diff
@@ -21,6 +21,7 @@ import Text.PrettyPrint.Leijen.Text ((<+>), squotes, space, string, Doc, punctua
 import qualified Text.PrettyPrint.Leijen.Text as P
 import SourceSpan
 import Source
+import Data.Aeson as A
 
 data Annotatable a = Annotatable a | Unannotatable a
 
@@ -53,7 +54,19 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Export{} -> Identifiable
           _ -> Unidentifiable
 
-data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text }
+data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
+                 | ErrorSummary { summary :: summary, span :: span }
+                 deriving (Generic, Eq, Show)
+
+instance (ToJSON summary, ToJSON span) => ToJSON (JSONSummary summary span) where
+  toJSON JSONSummary{..} = object [ "summary" .= summary, "span" .= span ]
+  toJSON ErrorSummary{..} = object [ "summary" .= summary, "span" .= span ]
+
+isErrorSummary :: JSONSummary summary span -> Bool
+isErrorSummary ErrorSummary{} = True
+isErrorSummary _ = False
+
+data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text, sourceSpan :: SourceSpan }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
  | ErrorInfo { errorSpan :: SourceSpan, termName :: Text }
  deriving (Eq, Show)
@@ -66,16 +79,20 @@ data DiffSummary a = DiffSummary {
 } deriving (Eq, Functor, Show, Generic)
 
 -- Returns a list of diff summary texts given two source blobs and a diff.
-diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both SourceBlob -> SyntaxDiff leaf fields -> [Either Text Text]
+diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) =>
+                  Both SourceBlob ->
+                  SyntaxDiff leaf fields ->
+                  [JSONSummary Text SourceSpans]
 diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> blobs) diff
 
 -- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
 -- in that 'DiffSummary'.
-summaryToTexts :: DiffSummary DiffInfo -> [Either Text Text]
-summaryToTexts DiffSummary{..} = runJoin . fmap (show . (<+> parentContexts parentAnnotation)) <$> (Join <$> summaries patch)
+summaryToTexts :: DiffSummary DiffInfo -> [JSONSummary Text SourceSpans]
+summaryToTexts DiffSummary{..} = (\jsonSummary ->
+  jsonSummary { summary = show $ summary jsonSummary <+> parentContexts parentAnnotation }) <$> summaries patch
 
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
-diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
+diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
 diffToDiffSummaries sources = para $ \diff ->
   let
     diff' = free (Prologue.fst <$> diff)
@@ -91,24 +108,27 @@ diffToDiffSummaries sources = para $ \diff ->
   where
     (beforeSource, afterSource) = runJoin sources
 
--- Returns a list of diff summary 'Docs' prefixed given a 'Patch'.
-summaries :: Patch DiffInfo -> [Either Doc Doc]
-summaries patch = eitherErrorOrDoc <$> patchToDoc patch
-  where eitherErrorOrDoc = if any hasErrorInfo patch then Left else Right
-
--- Flattens a patch of diff infos into a list of docs, one for every 'LeafInfo'
--- or `ErrorInfo` it contains.
-patchToDoc :: Patch DiffInfo -> [Doc]
-patchToDoc = \case
-  p@(Replace i1 i2) -> zipWith (\a b -> prefixWithPatch p a <+> "with" <+> determiner i1 <+> b) (toLeafInfos i1) (toLeafInfos i2)
-  p@(Insert info) -> prefixWithPatch p <$> toLeafInfos info
-  p@(Delete info) -> prefixWithPatch p <$> toLeafInfos info
+-- Flattens a patch of diff infos into a list of docs, one for every 'LeafInfo' or `ErrorInfo` it contains.
+summaries :: Patch DiffInfo -> [JSONSummary Doc SourceSpans]
+summaries = \case
+  p@(Replace i1 i2) -> zipWith (\a b ->
+    JSONSummary
+     {
+      summary = summary (prefixWithPatch p This a) <+> "with" <+> determiner i1 <+> summary b
+    , span = SourceSpans $ These (span a) (span b)
+    }) (toLeafInfos i1) (toLeafInfos i2)
+  p@(Insert info) -> prefixWithPatch p That <$> toLeafInfos info
+  p@(Delete info) -> prefixWithPatch p This <$> toLeafInfos info
 
 -- Prefixes a given doc with the type of patch it represents.
-prefixWithPatch :: Patch DiffInfo -> Doc -> Doc
-prefixWithPatch patch = prefixWithThe (patchToPrefix patch)
+prefixWithPatch :: Patch DiffInfo -> (SourceSpan -> These SourceSpan SourceSpan) -> JSONSummary Doc SourceSpan -> JSONSummary Doc SourceSpans
+prefixWithPatch patch constructor = prefixWithThe (patchToPrefix patch)
   where
-    prefixWithThe prefix doc = prefix <+> determiner' patch <+> doc
+    prefixWithThe prefix jsonSummary = jsonSummary
+      {
+        summary = prefix <+> determiner' patch <+> summary jsonSummary
+      , span = SourceSpans $ constructor (span jsonSummary)
+      }
     patchToPrefix = \case
       (Replace _ _) -> "Replaced"
       (Insert _) -> "Added"
@@ -117,21 +137,23 @@ prefixWithPatch patch = prefixWithThe (patchToPrefix patch)
 
 -- Optional determiner (e.g. "the") to tie together summary statements.
 determiner :: DiffInfo -> Doc
-determiner (LeafInfo "number" _) = ""
-determiner (LeafInfo "boolean" _) = ""
-determiner (LeafInfo "anonymous function" _) = "an"
+determiner (LeafInfo "number" _ _) = ""
+determiner (LeafInfo "boolean" _ _) = ""
+determiner (LeafInfo "anonymous function" _ _) = "an"
 determiner (BranchInfo bs _ _) = determiner (last bs)
 determiner _ = "the"
 
-toLeafInfos :: DiffInfo -> [Doc]
-toLeafInfos (LeafInfo "number" termName) = pure (squotes (toDoc termName))
-toLeafInfos (LeafInfo "boolean" termName) = pure (squotes (toDoc termName))
-toLeafInfos (LeafInfo "anonymous function" termName) = pure (toDoc termName)
-toLeafInfos (LeafInfo cName@"string" termName) = pure (toDoc termName <+> toDoc cName)
-toLeafInfos (LeafInfo cName@"export statement" termName) = pure (toDoc termName <+> toDoc cName)
-toLeafInfos LeafInfo{..} = pure (squotes (toDoc termName) <+> toDoc categoryName)
-toLeafInfos BranchInfo{..} = toLeafInfos =<< branches
-toLeafInfos err@ErrorInfo{} = pure (pretty err)
+toLeafInfos :: DiffInfo -> [JSONSummary Doc SourceSpan]
+toLeafInfos err@ErrorInfo{..} = pure $ ErrorSummary (pretty err) errorSpan
+toLeafInfos BranchInfo{..} = branches >>= toLeafInfos
+toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
+  (LeafInfo "number" termName _) -> squotes $ toDoc termName
+  (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
+  (LeafInfo "anonymous function" termName _) -> toDoc termName
+  (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
+  (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
+  LeafInfo{..} -> squotes (toDoc termName) <+> toDoc categoryName
+  node -> panic $ "Expected a leaf info but got a: " <> show node
 
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> Text
@@ -172,7 +194,7 @@ toTermName source term = case unwrap term of
   S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
   S.Pair a _ -> toTermName' a <> ": …"
   S.Return expr -> maybe "empty" toTermName' expr
-  S.Error _ _ -> termNameFromSource term
+  S.Error _ -> termNameFromSource term
 --  S.If expr _ _ -> termNameFromSource expr
   S.If expr _ Nothing -> termNameFromSource expr
   S.If expr _ (Just expr') -> termNameFromSource expr
@@ -216,15 +238,15 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
+termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
-  S.AnonymousFunction _ _ -> LeafInfo "anonymous function" (toTermName' term)
+  S.AnonymousFunction _ _ -> LeafInfo "anonymous function" (toTermName' term) (getField $ extract term)
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
-  S.Error sourceSpan _ -> ErrorInfo sourceSpan (toTermName' term)
+  S.Error _ -> ErrorInfo (getField $ extract term) (toTermName' term)
   -- S.If expr _ (Just expr') -> BranchInfo [(termToDiffInfo' expr), (termToDiffInfo' expr')] (toCategoryName term) BIf
-  _ -> LeafInfo (toCategoryName term) (toTermName' term)
+  _ -> LeafInfo (toCategoryName term) (toTermName' term) (getField $ extract term)
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob
 
@@ -245,12 +267,6 @@ appendSummary source term summary =
 isBranchInfo :: DiffInfo -> Bool
 isBranchInfo info = case info of
   BranchInfo{} -> True
-  _ -> False
-
-hasErrorInfo :: DiffInfo -> Bool
-hasErrorInfo info = case info of
-  (ErrorInfo _ _) -> True
-  (BranchInfo branches _ _) -> any hasErrorInfo branches
   _ -> False
 
 -- The user-facing category name of 'a'.
@@ -332,4 +348,4 @@ instance Arbitrary a => Arbitrary (DiffSummary a) where
 instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> string (toSL categoryName)
   pretty BranchInfo{..} = mconcat $ punctuate (string "," P.<> space) (pretty <$> branches)
-  pretty ErrorInfo{..} = squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan) <+> "in" <+> (string . toSL $ spanName errorSpan)
+  pretty ErrorInfo{..} = squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan)

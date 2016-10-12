@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "identifier.js": [
-                "Added the 'theVar' identifier"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'theVar' identifier"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "b3b641ed7deb3f41fd97836c9026ce33eeba4a48",
+    "sha1": "49074a4800a61fa651152d1ed712c66519fafbeb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "860e6cb5f10c84e6aac3953151b5ebec56ab3312"
+    "sha2": "7c6643be086c41a5cd376fbf7b36e2f7d33bc1bf"
 }
 ,{
     "testCaseDescription": "javascript-identifier-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "identifier.js": [
-                "Added the 'theVar2' identifier",
-                "Added the 'theVar' identifier"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'theVar2' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'theVar' identifier"
+                }
             ]
         },
         "errors": {}
@@ -29,16 +71,42 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "860e6cb5f10c84e6aac3953151b5ebec56ab3312",
+    "sha1": "7c6643be086c41a5cd376fbf7b36e2f7d33bc1bf",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "392eb6b25b6edd2cc3cad0293066ad0f330cc72f"
+    "sha2": "9714f432aec25fb2318e2dab9f9b2a78fc5cb22f"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-insert-test",
     "expectedResult": {
         "changes": {
             "identifier.js": [
-                "Replaced the 'theVar2' identifier with the 'theVar' identifier"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'theVar2' identifier with the 'theVar' identifier"
+                }
             ]
         },
         "errors": {}
@@ -46,16 +114,42 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "392eb6b25b6edd2cc3cad0293066ad0f330cc72f",
+    "sha1": "9714f432aec25fb2318e2dab9f9b2a78fc5cb22f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2179a48c2b6e7200e0a34f33e20e3d1efe2ae34a"
+    "sha2": "93fd36c156a2e1bd23e2e5777f4b5b7e7a82c7cb"
 }
 ,{
     "testCaseDescription": "javascript-identifier-replacement-test",
     "expectedResult": {
         "changes": {
             "identifier.js": [
-                "Replaced the 'theVar' identifier with the 'theVar2' identifier"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'theVar' identifier with the 'theVar2' identifier"
+                }
             ]
         },
         "errors": {}
@@ -63,18 +157,60 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "2179a48c2b6e7200e0a34f33e20e3d1efe2ae34a",
+    "sha1": "93fd36c156a2e1bd23e2e5777f4b5b7e7a82c7cb",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "43486e90c660f961f930e3e22143865875bcd5ff"
+    "sha2": "cfb79cbb2bcd620edb55c909983e5e631a08c863"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "identifier.js": [
-                "Deleted the 'theVar2' identifier",
-                "Deleted the 'theVar' identifier",
-                "Added the 'theVar2' identifier"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'theVar2' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'theVar' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'theVar2' identifier"
+                }
             ]
         },
         "errors": {}
@@ -82,16 +218,30 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "43486e90c660f961f930e3e22143865875bcd5ff",
+    "sha1": "cfb79cbb2bcd620edb55c909983e5e631a08c863",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "dad7ef451c5c151221fdd249d81634c437ebd8d7"
+    "sha2": "106dff12bfb07dc175748db3ce6f8a6ace4a561a"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-test",
     "expectedResult": {
         "changes": {
             "identifier.js": [
-                "Deleted the 'theVar' identifier"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'theVar' identifier"
+                }
             ]
         },
         "errors": {}
@@ -99,16 +249,30 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "dad7ef451c5c151221fdd249d81634c437ebd8d7",
+    "sha1": "106dff12bfb07dc175748db3ce6f8a6ace4a561a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2c5321229447560cf390e01286dc9b30cfdefe51"
+    "sha2": "947a90cdedee234b01c85052f7bb112fb1e7eae0"
 }
 ,{
     "testCaseDescription": "javascript-identifier-delete-rest-test",
     "expectedResult": {
         "changes": {
             "identifier.js": [
-                "Deleted the 'theVar2' identifier"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'theVar2' identifier"
+                }
             ]
         },
         "errors": {}
@@ -116,7 +280,7 @@
     "filePaths": [
         "identifier.js"
     ],
-    "sha1": "2c5321229447560cf390e01286dc9b30cfdefe51",
+    "sha1": "947a90cdedee234b01c85052f7bb112fb1e7eae0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d04271adf62b579bffb014a03e4e401ce79164ea"
+    "sha2": "d7c66b2feea9aa25c92f9e3005737bcd96679136"
 }]

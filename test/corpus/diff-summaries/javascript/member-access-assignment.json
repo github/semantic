@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "member-access-assignment.js": [
-                "Added the 'y.x' assignment"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y.x' assignment"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "36cf72c8436b4fcab0a1f6f85b659b979af0a331",
+    "sha1": "372f806f1ac14eeaef4f8dd5ae1f081823efe483",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d87821cc15d36a738643a185d75ee4801ba1458b"
+    "sha2": "a1055cc31a158a5fa654aa40427592b3d6b10c88"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "member-access-assignment.js": [
-                "Added the 'y.x' assignment",
-                "Added the 'y.x' assignment"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y.x' assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y.x' assignment"
+                }
             ]
         },
         "errors": {}
@@ -29,16 +71,42 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "d87821cc15d36a738643a185d75ee4801ba1458b",
+    "sha1": "a1055cc31a158a5fa654aa40427592b3d6b10c88",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "75b310b64e8a439d13af9e2e4a593c954738209d"
+    "sha2": "639b924cdb7df8d54c5accd88915cc8843556868"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-insert-test",
     "expectedResult": {
         "changes": {
             "member-access-assignment.js": [
-                "Replaced '1' with '0' in an assignment to y.x"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '0' in an assignment to y.x"
+                }
             ]
         },
         "errors": {}
@@ -46,16 +114,42 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "75b310b64e8a439d13af9e2e4a593c954738209d",
+    "sha1": "639b924cdb7df8d54c5accd88915cc8843556868",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cdb0ea086b19919dbcf6b92f19b8c4c11924d3ad"
+    "sha2": "21f1f660aaa494d71f21feebf996dee749004e74"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-replacement-test",
     "expectedResult": {
         "changes": {
             "member-access-assignment.js": [
-                "Replaced '0' with '1' in an assignment to y.x"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    7
+                                ],
+                                "end": [
+                                    1,
+                                    8
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '0' with '1' in an assignment to y.x"
+                }
             ]
         },
         "errors": {}
@@ -63,18 +157,60 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "cdb0ea086b19919dbcf6b92f19b8c4c11924d3ad",
+    "sha1": "21f1f660aaa494d71f21feebf996dee749004e74",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c8cd3670bf4acb97bd411fe9ab3431377e8fe2a7"
+    "sha2": "62c47a061654573bb752aae3bd9ef9bcceaddf20"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "member-access-assignment.js": [
-                "Deleted the 'y.x' assignment",
-                "Deleted the 'y.x' assignment",
-                "Added the 'y.x' assignment"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y.x' assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y.x' assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y.x' assignment"
+                }
             ]
         },
         "errors": {}
@@ -82,16 +218,30 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "c8cd3670bf4acb97bd411fe9ab3431377e8fe2a7",
+    "sha1": "62c47a061654573bb752aae3bd9ef9bcceaddf20",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e76071835624b33a7fb5bf1f9ab7dfcab10e9b3d"
+    "sha2": "19c82c7fd6b8e019cf970ad495af8c0998610f6f"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-test",
     "expectedResult": {
         "changes": {
             "member-access-assignment.js": [
-                "Deleted the 'y.x' assignment"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y.x' assignment"
+                }
             ]
         },
         "errors": {}
@@ -99,16 +249,30 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "e76071835624b33a7fb5bf1f9ab7dfcab10e9b3d",
+    "sha1": "19c82c7fd6b8e019cf970ad495af8c0998610f6f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fa75ab164595aadae5250d237f1aac21ba453b4b"
+    "sha2": "c87076b2cfb63f72f222f023fe8aa0d28927632a"
 }
 ,{
     "testCaseDescription": "javascript-member-access-assignment-delete-rest-test",
     "expectedResult": {
         "changes": {
             "member-access-assignment.js": [
-                "Deleted the 'y.x' assignment"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'y.x' assignment"
+                }
             ]
         },
         "errors": {}
@@ -116,7 +280,7 @@
     "filePaths": [
         "member-access-assignment.js"
     ],
-    "sha1": "fa75ab164595aadae5250d237f1aac21ba453b4b",
+    "sha1": "c87076b2cfb63f72f222f023fe8aa0d28927632a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "63243f11ee238a04b1c51987a7cbc7d48f5f405b"
+    "sha2": "9ca89bc6c9066b34bc18aecce4f646208c65c907"
 }]

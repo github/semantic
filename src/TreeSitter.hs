@@ -19,7 +19,7 @@ import SourceSpan
 import Info
 
 -- | Returns a TreeSitter parser for the given language and TreeSitter grammar.
-treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax.Syntax Text) (Record '[Range, Category])
+treeSitterParser :: Language -> Ptr TS.Language -> Parser (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan])
 treeSitterParser language grammar blob = do
   document <- ts_document_new
   ts_document_set_language document grammar
@@ -31,7 +31,7 @@ treeSitterParser language grammar blob = do
     pure term)
 
 -- | Return a parser for a tree sitter language & document.
-documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record '[Range, Category])
+documentToTerm :: Language -> Ptr Document -> Parser (Syntax.Syntax Text) (Record '[Range, Category, SourceSpan])
 documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
   ts_document_root_node_p document root
   toTerm root
@@ -43,9 +43,9 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
 
           let range = Range { start = fromIntegral $ ts_node_p_start_char node, end = fromIntegral $ ts_node_p_end_char node }
 
-          let sourceSpan = SourceSpan { spanName = toS path
-            , spanStart = SourcePos (fromIntegral $! ts_node_p_start_point_row node) (fromIntegral $! ts_node_p_start_point_column node)
-            , spanEnd = SourcePos (fromIntegral $! ts_node_p_end_point_row node) (fromIntegral $! ts_node_p_end_point_column node) }
+          let startPos = SourcePos (1 + (fromIntegral $! ts_node_p_start_point_row node)) (1 + (fromIntegral $! ts_node_p_start_point_column node))
+          let endPos = SourcePos (1 + (fromIntegral $! ts_node_p_end_point_row node)) (1 + (fromIntegral $! ts_node_p_end_point_column node))
+          let sourceSpan = SourceSpan { spanStart = startPos , spanEnd = endPos }
 
           -- Note: The strict application here is semantically important.
           -- Without it, we may not evaluate the range until after we’ve exited

@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "math-assignment-operator.js": [
-                "Added the 'x' math assignment"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "70a57d3ee8bb0f31663af70c592c7e294522a194",
+    "sha1": "20c9fcd2968854089edd9800a50d5c4a92d8e07b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "587e39b227f49afbbd8734d70873c2204ff20707"
+    "sha2": "44a0ac752ed04f0db713416a4b71465fcb6791e5"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "math-assignment-operator.js": [
-                "Added the 'x' math assignment",
-                "Added the 'x' math assignment"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                }
             ]
         },
         "errors": {}
@@ -29,16 +71,42 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "587e39b227f49afbbd8734d70873c2204ff20707",
+    "sha1": "44a0ac752ed04f0db713416a4b71465fcb6791e5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5895e0e380c0419193d04010cca1784eeba15916"
+    "sha2": "9186895045b5796889b609b6804f3ca92d100c37"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-delete-insert-test",
     "expectedResult": {
         "changes": {
             "math-assignment-operator.js": [
-                "Replaced '2' with '1' in the x math assignment"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1' in the x math assignment"
+                }
             ]
         },
         "errors": {}
@@ -46,16 +114,42 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "5895e0e380c0419193d04010cca1784eeba15916",
+    "sha1": "9186895045b5796889b609b6804f3ca92d100c37",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "560d079678ad8723705a343ec6ff3c6d7fa1de52"
+    "sha2": "708ef787fa29646989c2a62e3a38224c6e54150a"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-replacement-test",
     "expectedResult": {
         "changes": {
             "math-assignment-operator.js": [
-                "Replaced '1' with '2' in the x math assignment"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2' in the x math assignment"
+                }
             ]
         },
         "errors": {}
@@ -63,18 +157,60 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "560d079678ad8723705a343ec6ff3c6d7fa1de52",
+    "sha1": "708ef787fa29646989c2a62e3a38224c6e54150a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9b88562e4d8ae59d124ae4fbb3497e23df0ac59f"
+    "sha2": "dba9d03bc3f05c75c64261dc7980015b55215097"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "math-assignment-operator.js": [
-                "Deleted the 'x' math assignment",
-                "Deleted the 'x' math assignment",
-                "Added the 'x' math assignment"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' math assignment"
+                }
             ]
         },
         "errors": {}
@@ -82,16 +218,30 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "9b88562e4d8ae59d124ae4fbb3497e23df0ac59f",
+    "sha1": "dba9d03bc3f05c75c64261dc7980015b55215097",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d31232ad00dc03a03313602332a890bf729aab26"
+    "sha2": "4b9bb90264994d44abe5f4178554cbc9364b3fac"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-delete-test",
     "expectedResult": {
         "changes": {
             "math-assignment-operator.js": [
-                "Deleted the 'x' math assignment"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                }
             ]
         },
         "errors": {}
@@ -99,16 +249,30 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "d31232ad00dc03a03313602332a890bf729aab26",
+    "sha1": "4b9bb90264994d44abe5f4178554cbc9364b3fac",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "918b9d9b380f111754955445b1610ca37847cbc4"
+    "sha2": "c6ca546f3e99646514f92e89805309dc8ee3a519"
 }
 ,{
     "testCaseDescription": "javascript-math-assignment-operator-delete-rest-test",
     "expectedResult": {
         "changes": {
             "math-assignment-operator.js": [
-                "Deleted the 'x' math assignment"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' math assignment"
+                }
             ]
         },
         "errors": {}
@@ -116,7 +280,7 @@
     "filePaths": [
         "math-assignment-operator.js"
     ],
-    "sha1": "918b9d9b380f111754955445b1610ca37847cbc4",
+    "sha1": "c6ca546f3e99646514f92e89805309dc8ee3a519",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b2a12ed6ee90000f320e8bd5b90383e28e847abb"
+    "sha2": "296397df0f0e65c6e8ab7e4962469076b890cd66"
 }]

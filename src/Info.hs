@@ -1,10 +1,11 @@
 {-# LANGUAGE DataKinds, GeneralizedNewtypeDeriving #-}
-module Info (Range(..), characterRange, setCharacterRange, Category(..), category, setCategory, Cost(..), cost, setCost) where
+module Info (Range(..), characterRange, setCharacterRange, Category(..), category, setCategory, Cost(..), cost, setCost, SourceSpan(..), SourcePos(..), SourceSpans(..)) where
 
 import Data.Record
 import Prologue
 import Category
 import Range
+import SourceSpan
 import Test.QuickCheck
 
 newtype Cost = Cost { unCost :: Int }

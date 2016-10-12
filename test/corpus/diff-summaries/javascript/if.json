@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "if.js": [
-                "Added the 'x' if statement"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' if statement"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "57c773af116921575b844893c03a256cc1464667",
+    "sha1": "12025ea457b9f71f1c34d8354dcfef593fccd770",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9a036a1ba7629580a3a26267e39c063bac430795"
+    "sha2": "be1ba1d9246e11b23be78baf2717476ab716b9bf"
 }
 ,{
     "testCaseDescription": "javascript-if-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "if.js": [
-                "Added the 'a.b' if statement",
-                "Added the 'x' if statement"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a.b' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x' if statement"
+                }
             ]
         },
         "errors": {}
@@ -29,16 +71,42 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "9a036a1ba7629580a3a26267e39c063bac430795",
+    "sha1": "be1ba1d9246e11b23be78baf2717476ab716b9bf",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7c9866e86d569085e701e86e5d4b6eb93d5a6b62"
+    "sha2": "c01e982383545a2a238b3a6af70f2c1268e473d6"
 }
 ,{
     "testCaseDescription": "javascript-if-delete-insert-test",
     "expectedResult": {
         "changes": {
             "if.js": [
-                "Replaced the 'a.b' if statement with the 'x' if statement"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'a.b' if statement with the 'x' if statement"
+                }
             ]
         },
         "errors": {}
@@ -46,16 +114,42 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "7c9866e86d569085e701e86e5d4b6eb93d5a6b62",
+    "sha1": "c01e982383545a2a238b3a6af70f2c1268e473d6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c26f374cd4c53ae211a4e027e0e162563d16cbcb"
+    "sha2": "6040b05311f729269cebedf1d54c8038788faf89"
 }
 ,{
     "testCaseDescription": "javascript-if-replacement-test",
     "expectedResult": {
         "changes": {
             "if.js": [
-                "Replaced the 'x' if statement with the 'a.b' if statement"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    24
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x' if statement with the 'a.b' if statement"
+                }
             ]
         },
         "errors": {}
@@ -63,18 +157,60 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "c26f374cd4c53ae211a4e027e0e162563d16cbcb",
+    "sha1": "6040b05311f729269cebedf1d54c8038788faf89",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "812ef983ac5d4f52dce7f22284a3cfbe0799dc08"
+    "sha2": "ea9839117fdd5a20b5a49fd5bec5b0edf373e914"
 }
 ,{
     "testCaseDescription": "javascript-if-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "if.js": [
-                "Deleted the 'a.b' if statement",
-                "Deleted the 'x' if statement",
-                "Added the 'a.b' if statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a.b' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' if statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a.b' if statement"
+                }
             ]
         },
         "errors": {}
@@ -82,16 +218,30 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "812ef983ac5d4f52dce7f22284a3cfbe0799dc08",
+    "sha1": "ea9839117fdd5a20b5a49fd5bec5b0edf373e914",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "68ef64a63db680b54e82ce764af5df50a20fd90d"
+    "sha2": "450d9d28a46d3283979a55c31dcf4cd7fadd979b"
 }
 ,{
     "testCaseDescription": "javascript-if-delete-test",
     "expectedResult": {
         "changes": {
             "if.js": [
-                "Deleted the 'x' if statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' if statement"
+                }
             ]
         },
         "errors": {}
@@ -99,16 +249,30 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "68ef64a63db680b54e82ce764af5df50a20fd90d",
+    "sha1": "450d9d28a46d3283979a55c31dcf4cd7fadd979b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "028cd8f2800eb41fd83b1d55eaa3ad0b993c31a3"
+    "sha2": "d96611306db475c3b49c4e6f7c2ac07fedee9c42"
 }
 ,{
     "testCaseDescription": "javascript-if-delete-rest-test",
     "expectedResult": {
         "changes": {
             "if.js": [
-                "Deleted the 'a.b' if statement"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a.b' if statement"
+                }
             ]
         },
         "errors": {}
@@ -116,7 +280,7 @@
     "filePaths": [
         "if.js"
     ],
-    "sha1": "028cd8f2800eb41fd83b1d55eaa3ad0b993c31a3",
+    "sha1": "d96611306db475c3b49c4e6f7c2ac07fedee9c42",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "29f1d26b0bc64aa6be6229eca7f4367b07aa1170"
+    "sha2": "0e12557e9a116aa82c320e964f67655fe82a8476"
 }]

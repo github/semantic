@@ -20,21 +20,25 @@ import Term.Arbitrary
 import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.QuickCheck
+import Data.These
 
-arrayInfo :: Record '[Category, Range]
-arrayInfo = ArrayLiteral .: Range 0 3 .: RNil
+sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
+sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
 
-literalInfo :: Record '[Category, Range]
-literalInfo = StringLiteral .: Range 1 2 .: RNil
+arrayInfo :: Record '[Category, Range, SourceSpan]
+arrayInfo = ArrayLiteral .: Range 0 3 .: sourceSpanBetween (1, 1) (1, 5) .: RNil
 
-testDiff :: Diff (Syntax Text) (Record '[Category, Range])
+literalInfo :: Record '[Category, Range, SourceSpan]
+literalInfo = StringLiteral .: Range 1 2 .: sourceSpanBetween (1, 2) (1, 4) .: RNil
+
+testDiff :: Diff (Syntax Text) (Record '[Category, Range, SourceSpan])
 testDiff = free $ Free (pure arrayInfo :< Indexed [ free $ Pure (Insert (cofree $ literalInfo :< Leaf "\"a\"")) ])
 
 testSummary :: DiffSummary DiffInfo
-testSummary = DiffSummary { patch = Insert (LeafInfo "string" "a"), parentAnnotation = [] }
+testSummary = DiffSummary { patch = Insert (LeafInfo "string" "a" $ sourceSpanBetween (1,1) (1, 2)), parentAnnotation = [] }
 
 replacementSummary :: DiffSummary DiffInfo
-replacementSummary = DiffSummary { patch = Replace (LeafInfo "string" "a") (LeafInfo "symbol" "b"), parentAnnotation = [Left (Info.FunctionCall, "foo")] }
+replacementSummary = DiffSummary { patch = Replace (LeafInfo "string" "a" $ sourceSpanBetween (1, 2) (1, 4)) (LeafInfo "symbol" "b" $ sourceSpanBetween (1,1) (1, 2)), parentAnnotation = [Left (Info.FunctionCall, "foo")] }
 
 blobs :: Both SourceBlob
 blobs = both (SourceBlob (fromText "[]") nullOid "a.js" (Just defaultPlainBlob)) (SourceBlob (fromText "[a]") nullOid "b.js" (Just defaultPlainBlob))
@@ -43,16 +47,16 @@ spec :: Spec
 spec = parallel $ do
   describe "diffSummaries" $ do
     it "outputs a diff summary" $ do
-      diffSummaries blobs testDiff `shouldBe` [ Right $ "Added the \"a\" string" ]
+      diffSummaries blobs testDiff `shouldBe` [ JSONSummary "Added the \"a\" string" (SourceSpans . That $ sourceSpanBetween (1, 2) (1, 4)) ]
 
     prop "equal terms produce identity diffs" $
-      \ a -> let term = defaultFeatureVectorDecorator (category . headF) (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range]))) in
+      \ a -> let term = defaultFeatureVectorDecorator (category . headF) (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range, SourceSpan]))) in
         diffSummaries blobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
 
   describe "DiffInfo" $ do
     prop "patches in summaries match the patches in diffs" $
       \a -> let
-        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Cost, Range])))
+        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Cost, Range, SourceSpan])))
         summaries = diffToDiffSummaries (source <$> blobs) diff
         patches = toList diff
         in
@@ -61,14 +65,14 @@ spec = parallel $ do
               (() <$ branchPatches, () <$ otherPatches) `shouldBe` (() <$ branchDiffPatches, () <$ otherDiffPatches)
     prop "generates one LeafInfo for each child in an arbitrary branch patch" $
       \a -> let
-        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Range])))
+        diff = (toDiff (a :: ArbitraryDiff Text (Record '[Category, Range, SourceSpan])))
         diffInfoPatches = patch <$> diffToDiffSummaries (source <$> blobs) diff
         syntaxPatches = toList diff
         extractLeaves :: DiffInfo -> [DiffInfo]
         extractLeaves (BranchInfo children _ _) = join $ extractLeaves <$> children
         extractLeaves leaf = [ leaf ]
 
-        extractDiffLeaves :: Term (Syntax Text) (Record '[Category, Range]) -> [ Term (Syntax Text) (Record '[Category, Range]) ]
+        extractDiffLeaves :: Term (Syntax Text) (Record '[Category, Range, SourceSpan]) -> [ Term (Syntax Text) (Record '[Category, Range, SourceSpan]) ]
         extractDiffLeaves term = case unwrap term of
           (Indexed children) -> join $ extractDiffLeaves <$> children
           (Fixed children) -> join $ extractDiffLeaves <$> children

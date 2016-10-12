@@ -3,7 +3,21 @@
     "expectedResult": {
         "changes": {
             "method-call.js": [
-                "Added the 'object.someMethod(arg1, \"arg2\")' method call"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'object.someMethod(arg1, \"arg2\")' method call"
+                }
             ]
         },
         "errors": {}
@@ -11,17 +25,45 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "5e933ecc7f1454b396bd04022556601bcf8de7ab",
+    "sha1": "a37267842ee6f1e161c4316af0cb35f4b632a059",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d5c49b4be18c2ab655996bdd3a91482e9fc3ce9c"
+    "sha2": "609913d4f6d79ee00e3d411b2e3915071ad635f5"
 }
 ,{
     "testCaseDescription": "javascript-method-call-replacement-insert-test",
     "expectedResult": {
         "changes": {
             "method-call.js": [
-                "Added the 'object.someMethod(arg1, \"arg3\")' method call",
-                "Added the 'object.someMethod(arg1, \"arg2\")' method call"
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'object.someMethod(arg1, \"arg3\")' method call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'object.someMethod(arg1, \"arg2\")' method call"
+                }
             ]
         },
         "errors": {}
@@ -29,16 +71,42 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "d5c49b4be18c2ab655996bdd3a91482e9fc3ce9c",
+    "sha1": "609913d4f6d79ee00e3d411b2e3915071ad635f5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cb91783ae43cb3c50e645b8631425987562fa9b3"
+    "sha2": "33a0c4183dd058b371cce8b43c01dc788edd30f2"
 }
 ,{
     "testCaseDescription": "javascript-method-call-delete-insert-test",
     "expectedResult": {
         "changes": {
             "method-call.js": [
-                "Replaced the \"arg3\" string with the \"arg2\" string in the object.someMethod(arg1, \"arg2\") method call"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "end": [
+                                    1,
+                                    31
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "end": [
+                                    1,
+                                    31
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"arg3\" string with the \"arg2\" string in the object.someMethod(arg1, \"arg2\") method call"
+                }
             ]
         },
         "errors": {}
@@ -46,16 +114,42 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "cb91783ae43cb3c50e645b8631425987562fa9b3",
+    "sha1": "33a0c4183dd058b371cce8b43c01dc788edd30f2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4213cac18eed39c24d1538ad8c3967e08cb4c4ad"
+    "sha2": "b350dc1500aa52926e6cd6fedc4e04375a2f3828"
 }
 ,{
     "testCaseDescription": "javascript-method-call-replacement-test",
     "expectedResult": {
         "changes": {
             "method-call.js": [
-                "Replaced the \"arg2\" string with the \"arg3\" string in the object.someMethod(arg1, \"arg3\") method call"
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "end": [
+                                    1,
+                                    31
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    25
+                                ],
+                                "end": [
+                                    1,
+                                    31
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"arg2\" string with the \"arg3\" string in the object.someMethod(arg1, \"arg3\") method call"
+                }
             ]
         },
         "errors": {}
@@ -63,18 +157,60 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "4213cac18eed39c24d1538ad8c3967e08cb4c4ad",
+    "sha1": "b350dc1500aa52926e6cd6fedc4e04375a2f3828",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "96cd5a62c827403f9fd682d8b00b91d691a6a9cc"
+    "sha2": "ee87a9ae5d5c4a2518eb5f7ef0b26bd9b0a371e6"
 }
 ,{
     "testCaseDescription": "javascript-method-call-delete-replacement-test",
     "expectedResult": {
         "changes": {
             "method-call.js": [
-                "Deleted the 'object.someMethod(arg1, \"arg3\")' method call",
-                "Deleted the 'object.someMethod(arg1, \"arg2\")' method call",
-                "Added the 'object.someMethod(arg1, \"arg3\")' method call"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'object.someMethod(arg1, \"arg3\")' method call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'object.someMethod(arg1, \"arg2\")' method call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'object.someMethod(arg1, \"arg3\")' method call"
+                }
             ]
         },
         "errors": {}
@@ -82,16 +218,30 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "96cd5a62c827403f9fd682d8b00b91d691a6a9cc",
+    "sha1": "ee87a9ae5d5c4a2518eb5f7ef0b26bd9b0a371e6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2569aa3a97089f93caf1992871b5e4f3573b0877"
+    "sha2": "794adc95ac0d89beca54fc417b94eaf5ac50ec58"
 }
 ,{
     "testCaseDescription": "javascript-method-call-delete-test",
     "expectedResult": {
         "changes": {
             "method-call.js": [
-                "Deleted the 'object.someMethod(arg1, \"arg2\")' method call"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'object.someMethod(arg1, \"arg2\")' method call"
+                }
             ]
         },
         "errors": {}
@@ -99,16 +249,30 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "2569aa3a97089f93caf1992871b5e4f3573b0877",
+    "sha1": "794adc95ac0d89beca54fc417b94eaf5ac50ec58",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ed2ca022ea846444da59fa55719ca5d5e54cc047"
+    "sha2": "db28776718addccb53343bee695b484d8a389784"
 }
 ,{
     "testCaseDescription": "javascript-method-call-delete-rest-test",
     "expectedResult": {
         "changes": {
             "method-call.js": [
-                "Deleted the 'object.someMethod(arg1, \"arg3\")' method call"
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                32
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'object.someMethod(arg1, \"arg3\")' method call"
+                }
             ]
         },
         "errors": {}
@@ -116,7 +280,7 @@
     "filePaths": [
         "method-call.js"
     ],
-    "sha1": "ed2ca022ea846444da59fa55719ca5d5e54cc047",
+    "sha1": "db28776718addccb53343bee695b484d8a389784",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "53a9c959778b42d9f34bfc266d177a6f1b3065fd"
+    "sha2": "7b45d5b720f557df4fbd880be8c0e292c4defdc4"
 }]
