@@ -71,7 +71,7 @@ data Syntax a f
   -- | A method definition with an identifier, params, and a list of expressions.
   | Method f [f] [f]
   -- | An if statement with an expression, a clause, and maybe more expressions, clauses.
-  | If f f (Maybe f)
+  | If f f [f]
   -- | A module with an identifier, and a list of syntaxes.
   | Module { moduleId:: f, moduleBody :: [f] }
   | Import f [f]
