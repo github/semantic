@@ -62,6 +62,7 @@ diffFiles parser renderer sourceBlobs = do
           Free (info :< _) -> cost <$> info
           Pure patch -> uncurry both (fromThese 0 0 (unPatch (cost . extract <$> patch)))
 
+getLabel :: HasField fields Category => CofreeF (Syntax leaf) (Record fields) b -> (Category, Maybe leaf)
 getLabel (h :< t) = (category h, case t of
   Leaf s -> Just s
   _ -> Nothing)
