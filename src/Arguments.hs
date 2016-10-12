@@ -26,6 +26,7 @@ data CmdLineOptions = CmdLineOptions
   , outputFilePath :: Maybe FilePath
   , noIndex :: Bool
   , extraArgs :: [ExtraArg]
+  , developmentMode' :: Bool
   }
 
 -- | Arguments for the program (includes command line, environment, and defaults).
@@ -38,6 +39,7 @@ data Arguments = Arguments
   , diffMode :: DiffMode
   , shaRange :: Both (Maybe String)
   , filePaths :: [FilePath]
+  , developmentMode :: Bool
   } deriving (Show)
 
 -- | Returns Arguments for the program from parsed command line arguments.
@@ -62,6 +64,7 @@ programArguments CmdLineOptions{..} = do
       (_, _) -> CommitDiff
     , shaRange = fetchShas extraArgs
     , filePaths = filePaths
+    , developmentMode = developmentMode'
     }
   where
     fetchPaths :: [ExtraArg] -> [FilePath]
@@ -85,6 +88,7 @@ args gitDir sha1 sha2 filePaths format = Arguments
   , diffMode = CommitDiff
   , shaRange = Just <$> both sha1 sha2
   , filePaths = filePaths
+  , developmentMode = False
   }
 
 -- | 7 seconds
