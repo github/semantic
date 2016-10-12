@@ -1,4 +1,4 @@
-{-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables, DeriveAnyClass, StrictData #-}
+{-# LANGUAGE DataKinds, TypeFamilies, ScopedTypeVariables, DeriveAnyClass #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 
 module DiffSummary (diffSummaries, DiffSummary(..), DiffInfo(..), diffToDiffSummaries, isBranchInfo, isErrorSummary, JSONSummary(..)) where

@@ -1,4 +1,3 @@
-{-# LANGUAGE StrictData #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Category where
 

@@ -1,4 +1,4 @@
-{-# LANGUAGE DeriveAnyClass, StrictData #-}
+{-# LANGUAGE DeriveAnyClass #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 -- |
 -- Source position and span information

@@ -1,4 +1,4 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, StrictData #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# OPTIONS_GHC -funbox-strict-fields #-}
 module Source where
 
