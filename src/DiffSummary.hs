@@ -195,9 +195,7 @@ toTermName source term = case unwrap term of
   S.Pair a _ -> toTermName' a <> ": …"
   S.Return expr -> maybe "empty" toTermName' expr
   S.Error _ -> termNameFromSource term
---  S.If expr _ _ -> termNameFromSource expr
-  S.If expr _ Nothing -> termNameFromSource expr
-  S.If expr _ (Just expr') -> termNameFromSource expr
+  S.If expr _ _ -> termNameFromSource expr
   S.For clauses _ -> termNameFromChildren term clauses
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr
@@ -244,6 +242,7 @@ termToDiffInfo blob term = case unwrap term of
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
   S.AnonymousFunction _ _ -> LeafInfo "anonymous function" (toTermName' term) (getField $ extract term)
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
+  S.If expr _ elseIfs -> BranchInfo ([LeafInfo (toCategoryName term) (toTermName' expr) (getField $ extract term)] ++ (termToDiffInfo' <$> elseIfs)) (toCategoryName term) BIf
   S.Error _ -> ErrorInfo (getField $ extract term) (toTermName' term)
   -- S.If expr _ (Just expr') -> BranchInfo [(termToDiffInfo' expr), (termToDiffInfo' expr')] (toCategoryName term) BIf
   _ -> LeafInfo (toCategoryName term) (toTermName' term) (getField $ extract term)
