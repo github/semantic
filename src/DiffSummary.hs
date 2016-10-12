@@ -244,7 +244,6 @@ termToDiffInfo blob term = case unwrap term of
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
   S.If expr _ elseIfs -> BranchInfo ([LeafInfo (toCategoryName term) (toTermName' expr) (getField $ extract term)] <> (termToDiffInfo' <$> elseIfs)) (toCategoryName term) BIf
   S.Error _ -> ErrorInfo (getField $ extract term) (toTermName' term)
-  -- S.If expr _ (Just expr') -> BranchInfo [(termToDiffInfo' expr), (termToDiffInfo' expr')] (toCategoryName term) BIf
   _ -> LeafInfo (toCategoryName term) (toTermName' term) (getField $ extract term)
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob
