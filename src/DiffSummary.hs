@@ -242,7 +242,6 @@ termToDiffInfo blob term = case unwrap term of
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
   S.AnonymousFunction _ _ -> LeafInfo "anonymous function" (toTermName' term) (getField $ extract term)
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
-  S.If _ _ elseIfs -> BranchInfo ([toLeafInfo term] <> (termToDiffInfo' <$> elseIfs)) (toCategoryName term) BIf
   S.Error _ -> ErrorInfo (getField $ extract term) (toTermName' term)
   _ -> toLeafInfo term
   where toTermName' = toTermName blob
