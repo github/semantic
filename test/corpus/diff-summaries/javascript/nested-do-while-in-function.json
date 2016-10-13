@@ -91,7 +91,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the anonymous() function export statement"
+                    "summary": "Added the anonymous() export statement"
                 },
                 {
                     "span": {
@@ -287,7 +287,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the anonymous() function export statement"
+                    "summary": "Added the anonymous() export statement"
                 },
                 {
                     "span": {
@@ -437,7 +437,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the anonymous() function export statement"
+                    "summary": "Added the anonymous() export statement"
                 },
                 {
                     "span": {
@@ -1056,7 +1056,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the anonymous() function export statement"
+                    "summary": "Added the anonymous() export statement"
                 },
                 {
                     "span": {
@@ -1161,7 +1161,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the anonymous() function export statement"
+                    "summary": "Deleted the anonymous() export statement"
                 },
                 {
                     "span": {
@@ -1435,7 +1435,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the anonymous() function export statement"
+                    "summary": "Added the anonymous() export statement"
                 },
                 {
                     "span": {
@@ -1570,7 +1570,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the anonymous() function export statement"
+                    "summary": "Deleted the anonymous() export statement"
                 },
                 {
                     "span": {
@@ -1766,7 +1766,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the anonymous() function export statement"
+                    "summary": "Deleted the anonymous() export statement"
                 },
                 {
                     "span": {
@@ -1916,7 +1916,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the anonymous() function export statement"
+                    "summary": "Deleted the anonymous() export statement"
                 },
                 {
                     "span": {
@@ -2096,7 +2096,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the anonymous() function export statement"
+                    "summary": "Added the anonymous() export statement"
                 },
                 {
                     "span": {
@@ -2262,7 +2262,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the anonymous() function export statement"
+                    "summary": "Deleted the anonymous() export statement"
                 },
                 {
                     "span": {
@@ -2458,7 +2458,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the anonymous() function export statement"
+                    "summary": "Deleted the anonymous() export statement"
                 },
                 {
                     "span": {
