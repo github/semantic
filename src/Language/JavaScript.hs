@@ -49,6 +49,7 @@ termConstructor source sourceSpan name range children
     ("case", [ expr, body ]) -> S.Case expr body
     ("object", _) -> S.Object $ foldMap toTuple children
     ("pair", _) -> S.Fixed children
+    ("comment", _) -> S.Comment . toText $ slice range source
     ("if_statement", [ expr, clause1, clause2 ]) -> S.If expr clause1 (Just clause2)
     ("if_statement", [ expr, clause ]) -> S.If expr clause Nothing
     ("while_statement", [ expr, body ]) -> S.While expr body
