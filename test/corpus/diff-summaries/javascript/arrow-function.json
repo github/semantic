@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous(f, g) function"
+                    "summary": "Added an 'anonymous(f, g)' function"
                 }
             ]
         },
@@ -47,7 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous(f, g) function"
+                    "summary": "Added an 'anonymous(f, g)' function"
                 },
                 {
                     "span": {
@@ -62,7 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous(f, g) function"
+                    "summary": "Added an 'anonymous(f, g)' function"
                 }
             ]
         },
@@ -179,7 +179,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous(f, g) function"
+                    "summary": "Deleted an 'anonymous(f, g)' function"
                 },
                 {
                     "span": {
@@ -194,7 +194,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous(f, g) function"
+                    "summary": "Deleted an 'anonymous(f, g)' function"
                 },
                 {
                     "span": {
@@ -209,7 +209,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous(f, g) function"
+                    "summary": "Added an 'anonymous(f, g)' function"
                 }
             ]
         },
@@ -240,7 +240,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous(f, g) function"
+                    "summary": "Deleted an 'anonymous(f, g)' function"
                 }
             ]
         },
@@ -271,7 +271,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous(f, g) function"
+                    "summary": "Deleted an 'anonymous(f, g)' function"
                 }
             ]
         },

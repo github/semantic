@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous(a, b) function"
+                    "summary": "Added an 'anonymous(a, b)' function"
                 }
             ]
         },
@@ -47,7 +47,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous(b, c) function"
+                    "summary": "Added an 'anonymous(b, c)' function"
                 },
                 {
                     "span": {
@@ -62,7 +62,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous(a, b) function"
+                    "summary": "Added an 'anonymous(a, b)' function"
                 }
             ]
         },
@@ -341,7 +341,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous(b, c) function"
+                    "summary": "Deleted an 'anonymous(b, c)' function"
                 },
                 {
                     "span": {
@@ -356,7 +356,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous(a, b) function"
+                    "summary": "Deleted an 'anonymous(a, b)' function"
                 },
                 {
                     "span": {
@@ -371,7 +371,7 @@
                             ]
                         }
                     },
-                    "summary": "Added an anonymous(b, c) function"
+                    "summary": "Added an 'anonymous(b, c)' function"
                 }
             ]
         },
@@ -402,7 +402,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous(a, b) function"
+                    "summary": "Deleted an 'anonymous(a, b)' function"
                 }
             ]
         },
@@ -433,7 +433,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted an anonymous(b, c) function"
+                    "summary": "Deleted an 'anonymous(b, c)' function"
                 }
             ]
         },

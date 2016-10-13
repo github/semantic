@@ -151,7 +151,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
   (LeafInfo "anonymous function" termName _) -> squotes (toDoc termName) <+> string "function"
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
-  (LeafInfo cName@"export statement" termName _) -> P.enclose (string "{ ") (string " }") (toDoc termName) <+> toDoc cName
+  (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
   LeafInfo{..} -> squotes (toDoc termName) <+> toDoc categoryName
   node -> panic $ "Expected a leaf info but got a: " <> show node
 
@@ -217,9 +217,9 @@ toTermName source term = case unwrap term of
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
   S.Import identifier _ -> toTermName' identifier
-  S.Export Nothing expr -> intercalate ", " $ termNameFromSource <$> expr
-  S.Export (Just identifier) [] -> toTermName' identifier
-  S.Export (Just identifier) expr -> (intercalate ", " $ termNameFromSource <$> expr) <> " from " <> toTermName' identifier
+  S.Export Nothing expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }"
+  S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
+  S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
