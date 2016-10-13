@@ -11,7 +11,7 @@ import Patch
 import Prologue
 import Syntax
 import Term
-import Diffing
+import Diffing (getLabel)
 import Term.Arbitrary
 import Test.Hspec
 import Test.Hspec.QuickCheck
