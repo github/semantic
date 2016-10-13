@@ -385,8 +385,8 @@
       {
         "syntax": "if-else",
         "repoFilePath": "if-else.js",
-        "insert": "if (x) y; else if (a) b;",
-        "replacement": "if (a) { c; d; } else { e; }",
+        "insert": "if (x) y; else if (a) b; else if (c) d; else if (e) f; else g",
+        "replacement": "if (g) h; else if (i) { j; } else if (k) l; else if (m) { n; } else o",
         "testCaseFilePath": "test/corpus/diff-summaries/javascript/if-else.json"
       },
       {
