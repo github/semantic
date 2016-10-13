@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# OPTIONS_GHC -funbox-strict-fields #-}
 module Data.RandomWalkSimilarity
 ( rws
 , pqGramDecorator
@@ -219,7 +220,7 @@ defaultM :: Integer
 defaultM = 10
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
-data UnmappedTerm f fields = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Term f (Record fields)) }
+data UnmappedTerm f fields = UnmappedTerm { termIndex :: Int, feature :: Vector.Vector Double, term :: (Term f (Record fields)) }
 
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNil term = Term term | Index Int | Nil
@@ -234,13 +235,13 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 -- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
 defaultFeatureVectorDecorator
   :: (Hashable label, Traversable f)
-  => (forall b. TermF f (Record fields) b -> label)
+  => Label f fields label
   -> Term f (Record fields)
   -> Term f (Record (Vector.Vector Double ': fields))
 defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Hashable label, Traversable f) => (forall b. TermF f (Record fields) b -> label) -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (Vector.Vector Double ': fields))
+featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (Vector.Vector Double ': fields))
 featureVectorDecorator getLabel p q d
   = cata (\ (RCons gram rest :< functor) ->
       cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor))
@@ -249,7 +250,7 @@ featureVectorDecorator getLabel p q d
 -- | Annotates a term with the corresponding p,q-gram at each node.
 pqGramDecorator
   :: Traversable f
-  => (forall b. TermF f (Record fields) b -> label) -- ^ A function computing the label from an arbitrary unpacked term. This function can use the annotation and functor’s constructor, but not any recursive values inside the functor (since they’re held parametric in 'b').
+  => Label f fields label -- ^ A function computing the label from an arbitrary unpacked term. This function can use the annotation and functor’s constructor, but not any recursive values inside the functor (since they’re held parametric in 'b').
   -> Int -- ^ 'p'; the desired stem length for the grams.
   -> Int -- ^ 'q'; the desired base length for the grams.
   -> Term f (Record fields) -- ^ The term to decorate.
