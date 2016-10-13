@@ -151,7 +151,7 @@ toLeafInfos HideInfo = []
 toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "number" termName _) -> squotes $ toDoc termName
   (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
-  (LeafInfo "anonymous function" termName _) -> toDoc termName
+  (LeafInfo "anonymous function" termName _) -> toDoc termName <+> "function"
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
   LeafInfo{..} -> squotes (toDoc termName) <+> toDoc categoryName
@@ -160,13 +160,20 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
-  S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params <> " function"
+  S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
   S.Assignment identifier _ -> toTermName' identifier
   S.Function identifier _ _ -> toTermName' identifier
-  S.FunctionCall i args -> toTermName' i <> "(" <> intercalate ", " (toArgName <$> args) <> ")"
+  S.FunctionCall i args -> case unwrap i of
+    S.AnonymousFunction params _ ->
+      -- Omit a function call's arguments if it's arguments match the underlying
+      -- anonymous function's arguments.
+      if (category . extract <$> args) == (category . extract <$> params)
+      then toTermName' i
+      else "(" <> toTermName' i <> ")" <> paramsToArgNames args
+    _ -> toTermName' i <> paramsToArgNames args
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
     (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' property <> "()"
     (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' property
@@ -211,9 +218,9 @@ toTermName source term = case unwrap term of
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
   S.Import identifier _ -> toTermName' identifier
-  S.Export Nothing expr -> intercalate ", " $ termNameFromSource <$> expr
-  S.Export (Just identifier) [] -> toTermName' identifier
-  S.Export (Just identifier) expr -> (intercalate ", " $ termNameFromSource <$> expr) <> " from " <> toTermName' identifier
+  S.Export Nothing expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }"
+  S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
+  S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
