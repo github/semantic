@@ -163,8 +163,16 @@ toTermName source term = case unwrap term of
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
   S.Assignment identifier _ -> toTermName' identifier
-  S.Function identifier _ _ -> toTermName' identifier
-  S.FunctionCall i args -> toTermName' i <> "(" <> intercalate ", " (toArgName <$> args) <> ")"
+  S.Function identifier _ _ ->
+    toTermName' identifier
+  S.FunctionCall i args -> case unwrap i of
+    S.AnonymousFunction params _ ->
+      -- Omit a function call's arguments if it's arguments match the underlying
+      -- anonymous function's arguments.
+      if (category . extract <$> args) == (category . extract <$> params)
+      then toTermName' i
+      else "(" <> toTermName' i <> ")" <> paramsToArgNames args
+    _ -> toTermName' i <> paramsToArgNames args
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
     (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' property <> "()"
     (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' property
