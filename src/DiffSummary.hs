@@ -242,11 +242,12 @@ termToDiffInfo blob term = case unwrap term of
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
   S.AnonymousFunction _ _ -> LeafInfo "anonymous function" (toTermName' term) (getField $ extract term)
   Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
-  S.If expr _ elseIfs -> BranchInfo ([LeafInfo (toCategoryName term) (toTermName' expr) (getField $ extract term)] <> (termToDiffInfo' <$> elseIfs)) (toCategoryName term) BIf
+  S.If _ _ elseIfs -> BranchInfo ([toLeafInfo term] <> (termToDiffInfo' <$> elseIfs)) (toCategoryName term) BIf
   S.Error _ -> ErrorInfo (getField $ extract term) (toTermName' term)
-  _ -> LeafInfo (toCategoryName term) (toTermName' term) (getField $ extract term)
+  _ -> toLeafInfo term
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob
+        toLeafInfo term = LeafInfo (toCategoryName term) (toTermName' term) (getField $ extract term)
 
 -- | Append a parentAnnotation to the current DiffSummary instance.
 -- | For a DiffSummary without a parentAnnotation, we append a parentAnnotation with the first identifiable term.
