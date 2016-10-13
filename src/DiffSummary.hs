@@ -69,7 +69,7 @@ isErrorSummary _ = False
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text, sourceSpan :: SourceSpan }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
  | ErrorInfo { errorSpan :: SourceSpan, termName :: Text }
- | HideInfo
+ | HideInfo -- Hide/Strip from summary output entirely.
  deriving (Eq, Show)
 
 data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
