@@ -69,6 +69,7 @@ isErrorSummary _ = False
 data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text, sourceSpan :: SourceSpan }
  | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
  | ErrorInfo { errorSpan :: SourceSpan, termName :: Text }
+ | HideInfo -- Hide/Strip from summary output entirely.
  deriving (Eq, Show)
 
 data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
@@ -146,6 +147,7 @@ determiner _ = "the"
 toLeafInfos :: DiffInfo -> [JSONSummary Doc SourceSpan]
 toLeafInfos err@ErrorInfo{..} = pure $ ErrorSummary (pretty err) errorSpan
 toLeafInfos BranchInfo{..} = branches >>= toLeafInfos
+toLeafInfos HideInfo = []
 toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "number" termName _) -> squotes $ toDoc termName
   (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
@@ -241,7 +243,8 @@ termToDiffInfo blob term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
   S.AnonymousFunction _ _ -> LeafInfo "anonymous function" (toTermName' term) (getField $ extract term)
-  Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
+  S.Comment _ -> HideInfo
+  S.Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
   S.Error _ -> ErrorInfo (getField $ extract term) (toTermName' term)
   _ -> LeafInfo (toCategoryName term) (toTermName' term) (getField $ extract term)
   where toTermName' = toTermName blob
@@ -346,3 +349,4 @@ instance P.Pretty DiffInfo where
   pretty LeafInfo{..} = squotes (string $ toSL termName) <+> string (toSL categoryName)
   pretty BranchInfo{..} = mconcat $ punctuate (string "," P.<> space) (pretty <$> branches)
   pretty ErrorInfo{..} = squotes (string $ toSL termName) <+> "at" <+> (string . toSL $ displayStartEndPos errorSpan)
+  pretty HideInfo = ""
