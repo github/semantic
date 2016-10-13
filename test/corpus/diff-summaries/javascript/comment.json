@@ -1,25 +1,7 @@
 [{
     "testCaseDescription": "javascript-comment-insert-test",
     "expectedResult": {
-        "changes": {
-            "comment.js": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the '// This is a property' comment"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -32,40 +14,7 @@
 ,{
     "testCaseDescription": "javascript-comment-replacement-insert-test",
     "expectedResult": {
-        "changes": {
-            "comment.js": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the '/*\n * This is a method\n*/' comment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Added the '// This is a property' comment"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -78,37 +27,7 @@
 ,{
     "testCaseDescription": "javascript-comment-delete-insert-test",
     "expectedResult": {
-        "changes": {
-            "comment.js": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    22
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the '/*\n * This is a method\n*/' comment with the '// This is a property' comment"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -121,37 +40,7 @@
 ,{
     "testCaseDescription": "javascript-comment-replacement-test",
     "expectedResult": {
-        "changes": {
-            "comment.js": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    22
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    3
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the '// This is a property' comment with the '/*\n * This is a method\n*/' comment"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -164,55 +53,7 @@
 ,{
     "testCaseDescription": "javascript-comment-delete-replacement-test",
     "expectedResult": {
-        "changes": {
-            "comment.js": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '/*\n * This is a method\n*/' comment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '// This is a property' comment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the '/*\n * This is a method\n*/' comment"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -225,25 +66,7 @@
 ,{
     "testCaseDescription": "javascript-comment-delete-test",
     "expectedResult": {
-        "changes": {
-            "comment.js": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                22
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '// This is a property' comment"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
@@ -256,25 +79,7 @@
 ,{
     "testCaseDescription": "javascript-comment-delete-rest-test",
     "expectedResult": {
-        "changes": {
-            "comment.js": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '/*\n * This is a method\n*/' comment"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
