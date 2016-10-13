@@ -158,7 +158,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
-  S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params <> " function"
+  S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
