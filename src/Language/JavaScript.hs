@@ -50,8 +50,8 @@ termConstructor source sourceSpan name range children
     ("object", _) -> S.Object $ foldMap toTuple children
     ("pair", _) -> S.Fixed children
     ("comment", _) -> S.Comment . toText $ slice range source
-    ("if_statement", [ expr, clause1, clause2 ]) -> S.If expr clause1 (Just clause2)
-    ("if_statement", [ expr, clause ]) -> S.If expr clause Nothing
+    ("if_statement", [ expr, thenClause, elseClause ]) -> toElseIf expr thenClause elseClause
+    ("if_statement", [ expr, thenClause ]) -> S.If expr thenClause []
     ("while_statement", [ expr, body ]) -> S.While expr body
     ("do_statement", [ expr, body ]) -> S.DoWhile expr body
     ("throw_statement", [ expr ]) -> S.Throw expr
@@ -156,6 +156,19 @@ categoryForJavaScriptProductionName name = case name of
 
 toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
 toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl child
+
+-- | Convert a If Term to If Syntax. This handles nested else-if clauses recursively,
+-- | and satisfies arbitrarily long else-if clauses.
+toElseIf :: Term (S.Syntax Text) (Record fields)
+         -> Term (S.Syntax Text) (Record fields)
+         -> Term (S.Syntax Text) (Record fields)
+         -> S.Syntax Text (Term (S.Syntax Text) (Record fields))
+toElseIf expr thenClause elseClause = S.If expr thenClause (elseClause' elseClause)
+  where
+    elseClause' term = case unwrap term of
+      S.If _ _ [] -> [ term ]
+      S.If then' else' children -> [ cofree (extract term :< S.If then' else' []) ] <> (elseClause' =<< children)
+      _ -> [ term ]
 
 toTuple :: Term (S.Syntax Text) (Record fields) -> [Term (S.Syntax Text) (Record fields)]
 toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
