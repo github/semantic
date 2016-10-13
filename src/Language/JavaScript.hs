@@ -3,11 +3,10 @@ module Language.JavaScript where
 
 import Data.Record
 import Info
-import Prologue hiding (head)
+import Prologue
 import Source
 import qualified Syntax as S
 import Term
-import Data.List (head)
 
 operators :: [Text]
 operators = [ "op", "bool_op", "math_op", "delete_op", "type_op", "void_op", "rel_op", "bitwise_op" ]
@@ -50,9 +49,7 @@ termConstructor source sourceSpan name range children
     ("case", [ expr, body ]) -> S.Case expr body
     ("object", _) -> S.Object $ foldMap toTuple children
     ("pair", _) -> S.Fixed children
-    ("if_statement", [ expr, thenClause, elseClause ]) -> case unwrap elseClause of
-                                                            S.If{} -> S.If expr thenClause [(toElseIf elseClause)]
-                                                            _ -> S.If expr thenClause [elseClause]
+    ("if_statement", [ expr, thenClause, elseClause ]) -> toElseIf expr thenClause elseClause
     ("if_statement", [ expr, thenClause ]) -> S.If expr thenClause []
     ("while_statement", [ expr, body ]) -> S.While expr body
     ("do_statement", [ expr, body ]) -> S.DoWhile expr body
@@ -161,10 +158,16 @@ toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl chil
 
 -- | Convert a If Term to If Syntax. This handles nested else-if clauses recursively,
 -- | and satisfies arbitrarily long else-if clauses.
-toElseIf :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
-toElseIf child = case unwrap child of
-  S.If expr thenClause elseClause -> cofree $ setCategory (extract child) If :< S.If expr thenClause (toElseIf <$> elseClause)
-  _ -> child
+toElseIf :: Term (S.Syntax Text) (Record fields)
+         -> Term (S.Syntax Text) (Record fields)
+         -> Term (S.Syntax Text) (Record fields)
+         -> S.Syntax Text (Term (S.Syntax Text) (Record fields))
+toElseIf expr thenClause elseClause = S.If expr thenClause (elseClause' elseClause)
+  where
+    elseClause' term = case unwrap term of
+      S.If _ _ [] -> [ term ]
+      S.If then' else' children -> [ cofree (extract term :< S.If then' else' []) ] <> (elseClause' =<< children)
+      _ -> [ term ]
 
 toTuple :: Term (S.Syntax Text) (Record fields) -> [Term (S.Syntax Text) (Record fields)]
 toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
