@@ -17,51 +17,6 @@
                         }
                     },
                     "summary": "Added the 'x' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                16
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                31
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                46
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'e' if statement"
                 }
             ]
         },
@@ -70,9 +25,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "fff6323d021499933be7ea2e85391d2d8bb9a65a",
+    "sha1": "3903cb97b8c7fe507a17fa52ec09e6eaa1e95ad8",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "93de851722b5e93b2834dfa599e90148d2397e57"
+    "sha2": "182d895f1ed34f6ea3f5e01ebec34f3872486ae2"
 }
 ,{
     "testCaseDescription": "javascript-if-else-replacement-insert-test",
@@ -98,51 +53,6 @@
                     "span": {
                         "insert": {
                             "start": [
-                                1,
-                                16
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                35
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'k' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                50
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'm' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
                                 2,
                                 1
                             ],
@@ -153,51 +63,6 @@
                         }
                     },
                     "summary": "Added the 'x' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                16
-                            ],
-                            "end": [
-                                3,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                31
-                            ],
-                            "end": [
-                                3,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'c' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                46
-                            ],
-                            "end": [
-                                3,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'e' if statement"
                 }
             ]
         },
@@ -206,9 +71,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "93de851722b5e93b2834dfa599e90148d2397e57",
+    "sha1": "182d895f1ed34f6ea3f5e01ebec34f3872486ae2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "008c01d9f651d4927ed8fd6e4715ed7fc4aa4e11"
+    "sha2": "b27dbe99809ec3a3cff8c1bdac1829a7ec7f3a2a"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-insert-test",
@@ -436,6 +301,33 @@
                         }
                     },
                     "summary": "Deleted the 'n' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    69
+                                ],
+                                "end": [
+                                    1,
+                                    70
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    61
+                                ],
+                                "end": [
+                                    1,
+                                    62
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'o' identifier with the 'g' identifier"
                 }
             ]
         },
@@ -444,9 +336,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "008c01d9f651d4927ed8fd6e4715ed7fc4aa4e11",
+    "sha1": "b27dbe99809ec3a3cff8c1bdac1829a7ec7f3a2a",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0d08ea7dcaa25c97baf823149bd4a6cd7278f286"
+    "sha2": "2713de071b224835fcb35bf709342334422c4fb7"
 }
 ,{
     "testCaseDescription": "javascript-if-else-replacement-test",
@@ -674,6 +566,33 @@
                         }
                     },
                     "summary": "Deleted the 'f' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    61
+                                ],
+                                "end": [
+                                    1,
+                                    62
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    69
+                                ],
+                                "end": [
+                                    1,
+                                    70
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'g' identifier with the 'o' identifier"
                 }
             ]
         },
@@ -682,9 +601,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "0d08ea7dcaa25c97baf823149bd4a6cd7278f286",
+    "sha1": "2713de071b224835fcb35bf709342334422c4fb7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "ce82032008af2ba3f4fbdb1660a5ff7559d833f6"
+    "sha2": "acdc250e3e92d45007edc022e7a46bd7c8870264"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-replacement-test",
@@ -710,51 +629,6 @@
                     "span": {
                         "delete": {
                             "start": [
-                                1,
-                                16
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' if statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                35
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'k' if statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                50
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'm' if statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
                                 2,
                                 1
                             ],
@@ -765,51 +639,6 @@
                         }
                     },
                     "summary": "Deleted the 'x' if statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                16
-                            ],
-                            "end": [
-                                3,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' if statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                31
-                            ],
-                            "end": [
-                                3,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' if statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                46
-                            ],
-                            "end": [
-                                3,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'e' if statement"
                 },
                 {
                     "span": {
@@ -825,51 +654,6 @@
                         }
                     },
                     "summary": "Added the 'g' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                16
-                            ],
-                            "end": [
-                                3,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'i' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                35
-                            ],
-                            "end": [
-                                3,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'k' if statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                50
-                            ],
-                            "end": [
-                                3,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'm' if statement"
                 }
             ]
         },
@@ -878,9 +662,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "ce82032008af2ba3f4fbdb1660a5ff7559d833f6",
+    "sha1": "acdc250e3e92d45007edc022e7a46bd7c8870264",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "14dd7a551904082078df077f2be64632f828edc0"
+    "sha2": "c05504705f6307d70ec027ce0da03266c41b4333"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-test",
@@ -901,51 +685,6 @@
                         }
                     },
                     "summary": "Deleted the 'x' if statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                16
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a' if statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                31
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'c' if statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                46
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'e' if statement"
                 }
             ]
         },
@@ -954,9 +693,9 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "14dd7a551904082078df077f2be64632f828edc0",
+    "sha1": "c05504705f6307d70ec027ce0da03266c41b4333",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "79b0c2bdef22996d3626e285fc4e078c03bbaa86"
+    "sha2": "dbba6da8532f1191731609e596468ea525643576"
 }
 ,{
     "testCaseDescription": "javascript-if-else-delete-rest-test",
@@ -977,51 +716,6 @@
                         }
                     },
                     "summary": "Deleted the 'g' if statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                16
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'i' if statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                35
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'k' if statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                50
-                            ],
-                            "end": [
-                                2,
-                                1
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'm' if statement"
                 }
             ]
         },
@@ -1030,7 +724,7 @@
     "filePaths": [
         "if-else.js"
     ],
-    "sha1": "79b0c2bdef22996d3626e285fc4e078c03bbaa86",
+    "sha1": "dbba6da8532f1191731609e596468ea525643576",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3903cb97b8c7fe507a17fa52ec09e6eaa1e95ad8"
+    "sha2": "4c75eac553b89390d3a122886e4797b7e470dc3f"
 }]
