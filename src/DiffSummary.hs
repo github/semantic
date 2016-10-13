@@ -72,7 +72,7 @@ data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text, sourceSpan ::
  | HideInfo -- Hide/Strip from summary output entirely.
  deriving (Eq, Show)
 
-data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
+data Branch = BIndexed | BFixed | BCommented | BIf deriving (Show, Eq, Generic)
 
 data DiffSummary a = DiffSummary {
   patch :: Patch a,
@@ -246,9 +246,10 @@ termToDiffInfo blob term = case unwrap term of
   S.Comment _ -> HideInfo
   S.Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
   S.Error _ -> ErrorInfo (getField $ extract term) (toTermName' term)
-  _ -> LeafInfo (toCategoryName term) (toTermName' term) (getField $ extract term)
+  _ -> toLeafInfo term
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob
+        toLeafInfo term = LeafInfo (toCategoryName term) (toTermName' term) (getField $ extract term)
 
 -- | Append a parentAnnotation to the current DiffSummary instance.
 -- | For a DiffSummary without a parentAnnotation, we append a parentAnnotation with the first identifiable term.
