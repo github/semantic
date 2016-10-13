@@ -151,7 +151,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
   (LeafInfo "anonymous function" termName _) -> squotes (toDoc termName) <+> string "function"
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
-  (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
+  (LeafInfo cName@"export statement" termName _) -> P.enclose (string "{ ") (string " }") (toDoc termName) <+> toDoc cName
   LeafInfo{..} -> squotes (toDoc termName) <+> toDoc categoryName
   node -> panic $ "Expected a leaf info but got a: " <> show node
 
