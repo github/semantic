@@ -104,6 +104,12 @@ diffToDiffSummaries sources = para $ \diff ->
   where
     (beforeSource, afterSource) = runJoin sources
 
+-- Takes a 'DiffSummary DiffInfo' and returns a list of JSON Summaries whose text summaries represent the LeafInfo summaries of the 'DiffSummary'.
+summaryToTexts :: DiffSummary DiffInfo -> [JSONSummary Text SourceSpans]
+summaryToTexts DiffSummary{..} = appendParentContexts <$> summaries patch
+  where appendParentContexts jsonSummary =
+          jsonSummary { summary = show $ summary jsonSummary <+> parentContexts parentAnnotation }
+
 -- Flattens a patch of diff infos into a list of docs, one for every 'LeafInfo' or `ErrorInfo` it contains.
 summaries :: Patch DiffInfo -> [JSONSummary Doc SourceSpans]
 summaries = \case
