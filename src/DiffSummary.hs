@@ -23,6 +23,30 @@ import SourceSpan
 import Source
 import Data.Aeson as A
 
+
+data DiffInfo =
+   LeafInfo { categoryName :: Text, termName :: Text, sourceSpan :: SourceSpan }
+ | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
+ | ErrorInfo { errorSpan :: SourceSpan, termName :: Text }
+ | HideInfo -- Hide/Strip from summary output entirely.
+ deriving (Eq, Show)
+
+data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
+
+data DiffSummary a = DiffSummary {
+  patch :: Patch a,
+  parentAnnotation :: [Either (Category, Text) (Category, Text)]
+} deriving (Eq, Functor, Show, Generic)
+
+data JSONSummary summary span =
+    JSONSummary { summary :: summary, span :: span }
+  | ErrorSummary { summary :: summary, span :: span }
+  deriving (Generic, Eq, Show)
+
+instance (ToJSON summary, ToJSON span) => ToJSON (JSONSummary summary span) where
+  toJSON JSONSummary{..} = object [ "summary" .= summary, "span" .= span ]
+  toJSON ErrorSummary{..} = object [ "summary" .= summary, "span" .= span ]
+
 data Annotatable a = Annotatable a | Unannotatable a
 
 annotatable :: SyntaxTerm leaf fields -> Annotatable (SyntaxTerm leaf fields)
@@ -54,36 +78,12 @@ identifiable term = isIdentifiable (unwrap term) term
           S.Export{} -> Identifiable
           _ -> Unidentifiable
 
-data JSONSummary summary span = JSONSummary { summary :: summary, span :: span }
-                 | ErrorSummary { summary :: summary, span :: span }
-                 deriving (Generic, Eq, Show)
-
-instance (ToJSON summary, ToJSON span) => ToJSON (JSONSummary summary span) where
-  toJSON JSONSummary{..} = object [ "summary" .= summary, "span" .= span ]
-  toJSON ErrorSummary{..} = object [ "summary" .= summary, "span" .= span ]
-
 isErrorSummary :: JSONSummary summary span -> Bool
 isErrorSummary ErrorSummary{} = True
 isErrorSummary _ = False
 
-data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text, sourceSpan :: SourceSpan }
- | BranchInfo { branches :: [ DiffInfo ], categoryName :: Text, branchType :: Branch }
- | ErrorInfo { errorSpan :: SourceSpan, termName :: Text }
- | HideInfo -- Hide/Strip from summary output entirely.
- deriving (Eq, Show)
-
-data Branch = BIndexed | BFixed | BCommented | BIf deriving (Show, Eq, Generic)
-
-data DiffSummary a = DiffSummary {
-  patch :: Patch a,
-  parentAnnotation :: [Either (Category, Text) (Category, Text)]
-} deriving (Eq, Functor, Show, Generic)
 
 -- Returns a list of diff summary texts given two source blobs and a diff.
-diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) =>
-                  Both SourceBlob ->
-                  SyntaxDiff leaf fields ->
-                  [JSONSummary Text SourceSpans]
 diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> blobs) diff
 
 -- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
