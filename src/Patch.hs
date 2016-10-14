@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -funbox-strict-fields #-}
 module Patch
 ( Patch(..)
 , replacing

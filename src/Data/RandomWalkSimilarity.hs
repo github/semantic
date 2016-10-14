@@ -1,4 +1,5 @@
 {-# LANGUAGE DataKinds, GADTs, RankNTypes, ScopedTypeVariables, TypeOperators #-}
+{-# OPTIONS_GHC -funbox-strict-fields #-}
 module Data.RandomWalkSimilarity
 ( rws
 , pqGramDecorator
@@ -11,6 +12,7 @@ module Data.RandomWalkSimilarity
 , stripDiff
 , stripTerm
 , Gram(..)
+, Label
 ) where
 
 import Control.Applicative
@@ -34,23 +36,26 @@ import Data.Align.Generic
 import Data.These
 import Diff
 
+type Label f fields label = forall b. TermF f (Record fields) b -> label
+
 -- | Given a function comparing two terms recursively,
 -- a function to compute a Hashable label from an unpacked term, and two lists of terms,
 -- compute the diff of a pair of lists of terms using a random walk similarity metric,
 -- which completes in log-linear time.
 --
 -- This implementation is based on the paper [_RWS-Diff—Flexible and Efficient Change Detection in Hierarchical Data_](https://github.com/github/semantic-diff/files/325837/RWS-Diff.Flexible.and.Efficient.Change.Detection.in.Hierarchical.Data.pdf).
-rws :: forall f fields.
+rws :: forall f fields label.
     (GAlign f,
      Traversable f,
      Eq (f (Term f Category)),
-     HasField fields Category,
-     HasField fields (Vector.Vector Double))
+     Hashable label,
+     HasField fields Category)
     => (Term f (Record fields) -> Term f (Record fields) -> Maybe (Diff f (Record fields))) -- ^ A function which compares a pair of terms recursively, returning 'Just' their diffed value if appropriate, or 'Nothing' if they should not be compared.
+    -> Label f fields label
     -> [Term f (Record fields)] -- ^ The list of old terms.
     -> [Term f (Record fields)] -- ^ The list of new terms.
     -> [Diff f (Record fields)] -- ^ The resulting list of similarity-matched diffs.
-rws compare as bs
+rws compare getLabel as bs
   | null as, null bs = []
   | null as = inserting <$> bs
   | null bs = deleting <$> as
@@ -163,7 +168,8 @@ rws compare as bs
     kdas = KdTree.build (Vector.toList . feature) featurizedAs
     kdbs = KdTree.build (Vector.toList . feature) featurizedBs
 
-    featurize index term = UnmappedTerm index (getField (extract term)) term
+    featurize :: Int -> Term f (Record fields) -> UnmappedTerm f fields
+    featurize index term = UnmappedTerm index (getField . extract $ defaultFeatureVectorDecorator getLabel term) term
 
     toMap = IntMap.fromList . fmap (termIndex &&& identity)
 
@@ -214,7 +220,7 @@ defaultM :: Integer
 defaultM = 10
 
 -- | A term which has not yet been mapped by `rws`, along with its feature vector summary & index.
-data UnmappedTerm f fields = UnmappedTerm { termIndex :: {-# UNPACK #-} !Int, feature :: !(Vector.Vector Double), term :: !(Term f (Record fields)) }
+data UnmappedTerm f fields = UnmappedTerm { termIndex :: Int, feature :: Vector.Vector Double, term :: (Term f (Record fields)) }
 
 -- | Either a `term`, an index of a matched term, or nil.
 data TermOrIndexOrNil term = Term term | Index Int | Nil
@@ -229,13 +235,13 @@ data Gram label = Gram { stem :: [Maybe label], base :: [Maybe label] }
 -- | Annotates a term with a feature vector at each node, using the default values for the p, q, and d parameters.
 defaultFeatureVectorDecorator
   :: (Hashable label, Traversable f)
-  => (forall b. TermF f (Record fields) b -> label)
+  => Label f fields label
   -> Term f (Record fields)
   -> Term f (Record (Vector.Vector Double ': fields))
 defaultFeatureVectorDecorator getLabel = featureVectorDecorator getLabel defaultP defaultQ defaultD
 
 -- | Annotates a term with a feature vector at each node, parameterized by stem length, base width, and feature vector dimensions.
-featureVectorDecorator :: (Hashable label, Traversable f) => (forall b. TermF f (Record fields) b -> label) -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (Vector.Vector Double ': fields))
+featureVectorDecorator :: (Hashable label, Traversable f) => Label f fields label -> Int -> Int -> Int -> Term f (Record fields) -> Term f (Record (Vector.Vector Double ': fields))
 featureVectorDecorator getLabel p q d
   = cata (\ (RCons gram rest :< functor) ->
       cofree ((foldr (Vector.zipWith (+) . getField . extract) (unitVector d (hash gram)) functor .: rest) :< functor))
@@ -244,7 +250,7 @@ featureVectorDecorator getLabel p q d
 -- | Annotates a term with the corresponding p,q-gram at each node.
 pqGramDecorator
   :: Traversable f
-  => (forall b. TermF f (Record fields) b -> label) -- ^ A function computing the label from an arbitrary unpacked term. This function can use the annotation and functor’s constructor, but not any recursive values inside the functor (since they’re held parametric in 'b').
+  => Label f fields label -- ^ A function computing the label from an arbitrary unpacked term. This function can use the annotation and functor’s constructor, but not any recursive values inside the functor (since they’re held parametric in 'b').
   -> Int -- ^ 'p'; the desired stem length for the grams.
   -> Int -- ^ 'q'; the desired base length for the grams.
   -> Term f (Record fields) -- ^ The term to decorate.

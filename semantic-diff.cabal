@@ -91,7 +91,7 @@ library
                      , vector
                      , wl-pprint-text
   default-language:    Haskell2010
-  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, LambdaCase
+  default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, LambdaCase, StrictData
   ghc-options:        -Wall -fno-warn-name-shadowing -O2 -fprof-auto -j
 
 executable semantic-diff

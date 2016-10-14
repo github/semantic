@@ -7,7 +7,6 @@ import Data.Functor.Both
 import Data.List (union)
 import Data.Record
 import qualified Data.Text as T
-import qualified Data.Vector as Vector
 import Diffing
 import GHC.Show (Show(..))
 import Info
@@ -75,7 +74,7 @@ normalizeName path = addExtension (dropExtension $ dropExtension path) (takeExte
 -- | Given file paths for A, B, and, optionally, a diff, return whether diffing
 -- | the files will produce the diff. If no diff is provided, then the result
 -- | is true, but the diff will still be calculated.
-testDiff :: Renderer (Record '[Vector.Vector Double, Cost, Range, Category, SourceSpan]) -> Both (Maybe FilePath) -> Maybe FilePath -> (Maybe Verbatim -> Maybe Verbatim -> Expectation) -> Expectation
+testDiff :: Renderer (Record '[Cost, Range, Category, SourceSpan]) -> Both (Maybe FilePath) -> Maybe FilePath -> (Maybe Verbatim -> Maybe Verbatim -> Expectation) -> Expectation
 testDiff renderer paths diff matcher = do
   sources <- traverse (traverse readAndTranscodeFile) paths
   actual <- fmap Verbatim <$> traverse ((pure . concatOutputs . pure) <=< diffFiles' sources) parser

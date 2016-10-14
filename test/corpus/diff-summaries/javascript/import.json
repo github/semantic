@@ -130,9 +130,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "cac09a18ecd71b43948019911497d73b36d5fb38",
+    "sha1": "110e284b9b5d70a24d6747dbb0e6e6f7525b44f3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7a255c5674a94beedd27043f8b2999f24129c3d1"
+    "sha2": "8929273e7a60a0f8d0b25917e9f9e7b8808492b9"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-insert-test",
@@ -386,9 +386,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "7a255c5674a94beedd27043f8b2999f24129c3d1",
+    "sha1": "8929273e7a60a0f8d0b25917e9f9e7b8808492b9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7da58d7af4db5a7f625d3941a35094aebaa6fab5"
+    "sha2": "d56d94f765b22f263b9cf7a2bff4a62697f6e8a2"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-insert-test",
@@ -478,30 +478,63 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    25
-                                ],
-                                "end": [
-                                    3,
-                                    33
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    24
-                                ],
-                                "end": [
-                                    3,
-                                    29
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                30
+                            ]
+                        }
                     },
-                    "summary": "Replaced the \"badger\" string with the \"ant\" string in the \"ant\" import statement"
+                    "summary": "Added the '\"ant\"' import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                46
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"antelope\"' import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"ant-eater\"' import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                70
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"anaconda\"' import statement"
                 },
                 {
                     "span": {
@@ -509,404 +542,116 @@
                             {
                                 "start": [
                                     3,
-                                    10
+                                    1
                                 ],
                                 "end": [
                                     3,
-                                    17
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    10
-                                ],
-                                "end": [
-                                    3,
-                                    16
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'element' identifier with the 'member' identifier in the \"ant\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    37
-                                ],
-                                "end": [
-                                    4,
-                                    49
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    35
-                                ],
-                                "end": [
-                                    4,
-                                    45
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"bald-eagle\" string with the \"antelope\" string in the \"antelope\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    10
-                                ],
-                                "end": [
-                                    4,
-                                    18
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    10
-                                ],
-                                "end": [
-                                    4,
-                                    17
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'element1' identifier with the 'member1' identifier in the \"antelope\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    21
-                                ],
-                                "end": [
-                                    4,
-                                    29
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    20
-                                ],
-                                "end": [
-                                    4,
-                                    27
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'element2' identifier with the 'member2' identifier in the \"antelope\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    54
-                                ],
-                                "end": [
-                                    5,
-                                    65
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    45
-                                ],
-                                "end": [
-                                    5,
-                                    56
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"bandicoot\" string with the \"ant-eater\" string in the \"ant-eater\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    10
-                                ],
-                                "end": [
-                                    5,
-                                    18
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    10
-                                ],
-                                "end": [
-                                    5,
-                                    17
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'element1' identifier with the 'member1' identifier in the \"ant-eater\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    21
-                                ],
-                                "end": [
-                                    5,
-                                    29
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    20
-                                ],
-                                "end": [
-                                    5,
-                                    27
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'element2' identifier with the 'member2' identifier in the \"ant-eater\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    33
-                                ],
-                                "end": [
-                                    5,
-                                    46
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    31
-                                ],
-                                "end": [
-                                    5,
-                                    37
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'elementAlias2' identifier with the 'alias2' identifier in the \"ant-eater\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    68
-                                ],
-                                "end": [
-                                    6,
-                                    77
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    59
-                                ],
-                                "end": [
-                                    6,
-                                    69
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"banteng\" string with the \"anaconda\" string in the \"anaconda\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    25
-                                ],
-                                "end": [
-                                    6,
-                                    33
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    25
-                                ],
-                                "end": [
-                                    6,
-                                    32
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'element1' identifier with the 'member1' identifier in the \"anaconda\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    35
-                                ],
-                                "end": [
-                                    6,
-                                    43
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
                                     34
-                                ],
-                                "end": [
-                                    6,
-                                    41
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'element2' identifier with the 'member2' identifier in the \"anaconda\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    47
-                                ],
-                                "end": [
-                                    6,
-                                    60
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    45
-                                ],
-                                "end": [
-                                    6,
-                                    51
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'elementAlias2' identifier with the 'alias2' identifier in the \"anaconda\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    41
-                                ],
-                                "end": [
-                                    7,
-                                    49
                                 ]
                             },
                             {
                                 "start": [
                                     7,
-                                    38
+                                    1
                                 ],
                                 "end": [
                                     7,
-                                    49
+                                    50
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"barbet\" string with the \"alligator\" string in the \"alligator\" import statement"
+                    "summary": "Replaced the '\"badger\"' import statement with the '\"alligator\"' import statement"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    28
-                                ],
-                                "end": [
-                                    7,
-                                    35
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    28
-                                ],
-                                "end": [
-                                    7,
-                                    32
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                22
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'element' identifier with the 'name' identifier in the \"alligator\" import statement"
+                    "summary": "Added the '\"arctic-tern\"' import statement"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    8,
-                                    8
-                                ],
-                                "end": [
-                                    8,
-                                    18
-                                ]
-                            },
-                            {
-                                "start": [
-                                    8,
-                                    8
-                                ],
-                                "end": [
-                                    8,
-                                    21
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                50
+                            ]
+                        }
                     },
-                    "summary": "Replaced the \"basilisk\" string with the \"arctic-tern\" string in the \"arctic-tern\" import statement"
+                    "summary": "Deleted the '\"bald-eagle\"' import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"bandicoot\"' import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                78
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"banteng\"' import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"barbet\"' import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"basilisk\"' import statement"
                 }
             ]
         },
@@ -915,9 +660,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "7da58d7af4db5a7f625d3941a35094aebaa6fab5",
+    "sha1": "d56d94f765b22f263b9cf7a2bff4a62697f6e8a2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3360b4e2a79da60cd404db27520862368b5ccf66"
+    "sha2": "70b0e327d1737690933dfcf8c7bd925a1ca4f871"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-test",
@@ -1007,30 +752,63 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    24
-                                ],
-                                "end": [
-                                    3,
-                                    29
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    25
-                                ],
-                                "end": [
-                                    3,
-                                    33
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                34
+                            ]
+                        }
                     },
-                    "summary": "Replaced the \"ant\" string with the \"badger\" string in the \"badger\" import statement"
+                    "summary": "Added the '\"badger\"' import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"bald-eagle\"' import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                66
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"bandicoot\"' import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                78
+                            ]
+                        }
+                    },
+                    "summary": "Added the '\"banteng\"' import statement"
                 },
                 {
                     "span": {
@@ -1038,404 +816,116 @@
                             {
                                 "start": [
                                     3,
-                                    10
+                                    1
                                 ],
                                 "end": [
                                     3,
-                                    16
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    10
-                                ],
-                                "end": [
-                                    3,
-                                    17
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'member' identifier with the 'element' identifier in the \"badger\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    35
-                                ],
-                                "end": [
-                                    4,
-                                    45
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    37
-                                ],
-                                "end": [
-                                    4,
-                                    49
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"antelope\" string with the \"bald-eagle\" string in the \"bald-eagle\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    10
-                                ],
-                                "end": [
-                                    4,
-                                    17
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    10
-                                ],
-                                "end": [
-                                    4,
-                                    18
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'member1' identifier with the 'element1' identifier in the \"bald-eagle\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    4,
-                                    20
-                                ],
-                                "end": [
-                                    4,
-                                    27
-                                ]
-                            },
-                            {
-                                "start": [
-                                    4,
-                                    21
-                                ],
-                                "end": [
-                                    4,
-                                    29
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'member2' identifier with the 'element2' identifier in the \"bald-eagle\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    45
-                                ],
-                                "end": [
-                                    5,
-                                    56
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    54
-                                ],
-                                "end": [
-                                    5,
-                                    65
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"ant-eater\" string with the \"bandicoot\" string in the \"bandicoot\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    10
-                                ],
-                                "end": [
-                                    5,
-                                    17
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    10
-                                ],
-                                "end": [
-                                    5,
-                                    18
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'member1' identifier with the 'element1' identifier in the \"bandicoot\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    20
-                                ],
-                                "end": [
-                                    5,
-                                    27
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    21
-                                ],
-                                "end": [
-                                    5,
-                                    29
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'member2' identifier with the 'element2' identifier in the \"bandicoot\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    5,
-                                    31
-                                ],
-                                "end": [
-                                    5,
-                                    37
-                                ]
-                            },
-                            {
-                                "start": [
-                                    5,
-                                    33
-                                ],
-                                "end": [
-                                    5,
-                                    46
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'alias2' identifier with the 'elementAlias2' identifier in the \"bandicoot\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    59
-                                ],
-                                "end": [
-                                    6,
-                                    69
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    68
-                                ],
-                                "end": [
-                                    6,
-                                    77
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"anaconda\" string with the \"banteng\" string in the \"banteng\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    25
-                                ],
-                                "end": [
-                                    6,
-                                    32
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    25
-                                ],
-                                "end": [
-                                    6,
-                                    33
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'member1' identifier with the 'element1' identifier in the \"banteng\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    34
-                                ],
-                                "end": [
-                                    6,
-                                    41
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    35
-                                ],
-                                "end": [
-                                    6,
-                                    43
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'member2' identifier with the 'element2' identifier in the \"banteng\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    45
-                                ],
-                                "end": [
-                                    6,
-                                    51
-                                ]
-                            },
-                            {
-                                "start": [
-                                    6,
-                                    47
-                                ],
-                                "end": [
-                                    6,
-                                    60
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'alias2' identifier with the 'elementAlias2' identifier in the \"banteng\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    38
-                                ],
-                                "end": [
-                                    7,
-                                    49
+                                    30
                                 ]
                             },
                             {
                                 "start": [
                                     7,
-                                    41
+                                    1
                                 ],
                                 "end": [
                                     7,
-                                    49
+                                    50
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"alligator\" string with the \"barbet\" string in the \"barbet\" import statement"
+                    "summary": "Replaced the '\"ant\"' import statement with the '\"barbet\"' import statement"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    7,
-                                    28
-                                ],
-                                "end": [
-                                    7,
-                                    32
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    28
-                                ],
-                                "end": [
-                                    7,
-                                    35
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                19
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'name' identifier with the 'element' identifier in the \"barbet\" import statement"
+                    "summary": "Added the '\"basilisk\"' import statement"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    8,
-                                    8
-                                ],
-                                "end": [
-                                    8,
-                                    21
-                                ]
-                            },
-                            {
-                                "start": [
-                                    8,
-                                    8
-                                ],
-                                "end": [
-                                    8,
-                                    18
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                46
+                            ]
+                        }
                     },
-                    "summary": "Replaced the \"arctic-tern\" string with the \"basilisk\" string in the \"basilisk\" import statement"
+                    "summary": "Deleted the '\"antelope\"' import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                57
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"ant-eater\"' import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                70
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"anaconda\"' import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"alligator\"' import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                8,
+                                1
+                            ],
+                            "end": [
+                                8,
+                                22
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"arctic-tern\"' import statement"
                 }
             ]
         },
@@ -1444,9 +934,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "3360b4e2a79da60cd404db27520862368b5ccf66",
+    "sha1": "70b0e327d1737690933dfcf8c7bd925a1ca4f871",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "08214146b5b57e52e797e7977fbcfc8c2f2acd6f"
+    "sha2": "67cbd6d7f2a4ae48578af14a879214662d82e4e2"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-replacement-test",
@@ -1820,9 +1310,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "08214146b5b57e52e797e7977fbcfc8c2f2acd6f",
+    "sha1": "67cbd6d7f2a4ae48578af14a879214662d82e4e2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e462942a5f318660d56d311ceb5a0e1c9d6850b1"
+    "sha2": "f98b1467108f4fa1329acff5c7502306c0cb0f5c"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-test",
@@ -1956,9 +1446,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "e462942a5f318660d56d311ceb5a0e1c9d6850b1",
+    "sha1": "f98b1467108f4fa1329acff5c7502306c0cb0f5c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1e79d2b96777685f1ae0e7f9724439aae850cc5f"
+    "sha2": "ae342fb2632b86ad69f348c30b285da6157091b0"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-rest-test",
@@ -2092,7 +1582,7 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "1e79d2b96777685f1ae0e7f9724439aae850cc5f",
+    "sha1": "ae342fb2632b86ad69f348c30b285da6157091b0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "69f9b449dfd4e7e791586a52b66907259414e444"
+    "sha2": "fd1e9b12635afbdec41b1778d104a04b853b883f"
 }]
