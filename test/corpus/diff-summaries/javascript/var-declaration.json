@@ -25,9 +25,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "f8c6c80c7b1c840164b0747f6c700aa4bc9dd96f",
+    "sha1": "fdaf8c2602c344e78793a312cf833a5a9a9cb46e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "098d3f206ed660cd52b4e8da9a3479903c9e75be"
+    "sha2": "d1abc229d0e83f67fc2124b5740525580085ed40"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-replacement-insert-test",
@@ -101,9 +101,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "098d3f206ed660cd52b4e8da9a3479903c9e75be",
+    "sha1": "d1abc229d0e83f67fc2124b5740525580085ed40",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3533ac7e01c9bd233faeb3ea69b032455ecc258d"
+    "sha2": "18b504c4097fe65a42e801efc2ed16418dda0392"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-insert-test",
@@ -112,33 +112,30 @@
             "var-declaration.js": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                5
-                            ],
-                            "end": [
-                                1,
-                                10
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    10
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'x' variable"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                5
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' variable"
+                    "summary": "Replaced the 'x' variable with the 'x' variable"
                 },
                 {
                     "span": {
@@ -177,30 +174,15 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "3533ac7e01c9bd233faeb3ea69b032455ecc258d",
+    "sha1": "18b504c4097fe65a42e801efc2ed16418dda0392",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c657f738a37198dd6f0063ea90692267c20de0a2"
+    "sha2": "61658354f2e278830ee3a5c6f02d8b37b0fe1e52"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-replacement-test",
     "expectedResult": {
         "changes": {
             "var-declaration.js": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                5
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' variable"
-                },
                 {
                     "span": {
                         "replace": [
@@ -217,16 +199,31 @@
                             {
                                 "start": [
                                     1,
-                                    8
+                                    5
                                 ],
                                 "end": [
                                     1,
-                                    14
+                                    6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'x' var assignment with the 'y' var assignment"
+                    "summary": "Replaced the 'x' variable with the 'x' variable"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                8
+                            ],
+                            "end": [
+                                1,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' variable"
                 },
                 {
                     "span": {
@@ -250,9 +247,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "c657f738a37198dd6f0063ea90692267c20de0a2",
+    "sha1": "61658354f2e278830ee3a5c6f02d8b37b0fe1e52",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d97872a968d7cac19a54b18b98f499d0d5e2bf9a"
+    "sha2": "7751deb15f056c3f37069ac03f9fb7d417e1e79c"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-replacement-test",
@@ -371,9 +368,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "d97872a968d7cac19a54b18b98f499d0d5e2bf9a",
+    "sha1": "7751deb15f056c3f37069ac03f9fb7d417e1e79c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "eb6c494f33a21d36522bdf9119284dafac35a602"
+    "sha2": "15b8d678e6eb01d6743e2a4b2b30f186b006ae50"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-test",
@@ -402,9 +399,9 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "eb6c494f33a21d36522bdf9119284dafac35a602",
+    "sha1": "15b8d678e6eb01d6743e2a4b2b30f186b006ae50",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "73ddbbd9322af0974adee136aeed8d73653fc45e"
+    "sha2": "ee2464efd51b875b2bd775bcf48e6a5eec7232fc"
 }
 ,{
     "testCaseDescription": "javascript-var-declaration-delete-rest-test",
@@ -463,7 +460,7 @@
     "filePaths": [
         "var-declaration.js"
     ],
-    "sha1": "73ddbbd9322af0974adee136aeed8d73653fc45e",
+    "sha1": "ee2464efd51b875b2bd775bcf48e6a5eec7232fc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4e38fe5601da692139c04eaaf2b509eb7c849c68"
+    "sha2": "6c964785e6ae52e9f6042b0d12dad2b729b1e4ae"
 }]

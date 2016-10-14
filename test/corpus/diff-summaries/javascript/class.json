@@ -25,9 +25,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "474d3e51b55de08c93ed33cb4f08681567c49789",
+    "sha1": "6f94c3c87b8a5aca474985d3fd63638e48db29f2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c4e17c3e21dc18f702afb25eee510905d7680a64"
+    "sha2": "927891297ed8fd7f8339a330954f671c315f121c"
 }
 ,{
     "testCaseDescription": "javascript-class-replacement-insert-test",
@@ -71,9 +71,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "c4e17c3e21dc18f702afb25eee510905d7680a64",
+    "sha1": "927891297ed8fd7f8339a330954f671c315f121c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7037fa96dfea139b17d6ce24087ad9546d98e17d"
+    "sha2": "673f55820ceb549750cf2971df6bf704651950d9"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-insert-test",
@@ -109,63 +109,57 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                42
-                            ],
-                            "end": [
-                                1,
-                                62
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'two' method in the Foo class"
+                    "summary": "Replaced the 'bar' identifier with the 'two' identifier in the two method of the 'Foo' class"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                63
-                            ],
-                            "end": [
-                                1,
-                                85
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "end": [
+                                    1,
+                                    66
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "end": [
+                                    1,
+                                    68
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'three' method in the Foo class"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                42
-                            ],
-                            "end": [
-                                1,
-                                62
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bar' method in the Foo class"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                63
-                            ],
-                            "end": [
-                                1,
-                                83
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'baz' method in the Foo class"
+                    "summary": "Replaced the 'baz' identifier with the 'three' identifier in the three method of the 'Foo' class"
                 }
             ]
         },
@@ -174,9 +168,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "7037fa96dfea139b17d6ce24087ad9546d98e17d",
+    "sha1": "673f55820ceb549750cf2971df6bf704651950d9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1576b96c584a1e14e0008a9a328c18e9fd405ed0"
+    "sha2": "9186c0af54941776deaa02de1164c36f7f605dc0"
 }
 ,{
     "testCaseDescription": "javascript-class-replacement-test",
@@ -212,63 +206,57 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                42
-                            ],
-                            "end": [
-                                1,
-                                62
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    42
+                                ],
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'bar' method in the Foo class"
+                    "summary": "Replaced the 'two' identifier with the 'bar' identifier in the bar method of the 'Foo' class"
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                63
-                            ],
-                            "end": [
-                                1,
-                                83
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "end": [
+                                    1,
+                                    68
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    63
+                                ],
+                                "end": [
+                                    1,
+                                    66
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'baz' method in the Foo class"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                42
-                            ],
-                            "end": [
-                                1,
-                                62
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'two' method in the Foo class"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                63
-                            ],
-                            "end": [
-                                1,
-                                85
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'three' method in the Foo class"
+                    "summary": "Replaced the 'three' identifier with the 'baz' identifier in the baz method of the 'Foo' class"
                 }
             ]
         },
@@ -277,9 +265,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "1576b96c584a1e14e0008a9a328c18e9fd405ed0",
+    "sha1": "9186c0af54941776deaa02de1164c36f7f605dc0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "283b4a6f9dc3395632f781ce8f0f0b980ce05398"
+    "sha2": "d8c53948104b3c8c586f7d2a742fe31b0574823f"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-replacement-test",
@@ -338,9 +326,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "283b4a6f9dc3395632f781ce8f0f0b980ce05398",
+    "sha1": "d8c53948104b3c8c586f7d2a742fe31b0574823f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "78d3f43c5723767dfabdd999d814d3f11d248931"
+    "sha2": "5017624b71fc70f2c5a338e42647a8ac55ae9b98"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-test",
@@ -369,9 +357,9 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "78d3f43c5723767dfabdd999d814d3f11d248931",
+    "sha1": "5017624b71fc70f2c5a338e42647a8ac55ae9b98",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "5a462ae4c1d73650cf3be9b406d3048127e04bcf"
+    "sha2": "100ecf0c66b14ecce0726148bf79918b8f6b7423"
 }
 ,{
     "testCaseDescription": "javascript-class-delete-rest-test",
@@ -400,7 +388,7 @@
     "filePaths": [
         "class.js"
     ],
-    "sha1": "5a462ae4c1d73650cf3be9b406d3048127e04bcf",
+    "sha1": "100ecf0c66b14ecce0726148bf79918b8f6b7423",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "0e3ab484b61aa0e7144a8933341fd64e0d8d1ddf"
+    "sha2": "d0e76415fa7b018af334625ad116636c7334df00"
 }]

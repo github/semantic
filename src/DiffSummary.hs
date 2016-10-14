@@ -73,7 +73,7 @@ data DiffInfo = LeafInfo { categoryName :: Text, termName :: Text, sourceSpan ::
  | HideInfo -- Hide/Strip from summary output entirely.
  deriving (Eq, Show)
 
-data Branch = BIndexed | BFixed | BCommented deriving (Show, Eq, Generic)
+data Branch = BIndexed | BFixed | BCommented | BIf deriving (Show, Eq, Generic)
 
 data DiffSummary a = DiffSummary {
   patch :: Patch a,
@@ -152,7 +152,7 @@ toLeafInfos HideInfo = []
 toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "number" termName _) -> squotes $ toDoc termName
   (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
-  (LeafInfo "anonymous function" termName _) -> toDoc termName
+  (LeafInfo "anonymous function" termName _) -> toDoc termName <+> "function"
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
   LeafInfo{..} -> squotes (toDoc termName) <+> toDoc categoryName
@@ -161,13 +161,20 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
 -- Returns a text representing a specific term given a source and a term.
 toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
-  S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params <> " function"
+  S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   S.Indexed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
   Leaf leaf -> toCategoryName leaf
   S.Assignment identifier _ -> toTermName' identifier
   S.Function identifier _ _ -> toTermName' identifier
-  S.FunctionCall i args -> toTermName' i <> "(" <> intercalate ", " (toArgName <$> args) <> ")"
+  S.FunctionCall i args -> case unwrap i of
+    S.AnonymousFunction params _ ->
+      -- Omit a function call's arguments if it's arguments match the underlying
+      -- anonymous function's arguments.
+      if (category . extract <$> args) == (category . extract <$> params)
+      then toTermName' i
+      else "(" <> toTermName' i <> ")" <> paramsToArgNames args
+    _ -> toTermName' i <> paramsToArgNames args
   S.MemberAccess base property -> case (unwrap base, unwrap property) of
     (S.FunctionCall{}, S.FunctionCall{}) -> toTermName' base <> "()." <> toTermName' property <> "()"
     (S.FunctionCall{}, _) -> toTermName' base <> "()." <> toTermName' property
@@ -212,9 +219,9 @@ toTermName source term = case unwrap term of
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
   S.Import identifier _ -> toTermName' identifier
-  S.Export Nothing expr -> intercalate ", " $ termNameFromSource <$> expr
-  S.Export (Just identifier) [] -> toTermName' identifier
-  S.Export (Just identifier) expr -> (intercalate ", " $ termNameFromSource <$> expr) <> " from " <> toTermName' identifier
+  S.Export Nothing expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }"
+  S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
+  S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -247,9 +254,10 @@ termToDiffInfo blob term = case unwrap term of
   S.Comment _ -> HideInfo
   S.Commented cs leaf -> BranchInfo (termToDiffInfo' <$> cs <> maybeToList leaf) (toCategoryName term) BCommented
   S.Error _ -> ErrorInfo (getField $ extract term) (toTermName' term)
-  _ -> LeafInfo (toCategoryName term) (toTermName' term) (getField $ extract term)
+  _ -> toLeafInfo term
   where toTermName' = toTermName blob
         termToDiffInfo' = termToDiffInfo blob
+        toLeafInfo term = LeafInfo (toCategoryName term) (toTermName' term) (getField $ extract term)
 
 -- | Append a parentAnnotation to the current DiffSummary instance.
 -- | For a DiffSummary without a parentAnnotation, we append a parentAnnotation with the first identifiable term.

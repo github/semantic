@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1, name2, name3, nameN export statement"
+                    "summary": "Added the { name1, name2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the variable1 as name1, variable2 as name2, nameN export statement"
+                    "summary": "Added the { variable1 as name1, variable2 as name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -46,7 +46,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1, name2, nameN export statement"
+                    "summary": "Added the { name1, name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -61,7 +61,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1 = value1, name2 = value2, name3, nameN export statement"
+                    "summary": "Added the { name1 = value1, name2 = value2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -76,7 +76,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the namedFunction export statement"
+                    "summary": "Added the { namedFunction } export statement"
                 },
                 {
                     "span": {
@@ -91,7 +91,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the anonymous() function export statement"
+                    "summary": "Added the { anonymous() } export statement"
                 },
                 {
                     "span": {
@@ -106,7 +106,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1 export statement"
+                    "summary": "Added the { name1 } export statement"
                 },
                 {
                     "span": {
@@ -121,7 +121,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1 as default export statement"
+                    "summary": "Added the { name1 as default } export statement"
                 },
                 {
                     "span": {
@@ -136,7 +136,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' export statement"
+                    "summary": "Added the { 'foo' } export statement"
                 },
                 {
                     "span": {
@@ -151,7 +151,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1, name2, nameN from 'foo' export statement"
+                    "summary": "Added the { name1, name2, nameN } from 'foo' export statement"
                 },
                 {
                     "span": {
@@ -166,7 +166,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the import1 as name1, import2 as name2, nameN from 'bar' export statement"
+                    "summary": "Added the { import1 as name1, import2 as name2, nameN } from 'bar' export statement"
                 }
             ]
         },
@@ -175,9 +175,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "90c40d6b9d264c5ccacb7f69012bd0579bfe2467",
+    "sha1": "c2a1c74671641df29dcd7c30779f9ff6a04e0229",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "c3ac63e01f7de31b9164d7fa0eeb4602e7f6f1d3"
+    "sha2": "f9742725541e31b93ddbaca4e9cdb6dab082fdd4"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-insert-test",
@@ -197,7 +197,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name4, name5, name6, nameZ export statement"
+                    "summary": "Added the { name4, name5, name6, nameZ } export statement"
                 },
                 {
                     "span": {
@@ -212,7 +212,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the variable2 as name2, variable3 as name3, nameY export statement"
+                    "summary": "Added the { variable2 as name2, variable3 as name3, nameY } export statement"
                 },
                 {
                     "span": {
@@ -227,7 +227,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name3, name4, nameT export statement"
+                    "summary": "Added the { name3, name4, nameT } export statement"
                 },
                 {
                     "span": {
@@ -242,7 +242,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name2 = value2, name3 = value3, name4, nameO export statement"
+                    "summary": "Added the { name2 = value2, name3 = value3, name4, nameO } export statement"
                 },
                 {
                     "span": {
@@ -257,7 +257,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the otherNamedFunction export statement"
+                    "summary": "Added the { otherNamedFunction } export statement"
                 },
                 {
                     "span": {
@@ -272,7 +272,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the newName1 export statement"
+                    "summary": "Added the { newName1 } export statement"
                 },
                 {
                     "span": {
@@ -287,7 +287,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the anonymous() function export statement"
+                    "summary": "Added the { anonymous() } export statement"
                 },
                 {
                     "span": {
@@ -302,7 +302,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name2 as statement export statement"
+                    "summary": "Added the { name2 as statement } export statement"
                 },
                 {
                     "span": {
@@ -317,7 +317,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'baz' export statement"
+                    "summary": "Added the { 'baz' } export statement"
                 },
                 {
                     "span": {
@@ -332,7 +332,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name7, name8, nameP from 'buzz' export statement"
+                    "summary": "Added the { name7, name8, nameP } from 'buzz' export statement"
                 },
                 {
                     "span": {
@@ -347,7 +347,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the import6 as name6, import7 as name7, nameB from 'fizz' export statement"
+                    "summary": "Added the { import6 as name6, import7 as name7, nameB } from 'fizz' export statement"
                 },
                 {
                     "span": {
@@ -362,7 +362,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1, name2, name3, nameN export statement"
+                    "summary": "Added the { name1, name2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -377,7 +377,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the variable1 as name1, variable2 as name2, nameN export statement"
+                    "summary": "Added the { variable1 as name1, variable2 as name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -392,7 +392,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1, name2, nameN export statement"
+                    "summary": "Added the { name1, name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -407,7 +407,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1 = value1, name2 = value2, name3, nameN export statement"
+                    "summary": "Added the { name1 = value1, name2 = value2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -422,7 +422,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the namedFunction export statement"
+                    "summary": "Added the { namedFunction } export statement"
                 },
                 {
                     "span": {
@@ -437,7 +437,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the anonymous() function export statement"
+                    "summary": "Added the { anonymous() } export statement"
                 },
                 {
                     "span": {
@@ -452,7 +452,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1 export statement"
+                    "summary": "Added the { name1 } export statement"
                 },
                 {
                     "span": {
@@ -467,7 +467,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1 as default export statement"
+                    "summary": "Added the { name1 as default } export statement"
                 },
                 {
                     "span": {
@@ -482,7 +482,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' export statement"
+                    "summary": "Added the { 'foo' } export statement"
                 },
                 {
                     "span": {
@@ -497,7 +497,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1, name2, nameN from 'foo' export statement"
+                    "summary": "Added the { name1, name2, nameN } from 'foo' export statement"
                 },
                 {
                     "span": {
@@ -512,7 +512,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the import1 as name1, import2 as name2, nameN from 'bar' export statement"
+                    "summary": "Added the { import1 as name1, import2 as name2, nameN } from 'bar' export statement"
                 }
             ]
         },
@@ -521,9 +521,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "c3ac63e01f7de31b9164d7fa0eeb4602e7f6f1d3",
+    "sha1": "f9742725541e31b93ddbaca4e9cdb6dab082fdd4",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "971363f4200f3624e6501f6f0fdeb9dc50f166a7"
+    "sha2": "a08aafc86a58606c8964e44993eb2bd2c7b20254"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-insert-test",
@@ -555,7 +555,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'name4' identifier with the 'name1' identifier in the name1, name2, name3, nameN export statement"
+                    "summary": "Replaced the 'name4' identifier with the 'name1' identifier in the { name1, name2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -582,7 +582,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'name5' identifier with the 'name2' identifier in the name1, name2, name3, nameN export statement"
+                    "summary": "Replaced the 'name5' identifier with the 'name2' identifier in the { name1, name2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -609,7 +609,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'name6' identifier with the 'name3' identifier in the name1, name2, name3, nameN export statement"
+                    "summary": "Replaced the 'name6' identifier with the 'name3' identifier in the { name1, name2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -636,7 +636,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'nameZ' identifier with the 'nameN' identifier in the name1, name2, name3, nameN export statement"
+                    "summary": "Replaced the 'nameZ' identifier with the 'nameN' identifier in the { name1, name2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -663,7 +663,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'variable2' identifier with the 'variable1' identifier in the variable1 as name1, variable2 as name2, nameN export statement"
+                    "summary": "Replaced the 'variable2' identifier with the 'variable1' identifier in the { variable1 as name1, variable2 as name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -690,7 +690,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'name2' identifier with the 'name1' identifier in the variable1 as name1, variable2 as name2, nameN export statement"
+                    "summary": "Replaced the 'name2' identifier with the 'name1' identifier in the { variable1 as name1, variable2 as name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -717,7 +717,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'variable3' identifier with the 'variable2' identifier in the variable1 as name1, variable2 as name2, nameN export statement"
+                    "summary": "Replaced the 'variable3' identifier with the 'variable2' identifier in the { variable1 as name1, variable2 as name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -744,7 +744,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'name3' identifier with the 'name2' identifier in the variable1 as name1, variable2 as name2, nameN export statement"
+                    "summary": "Replaced the 'name3' identifier with the 'name2' identifier in the { variable1 as name1, variable2 as name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -771,7 +771,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'nameY' identifier with the 'nameN' identifier in the variable1 as name1, variable2 as name2, nameN export statement"
+                    "summary": "Replaced the 'nameY' identifier with the 'nameN' identifier in the { variable1 as name1, variable2 as name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -798,7 +798,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'name3' identifier with the 'name1' identifier in the name1, name2, nameN export statement"
+                    "summary": "Replaced the 'name3' identifier with the 'name1' identifier in the { name1, name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -825,7 +825,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'name4' identifier with the 'name2' identifier in the name1, name2, nameN export statement"
+                    "summary": "Replaced the 'name4' identifier with the 'name2' identifier in the { name1, name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -852,7 +852,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'nameT' identifier with the 'nameN' identifier in the name1, name2, nameN export statement"
+                    "summary": "Replaced the 'nameT' identifier with the 'nameN' identifier in the { name1, name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -987,7 +987,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'name4' identifier with the 'name3' identifier in the name1 = value1, name2 = value2, name3, nameN export statement"
+                    "summary": "Replaced the 'name4' identifier with the 'name3' identifier in the { name1 = value1, name2 = value2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -1014,7 +1014,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'nameO' identifier with the 'nameN' identifier in the name1 = value1, name2 = value2, name3, nameN export statement"
+                    "summary": "Replaced the 'nameO' identifier with the 'nameN' identifier in the { name1 = value1, name2 = value2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -1041,7 +1041,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'otherNamedFunction' identifier with the 'namedFunction' identifier in the namedFunction export statement"
+                    "summary": "Replaced the 'otherNamedFunction' identifier with the 'namedFunction' identifier in the { namedFunction } export statement"
                 },
                 {
                     "span": {
@@ -1056,61 +1056,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the anonymous() function export statement"
+                    "summary": "Added the { anonymous() } export statement"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    25
-                                ],
-                                "end": [
-                                    6,
-                                    33
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    25
-                                ],
-                                "end": [
-                                    7,
-                                    30
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                37
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'newName1' identifier with the 'name1' identifier in the name1 function"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    6,
-                                    36
-                                ],
-                                "end": [
-                                    6,
-                                    38
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    33
-                                ],
-                                "end": [
-                                    7,
-                                    36
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the '{}' expression statements with the '{ }' expression statements in the name1 function"
+                    "summary": "Added the { name1 } export statement"
                 },
                 {
                     "span": {
@@ -1125,7 +1086,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1 as default export statement"
+                    "summary": "Added the { name1 as default } export statement"
                 },
                 {
                     "span": {
@@ -1140,7 +1101,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' export statement"
+                    "summary": "Added the { 'foo' } export statement"
                 },
                 {
                     "span": {
@@ -1155,7 +1116,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name1, name2, nameN from 'foo' export statement"
+                    "summary": "Added the { name1, name2, nameN } from 'foo' export statement"
                 },
                 {
                     "span": {
@@ -1170,7 +1131,22 @@
                             ]
                         }
                     },
-                    "summary": "Added the import1 as name1, import2 as name2, nameN from 'bar' export statement"
+                    "summary": "Added the { import1 as name1, import2 as name2, nameN } from 'bar' export statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                39
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the { newName1 } export statement"
                 },
                 {
                     "span": {
@@ -1185,7 +1161,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the anonymous() function export statement"
+                    "summary": "Deleted the { anonymous() } export statement"
                 },
                 {
                     "span": {
@@ -1200,7 +1176,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name2 as statement export statement"
+                    "summary": "Deleted the { name2 as statement } export statement"
                 },
                 {
                     "span": {
@@ -1215,7 +1191,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'baz' export statement"
+                    "summary": "Deleted the { 'baz' } export statement"
                 },
                 {
                     "span": {
@@ -1230,7 +1206,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name7, name8, nameP from 'buzz' export statement"
+                    "summary": "Deleted the { name7, name8, nameP } from 'buzz' export statement"
                 },
                 {
                     "span": {
@@ -1245,7 +1221,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the import6 as name6, import7 as name7, nameB from 'fizz' export statement"
+                    "summary": "Deleted the { import6 as name6, import7 as name7, nameB } from 'fizz' export statement"
                 }
             ]
         },
@@ -1254,9 +1230,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "971363f4200f3624e6501f6f0fdeb9dc50f166a7",
+    "sha1": "a08aafc86a58606c8964e44993eb2bd2c7b20254",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6852e31635573f80077c4099ddfc8e9c9e492b1e"
+    "sha2": "8d5b4923da4ea183a2211a297aa083c2bdafe99e"
 }
 ,{
     "testCaseDescription": "javascript-export-replacement-test",
@@ -1288,7 +1264,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'name1' identifier with the 'name4' identifier in the name4, name5, name6, nameZ export statement"
+                    "summary": "Replaced the 'name1' identifier with the 'name4' identifier in the { name4, name5, name6, nameZ } export statement"
                 },
                 {
                     "span": {
@@ -1315,7 +1291,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'name2' identifier with the 'name5' identifier in the name4, name5, name6, nameZ export statement"
+                    "summary": "Replaced the 'name2' identifier with the 'name5' identifier in the { name4, name5, name6, nameZ } export statement"
                 },
                 {
                     "span": {
@@ -1342,7 +1318,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'name3' identifier with the 'name6' identifier in the name4, name5, name6, nameZ export statement"
+                    "summary": "Replaced the 'name3' identifier with the 'name6' identifier in the { name4, name5, name6, nameZ } export statement"
                 },
                 {
                     "span": {
@@ -1369,7 +1345,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'nameN' identifier with the 'nameZ' identifier in the name4, name5, name6, nameZ export statement"
+                    "summary": "Replaced the 'nameN' identifier with the 'nameZ' identifier in the { name4, name5, name6, nameZ } export statement"
                 },
                 {
                     "span": {
@@ -1384,7 +1360,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the variable2 as name2, variable3 as name3, nameY export statement"
+                    "summary": "Added the { variable2 as name2, variable3 as name3, nameY } export statement"
                 },
                 {
                     "span": {
@@ -1399,7 +1375,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name3, name4, nameT export statement"
+                    "summary": "Added the { name3, name4, nameT } export statement"
                 },
                 {
                     "span": {
@@ -1414,7 +1390,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name2 = value2, name3 = value3, name4, nameO export statement"
+                    "summary": "Added the { name2 = value2, name3 = value3, name4, nameO } export statement"
                 },
                 {
                     "span": {
@@ -1429,7 +1405,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the otherNamedFunction export statement"
+                    "summary": "Added the { otherNamedFunction } export statement"
                 },
                 {
                     "span": {
@@ -1444,7 +1420,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the newName1 export statement"
+                    "summary": "Added the { newName1 } export statement"
                 },
                 {
                     "span": {
@@ -1459,7 +1435,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the anonymous() function export statement"
+                    "summary": "Added the { anonymous() } export statement"
                 },
                 {
                     "span": {
@@ -1474,7 +1450,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name2 as statement export statement"
+                    "summary": "Added the { name2 as statement } export statement"
                 },
                 {
                     "span": {
@@ -1489,7 +1465,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'baz' export statement"
+                    "summary": "Added the { 'baz' } export statement"
                 },
                 {
                     "span": {
@@ -1504,7 +1480,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name7, name8, nameP from 'buzz' export statement"
+                    "summary": "Added the { name7, name8, nameP } from 'buzz' export statement"
                 },
                 {
                     "span": {
@@ -1519,7 +1495,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the import6 as name6, import7 as name7, nameB from 'fizz' export statement"
+                    "summary": "Added the { import6 as name6, import7 as name7, nameB } from 'fizz' export statement"
                 },
                 {
                     "span": {
@@ -1534,7 +1510,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the variable1 as name1, variable2 as name2, nameN export statement"
+                    "summary": "Deleted the { variable1 as name1, variable2 as name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -1549,7 +1525,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1, name2, nameN export statement"
+                    "summary": "Deleted the { name1, name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -1564,7 +1540,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1 = value1, name2 = value2, name3, nameN export statement"
+                    "summary": "Deleted the { name1 = value1, name2 = value2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -1579,7 +1555,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the namedFunction export statement"
+                    "summary": "Deleted the { namedFunction } export statement"
                 },
                 {
                     "span": {
@@ -1594,7 +1570,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the anonymous() function export statement"
+                    "summary": "Deleted the { anonymous() } export statement"
                 },
                 {
                     "span": {
@@ -1609,7 +1585,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1 export statement"
+                    "summary": "Deleted the { name1 } export statement"
                 },
                 {
                     "span": {
@@ -1624,7 +1600,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1 as default export statement"
+                    "summary": "Deleted the { name1 as default } export statement"
                 },
                 {
                     "span": {
@@ -1639,7 +1615,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' export statement"
+                    "summary": "Deleted the { 'foo' } export statement"
                 },
                 {
                     "span": {
@@ -1654,7 +1630,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1, name2, nameN from 'foo' export statement"
+                    "summary": "Deleted the { name1, name2, nameN } from 'foo' export statement"
                 },
                 {
                     "span": {
@@ -1669,7 +1645,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the import1 as name1, import2 as name2, nameN from 'bar' export statement"
+                    "summary": "Deleted the { import1 as name1, import2 as name2, nameN } from 'bar' export statement"
                 }
             ]
         },
@@ -1678,9 +1654,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "6852e31635573f80077c4099ddfc8e9c9e492b1e",
+    "sha1": "8d5b4923da4ea183a2211a297aa083c2bdafe99e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f4b385dd047f80ff108460681b819cfa7ac74fd6"
+    "sha2": "49b5224421f545b4bd31fa7a4f786cee15872c7c"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-replacement-test",
@@ -1700,7 +1676,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name4, name5, name6, nameZ export statement"
+                    "summary": "Deleted the { name4, name5, name6, nameZ } export statement"
                 },
                 {
                     "span": {
@@ -1715,7 +1691,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the variable2 as name2, variable3 as name3, nameY export statement"
+                    "summary": "Deleted the { variable2 as name2, variable3 as name3, nameY } export statement"
                 },
                 {
                     "span": {
@@ -1730,7 +1706,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name3, name4, nameT export statement"
+                    "summary": "Deleted the { name3, name4, nameT } export statement"
                 },
                 {
                     "span": {
@@ -1745,7 +1721,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name2 = value2, name3 = value3, name4, nameO export statement"
+                    "summary": "Deleted the { name2 = value2, name3 = value3, name4, nameO } export statement"
                 },
                 {
                     "span": {
@@ -1760,7 +1736,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the otherNamedFunction export statement"
+                    "summary": "Deleted the { otherNamedFunction } export statement"
                 },
                 {
                     "span": {
@@ -1775,7 +1751,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the newName1 export statement"
+                    "summary": "Deleted the { newName1 } export statement"
                 },
                 {
                     "span": {
@@ -1790,7 +1766,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the anonymous() function export statement"
+                    "summary": "Deleted the { anonymous() } export statement"
                 },
                 {
                     "span": {
@@ -1805,7 +1781,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name2 as statement export statement"
+                    "summary": "Deleted the { name2 as statement } export statement"
                 },
                 {
                     "span": {
@@ -1820,7 +1796,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'baz' export statement"
+                    "summary": "Deleted the { 'baz' } export statement"
                 },
                 {
                     "span": {
@@ -1835,7 +1811,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name7, name8, nameP from 'buzz' export statement"
+                    "summary": "Deleted the { name7, name8, nameP } from 'buzz' export statement"
                 },
                 {
                     "span": {
@@ -1850,7 +1826,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the import6 as name6, import7 as name7, nameB from 'fizz' export statement"
+                    "summary": "Deleted the { import6 as name6, import7 as name7, nameB } from 'fizz' export statement"
                 },
                 {
                     "span": {
@@ -1865,7 +1841,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1, name2, name3, nameN export statement"
+                    "summary": "Deleted the { name1, name2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -1880,7 +1856,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the variable1 as name1, variable2 as name2, nameN export statement"
+                    "summary": "Deleted the { variable1 as name1, variable2 as name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -1895,7 +1871,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1, name2, nameN export statement"
+                    "summary": "Deleted the { name1, name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -1910,7 +1886,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1 = value1, name2 = value2, name3, nameN export statement"
+                    "summary": "Deleted the { name1 = value1, name2 = value2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -1925,7 +1901,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the namedFunction export statement"
+                    "summary": "Deleted the { namedFunction } export statement"
                 },
                 {
                     "span": {
@@ -1940,7 +1916,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the anonymous() function export statement"
+                    "summary": "Deleted the { anonymous() } export statement"
                 },
                 {
                     "span": {
@@ -1955,7 +1931,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1 export statement"
+                    "summary": "Deleted the { name1 } export statement"
                 },
                 {
                     "span": {
@@ -1970,7 +1946,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1 as default export statement"
+                    "summary": "Deleted the { name1 as default } export statement"
                 },
                 {
                     "span": {
@@ -1985,7 +1961,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' export statement"
+                    "summary": "Deleted the { 'foo' } export statement"
                 },
                 {
                     "span": {
@@ -2000,7 +1976,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1, name2, nameN from 'foo' export statement"
+                    "summary": "Deleted the { name1, name2, nameN } from 'foo' export statement"
                 },
                 {
                     "span": {
@@ -2015,7 +1991,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the import1 as name1, import2 as name2, nameN from 'bar' export statement"
+                    "summary": "Deleted the { import1 as name1, import2 as name2, nameN } from 'bar' export statement"
                 },
                 {
                     "span": {
@@ -2030,7 +2006,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name4, name5, name6, nameZ export statement"
+                    "summary": "Added the { name4, name5, name6, nameZ } export statement"
                 },
                 {
                     "span": {
@@ -2045,7 +2021,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the variable2 as name2, variable3 as name3, nameY export statement"
+                    "summary": "Added the { variable2 as name2, variable3 as name3, nameY } export statement"
                 },
                 {
                     "span": {
@@ -2060,7 +2036,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name3, name4, nameT export statement"
+                    "summary": "Added the { name3, name4, nameT } export statement"
                 },
                 {
                     "span": {
@@ -2075,7 +2051,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name2 = value2, name3 = value3, name4, nameO export statement"
+                    "summary": "Added the { name2 = value2, name3 = value3, name4, nameO } export statement"
                 },
                 {
                     "span": {
@@ -2090,7 +2066,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the otherNamedFunction export statement"
+                    "summary": "Added the { otherNamedFunction } export statement"
                 },
                 {
                     "span": {
@@ -2105,7 +2081,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the newName1 export statement"
+                    "summary": "Added the { newName1 } export statement"
                 },
                 {
                     "span": {
@@ -2120,7 +2096,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the anonymous() function export statement"
+                    "summary": "Added the { anonymous() } export statement"
                 },
                 {
                     "span": {
@@ -2135,7 +2111,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name2 as statement export statement"
+                    "summary": "Added the { name2 as statement } export statement"
                 },
                 {
                     "span": {
@@ -2150,7 +2126,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'baz' export statement"
+                    "summary": "Added the { 'baz' } export statement"
                 },
                 {
                     "span": {
@@ -2165,7 +2141,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name7, name8, nameP from 'buzz' export statement"
+                    "summary": "Added the { name7, name8, nameP } from 'buzz' export statement"
                 },
                 {
                     "span": {
@@ -2180,7 +2156,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the import6 as name6, import7 as name7, nameB from 'fizz' export statement"
+                    "summary": "Added the { import6 as name6, import7 as name7, nameB } from 'fizz' export statement"
                 }
             ]
         },
@@ -2189,9 +2165,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "f4b385dd047f80ff108460681b819cfa7ac74fd6",
+    "sha1": "49b5224421f545b4bd31fa7a4f786cee15872c7c",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8e1d1776a385d2f8aed58cec173dc19337fa3acb"
+    "sha2": "109a54c0eb21d309a7c9b9b66cfe41d4fdc0d79d"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-test",
@@ -2211,7 +2187,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1, name2, name3, nameN export statement"
+                    "summary": "Deleted the { name1, name2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -2226,7 +2202,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the variable1 as name1, variable2 as name2, nameN export statement"
+                    "summary": "Deleted the { variable1 as name1, variable2 as name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -2241,7 +2217,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1, name2, nameN export statement"
+                    "summary": "Deleted the { name1, name2, nameN } export statement"
                 },
                 {
                     "span": {
@@ -2256,7 +2232,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1 = value1, name2 = value2, name3, nameN export statement"
+                    "summary": "Deleted the { name1 = value1, name2 = value2, name3, nameN } export statement"
                 },
                 {
                     "span": {
@@ -2271,7 +2247,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the namedFunction export statement"
+                    "summary": "Deleted the { namedFunction } export statement"
                 },
                 {
                     "span": {
@@ -2286,7 +2262,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the anonymous() function export statement"
+                    "summary": "Deleted the { anonymous() } export statement"
                 },
                 {
                     "span": {
@@ -2301,7 +2277,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1 export statement"
+                    "summary": "Deleted the { name1 } export statement"
                 },
                 {
                     "span": {
@@ -2316,7 +2292,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1 as default export statement"
+                    "summary": "Deleted the { name1 as default } export statement"
                 },
                 {
                     "span": {
@@ -2331,7 +2307,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' export statement"
+                    "summary": "Deleted the { 'foo' } export statement"
                 },
                 {
                     "span": {
@@ -2346,7 +2322,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name1, name2, nameN from 'foo' export statement"
+                    "summary": "Deleted the { name1, name2, nameN } from 'foo' export statement"
                 },
                 {
                     "span": {
@@ -2361,7 +2337,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the import1 as name1, import2 as name2, nameN from 'bar' export statement"
+                    "summary": "Deleted the { import1 as name1, import2 as name2, nameN } from 'bar' export statement"
                 }
             ]
         },
@@ -2370,9 +2346,9 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "8e1d1776a385d2f8aed58cec173dc19337fa3acb",
+    "sha1": "109a54c0eb21d309a7c9b9b66cfe41d4fdc0d79d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "874a664f50d4f2bed77efe31df4121efbcb7e9c8"
+    "sha2": "ae765442910c730e3db4fec7bc5bf90afe74ccc6"
 }
 ,{
     "testCaseDescription": "javascript-export-delete-rest-test",
@@ -2392,7 +2368,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name4, name5, name6, nameZ export statement"
+                    "summary": "Deleted the { name4, name5, name6, nameZ } export statement"
                 },
                 {
                     "span": {
@@ -2407,7 +2383,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the variable2 as name2, variable3 as name3, nameY export statement"
+                    "summary": "Deleted the { variable2 as name2, variable3 as name3, nameY } export statement"
                 },
                 {
                     "span": {
@@ -2422,7 +2398,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name3, name4, nameT export statement"
+                    "summary": "Deleted the { name3, name4, nameT } export statement"
                 },
                 {
                     "span": {
@@ -2437,7 +2413,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name2 = value2, name3 = value3, name4, nameO export statement"
+                    "summary": "Deleted the { name2 = value2, name3 = value3, name4, nameO } export statement"
                 },
                 {
                     "span": {
@@ -2452,7 +2428,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the otherNamedFunction export statement"
+                    "summary": "Deleted the { otherNamedFunction } export statement"
                 },
                 {
                     "span": {
@@ -2467,7 +2443,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the newName1 export statement"
+                    "summary": "Deleted the { newName1 } export statement"
                 },
                 {
                     "span": {
@@ -2482,7 +2458,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the anonymous() function export statement"
+                    "summary": "Deleted the { anonymous() } export statement"
                 },
                 {
                     "span": {
@@ -2497,7 +2473,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name2 as statement export statement"
+                    "summary": "Deleted the { name2 as statement } export statement"
                 },
                 {
                     "span": {
@@ -2512,7 +2488,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'baz' export statement"
+                    "summary": "Deleted the { 'baz' } export statement"
                 },
                 {
                     "span": {
@@ -2527,7 +2503,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name7, name8, nameP from 'buzz' export statement"
+                    "summary": "Deleted the { name7, name8, nameP } from 'buzz' export statement"
                 },
                 {
                     "span": {
@@ -2542,7 +2518,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the import6 as name6, import7 as name7, nameB from 'fizz' export statement"
+                    "summary": "Deleted the { import6 as name6, import7 as name7, nameB } from 'fizz' export statement"
                 }
             ]
         },
@@ -2551,7 +2527,7 @@
     "filePaths": [
         "export.js"
     ],
-    "sha1": "874a664f50d4f2bed77efe31df4121efbcb7e9c8",
+    "sha1": "ae765442910c730e3db4fec7bc5bf90afe74ccc6",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3483bf17f1fdb86e4b583fba80d44d9d11f682fd"
+    "sha2": "8dac6df2896cea96348c6e67bbcf56527947be6f"
 }]
