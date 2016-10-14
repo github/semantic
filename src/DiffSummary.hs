@@ -84,16 +84,11 @@ isErrorSummary _ = False
 
 
 -- Returns a list of diff summary texts given two source blobs and a diff.
+diffSummaries :: (HasCategory leaf, DefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary Text SourceSpans]
 diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> blobs) diff
 
--- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
--- in that 'DiffSummary'.
-summaryToTexts :: DiffSummary DiffInfo -> [JSONSummary Text SourceSpans]
-summaryToTexts DiffSummary{..} = (\jsonSummary ->
-  jsonSummary { summary = show $ summary jsonSummary <+> parentContexts parentAnnotation }) <$> summaries patch
-
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
-diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
+diffToDiffSummaries :: (HasCategory leaf, DefaultFields fields) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
 diffToDiffSummaries sources = para $ \diff ->
   let
     diff' = free (Prologue.fst <$> diff)
