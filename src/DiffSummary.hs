@@ -159,7 +159,7 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   node -> panic $ "Expected a leaf info but got a: " <> show node
 
 -- Returns a text representing a specific term given a source and a term.
-toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> Text
+toTermName :: forall leaf fields. (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
   S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
@@ -246,7 +246,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
+termToDiffInfo :: (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
@@ -263,7 +263,7 @@ termToDiffInfo blob term = case unwrap term of
 -- | For a DiffSummary without a parentAnnotation, we append a parentAnnotation with the first identifiable term.
 -- | For a DiffSummary with a parentAnnotation, we append the next annotatable term to the extant parentAnnotation.
 -- | If a DiffSummary already has a parentAnnotation, and a (grand) parentAnnotation, then we return the summary without modification.
-appendSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
+appendSummary :: (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 appendSummary source term summary =
   case (parentAnnotation summary, identifiable term, annotatable term) of
     ([], Identifiable _, _) -> appendParentAnnotation Left
