@@ -21,6 +21,7 @@ import Test.Hspec (Spec, describe, it, parallel)
 import Test.Hspec.Expectations.Pretty
 import Test.Hspec.QuickCheck
 import Data.These
+import Diffing (getLabel)
 
 sourceSpanBetween :: (Int, Int) -> (Int, Int) -> SourceSpan
 sourceSpanBetween (s1, e1) (s2, e2) = SourceSpan (SourcePos s1 e1) (SourcePos s2 e2)
@@ -51,7 +52,7 @@ spec = parallel $ do
 
     prop "equal terms produce identity diffs" $
       \ a -> let term = defaultFeatureVectorDecorator (category . headF) (toTerm (a :: ArbitraryTerm Text (Record '[Category, Range, SourceSpan]))) in
-        diffSummaries blobs (diffTerms wrap (==) diffCost term term) `shouldBe` []
+        diffSummaries blobs (diffTerms wrap (==) diffCost getLabel term term) `shouldBe` []
 
   describe "DiffInfo" $ do
     prop "patches in summaries match the patches in diffs" $

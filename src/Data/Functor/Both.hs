@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -fno-warn-orphans #-}
+{-# OPTIONS_GHC -fno-warn-orphans -funbox-strict-fields #-}
 module Data.Functor.Both (Both,both, runBothWith, fst, snd, module X) where
 
 import Data.Bifunctor.Join as X

@@ -1,3 +1,4 @@
+{-# LANGUAGE Strict #-}
 module SES where
 
 import qualified Data.Map as Map
@@ -44,7 +45,6 @@ diffAt diffTerms cost (i, j) as bs
     costOf ((_, c) : _) = c
     best = minimumBy (comparing costOf)
     recur = diffAt diffTerms cost
-
 
 -- | Prepend an edit script and the cumulative cost onto the edit script.
 consWithCost :: Cost edit -> edit -> [(edit, Int)] -> [(edit, Int)]

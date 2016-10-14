@@ -25,9 +25,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "525c410ecf4e93a1e2a4458048ac8ad20f94b106",
+    "sha1": "a0175e65e90799bed222a0cca0576cd48cd7b133",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2224c08ad1a8c458c28dfe1adf50020de4ff8d11"
+    "sha2": "12f36d52f2c83a36587956650d27651a6f692952"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-insert-test",
@@ -71,9 +71,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "2224c08ad1a8c458c28dfe1adf50020de4ff8d11",
+    "sha1": "12f36d52f2c83a36587956650d27651a6f692952",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "39bf515c5d70188ed5c1af1659f8f46c8b29cbf4"
+    "sha2": "a436f5b13c4d438d2b389b72c6d9ed7e70224dda"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-insert-test",
@@ -141,9 +141,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "39bf515c5d70188ed5c1af1659f8f46c8b29cbf4",
+    "sha1": "a436f5b13c4d438d2b389b72c6d9ed7e70224dda",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e9f0a4da7f5ac91ab96c81686c91bcac74d3db73"
+    "sha2": "32102f31cc5b8b5b74713e26a662e5f9da5690f2"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-replacement-test",
@@ -211,9 +211,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "e9f0a4da7f5ac91ab96c81686c91bcac74d3db73",
+    "sha1": "32102f31cc5b8b5b74713e26a662e5f9da5690f2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "46a18c0e28d591d0e909510c820f4bbce36c68c5"
+    "sha2": "f69be3858e959b1bf8db98a254c0f6d88bcd4cef"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-replacement-test",
@@ -272,9 +272,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "46a18c0e28d591d0e909510c820f4bbce36c68c5",
+    "sha1": "f69be3858e959b1bf8db98a254c0f6d88bcd4cef",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "805eaa3b4a99ca8781f9913d2da30105a810581e"
+    "sha2": "bb28b7f574961d6f4e2f08b1e1b8eefeeab27ef9"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-test",
@@ -303,9 +303,9 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "805eaa3b4a99ca8781f9913d2da30105a810581e",
+    "sha1": "bb28b7f574961d6f4e2f08b1e1b8eefeeab27ef9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "dcfc4060871b8f119034866ad45dfef8a795c0b0"
+    "sha2": "3c8d00ca3352e0d884fedf07a0d509317f048a45"
 }
 ,{
     "testCaseDescription": "javascript-math-operator-delete-rest-test",
@@ -334,7 +334,7 @@
     "filePaths": [
         "math-operator.js"
     ],
-    "sha1": "dcfc4060871b8f119034866ad45dfef8a795c0b0",
+    "sha1": "3c8d00ca3352e0d884fedf07a0d509317f048a45",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8483a9d6002f107db08fef4c3389e0f5a2234617"
+    "sha2": "2e01e44b83e82ce6f4210318eed9b60890b681f2"
 }]
