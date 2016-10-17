@@ -15,10 +15,11 @@ termConstructor
   -> Range -- ^ The character range that the term occupies.
   -> [Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])] -- ^ The child nodes of the term.
   -> IO (Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan name range children = withDefaultInfo $
-  case (name, children) of
+termConstructor source sourceSpan name range children = withDefaultInfo =<< do
+  putStrLn name
+  pure $ case (name, children) of
     ("return_statement", _) -> S.Return (listToMaybe children)
-    (_, []) -> S.Leaf . toText $ slice range source
+    (_, _) -> S.Leaf . toText $ slice range source
   where
     withDefaultInfo syntax = do
       sourceSpan' <- sourceSpan
@@ -32,5 +33,12 @@ categoryForGoName = \case
   "return_statement" -> Return
   "interpreted_string_literal" -> StringLiteral
   "raw_string_literal" -> StringLiteral
+  "binary_expression" -> RelationalOperator
+  "function_declaration" -> Function
+  "call_expression" -> FunctionCall
+  "selector_expression" -> MethodCall
+  "parameters" -> Args
+  "short_var_declaration" -> VarDecl
+  "assignment_statement" -> Assignment
   s -> Other (toS s)
 
