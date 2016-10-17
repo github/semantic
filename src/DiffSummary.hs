@@ -223,7 +223,7 @@ toTermName source term = case unwrap term of
   S.Import identifier [expr] -> case unwrap expr of
     S.Indexed [expr'] -> intercalate ", " [(termNameFromSource expr')] <> " from " <> toTermName' identifier
     _ -> intercalate ", " [(termNameFromSource expr)] <> " from " <> toTermName' identifier
-  S.Import identifier exprs'@(expr:exprs) -> intercalate ", " (termNameFromSource <$> exprs') <> " from " <> toTermName' identifier
+  S.Import identifier exprs'@(_:_) -> intercalate ", " (termNameFromSource <$> exprs') <> " from " <> toTermName' identifier
   S.Export Nothing expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }"
   S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
   S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
