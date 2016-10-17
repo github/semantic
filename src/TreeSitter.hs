@@ -7,6 +7,7 @@ import Data.Record
 import Language
 import qualified Language.JavaScript as JS
 import qualified Language.C as C
+import qualified Language.Go as Go
 import Parser
 import Range
 import Source
@@ -57,5 +58,6 @@ documentToTerm language document SourceBlob{..} = alloca $ \ root -> do
         termConstructor = case language of
           JavaScript -> JS.termConstructor
           C -> C.termConstructor
+          Go -> Go.termConstructor
           _ -> Language.termConstructor
         isNonEmpty child = category (extract child) /= Empty
