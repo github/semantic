@@ -3,6 +3,26 @@ module Language.Go where
 
 import Prologue
 import Info
+import Source
+import Term
+import qualified Syntax as S
+import Data.Record
+
+termConstructor
+  :: Source Char -- ^ The source that the term occurs within.
+  -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
+  -> Text -- ^ The name of the production for this node.
+  -> Range -- ^ The character range that the term occupies.
+  -> [Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])] -- ^ The child nodes of the term.
+  -> IO (Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
+termConstructor source sourceSpan name range children = withDefaultInfo $
+  case (name, children) of
+    ("return_statement", _) -> S.Return (listToMaybe children)
+    (_, []) -> S.Leaf . toText $ slice range source
+  where
+    withDefaultInfo syntax = do
+      sourceSpan' <- sourceSpan
+      pure $! cofree ((range .: categoryForGoName name .: sourceSpan' .: RNil) :< syntax)
 
 categoryForGoName :: Text -> Category
 categoryForGoName = \case
