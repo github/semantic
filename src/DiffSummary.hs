@@ -23,6 +23,7 @@ import qualified Text.PrettyPrint.Leijen.Text as P
 import SourceSpan
 import Source
 import Data.Aeson as A
+import Data.List (concatMap)
 
 data Annotatable a = Annotatable a | Unannotatable a
 
