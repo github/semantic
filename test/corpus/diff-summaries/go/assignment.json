@@ -16,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'var foo int = 42' ERROR"
+                    "summary": "Added the 'foo' assignment"
                 }
             ]
         },
@@ -59,7 +59,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'var foo int = 42' ERROR with the 'var bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' ERROR"
+                    "summary": "Replaced the 'foo' assignment with the 'bar' assignment"
                 }
             ]
         },
@@ -102,7 +102,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'var bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' ERROR with the 'var foo int = 42\nvar foo int = 42\nvar foo int = 42\n' ERROR"
+                    "summary": "Replaced the 'bar' assignment with the 'foo' assignment"
                 }
             ]
         },
@@ -145,7 +145,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'var foo int = 42\nvar foo int = 42\nvar foo int = 42\n' ERROR with the 'var bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' ERROR"
+                    "summary": "Replaced the 'bar' assignment with the 'foo' assignment"
                 }
             ]
         },
@@ -188,7 +188,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'var bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' ERROR with the 'var foo int = 42\nvar bar string = \"hello\"\n' ERROR"
+                    "summary": "Replaced the 'bar' assignment with the 'foo' assignment"
                 }
             ]
         },
@@ -231,7 +231,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'var foo int = 42\nvar bar string = \"hello\"\n' ERROR with the 'var bar string = \"hello\"' ERROR"
+                    "summary": "Replaced the 'var bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' ERROR with the 'var foo int = 42\nvar bar string = \"hello\"\n' ERROR"
                 }
             ]
         },
@@ -262,7 +262,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'var bar string = \"hello\"' ERROR"
+                    "summary": "Deleted the 'bar' assignment"
                 }
             ]
         },
