@@ -61,7 +61,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the { member1 , member2 } from \"antelope\" import statement"
+                    "summary": "Added the member1 , member2 from \"antelope\" import statement"
                 },
                 {
                     "span": {
@@ -76,7 +76,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
+                    "summary": "Added the member1 , member2 as alias2 from \"ant-eater\" import statement"
                 },
                 {
                     "span": {
@@ -130,9 +130,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "756273ef4a7598fd5fcb9a681bb20bd0e585c3c3",
+    "sha1": "3ae621df162ded0a0cc23dc6ac16b11c9b5e5e43",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "fd475dda0e3ee31a8bdd50f5f442960562164f79"
+    "sha2": "7babe13ca5feebe037df2a299a0cb56b2dbfc487"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-insert-test",
@@ -197,7 +197,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the { element1 , element2 } from \"bald-eagle\" import statement"
+                    "summary": "Added the element1 , element2 from \"bald-eagle\" import statement"
                 },
                 {
                     "span": {
@@ -212,7 +212,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
+                    "summary": "Added the element1 , element2 as elementAlias2 from \"bandicoot\" import statement"
                 },
                 {
                     "span": {
@@ -317,7 +317,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the { member1 , member2 } from \"antelope\" import statement"
+                    "summary": "Added the member1 , member2 from \"antelope\" import statement"
                 },
                 {
                     "span": {
@@ -332,7 +332,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
+                    "summary": "Added the member1 , member2 as alias2 from \"ant-eater\" import statement"
                 },
                 {
                     "span": {
@@ -386,9 +386,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "fd475dda0e3ee31a8bdd50f5f442960562164f79",
+    "sha1": "7babe13ca5feebe037df2a299a0cb56b2dbfc487",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e660ca7ef35c1046ef3ead0dc1811557ce1fc23f"
+    "sha2": "94d777812826cbf929a0e7a582daeb25c9f1cdad"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-insert-test",
@@ -504,7 +504,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the { member1 , member2 } from \"antelope\" import statement"
+                    "summary": "Added the member1 , member2 from \"antelope\" import statement"
                 },
                 {
                     "span": {
@@ -519,7 +519,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
+                    "summary": "Added the member1 , member2 as alias2 from \"ant-eater\" import statement"
                 },
                 {
                     "span": {
@@ -591,7 +591,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the { element1 , element2 } from \"bald-eagle\" import statement"
+                    "summary": "Deleted the element1 , element2 from \"bald-eagle\" import statement"
                 },
                 {
                     "span": {
@@ -606,7 +606,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
+                    "summary": "Deleted the element1 , element2 as elementAlias2 from \"bandicoot\" import statement"
                 },
                 {
                     "span": {
@@ -660,9 +660,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "e660ca7ef35c1046ef3ead0dc1811557ce1fc23f",
+    "sha1": "94d777812826cbf929a0e7a582daeb25c9f1cdad",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2f85e029da180e89aadeda3834079cbc6b2626df"
+    "sha2": "f8ddd719ed2909577bc19f08788957ffc1bc72ce"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-test",
@@ -778,7 +778,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the { element1 , element2 } from \"bald-eagle\" import statement"
+                    "summary": "Added the element1 , element2 from \"bald-eagle\" import statement"
                 },
                 {
                     "span": {
@@ -793,7 +793,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
+                    "summary": "Added the element1 , element2 as elementAlias2 from \"bandicoot\" import statement"
                 },
                 {
                     "span": {
@@ -865,7 +865,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the { member1 , member2 } from \"antelope\" import statement"
+                    "summary": "Deleted the member1 , member2 from \"antelope\" import statement"
                 },
                 {
                     "span": {
@@ -880,7 +880,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
+                    "summary": "Deleted the member1 , member2 as alias2 from \"ant-eater\" import statement"
                 },
                 {
                     "span": {
@@ -934,9 +934,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "2f85e029da180e89aadeda3834079cbc6b2626df",
+    "sha1": "f8ddd719ed2909577bc19f08788957ffc1bc72ce",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "e31f9695fa7dae0ff1ee9da577722ef11e97d955"
+    "sha2": "b94842f36559d65e33c859bca354e3e659923f62"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-replacement-test",
@@ -1001,7 +1001,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the { element1 , element2 } from \"bald-eagle\" import statement"
+                    "summary": "Deleted the element1 , element2 from \"bald-eagle\" import statement"
                 },
                 {
                     "span": {
@@ -1016,7 +1016,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
+                    "summary": "Deleted the element1 , element2 as elementAlias2 from \"bandicoot\" import statement"
                 },
                 {
                     "span": {
@@ -1121,7 +1121,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the { member1 , member2 } from \"antelope\" import statement"
+                    "summary": "Deleted the member1 , member2 from \"antelope\" import statement"
                 },
                 {
                     "span": {
@@ -1136,7 +1136,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
+                    "summary": "Deleted the member1 , member2 as alias2 from \"ant-eater\" import statement"
                 },
                 {
                     "span": {
@@ -1241,7 +1241,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the { element1 , element2 } from \"bald-eagle\" import statement"
+                    "summary": "Added the element1 , element2 from \"bald-eagle\" import statement"
                 },
                 {
                     "span": {
@@ -1256,7 +1256,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
+                    "summary": "Added the element1 , element2 as elementAlias2 from \"bandicoot\" import statement"
                 },
                 {
                     "span": {
@@ -1310,9 +1310,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "e31f9695fa7dae0ff1ee9da577722ef11e97d955",
+    "sha1": "b94842f36559d65e33c859bca354e3e659923f62",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "afe03c2144a3af7aa0194c59d908eda4b7f1e374"
+    "sha2": "85252baf0a924e76d0e1c6d932571b293a2bb939"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-test",
@@ -1377,7 +1377,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the { member1 , member2 } from \"antelope\" import statement"
+                    "summary": "Deleted the member1 , member2 from \"antelope\" import statement"
                 },
                 {
                     "span": {
@@ -1392,7 +1392,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
+                    "summary": "Deleted the member1 , member2 as alias2 from \"ant-eater\" import statement"
                 },
                 {
                     "span": {
@@ -1446,9 +1446,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "afe03c2144a3af7aa0194c59d908eda4b7f1e374",
+    "sha1": "85252baf0a924e76d0e1c6d932571b293a2bb939",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "4a5f0f4efa9d8c86c918a82b980285923e8e7e26"
+    "sha2": "cb3ee6d2ef9d7a875881dd16206604b505460ab7"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-rest-test",
@@ -1513,7 +1513,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the { element1 , element2 } from \"bald-eagle\" import statement"
+                    "summary": "Deleted the element1 , element2 from \"bald-eagle\" import statement"
                 },
                 {
                     "span": {
@@ -1528,7 +1528,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
+                    "summary": "Deleted the element1 , element2 as elementAlias2 from \"bandicoot\" import statement"
                 },
                 {
                     "span": {
@@ -1582,7 +1582,7 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "4a5f0f4efa9d8c86c918a82b980285923e8e7e26",
+    "sha1": "cb3ee6d2ef9d7a875881dd16206604b505460ab7",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9001d783fa3d7a463ffd53227745f7f90f7e9b69"
+    "sha2": "1fafdab82fd48882271d7313f894a0fb6629cf8c"
 }]
