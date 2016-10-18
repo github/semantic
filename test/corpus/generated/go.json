@@ -1,0 +1,16 @@
+[
+  {
+    "repoPath": "test/corpus/repos/go",
+    "repoUrl": "https://github.com/joshvera/go.git",
+    "language": "go",
+    "syntaxes": [
+      {
+        "syntax": "var",
+        "repoFilePath": "var.go",
+        "insert": "var foo int = 42",
+        "testCaseFilePath": "test/corpus/diff-summaries/go/var.json",
+        "replacement": "var bar string = \"hello\""
+      }
+    ]
+  }
+]

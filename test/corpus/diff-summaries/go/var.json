@@ -1,0 +1,277 @@
+[{
+    "testCaseDescription": "go-var-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var.go": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'var foo int = 42' ERROR"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var.go"
+    ],
+    "sha1": "341afefb1da9e96022027b801ae758beb5af2615",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "eba7f32ed9118f22daf2811f585f70298a073ad2"
+}
+,{
+    "testCaseDescription": "go-var-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'var foo int = 42' ERROR with the 'var bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' ERROR"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var.go"
+    ],
+    "sha1": "eba7f32ed9118f22daf2811f585f70298a073ad2",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "4861ea5b6483302fd7194741dff85c3653aaaea5"
+}
+,{
+    "testCaseDescription": "go-var-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "var.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'var bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' ERROR with the 'var foo int = 42\nvar foo int = 42\nvar foo int = 42\n' ERROR"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var.go"
+    ],
+    "sha1": "4861ea5b6483302fd7194741dff85c3653aaaea5",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "dcf06c5ed7b08e19cabeb4fcf762e5ca025c7bc0"
+}
+,{
+    "testCaseDescription": "go-var-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "var.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'var foo int = 42\nvar foo int = 42\nvar foo int = 42\n' ERROR with the 'var bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' ERROR"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var.go"
+    ],
+    "sha1": "dcf06c5ed7b08e19cabeb4fcf762e5ca025c7bc0",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "094dbedaafed81ca15717c69a0e9df25d4e4fb4d"
+}
+,{
+    "testCaseDescription": "go-var-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "var.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'var bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' ERROR with the 'var foo int = 42\nvar bar string = \"hello\"\n' ERROR"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var.go"
+    ],
+    "sha1": "094dbedaafed81ca15717c69a0e9df25d4e4fb4d",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "15936613e8ac1dc0ea0bab4e5d65d4a8ec4b4ea8"
+}
+,{
+    "testCaseDescription": "go-var-delete-test",
+    "expectedResult": {
+        "changes": {
+            "var.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    25
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'var foo int = 42\nvar bar string = \"hello\"\n' ERROR with the 'var bar string = \"hello\"' ERROR"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var.go"
+    ],
+    "sha1": "15936613e8ac1dc0ea0bab4e5d65d4a8ec4b4ea8",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "7b7144aad3bcbb22f92c71aa47e9d2f8a2357348"
+}
+,{
+    "testCaseDescription": "go-var-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "var.go": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                25
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'var bar string = \"hello\"' ERROR"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "var.go"
+    ],
+    "sha1": "7b7144aad3bcbb22f92c71aa47e9d2f8a2357348",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "0ce5a812cda886413cb6079823b50a0f215fc9ec"
+}]
