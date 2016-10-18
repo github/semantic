@@ -28,7 +28,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'package main' source_file with the 'package main\n\n\nvar foo int = 42\n' source_file"
+                    "summary": "Added the 'foo' assignment"
                 }
             ]
         },
