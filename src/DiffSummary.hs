@@ -231,6 +231,14 @@ toTermName source term = case unwrap term of
         termNameFromRange range = toText $ Source.slice range source
         range = characterRange . extract
         paramsToArgNames params = "(" <> intercalate ", " (toArgName <$> params) <> ")"
+        -- | For Import Syntaxes, unnamed nodes at the start or the end of a source are captured in a parent Indexed node.
+        -- | This in some cases can lead to us slicing a source based on the range of the Indexed node, rather than the children.
+        -- | This can cause us to add extra characters beyond the ranges of the Indexed nodes children.
+        -- | removeIndexedNode strips the containing Indexed nodes from a list of expressions to get the ranges of the children,
+        -- | so when we unionRanges we can ensure the union of ranges accounts only for children, and not the sometimes misleading Indexed node's ranges.
+        removeIndexedNode = concatMap (\term -> case unwrap term of
+                                                  S.Indexed children -> removeIndexedNode children
+                                                  _ -> [term])
         toArgName :: SyntaxTerm leaf fields -> Text
         toArgName arg = case identifiable arg of
                           Identifiable arg -> toTermName' arg
