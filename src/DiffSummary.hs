@@ -218,8 +218,8 @@ toTermName source term = case unwrap term of
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
   S.Import identifier [] -> termNameFromSource identifier
-  S.Import identifier expr@[expr'] -> (termNameFromChildren term (removeIndexedNode [expr'])) <> " from " <> toTermName' identifier
-  S.Import identifier exprs -> (termNameFromChildren term exprs) <> " from " <> toTermName' identifier
+  S.Import identifier expr@[_] -> termNameFromChildren term (removeIndexedNode expr) <> " from " <> toTermName' identifier
+  S.Import identifier exprs -> termNameFromChildren term exprs <> " from " <> toTermName' identifier
   S.Export Nothing expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }"
   S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
   S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
