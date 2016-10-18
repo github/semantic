@@ -1,9 +1,16 @@
-{-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators #-}
+{-# LANGUAGE DataKinds, GADTs, KindSignatures, MultiParamTypeClasses, TypeOperators, ConstraintKinds #-}
 module Data.Record where
 
 import GHC.Show
 import Prologue
 import Test.QuickCheck
+import Category
+import Range
+import SourceSpan
+
+
+-- | A type alias for HasField constraints commonly used throughout semantic-diff.
+type DefaultFields fields = (HasField fields Category, HasField fields Range, HasField fields SourceSpan)
 
 -- | A type-safe, extensible record structure.
 -- |
