@@ -5,10 +5,10 @@
     "language": "go",
     "syntaxes": [
       {
-        "syntax": "var",
-        "repoFilePath": "var.go",
+        "syntax": "assignment",
+        "repoFilePath": "assignment.go",
         "insert": "var foo int = 42",
-        "testCaseFilePath": "test/corpus/diff-summaries/go/var.json",
+        "testCaseFilePath": "test/corpus/diff-summaries/go/assignment.json",
         "replacement": "var bar string = \"hello\""
       }
     ]
