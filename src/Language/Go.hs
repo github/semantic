@@ -19,7 +19,8 @@ termConstructor source sourceSpan name range children = withDefaultInfo =<< do
   putStrLn name
   pure $ case (name, children) of
     ("return_statement", _) -> S.Return (listToMaybe children)
-    (_, _) -> S.Leaf . toText $ slice range source
+    (_, []) -> S.Leaf . toText $ slice range source
+    _  -> S.Indexed children
   where
     withDefaultInfo syntax = do
       sourceSpan' <- sourceSpan
