@@ -1,15 +1,12 @@
 {-# LANGUAGE TupleSections, ScopedTypeVariables #-}
 module Renderer.Summary where
 
-import Category
 import Prologue
 import Renderer
 import Data.Record
-import Range
 import DiffSummary
 import Data.Map as Map hiding (null)
 import Source
-import SourceSpan
 import Data.Aeson
 import Data.List as List
 
