@@ -3,6 +3,7 @@
     "repoPath": "test/corpus/repos/go",
     "repoUrl": "https://github.com/joshvera/go.git",
     "language": "go",
+    "templateText": "package main\n",
     "syntaxes": [
       {
         "syntax": "assignment",

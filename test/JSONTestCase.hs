@@ -10,6 +10,7 @@ data JSONMetaRepo = JSONMetaRepo { repoPath :: !String
                                  , repoUrl :: !String
                                  , language :: !String
                                  , syntaxes :: ![JSONMetaSyntax]
+                                 , templateText :: !(Maybe String)
                                  } deriving (Show, Generic, FromJSON)
 
 data JSONMetaSyntax = JSONMetaSyntax { syntax :: !String

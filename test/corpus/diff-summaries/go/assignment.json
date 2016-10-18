@@ -5,18 +5,30 @@
             "assignment.go": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    13
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    1
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'foo' assignment"
+                    "summary": "Replaced the 'package main' source_file with the 'package main\n\n\nvar foo int = 42\n' source_file"
                 }
             ]
         },
@@ -25,9 +37,9 @@
     "filePaths": [
         "assignment.go"
     ],
-    "sha1": "e5c03dd2dec45eb07530e422c3037cbb3215f2c8",
+    "sha1": "b9da8acec42374295d1e2c8ef4e718a71674b5c8",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "f24e7162d5add6f51ef328f9810a510ea8dc1779"
+    "sha2": "78d912e517fdbf5bf094f2eb42416144c7bd6ba9"
 }
 ,{
     "testCaseDescription": "go-assignment-replacement-insert-test",
@@ -43,8 +55,8 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    17
+                                    5,
+                                    1
                                 ]
                             },
                             {
@@ -53,13 +65,13 @@
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    7,
                                     1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' assignment with the 'bar' assignment"
+                    "summary": "Replaced the 'package main\n\n\nvar foo int = 42\n' source_file with the 'package main\n\n\nvar bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' source_file"
                 }
             ]
         },
@@ -68,9 +80,9 @@
     "filePaths": [
         "assignment.go"
     ],
-    "sha1": "f24e7162d5add6f51ef328f9810a510ea8dc1779",
+    "sha1": "78d912e517fdbf5bf094f2eb42416144c7bd6ba9",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "32ed6d330fd778f40d75859c4bc2b41110ccea7d"
+    "sha2": "46b7a84458c868398bc8b288598385b7ecb00c31"
 }
 ,{
     "testCaseDescription": "go-assignment-delete-insert-test",
@@ -86,7 +98,7 @@
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    7,
                                     1
                                 ]
                             },
@@ -96,13 +108,13 @@
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    7,
                                     1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar' assignment with the 'foo' assignment"
+                    "summary": "Replaced the 'package main\n\n\nvar bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' source_file with the 'package main\n\n\nvar foo int = 42\nvar foo int = 42\nvar foo int = 42\n' source_file"
                 }
             ]
         },
@@ -111,9 +123,9 @@
     "filePaths": [
         "assignment.go"
     ],
-    "sha1": "32ed6d330fd778f40d75859c4bc2b41110ccea7d",
+    "sha1": "46b7a84458c868398bc8b288598385b7ecb00c31",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "69f46ae90b9ac56d897f6ca46d84e05593983cac"
+    "sha2": "0660fdb214202450d7cce4f515f3a60ef9c10490"
 }
 ,{
     "testCaseDescription": "go-assignment-replacement-test",
@@ -129,7 +141,7 @@
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    7,
                                     1
                                 ]
                             },
@@ -139,13 +151,13 @@
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    7,
                                     1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar' assignment with the 'foo' assignment"
+                    "summary": "Replaced the 'package main\n\n\nvar foo int = 42\nvar foo int = 42\nvar foo int = 42\n' source_file with the 'package main\n\n\nvar bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' source_file"
                 }
             ]
         },
@@ -154,9 +166,9 @@
     "filePaths": [
         "assignment.go"
     ],
-    "sha1": "69f46ae90b9ac56d897f6ca46d84e05593983cac",
+    "sha1": "0660fdb214202450d7cce4f515f3a60ef9c10490",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "15c297fbbb50bebdaabb08a83d97fc00235a6655"
+    "sha2": "f97f9b8acec8b3ff1d5ed77d9bc13c2666a6de4d"
 }
 ,{
     "testCaseDescription": "go-assignment-delete-replacement-test",
@@ -172,7 +184,7 @@
                                     1
                                 ],
                                 "end": [
-                                    4,
+                                    7,
                                     1
                                 ]
                             },
@@ -182,13 +194,13 @@
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    6,
                                     1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar' assignment with the 'foo' assignment"
+                    "summary": "Replaced the 'package main\n\n\nvar bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' source_file with the 'package main\n\n\nvar foo int = 42\nvar bar string = \"hello\"\n' source_file"
                 }
             ]
         },
@@ -197,9 +209,9 @@
     "filePaths": [
         "assignment.go"
     ],
-    "sha1": "15c297fbbb50bebdaabb08a83d97fc00235a6655",
+    "sha1": "f97f9b8acec8b3ff1d5ed77d9bc13c2666a6de4d",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "b166f37106251a0b4244cb96caa2c4115699c65f"
+    "sha2": "26a079f5798bcd44defb40ff55f6e8a2691d3f85"
 }
 ,{
     "testCaseDescription": "go-assignment-delete-test",
@@ -215,7 +227,50 @@
                                     1
                                 ],
                                 "end": [
-                                    3,
+                                    6,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    5,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'package main\n\n\nvar foo int = 42\nvar bar string = \"hello\"\n' source_file with the 'package main\n\n\nvar bar string = \"hello\"\n' source_file"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "assignment.go"
+    ],
+    "sha1": "26a079f5798bcd44defb40ff55f6e8a2691d3f85",
+    "gitDir": "test/corpus/repos/go",
+    "sha2": "7df173e52ab3790631e6c3f946896d283fbc433e"
+}
+,{
+    "testCaseDescription": "go-assignment-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "assignment.go": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    5,
                                     1
                                 ]
                             },
@@ -226,12 +281,12 @@
                                 ],
                                 "end": [
                                     1,
-                                    25
+                                    13
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'var bar string = \"hello\"\nvar foo int = 42\nvar foo int = 42\n' ERROR with the 'var foo int = 42\nvar bar string = \"hello\"\n' ERROR"
+                    "summary": "Replaced the 'package main\n\n\nvar bar string = \"hello\"\n' source_file with the 'package main' source_file"
                 }
             ]
         },
@@ -240,38 +295,7 @@
     "filePaths": [
         "assignment.go"
     ],
-    "sha1": "b166f37106251a0b4244cb96caa2c4115699c65f",
+    "sha1": "7df173e52ab3790631e6c3f946896d283fbc433e",
     "gitDir": "test/corpus/repos/go",
-    "sha2": "8b609bd3d2e63b59cd2f4dbb0ef28d8a901a4016"
-}
-,{
-    "testCaseDescription": "go-assignment-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "assignment.go": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                25
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bar' assignment"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "assignment.go"
-    ],
-    "sha1": "8b609bd3d2e63b59cd2f4dbb0ef28d8a901a4016",
-    "gitDir": "test/corpus/repos/go",
-    "sha2": "f6aae483e1a28331a6c388755ca93f8007caddff"
+    "sha2": "d3fa479c4d82673363dbcee77472346afb069504"
 }]
