@@ -34,6 +34,7 @@ library
                      , Language.C
                      , Language.JavaScript
                      , Language.Markdown
+                     , Language.Ruby
                      , Parser
                      , Patch
                      , Patch.Arbitrary
