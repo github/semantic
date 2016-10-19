@@ -22,3 +22,6 @@
 [submodule "vendor/hspec-expectations-pretty-diff"]
 	path = vendor/hspec-expectations-pretty-diff
 	url = https://github.com/rewinfrey/hspec-expectations-pretty-diff
+[submodule "test/corpus/repos/ruby"]
+	path = test/corpus/repos/ruby
+	url = https://github.com/diff-fixtures/ruby.git
