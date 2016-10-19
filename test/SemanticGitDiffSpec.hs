@@ -39,15 +39,18 @@ runTestsIn filePaths format matcher = do
             Left err ->  it ("An error occurred " <> err <> " (" <> filePath <> ")") $ True `shouldBe` False
             Right testCases -> traverse_ (\testCase -> it (testCaseDescription testCase) $ assertDiffSummary testCase format matcher) testCases
 
-spec :: Spec
-spec = parallel $ do
-  diffSummaryFiles <- runIO $ testCaseFiles "test/corpus/diff-summaries"
-  diffSummaryToDoFiles <- runIO $ testCaseFiles "test/corpus/diff-summaries-todo"
-  diffSummaryCrasherFiles <- runIO $ testCaseFiles "test/corpus/diff-summary-crashers"
+spec :: Maybe String -> Spec
+spec maybeLanguage = parallel $ do
+  diffSummaryFiles <- runIO $ testCaseFiles maybeLanguage "test/corpus/diff-summaries"
+  diffSummaryToDoFiles <- runIO $ testCaseFiles maybeLanguage "test/corpus/diff-summaries-todo"
+  diffSummaryCrasherFiles <- runIO $ testCaseFiles maybeLanguage "test/corpus/diff-summary-crashers"
 
   describe "diff summaries" $ runTestsIn diffSummaryFiles Summary shouldBe
   describe "diff summaries todo" $ runTestsIn diffSummaryToDoFiles Summary shouldNotBe
   describe "diff summaries crashers todo" $ runTestsIn diffSummaryCrasherFiles Summary shouldBe
 
-  where testCaseFiles :: String -> IO [FilePath]
-        testCaseFiles = globDir1 (compile "*/*.json")
+  where
+    testCaseFiles :: Maybe String -> String -> IO [FilePath]
+    testCaseFiles maybeLanguage dir = case maybeLanguage of
+      Just language -> globDir1 (compile (language <> "/*.json")) dir
+      Nothing -> globDir1 (compile "*/*.json") dir
