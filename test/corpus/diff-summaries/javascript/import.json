@@ -61,7 +61,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the member1 , member2 from \"antelope\" import statement"
+                    "summary": "Added the { member1 , member2 } from \"antelope\" import statement"
                 },
                 {
                     "span": {
@@ -76,7 +76,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the member1 , member2 as alias2 from \"ant-eater\" import statement"
+                    "summary": "Added the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
                 },
                 {
                     "span": {
@@ -130,9 +130,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "3ae621df162ded0a0cc23dc6ac16b11c9b5e5e43",
+    "sha1": "a2d4c453bd5819dd22716ce40c5abd91aaf0af96",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "7babe13ca5feebe037df2a299a0cb56b2dbfc487"
+    "sha2": "8f038627298d51e24022cc940dbb46cfb596b42f"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-insert-test",
@@ -197,7 +197,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the element1 , element2 from \"bald-eagle\" import statement"
+                    "summary": "Added the { element1 , element2 } from \"bald-eagle\" import statement"
                 },
                 {
                     "span": {
@@ -212,7 +212,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the element1 , element2 as elementAlias2 from \"bandicoot\" import statement"
+                    "summary": "Added the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
                 },
                 {
                     "span": {
@@ -317,7 +317,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the member1 , member2 from \"antelope\" import statement"
+                    "summary": "Added the { member1 , member2 } from \"antelope\" import statement"
                 },
                 {
                     "span": {
@@ -332,7 +332,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the member1 , member2 as alias2 from \"ant-eater\" import statement"
+                    "summary": "Added the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
                 },
                 {
                     "span": {
@@ -386,15 +386,30 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "7babe13ca5feebe037df2a299a0cb56b2dbfc487",
+    "sha1": "8f038627298d51e24022cc940dbb46cfb596b42f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "94d777812826cbf929a0e7a582daeb25c9f1cdad"
+    "sha2": "d64ca338a92ed3c8bf4accf04cce6664434d8470"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-insert-test",
     "expectedResult": {
         "changes": {
             "import.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                33
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember from \"foo\" import statement"
+                },
                 {
                     "span": {
                         "replace": [
@@ -410,33 +425,6 @@
                             },
                             {
                                 "start": [
-                                    1,
-                                    27
-                                ],
-                                "end": [
-                                    1,
-                                    32
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"babirusa\" string with the \"foo\" string in the defaultMember from \"foo\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    28
-                                ],
-                                "end": [
-                                    2,
-                                    36
-                                ]
-                            },
-                            {
-                                "start": [
                                     2,
                                     23
                                 ],
@@ -447,19 +435,19 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"baboon\" string with the \"aardvark\" string in the name from \"aardvark\" import statement"
+                    "summary": "Replaced the \"babirusa\" string with the \"aardvark\" string in the name from \"aardvark\" import statement"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
-                                    13
+                                    1,
+                                    8
                                 ],
                                 "end": [
-                                    2,
-                                    22
+                                    1,
+                                    21
                                 ]
                             },
                             {
@@ -474,7 +462,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'otherName' identifier with the 'name' identifier in the name from \"aardvark\" import statement"
+                    "summary": "Replaced the 'defaultMember' identifier with the 'name' identifier in the name from \"aardvark\" import statement"
                 },
                 {
                     "span": {
@@ -504,7 +492,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the member1 , member2 from \"antelope\" import statement"
+                    "summary": "Added the { member1 , member2 } from \"antelope\" import statement"
                 },
                 {
                     "span": {
@@ -519,7 +507,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the member1 , member2 as alias2 from \"ant-eater\" import statement"
+                    "summary": "Added the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
                 },
                 {
                     "span": {
@@ -538,30 +526,18 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    34
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    1
-                                ],
-                                "end": [
-                                    7,
-                                    50
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
                     },
-                    "summary": "Replaced the element from \"badger\" import statement with the defaultMember, * as name from \"alligator\" import statement"
+                    "summary": "Added the defaultMember, * as name from \"alligator\" import statement"
                 },
                 {
                     "span": {
@@ -582,6 +558,36 @@
                     "span": {
                         "delete": {
                             "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                37
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the otherName from \"baboon\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the element from \"badger\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
                                 4,
                                 1
                             ],
@@ -591,7 +597,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the element1 , element2 from \"bald-eagle\" import statement"
+                    "summary": "Deleted the { element1 , element2 } from \"bald-eagle\" import statement"
                 },
                 {
                     "span": {
@@ -606,7 +612,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the element1 , element2 as elementAlias2 from \"bandicoot\" import statement"
+                    "summary": "Deleted the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
                 },
                 {
                     "span": {
@@ -660,15 +666,30 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "94d777812826cbf929a0e7a582daeb25c9f1cdad",
+    "sha1": "d64ca338a92ed3c8bf4accf04cce6664434d8470",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f8ddd719ed2909577bc19f08788957ffc1bc72ce"
+    "sha2": "6cf5d045aecc63d55a582bbc3644f033ad58e36d"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-test",
     "expectedResult": {
         "changes": {
             "import.js": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                38
+                            ]
+                        }
+                    },
+                    "summary": "Added the defaultMember from \"babirusa\" import statement"
+                },
                 {
                     "span": {
                         "replace": [
@@ -684,17 +705,44 @@
                             },
                             {
                                 "start": [
-                                    1,
-                                    27
+                                    2,
+                                    28
                                 ],
                                 "end": [
-                                    1,
-                                    37
+                                    2,
+                                    36
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"foo\" string with the \"babirusa\" string in the defaultMember from \"babirusa\" import statement"
+                    "summary": "Replaced the \"foo\" string with the \"baboon\" string in the otherName from \"baboon\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    13
+                                ],
+                                "end": [
+                                    2,
+                                    22
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'defaultMember' identifier with the 'otherName' identifier in the otherName from \"baboon\" import statement"
                 },
                 {
                     "span": {
@@ -711,17 +759,17 @@
                             },
                             {
                                 "start": [
-                                    2,
-                                    28
+                                    3,
+                                    25
                                 ],
                                 "end": [
-                                    2,
-                                    36
+                                    3,
+                                    33
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"aardvark\" string with the \"baboon\" string in the otherName from \"baboon\" import statement"
+                    "summary": "Replaced the \"aardvark\" string with the \"badger\" string in the element from \"badger\" import statement"
                 },
                 {
                     "span": {
@@ -738,32 +786,17 @@
                             },
                             {
                                 "start": [
-                                    2,
-                                    13
+                                    3,
+                                    10
                                 ],
                                 "end": [
-                                    2,
-                                    22
+                                    3,
+                                    17
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'name' identifier with the 'otherName' identifier in the otherName from \"baboon\" import statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                34
-                            ]
-                        }
-                    },
-                    "summary": "Added the element from \"badger\" import statement"
+                    "summary": "Replaced the 'name' identifier with the 'element' identifier in the element from \"badger\" import statement"
                 },
                 {
                     "span": {
@@ -778,7 +811,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the element1 , element2 from \"bald-eagle\" import statement"
+                    "summary": "Added the { element1 , element2 } from \"bald-eagle\" import statement"
                 },
                 {
                     "span": {
@@ -793,7 +826,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the element1 , element2 as elementAlias2 from \"bandicoot\" import statement"
+                    "summary": "Added the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
                 },
                 {
                     "span": {
@@ -812,30 +845,18 @@
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    30
-                                ]
-                            },
-                            {
-                                "start": [
-                                    7,
-                                    1
-                                ],
-                                "end": [
-                                    7,
-                                    50
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                7,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                50
+                            ]
+                        }
                     },
-                    "summary": "Replaced the member from \"ant\" import statement with the defaultMember, * as element from \"barbet\" import statement"
+                    "summary": "Added the defaultMember, * as element from \"barbet\" import statement"
                 },
                 {
                     "span": {
@@ -856,6 +877,21 @@
                     "span": {
                         "delete": {
                             "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                30
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the member from \"ant\" import statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
                                 4,
                                 1
                             ],
@@ -865,7 +901,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the member1 , member2 from \"antelope\" import statement"
+                    "summary": "Deleted the { member1 , member2 } from \"antelope\" import statement"
                 },
                 {
                     "span": {
@@ -880,7 +916,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the member1 , member2 as alias2 from \"ant-eater\" import statement"
+                    "summary": "Deleted the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
                 },
                 {
                     "span": {
@@ -934,9 +970,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "f8ddd719ed2909577bc19f08788957ffc1bc72ce",
+    "sha1": "6cf5d045aecc63d55a582bbc3644f033ad58e36d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "b94842f36559d65e33c859bca354e3e659923f62"
+    "sha2": "3013722a563d2868bf7bfe021bdfdfdff521b967"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-replacement-test",
@@ -1001,7 +1037,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the element1 , element2 from \"bald-eagle\" import statement"
+                    "summary": "Deleted the { element1 , element2 } from \"bald-eagle\" import statement"
                 },
                 {
                     "span": {
@@ -1016,7 +1052,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the element1 , element2 as elementAlias2 from \"bandicoot\" import statement"
+                    "summary": "Deleted the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
                 },
                 {
                     "span": {
@@ -1121,7 +1157,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the member1 , member2 from \"antelope\" import statement"
+                    "summary": "Deleted the { member1 , member2 } from \"antelope\" import statement"
                 },
                 {
                     "span": {
@@ -1136,7 +1172,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the member1 , member2 as alias2 from \"ant-eater\" import statement"
+                    "summary": "Deleted the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
                 },
                 {
                     "span": {
@@ -1241,7 +1277,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the element1 , element2 from \"bald-eagle\" import statement"
+                    "summary": "Added the { element1 , element2 } from \"bald-eagle\" import statement"
                 },
                 {
                     "span": {
@@ -1256,7 +1292,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the element1 , element2 as elementAlias2 from \"bandicoot\" import statement"
+                    "summary": "Added the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
                 },
                 {
                     "span": {
@@ -1310,9 +1346,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "b94842f36559d65e33c859bca354e3e659923f62",
+    "sha1": "3013722a563d2868bf7bfe021bdfdfdff521b967",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "85252baf0a924e76d0e1c6d932571b293a2bb939"
+    "sha2": "2f86f9da336f0407a2ca39d0ee4a959091bb7952"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-test",
@@ -1377,7 +1413,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the member1 , member2 from \"antelope\" import statement"
+                    "summary": "Deleted the { member1 , member2 } from \"antelope\" import statement"
                 },
                 {
                     "span": {
@@ -1392,7 +1428,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the member1 , member2 as alias2 from \"ant-eater\" import statement"
+                    "summary": "Deleted the { member1 , member2 as alias2 } from \"ant-eater\" import statement"
                 },
                 {
                     "span": {
@@ -1446,9 +1482,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "85252baf0a924e76d0e1c6d932571b293a2bb939",
+    "sha1": "2f86f9da336f0407a2ca39d0ee4a959091bb7952",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "cb3ee6d2ef9d7a875881dd16206604b505460ab7"
+    "sha2": "30944a87fbaf4af40445ddb8264003eedeec821f"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-rest-test",
@@ -1513,7 +1549,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the element1 , element2 from \"bald-eagle\" import statement"
+                    "summary": "Deleted the { element1 , element2 } from \"bald-eagle\" import statement"
                 },
                 {
                     "span": {
@@ -1528,7 +1564,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the element1 , element2 as elementAlias2 from \"bandicoot\" import statement"
+                    "summary": "Deleted the { element1 , element2 as elementAlias2 } from \"bandicoot\" import statement"
                 },
                 {
                     "span": {
@@ -1582,7 +1618,7 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "cb3ee6d2ef9d7a875881dd16206604b505460ab7",
+    "sha1": "30944a87fbaf4af40445ddb8264003eedeec821f",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1fafdab82fd48882271d7313f894a0fb6629cf8c"
+    "sha2": "9610afd6cbcffec3359a682713065543f20fa1f3"
 }]
