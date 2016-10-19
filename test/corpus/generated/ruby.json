@@ -1,0 +1,16 @@
+[
+  {
+    "repoPath": "test/corpus/repos/ruby",
+    "repoUrl": "https://github.com/diff-fixtures/ruby.git",
+    "language": "ruby",
+    "syntaxes": [
+      {
+        "syntax": "assignment",
+        "repoFilePath": "assignment.rb",
+        "insert": "x = 0",
+        "replacement": "x = 1",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/assignment.json"
+      }
+    ]
+  }
+]

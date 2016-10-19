@@ -18,6 +18,7 @@ termConstructor
 termConstructor source sourceSpan name range children = withDefaultInfo =<< do
   putStrLn name
   pure $ case (name, children) of
+    ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where
@@ -27,4 +28,5 @@ termConstructor source sourceSpan name range children = withDefaultInfo =<< do
 
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
+  "assignment" -> Assignment
   s -> Other (toS s)
