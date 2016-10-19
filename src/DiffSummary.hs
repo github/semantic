@@ -137,6 +137,7 @@ prefixWithPatch patch constructor = prefixWithThe (patchToPrefix patch)
 -- Optional determiner (e.g. "the") to tie together summary statements.
 determiner :: DiffInfo -> Doc
 determiner (LeafInfo "number" _ _) = ""
+determiner (LeafInfo "integer" _ _) = ""
 determiner (LeafInfo "boolean" _ _) = ""
 determiner (LeafInfo "anonymous function" _ _) = "an"
 determiner (BranchInfo bs _ _) = determiner (last bs)
@@ -148,6 +149,7 @@ toLeafInfos BranchInfo{..} = branches >>= toLeafInfos
 toLeafInfos HideInfo = []
 toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "number" termName _) -> squotes $ toDoc termName
+  (LeafInfo "integer" termName _) -> squotes $ toDoc termName
   (LeafInfo "boolean" termName _) -> squotes $ toDoc termName
   (LeafInfo "anonymous function" termName _) -> toDoc termName <+> "function"
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName

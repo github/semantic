@@ -29,4 +29,5 @@ termConstructor source sourceSpan name range children = withDefaultInfo =<< do
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
   "assignment" -> Assignment
+  "integer" -> IntegerLiteral
   s -> Other (toS s)

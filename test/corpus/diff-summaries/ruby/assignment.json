@@ -105,7 +105,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '1' integer with the '0' integer in an assignment to x"
+                    "summary": "Replaced '1' with '0' in an assignment to x"
                 }
             ]
         },
@@ -148,7 +148,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the '0' integer with the '1' integer in an assignment to x"
+                    "summary": "Replaced '0' with '1' in an assignment to x"
                 }
             ]
         },
