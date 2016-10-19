@@ -67,7 +67,12 @@ termConstructor source sourceSpan name range children
     ("method_definition", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
     ("class", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
     ("class", [ identifier, definitions ]) -> S.Class identifier Nothing (toList (unwrap definitions))
-    ("import_statement", [ statements, identifier ] ) -> S.Import identifier (toList (unwrap statements))
+    ("import_statement", [ statements, identifier ] ) -> S.Import identifier (removeIndexedNodes [statements])
+      where
+        removeIndexedNodes = foldMap $ \term ->
+          case unwrap term of
+            S.Indexed [child] -> removeIndexedNodes [child]
+            _ -> [term]
     ("import_statement", [ identifier ] ) -> S.Import identifier []
     ("export_statement", [ statements, identifier] ) -> S.Export (Just identifier) (toList (unwrap statements))
     ("export_statement", [ statements ] ) -> case unwrap statements of
