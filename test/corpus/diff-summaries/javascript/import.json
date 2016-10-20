@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name from \"aardvark\" import statement"
+                    "summary": "Added the * as name from \"aardvark\" import statement"
                 },
                 {
                     "span": {
@@ -46,7 +46,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the member from \"ant\" import statement"
+                    "summary": "Added the { member } from \"ant\" import statement"
                 },
                 {
                     "span": {
@@ -130,9 +130,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "a2d4c453bd5819dd22716ce40c5abd91aaf0af96",
+    "sha1": "9610afd6cbcffec3359a682713065543f20fa1f3",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "8f038627298d51e24022cc940dbb46cfb596b42f"
+    "sha2": "4bf41968b9cf8e43bccb4eb05e2f3345ec1fbf22"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-insert-test",
@@ -167,7 +167,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the otherName from \"baboon\" import statement"
+                    "summary": "Added the * as otherName from \"baboon\" import statement"
                 },
                 {
                     "span": {
@@ -182,7 +182,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the element from \"badger\" import statement"
+                    "summary": "Added the { element } from \"badger\" import statement"
                 },
                 {
                     "span": {
@@ -287,7 +287,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the name from \"aardvark\" import statement"
+                    "summary": "Added the * as name from \"aardvark\" import statement"
                 },
                 {
                     "span": {
@@ -302,7 +302,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the member from \"ant\" import statement"
+                    "summary": "Added the { member } from \"ant\" import statement"
                 },
                 {
                     "span": {
@@ -386,30 +386,15 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "8f038627298d51e24022cc940dbb46cfb596b42f",
+    "sha1": "4bf41968b9cf8e43bccb4eb05e2f3345ec1fbf22",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d64ca338a92ed3c8bf4accf04cce6664434d8470"
+    "sha2": "f959bc243d5a53c6b9cfad8c2d13e361a35845f0"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-insert-test",
     "expectedResult": {
         "changes": {
             "import.js": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                33
-                            ]
-                        }
-                    },
-                    "summary": "Added the defaultMember from \"foo\" import statement"
-                },
                 {
                     "span": {
                         "replace": [
@@ -425,6 +410,33 @@
                             },
                             {
                                 "start": [
+                                    1,
+                                    27
+                                ],
+                                "end": [
+                                    1,
+                                    32
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"babirusa\" string with the \"foo\" string in the defaultMember from \"foo\" import statement"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    28
+                                ],
+                                "end": [
+                                    2,
+                                    36
+                                ]
+                            },
+                            {
+                                "start": [
                                     2,
                                     23
                                 ],
@@ -435,19 +447,19 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the \"babirusa\" string with the \"aardvark\" string in the name from \"aardvark\" import statement"
+                    "summary": "Replaced the \"baboon\" string with the \"aardvark\" string in the * as name from \"aardvark\" import statement"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    1,
-                                    8
+                                    2,
+                                    13
                                 ],
                                 "end": [
-                                    1,
-                                    21
+                                    2,
+                                    22
                                 ]
                             },
                             {
@@ -462,7 +474,7 @@
                             }
                         ]
                     },
-                    "summary": "Replaced the 'defaultMember' identifier with the 'name' identifier in the name from \"aardvark\" import statement"
+                    "summary": "Replaced the 'otherName' identifier with the 'name' identifier in the * as name from \"aardvark\" import statement"
                 },
                 {
                     "span": {
@@ -477,7 +489,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the member from \"ant\" import statement"
+                    "summary": "Added the { member } from \"ant\" import statement"
                 },
                 {
                     "span": {
@@ -526,18 +538,30 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                50
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    34
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    50
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the defaultMember, * as name from \"alligator\" import statement"
+                    "summary": "Replaced the { element } from \"badger\" import statement with the defaultMember, * as name from \"alligator\" import statement"
                 },
                 {
                     "span": {
@@ -553,36 +577,6 @@
                         }
                     },
                     "summary": "Added the \"arctic-tern\" import statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                37
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the otherName from \"baboon\" import statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                34
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the element from \"badger\" import statement"
                 },
                 {
                     "span": {
@@ -666,30 +660,15 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "d64ca338a92ed3c8bf4accf04cce6664434d8470",
+    "sha1": "f959bc243d5a53c6b9cfad8c2d13e361a35845f0",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "6cf5d045aecc63d55a582bbc3644f033ad58e36d"
+    "sha2": "2adaab96ff3e868d0e8d91825c5acaa58f88a5e9"
 }
 ,{
     "testCaseDescription": "javascript-import-replacement-test",
     "expectedResult": {
         "changes": {
             "import.js": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                38
-                            ]
-                        }
-                    },
-                    "summary": "Added the defaultMember from \"babirusa\" import statement"
-                },
                 {
                     "span": {
                         "replace": [
@@ -705,44 +684,17 @@
                             },
                             {
                                 "start": [
-                                    2,
-                                    28
+                                    1,
+                                    27
                                 ],
                                 "end": [
-                                    2,
-                                    36
+                                    1,
+                                    37
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"foo\" string with the \"baboon\" string in the otherName from \"baboon\" import statement"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    8
-                                ],
-                                "end": [
-                                    1,
-                                    21
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    13
-                                ],
-                                "end": [
-                                    2,
-                                    22
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'defaultMember' identifier with the 'otherName' identifier in the otherName from \"baboon\" import statement"
+                    "summary": "Replaced the \"foo\" string with the \"babirusa\" string in the defaultMember from \"babirusa\" import statement"
                 },
                 {
                     "span": {
@@ -759,17 +711,17 @@
                             },
                             {
                                 "start": [
-                                    3,
-                                    25
+                                    2,
+                                    28
                                 ],
                                 "end": [
-                                    3,
-                                    33
+                                    2,
+                                    36
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"aardvark\" string with the \"badger\" string in the element from \"badger\" import statement"
+                    "summary": "Replaced the \"aardvark\" string with the \"baboon\" string in the * as otherName from \"baboon\" import statement"
                 },
                 {
                     "span": {
@@ -786,17 +738,32 @@
                             },
                             {
                                 "start": [
-                                    3,
-                                    10
+                                    2,
+                                    13
                                 ],
                                 "end": [
-                                    3,
-                                    17
+                                    2,
+                                    22
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'name' identifier with the 'element' identifier in the element from \"badger\" import statement"
+                    "summary": "Replaced the 'name' identifier with the 'otherName' identifier in the * as otherName from \"baboon\" import statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                34
+                            ]
+                        }
+                    },
+                    "summary": "Added the { element } from \"badger\" import statement"
                 },
                 {
                     "span": {
@@ -845,18 +812,30 @@
                 },
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                50
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    3,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    30
+                                ]
+                            },
+                            {
+                                "start": [
+                                    7,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    50
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the defaultMember, * as element from \"barbet\" import statement"
+                    "summary": "Replaced the { member } from \"ant\" import statement with the defaultMember, * as element from \"barbet\" import statement"
                 },
                 {
                     "span": {
@@ -872,21 +851,6 @@
                         }
                     },
                     "summary": "Added the \"basilisk\" import statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                30
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the member from \"ant\" import statement"
                 },
                 {
                     "span": {
@@ -970,9 +934,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "6cf5d045aecc63d55a582bbc3644f033ad58e36d",
+    "sha1": "2adaab96ff3e868d0e8d91825c5acaa58f88a5e9",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "3013722a563d2868bf7bfe021bdfdfdff521b967"
+    "sha2": "2fbab0c52886d92b646d883a100a9fdf680e2eb5"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-replacement-test",
@@ -1007,7 +971,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the otherName from \"baboon\" import statement"
+                    "summary": "Deleted the * as otherName from \"baboon\" import statement"
                 },
                 {
                     "span": {
@@ -1022,7 +986,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the element from \"badger\" import statement"
+                    "summary": "Deleted the { element } from \"badger\" import statement"
                 },
                 {
                     "span": {
@@ -1127,7 +1091,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name from \"aardvark\" import statement"
+                    "summary": "Deleted the * as name from \"aardvark\" import statement"
                 },
                 {
                     "span": {
@@ -1142,7 +1106,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the member from \"ant\" import statement"
+                    "summary": "Deleted the { member } from \"ant\" import statement"
                 },
                 {
                     "span": {
@@ -1247,7 +1211,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the otherName from \"baboon\" import statement"
+                    "summary": "Added the * as otherName from \"baboon\" import statement"
                 },
                 {
                     "span": {
@@ -1262,7 +1226,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the element from \"badger\" import statement"
+                    "summary": "Added the { element } from \"badger\" import statement"
                 },
                 {
                     "span": {
@@ -1346,9 +1310,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "3013722a563d2868bf7bfe021bdfdfdff521b967",
+    "sha1": "2fbab0c52886d92b646d883a100a9fdf680e2eb5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "2f86f9da336f0407a2ca39d0ee4a959091bb7952"
+    "sha2": "4265168a1d23c17faf4a5796e7f88398fe75ca39"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-test",
@@ -1383,7 +1347,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the name from \"aardvark\" import statement"
+                    "summary": "Deleted the * as name from \"aardvark\" import statement"
                 },
                 {
                     "span": {
@@ -1398,7 +1362,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the member from \"ant\" import statement"
+                    "summary": "Deleted the { member } from \"ant\" import statement"
                 },
                 {
                     "span": {
@@ -1482,9 +1446,9 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "2f86f9da336f0407a2ca39d0ee4a959091bb7952",
+    "sha1": "4265168a1d23c17faf4a5796e7f88398fe75ca39",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "30944a87fbaf4af40445ddb8264003eedeec821f"
+    "sha2": "19f82dee332aacf5f8d30ed8e90df6a4b49bf3a5"
 }
 ,{
     "testCaseDescription": "javascript-import-delete-rest-test",
@@ -1519,7 +1483,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the otherName from \"baboon\" import statement"
+                    "summary": "Deleted the * as otherName from \"baboon\" import statement"
                 },
                 {
                     "span": {
@@ -1534,7 +1498,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the element from \"badger\" import statement"
+                    "summary": "Deleted the { element } from \"badger\" import statement"
                 },
                 {
                     "span": {
@@ -1618,7 +1582,7 @@
     "filePaths": [
         "import.js"
     ],
-    "sha1": "30944a87fbaf4af40445ddb8264003eedeec821f",
+    "sha1": "19f82dee332aacf5f8d30ed8e90df6a4b49bf3a5",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "9610afd6cbcffec3359a682713065543f20fa1f3"
+    "sha2": "950c3ba11262666fa769fa105e42cbe99b392eda"
 }]
