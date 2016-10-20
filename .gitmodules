@@ -24,4 +24,4 @@
 	url = https://github.com/rewinfrey/hspec-expectations-pretty-diff
 [submodule "test/corpus/repos/go"]
 	path = test/corpus/repos/go
-	url = https://github.com/joshvera/go.git
+	url = https://github.com/diff-fixtures/go.git
