@@ -10,6 +10,13 @@
         "insert": "x = 0",
         "replacement": "x = 1",
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/assignment.json"
+      },
+      {
+        "syntax": "comment",
+        "repoFilePath": "comment.rb",
+        "insert": "# This is a comment",
+        "replacement": "=begin\nThis is a multiline\ncomment\n=end",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/comment.json"
       }
     ]
   }
