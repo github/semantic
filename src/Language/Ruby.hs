@@ -15,10 +15,11 @@ termConstructor
   -> Range -- ^ The character range that the term occupies.
   -> [Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])] -- ^ The child nodes of the term.
   -> IO (Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan name range children = withDefaultInfo =<< do
-  putStrLn name
-  pure $ case (name, children) of
+termConstructor source sourceSpan name range children
+  | name == "ERROR" = withDefaultInfo (S.Error children)
+  | otherwise = withDefaultInfo $ case (name, children) of
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
+    ("comment", _) -> S.Comment . toText $ slice range source
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where
@@ -29,5 +30,8 @@ termConstructor source sourceSpan name range children = withDefaultInfo =<< do
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
   "assignment" -> Assignment
+  "comment" -> Comment
+  "ERROR" -> Error
   "integer" -> IntegerLiteral
-  s -> Other (toS s)
+  "program" -> Program
+  s -> Other s
