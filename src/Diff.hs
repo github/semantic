@@ -35,10 +35,18 @@ mergeMaybe transform = iter algebra . fmap transform
   where algebra :: Mergeable f => TermF f (Both annotation) (Maybe (Term f annotation)) -> Maybe (Term f annotation)
         algebra (annotations :< syntax) = cofree . (Both.fst annotations :<) <$> sequenceAlt syntax
 
+mergeMaybe' :: Mergeable f => (Patch (Term f annotation) -> Maybe (Term f annotation)) -> Diff f annotation -> Maybe (Term f annotation)
+mergeMaybe' transform = iter algebra . fmap transform
+  where algebra :: Mergeable f => TermF f (Both annotation) (Maybe (Term f annotation)) -> Maybe (Term f annotation)
+        algebra (annotations :< syntax) = cofree . (Both.snd annotations :<) <$> sequenceAlt syntax
+
 -- | Recover the before state of a diff.
 beforeTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
 beforeTerm = mergeMaybe before
 
 -- | Recover the after state of a diff.
 afterTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
-afterTerm = mergeMaybe after
+afterTerm diff = mergeMaybe after diff
+
+afterTerm' :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
+afterTerm' diff = mergeMaybe' after diff
