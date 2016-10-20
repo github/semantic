@@ -96,7 +96,7 @@ diffToDiffSummaries sources = para $ \diff ->
   let
     diff' = free (Prologue.fst <$> diff)
     annotateWithCategory :: [DiffSummary DiffInfo] -> [DiffSummary DiffInfo]
-    annotateWithCategory children = case (beforeTerm diff', afterTerm diff') of
+    annotateWithCategory children = case (beforeTerm diff', afterTerm' diff') of
       (_, Just diff'') -> appendSummary (Both.snd sources) diff'' <$> children
       (Just diff'', _) -> appendSummary (Both.fst sources) diff'' <$> children
       (Nothing, Nothing) -> []
