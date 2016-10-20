@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeFamilies, TypeSynonymInstances #-}
+{-# LANGUAGE TypeFamilies, TypeSynonymInstances, ScopedTypeVariables #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 module Diff where
 
@@ -30,20 +30,15 @@ diffCost :: (Foldable f, Functor f) => Diff f annotation -> Int
 diffCost = diffSum $ patchSum termSize
 
 -- | Merge a diff using a function to provide the Term (in Maybe, to simplify recovery of the before/after state) for every Patch.
-mergeMaybe :: Mergeable f => (Patch (Term f annotation) -> Maybe (Term f annotation)) -> Diff f annotation -> Maybe (Term f annotation)
-mergeMaybe transform = iter algebra . fmap transform
-  where algebra :: Mergeable f => TermF f (Both annotation) (Maybe (Term f annotation)) -> Maybe (Term f annotation)
-        algebra (annotations :< syntax) = cofree . (Both.fst annotations :<) <$> sequenceAlt syntax
-
-mergeMaybe' :: Mergeable f => (Patch (Term f annotation) -> Maybe (Term f annotation)) -> Diff f annotation -> Maybe (Term f annotation)
-mergeMaybe' transform = iter algebra . fmap transform
-  where algebra :: Mergeable f => TermF f (Both annotation) (Maybe (Term f annotation)) -> Maybe (Term f annotation)
-        algebra (annotations :< syntax) = cofree . (Both.snd annotations :<) <$> sequenceAlt syntax
+mergeMaybe :: forall f annotation. Mergeable f => (Patch (Term f annotation) -> Maybe (Term f annotation)) -> (Both annotation -> annotation) -> Diff f annotation -> Maybe (Term f annotation)
+mergeMaybe transform extractAnnotation = iter algebra . fmap transform
+  where algebra :: TermF f (Both annotation) (Maybe (Term f annotation)) -> Maybe (Term f annotation)
+        algebra (annotations :< syntax) = cofree . (extractAnnotation annotations :<) <$> sequenceAlt syntax
 
 -- | Recover the before state of a diff.
 beforeTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
-beforeTerm = mergeMaybe before
+beforeTerm = mergeMaybe before Both.fst
 
 -- | Recover the after state of a diff.
 afterTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
-afterTerm diff = mergeMaybe' after diff
+afterTerm = mergeMaybe after Both.snd
