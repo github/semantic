@@ -25,9 +25,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "928a00d4fd3c3fc5e67b7d54564a784dd222d6df",
+    "sha1": "8397e8bab234cfb40d758bd3f508928f7e609eda",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f55421b230c4923ed664cd8e3622b7e51b058789"
+    "sha2": "b5cbe67685d4ed34e57adbca76e9edb2deb63872"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-replacement-insert-test",
@@ -71,9 +71,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "f55421b230c4923ed664cd8e3622b7e51b058789",
+    "sha1": "b5cbe67685d4ed34e57adbca76e9edb2deb63872",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "94ea7d4bc4d4606830fbffc9dbf51ac81f739bdf"
+    "sha2": "d45f52c775e8f8de44818ec7b528d55415d27a62"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-insert-test",
@@ -102,9 +102,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "94ea7d4bc4d4606830fbffc9dbf51ac81f739bdf",
+    "sha1": "d45f52c775e8f8de44818ec7b528d55415d27a62",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "1d8d11f76566ccd86e01a16c902233e28411ee56"
+    "sha2": "75525f5c71abf02dd570e9a3ce818bccf942b042"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-replacement-test",
@@ -133,9 +133,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "1d8d11f76566ccd86e01a16c902233e28411ee56",
+    "sha1": "75525f5c71abf02dd570e9a3ce818bccf942b042",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "43bb80a849e191473a96dd89f9155f4c555c6326"
+    "sha2": "e3c36babcfd30ff4680ded2f1ee86fa16f0c4582"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-replacement-test",
@@ -194,9 +194,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "43bb80a849e191473a96dd89f9155f4c555c6326",
+    "sha1": "e3c36babcfd30ff4680ded2f1ee86fa16f0c4582",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "d98bd540bfb1bcf6c7f716e4cd2d408578b5eafe"
+    "sha2": "6f9a8bad0dd307d36f735a709cf1d2805fa99a56"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-test",
@@ -225,9 +225,9 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "d98bd540bfb1bcf6c7f716e4cd2d408578b5eafe",
+    "sha1": "6f9a8bad0dd307d36f735a709cf1d2805fa99a56",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "f637e1d91328db29266f59df823d3394d26768dc"
+    "sha2": "14990f01359eb1939847a22c255fec278a43e529"
 }
 ,{
     "testCaseDescription": "javascript-return-statement-delete-rest-test",
@@ -256,7 +256,7 @@
     "filePaths": [
         "return-statement.js"
     ],
-    "sha1": "f637e1d91328db29266f59df823d3394d26768dc",
+    "sha1": "14990f01359eb1939847a22c255fec278a43e529",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "326bf6e98fb79cd2a89f227fffebf3966e191811"
+    "sha2": "f44956c8e350313dc0c3aa6a19dd68f221bb3e01"
 }]
