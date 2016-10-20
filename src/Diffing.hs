@@ -147,13 +147,15 @@ truncatedDiff arguments sources = pure $ case format arguments of
 printDiff :: (HasField fields SourceSpan, HasField fields Category, HasField fields Cost, HasField fields Range) => Parser (Syntax Text) (Record fields) -> DiffArguments -> Both SourceBlob -> IO ()
 printDiff parser arguments sources = do
   rendered <- textDiff parser arguments sources
-  let renderedText = case rendered of
-                       SplitOutput text -> text
-                       PatchOutput text -> text
-                       JSONOutput series -> toS . encodingToLazyByteString . toEncoding $ toJSON series
-                       SummaryOutput summaries -> toS . encodingToLazyByteString . toEncoding $ toJSON summaries
-
-  writeToOutput (output arguments) renderedText
+  writeToOutput (output arguments) $
+    case rendered of
+      SplitOutput text -> text
+      PatchOutput text -> text
+      JSONOutput series -> encodingToText (toJSON series)
+      SummaryOutput summaries -> encodingToText (toJSON summaries)
+  where
+    -- TODO: Don't go from Value to Text?
+    encodingToText = toS . encodingToLazyByteString . toEncoding
 
 -- | Writes text to an output file or stdout.
 writeToOutput :: Maybe FilePath -> Text -> IO ()
