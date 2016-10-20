@@ -45,8 +45,8 @@ beforeTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
 beforeTerm = mergeMaybe before
 
 -- | Recover the after state of a diff.
-afterTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
-afterTerm diff = mergeMaybe after diff
-
 afterTerm' :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
-afterTerm' diff = mergeMaybe' after diff
+afterTerm' diff = mergeMaybe after diff
+
+afterTerm :: Mergeable f => Diff f annotation -> Maybe (Term f annotation)
+afterTerm diff = mergeMaybe' after diff
