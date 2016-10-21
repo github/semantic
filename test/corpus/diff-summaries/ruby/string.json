@@ -1,0 +1,460 @@
+[{
+    "testCaseDescription": "ruby-string-insert-test",
+    "expectedResult": {
+        "changes": {
+            "string.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the '' string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo with \"bar\"' string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.rb"
+    ],
+    "sha1": "af6312ca6145740c56b2a2631b64840579ae6bf2",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "91fc401a4ffc87a7578e21a41e1051171ed49581"
+}
+,{
+    "testCaseDescription": "ruby-string-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "string.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"\" string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"bar with 'foo'\" string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the '' string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo with \"bar\"' string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.rb"
+    ],
+    "sha1": "91fc401a4ffc87a7578e21a41e1051171ed49581",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "c17d64b27eeb00ef6b5af7a5edf5a90995860549"
+}
+,{
+    "testCaseDescription": "ruby-string-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "string.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"\" string with the '' string"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the \"bar with 'foo'\" string with the 'foo with \"bar\"' string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.rb"
+    ],
+    "sha1": "c17d64b27eeb00ef6b5af7a5edf5a90995860549",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "dc23f27dce573b342cfe90de89524fd91a3d72c1"
+}
+,{
+    "testCaseDescription": "ruby-string-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "string.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    3
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    3
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '' string with the \"\" string"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    17
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    17
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo with \"bar\"' string with the \"bar with 'foo'\" string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.rb"
+    ],
+    "sha1": "dc23f27dce573b342cfe90de89524fd91a3d72c1",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "00d8bbac956e0b783702546a195e4e8bf6c278b7"
+}
+,{
+    "testCaseDescription": "ruby-string-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "string.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"\" string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"bar with 'foo'\" string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '' string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo with \"bar\"' string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"\" string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Added the \"bar with 'foo'\" string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.rb"
+    ],
+    "sha1": "00d8bbac956e0b783702546a195e4e8bf6c278b7",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a8d4391402449d8c4180e3eb1b187dd86c6c8393"
+}
+,{
+    "testCaseDescription": "ruby-string-delete-test",
+    "expectedResult": {
+        "changes": {
+            "string.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '' string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo with \"bar\"' string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.rb"
+    ],
+    "sha1": "a8d4391402449d8c4180e3eb1b187dd86c6c8393",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "2019641f1a3fc5ed7cca0db3c4410e7f022f09aa"
+}
+,{
+    "testCaseDescription": "ruby-string-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "string.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"\" string"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the \"bar with 'foo'\" string"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "string.rb"
+    ],
+    "sha1": "2019641f1a3fc5ed7cca0db3c4410e7f022f09aa",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "b83354974b91a7032a74973c18a9413becafee6c"
+}]

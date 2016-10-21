@@ -34,4 +34,8 @@ categoryForRubyName = \case
   "ERROR" -> Error
   "integer" -> IntegerLiteral
   "program" -> Program
+  "string" -> StringLiteral
+  "symbol" -> SymbolLiteral
+  "float" -> NumberLiteral
+  "boolean" -> Boolean
   s -> Other s
