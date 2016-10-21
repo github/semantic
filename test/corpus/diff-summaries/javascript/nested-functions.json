@@ -25,9 +25,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "61b914ee8f95319311ab2a31fd2ad953cafb16fa",
+    "sha1": "2ae3dbb197d2af3f6c733f583bd1e46038782da2",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "07887ecc86dddee8229a8d08ee8dcc6d7572121f"
+    "sha2": "475ee7ae5eff4e56bc226ad3a2486038d50a5e95"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-replacement-insert-test",
@@ -71,9 +71,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "07887ecc86dddee8229a8d08ee8dcc6d7572121f",
+    "sha1": "475ee7ae5eff4e56bc226ad3a2486038d50a5e95",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "61c06e9efa18663594722716e58aa64e5ffd4758"
+    "sha2": "0c3acc500894a5961a872157c95fed200762da9d"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-insert-test",
@@ -141,9 +141,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "61c06e9efa18663594722716e58aa64e5ffd4758",
+    "sha1": "0c3acc500894a5961a872157c95fed200762da9d",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "a020ecc7347999e4b5a89e698dea818a58cbf947"
+    "sha2": "48b340e7b3bd54aa35e2fdf9d2bb87bdd7afdf4e"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-replacement-test",
@@ -211,9 +211,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "a020ecc7347999e4b5a89e698dea818a58cbf947",
+    "sha1": "48b340e7b3bd54aa35e2fdf9d2bb87bdd7afdf4e",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "649807091c5b98fb7b727a3442047b3d82cffc94"
+    "sha2": "b014c105d8a719941c687729832424442fe1c43b"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-replacement-test",
@@ -272,9 +272,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "649807091c5b98fb7b727a3442047b3d82cffc94",
+    "sha1": "b014c105d8a719941c687729832424442fe1c43b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "66d77629efe8fd4035a9cb5209fd9f60450b44f6"
+    "sha2": "dc09f8bb5cd29d5f1e434aed0d708564ed8abccc"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-test",
@@ -303,9 +303,9 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "66d77629efe8fd4035a9cb5209fd9f60450b44f6",
+    "sha1": "dc09f8bb5cd29d5f1e434aed0d708564ed8abccc",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "10164d0894b9f540b2def25a8f283bcaed45ec99"
+    "sha2": "11d324408c3f978fe3e75706ed5c396d1d0c249b"
 }
 ,{
     "testCaseDescription": "javascript-nested-functions-delete-rest-test",
@@ -334,7 +334,7 @@
     "filePaths": [
         "nested-functions.js"
     ],
-    "sha1": "10164d0894b9f540b2def25a8f283bcaed45ec99",
+    "sha1": "11d324408c3f978fe3e75706ed5c396d1d0c249b",
     "gitDir": "test/corpus/repos/javascript",
-    "sha2": "266ec1f139daf92a206089f050ad57c325ce813c"
+    "sha2": "2a887b5d06f807f64eb0441bf4a29ca83e919096"
 }]

@@ -81,20 +81,17 @@ data DiffSummary a = DiffSummary {
 } deriving (Eq, Functor, Show, Generic)
 
 -- Returns a list of diff summary texts given two source blobs and a diff.
-diffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) =>
-                  Both SourceBlob ->
-                  SyntaxDiff leaf fields ->
-                  [JSONSummary Text SourceSpans]
+diffSummaries :: (HasCategory leaf, DefaultFields fields) => Both SourceBlob -> SyntaxDiff leaf fields -> [JSONSummary Text SourceSpans]
 diffSummaries blobs diff = summaryToTexts =<< diffToDiffSummaries (source <$> blobs) diff
 
--- Takes a 'DiffSummary' and returns a list of summary texts representing the LeafInfos
--- in that 'DiffSummary'.
+-- Takes a 'DiffSummary DiffInfo' and returns a list of JSON Summaries whose text summaries represent the LeafInfo summaries of the 'DiffSummary'.
 summaryToTexts :: DiffSummary DiffInfo -> [JSONSummary Text SourceSpans]
-summaryToTexts DiffSummary{..} = (\jsonSummary ->
-  jsonSummary { summary = show $ summary jsonSummary <+> parentContexts parentAnnotation }) <$> summaries patch
+summaryToTexts DiffSummary{..} = appendParentContexts <$> summaries patch
+  where appendParentContexts jsonSummary =
+          jsonSummary { summary = show $ summary jsonSummary <+> parentContexts parentAnnotation }
 
 -- Returns a list of 'DiffSummary' given two source blobs and a diff.
-diffToDiffSummaries :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
+diffToDiffSummaries :: (HasCategory leaf, DefaultFields fields) => Both (Source Char) -> SyntaxDiff leaf fields -> [DiffSummary DiffInfo]
 diffToDiffSummaries sources = para $ \diff ->
   let
     diff' = free (Prologue.fst <$> diff)
@@ -155,11 +152,12 @@ toLeafInfos leaf = pure . flip JSONSummary (sourceSpan leaf) $ case leaf of
   (LeafInfo "anonymous function" termName _) -> toDoc termName <+> "function"
   (LeafInfo cName@"string" termName _) -> toDoc termName <+> toDoc cName
   (LeafInfo cName@"export statement" termName _) -> toDoc termName <+> toDoc cName
+  (LeafInfo cName@"import statement" termName _) -> toDoc termName <+> toDoc cName
   LeafInfo{..} -> squotes (toDoc termName) <+> toDoc categoryName
   node -> panic $ "Expected a leaf info but got a: " <> show node
 
 -- Returns a text representing a specific term given a source and a term.
-toTermName :: forall leaf fields. (HasCategory leaf, HasField fields Category, HasField fields Range) => Source Char -> SyntaxTerm leaf fields -> Text
+toTermName :: forall leaf fields. (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> Text
 toTermName source term = case unwrap term of
   S.AnonymousFunction params _ -> "anonymous" <> paramsToArgNames params
   S.Fixed children -> fromMaybe "branch" $ (toCategoryName . category) . extract <$> head children
@@ -218,7 +216,8 @@ toTermName source term = case unwrap term of
   S.Comment a -> toCategoryName a
   S.Commented _ _ -> termNameFromChildren term (toList $ unwrap term)
   S.Module identifier _ -> toTermName' identifier
-  S.Import identifier _ -> toTermName' identifier
+  S.Import identifier [] -> termNameFromSource identifier
+  S.Import identifier exprs -> termNameFromChildren term exprs <> " from " <> toTermName' identifier
   S.Export Nothing expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }"
   S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
   S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
@@ -246,7 +245,7 @@ parentContexts contexts = hsep $ either identifiableDoc annotatableDoc <$> conte
 toDoc :: Text -> Doc
 toDoc = string . toS
 
-termToDiffInfo :: (HasCategory leaf, HasField fields Category, HasField fields Range, HasField fields SourceSpan) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
+termToDiffInfo :: (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> DiffInfo
 termToDiffInfo blob term = case unwrap term of
   S.Indexed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BIndexed
   S.Fixed children -> BranchInfo (termToDiffInfo' <$> children) (toCategoryName term) BFixed
@@ -263,7 +262,7 @@ termToDiffInfo blob term = case unwrap term of
 -- | For a DiffSummary without a parentAnnotation, we append a parentAnnotation with the first identifiable term.
 -- | For a DiffSummary with a parentAnnotation, we append the next annotatable term to the extant parentAnnotation.
 -- | If a DiffSummary already has a parentAnnotation, and a (grand) parentAnnotation, then we return the summary without modification.
-appendSummary :: (HasCategory leaf, HasField fields Range, HasField fields Category) => Source Char -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
+appendSummary :: (HasCategory leaf, DefaultFields fields) => Source Char -> SyntaxTerm leaf fields -> DiffSummary DiffInfo -> DiffSummary DiffInfo
 appendSummary source term summary =
   case (parentAnnotation summary, identifiable term, annotatable term) of
     ([], Identifiable _, _) -> appendParentAnnotation Left
