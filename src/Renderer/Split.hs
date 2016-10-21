@@ -83,6 +83,7 @@ styleName category = "category-" <> case category of
   C.Module -> "module_statement"
   C.Import -> "import_statement"
   C.Export -> "export_statement"
+  C.ModuleName -> "module_name"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

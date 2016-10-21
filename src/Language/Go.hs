@@ -18,6 +18,10 @@ termConstructor
 termConstructor source sourceSpan name range children = withDefaultInfo =<< do
   pure $ case (name, children) of
     ("return_statement", _) -> S.Return (listToMaybe children)
+    ("source_file", packageName : xs) | category (extract packageName) == Other "package_clause" ->
+      case unwrap packageName of
+        S.Indexed [identifier] -> S.Module identifier xs
+        _ -> S.Error [packageName]
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where
