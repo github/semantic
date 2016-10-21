@@ -44,6 +44,6 @@ categoryForGoName = \case
   "parameters" -> Args
   "short_var_declaration" -> VarDecl
   "assignment_statement" -> Assignment
-  "source_file" -> Program
+  "source_file" -> Module
   s -> Other (toS s)
 
