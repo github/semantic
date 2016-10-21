@@ -10,13 +10,13 @@ import Data.Record
 import Data.These
 import Syntax
 
--- | A Term with an annotation and an abstract syntax tree.
+-- | A Term with an abstract syntax tree and an annotation.
+type Term f annotation = Cofree f annotation
 type TermF = CofreeF
-type Term f = Cofree f
 
 -- | A Term with a Syntax leaf and a record of fields.
-type SyntaxTermF leaf fields = TermF (Syntax leaf) (Record fields)
 type SyntaxTerm leaf fields = Term (Syntax leaf) (Record fields)
+type SyntaxTermF leaf fields = TermF (Syntax leaf) (Record fields)
 
 -- Term has a Base functor TermF which gives it Recursive and Corecursive instances.
 type instance Base (Term f a) = TermF f a
