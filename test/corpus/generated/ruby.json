@@ -19,6 +19,13 @@
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/comment.json"
       },
       {
+        "syntax": "number",
+        "repoFilePath": "number.rb",
+        "insert": "1234\n1_234\n0d1_234\n0xa_bcd_ef0_123_456_789\n0o1234567\n0b1_0\n1.234_5e678_90\n",
+        "replacement": "1235\n1_235\n0d1_235\n0xa_bcd_ef0_123_456_788\n0o1234576\n0b1_1\n1.234_5e678_91\n",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/number.json"
+      },
+      {
         "syntax": "symbol",
         "repoFilePath": "symbol.rb",
         "insert": ":foo\n:'foo'\n:\"foo\"",
@@ -33,11 +40,11 @@
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/string.json"
       },
       {
-        "syntax": "number",
-        "repoFilePath": "number.rb",
-        "insert": "1234\n1_234\n0d1_234\n0xa_bcd_ef0_123_456_789\n0o1234567\n0b1_0\n1.234_5e678_90\n",
-        "replacement": "1235\n1_235\n0d1_235\n0xa_bcd_ef0_123_456_788\n0o1234576\n0b1_1\n1.234_5e678_91\n",
-        "testCaseFilePath": "test/corpus/diff-summaries/ruby/number.json"
+        "syntax": "interpolation",
+        "repoFilePath": "symbol.rb",
+        "insert": ":\"foo #{bar}\"\n\"foo #{bar}\"",
+        "replacement": ":\"bar #{foo}\"\n\"bar #{foo}\"",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/interpolation.json"
       }
     ]
   }

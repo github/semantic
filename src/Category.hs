@@ -114,6 +114,8 @@ data Category
   | Import
   -- | An export
   | Export
+  -- | An interpolation (e.g. "#{bar}" Ruby)
+  | Interpolation
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -168,6 +170,7 @@ instance Arbitrary Category where
     , pure Module
     , pure Import
     , pure Export
+    , pure Interpolation
     , Other <$> arbitrary
     ]
 

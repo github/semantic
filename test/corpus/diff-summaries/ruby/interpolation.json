@@ -1,226 +1,156 @@
 [{
-    "testCaseDescription": "ruby-string-insert-test",
+    "testCaseDescription": "ruby-interpolation-insert-test",
     "expectedResult": {
         "changes": {
-            "string.rb": [
+            "symbol.rb": [
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 1,
-                                1
+                                9
                             ],
                             "end": [
                                 1,
-                                3
+                                12
                             ]
                         }
                     },
-                    "summary": "Added the '' string"
+                    "summary": "Added the 'bar' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 2,
-                                1
+                                8
                             ],
                             "end": [
                                 2,
-                                17
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'foo with \"bar\"' string"
+                    "summary": "Added the 'bar' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "string.rb"
+        "symbol.rb"
     ],
-    "sha1": "3d8c8b2de0e3b628482e4d542ac02b75f104c15e",
+    "sha1": "e2e52515cc32a316dc8b90cffa5feaedd2440b44",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c358c44b55c79d8f18ae0ad7b4831d26ccb9f30c"
+    "sha2": "1669691d669f276721fc5aa9f3ecb03d1e56873d"
 }
 ,{
-    "testCaseDescription": "ruby-string-replacement-insert-test",
+    "testCaseDescription": "ruby-interpolation-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "string.rb": [
+            "symbol.rb": [
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 1,
-                                1
+                                9
                             ],
                             "end": [
                                 1,
-                                3
+                                12
                             ]
                         }
                     },
-                    "summary": "Added the \"\" string"
+                    "summary": "Added the 'foo' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 2,
-                                1
+                                8
                             ],
                             "end": [
                                 2,
-                                17
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the \"bar with 'foo'\" string"
+                    "summary": "Added the 'foo' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                1
+                                9
                             ],
                             "end": [
                                 3,
-                                3
+                                12
                             ]
                         }
                     },
-                    "summary": "Added the '' string"
+                    "summary": "Added the 'bar' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                8
                             ],
                             "end": [
                                 4,
-                                17
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'foo with \"bar\"' string"
+                    "summary": "Added the 'bar' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "string.rb"
+        "symbol.rb"
     ],
-    "sha1": "c358c44b55c79d8f18ae0ad7b4831d26ccb9f30c",
+    "sha1": "1669691d669f276721fc5aa9f3ecb03d1e56873d",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "291238a947b59cb6a3075247325ec657aa1253c1"
+    "sha2": "8493efd460bdf2bf88920633ce3044fb6c26a7e6"
 }
 ,{
-    "testCaseDescription": "ruby-string-delete-insert-test",
+    "testCaseDescription": "ruby-interpolation-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "string.rb": [
+            "symbol.rb": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    1
+                                    9
                                 ],
                                 "end": [
                                     1,
-                                    3
+                                    12
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    1
+                                    9
                                 ],
                                 "end": [
                                     1,
-                                    3
+                                    12
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"\" string with the '' string"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    17
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    17
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the \"bar with 'foo'\" string with the 'foo with \"bar\"' string"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "string.rb"
-    ],
-    "sha1": "291238a947b59cb6a3075247325ec657aa1253c1",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7d8191620f92dace5413948f1447c97f831dd4ab"
-}
-,{
-    "testCaseDescription": "ruby-string-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "string.rb": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    3
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the '' string with the \"\" string"
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier"
                 },
                 {
                     "span": {
@@ -228,233 +158,303 @@
                             {
                                 "start": [
                                     2,
-                                    1
+                                    8
                                 ],
                                 "end": [
                                     2,
-                                    17
+                                    11
                                 ]
                             },
                             {
                                 "start": [
                                     2,
-                                    1
+                                    8
                                 ],
                                 "end": [
                                     2,
-                                    17
+                                    11
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo with \"bar\"' string with the \"bar with 'foo'\" string"
+                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "string.rb"
+        "symbol.rb"
     ],
-    "sha1": "7d8191620f92dace5413948f1447c97f831dd4ab",
+    "sha1": "8493efd460bdf2bf88920633ce3044fb6c26a7e6",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "bd9d9481b236c8700915ec4d14a56eb6bc83b1df"
+    "sha2": "8a2c707dcb5fa3743bcb44caa725c2a41e485276"
 }
 ,{
-    "testCaseDescription": "ruby-string-delete-replacement-test",
+    "testCaseDescription": "ruby-interpolation-replacement-test",
     "expectedResult": {
         "changes": {
-            "string.rb": [
+            "symbol.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    1,
+                                    12
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    8
+                                ],
+                                "end": [
+                                    2,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    2,
+                                    8
+                                ],
+                                "end": [
+                                    2,
+                                    11
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "symbol.rb"
+    ],
+    "sha1": "8a2c707dcb5fa3743bcb44caa725c2a41e485276",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "d59fa52a4f3b228168e679f7e807372ab5f03fc3"
+}
+,{
+    "testCaseDescription": "ruby-interpolation-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "symbol.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 1,
-                                1
+                                9
                             ],
                             "end": [
                                 1,
-                                3
+                                12
                             ]
                         }
                     },
-                    "summary": "Deleted the \"\" string"
+                    "summary": "Deleted the 'foo' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 2,
-                                1
+                                8
                             ],
                             "end": [
                                 2,
-                                17
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the \"bar with 'foo'\" string"
+                    "summary": "Deleted the 'foo' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                1
+                                9
                             ],
                             "end": [
                                 3,
-                                3
+                                12
                             ]
                         }
                     },
-                    "summary": "Deleted the '' string"
+                    "summary": "Deleted the 'bar' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                1
+                                8
                             ],
                             "end": [
                                 4,
-                                17
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo with \"bar\"' string"
+                    "summary": "Deleted the 'bar' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 3,
-                                1
+                                9
                             ],
                             "end": [
                                 3,
-                                3
+                                12
                             ]
                         }
                     },
-                    "summary": "Added the \"\" string"
+                    "summary": "Added the 'foo' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 4,
-                                1
+                                8
                             ],
                             "end": [
                                 4,
-                                17
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the \"bar with 'foo'\" string"
+                    "summary": "Added the 'foo' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "string.rb"
+        "symbol.rb"
     ],
-    "sha1": "bd9d9481b236c8700915ec4d14a56eb6bc83b1df",
+    "sha1": "d59fa52a4f3b228168e679f7e807372ab5f03fc3",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b81d316221822581996d121d022403c359c644b7"
+    "sha2": "d16b23e33d322e60e82e36ac173a3253a1b696be"
 }
 ,{
-    "testCaseDescription": "ruby-string-delete-test",
+    "testCaseDescription": "ruby-interpolation-delete-test",
     "expectedResult": {
         "changes": {
-            "string.rb": [
+            "symbol.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 1,
-                                1
+                                9
                             ],
                             "end": [
                                 1,
-                                3
+                                12
                             ]
                         }
                     },
-                    "summary": "Deleted the '' string"
+                    "summary": "Deleted the 'bar' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 2,
-                                1
+                                8
                             ],
                             "end": [
                                 2,
-                                17
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo with \"bar\"' string"
+                    "summary": "Deleted the 'bar' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "string.rb"
+        "symbol.rb"
     ],
-    "sha1": "b81d316221822581996d121d022403c359c644b7",
+    "sha1": "d16b23e33d322e60e82e36ac173a3253a1b696be",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "9c7f7ea5c175b2a73cc6eb4892bb95ad7afb2f9e"
+    "sha2": "cda7680a2a1925c61784b8977a7a7d3eb0c40c45"
 }
 ,{
-    "testCaseDescription": "ruby-string-delete-rest-test",
+    "testCaseDescription": "ruby-interpolation-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "string.rb": [
+            "symbol.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 1,
-                                1
+                                9
                             ],
                             "end": [
                                 1,
-                                3
+                                12
                             ]
                         }
                     },
-                    "summary": "Deleted the \"\" string"
+                    "summary": "Deleted the 'foo' identifier"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 2,
-                                1
+                                8
                             ],
                             "end": [
                                 2,
-                                17
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the \"bar with 'foo'\" string"
+                    "summary": "Deleted the 'foo' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "string.rb"
+        "symbol.rb"
     ],
-    "sha1": "9c7f7ea5c175b2a73cc6eb4892bb95ad7afb2f9e",
+    "sha1": "cda7680a2a1925c61784b8977a7a7d3eb0c40c45",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "e2e52515cc32a316dc8b90cffa5feaedd2440b44"
+    "sha2": "97ba87e0226da1474103d925fc411b9b5bb7a33c"
 }]

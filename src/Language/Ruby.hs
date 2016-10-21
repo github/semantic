@@ -32,7 +32,9 @@ categoryForRubyName = \case
   "assignment" -> Assignment
   "comment" -> Comment
   "ERROR" -> Error
+  "identifier" -> Identifier
   "integer" -> IntegerLiteral
+  "interpolation" -> Interpolation
   "program" -> Program
   "string" -> StringLiteral
   "symbol" -> SymbolLiteral
