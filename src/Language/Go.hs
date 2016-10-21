@@ -16,7 +16,6 @@ termConstructor
   -> [Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])] -- ^ The child nodes of the term.
   -> IO (Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
 termConstructor source sourceSpan name range children = withDefaultInfo =<< do
-  putStrLn name
   pure $ case (name, children) of
     ("return_statement", _) -> S.Return (listToMaybe children)
     (_, []) -> S.Leaf . toText $ slice range source
