@@ -30,14 +30,14 @@ termConstructor source sourceSpan name range children
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
   "assignment" -> Assignment
+  "boolean" -> Boolean
   "comment" -> Comment
   "ERROR" -> Error
+  "float" -> NumberLiteral
   "identifier" -> Identifier
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
   "program" -> Program
   "string" -> StringLiteral
   "symbol" -> SymbolLiteral
-  "float" -> NumberLiteral
-  "boolean" -> Boolean
   s -> Other s
