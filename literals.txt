@@ -1,0 +1,13 @@
+===============
+string literal
+===============
+
+-"foo"
++"bar"
+
+---
+
+@@ summary
+Added the "foo" string
+Replaced the "foo" string with the "bar" string
+Deleted the "bar" string
