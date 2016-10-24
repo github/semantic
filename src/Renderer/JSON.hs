@@ -64,8 +64,15 @@ lineFields n term range = [ "number" .= n
                           , "hasChanges" .= hasChanges term
                           ]
 
-termFields :: (ToJSON recur, KeyValue kv, HasField fields Category, HasField fields Range) => Record fields -> Syntax leaf recur -> [kv]
-termFields info syntax = "range" .= characterRange info : "category" .= category info : case syntax of
+termFields :: (KeyValue kv, ToJSON recur, HasField fields Category, HasField fields Range) =>
+  Record fields ->
+  Syntax leaf recur ->
+  [kv]
+termFields info syntax = "range" .= characterRange info : "category" .= category info : syntaxToTermField syntax
+
+
+syntaxToTermField :: (ToJSON recur, KeyValue kv) => Syntax leaf recur -> [kv]
+syntaxToTermField syntax = case syntax of
   Leaf _ -> []
   Indexed c -> childrenFields c
   Fixed c -> childrenFields c
