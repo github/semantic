@@ -78,6 +78,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
   S.MethodCall targetId methodId args -> [ "targetIdentifier" .= targetId ] <> [ "methodId" .= methodId ] <> [ "args" .= args ]
   S.Args c -> childrenFields c
+  S.Operator c -> childrenFields c
   S.If expr clause maybeClause -> [ "if" .= expr ] <> [ "ifBody" .=  clause ] <> [ "elseBody" .= maybeClause ]
   S.For exprs body -> [ "forExpressions" .= exprs ] <> [ "forBody" .= body ]
   S.While expr body -> [ "whileExpr" .= expr ]  <> [ "whileBody" .= body ]
