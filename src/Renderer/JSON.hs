@@ -69,12 +69,13 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   Leaf _ -> []
   Indexed c -> childrenFields c
   Fixed c -> childrenFields c
-  S.AnonymousFunction params c -> [ "params" .= params ] <> childrenFields c
   S.FunctionCall identifier params -> [ "identifier" .= identifier ] <> [ "params" .= params ]
+  S.Ternary expr cases -> [ "ternaryExpression" .= expr ] <> [ "cases" .= cases ]
+  S.AnonymousFunction params c -> [ "params" .= params ] <> childrenFields c
   S.Function identifier params c -> [ "identifier" .= identifier ] <> [ "params" .= params ] <> childrenFields c
+  S.Assignment assignmentId property -> [ "assignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
   S.MethodCall targetId methodId args -> [ "targetIdentifier" .= targetId ] <> [ "methodId" .= methodId ] <> [ "args" .= args ]
   S.Args c -> childrenFields c
-  S.Assignment assignmentId property -> [ "assignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
   S.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
   S.If expr clause maybeClause -> [ "if" .= expr ] <> [ "ifBody" .=  clause ] <> [ "elseBody" .= maybeClause ]
   S.For exprs body -> [ "forExpressions" .= exprs ] <> [ "forBody" .= body ]
@@ -85,7 +86,6 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.VarDecl decl -> [ "variableDeclaration" .= decl ]
   S.VarAssignment id value -> [ "varIdentifier" .= id ] <> [ "value" .= value ]
   S.MathAssignment id value -> [ "mathIdentifier" .= id ] <> [ "value" .= value ]
-  S.Ternary expr cases -> [ "ternaryExpression" .= expr ] <> [ "cases" .= cases ]
   S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
   S.SubscriptAccess id property -> [ "subscriptId" .= id ] <> [ "property" .= property ]
   S.Object pairs -> childrenFields pairs
