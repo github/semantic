@@ -74,6 +74,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.AnonymousFunction params c -> [ "params" .= params ] <> childrenFields c
   S.Function identifier params c -> [ "identifier" .= identifier ] <> [ "params" .= params ] <> childrenFields c
   S.Assignment assignmentId property -> [ "assignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
+  S.MathAssignment assignmentId property -> [ "mathAssignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
   S.MethodCall targetId methodId args -> [ "targetIdentifier" .= targetId ] <> [ "methodId" .= methodId ] <> [ "args" .= args ]
   S.Args c -> childrenFields c
   S.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
