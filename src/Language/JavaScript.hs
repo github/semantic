@@ -152,6 +152,7 @@ categoryForJavaScriptProductionName name = case name of
   "rel_op" -> RelationalOperator
   "import_statement" -> Import
   "export_statement" -> Export
+  "namespace_import" -> NamespaceImport
   _ -> Other name
 
 toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
