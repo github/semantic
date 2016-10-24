@@ -24,7 +24,14 @@ termConstructor source sourceSpan name range children
     ("comment", _) -> S.Comment . toText $ slice range source
     ("conditional_assignment", [ identifier, value ]) -> S.ConditionalAssignment identifier value
     ("conditional", condition : cases) -> S.Ternary condition cases
+    ("function_call", _) -> case runCofree <$> children of
+      [ _ :< S.MemberAccess{..}, _ :< S.Args args ] -> S.MethodCall memberId property args
+      [ _ :< S.MemberAccess{..} ] -> S.MethodCall memberId property []
+      [ function, _ :< S.Args args ] -> S.FunctionCall (cofree function) args
+      (x:xs) -> S.FunctionCall (cofree x) (cofree <$> xs)
+      _ -> S.Indexed children
     ("hash", _) -> S.Object $ foldMap toTuple children
+    ("member_access", [ base, property ]) -> S.MemberAccess base property
     ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
     ("return_statement", _) -> S.Return (listToMaybe children)
     _ | name `elem` ["boolean_and", "boolean_or", "bitwise_or", "bitwise_and", "shift", "relational", "comparison"]
@@ -51,10 +58,12 @@ categoryForRubyName = \case
   "ERROR" -> Error
   "fixnum" -> IntegerLiteral
   "float" -> NumberLiteral
+  "function_call" -> FunctionCall
   "hash" -> Object
   "identifier" -> Identifier
   "interpolation" -> Interpolation
   "math_assignment" -> MathAssignment
+  "member_access" -> MemberAccess
   "nil" -> Identifier
   "program" -> Program
   "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.

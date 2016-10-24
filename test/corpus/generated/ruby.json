@@ -129,6 +129,13 @@
         "insert": "condition ? case1 : case2",
         "replacement": "if condition then case 1 else case2",
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/ternary.json"
+      },
+      {
+        "syntax": "method-invocation",
+        "repoFilePath": "method-invocation.rb",
+        "insert": "print\nfoo.bar\nbar",
+        "replacement": "print(\"hello world\")\nfoo.bar()\nbar 2, 3\nbar(2, 3)",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/method-invocation.json"
       }
     ]
   }
