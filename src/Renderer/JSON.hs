@@ -75,9 +75,9 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Function identifier params c -> [ "identifier" .= identifier ] <> [ "params" .= params ] <> childrenFields c
   S.Assignment assignmentId property -> [ "assignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
   S.MathAssignment assignmentId property -> [ "mathAssignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
+  S.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
   S.MethodCall targetId methodId args -> [ "targetIdentifier" .= targetId ] <> [ "methodId" .= methodId ] <> [ "args" .= args ]
   S.Args c -> childrenFields c
-  S.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
   S.If expr clause maybeClause -> [ "if" .= expr ] <> [ "ifBody" .=  clause ] <> [ "elseBody" .= maybeClause ]
   S.For exprs body -> [ "forExpressions" .= exprs ] <> [ "forBody" .= body ]
   S.While expr body -> [ "whileExpr" .= expr ]  <> [ "whileBody" .= body ]
