@@ -112,10 +112,9 @@ data Category
   | Module
   -- | An import
   | Import
-  -- | A qualified import statement
-  | NamespaceImport
   -- | An export
   | Export
+  | NamespaceImport
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
