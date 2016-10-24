@@ -85,6 +85,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.VarDecl decl -> [ "variableDeclaration" .= decl ]
   S.VarAssignment id value -> [ "varIdentifier" .= id ] <> [ "value" .= value ]
   S.MathAssignment id value -> [ "mathIdentifier" .= id ] <> [ "value" .= value ]
+  S.ConditionalAssignment id value -> [ "conditionalIdentifier" .= id ] <> [ "value" .= value ]
   S.Ternary expr cases -> [ "ternaryExpression" .= expr ] <> [ "cases" .= cases ]
   S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
   S.SubscriptAccess id property -> [ "subscriptId" .= id ] <> [ "property" .= property ]
