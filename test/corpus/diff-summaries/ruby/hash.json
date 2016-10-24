@@ -1,460 +1,430 @@
 [{
-    "testCaseDescription": "ruby-interpolation-insert-test",
+    "testCaseDescription": "ruby-hash-insert-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "hash.rb": [
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 1,
-                                9
+                                1
                             ],
                             "end": [
                                 1,
-                                12
+                                71
                             ]
                         }
                     },
-                    "summary": "Added the 'bar' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                8
-                            ],
-                            "end": [
-                                2,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'bar' identifier"
+                    "summary": "Added the '{ :key1: …, :key2: …, \"key3\": …, :\"symbol_key\": … }' object"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "hash.rb"
     ],
-    "sha1": "3ae8d0f1f08334d6537e92d78300cab94d2e967e",
+    "sha1": "5d946d90a628f51cdd5b6355738f10b7c8cbc885",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d67eb2efad1f8252dd018d51df81b6a540645dbf"
+    "sha2": "ee438a0e1059aeaf0b00bda01c254a76485b0477"
 }
 ,{
-    "testCaseDescription": "ruby-interpolation-replacement-insert-test",
+    "testCaseDescription": "ruby-hash-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "hash.rb": [
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 1,
-                                9
+                                1
                             ],
                             "end": [
                                 1,
-                                12
+                                47
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' identifier"
+                    "summary": "Added the '{ key1: …, key2: …, key3: … }' object"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 2,
-                                8
+                                1
                             ],
                             "end": [
                                 2,
-                                11
+                                71
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                9
-                            ],
-                            "end": [
-                                3,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'bar' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'bar' identifier"
+                    "summary": "Added the '{ :key1: …, :key2: …, \"key3\": …, :\"symbol_key\": … }' object"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "hash.rb"
     ],
-    "sha1": "d67eb2efad1f8252dd018d51df81b6a540645dbf",
+    "sha1": "ee438a0e1059aeaf0b00bda01c254a76485b0477",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "19802cb5024d12c69ea5e94ce43523becccd9323"
+    "sha2": "5904dbc34374c0581d68e80b13bc6471558a9b47"
 }
 ,{
-    "testCaseDescription": "ruby-interpolation-delete-insert-test",
+    "testCaseDescription": "ruby-hash-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "hash.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                3
+                            ],
+                            "end": [
+                                1,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':key1: …' pair"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                21
+                            ],
+                            "end": [
+                                1,
+                                31
+                            ]
+                        }
+                    },
+                    "summary": "Added the ':key2: …' pair"
+                },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    9
+                                    3
                                 ],
                                 "end": [
                                     1,
-                                    12
+                                    24
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    9
+                                    33
                                 ],
                                 "end": [
                                     1,
-                                    12
+                                    48
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier"
+                    "summary": "Replaced the 'key1: …' pair with the '\"key3\": …' pair"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
-                                    8
+                                    1,
+                                    26
                                 ],
                                 "end": [
-                                    2,
-                                    11
+                                    1,
+                                    33
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
-                                    8
+                                    1,
+                                    50
                                 ],
                                 "end": [
-                                    2,
-                                    11
+                                    1,
+                                    69
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'foo' identifier with the 'bar' identifier"
+                    "summary": "Replaced the 'key2: …' pair with the ':\"symbol_key\": …' pair"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                35
+                            ],
+                            "end": [
+                                1,
+                                45
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'key3: …' pair"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "hash.rb"
     ],
-    "sha1": "19802cb5024d12c69ea5e94ce43523becccd9323",
+    "sha1": "5904dbc34374c0581d68e80b13bc6471558a9b47",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4007f7605745bb62e67eba895b6b52923d6794ff"
+    "sha2": "a01160d180e3fad2ac5190ae203291e8e4dcc086"
 }
 ,{
-    "testCaseDescription": "ruby-interpolation-replacement-test",
+    "testCaseDescription": "ruby-hash-replacement-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "hash.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    9
-                                ],
-                                "end": [
-                                    1,
-                                    12
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    9
-                                ],
-                                "end": [
-                                    1,
-                                    12
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                3
+                            ],
+                            "end": [
+                                1,
+                                24
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier"
+                    "summary": "Added the 'key1: …' pair"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
-                                    8
+                                    1,
+                                    3
                                 ],
                                 "end": [
-                                    2,
-                                    11
+                                    1,
+                                    19
                                 ]
                             },
                             {
                                 "start": [
-                                    2,
-                                    8
+                                    1,
+                                    26
                                 ],
                                 "end": [
-                                    2,
-                                    11
+                                    1,
+                                    33
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the 'bar' identifier with the 'foo' identifier"
+                    "summary": "Replaced the ':key1: …' pair with the 'key2: …' pair"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    21
+                                ],
+                                "end": [
+                                    1,
+                                    31
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    35
+                                ],
+                                "end": [
+                                    1,
+                                    45
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the ':key2: …' pair with the 'key3: …' pair"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                33
+                            ],
+                            "end": [
+                                1,
+                                48
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '\"key3\": …' pair"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                50
+                            ],
+                            "end": [
+                                1,
+                                69
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the ':\"symbol_key\": …' pair"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "hash.rb"
     ],
-    "sha1": "4007f7605745bb62e67eba895b6b52923d6794ff",
+    "sha1": "a01160d180e3fad2ac5190ae203291e8e4dcc086",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0ff4976f8ba48a8cd63320ebcd36170f50bc01b6"
+    "sha2": "56a2164c3d1deba3dbbe9283cb0b02a4eecc2f63"
 }
 ,{
-    "testCaseDescription": "ruby-interpolation-delete-replacement-test",
+    "testCaseDescription": "ruby-hash-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "hash.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 1,
-                                9
+                                1
                             ],
                             "end": [
                                 1,
-                                12
+                                47
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' identifier"
+                    "summary": "Deleted the '{ key1: …, key2: …, key3: … }' object"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 2,
-                                8
+                                1
                             ],
                             "end": [
                                 2,
-                                11
+                                71
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                9
-                            ],
-                            "end": [
-                                3,
-                                12
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bar' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bar' identifier"
+                    "summary": "Deleted the '{ :key1: …, :key2: …, \"key3\": …, :\"symbol_key\": … }' object"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                3,
-                                9
+                                2,
+                                1
                             ],
                             "end": [
-                                3,
-                                12
+                                2,
+                                47
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                8
-                            ],
-                            "end": [
-                                4,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' identifier"
+                    "summary": "Added the '{ key1: …, key2: …, key3: … }' object"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "hash.rb"
     ],
-    "sha1": "0ff4976f8ba48a8cd63320ebcd36170f50bc01b6",
+    "sha1": "56a2164c3d1deba3dbbe9283cb0b02a4eecc2f63",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "77ffa5f5c0c7d9855d7623e1dbaf9640bc3f664f"
+    "sha2": "b9e2e5477920959f3ee875d5d03e8f5033a2adf1"
 }
 ,{
-    "testCaseDescription": "ruby-interpolation-delete-test",
+    "testCaseDescription": "ruby-hash-delete-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "hash.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 1,
-                                9
+                                1
                             ],
                             "end": [
                                 1,
-                                12
+                                71
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                8
-                            ],
-                            "end": [
-                                2,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bar' identifier"
+                    "summary": "Deleted the '{ :key1: …, :key2: …, \"key3\": …, :\"symbol_key\": … }' object"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "hash.rb"
     ],
-    "sha1": "77ffa5f5c0c7d9855d7623e1dbaf9640bc3f664f",
+    "sha1": "b9e2e5477920959f3ee875d5d03e8f5033a2adf1",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "006937e69cc94a0a1e50095ad53cac4fab81bfb5"
+    "sha2": "ecfd998b8effba545c3eb303844b23887b6c0d08"
 }
 ,{
-    "testCaseDescription": "ruby-interpolation-delete-rest-test",
+    "testCaseDescription": "ruby-hash-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "hash.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 1,
-                                9
+                                1
                             ],
                             "end": [
                                 1,
-                                12
+                                47
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                8
-                            ],
-                            "end": [
-                                2,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'foo' identifier"
+                    "summary": "Deleted the '{ key1: …, key2: …, key3: … }' object"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "symbol.rb"
+        "hash.rb"
     ],
-    "sha1": "006937e69cc94a0a1e50095ad53cac4fab81bfb5",
+    "sha1": "ecfd998b8effba545c3eb303844b23887b6c0d08",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "65b1998924910b203e59bb9663e9fbdb64bd07a7"
+    "sha2": "6aa9f27cbbb82bcbcc07cc9b21c4142bd23e8ed5"
 }]

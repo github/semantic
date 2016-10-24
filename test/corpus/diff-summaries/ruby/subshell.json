@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-assignment-insert-test",
+    "testCaseDescription": "ruby-subshell-insert-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "subshell.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,28 +12,28 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment"
+                    "summary": "Added the `ls -la` subshell command"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "subshell.rb"
     ],
-    "sha1": "b6eae9ac76eeef3fdbc78c9247519879544d1223",
+    "sha1": "0b246e398dd9895936669abac6320b20d4b6f315",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "73dd45c05b436b7da029094a37157411aaf6ac4a"
+    "sha2": "1dcd1267510270dcd7b39718b89a1e77a42cb5aa"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-replacement-insert-test",
+    "testCaseDescription": "ruby-subshell-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "subshell.rb": [
                 {
                     "span": {
                         "insert": {
@@ -43,11 +43,11 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment"
+                    "summary": "Added the `git status` subshell command"
                 },
                 {
                     "span": {
@@ -58,114 +58,114 @@
                             ],
                             "end": [
                                 2,
-                                6
+                                9
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment"
+                    "summary": "Added the `ls -la` subshell command"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "subshell.rb"
     ],
-    "sha1": "73dd45c05b436b7da029094a37157411aaf6ac4a",
+    "sha1": "1dcd1267510270dcd7b39718b89a1e77a42cb5aa",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1511e0e2c55eac49fe1c499499e0d3f1a87d4817"
+    "sha2": "49d33c3e09812d812531b92289ed30fc96011887"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-delete-insert-test",
+    "testCaseDescription": "ruby-subshell-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "subshell.rb": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    5
+                                    1
                                 ],
                                 "end": [
                                     1,
-                                    6
+                                    13
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    5
+                                    1
                                 ],
                                 "end": [
                                     1,
-                                    6
+                                    9
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in an assignment to x"
+                    "summary": "Replaced the `git status` subshell command with the `ls -la` subshell command"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "subshell.rb"
     ],
-    "sha1": "1511e0e2c55eac49fe1c499499e0d3f1a87d4817",
+    "sha1": "49d33c3e09812d812531b92289ed30fc96011887",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fcffe9f7787a13a0f47e5e346f8eceeabc9b58f6"
+    "sha2": "0f9379129db599119ce71daeb8d1b85af5e0d554"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-replacement-test",
+    "testCaseDescription": "ruby-subshell-replacement-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "subshell.rb": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    5
+                                    1
                                 ],
                                 "end": [
                                     1,
-                                    6
+                                    9
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    5
+                                    1
                                 ],
                                 "end": [
                                     1,
-                                    6
+                                    13
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in an assignment to x"
+                    "summary": "Replaced the `ls -la` subshell command with the `git status` subshell command"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "subshell.rb"
     ],
-    "sha1": "fcffe9f7787a13a0f47e5e346f8eceeabc9b58f6",
+    "sha1": "0f9379129db599119ce71daeb8d1b85af5e0d554",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d07c5b563d8ca6bbd41f4595ac4bb65c733d08f1"
+    "sha2": "2d8e02a395eee360589829f01b3262aeeb487a67"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-delete-replacement-test",
+    "testCaseDescription": "ruby-subshell-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "subshell.rb": [
                 {
                     "span": {
                         "delete": {
@@ -175,11 +175,11 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' assignment"
+                    "summary": "Deleted the `git status` subshell command"
                 },
                 {
                     "span": {
@@ -190,11 +190,11 @@
                             ],
                             "end": [
                                 2,
-                                6
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' assignment"
+                    "summary": "Deleted the `ls -la` subshell command"
                 },
                 {
                     "span": {
@@ -205,28 +205,28 @@
                             ],
                             "end": [
                                 2,
-                                6
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment"
+                    "summary": "Added the `git status` subshell command"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "subshell.rb"
     ],
-    "sha1": "d07c5b563d8ca6bbd41f4595ac4bb65c733d08f1",
+    "sha1": "2d8e02a395eee360589829f01b3262aeeb487a67",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "dbcfd3107913482700be082bcafd53c10cb0318c"
+    "sha2": "027e42773f839186f58a720f3604cc0409365b19"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-delete-test",
+    "testCaseDescription": "ruby-subshell-delete-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "subshell.rb": [
                 {
                     "span": {
                         "delete": {
@@ -236,28 +236,28 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' assignment"
+                    "summary": "Deleted the `ls -la` subshell command"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "subshell.rb"
     ],
-    "sha1": "dbcfd3107913482700be082bcafd53c10cb0318c",
+    "sha1": "027e42773f839186f58a720f3604cc0409365b19",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ba036f115f944a91c5198f0633b8548498ea71a2"
+    "sha2": "17664b7eee6029ad4ae89511ca6e6ea6d87d68f5"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-delete-rest-test",
+    "testCaseDescription": "ruby-subshell-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "subshell.rb": [
                 {
                     "span": {
                         "delete": {
@@ -267,20 +267,20 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' assignment"
+                    "summary": "Deleted the `git status` subshell command"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "subshell.rb"
     ],
-    "sha1": "ba036f115f944a91c5198f0633b8548498ea71a2",
+    "sha1": "17664b7eee6029ad4ae89511ca6e6ea6d87d68f5",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2ac2928c916b76ac61561c57976a6273d2c8546d"
+    "sha2": "5d946d90a628f51cdd5b6355738f10b7c8cbc885"
 }]

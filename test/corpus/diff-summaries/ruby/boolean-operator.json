@@ -1,0 +1,196 @@
+[{
+    "testCaseDescription": "ruby-boolean-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a || b' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.rb"
+    ],
+    "sha1": "6aa9f27cbbb82bcbcc07cc9b21c4142bd23e8ed5",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "5e685e78330a99a5dcf19076e57a821b26d5c4f0"
+}
+,{
+    "testCaseDescription": "ruby-boolean-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a && b' boolean operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a || b' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.rb"
+    ],
+    "sha1": "5e685e78330a99a5dcf19076e57a821b26d5c4f0",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ed3615c796dfbb210f98bfce38d010249012f8e7"
+}
+,{
+    "testCaseDescription": "ruby-boolean-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.rb"
+    ],
+    "sha1": "ed3615c796dfbb210f98bfce38d010249012f8e7",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "4d22e0103fd650ddeb20b8102f6a4ae489492d6b"
+}
+,{
+    "testCaseDescription": "ruby-boolean-operator-replacement-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.rb"
+    ],
+    "sha1": "4d22e0103fd650ddeb20b8102f6a4ae489492d6b",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "91d4d4f376d859688dc3268c05f1b7b0f8bb16ae"
+}
+,{
+    "testCaseDescription": "ruby-boolean-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a && b' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.rb"
+    ],
+    "sha1": "91d4d4f376d859688dc3268c05f1b7b0f8bb16ae",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ee3745bd1aad619d3227eb6b34f80ef978f0aa15"
+}
+,{
+    "testCaseDescription": "ruby-boolean-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a || b' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.rb"
+    ],
+    "sha1": "ee3745bd1aad619d3227eb6b34f80ef978f0aa15",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "541a47b0e0c5b2f8aca8acefcef22b18aa04e281"
+}
+,{
+    "testCaseDescription": "ruby-boolean-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "boolean-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a && b' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "boolean-operator.rb"
+    ],
+    "sha1": "541a47b0e0c5b2f8aca8acefcef22b18aa04e281",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "d4ee026c1d0a4726a6869d8833351006607496a8"
+}]

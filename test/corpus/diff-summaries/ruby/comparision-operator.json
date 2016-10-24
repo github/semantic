@@ -1,0 +1,286 @@
+[{
+    "testCaseDescription": "ruby-comparision-operator-insert-test",
+    "expectedResult": {
+        "changes": {
+            "comparision-operator.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x < y' relational operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a > b' relational operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comparision-operator.rb"
+    ],
+    "sha1": "5fe0f79c2eb98190a5ea4d4410cd32cdf9868f7d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "6bc2105e6eb790776b0840cd2ae08d5d15350d10"
+}
+,{
+    "testCaseDescription": "ruby-comparision-operator-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "comparision-operator.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x <= y' relational operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a >= b' relational operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x < y' relational operator"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a > b' relational operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comparision-operator.rb"
+    ],
+    "sha1": "6bc2105e6eb790776b0840cd2ae08d5d15350d10",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "4332b265333f96f7f4ff61a3d9693a0e73855286"
+}
+,{
+    "testCaseDescription": "ruby-comparision-operator-delete-insert-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "comparision-operator.rb"
+    ],
+    "sha1": "4332b265333f96f7f4ff61a3d9693a0e73855286",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "0ea173b528cfce0a9bdc5a322c8c578beecf675b"
+}
+,{
+    "testCaseDescription": "ruby-comparision-operator-replacement-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "comparision-operator.rb"
+    ],
+    "sha1": "0ea173b528cfce0a9bdc5a322c8c578beecf675b",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "37f2ed83ec0194f48e500f292764498e68bc4096"
+}
+,{
+    "testCaseDescription": "ruby-comparision-operator-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "comparision-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x <= y' relational operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a >= b' relational operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comparision-operator.rb"
+    ],
+    "sha1": "37f2ed83ec0194f48e500f292764498e68bc4096",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "d3b357bf48896efbc1e34f34fdb766b196e531a0"
+}
+,{
+    "testCaseDescription": "ruby-comparision-operator-delete-test",
+    "expectedResult": {
+        "changes": {
+            "comparision-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x < y' relational operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a > b' relational operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comparision-operator.rb"
+    ],
+    "sha1": "d3b357bf48896efbc1e34f34fdb766b196e531a0",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "eb715382999dc732f357eedcc96abab8c895fca9"
+}
+,{
+    "testCaseDescription": "ruby-comparision-operator-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "comparision-operator.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x <= y' relational operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a >= b' relational operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "comparision-operator.rb"
+    ],
+    "sha1": "eb715382999dc732f357eedcc96abab8c895fca9",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "5b5f2817da62f71ae4da68ebbb390c2a531dd90c"
+}]

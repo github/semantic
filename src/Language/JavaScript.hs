@@ -5,6 +5,7 @@ import Data.Record
 import Info
 import Prologue
 import Source
+import Language
 import qualified Syntax as S
 import Term
 
@@ -153,25 +154,3 @@ categoryForJavaScriptProductionName name = case name of
   "import_statement" -> Import
   "export_statement" -> Export
   _ -> Other name
-
-toVarDecl :: (HasField fields Category) => Term (S.Syntax Text) (Record fields) -> Term (S.Syntax Text) (Record fields)
-toVarDecl child = cofree $ setCategory (extract child) VarDecl :< S.VarDecl child
-
--- | Convert a If Term to If Syntax. This handles nested else-if clauses recursively,
--- | and satisfies arbitrarily long else-if clauses.
-toElseIf :: Term (S.Syntax Text) (Record fields)
-         -> Term (S.Syntax Text) (Record fields)
-         -> Term (S.Syntax Text) (Record fields)
-         -> S.Syntax Text (Term (S.Syntax Text) (Record fields))
-toElseIf expr thenClause elseClause = S.If expr thenClause (elseClause' elseClause)
-  where
-    elseClause' term = case unwrap term of
-      S.If _ _ [] -> [ term ]
-      S.If then' else' children -> [ cofree (extract term :< S.If then' else' []) ] <> (elseClause' =<< children)
-      _ -> [ term ]
-
-toTuple :: Term (S.Syntax Text) (Record fields) -> [Term (S.Syntax Text) (Record fields)]
-toTuple child | S.Indexed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
-toTuple child | S.Fixed [key,value] <- unwrap child = [cofree (extract child :< S.Pair key value)]
-toTuple child | S.Leaf c <- unwrap child = [cofree (extract child :< S.Comment c)]
-toTuple child = pure child

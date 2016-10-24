@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-symbol-insert-test",
+    "testCaseDescription": "ruby-math_assignment-insert-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "math_assignment.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,11 +12,11 @@
                             ],
                             "end": [
                                 1,
-                                5
+                                7
                             ]
                         }
                     },
-                    "summary": "Added the ':foo' symbol"
+                    "summary": "Added the 'x' math assignment"
                 },
                 {
                     "span": {
@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the ':'foo'' symbol"
+                    "summary": "Added the 'x' math assignment"
                 },
                 {
                     "span": {
@@ -46,68 +46,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the ':\"foo\"' symbol"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "symbol.rb"
-    ],
-    "sha1": "a208c7d836979adffb778fc18c7575b3e6ce995d",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "898179c974ed1e0a84938c1bab440aa17348bfb1"
-}
-,{
-    "testCaseDescription": "ruby-symbol-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "symbol.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the ':bar' symbol"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the ':'bar'' symbol"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the ':\"bar\"' symbol"
+                    "summary": "Added the 'x' math assignment"
                 },
                 {
                     "span": {
@@ -118,341 +57,72 @@
                             ],
                             "end": [
                                 4,
-                                5
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the ':foo' symbol"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the ':'foo'' symbol"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the ':\"foo\"' symbol"
+                    "summary": "Added the 'x' identifier"
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "math_assignment.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/= 1\nx **= 1' at line 4, column 3 - line 5, column 8"
+                }
+            ]
+        }
     },
     "filePaths": [
-        "symbol.rb"
+        "math_assignment.rb"
     ],
-    "sha1": "898179c974ed1e0a84938c1bab440aa17348bfb1",
+    "sha1": "9231520dab61adad13f93bc68bf0a5450ad0703b",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "30cb318a84e5b96a35377daee8844ae17bc9ce1d"
+    "sha2": "495588b897b8b30641488fc3a1ab23b01f7549ff"
 }
 ,{
-    "testCaseDescription": "ruby-symbol-delete-insert-test",
+    "testCaseDescription": "ruby-math_assignment-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "math_assignment.rb": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    1
+                                    6
                                 ],
                                 "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
                                     1,
                                     5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
                                 ],
                                 "end": [
                                     1,
-                                    5
+                                    6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the ':bar' symbol with the ':foo' symbol"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    7
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    7
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the ':'bar'' symbol with the ':'foo'' symbol"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    7
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    7
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the ':\"bar\"' symbol with the ':\"foo\"' symbol"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "symbol.rb"
-    ],
-    "sha1": "30cb318a84e5b96a35377daee8844ae17bc9ce1d",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b1c8ef85cb99877a5ba6a1fcb8eb355cf48c4b73"
-}
-,{
-    "testCaseDescription": "ruby-symbol-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "symbol.rb": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    5
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    5
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the ':foo' symbol with the ':bar' symbol"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    7
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    7
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the ':'foo'' symbol with the ':'bar'' symbol"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    7
-                                ]
-                            },
-                            {
-                                "start": [
-                                    3,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    7
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the ':\"foo\"' symbol with the ':\"bar\"' symbol"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "symbol.rb"
-    ],
-    "sha1": "b1c8ef85cb99877a5ba6a1fcb8eb355cf48c4b73",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "835a40c0d5fb0a892d5407b1df43050cecdd6f4f"
-}
-,{
-    "testCaseDescription": "ruby-symbol-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "symbol.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ':bar' symbol"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ':'bar'' symbol"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ':\"bar\"' symbol"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ':foo' symbol"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ':'foo'' symbol"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ':\"foo\"' symbol"
+                    "summary": "Replaced '1' with '2' in the x math assignment"
                 },
                 {
                     "span": {
@@ -463,58 +133,401 @@
                             ],
                             "end": [
                                 4,
-                                5
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the ':bar' symbol"
+                    "summary": "Added the 'x' identifier"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                5,
-                                1
+                                4,
+                                3
                             ],
                             "end": [
-                                5,
-                                7
+                                9,
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the ':'bar'' symbol"
+                    "summary": "Added the '/= 1\nx **= 1\nx += 1\nx -= 1\nx *= 1\nx /' regex"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                }
+            ]
+        },
+        "errors": {
+            "math_assignment.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                4
+                            ],
+                            "end": [
+                                16,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the '= 1\nx **= 1\nx += 1\nx -= 1\nx *= 1\nx /= 1\nx **= 1\n' at line 9, column 4 - line 16, column 1"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/= 1\nx **= 1' at line 4, column 3 - line 5, column 8"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "math_assignment.rb"
+    ],
+    "sha1": "495588b897b8b30641488fc3a1ab23b01f7549ff",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "6939db311712c88777c98114d72b48a93ac36992"
+}
+,{
+    "testCaseDescription": "ruby-math_assignment-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "math_assignment.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1' in the x math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math_assignment.rb"
+    ],
+    "sha1": "6939db311712c88777c98114d72b48a93ac36992",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "8c6b01231a0885d9782563336d143b8cc4dbf955"
+}
+,{
+    "testCaseDescription": "ruby-math_assignment-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "math_assignment.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2' in the x math assignment"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "math_assignment.rb"
+    ],
+    "sha1": "8c6b01231a0885d9782563336d143b8cc4dbf955",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "656a2341f431ca261a635a42ab603f364c6f3f76"
+}
+,{
+    "testCaseDescription": "ruby-math_assignment-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "math_assignment.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '2' with '1' in the x math assignment"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    4,
+                                    3
+                                ],
+                                "end": [
+                                    9,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    4,
+                                    3
+                                ],
+                                "end": [
+                                    9,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '/= 1\nx **= 1\nx += 1\nx -= 1\nx *= 1\nx /' regex with the '/= 1\nx **= 1\nx+= 2\nx -= 1\nx *= 1\nx /' regex"
+                }
+            ]
+        },
+        "errors": {
+            "math_assignment.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                9,
+                                4
+                            ],
+                            "end": [
+                                11,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Added the '= 1\nx **= 1\n' at line 9, column 4 - line 11, column 1"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                4
+                            ],
+                            "end": [
+                                16,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '= 1\nx **= 1\nx += 1\nx -= 1\nx *= 1\nx /= 1\nx **= 1\n' at line 9, column 4 - line 16, column 1"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "math_assignment.rb"
+    ],
+    "sha1": "656a2341f431ca261a635a42ab603f364c6f3f76",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ae3945bd209ea3f41d712e6bf7425956b42f3f32"
+}
+,{
+    "testCaseDescription": "ruby-math_assignment-delete-test",
+    "expectedResult": {
+        "changes": {
+            "math_assignment.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    6
+                                ],
+                                "end": [
+                                    1,
+                                    7
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    5
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced '1' with '2' in the x math assignment"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                6,
+                                4,
                                 1
                             ],
                             "end": [
-                                6,
-                                7
+                                4,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the ':\"bar\"' symbol"
+                    "summary": "Added the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                9,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/= 1\nx **= 1\nx+= 2\nx -= 1\nx *= 1\nx /' regex"
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "math_assignment.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                3
+                            ],
+                            "end": [
+                                5,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/= 1\nx **= 1' at line 4, column 3 - line 5, column 8"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                9,
+                                4
+                            ],
+                            "end": [
+                                11,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '= 1\nx **= 1\n' at line 9, column 4 - line 11, column 1"
+                }
+            ]
+        }
     },
     "filePaths": [
-        "symbol.rb"
+        "math_assignment.rb"
     ],
-    "sha1": "835a40c0d5fb0a892d5407b1df43050cecdd6f4f",
+    "sha1": "ae3945bd209ea3f41d712e6bf7425956b42f3f32",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0810c498838e8fd91da68ef2d9517ff2c431804b"
+    "sha2": "f2f83c8f22bc678c685fbfccf3305b4c3eca1afb"
 }
 ,{
-    "testCaseDescription": "ruby-symbol-delete-test",
+    "testCaseDescription": "ruby-math_assignment-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "symbol.rb": [
+            "math_assignment.rb": [
                 {
                     "span": {
                         "delete": {
@@ -524,11 +537,11 @@
                             ],
                             "end": [
                                 1,
-                                5
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted the ':foo' symbol"
+                    "summary": "Deleted the 'x' math assignment"
                 },
                 {
                     "span": {
@@ -543,7 +556,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the ':'foo'' symbol"
+                    "summary": "Deleted the 'x' math assignment"
                 },
                 {
                     "span": {
@@ -558,77 +571,49 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the ':\"foo\"' symbol"
+                    "summary": "Deleted the 'x' math assignment"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' identifier"
                 }
             ]
         },
-        "errors": {}
-    },
-    "filePaths": [
-        "symbol.rb"
-    ],
-    "sha1": "0810c498838e8fd91da68ef2d9517ff2c431804b",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2fc5273101b5b47718f3f9630a8bddea77013094"
-}
-,{
-    "testCaseDescription": "ruby-symbol-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "symbol.rb": [
+        "errors": {
+            "math_assignment.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                1,
-                                1
+                                4,
+                                3
                             ],
                             "end": [
-                                1,
-                                5
+                                5,
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the ':bar' symbol"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ':'bar'' symbol"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ':\"bar\"' symbol"
+                    "summary": "Deleted the '/= 1\nx **= 1' at line 4, column 3 - line 5, column 8"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
-        "symbol.rb"
+        "math_assignment.rb"
     ],
-    "sha1": "2fc5273101b5b47718f3f9630a8bddea77013094",
+    "sha1": "f2f83c8f22bc678c685fbfccf3305b4c3eca1afb",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4121ac47822fd9dbb7d4b39feff1d0d26f1ceec2"
+    "sha2": "55cae8acacbda6caa7260e265b431765e1af6265"
 }]

@@ -1,0 +1,277 @@
+[{
+    "testCaseDescription": "ruby-ternary-insert-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'condition' ternary expression"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "sha1": "c15f47cba2199bdfb9588f3fc003a908ea0d63de",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "f427c9e741f9141e496e07c16a88fb7f0f794af9"
+}
+,{
+    "testCaseDescription": "ruby-ternary-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'condition' ternary expression with the 'if condition then case 1 else case2\ncondition ? case1 : case2\ncondition ? case1 : case2\n' at line 1, column 1 - line 4, column 1"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "sha1": "f427c9e741f9141e496e07c16a88fb7f0f794af9",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ed43c87bf5defe7c3239c8d74f37a8f8b4af66de"
+}
+,{
+    "testCaseDescription": "ruby-ternary-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    26
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'if condition then case 1 else case2\ncondition ? case1 : case2\ncondition ? case1 : case2\n' at line 1, column 1 - line 4, column 1 with the 'condition' ternary expression"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "sha1": "ed43c87bf5defe7c3239c8d74f37a8f8b4af66de",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "aa36178198ced09255e93dde3445a05aabd9fd3d"
+}
+,{
+    "testCaseDescription": "ruby-ternary-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'condition' ternary expression with the 'if condition then case 1 else case2\ncondition ? case1 : case2\ncondition ? case1 : case2\n' at line 1, column 1 - line 4, column 1"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "sha1": "aa36178198ced09255e93dde3445a05aabd9fd3d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "582905a5dc3fcd9c903b64a512b8d2bf1ef5d92f"
+}
+,{
+    "testCaseDescription": "ruby-ternary-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    4,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    26
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'if condition then case 1 else case2\ncondition ? case1 : case2\ncondition ? case1 : case2\n' at line 1, column 1 - line 4, column 1 with the 'condition' ternary expression"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "sha1": "582905a5dc3fcd9c903b64a512b8d2bf1ef5d92f",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "30db372b1d8c941224dc43d64759273971575e91"
+}
+,{
+    "testCaseDescription": "ruby-ternary-delete-test",
+    "expectedResult": {
+        "changes": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    26
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    2,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'condition' ternary expression with the 'if condition then case 1 else case2\n' at line 1, column 1 - line 2, column 1"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "sha1": "30db372b1d8c941224dc43d64759273971575e91",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "cb185f3db87961f4a825c3aa71b19082dc0f81df"
+}
+,{
+    "testCaseDescription": "ruby-ternary-delete-rest-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {
+            "ternary.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'if condition then case 1 else case2\n' at line 1, column 1 - line 2, column 1"
+                }
+            ]
+        }
+    },
+    "filePaths": [
+        "ternary.rb"
+    ],
+    "sha1": "cb185f3db87961f4a825c3aa71b19082dc0f81df",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a6fc8b0f558943ca53903610f61151e1eefa50ea"
+}]

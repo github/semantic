@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-assignment-insert-test",
+    "testCaseDescription": "ruby-conditional_assignment-insert-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "conditional_assignment.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,28 +12,28 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment"
+                    "summary": "Added the 'x' conditional assignment"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "conditional_assignment.rb"
     ],
-    "sha1": "b6eae9ac76eeef3fdbc78c9247519879544d1223",
+    "sha1": "55cae8acacbda6caa7260e265b431765e1af6265",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "73dd45c05b436b7da029094a37157411aaf6ac4a"
+    "sha2": "b04cf752a65969d1622fbf648b3fa9737a2912c2"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-replacement-insert-test",
+    "testCaseDescription": "ruby-conditional_assignment-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "conditional_assignment.rb": [
                 {
                     "span": {
                         "insert": {
@@ -43,11 +43,11 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment"
+                    "summary": "Added the 'x' conditional assignment"
                 },
                 {
                     "span": {
@@ -58,114 +58,114 @@
                             ],
                             "end": [
                                 2,
-                                6
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment"
+                    "summary": "Added the 'x' conditional assignment"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "conditional_assignment.rb"
     ],
-    "sha1": "73dd45c05b436b7da029094a37157411aaf6ac4a",
+    "sha1": "b04cf752a65969d1622fbf648b3fa9737a2912c2",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1511e0e2c55eac49fe1c499499e0d3f1a87d4817"
+    "sha2": "c49eaf7778c842cdb120cf367fdf66dcec0c7c2a"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-delete-insert-test",
+    "testCaseDescription": "ruby-conditional_assignment-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "conditional_assignment.rb": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    5
+                                    7
                                 ],
                                 "end": [
                                     1,
-                                    6
+                                    8
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    5
+                                    7
                                 ],
                                 "end": [
                                     1,
-                                    6
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '1' with '0' in an assignment to x"
+                    "summary": "Replaced '7' with '5'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "conditional_assignment.rb"
     ],
-    "sha1": "1511e0e2c55eac49fe1c499499e0d3f1a87d4817",
+    "sha1": "c49eaf7778c842cdb120cf367fdf66dcec0c7c2a",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fcffe9f7787a13a0f47e5e346f8eceeabc9b58f6"
+    "sha2": "9e861395bfaa1b2cd15121a885571b6e486ba77e"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-replacement-test",
+    "testCaseDescription": "ruby-conditional_assignment-replacement-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "conditional_assignment.rb": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    5
+                                    7
                                 ],
                                 "end": [
                                     1,
-                                    6
+                                    8
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    5
+                                    7
                                 ],
                                 "end": [
                                     1,
-                                    6
+                                    8
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '0' with '1' in an assignment to x"
+                    "summary": "Replaced '5' with '7'"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "conditional_assignment.rb"
     ],
-    "sha1": "fcffe9f7787a13a0f47e5e346f8eceeabc9b58f6",
+    "sha1": "9e861395bfaa1b2cd15121a885571b6e486ba77e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d07c5b563d8ca6bbd41f4595ac4bb65c733d08f1"
+    "sha2": "cd8fdb632eb6d7b5cf8f0a56d1007bdaabafdfee"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-delete-replacement-test",
+    "testCaseDescription": "ruby-conditional_assignment-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "conditional_assignment.rb": [
                 {
                     "span": {
                         "delete": {
@@ -175,11 +175,11 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' assignment"
+                    "summary": "Deleted the 'x' conditional assignment"
                 },
                 {
                     "span": {
@@ -190,11 +190,11 @@
                             ],
                             "end": [
                                 2,
-                                6
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' assignment"
+                    "summary": "Deleted the 'x' conditional assignment"
                 },
                 {
                     "span": {
@@ -205,28 +205,28 @@
                             ],
                             "end": [
                                 2,
-                                6
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment"
+                    "summary": "Added the 'x' conditional assignment"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "conditional_assignment.rb"
     ],
-    "sha1": "d07c5b563d8ca6bbd41f4595ac4bb65c733d08f1",
+    "sha1": "cd8fdb632eb6d7b5cf8f0a56d1007bdaabafdfee",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "dbcfd3107913482700be082bcafd53c10cb0318c"
+    "sha2": "2cf7dcef027476b4a02129a1fb057ffa2ee1c0b3"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-delete-test",
+    "testCaseDescription": "ruby-conditional_assignment-delete-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "conditional_assignment.rb": [
                 {
                     "span": {
                         "delete": {
@@ -236,28 +236,28 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' assignment"
+                    "summary": "Deleted the 'x' conditional assignment"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "conditional_assignment.rb"
     ],
-    "sha1": "dbcfd3107913482700be082bcafd53c10cb0318c",
+    "sha1": "2cf7dcef027476b4a02129a1fb057ffa2ee1c0b3",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ba036f115f944a91c5198f0633b8548498ea71a2"
+    "sha2": "064c9f9c0a0c967296998d4c62bf4c0de2aaa752"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-delete-rest-test",
+    "testCaseDescription": "ruby-conditional_assignment-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "conditional_assignment.rb": [
                 {
                     "span": {
                         "delete": {
@@ -267,20 +267,20 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' assignment"
+                    "summary": "Deleted the 'x' conditional assignment"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "conditional_assignment.rb"
     ],
-    "sha1": "ba036f115f944a91c5198f0633b8548498ea71a2",
+    "sha1": "064c9f9c0a0c967296998d4c62bf4c0de2aaa752",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2ac2928c916b76ac61561c57976a6273d2c8546d"
+    "sha2": "aecb98be7694937e1f25be7cec17965656cf4895"
 }]

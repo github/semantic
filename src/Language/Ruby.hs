@@ -5,6 +5,7 @@ import Data.Record
 import Info
 import Prologue
 import Source
+import Language
 import qualified Syntax as S
 import Term
 
@@ -18,8 +19,16 @@ termConstructor
 termConstructor source sourceSpan name range children
   | name == "ERROR" = withDefaultInfo (S.Error children)
   | otherwise = withDefaultInfo $ case (name, children) of
+    ("array", _) -> S.Array children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("comment", _) -> S.Comment . toText $ slice range source
+    ("conditional_assignment", [ identifier, value ]) -> S.ConditionalAssignment identifier value
+    ("conditional", condition : cases) -> S.Ternary condition cases
+    ("hash", _) -> S.Object $ foldMap toTuple children
+    ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
+    ("return_statement", _) -> S.Return (listToMaybe children)
+    _ | name `elem` ["boolean_and", "boolean_or", "bitwise_or", "bitwise_and", "shift", "relational", "comparison"]
+      -> S.Operator children
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where
@@ -30,14 +39,28 @@ termConstructor source sourceSpan name range children
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
   "assignment" -> Assignment
+  "bitwise_and" -> BitwiseOperator -- bitwise and, e.g &.
+  "bitwise_or" -> BitwiseOperator -- bitwise or, e.g. ^, |.
+  "boolean_and" -> BooleanOperator -- boolean and, e.g. &&.
+  "boolean_or" -> BooleanOperator -- boolean or, e.g. &&.
   "boolean" -> Boolean
   "comment" -> Comment
+  "comparison" -> RelationalOperator -- comparison operator, e.g. <, <=, >=, >.
+  "conditional_assignment" -> ConditionalAssignment
+  "conditional" -> Ternary
   "ERROR" -> Error
+  "fixnum" -> IntegerLiteral
   "float" -> NumberLiteral
+  "hash" -> Object
   "identifier" -> Identifier
-  "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
+  "math_assignment" -> MathAssignment
+  "nil" -> Identifier
   "program" -> Program
+  "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.
+  "return_statement" -> Return
+  "shift" -> BitwiseOperator -- bitwise shift, e.g <<, >>.
   "string" -> StringLiteral
+  "subshell" -> Subshell
   "symbol" -> SymbolLiteral
   s -> Other s

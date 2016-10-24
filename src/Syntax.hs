@@ -76,6 +76,8 @@ data Syntax a f
   | Module { moduleId:: f, moduleBody :: [f] }
   | Import f [f]
   | Export (Maybe f) [f]
+  -- | A conditional assignment represents expressions whose operator classifies as conditional (e.g. ||= or &&=).
+  | ConditionalAssignment { conditionalAssignmentId :: f, value :: f }
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 
