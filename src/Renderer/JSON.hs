@@ -76,6 +76,12 @@ termFields :: (KeyValue kv, ToJSON recur, HasField fields Category, HasField fie
   [kv]
 termFields info syntax = "range" .= characterRange info : "category" .= category info : syntaxToTermField syntax
 
+patchFields :: (KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (SyntaxTerm leaf fields) -> [kv]
+patchFields patch = case patch of
+  SplitInsert term -> fields "insert" term
+  SplitDelete term -> fields "delete" term
+  SplitReplace term -> fields "replace" term
+  where fields kind term | (info :< syntax) <- runCofree term = "patch" .= T.pack kind : termFields info syntax
 
 syntaxToTermField :: (ToJSON recur, KeyValue kv) => Syntax leaf recur -> [kv]
 syntaxToTermField syntax = case syntax of
@@ -117,10 +123,3 @@ syntaxToTermField syntax = case syntax of
   S.Import identifier expr -> [ "importIdentifier" .= identifier ] <> [ "importStatements" .= expr ]
   S.Export identifier expr -> [ "exportIdentifier" .= identifier ] <> [ "exportStatements" .= expr ]
   where childrenFields c = [ "children" .= c ]
-
-patchFields :: (KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (SyntaxTerm leaf fields) -> [kv]
-patchFields patch = case patch of
-  SplitInsert term -> fields "insert" term
-  SplitDelete term -> fields "delete" term
-  SplitReplace term -> fields "replace" term
-  where fields kind term | (info :< syntax) <- runCofree term = "patch" .= T.pack kind : termFields info syntax
