@@ -112,6 +112,8 @@ data Category
   | Module
   -- | An import
   | Import
+  -- | A qualified import statement
+  | NamespaceImport
   -- | An export
   | Export
   deriving (Eq, Generic, Ord, Show)
