@@ -1,99 +1,8 @@
 [{
-    "testCaseDescription": "ruby-math_assignment-insert-test",
+    "testCaseDescription": "ruby-method-invocation-insert-test",
     "expectedResult": {
         "changes": {
-            "math_assignment.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "math_assignment.rb"
-    ],
-    "sha1": "be45f7caef3880ddd78afe33a5af47b4a90c8051",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "9aa53231ba4f073df0f6c63d08bf066fd21f64fe"
-}
-,{
-    "testCaseDescription": "ruby-math_assignment-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "math_assignment.rb": [
+            "method-invocation.rb": [
                 {
                     "span": {
                         "insert": {
@@ -107,7 +16,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'print' identifier"
                 },
                 {
                     "span": {
@@ -118,56 +27,117 @@
                             ],
                             "end": [
                                 2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
                                 8
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'foo.bar' member access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-invocation.rb"
+    ],
+    "sha1": "6ad5bfa34184ee2b10bd0c358932ad5a496867c7",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "f864c8501ae8a0b2f55b7acd68839c9831dde429"
+}
+,{
+    "testCaseDescription": "ruby-method-invocation-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-invocation.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'print(…)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo.bar(())' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar(…)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar(…)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'print' identifier"
                 },
                 {
                     "span": {
@@ -178,11 +148,11 @@
                             ],
                             "end": [
                                 6,
-                                7
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'foo.bar' member access"
                 },
                 {
                     "span": {
@@ -193,159 +163,331 @@
                             ],
                             "end": [
                                 7,
-                                7
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Added the 'bar' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-invocation.rb"
+    ],
+    "sha1": "f864c8501ae8a0b2f55b7acd68839c9831dde429",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "aad7b7f06c886007d8b33cac5b4b4a8af2374ad9"
+}
+,{
+    "testCaseDescription": "ruby-method-invocation-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "method-invocation.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'print' identifier"
                 },
                 {
                     "span": {
                         "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo.bar' member access"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'print(…)' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo.bar(())' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar(…)' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar(…)' function call"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-invocation.rb"
+    ],
+    "sha1": "aad7b7f06c886007d8b33cac5b4b4a8af2374ad9",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "c38f231f74d6da796fc77c20c1dd1612e0a845ea"
+}
+,{
+    "testCaseDescription": "ruby-method-invocation-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-invocation.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'print(…)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo.bar(())' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar(…)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar(…)' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'print' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                8
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo.bar' member access"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "method-invocation.rb"
+    ],
+    "sha1": "c38f231f74d6da796fc77c20c1dd1612e0a845ea",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "47ddeb081ce7d72b185003091cb2a68c5e39c685"
+}
+,{
+    "testCaseDescription": "ruby-method-invocation-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "method-invocation.rb": [
+                {
+                    "span": {
+                        "delete": {
                             "start": [
                                 8,
                                 1
                             ],
                             "end": [
                                 8,
-                                7
+                                6
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Deleted the 'print' identifier"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 9,
                                 1
                             ],
                             "end": [
                                 9,
-                                7
+                                8
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Deleted the 'foo.bar' member access"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 10,
                                 1
                             ],
                             "end": [
                                 10,
-                                8
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Deleted the 'bar' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "math_assignment.rb"
+        "method-invocation.rb"
     ],
-    "sha1": "9aa53231ba4f073df0f6c63d08bf066fd21f64fe",
+    "sha1": "47ddeb081ce7d72b185003091cb2a68c5e39c685",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8736115f9ac536531bd78bb99c1b229cedf2a9a7"
+    "sha2": "24f54fd20946f5c881d157a8ea4d516a3fd4b92d"
 }
 ,{
-    "testCaseDescription": "ruby-math_assignment-delete-insert-test",
+    "testCaseDescription": "ruby-method-invocation-delete-test",
     "expectedResult": {
         "changes": {
-            "math_assignment.rb": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    6
-                                ],
-                                "end": [
-                                    1,
-                                    7
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '2' with '1' in the x math assignment"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "math_assignment.rb"
-    ],
-    "sha1": "8736115f9ac536531bd78bb99c1b229cedf2a9a7",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "395a80a04d54b8c6143557ddff6e8023738b9bf1"
-}
-,{
-    "testCaseDescription": "ruby-math_assignment-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "math_assignment.rb": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    6
-                                ],
-                                "end": [
-                                    1,
-                                    7
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '1' with '2' in the x math assignment"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "math_assignment.rb"
-    ],
-    "sha1": "395a80a04d54b8c6143557ddff6e8023738b9bf1",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "aa6b52fdf13776f5977dbcb822c495b00d3099cc"
-}
-,{
-    "testCaseDescription": "ruby-math_assignment-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "math_assignment.rb": [
+            "method-invocation.rb": [
                 {
                     "span": {
                         "delete": {
@@ -359,7 +501,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'print' identifier"
                 },
                 {
                     "span": {
@@ -370,103 +512,43 @@
                             ],
                             "end": [
                                 2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
                                 8
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'foo.bar' member access"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                6,
+                                3,
                                 1
                             ],
                             "end": [
-                                6,
-                                7
+                                3,
+                                4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' math assignment"
+                    "summary": "Deleted the 'bar' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "math_assignment.rb"
+        "method-invocation.rb"
     ],
-    "sha1": "aa6b52fdf13776f5977dbcb822c495b00d3099cc",
+    "sha1": "24f54fd20946f5c881d157a8ea4d516a3fd4b92d",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7efe74cebe28feec91afcf363de99b717ce3cac8"
+    "sha2": "7153a43d44ea9b2aec9db20113de3e507a551415"
 }
 ,{
-    "testCaseDescription": "ruby-math_assignment-delete-test",
+    "testCaseDescription": "ruby-method-invocation-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "math_assignment.rb": [
+            "method-invocation.rb": [
                 {
                     "span": {
                         "delete": {
@@ -476,11 +558,11 @@
                             ],
                             "end": [
                                 1,
-                                7
+                                21
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'print(…)' function call"
                 },
                 {
                     "span": {
@@ -491,11 +573,11 @@
                             ],
                             "end": [
                                 2,
-                                7
+                                10
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'foo.bar(())' function call"
                 },
                 {
                     "span": {
@@ -506,11 +588,11 @@
                             ],
                             "end": [
                                 3,
-                                7
+                                9
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'bar(…)' function call"
                 },
                 {
                     "span": {
@@ -521,126 +603,20 @@
                             ],
                             "end": [
                                 4,
-                                7
+                                10
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
+                    "summary": "Deleted the 'bar(…)' function call"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "math_assignment.rb"
+        "method-invocation.rb"
     ],
-    "sha1": "7efe74cebe28feec91afcf363de99b717ce3cac8",
+    "sha1": "7153a43d44ea9b2aec9db20113de3e507a551415",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6a9d20c51e78e11f3d35215731f20736833b4b69"
-}
-,{
-    "testCaseDescription": "ruby-math_assignment-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "math_assignment.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' math assignment"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "math_assignment.rb"
-    ],
-    "sha1": "6a9d20c51e78e11f3d35215731f20736833b4b69",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "69598d63ec9665ea224f03744a2354521c68bd48"
+    "sha2": "d70e3907cf1d351e6d18d55d83a00be5334552a9"
 }]

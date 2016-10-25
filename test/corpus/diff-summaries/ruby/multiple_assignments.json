@@ -12,100 +12,22 @@
                             ],
                             "end": [
                                 1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                7
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added 'z' assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                15
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added '20'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                19
-                            ],
-                            "end": [
-                                1,
                                 21
                             ]
                         }
                     },
-                    "summary": "Added '30'"
+                    "summary": "Added the 'x(…)' function call"
                 }
             ]
         },
-        "errors": {
-            "multiple_assignments.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                2
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added ',' at line 1, column 2 - line 1, column 3"
-                }
-            ]
-        }
+        "errors": {}
     },
     "filePaths": [
         "multiple_assignments.rb"
     ],
-    "sha1": "aecb98be7694937e1f25be7cec17965656cf4895",
+    "sha1": "1301dca7fccb05d1bbe530ab508eec275cd54db9",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "284594ba69f70d79016dcfa908f48dc786a8dcbe"
+    "sha2": "5ff752e17332f71d886e4f87f3420e5edd8970b6"
 }
 ,{
     "testCaseDescription": "ruby-multiple_assignments-replacement-insert-test",
@@ -125,127 +47,22 @@
                             ]
                         }
                     },
-                    "summary": "Added 'x' identifier"
+                    "summary": "Added the 'x' identifier"
                 },
                 {
                     "span": {
-                        "insert": {
+                        "delete": {
                             "start": [
                                 1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                8
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added 'aVariable' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                19
-                            ],
-                            "end": [
-                                1,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Added '40'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
                                 1
                             ],
                             "end": [
-                                2,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                4
-                            ],
-                            "end": [
-                                2,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                7
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Added 'z' assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                15
-                            ],
-                            "end": [
-                                2,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added '20'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                19
-                            ],
-                            "end": [
-                                2,
+                                1,
                                 21
                             ]
                         }
                     },
-                    "summary": "Added '30'"
+                    "summary": "Deleted the 'x(…)' function call"
                 }
             ]
         },
@@ -259,27 +76,12 @@
                                 2
                             ],
                             "end": [
-                                1,
-                                3
+                                3,
+                                21
                             ]
                         }
                     },
-                    "summary": "Added ',' at line 1, column 2 - line 1, column 3"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added ',' at line 2, column 2 - line 2, column 3"
+                    "summary": "Added the ', y = aVariable, 40\nx, y, z = 10, 20, 30\nx, y, z = 10, 20, 30' at line 1, column 2 - line 3, column 21"
                 }
             ]
         }
@@ -287,540 +89,48 @@
     "filePaths": [
         "multiple_assignments.rb"
     ],
-    "sha1": "284594ba69f70d79016dcfa908f48dc786a8dcbe",
+    "sha1": "5ff752e17332f71d886e4f87f3420e5edd8970b6",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8dc8a9f60efd872f213eb7289e2089497dcc300b"
+    "sha2": "6b22441dbd50f93c79c8fc1be9d7577e5d196d2e"
 }
 ,{
     "testCaseDescription": "ruby-multiple_assignments-delete-insert-test",
     "expectedResult": {
-        "changes": {
-            "multiple_assignments.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    2
-                                ],
-                                "end": [
-                                    1,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    7
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the ',' at line 1, column 2 - line 1, column 3 with the 'z' assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                15
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added '20'"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    19
-                                ],
-                                "end": [
-                                    1,
-                                    21
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    19
-                                ],
-                                "end": [
-                                    1,
-                                    21
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '40' with '30'"
-                }
-            ]
-        },
-        "errors": {
-            "multiple_assignments.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                2
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the ',' at line 1, column 2 - line 1, column 3"
-                }
-            ]
-        }
+        "changes": {},
+        "errors": {}
     },
     "filePaths": [
         "multiple_assignments.rb"
     ],
-    "sha1": "8dc8a9f60efd872f213eb7289e2089497dcc300b",
+    "sha1": "6b22441dbd50f93c79c8fc1be9d7577e5d196d2e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6fe68b236b4b6b1966f43debabf365c6747e9e5f"
+    "sha2": "f59c5fda194e65264c66410a5a4504ff070f499c"
 }
 ,{
     "testCaseDescription": "ruby-multiple_assignments-replacement-test",
     "expectedResult": {
-        "changes": {
-            "multiple_assignments.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                8
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'aVariable' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                19
-                            ],
-                            "end": [
-                                1,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Added '40'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                7
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'z' assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                15
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '20'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                19
-                            ],
-                            "end": [
-                                1,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '30'"
-                }
-            ]
-        },
-        "errors": {
-            "multiple_assignments.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                2
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the ',' at line 1, column 2 - line 1, column 3"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                2
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the ',' at line 1, column 2 - line 1, column 3"
-                }
-            ]
-        }
+        "changes": {},
+        "errors": {}
     },
     "filePaths": [
         "multiple_assignments.rb"
     ],
-    "sha1": "6fe68b236b4b6b1966f43debabf365c6747e9e5f",
+    "sha1": "f59c5fda194e65264c66410a5a4504ff070f499c",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ddc42e9b11caa3922ddad5cceb57c565bba93b0b"
+    "sha2": "f30e3004de69fad493c85d116949d4157c46141a"
 }
 ,{
     "testCaseDescription": "ruby-multiple_assignments-delete-replacement-test",
     "expectedResult": {
-        "changes": {
-            "multiple_assignments.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                8
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'aVariable' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                19
-                            ],
-                            "end": [
-                                1,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '40'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                4
-                            ],
-                            "end": [
-                                2,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                7
-                            ],
-                            "end": [
-                                2,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'z' assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                15
-                            ],
-                            "end": [
-                                2,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '20'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                19
-                            ],
-                            "end": [
-                                2,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '30'"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Added 'x' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                4
-                            ],
-                            "end": [
-                                2,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added 'y' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                8
-                            ],
-                            "end": [
-                                2,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added 'aVariable' identifier"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                19
-                            ],
-                            "end": [
-                                2,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Added '40'"
-                }
-            ]
-        },
-        "errors": {
-            "multiple_assignments.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                2
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted ',' at line 1, column 2 - line 1, column 3"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted ',' at line 2, column 2 - line 2, column 3"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                2
-                            ],
-                            "end": [
-                                2,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added ',' at line 2, column 2 - line 2, column 3"
-                }
-            ]
-        }
+        "changes": {},
+        "errors": {}
     },
     "filePaths": [
         "multiple_assignments.rb"
     ],
-    "sha1": "ddc42e9b11caa3922ddad5cceb57c565bba93b0b",
+    "sha1": "f30e3004de69fad493c85d116949d4157c46141a",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f210bccb314fafedc9b60571d8f2aa1164910fa2"
+    "sha2": "3c492c8fe9332551dec5829aecb4a84501b474ed"
 }
 ,{
     "testCaseDescription": "ruby-multiple_assignments-delete-test",
@@ -829,6 +139,21 @@
             "multiple_assignments.rb": [
                 {
                     "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                21
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'x(…)' function call"
+                },
+                {
+                    "span": {
                         "delete": {
                             "start": [
                                 1,
@@ -840,67 +165,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                7
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'z' assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                15
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '20'"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                19
-                            ],
-                            "end": [
-                                1,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '30'"
+                    "summary": "Deleted the 'x' identifier"
                 }
             ]
         },
@@ -914,12 +179,12 @@
                                 2
                             ],
                             "end": [
-                                1,
-                                3
+                                2,
+                                21
                             ]
                         }
                     },
-                    "summary": "Deleted ',' at line 1, column 2 - line 1, column 3"
+                    "summary": "Deleted the ', y, z = 10, 20, 30\nx, y = aVariable, 40' at line 1, column 2 - line 2, column 21"
                 }
             ]
         }
@@ -927,9 +192,9 @@
     "filePaths": [
         "multiple_assignments.rb"
     ],
-    "sha1": "f210bccb314fafedc9b60571d8f2aa1164910fa2",
+    "sha1": "3c492c8fe9332551dec5829aecb4a84501b474ed",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "dbe86231b61a6d5fa5514383df8763ebe4653192"
+    "sha2": "979655d88ee036aba2893f9a7251c4ab5a11d823"
 }
 ,{
     "testCaseDescription": "ruby-multiple_assignments-delete-rest-test",
@@ -945,83 +210,20 @@
                             ],
                             "end": [
                                 1,
-                                2
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'x' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'y' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                8
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted 'aVariable' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                19
-                            ],
-                            "end": [
-                                1,
                                 21
                             ]
                         }
                     },
-                    "summary": "Deleted '40'"
+                    "summary": "Deleted the 'x(…)' function call"
                 }
             ]
         },
-        "errors": {
-            "multiple_assignments.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                2
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted ',' at line 1, column 2 - line 1, column 3"
-                }
-            ]
-        }
+        "errors": {}
     },
     "filePaths": [
         "multiple_assignments.rb"
     ],
-    "sha1": "dbe86231b61a6d5fa5514383df8763ebe4653192",
+    "sha1": "979655d88ee036aba2893f9a7251c4ab5a11d823",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "20dbfc2465faf5448a116a5bee396d0ce69a3f4d"
+    "sha2": "c9607011febb409de5fda95ecbdee411dd8a57ff"
 }]

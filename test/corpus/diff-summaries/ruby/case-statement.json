@@ -1,0 +1,262 @@
+[{
+    "testCaseDescription": "ruby-case-statement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "case-statement.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' switch statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "case-statement.rb"
+    ],
+    "sha1": "d70e3907cf1d351e6d18d55d83a00be5334552a9",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ff221e497071ae29c8e26c4fc8c8b1124a535d66"
+}
+,{
+    "testCaseDescription": "ruby-case-statement-replacement-insert-test",
+    "expectedResult": {
+        "changes": {
+            "case-statement.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' switch statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' switch statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "case-statement.rb"
+    ],
+    "sha1": "ff221e497071ae29c8e26c4fc8c8b1124a535d66",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "4b3c424192165233b51ef09cfc8a13c814d3ce02"
+}
+,{
+    "testCaseDescription": "ruby-case-statement-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "case-statement.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'else' else_block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "case-statement.rb"
+    ],
+    "sha1": "4b3c424192165233b51ef09cfc8a13c814d3ce02",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a32b61561eb80d0e6dbcf09527cace25e50e508a"
+}
+,{
+    "testCaseDescription": "ruby-case-statement-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "case-statement.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'else' else_block"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "case-statement.rb"
+    ],
+    "sha1": "a32b61561eb80d0e6dbcf09527cace25e50e508a",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "0d3616c7b26a139332b8d8be17ea0520c5ea3568"
+}
+,{
+    "testCaseDescription": "ruby-case-statement-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "case-statement.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' switch statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                5,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' switch statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' switch statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "case-statement.rb"
+    ],
+    "sha1": "0d3616c7b26a139332b8d8be17ea0520c5ea3568",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "f395e3fc9cf876e08355c0f13bbe61ad0a78b607"
+}
+,{
+    "testCaseDescription": "ruby-case-statement-delete-test",
+    "expectedResult": {
+        "changes": {
+            "case-statement.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' switch statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "case-statement.rb"
+    ],
+    "sha1": "f395e3fc9cf876e08355c0f13bbe61ad0a78b607",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "774b005f0f5ae11f91bee54f466ec92676244797"
+}
+,{
+    "testCaseDescription": "ruby-case-statement-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "case-statement.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' switch statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "case-statement.rb"
+    ],
+    "sha1": "774b005f0f5ae11f91bee54f466ec92676244797",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "7fef7e554f798197e42ce0469a032e2c52d0246b"
+}]
