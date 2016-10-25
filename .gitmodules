@@ -22,3 +22,6 @@
 [submodule "vendor/hspec-expectations-pretty-diff"]
 	path = vendor/hspec-expectations-pretty-diff
 	url = https://github.com/rewinfrey/hspec-expectations-pretty-diff
+[submodule "vendor/effects"]
+	path = vendor/effects
+	url = git@github.com:joshvera/effects.git
