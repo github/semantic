@@ -15,19 +15,19 @@ termConstructor
   -> Range -- ^ The character range that the term occupies.
   -> [Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])] -- ^ The child nodes of the term.
   -> IO (Term (S.Syntax Text) (Record '[Range, Category, SourceSpan])) -- ^ The resulting term, in IO.
-termConstructor source sourceSpan name range children = withDefaultInfo =<< do
-  pure $ case (name, children) of
-    ("return_statement", _) -> S.Return (listToMaybe children)
-    ("source_file", packageName : xs) | category (extract packageName) == Other "package_clause" ->
-      case unwrap packageName of
-        S.Indexed [identifier] -> S.Module identifier xs
-        _ -> S.Error [packageName]
-    (_, []) -> S.Leaf . toText $ slice range source
-    _  -> S.Indexed children
+termConstructor source sourceSpan name range children = case (name, children) of
+  ("return_statement", _) -> withDefaultInfo $ S.Return (listToMaybe children)
+  ("source_file", packageName : xs) | category (extract packageName) == Other "package_clause" ->
+    case unwrap packageName of
+      S.Indexed [identifier] -> withCategory Module (S.Module identifier xs)
+      _ -> withCategory Error (S.Error $ packageName : xs)
+  (_, []) -> withDefaultInfo . S.Leaf $ toText (slice range source)
+  _  -> withDefaultInfo $ S.Indexed children
   where
-    withDefaultInfo syntax = do
+    withCategory category syntax = do
       sourceSpan' <- sourceSpan
-      pure $! cofree ((range .: categoryForGoName name .: sourceSpan' .: RNil) :< syntax)
+      pure $! cofree ((range .: category .: sourceSpan' .: RNil) :< syntax)
+    withDefaultInfo = withCategory (categoryForGoName name)
 
 categoryForGoName :: Text -> Category
 categoryForGoName = \case
