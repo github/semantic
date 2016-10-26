@@ -85,9 +85,9 @@
     "filePaths": [
         "math_assignment.rb"
     ],
-    "sha1": "104e6d32e5d8a1fbcd9557785a8ebd03051fb8cf",
+    "sha1": "38bbc085e304083bd11915696df1b699c64c4d3a",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "37e692f54262e2c9680110316b18d2ec87cf615a"
+    "sha2": "31d6bdbe6f14a5f57accf2b25a75db94ed50ad8f"
 }
 ,{
     "testCaseDescription": "ruby-math_assignment-replacement-insert-test",
@@ -251,9 +251,9 @@
     "filePaths": [
         "math_assignment.rb"
     ],
-    "sha1": "37e692f54262e2c9680110316b18d2ec87cf615a",
+    "sha1": "31d6bdbe6f14a5f57accf2b25a75db94ed50ad8f",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4c32e5b741f7023c0d5ae53187826f2aec11221f"
+    "sha2": "f1c23cb0714170719c6087667b296c509cf32f7e"
 }
 ,{
     "testCaseDescription": "ruby-math_assignment-delete-insert-test",
@@ -294,9 +294,9 @@
     "filePaths": [
         "math_assignment.rb"
     ],
-    "sha1": "4c32e5b741f7023c0d5ae53187826f2aec11221f",
+    "sha1": "f1c23cb0714170719c6087667b296c509cf32f7e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3f89bfb689a36444fae96420c07cafcedf810e0d"
+    "sha2": "34d503cb63f0d4e9f5b53b1a9f9534deeea9742d"
 }
 ,{
     "testCaseDescription": "ruby-math_assignment-replacement-test",
@@ -337,9 +337,9 @@
     "filePaths": [
         "math_assignment.rb"
     ],
-    "sha1": "3f89bfb689a36444fae96420c07cafcedf810e0d",
+    "sha1": "34d503cb63f0d4e9f5b53b1a9f9534deeea9742d",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a0934ef018fd5156079cdaef1c10c157cb82bb12"
+    "sha2": "12c747d8f7fc1212cb8ccc35fa7388d6caecec55"
 }
 ,{
     "testCaseDescription": "ruby-math_assignment-delete-replacement-test",
@@ -458,9 +458,9 @@
     "filePaths": [
         "math_assignment.rb"
     ],
-    "sha1": "a0934ef018fd5156079cdaef1c10c157cb82bb12",
+    "sha1": "12c747d8f7fc1212cb8ccc35fa7388d6caecec55",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8d85de2996ef79b6fbbccc55b572fce6141f0a05"
+    "sha2": "cf14b7f112afc355f3e073a35a69b8ea485aa7bc"
 }
 ,{
     "testCaseDescription": "ruby-math_assignment-delete-test",
@@ -549,9 +549,9 @@
     "filePaths": [
         "math_assignment.rb"
     ],
-    "sha1": "8d85de2996ef79b6fbbccc55b572fce6141f0a05",
+    "sha1": "cf14b7f112afc355f3e073a35a69b8ea485aa7bc",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "241b39ba005d4bb9f7ead5db8d7ba3c8604fa827"
+    "sha2": "c937009c41cd5d235b74de16366001ea639fde00"
 }
 ,{
     "testCaseDescription": "ruby-math_assignment-delete-rest-test",
@@ -640,7 +640,7 @@
     "filePaths": [
         "math_assignment.rb"
     ],
-    "sha1": "241b39ba005d4bb9f7ead5db8d7ba3c8604fa827",
+    "sha1": "c937009c41cd5d235b74de16366001ea639fde00",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f528e42a19e2fb87e591e8d0f06b0c0e2fc30b4a"
+    "sha2": "2cd88afdb6b8c6ca420a7a7b2d4458ec33e04264"
 }]

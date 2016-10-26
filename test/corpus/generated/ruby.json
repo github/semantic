@@ -148,8 +148,22 @@
         "syntax": "class",
         "repoFilePath": "class.rb",
         "insert": "class Foo < Super\n  def test; end\nend",
-        "replacement": "",
+        "replacement": "class Foo\n  def test; end\nend",
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/class.json"
+      },
+      {
+        "syntax": "return",
+        "repoFilePath": "return.rb",
+        "insert": "return foo",
+        "replacement": "return",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/return.json"
+      },
+      {
+        "syntax": "yield",
+        "repoFilePath": "yield.rb",
+        "insert": "yield foo",
+        "replacement": "yield",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/yield.json"
       }
     ]
   }

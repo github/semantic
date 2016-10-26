@@ -205,6 +205,7 @@ toTermName source term = case unwrap term of
   S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
   S.Pair a _ -> toTermName' a <> ": …"
   S.Return expr -> maybe "empty" toTermName' expr
+  S.Yield expr -> maybe "empty" toTermName' expr
   S.Error _ -> termNameFromSource term
   S.If expr _ _ -> termNameFromSource expr
   S.For clauses _ -> termNameFromChildren term clauses
@@ -346,6 +347,7 @@ instance HasCategory Category where
     C.Interpolation -> "interpolation"
     C.Subshell -> "subshell command"
     C.ConditionalAssignment -> "conditional assignment"
+    C.Yield -> "yield statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

@@ -120,6 +120,8 @@ data Category
   | Subshell
   -- | A conditional assignment expression.
   | ConditionalAssignment
+  -- | A yield statement.
+  | Yield
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -177,6 +179,7 @@ instance Arbitrary Category where
     , pure Interpolation
     , pure Subshell
     , pure ConditionalAssignment
+    , pure Yield
     , Other <$> arbitrary
     ]
 

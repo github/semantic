@@ -92,6 +92,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Object pairs -> childrenFields pairs
   S.Pair a b -> childrenFields [a, b]
   S.Return expr -> [ "returnExpression" .= expr ]
+  S.Yield expr -> [ "yieldExpression" .= expr ]
   S.Constructor expr -> [ "constructorExpression" .= expr ]
   S.Comment _ -> []
   S.Commented comments child -> childrenFields (comments <> maybeToList child)

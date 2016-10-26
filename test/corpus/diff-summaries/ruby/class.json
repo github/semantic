@@ -25,9 +25,9 @@
     "filePaths": [
         "class.rb"
     ],
-    "sha1": "419792e05169589c02ce92c9444ab2a237d6a418",
+    "sha1": "34022ada691bc55e900a46f0df216769f09523d4",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "61dbe8f498303cdf938cbf8f4e3aeda76c832516"
+    "sha2": "0b4e2255b668296e258445b6e7540215a07012f5"
 }
 ,{
     "testCaseDescription": "ruby-class-replacement-insert-test",
@@ -42,38 +42,22 @@
                                 1
                             ],
                             "end": [
-                                4,
+                                3,
                                 4
                             ]
                         }
                     },
                     "summary": "Added the 'Foo' class"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "class.rb"
-    ],
-    "sha1": "61dbe8f498303cdf938cbf8f4e3aeda76c832516",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "54265e3982102d6f9cfe411ef0bed2f6fb134c3e"
-}
-,{
-    "testCaseDescription": "ruby-class-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "class.rb": [
+                },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                1,
+                                4,
                                 1
                             ],
                             "end": [
-                                3,
+                                6,
                                 4
                             ]
                         }
@@ -87,40 +71,35 @@
     "filePaths": [
         "class.rb"
     ],
-    "sha1": "54265e3982102d6f9cfe411ef0bed2f6fb134c3e",
+    "sha1": "0b4e2255b668296e258445b6e7540215a07012f5",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "22248498b148c335198758757e506d064432268f"
+    "sha2": "d30ed0e0d9e0134b8c4511646e7a23870dbefd45"
 }
 ,{
-    "testCaseDescription": "ruby-class-replacement-test",
+    "testCaseDescription": "ruby-class-delete-insert-test",
     "expectedResult": {
-        "changes": {
-            "class.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'Foo' class"
-                }
-            ]
-        },
+        "changes": {},
         "errors": {}
     },
     "filePaths": [
         "class.rb"
     ],
-    "sha1": "22248498b148c335198758757e506d064432268f",
+    "sha1": "d30ed0e0d9e0134b8c4511646e7a23870dbefd45",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6bfbbf4cd19ff169a63f0a31c8385e25ab01b144"
+    "sha2": "e5ce3c9ba5d93a57eac74451222b7d6cd07a3d83"
+}
+,{
+    "testCaseDescription": "ruby-class-replacement-test",
+    "expectedResult": {
+        "changes": {},
+        "errors": {}
+    },
+    "filePaths": [
+        "class.rb"
+    ],
+    "sha1": "e5ce3c9ba5d93a57eac74451222b7d6cd07a3d83",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "55f4775dbe671208c32278b43f3e31927b1c7218"
 }
 ,{
     "testCaseDescription": "ruby-class-delete-replacement-test",
@@ -135,7 +114,68 @@
                                 1
                             ],
                             "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
                                 4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' class"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "class.rb"
+    ],
+    "sha1": "55f4775dbe671208c32278b43f3e31927b1c7218",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "0d62a06db07a89173c0067be73bb9c0924658933"
+}
+,{
+    "testCaseDescription": "ruby-class-delete-test",
+    "expectedResult": {
+        "changes": {
+            "class.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
                                 4
                             ]
                         }
@@ -149,52 +189,9 @@
     "filePaths": [
         "class.rb"
     ],
-    "sha1": "6bfbbf4cd19ff169a63f0a31c8385e25ab01b144",
+    "sha1": "0d62a06db07a89173c0067be73bb9c0924658933",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "dbd381eeea7fc946d04586de6b9db9b44dd8b6de"
-}
-,{
-    "testCaseDescription": "ruby-class-delete-test",
-    "expectedResult": {
-        "changes": {
-            "class.rb": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    3,
-                                    4
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    1
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'Foo' class with the '\n' top level"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "class.rb"
-    ],
-    "sha1": "dbd381eeea7fc946d04586de6b9db9b44dd8b6de",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "aa7eb83a0fbc952536fee1fbb5ce10dc87497a3e"
+    "sha2": "2956a9ddc219628c6ed2a3b339b13d6dff5c18b8"
 }
 ,{
     "testCaseDescription": "ruby-class-delete-rest-test",
@@ -209,12 +206,12 @@
                                 1
                             ],
                             "end": [
-                                2,
-                                1
+                                3,
+                                4
                             ]
                         }
                     },
-                    "summary": "Deleted the '\n' top level"
+                    "summary": "Deleted the 'Foo' class"
                 }
             ]
         },
@@ -223,7 +220,7 @@
     "filePaths": [
         "class.rb"
     ],
-    "sha1": "aa7eb83a0fbc952536fee1fbb5ce10dc87497a3e",
+    "sha1": "2956a9ddc219628c6ed2a3b339b13d6dff5c18b8",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2317ed81c651e2425e11ce1310ba0a9243a8458c"
+    "sha2": "f8910c25faf46e769f70c04b569b25342713e245"
 }]

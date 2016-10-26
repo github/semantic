@@ -40,6 +40,7 @@ termConstructor source sourceSpan name range children
     ("method_declaration", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
     ("method_declaration", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
     ("return_statement", _) -> S.Return (listToMaybe children)
+    ("yield", _) -> S.Yield (listToMaybe children)
     _ | name `elem` ["boolean_and", "boolean_or", "bitwise_or", "bitwise_and", "shift", "relational", "comparison"]
       -> S.Operator children
     (_, []) -> S.Leaf . toText $ slice range source
@@ -83,4 +84,5 @@ categoryForRubyName = \case
   "string" -> StringLiteral
   "subshell" -> Subshell
   "symbol" -> SymbolLiteral
+  "yield" -> Yield
   s -> Other s

@@ -78,6 +78,7 @@ data Syntax a f
   | Export (Maybe f) [f]
   -- | A conditional assignment represents expressions whose operator classifies as conditional (e.g. ||= or &&=).
   | ConditionalAssignment { conditionalAssignmentId :: f, value :: f }
+  | Yield (Maybe f)
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 

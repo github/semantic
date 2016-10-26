@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-assignment-insert-test",
+    "testCaseDescription": "ruby-yield-insert-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "yield.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,28 +12,28 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                10
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment"
+                    "summary": "Added the 'foo' yield statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "yield.rb"
     ],
-    "sha1": "ed05c5b9395b5564308f1d52ae931bd39d5a3cb6",
+    "sha1": "39ae806b1ae634068395b35085944e405461348f",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "37d8e777a7c7053b616fc3464401816e9debc60c"
+    "sha2": "890cb263430ac399399afd829334ed051d690a27"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-replacement-insert-test",
+    "testCaseDescription": "ruby-yield-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "yield.rb": [
                 {
                     "span": {
                         "insert": {
@@ -47,7 +47,130 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment"
+                    "summary": "Added the 'empty' yield statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' yield statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.rb"
+    ],
+    "sha1": "890cb263430ac399399afd829334ed051d690a27",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "3a0e976f298467135bc50d49cf557552008fc97f"
+}
+,{
+    "testCaseDescription": "ruby-yield-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "yield.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                7
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.rb"
+    ],
+    "sha1": "3a0e976f298467135bc50d49cf557552008fc97f",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "075f4112d52bbfaa890d4eb965d490712fa20aac"
+}
+,{
+    "testCaseDescription": "ruby-yield-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "yield.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                7
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "yield.rb"
+    ],
+    "sha1": "075f4112d52bbfaa890d4eb965d490712fa20aac",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "a7e34fab4b84241bfd724a05fccfc6d5f62274c5"
+}
+,{
+    "testCaseDescription": "ruby-yield-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "yield.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'empty' yield statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' yield statement"
                 },
                 {
                     "span": {
@@ -62,110 +185,55 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'x' assignment"
+                    "summary": "Added the 'empty' yield statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "yield.rb"
     ],
-    "sha1": "37d8e777a7c7053b616fc3464401816e9debc60c",
+    "sha1": "a7e34fab4b84241bfd724a05fccfc6d5f62274c5",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6e3c3687efe728b53e432442d5b1b218256aaa8c"
+    "sha2": "cd77d25b8e2161e68ddab6a4710f60a58bd86d23"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-delete-insert-test",
+    "testCaseDescription": "ruby-yield-delete-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
+            "yield.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
                     },
-                    "summary": "Replaced '1' with '0' in an assignment to x"
+                    "summary": "Deleted the 'foo' yield statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "yield.rb"
     ],
-    "sha1": "6e3c3687efe728b53e432442d5b1b218256aaa8c",
+    "sha1": "cd77d25b8e2161e68ddab6a4710f60a58bd86d23",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a8d6c7910ad10207593280b82f477240775f26c2"
+    "sha2": "d5871bc2a7e304070a570e98a6e3c7ff02c587f3"
 }
 ,{
-    "testCaseDescription": "ruby-assignment-replacement-test",
+    "testCaseDescription": "ruby-yield-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "assignment.rb": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    5
-                                ],
-                                "end": [
-                                    1,
-                                    6
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '0' with '1' in an assignment to x"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "assignment.rb"
-    ],
-    "sha1": "a8d6c7910ad10207593280b82f477240775f26c2",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8762d8b6f0e414e2d4f8c60de052f1c575456dda"
-}
-,{
-    "testCaseDescription": "ruby-assignment-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "assignment.rb": [
+            "yield.rb": [
                 {
                     "span": {
                         "delete": {
@@ -179,108 +247,16 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' assignment"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' assignment"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'x' assignment"
+                    "summary": "Deleted the 'empty' yield statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "assignment.rb"
+        "yield.rb"
     ],
-    "sha1": "8762d8b6f0e414e2d4f8c60de052f1c575456dda",
+    "sha1": "d5871bc2a7e304070a570e98a6e3c7ff02c587f3",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "944e46624bb6e5b9ac385719c04d784575fcf0bc"
-}
-,{
-    "testCaseDescription": "ruby-assignment-delete-test",
-    "expectedResult": {
-        "changes": {
-            "assignment.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' assignment"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "assignment.rb"
-    ],
-    "sha1": "944e46624bb6e5b9ac385719c04d784575fcf0bc",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "630a48ac0c5225843bc9de7a04123c1981e5b0e6"
-}
-,{
-    "testCaseDescription": "ruby-assignment-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "assignment.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' assignment"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "assignment.rb"
-    ],
-    "sha1": "630a48ac0c5225843bc9de7a04123c1981e5b0e6",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "90fc7487dac1e27b923cec7b75b374ba2b4e0cbd"
+    "sha2": "dbe070995f875acff55ccfcf16c77c9f733468a0"
 }]
