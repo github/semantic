@@ -20,6 +20,8 @@ import qualified Data.String.Utils as DSUtils
 import Options.Applicative hiding ((<>))
 import qualified Options.Applicative as O
 import qualified Renderer as R
+import Control.Monad.Effect
+import Control.Monad.Effect.Internal
 
 data GenerateFormat =
     GenerateSummaries
@@ -148,6 +150,12 @@ maybeMapSummary = fmap $ \case
     R.SummaryOutput output -> Just output
     _ -> Nothing
 
+maybeMapJSON :: [R.Output] -> [Maybe (Map Text Value)]
+maybeMapJSON = fmap $ \case
+  R.JSONOutput output -> Just output
+  _ -> Nothing
+
+
 -- | This function represents the heart of the test case generation. It keeps track of
 -- | the git shas prior to running a command, fetches the git sha after a command, so that
 -- | JSONTestCase objects can be created. Finally, it appends the created JSONTestCase
@@ -155,11 +163,12 @@ maybeMapSummary = fmap $ \case
 runGenerateCommitAndTestCase :: GeneratorArgs -> String -> FilePath -> (JSONMetaSyntax, String, String, String) -> IO ()
 runGenerateCommitAndTestCase opts language repoPath (JSONMetaSyntax{..}, description, seperator, command) = do
   Prelude.putStrLn $ "Executing " <> syntax <> " " <> description <> " commit."
+
   beforeSha <- executeCommand repoPath getLastCommitShaCommand
   _ <- executeCommand repoPath command
   afterSha <- executeCommand repoPath getLastCommitShaCommand
 
-  (summaryChanges, summaryErrors) <- runMaybeSummaries beforeSha afterSha repoPath repoFilePath opts
+  expectedResult' <- runExpectedResultGenerator repoPath beforeSha afterSha repoFilePath opts
 
   let jsonTestCase = encodePretty JSONTestCase {
     gitDir = extractGitDir repoPath,
@@ -167,10 +176,7 @@ runGenerateCommitAndTestCase opts language repoPath (JSONMetaSyntax{..}, descrip
     filePaths = [repoFilePath],
     sha1 = beforeSha,
     sha2 = afterSha,
-    expectedResult = Map.fromList [
-      ("changes", fromMaybe (Map.singleton mempty mempty) summaryChanges),
-      ("errors", fromMaybe (Map.singleton mempty mempty) summaryErrors)
-      ]
+    expectedResult = expectedResult'
     }
 
   Prelude.putStrLn $ "Generating test case for " <> language <> ": " <> syntax <> " " <> description <> "."
@@ -179,18 +185,48 @@ runGenerateCommitAndTestCase opts language repoPath (JSONMetaSyntax{..}, descrip
   where extractGitDir :: String -> String
         extractGitDir fullRepoPath = DC.unpack $ snd $ DC.breakSubstring (DC.pack "test") (DC.pack fullRepoPath)
 
--- | Conditionally generate the diff summaries for the given shas and file path based
--- | on the -g | --generate flag. By default diff summaries are not generated when
--- | constructing test cases, and the tuple (Nothing, Nothing) is returned.
-runMaybeSummaries :: String -> String -> FilePath -> FilePath -> GeneratorArgs -> IO (Maybe (Map Text [Value]), Maybe (Map Text [Value]))
-runMaybeSummaries beforeSha afterSha repoPath repoFilePath GeneratorArgs{..}
-  | generateResults = do
-      diffs <- fetchDiffs $ args repoPath beforeSha afterSha [repoFilePath] R.Summary
-      let headResult = Prelude.head $ maybeMapSummary diffs
-      let changes = fromMaybe (fromList [("changes", mempty)]) headResult ! "changes"
-      let errors = fromMaybe (fromList [("errors", mempty)]) headResult ! "errors"
-      return (Just changes, Just errors)
-  | otherwise = return (Nothing, Nothing)
+data GenerateEff a where
+  GenerateSummaries' :: Arguments -> GenerateEff ExpectedResult
+  GenerateJSON' :: Arguments -> GenerateEff ExpectedResult
+
+-- args :: FilePath -> String -> String -> [String] -> R.Format -> Arguments
+generateSummaries' :: FilePath -> String -> String -> FilePath -> Eff '[GenerateEff] ExpectedResult
+generateSummaries' repoPath beforeSha afterSha repoFilePath = send $ GenerateSummaries' (args repoPath beforeSha afterSha [repoFilePath] R.Summary)
+
+generateJSON' :: FilePath -> String -> String -> FilePath -> Eff '[GenerateEff] ExpectedResult
+generateJSON' repoPath beforeSha afterSha repoFilePath = send $ GenerateJSON' (args repoPath beforeSha afterSha [repoFilePath] R.JSON)
+
+run :: Eff '[GenerateEff] ExpectedResult -> IO ExpectedResult
+run (Val x) = pure x
+run (E u queue) = case decompose u of
+  (Right (GenerateSummaries' args)) -> generateSummaries args >>= \s -> Main.run (apply queue s)
+  (Right (GenerateJSON' args)) -> generateJSON args >>= \s -> Main.run (apply queue s)
+  (Left _) -> error "this isn't possible"
+
+runExpectedResultGenerator :: FilePath -> String -> String -> FilePath -> GeneratorArgs -> IO ExpectedResult
+runExpectedResultGenerator repoPath beforeSha afterSha repoFilePath GeneratorArgs{..} =
+  case generateFormat of
+    GenerateSummaries -> Main.run $ generateSummaries' repoPath beforeSha afterSha repoFilePath
+    GenerateJSON -> Main.run $ generateJSON' repoPath beforeSha afterSha repoFilePath
+    GenerateAll -> pure EmptyResult
+    _ -> pure EmptyResult
+
+generateSummaries :: Arguments -> IO ExpectedResult -- (Map Text [Value], Map Text [Value])
+generateSummaries args@Arguments{..} = do
+  diffs <- fetchDiffs args
+  let headResult = Prelude.head $ maybeMapSummary diffs
+  let changes = fromMaybe (fromList [("changes", mempty)]) headResult ! "changes"
+  let errors = fromMaybe (fromList [("errors", mempty)]) headResult ! "errors"
+  pure $ SummaryResult ( Map.fromList [ ("changes", changes), ("errors", errors) ] )
+
+generateJSON :: Arguments -> IO ExpectedResult -- (Map Text Value)
+generateJSON args = do
+  diffs <- fetchDiffs args
+  let headResult = Prelude.head $ maybeMapJSON diffs
+  let oids = fromMaybe (fromList [("oids", "")]) headResult ! "oids"
+  let paths = fromMaybe (fromList [("output", "")]) headResult ! "paths"
+  let rows = fromMaybe (fromList [("rows", "")]) headResult ! "rows"
+  pure $ JSONResult ( Map.fromList [ ("oids", oids), ("paths", paths), ("rows", rows) ] )
 
 -- | Commands represent the various combination of patches (insert, delete, replacement)
 -- | for a given syntax.
