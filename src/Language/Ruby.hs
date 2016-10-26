@@ -20,6 +20,7 @@ termConstructor source sourceSpan name range children
   | name == "ERROR" = withDefaultInfo (S.Error children)
   | otherwise = withDefaultInfo $ case (name, children) of
     ("array", _) -> S.Array children
+    ("argument_list", _) -> S.Args children
     ("assignment", [ identifier, value ]) -> S.Assignment identifier value
     ("case_statement", expr : rest) -> S.Switch expr rest
     ("class_declaration", [ identifier, superclass, definitions ]) -> S.Class identifier (Just superclass) (toList (unwrap definitions))
@@ -50,6 +51,7 @@ termConstructor source sourceSpan name range children
 
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
+  "argument_list" -> Args
   "assignment" -> Assignment
   "bitwise_and" -> BitwiseOperator -- bitwise and, e.g &.
   "bitwise_or" -> BitwiseOperator -- bitwise or, e.g. ^, |.

@@ -55,9 +55,9 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "6ad5bfa34184ee2b10bd0c358932ad5a496867c7",
+    "sha1": "3c420fbf503a410bbdee4ca6b19a244c8901e3ec",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f864c8501ae8a0b2f55b7acd68839c9831dde429"
+    "sha2": "a0fc7c75712b9a1e50388eb8af8e68389da88c04"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-replacement-insert-test",
@@ -77,7 +77,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'print(…)' function call"
+                    "summary": "Added the 'print(\"hello world\")' function call"
                 },
                 {
                     "span": {
@@ -92,7 +92,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo.bar(())' function call"
+                    "summary": "Added the 'foo.bar()' function call"
                 },
                 {
                     "span": {
@@ -107,7 +107,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar(…)' function call"
+                    "summary": "Added the 'bar(2, 3)' function call"
                 },
                 {
                     "span": {
@@ -122,7 +122,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar(…)' function call"
+                    "summary": "Added the 'bar(2, 3)' function call"
                 },
                 {
                     "span": {
@@ -176,9 +176,9 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "f864c8501ae8a0b2f55b7acd68839c9831dde429",
+    "sha1": "a0fc7c75712b9a1e50388eb8af8e68389da88c04",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "aad7b7f06c886007d8b33cac5b4b4a8af2374ad9"
+    "sha2": "a70994adcb4bc9459a4e542b9e1138364cd7fed9"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-delete-insert-test",
@@ -243,7 +243,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'print(…)' function call"
+                    "summary": "Deleted the 'print(\"hello world\")' function call"
                 },
                 {
                     "span": {
@@ -258,7 +258,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo.bar(())' function call"
+                    "summary": "Deleted the 'foo.bar()' function call"
                 },
                 {
                     "span": {
@@ -273,7 +273,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar(…)' function call"
+                    "summary": "Deleted the 'bar(2, 3)' function call"
                 },
                 {
                     "span": {
@@ -288,7 +288,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar(…)' function call"
+                    "summary": "Deleted the 'bar(2, 3)' function call"
                 }
             ]
         },
@@ -297,9 +297,9 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "aad7b7f06c886007d8b33cac5b4b4a8af2374ad9",
+    "sha1": "a70994adcb4bc9459a4e542b9e1138364cd7fed9",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c38f231f74d6da796fc77c20c1dd1612e0a845ea"
+    "sha2": "cdf303c92be57204ba1696e2b2efbd5554b5027d"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-replacement-test",
@@ -319,7 +319,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'print(…)' function call"
+                    "summary": "Added the 'print(\"hello world\")' function call"
                 },
                 {
                     "span": {
@@ -334,7 +334,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo.bar(())' function call"
+                    "summary": "Added the 'foo.bar()' function call"
                 },
                 {
                     "span": {
@@ -349,7 +349,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar(…)' function call"
+                    "summary": "Added the 'bar(2, 3)' function call"
                 },
                 {
                     "span": {
@@ -364,7 +364,7 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'bar(…)' function call"
+                    "summary": "Added the 'bar(2, 3)' function call"
                 },
                 {
                     "span": {
@@ -418,9 +418,9 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "c38f231f74d6da796fc77c20c1dd1612e0a845ea",
+    "sha1": "cdf303c92be57204ba1696e2b2efbd5554b5027d",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "47ddeb081ce7d72b185003091cb2a68c5e39c685"
+    "sha2": "cb1e902a63dae75ecdfcccbeed68ac93ab6e145e"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-delete-replacement-test",
@@ -479,9 +479,9 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "47ddeb081ce7d72b185003091cb2a68c5e39c685",
+    "sha1": "cb1e902a63dae75ecdfcccbeed68ac93ab6e145e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "24f54fd20946f5c881d157a8ea4d516a3fd4b92d"
+    "sha2": "f53e8959adf5fbaf159899142f54a046fcd003ff"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-delete-test",
@@ -540,9 +540,9 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "24f54fd20946f5c881d157a8ea4d516a3fd4b92d",
+    "sha1": "f53e8959adf5fbaf159899142f54a046fcd003ff",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7153a43d44ea9b2aec9db20113de3e507a551415"
+    "sha2": "a2a903f3e0be4e0730152e55731882883556afef"
 }
 ,{
     "testCaseDescription": "ruby-method-invocation-delete-rest-test",
@@ -562,7 +562,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'print(…)' function call"
+                    "summary": "Deleted the 'print(\"hello world\")' function call"
                 },
                 {
                     "span": {
@@ -577,7 +577,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo.bar(())' function call"
+                    "summary": "Deleted the 'foo.bar()' function call"
                 },
                 {
                     "span": {
@@ -592,7 +592,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar(…)' function call"
+                    "summary": "Deleted the 'bar(2, 3)' function call"
                 },
                 {
                     "span": {
@@ -607,7 +607,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'bar(…)' function call"
+                    "summary": "Deleted the 'bar(2, 3)' function call"
                 }
             ]
         },
@@ -616,7 +616,7 @@
     "filePaths": [
         "method-invocation.rb"
     ],
-    "sha1": "7153a43d44ea9b2aec9db20113de3e507a551415",
+    "sha1": "a2a903f3e0be4e0730152e55731882883556afef",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d70e3907cf1d351e6d18d55d83a00be5334552a9"
+    "sha2": "5b64bff98de465bdaf6249a267c8e1ebd59c6a7d"
 }]

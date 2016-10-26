@@ -1,7 +1,8 @@
 [{
     "testCaseDescription": "ruby-delimiter-insert-test",
     "expectedResult": {
-        "changes": {
+        "changes": {},
+        "errors": {
             "delimiter.rb": [
                 {
                     "span": {
@@ -11,98 +12,22 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the %q=a= string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
+                                7,
                                 1
-                            ],
-                            "end": [
-                                2,
-                                10
                             ]
                         }
                     },
-                    "summary": "Added the %q<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the %=a= string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the %Q=a= string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the %<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the %Q<a<b>c> string"
+                    "summary": "Added the '%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n' at line 1, column 1 - line 7, column 1"
                 }
             ]
-        },
-        "errors": {}
+        }
     },
     "filePaths": [
         "delimiter.rb"
     ],
-    "sha1": "7e098e0276b53c082b35b6764177b2cdf5e124b1",
+    "sha1": "9138a807f42b792a37a5d79940d22c5a10410459",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "63b8d364aa5d40b54973daaad3ebea1cec92991b"
+    "sha2": "7861e9fe6cdbe1260b49624c0e71265d9323cd19"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-replacement-insert-test",
@@ -111,183 +36,30 @@
             "delimiter.rb": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    7,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    19,
+                                    1
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the %q!b! string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the %q{d{e}f} string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the %!b! string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the %Q!b! string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the %{d{e}f} string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the %Q{d{e}f} string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the %q=a= string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the %q<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the %=a= string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the %Q=a= string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the %<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the %Q<a<b>c> string"
+                    "summary": "Replaced the '%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n' at line 1, column 1 - line 7, column 1 with the '%q!b!\n%q{d{e}f}\n%!b!\n%Q!b!\n%{d{e}f}\n%Q{d{e}f}\n%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n' at line 1, column 1 - line 19, column 1"
                 }
             ]
         },
@@ -296,9 +68,9 @@
     "filePaths": [
         "delimiter.rb"
     ],
-    "sha1": "63b8d364aa5d40b54973daaad3ebea1cec92991b",
+    "sha1": "7861e9fe6cdbe1260b49624c0e71265d9323cd19",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "9b0454562b613426ab41252724fd03fe65163e6c"
+    "sha2": "4af17ec6c7026857d7260b1cb8bfe56b893653b0"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-delete-insert-test",
@@ -307,66 +79,6 @@
             "delimiter.rb": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the %q=a= string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the %q<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the %=a= string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the %Q=a= string"
-                },
-                {
-                    "span": {
                         "replace": [
                             {
                                 "start": [
@@ -374,113 +86,23 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    6
+                                    19,
+                                    1
                                 ]
                             },
                             {
                                 "start": [
-                                    5,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    5,
-                                    9
+                                    19,
+                                    1
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the %q!b! string with the %<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the %Q<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %q{d{e}f} string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %!b! string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %Q!b! string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %{d{e}f} string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %Q{d{e}f} string"
+                    "summary": "Replaced the '%q!b!\n%q{d{e}f}\n%!b!\n%Q!b!\n%{d{e}f}\n%Q{d{e}f}\n%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n' at line 1, column 1 - line 19, column 1 with the '%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n' at line 1, column 1 - line 19, column 1"
                 }
             ]
         },
@@ -489,9 +111,9 @@
     "filePaths": [
         "delimiter.rb"
     ],
-    "sha1": "9b0454562b613426ab41252724fd03fe65163e6c",
+    "sha1": "4af17ec6c7026857d7260b1cb8bfe56b893653b0",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "08da723f4802d58dd770a1690713525c2ed8cf4a"
+    "sha2": "1e26b91bc20637a52ca7869907e657dd9cd1486d"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-replacement-test",
@@ -500,34 +122,47 @@
             "delimiter.rb": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    19,
+                                    1
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    19,
+                                    1
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the %q!b! string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the %q{d{e}f} string"
-                },
+                    "summary": "Replaced the '%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n' at line 1, column 1 - line 19, column 1 with the '%q!b!\n%q{d{e}f}\n%!b!\n%Q!b!\n%{d{e}f}\n%Q{d{e}f}\n%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n' at line 1, column 1 - line 19, column 1"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "delimiter.rb"
+    ],
+    "sha1": "1e26b91bc20637a52ca7869907e657dd9cd1486d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "4de36111316f2943f1adbd2ebfdd6a18fc35ab15"
+}
+,{
+    "testCaseDescription": "ruby-delimiter-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "delimiter.rb": [
                 {
                     "span": {
                         "replace": [
@@ -537,143 +172,23 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    6
+                                    19,
+                                    1
                                 ]
                             },
                             {
                                 "start": [
-                                    3,
+                                    1,
                                     1
                                 ],
                                 "end": [
-                                    3,
-                                    5
+                                    1,
+                                    4
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the %q=a= string with the %!b! string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the %Q!b! string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the %{d{e}f} string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the %Q{d{e}f} string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %q<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %=a= string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %Q=a= string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %Q<a<b>c> string"
+                    "summary": "Replaced the '%q!b!\n%q{d{e}f}\n%!b!\n%Q!b!\n%{d{e}f}\n%Q{d{e}f}\n%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n' at line 1, column 1 - line 19, column 1 with the '%q=' at line 1, column 1 - line 1, column 4"
                 }
             ]
         },
@@ -682,295 +197,9 @@
     "filePaths": [
         "delimiter.rb"
     ],
-    "sha1": "08da723f4802d58dd770a1690713525c2ed8cf4a",
+    "sha1": "4de36111316f2943f1adbd2ebfdd6a18fc35ab15",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "315a16d0c2e6a2e0e25001f6411110e7bebd32b1"
-}
-,{
-    "testCaseDescription": "ruby-delimiter-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "delimiter.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %q!b! string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %q{d{e}f} string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %!b! string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %Q!b! string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %{d{e}f} string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %Q{d{e}f} string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %q=a= string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %q<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %=a= string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                10,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %Q=a= string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                11,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %Q<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                7,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the %q!b! string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                8,
-                                1
-                            ],
-                            "end": [
-                                8,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the %q{d{e}f} string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                9,
-                                1
-                            ],
-                            "end": [
-                                9,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the %!b! string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                10,
-                                1
-                            ],
-                            "end": [
-                                10,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the %Q!b! string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                11,
-                                1
-                            ],
-                            "end": [
-                                11,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Added the %{d{e}f} string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                12,
-                                1
-                            ],
-                            "end": [
-                                12,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Added the %Q{d{e}f} string"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "delimiter.rb"
-    ],
-    "sha1": "315a16d0c2e6a2e0e25001f6411110e7bebd32b1",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5c5ebe57a9d0954ad65aa8e7ee726009127463fd"
+    "sha2": "1fffd41e523e0322b1d962eaadf232a9f42e4d17"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-delete-test",
@@ -979,18 +208,48 @@
             "delimiter.rb": [
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
                                 1,
-                                1
+                                4
                             ],
                             "end": [
-                                1,
-                                6
+                                2,
+                                10
                             ]
                         }
                     },
-                    "summary": "Deleted the %q=a= string"
+                    "summary": "Added the 'b(…)' function call"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                3
+                            ],
+                            "end": [
+                                5,
+                                9
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b(…)' function call"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                4
+                            ],
+                            "end": [
+                                1,
+                                5
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a' identifier"
                 },
                 {
                     "span": {
@@ -1006,77 +265,80 @@
                         }
                     },
                     "summary": "Deleted the %q<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %=a= string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %Q=a= string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                5,
-                                9
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %<a<b>c> string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                10
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %Q<a<b>c> string"
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "delimiter.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Added the '%q' at line 1, column 1 - line 1, column 3"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Added the '%' at line 3, column 1 - line 3, column 2"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '%q=' at line 1, column 1 - line 1, column 4"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                12,
+                                1
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>\n%q!b!\n%q{d{e}f}\n%!b!\n%Q!b!\n%{d{e}f}\n' at line 3, column 1 - line 12, column 1"
+                }
+            ]
+        }
     },
     "filePaths": [
         "delimiter.rb"
     ],
-    "sha1": "5c5ebe57a9d0954ad65aa8e7ee726009127463fd",
+    "sha1": "1fffd41e523e0322b1d962eaadf232a9f42e4d17",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "457f5c31011d4b7b5dedeca54a5d555abb23fe60"
+    "sha2": "da5ccbc80d3ce58868fc2e880d56a8e28b34e791"
 }
 ,{
     "testCaseDescription": "ruby-delimiter-delete-rest-test",
@@ -1088,22 +350,7 @@
                         "delete": {
                             "start": [
                                 1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %q!b! string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
+                                4
                             ],
                             "end": [
                                 2,
@@ -1111,44 +358,14 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the %q{d{e}f} string"
+                    "summary": "Deleted the 'b(…)' function call"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %!b! string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the %Q!b! string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
+                                3
                             ],
                             "end": [
                                 5,
@@ -1156,7 +373,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the %{d{e}f} string"
+                    "summary": "Deleted the 'b(…)' function call"
                 },
                 {
                     "span": {
@@ -1175,12 +392,45 @@
                 }
             ]
         },
-        "errors": {}
+        "errors": {
+            "delimiter.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                3
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '%q' at line 1, column 1 - line 1, column 3"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '%' at line 3, column 1 - line 3, column 2"
+                }
+            ]
+        }
     },
     "filePaths": [
         "delimiter.rb"
     ],
-    "sha1": "457f5c31011d4b7b5dedeca54a5d555abb23fe60",
+    "sha1": "da5ccbc80d3ce58868fc2e880d56a8e28b34e791",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "be45f7caef3880ddd78afe33a5af47b4a90c8051"
+    "sha2": "104e6d32e5d8a1fbcd9557785a8ebd03051fb8cf"
 }]
