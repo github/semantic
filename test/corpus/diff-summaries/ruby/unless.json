@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-string-insert-test",
+    "testCaseDescription": "ruby-unless-insert-test",
     "expectedResult": {
         "changes": {
-            "string.rb": [
+            "unless.rb": [
                 {
                     "span": {
                         "insert": {
@@ -11,44 +11,29 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                3
+                                5,
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the '' string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo with \"bar\"' string"
+                    "summary": "Added the 'foo' unless statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "string.rb"
+        "unless.rb"
     ],
-    "sha1": "363c5cd5d7fe8895a0c86fe2c8a92d929501974e",
+    "sha1": "269c949f4170748888565a010c081c514facd0d4",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "121db9c67a3149e151645abab127679baebf3030"
+    "sha2": "00b5c04ef555810e2a049f9bc32bb5279158773b"
 }
 ,{
-    "testCaseDescription": "ruby-string-replacement-insert-test",
+    "testCaseDescription": "ruby-unless-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "string.rb": [
+            "unless.rb": [
                 {
                     "span": {
                         "insert": {
@@ -57,27 +42,12 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                3
+                                2,
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the \"\" string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added the \"bar with 'foo'\" string"
+                    "summary": "Added the 'x' unless statement"
                 },
                 {
                     "span": {
@@ -87,213 +57,112 @@
                                 1
                             ],
                             "end": [
-                                3,
-                                3
+                                4,
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the '' string"
+                    "summary": "Added the 'y' unless statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                4,
+                                5,
                                 1
                             ],
                             "end": [
-                                4,
-                                17
+                                9,
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'foo with \"bar\"' string"
+                    "summary": "Added the 'foo' unless statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "string.rb"
+        "unless.rb"
     ],
-    "sha1": "121db9c67a3149e151645abab127679baebf3030",
+    "sha1": "00b5c04ef555810e2a049f9bc32bb5279158773b",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fbdfde40558981ecb3695ec131ec73d1c9a142aa"
+    "sha2": "b123125cf59381b287c6ab304f6bab9c9c739e07"
 }
 ,{
-    "testCaseDescription": "ruby-string-delete-insert-test",
+    "testCaseDescription": "ruby-unless-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "string.rb": [
+            "unless.rb": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    1
+                                    8
                                 ],
                                 "end": [
                                     1,
-                                    3
+                                    9
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    1
+                                    8
                                 ],
                                 "end": [
                                     1,
-                                    3
+                                    11
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"\" string with the '' string"
+                    "summary": "Replaced the 'x' identifier with the 'foo' identifier"
                 },
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
-                                    2,
-                                    1
+                                    1,
+                                    9
                                 ],
                                 "end": [
                                     2,
-                                    17
+                                    1
                                 ]
                             },
                             {
                                 "start": [
                                     2,
-                                    1
+                                    3
                                 ],
                                 "end": [
                                     2,
-                                    17
+                                    6
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the \"bar with 'foo'\" string with the 'foo with \"bar\"' string"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "string.rb"
-    ],
-    "sha1": "fbdfde40558981ecb3695ec131ec73d1c9a142aa",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f043934ebaf45a6101db61a6c1539a494fc8d839"
-}
-,{
-    "testCaseDescription": "ruby-string-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "string.rb": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    3
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the '' string with the \"\" string"
+                    "summary": "Replaced the '\n' then_block with the 'bar' identifier"
                 },
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    17
-                                ]
-                            },
-                            {
-                                "start": [
-                                    2,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    17
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the 'foo with \"bar\"' string with the \"bar with 'foo'\" string"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "string.rb"
-    ],
-    "sha1": "f043934ebaf45a6101db61a6c1539a494fc8d839",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b4ac7f20a9c2115cf9be38088d4e665ad6c013c5"
-}
-,{
-    "testCaseDescription": "ruby-string-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "string.rb": [
-                {
-                    "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
+                                4,
                                 3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the \"\" string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
                             ],
                             "end": [
-                                2,
-                                17
+                                4,
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted the \"bar with 'foo'\" string"
+                    "summary": "Added the 'bat' identifier"
                 },
                 {
                     "span": {
@@ -303,27 +172,97 @@
                                 1
                             ],
                             "end": [
-                                3,
-                                3
+                                4,
+                                4
                             ]
                         }
                     },
-                    "summary": "Deleted the '' string"
+                    "summary": "Deleted the 'y' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "unless.rb"
+    ],
+    "sha1": "b123125cf59381b287c6ab304f6bab9c9c739e07",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "0cca01fa7bff681db4345eda9e4b0794c17d83fd"
+}
+,{
+    "testCaseDescription": "ruby-unless-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "unless.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    11
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    8
+                                ],
+                                "end": [
+                                    1,
+                                    9
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'foo' identifier with the 'x' identifier"
+                },
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    2,
+                                    3
+                                ],
+                                "end": [
+                                    2,
+                                    6
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    9
+                                ],
+                                "end": [
+                                    2,
+                                    1
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'bar' identifier with the '\n' then_block"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 4,
-                                1
+                                3
                             ],
                             "end": [
                                 4,
-                                17
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo with \"bar\"' string"
+                    "summary": "Deleted the 'bat' identifier"
                 },
                 {
                     "span": {
@@ -333,128 +272,129 @@
                                 1
                             ],
                             "end": [
+                                4,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'y' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "unless.rb"
+    ],
+    "sha1": "0cca01fa7bff681db4345eda9e4b0794c17d83fd",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "c89fd2bab648ca4b04fa806ca9b43ea831fd78fe"
+}
+,{
+    "testCaseDescription": "ruby-unless-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "unless.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                10,
+                                1
+                            ],
+                            "end": [
+                                14,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "unless.rb"
+    ],
+    "sha1": "c89fd2bab648ca4b04fa806ca9b43ea831fd78fe",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "eadbc75da8568ef252070cc39f1524ab02985d7e"
+}
+,{
+    "testCaseDescription": "ruby-unless-delete-test",
+    "expectedResult": {
+        "changes": {
+            "unless.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "unless.rb"
+    ],
+    "sha1": "eadbc75da8568ef252070cc39f1524ab02985d7e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e8b57eef810dfc5fffb2ada9e37676d914a79555"
+}
+,{
+    "testCaseDescription": "ruby-unless-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "unless.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x' unless statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
                                 3,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Added the \"\" string"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
                                 1
                             ],
                             "end": [
                                 4,
-                                17
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the \"bar with 'foo'\" string"
+                    "summary": "Deleted the 'y' unless statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "string.rb"
+        "unless.rb"
     ],
-    "sha1": "b4ac7f20a9c2115cf9be38088d4e665ad6c013c5",
+    "sha1": "e8b57eef810dfc5fffb2ada9e37676d914a79555",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3fdbd42bf39078767558c17c9afd4ce07a5e7760"
-}
-,{
-    "testCaseDescription": "ruby-string-delete-test",
-    "expectedResult": {
-        "changes": {
-            "string.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the '' string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'foo with \"bar\"' string"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "string.rb"
-    ],
-    "sha1": "3fdbd42bf39078767558c17c9afd4ce07a5e7760",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4d41c4e7f96511c4cb490806021859c9fe7a2730"
-}
-,{
-    "testCaseDescription": "ruby-string-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "string.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                3
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the \"\" string"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the \"bar with 'foo'\" string"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "string.rb"
-    ],
-    "sha1": "4d41c4e7f96511c4cb490806021859c9fe7a2730",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ffeca88b5aaa020f65cc8166650b00057e2cbbd7"
+    "sha2": "9a49c9fc34c676361cb4fc39e45fb224d43355a3"
 }]

@@ -185,6 +185,20 @@
         "insert": "if foo\n  bar\nelsif quux\n  baz\nelse\n  bat\nend",
         "replacement": "if x\nend\nif y then\nend",
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/if.json"
+      },
+      {
+        "syntax": "unless",
+        "repoFilePath": "unless.rb",
+        "insert": "unless foo\n  bar\nelse\n  bat\nend",
+        "replacement": "unless x\nend\nunless y then\nend",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/unless.json"
+      },
+      {
+        "syntax": "if-unless-modifiers",
+        "repoFilePath": "if-unless-modifiers.rb",
+        "insert": "print unless foo",
+        "replacement": "print if foo",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/if-unless-modifiers.json"
       }
     ]
   }

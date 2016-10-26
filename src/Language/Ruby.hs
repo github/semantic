@@ -35,12 +35,15 @@ termConstructor source sourceSpan name range children
       (x:xs) -> S.FunctionCall (cofree x) (cofree <$> xs)
       _ -> S.Indexed children
     ("hash", _) -> S.Object $ foldMap toTuple children
+    ("if_modifier", [ lhs, condition ]) -> S.If condition [lhs]
     ("if_statement", expr : rest ) -> S.If expr rest
     ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
     ("member_access", [ base, property ]) -> S.MemberAccess base property
     ("method_declaration", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
     ("method_declaration", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
     ("return_statement", _) -> S.Return (listToMaybe children)
+    ("unless_modifier", [ lhs, condition ]) -> S.Unless condition [lhs]
+    ("unless_statement", expr : rest ) -> S.Unless expr rest
     ("until_modifier", [ lhs, condition ]) -> S.Until condition (Just lhs)
     ("until_statement", [ expr, body ]) -> S.Until expr (Just body)
     ("until_statement", [ expr ]) -> S.Until expr Nothing
@@ -78,6 +81,7 @@ categoryForRubyName = \case
   "function_call" -> FunctionCall
   "hash" -> Object
   "identifier" -> Identifier
+  "if_modifier" -> If
   "if_statement" -> If
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
@@ -92,6 +96,8 @@ categoryForRubyName = \case
   "string" -> StringLiteral
   "subshell" -> Subshell
   "symbol" -> SymbolLiteral
+  "unless_modifier" -> Unless
+  "unless_statement" -> Unless
   "until_modifier" -> Until
   "until_statement" -> Until
   "while_modifier" -> While

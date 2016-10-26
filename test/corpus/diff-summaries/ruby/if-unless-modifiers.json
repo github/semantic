@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-conditional_assignment-insert-test",
+    "testCaseDescription": "ruby-if-unless-modifiers-insert-test",
     "expectedResult": {
         "changes": {
-            "conditional_assignment.rb": [
+            "if-unless-modifiers.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,28 +12,28 @@
                             ],
                             "end": [
                                 1,
-                                8
+                                17
                             ]
                         }
                     },
-                    "summary": "Added the 'x' conditional assignment"
+                    "summary": "Added the 'foo' unless statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "conditional_assignment.rb"
+        "if-unless-modifiers.rb"
     ],
-    "sha1": "40318b11f4ff5565e2ef7bc7cced2c8333a15291",
+    "sha1": "9a49c9fc34c676361cb4fc39e45fb224d43355a3",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ec1f97b76f2efcd3d6d9a7eed0ac1d185f811631"
+    "sha2": "8d64cd5d6612ac02da2163702fe6b605ed10133f"
 }
 ,{
-    "testCaseDescription": "ruby-conditional_assignment-replacement-insert-test",
+    "testCaseDescription": "ruby-if-unless-modifiers-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "conditional_assignment.rb": [
+            "if-unless-modifiers.rb": [
                 {
                     "span": {
                         "insert": {
@@ -43,11 +43,11 @@
                             ],
                             "end": [
                                 1,
-                                8
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the 'x' conditional assignment"
+                    "summary": "Added the 'foo' if statement"
                 },
                 {
                     "span": {
@@ -58,114 +58,43 @@
                             ],
                             "end": [
                                 2,
-                                8
+                                17
                             ]
                         }
                     },
-                    "summary": "Added the 'x' conditional assignment"
+                    "summary": "Added the 'foo' unless statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "conditional_assignment.rb"
+        "if-unless-modifiers.rb"
     ],
-    "sha1": "ec1f97b76f2efcd3d6d9a7eed0ac1d185f811631",
+    "sha1": "8d64cd5d6612ac02da2163702fe6b605ed10133f",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a7c4b468de39aae898799af44b3bbe99eaa5ff2e"
+    "sha2": "68b3e5ee06dc8c1a4bb59ed310a756c6ce72b528"
 }
 ,{
-    "testCaseDescription": "ruby-conditional_assignment-delete-insert-test",
+    "testCaseDescription": "ruby-if-unless-modifiers-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "conditional_assignment.rb": [
+            "if-unless-modifiers.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    7
-                                ],
-                                "end": [
-                                    1,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    7
-                                ],
-                                "end": [
-                                    1,
-                                    8
-                                ]
-                            }
-                        ]
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
                     },
-                    "summary": "Replaced '7' with '5'"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "conditional_assignment.rb"
-    ],
-    "sha1": "a7c4b468de39aae898799af44b3bbe99eaa5ff2e",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "07a9087ac33de62343fc3ac303bb14c35259972b"
-}
-,{
-    "testCaseDescription": "ruby-conditional_assignment-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "conditional_assignment.rb": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    7
-                                ],
-                                "end": [
-                                    1,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    7
-                                ],
-                                "end": [
-                                    1,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '5' with '7'"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "conditional_assignment.rb"
-    ],
-    "sha1": "07a9087ac33de62343fc3ac303bb14c35259972b",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "055c724f340298c498d8f8e01bbc260a8394b321"
-}
-,{
-    "testCaseDescription": "ruby-conditional_assignment-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "conditional_assignment.rb": [
+                    "summary": "Added the 'foo' unless statement"
+                },
                 {
                     "span": {
                         "delete": {
@@ -175,11 +104,88 @@
                             ],
                             "end": [
                                 1,
-                                8
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' conditional assignment"
+                    "summary": "Deleted the 'foo' if statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-unless-modifiers.rb"
+    ],
+    "sha1": "68b3e5ee06dc8c1a4bb59ed310a756c6ce72b528",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "bd84093f47b1396dc82ef8bc5c8e4530d08a0cc5"
+}
+,{
+    "testCaseDescription": "ruby-if-unless-modifiers-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if-unless-modifiers.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' if statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                17
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' unless statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "if-unless-modifiers.rb"
+    ],
+    "sha1": "bd84093f47b1396dc82ef8bc5c8e4530d08a0cc5",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "ec8d95aeb79f83bd4c14b388b4ef4d40e44a3067"
+}
+,{
+    "testCaseDescription": "ruby-if-unless-modifiers-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "if-unless-modifiers.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' if statement"
                 },
                 {
                     "span": {
@@ -190,11 +196,11 @@
                             ],
                             "end": [
                                 2,
-                                8
+                                17
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' conditional assignment"
+                    "summary": "Deleted the 'foo' unless statement"
                 },
                 {
                     "span": {
@@ -205,28 +211,28 @@
                             ],
                             "end": [
                                 2,
-                                8
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the 'x' conditional assignment"
+                    "summary": "Added the 'foo' if statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "conditional_assignment.rb"
+        "if-unless-modifiers.rb"
     ],
-    "sha1": "055c724f340298c498d8f8e01bbc260a8394b321",
+    "sha1": "ec8d95aeb79f83bd4c14b388b4ef4d40e44a3067",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "93c7399934cd0808ada61687e75cd7d4598ff37a"
+    "sha2": "2adb8e89eca20aeffe4f61467e55f666dc7b32fb"
 }
 ,{
-    "testCaseDescription": "ruby-conditional_assignment-delete-test",
+    "testCaseDescription": "ruby-if-unless-modifiers-delete-test",
     "expectedResult": {
         "changes": {
-            "conditional_assignment.rb": [
+            "if-unless-modifiers.rb": [
                 {
                     "span": {
                         "delete": {
@@ -236,28 +242,28 @@
                             ],
                             "end": [
                                 1,
-                                8
+                                17
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' conditional assignment"
+                    "summary": "Deleted the 'foo' unless statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "conditional_assignment.rb"
+        "if-unless-modifiers.rb"
     ],
-    "sha1": "93c7399934cd0808ada61687e75cd7d4598ff37a",
+    "sha1": "2adb8e89eca20aeffe4f61467e55f666dc7b32fb",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "40a22fcba2a0226c055309dd76332b7954f95ec7"
+    "sha2": "fca33e9bfadbde4f8ec5c8893470f8326de786ec"
 }
 ,{
-    "testCaseDescription": "ruby-conditional_assignment-delete-rest-test",
+    "testCaseDescription": "ruby-if-unless-modifiers-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "conditional_assignment.rb": [
+            "if-unless-modifiers.rb": [
                 {
                     "span": {
                         "delete": {
@@ -267,20 +273,20 @@
                             ],
                             "end": [
                                 1,
-                                8
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' conditional assignment"
+                    "summary": "Deleted the 'foo' if statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "conditional_assignment.rb"
+        "if-unless-modifiers.rb"
     ],
-    "sha1": "40a22fcba2a0226c055309dd76332b7954f95ec7",
+    "sha1": "fca33e9bfadbde4f8ec5c8893470f8326de786ec",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ace7c817de39ba03253a461a3b5301f47534cd8c"
+    "sha2": "4a1c969590d1e2fee76c18486858a86601857b3e"
 }]

@@ -227,6 +227,7 @@ toTermName source term = case unwrap term of
   S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
   S.ConditionalAssignment id _ -> toTermName' id
   S.Until expr _ -> toTermName' expr
+  S.Unless expr _ -> termNameFromSource expr
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -352,6 +353,7 @@ instance HasCategory Category where
     C.ConditionalAssignment -> "conditional assignment"
     C.Yield -> "yield statement"
     C.Until -> "until statement"
+    C.Unless -> "unless statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

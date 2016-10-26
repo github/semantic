@@ -80,6 +80,8 @@ data Syntax a f
   | ConditionalAssignment { conditionalAssignmentId :: f, value :: f }
   | Yield (Maybe f)
   | Until { untilExpr :: f, untilBody :: Maybe f }
+  -- | An unless statement with an expression and maybe more expression clauses.
+  | Unless f [f]
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 

@@ -106,6 +106,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.ConditionalAssignment id value -> [ "conditionalIdentifier" .= id ] <> [ "value" .= value ]
   S.Yield expr -> [ "yieldExpression" .= expr ]
   S.Until expr body -> [ "untilExpr" .= expr ]  <> [ "untilBody" .= body ]
+  S.Unless expr clauses -> [ "unless" .= expr ] <> childrenFields clauses
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: (KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (SyntaxTerm leaf fields) -> [kv]

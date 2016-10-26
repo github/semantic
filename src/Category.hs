@@ -124,6 +124,8 @@ data Category
   | Yield
   -- | An until expression.
   | Until
+  -- | A unless/else expression.
+  | Unless
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -183,6 +185,7 @@ instance Arbitrary Category where
     , pure ConditionalAssignment
     , pure Yield
     , pure Until
+    , pure Unless
     , Other <$> arbitrary
     ]
 
