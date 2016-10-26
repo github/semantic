@@ -35,6 +35,7 @@ termConstructor source sourceSpan name range children
       (x:xs) -> S.FunctionCall (cofree x) (cofree <$> xs)
       _ -> S.Indexed children
     ("hash", _) -> S.Object $ foldMap toTuple children
+    ("if_statement", expr : rest ) -> S.If expr rest
     ("math_assignment", [ identifier, value ]) -> S.MathAssignment identifier value
     ("member_access", [ base, property ]) -> S.MemberAccess base property
     ("method_declaration", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
@@ -77,6 +78,7 @@ categoryForRubyName = \case
   "function_call" -> FunctionCall
   "hash" -> Object
   "identifier" -> Identifier
+  "if_statement" -> If
   "integer" -> IntegerLiteral
   "interpolation" -> Interpolation
   "math_assignment" -> MathAssignment

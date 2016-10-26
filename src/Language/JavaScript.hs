@@ -51,8 +51,7 @@ termConstructor source sourceSpan name range children
     ("object", _) -> S.Object $ foldMap toTuple children
     ("pair", _) -> S.Fixed children
     ("comment", _) -> S.Comment . toText $ slice range source
-    ("if_statement", [ expr, thenClause, elseClause ]) -> toElseIf expr thenClause elseClause
-    ("if_statement", [ expr, thenClause ]) -> S.If expr thenClause []
+    ("if_statement", expr : rest ) -> S.If expr rest
     ("while_statement", [ expr, body ]) -> S.While expr (Just body)
     ("do_statement", [ expr, body ]) -> S.DoWhile expr body
     ("throw_statement", [ expr ]) -> S.Throw expr

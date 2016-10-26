@@ -207,7 +207,7 @@ toTermName source term = case unwrap term of
   S.Return expr -> maybe "empty" toTermName' expr
   S.Yield expr -> maybe "empty" toTermName' expr
   S.Error _ -> termNameFromSource term
-  S.If expr _ _ -> termNameFromSource expr
+  S.If expr _ -> termNameFromSource expr
   S.For clauses _ -> termNameFromChildren term clauses
   S.While expr _ -> toTermName' expr
   S.DoWhile _ expr -> toTermName' expr

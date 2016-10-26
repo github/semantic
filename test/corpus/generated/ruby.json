@@ -178,6 +178,13 @@
         "insert": "until foo do\nend\nfoo until done",
         "replacement": "until foo\n  bar\nend",
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/until.json"
+      },
+      {
+        "syntax": "if",
+        "repoFilePath": "if.rb",
+        "insert": "if foo\n  bar\nelsif quux\n  baz\nelse\n  bat\nend",
+        "replacement": "if x\nend\nif y then\nend",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/if.json"
       }
     ]
   }

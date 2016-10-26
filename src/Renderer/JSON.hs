@@ -76,7 +76,7 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Args c -> childrenFields c
   S.Assignment assignmentId property -> [ "assignmentIdentifier" .= assignmentId ] <> [ "property" .= property ]
   S.MemberAccess memberId value -> [ "memberIdentifier" .= memberId ] <> [ "value" .= value ]
-  S.If expr clause maybeClause -> [ "if" .= expr ] <> [ "ifBody" .=  clause ] <> [ "elseBody" .= maybeClause ]
+  S.If expr clauses -> [ "if" .= expr ] <> childrenFields clauses
   S.For exprs body -> [ "forExpressions" .= exprs ] <> [ "forBody" .= body ]
   S.While expr body -> [ "whileExpr" .= expr ]  <> [ "whileBody" .= body ]
   S.DoWhile expr body -> [ "doWhileExpr" .= expr ]  <> [ "doWhileBody" .= body ]

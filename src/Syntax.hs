@@ -70,8 +70,8 @@ data Syntax a f
   | Class f (Maybe f) [f]
   -- | A method definition with an identifier, params, and a list of expressions.
   | Method f [f] [f]
-  -- | An if statement with an expression, a clause, and maybe more expressions, clauses.
-  | If f f [f]
+  -- | An if statement with an expression and maybe more expression clauses.
+  | If f [f]
   -- | A module with an identifier, and a list of syntaxes.
   | Module { moduleId:: f, moduleBody :: [f] }
   | Import f [f]
