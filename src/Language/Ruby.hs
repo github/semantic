@@ -94,6 +94,7 @@ categoryForRubyName = \case
   "nil" -> Identifier
   "or" -> BooleanOperator
   "program" -> Program
+  "regex" -> Regex
   "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.
   "return_statement" -> Return
   "shift" -> BitwiseOperator -- bitwise shift, e.g <<, >>.

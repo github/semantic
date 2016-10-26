@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-conditional_assignment-insert-test",
+    "testCaseDescription": "ruby-regex-insert-test",
     "expectedResult": {
         "changes": {
-            "conditional_assignment.rb": [
+            "regex.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,28 +12,28 @@
                             ],
                             "end": [
                                 1,
-                                8
+                                19
                             ]
                         }
                     },
-                    "summary": "Added the 'x' conditional assignment"
+                    "summary": "Added the '/^(foo|bar[^_])$/i' regex"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "conditional_assignment.rb"
+        "regex.rb"
     ],
-    "sha1": "ac287bb4a8a54a01a3a60cbacddac256d1f26343",
+    "sha1": "e2e23ab752f4d965ab0297728b4441bca85f6dc4",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "317dbe650c17804cd0860e5c61453881b986dbdb"
+    "sha2": "f7e62d72afa09e1d6b0fcbe125aab6fa0bfb1dd4"
 }
 ,{
-    "testCaseDescription": "ruby-conditional_assignment-replacement-insert-test",
+    "testCaseDescription": "ruby-regex-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "conditional_assignment.rb": [
+            "regex.rb": [
                 {
                     "span": {
                         "insert": {
@@ -43,11 +43,11 @@
                             ],
                             "end": [
                                 1,
-                                8
+                                6
                             ]
                         }
                     },
-                    "summary": "Added the 'x' conditional assignment"
+                    "summary": "Added the '%r/a/' regex"
                 },
                 {
                     "span": {
@@ -58,128 +58,69 @@
                             ],
                             "end": [
                                 2,
-                                8
+                                10
                             ]
                         }
                     },
-                    "summary": "Added the 'x' conditional assignment"
+                    "summary": "Added the '%r<a<b>c>' regex"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Added the '/^(foo|bar[^_])$/i' regex"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "conditional_assignment.rb"
+        "regex.rb"
     ],
-    "sha1": "317dbe650c17804cd0860e5c61453881b986dbdb",
+    "sha1": "f7e62d72afa09e1d6b0fcbe125aab6fa0bfb1dd4",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5ab9ad9d3541f8b25f4480b43933cfab01d2d457"
+    "sha2": "78d53bad84d913818d83a696442eceb3013c756e"
 }
 ,{
-    "testCaseDescription": "ruby-conditional_assignment-delete-insert-test",
+    "testCaseDescription": "ruby-regex-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "conditional_assignment.rb": [
+            "regex.rb": [
                 {
                     "span": {
                         "replace": [
                             {
                                 "start": [
                                     1,
-                                    7
+                                    1
                                 ],
                                 "end": [
                                     1,
-                                    8
+                                    6
                                 ]
                             },
                             {
                                 "start": [
                                     1,
-                                    7
+                                    1
                                 ],
                                 "end": [
                                     1,
-                                    8
+                                    19
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced '7' with '5'"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "conditional_assignment.rb"
-    ],
-    "sha1": "5ab9ad9d3541f8b25f4480b43933cfab01d2d457",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1788082891980302e1e006445aa633fadbc033c0"
-}
-,{
-    "testCaseDescription": "ruby-conditional_assignment-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "conditional_assignment.rb": [
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    7
-                                ],
-                                "end": [
-                                    1,
-                                    8
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    7
-                                ],
-                                "end": [
-                                    1,
-                                    8
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '5' with '7'"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "conditional_assignment.rb"
-    ],
-    "sha1": "1788082891980302e1e006445aa633fadbc033c0",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1bf19b3fc3972249361ca860b24ef1a7c76a12c9"
-}
-,{
-    "testCaseDescription": "ruby-conditional_assignment-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "conditional_assignment.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                8
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'x' conditional assignment"
+                    "summary": "Replaced the '%r/a/' regex with the '/^(foo|bar[^_])$/i' regex"
                 },
                 {
                     "span": {
@@ -190,11 +131,54 @@
                             ],
                             "end": [
                                 2,
-                                8
+                                10
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' conditional assignment"
+                    "summary": "Deleted the '%r<a<b>c>' regex"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.rb"
+    ],
+    "sha1": "78d53bad84d913818d83a696442eceb3013c756e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "cd70c865bebc09dc91967663c29472e41e18196f"
+}
+,{
+    "testCaseDescription": "ruby-regex-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "regex.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    19
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    6
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the '/^(foo|bar[^_])$/i' regex with the '%r/a/' regex"
                 },
                 {
                     "span": {
@@ -205,28 +189,59 @@
                             ],
                             "end": [
                                 2,
-                                8
+                                10
                             ]
                         }
                     },
-                    "summary": "Added the 'x' conditional assignment"
+                    "summary": "Added the '%r<a<b>c>' regex"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "conditional_assignment.rb"
+        "regex.rb"
     ],
-    "sha1": "1bf19b3fc3972249361ca860b24ef1a7c76a12c9",
+    "sha1": "cd70c865bebc09dc91967663c29472e41e18196f",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "2c7fbbe457569e13775ee81c208cfbc5e673a42d"
+    "sha2": "d121aafd42795a4e1451a0917ea2cd56bdbe4362"
 }
 ,{
-    "testCaseDescription": "ruby-conditional_assignment-delete-test",
+    "testCaseDescription": "ruby-regex-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "conditional_assignment.rb": [
+            "regex.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                19
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '/^(foo|bar[^_])$/i' regex"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "regex.rb"
+    ],
+    "sha1": "d121aafd42795a4e1451a0917ea2cd56bdbe4362",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "92a2eec0b880d522b035b40b2d979d197954a48e"
+}
+,{
+    "testCaseDescription": "ruby-regex-delete-test",
+    "expectedResult": {
+        "changes": {
+            "regex.rb": [
                 {
                     "span": {
                         "delete": {
@@ -236,28 +251,28 @@
                             ],
                             "end": [
                                 1,
-                                8
+                                19
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' conditional assignment"
+                    "summary": "Deleted the '/^(foo|bar[^_])$/i' regex"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "conditional_assignment.rb"
+        "regex.rb"
     ],
-    "sha1": "2c7fbbe457569e13775ee81c208cfbc5e673a42d",
+    "sha1": "92a2eec0b880d522b035b40b2d979d197954a48e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4c8d25e8c6bd39bfe64ab26a6e30c607782a8b74"
+    "sha2": "7ac64135478fe922837504033096797e67360142"
 }
 ,{
-    "testCaseDescription": "ruby-conditional_assignment-delete-rest-test",
+    "testCaseDescription": "ruby-regex-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "conditional_assignment.rb": [
+            "regex.rb": [
                 {
                     "span": {
                         "delete": {
@@ -267,20 +282,35 @@
                             ],
                             "end": [
                                 1,
-                                8
+                                6
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x' conditional assignment"
+                    "summary": "Deleted the '%r/a/' regex"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the '%r<a<b>c>' regex"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "conditional_assignment.rb"
+        "regex.rb"
     ],
-    "sha1": "4c8d25e8c6bd39bfe64ab26a6e30c607782a8b74",
+    "sha1": "7ac64135478fe922837504033096797e67360142",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4f61d6f862ede006d2955d171de03e39ee1cb244"
+    "sha2": "5318035d30d0307a6c3f4a7caf195ddbe58afb1f"
 }]

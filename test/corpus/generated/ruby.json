@@ -206,6 +206,13 @@
         "insert": "foo and bar",
         "replacement": "foo or bar\na or b and c",
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/and-or.json"
+      },
+      {
+        "syntax": "regex",
+        "repoFilePath": "regex.rb",
+        "insert": "/^(foo|bar[^_])$/i",
+        "replacement": "%r/a/\n%r<a<b>c>",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/regex.json"
       }
     ]
   }
