@@ -199,6 +199,13 @@
         "insert": "print unless foo",
         "replacement": "print if foo",
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/if-unless-modifiers.json"
+      },
+      {
+        "syntax": "and-or",
+        "repoFilePath": "and-or.rb",
+        "insert": "foo and bar",
+        "replacement": "foo or bar\na or b and c",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/and-or.json"
       }
     ]
   }

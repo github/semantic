@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-yield-insert-test",
+    "testCaseDescription": "ruby-and-or-insert-test",
     "expectedResult": {
         "changes": {
-            "yield.rb": [
+            "and-or.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,28 +12,28 @@
                             ],
                             "end": [
                                 1,
-                                10
+                                12
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' yield statement"
+                    "summary": "Added the 'foo and bar' boolean operator"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "yield.rb"
+        "and-or.rb"
     ],
-    "sha1": "e9ac076c248cc983eeec934b539ab5f360a1f659",
+    "sha1": "fc4744555871b82d1296339fcb5ead8cf4d8fbf1",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c6faba62cd0ad9e82e0ffde4d7bb86de0ade060a"
+    "sha2": "513818970ec44a3169a61ba9f01c0da6a74ee003"
 }
 ,{
-    "testCaseDescription": "ruby-yield-replacement-insert-test",
+    "testCaseDescription": "ruby-and-or-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "yield.rb": [
+            "and-or.rb": [
                 {
                     "span": {
                         "insert": {
@@ -43,11 +43,11 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'empty' yield statement"
+                    "summary": "Added the 'foo or bar' boolean operator"
                 },
                 {
                     "span": {
@@ -58,90 +58,105 @@
                             ],
                             "end": [
                                 2,
-                                10
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' yield statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "yield.rb"
-    ],
-    "sha1": "c6faba62cd0ad9e82e0ffde4d7bb86de0ade060a",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "06a14bf5c73b7774956857e05e561c3a128de287"
-}
-,{
-    "testCaseDescription": "ruby-yield-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "yield.rb": [
+                    "summary": "Added the 'a or b and c' boolean operator"
+                },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                1,
-                                7
+                                3,
+                                1
                             ],
                             "end": [
-                                1,
-                                10
+                                3,
+                                12
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' identifier"
+                    "summary": "Added the 'foo and bar' boolean operator"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "yield.rb"
+        "and-or.rb"
     ],
-    "sha1": "06a14bf5c73b7774956857e05e561c3a128de287",
+    "sha1": "513818970ec44a3169a61ba9f01c0da6a74ee003",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8370d190178c09c11ed3a847e3c5516fe34772f6"
+    "sha2": "48051076721e9cb8134a5af90858c67d36444d32"
 }
 ,{
-    "testCaseDescription": "ruby-yield-replacement-test",
+    "testCaseDescription": "ruby-and-or-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "yield.rb": [
+            "and-or.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
-                                1,
-                                7
+                                2,
+                                1
                             ],
                             "end": [
-                                1,
-                                10
+                                2,
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' identifier"
+                    "summary": "Deleted the 'a or b and c' boolean operator"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "yield.rb"
+        "and-or.rb"
     ],
-    "sha1": "8370d190178c09c11ed3a847e3c5516fe34772f6",
+    "sha1": "48051076721e9cb8134a5af90858c67d36444d32",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "42e829027af2a7dae1af6c4db990938c04d88e41"
+    "sha2": "64a1ba9ff7197d53d2129c26a82be147b86016f7"
 }
 ,{
-    "testCaseDescription": "ruby-yield-delete-replacement-test",
+    "testCaseDescription": "ruby-and-or-replacement-test",
     "expectedResult": {
         "changes": {
-            "yield.rb": [
+            "and-or.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'a or b and c' boolean operator"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "and-or.rb"
+    ],
+    "sha1": "64a1ba9ff7197d53d2129c26a82be147b86016f7",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "2013c2c7b9c4b9ad0e19b5bd0939b67ce1677d65"
+}
+,{
+    "testCaseDescription": "ruby-and-or-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "and-or.rb": [
                 {
                     "span": {
                         "delete": {
@@ -151,11 +166,11 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'empty' yield statement"
+                    "summary": "Deleted the 'foo or bar' boolean operator"
                 },
                 {
                     "span": {
@@ -166,43 +181,43 @@
                             ],
                             "end": [
                                 2,
-                                10
+                                13
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' yield statement"
+                    "summary": "Deleted the 'a or b and c' boolean operator"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                3,
                                 1
                             ],
                             "end": [
-                                2,
-                                6
+                                3,
+                                13
                             ]
                         }
                     },
-                    "summary": "Added the 'empty' yield statement"
+                    "summary": "Added the 'a or b and c' boolean operator"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "yield.rb"
+        "and-or.rb"
     ],
-    "sha1": "42e829027af2a7dae1af6c4db990938c04d88e41",
+    "sha1": "2013c2c7b9c4b9ad0e19b5bd0939b67ce1677d65",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "db8dabe7bbecfcb6d972fd509aa36c530d6539bd"
+    "sha2": "29d4751dee553262a36f92d0a76915367ff9c3d0"
 }
 ,{
-    "testCaseDescription": "ruby-yield-delete-test",
+    "testCaseDescription": "ruby-and-or-delete-test",
     "expectedResult": {
         "changes": {
-            "yield.rb": [
+            "and-or.rb": [
                 {
                     "span": {
                         "delete": {
@@ -212,28 +227,28 @@
                             ],
                             "end": [
                                 1,
-                                10
+                                12
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' yield statement"
+                    "summary": "Deleted the 'foo and bar' boolean operator"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "yield.rb"
+        "and-or.rb"
     ],
-    "sha1": "db8dabe7bbecfcb6d972fd509aa36c530d6539bd",
+    "sha1": "29d4751dee553262a36f92d0a76915367ff9c3d0",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f67856336b0efb9aab61d032d7b6cfdd5e20c83c"
+    "sha2": "6f3429c926707bf8f1bbafbf7ba8062bc84bfb6c"
 }
 ,{
-    "testCaseDescription": "ruby-yield-delete-rest-test",
+    "testCaseDescription": "ruby-and-or-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "yield.rb": [
+            "and-or.rb": [
                 {
                     "span": {
                         "delete": {
@@ -243,20 +258,35 @@
                             ],
                             "end": [
                                 1,
-                                6
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'empty' yield statement"
+                    "summary": "Deleted the 'foo or bar' boolean operator"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                13
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'a or b and c' boolean operator"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "yield.rb"
+        "and-or.rb"
     ],
-    "sha1": "f67856336b0efb9aab61d032d7b6cfdd5e20c83c",
+    "sha1": "6f3429c926707bf8f1bbafbf7ba8062bc84bfb6c",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ccdccfe09a6338d1264ed682c40da270819ce000"
+    "sha2": "63ef22cf3a206dad8497392076a0088be7b36ab9"
 }]

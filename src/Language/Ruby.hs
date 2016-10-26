@@ -9,6 +9,9 @@ import Language
 import qualified Syntax as S
 import Term
 
+operators :: [Text]
+operators = ["and", "boolean_and", "or", "boolean_or", "bitwise_or", "bitwise_and", "shift", "relational", "comparison"]
+
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
@@ -51,8 +54,7 @@ termConstructor source sourceSpan name range children
     ("while_statement", [ expr, body ]) -> S.While expr (Just body)
     ("while_statement", [ expr ]) -> S.While expr Nothing
     ("yield", _) -> S.Yield (listToMaybe children)
-    _ | name `elem` ["boolean_and", "boolean_or", "bitwise_or", "bitwise_and", "shift", "relational", "comparison"]
-      -> S.Operator children
+    _ | name `elem` operators -> S.Operator children
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where
@@ -62,6 +64,7 @@ termConstructor source sourceSpan name range children
 
 categoryForRubyName :: Text -> Category
 categoryForRubyName = \case
+  "and" -> BooleanOperator
   "argument_list" -> Args
   "assignment" -> Assignment
   "bitwise_and" -> BitwiseOperator -- bitwise and, e.g &.
@@ -89,6 +92,7 @@ categoryForRubyName = \case
   "member_access" -> MemberAccess
   "method_declaration" -> Method
   "nil" -> Identifier
+  "or" -> BooleanOperator
   "program" -> Program
   "relational" -> RelationalOperator -- relational operator, e.g. ==, !=, ===, <=>, =~, !~.
   "return_statement" -> Return
