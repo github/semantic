@@ -1,4 +1,4 @@
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE LambdaCase, GADTs, DataKinds #-}
 module Main where
 
 import Arguments
