@@ -21,10 +21,20 @@ import Options.Applicative hiding ((<>))
 import qualified Options.Applicative as O
 import qualified Renderer as R
 
-data GeneratorArgs = GeneratorArgs { generateResults :: Bool } deriving (Show)
+data GenerateFormat =
+    GenerateSummaries
+  | GenerateJSON
+  | GenerateAll
+  | GenerateNone
+  deriving (Show)
+
+data GeneratorArgs = GeneratorArgs { generateFormat :: GenerateFormat } deriving (Show)
 
 generatorArgs :: Parser GeneratorArgs
-generatorArgs = GeneratorArgs <$> switch ( long "generate-results" O.<> short 'g' O.<> help "Use generated expected results for new JSON test cases (rather than defaulting to an empty \"\")" )
+generatorArgs = GeneratorArgs
+  <$> (flag GenerateNone GenerateSummaries (long "generate-summaries" O.<> short 's' O.<> help "Use generated summary results for new JSON test cases (rather than defaulting to an empty \"\")")
+  <|> flag' GenerateJSON (long "generate-json" O.<> short 'j' O.<> help "Use generated JSON output for new JSON test cases (rather than defaulting to an empty \"\")")
+  <|> flag' GenerateAll (long "generate-all" O.<> short 'a' O.<> help "Use generated summary results and JSON output for new JSON test cases respectively"))
 
 options :: ParserInfo GeneratorArgs
 options = info (helper <*> generatorArgs) (fullDesc O.<> progDesc "Auto-generate JSON test cases" O.<> header "JSON Test Case Generator")
