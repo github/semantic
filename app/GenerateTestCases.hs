@@ -199,9 +199,9 @@ generateJSON' repoPath beforeSha afterSha repoFilePath = send $ GenerateJSON' (a
 run :: Eff '[GenerateEff] ExpectedResult -> IO ExpectedResult
 run (Val x) = pure x
 run (E u queue) = case decompose u of
-  (Right (GenerateSummaries' args)) -> generateSummaries args >>= \s -> Main.run (apply queue s)
-  (Right (GenerateJSON' args)) -> generateJSON args >>= \s -> Main.run (apply queue s)
-  (Left _) -> error "this isn't possible"
+  (Right (GenerateSummaries' args)) -> generateSummaries args >> Main.run (apply queue EmptyResult)
+  (Right (GenerateJSON' args)) -> generateJSON args >> Main.run (apply queue EmptyResult)
+  (Left _) -> pure EmptyResult
 
 runExpectedResultGenerator :: FilePath -> String -> String -> FilePath -> GeneratorArgs -> IO ExpectedResult
 runExpectedResultGenerator repoPath beforeSha afterSha repoFilePath GeneratorArgs{..} =
