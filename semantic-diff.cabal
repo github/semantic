@@ -123,6 +123,7 @@ executable generate-test-cases
                      , process
                      , semantic-diff
                      , text >= 1.2.1.3
+                     , effects
   default-language:    Haskell2010
   default-extensions:  DeriveFunctor, DeriveFoldable, DeriveTraversable, DeriveGeneric, FlexibleContexts, FlexibleInstances, OverloadedStrings, NoImplicitPrelude, RecordWildCards, LambdaCase
 
