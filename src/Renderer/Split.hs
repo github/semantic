@@ -87,6 +87,7 @@ styleName category = "category-" <> case category of
   C.Subshell -> "subshell"
   C.ConditionalAssignment -> "conditional_assignment"
   C.Yield -> "yield_statement"
+  C.Until -> "until"
 
 -- | Pick the class name for a split patch.
 splitPatchToClassName :: SplitPatch a -> AttributeValue

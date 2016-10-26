@@ -59,7 +59,7 @@ data Syntax a f
   | Error [f]
   | For [f] f
   | DoWhile { doWhileBody :: f, doWhileExpr :: f }
-  | While { whileExpr :: f, whileBody :: f }
+  | While { whileExpr :: f, whileBody :: Maybe f }
   | Return (Maybe f)
   | Throw f
   | Constructor f
@@ -79,6 +79,7 @@ data Syntax a f
   -- | A conditional assignment represents expressions whose operator classifies as conditional (e.g. ||= or &&=).
   | ConditionalAssignment { conditionalAssignmentId :: f, value :: f }
   | Yield (Maybe f)
+  | Until { untilExpr :: f, untilBody :: Maybe f }
   deriving (Eq, Foldable, Functor, Generic, Generic1, Mergeable, Ord, Show, Traversable)
 
 

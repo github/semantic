@@ -53,7 +53,7 @@ termConstructor source sourceSpan name range children
     ("comment", _) -> S.Comment . toText $ slice range source
     ("if_statement", [ expr, thenClause, elseClause ]) -> toElseIf expr thenClause elseClause
     ("if_statement", [ expr, thenClause ]) -> S.If expr thenClause []
-    ("while_statement", [ expr, body ]) -> S.While expr body
+    ("while_statement", [ expr, body ]) -> S.While expr (Just body)
     ("do_statement", [ expr, body ]) -> S.DoWhile expr body
     ("throw_statement", [ expr ]) -> S.Throw expr
     ("new_expression", [ expr ]) -> S.Constructor expr

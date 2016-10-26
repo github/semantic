@@ -25,9 +25,9 @@
     "filePaths": [
         "yield.rb"
     ],
-    "sha1": "39ae806b1ae634068395b35085944e405461348f",
+    "sha1": "7de63c31cbe1320f2a2ed76af1c45c2f1b9ecf7e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "890cb263430ac399399afd829334ed051d690a27"
+    "sha2": "1a0f45a94914df274d477c17bbef6cc00a441fe6"
 }
 ,{
     "testCaseDescription": "ruby-yield-replacement-insert-test",
@@ -71,9 +71,9 @@
     "filePaths": [
         "yield.rb"
     ],
-    "sha1": "890cb263430ac399399afd829334ed051d690a27",
+    "sha1": "1a0f45a94914df274d477c17bbef6cc00a441fe6",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3a0e976f298467135bc50d49cf557552008fc97f"
+    "sha2": "26fe5e31cbe4c6b42187c241779fcc6c3868d0fc"
 }
 ,{
     "testCaseDescription": "ruby-yield-delete-insert-test",
@@ -102,9 +102,9 @@
     "filePaths": [
         "yield.rb"
     ],
-    "sha1": "3a0e976f298467135bc50d49cf557552008fc97f",
+    "sha1": "26fe5e31cbe4c6b42187c241779fcc6c3868d0fc",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "075f4112d52bbfaa890d4eb965d490712fa20aac"
+    "sha2": "86362937320631bc2b2b593535826fbcc28af759"
 }
 ,{
     "testCaseDescription": "ruby-yield-replacement-test",
@@ -133,9 +133,9 @@
     "filePaths": [
         "yield.rb"
     ],
-    "sha1": "075f4112d52bbfaa890d4eb965d490712fa20aac",
+    "sha1": "86362937320631bc2b2b593535826fbcc28af759",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a7e34fab4b84241bfd724a05fccfc6d5f62274c5"
+    "sha2": "395c85f60d60158787c1bb40d5fe7cfa1a12de4e"
 }
 ,{
     "testCaseDescription": "ruby-yield-delete-replacement-test",
@@ -194,9 +194,9 @@
     "filePaths": [
         "yield.rb"
     ],
-    "sha1": "a7e34fab4b84241bfd724a05fccfc6d5f62274c5",
+    "sha1": "395c85f60d60158787c1bb40d5fe7cfa1a12de4e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "cd77d25b8e2161e68ddab6a4710f60a58bd86d23"
+    "sha2": "854b99d4feb128b7181135e60c3dbbc182df21ad"
 }
 ,{
     "testCaseDescription": "ruby-yield-delete-test",
@@ -225,9 +225,9 @@
     "filePaths": [
         "yield.rb"
     ],
-    "sha1": "cd77d25b8e2161e68ddab6a4710f60a58bd86d23",
+    "sha1": "854b99d4feb128b7181135e60c3dbbc182df21ad",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d5871bc2a7e304070a570e98a6e3c7ff02c587f3"
+    "sha2": "d9b6f6c5a47f7f8f11cc41dcb831e168963ff5b3"
 }
 ,{
     "testCaseDescription": "ruby-yield-delete-rest-test",
@@ -256,7 +256,7 @@
     "filePaths": [
         "yield.rb"
     ],
-    "sha1": "d5871bc2a7e304070a570e98a6e3c7ff02c587f3",
+    "sha1": "d9b6f6c5a47f7f8f11cc41dcb831e168963ff5b3",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "dbe070995f875acff55ccfcf16c77c9f733468a0"
+    "sha2": "8c66e54252fffce9f1d2be5ec107d23b27c3c3f2"
 }]

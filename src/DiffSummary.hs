@@ -201,7 +201,6 @@ toTermName source term = case unwrap term of
   S.Switch expr _ -> toTermName' expr
   S.Ternary expr _ -> toTermName' expr
   S.MathAssignment id _ -> toTermName' id
-  S.ConditionalAssignment id _ -> toTermName' id
   S.Operator _ -> termNameFromSource term
   S.Object kvs -> "{ " <> intercalate ", " (toTermName' <$> kvs) <> " }"
   S.Pair a _ -> toTermName' a <> ": …"
@@ -226,6 +225,8 @@ toTermName source term = case unwrap term of
   S.Export Nothing expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }"
   S.Export (Just identifier) [] -> "{ " <> toTermName' identifier <> " }"
   S.Export (Just identifier) expr -> "{ " <> intercalate ", " (termNameFromSource <$> expr) <> " }" <> " from " <> toTermName' identifier
+  S.ConditionalAssignment id _ -> toTermName' id
+  S.Until expr _ -> toTermName' expr
   where toTermName' = toTermName source
         termNameFromChildren term children = termNameFromRange (unionRangesFrom (range term) (range <$> children))
         termNameFromSource term = termNameFromRange (range term)
@@ -350,6 +351,7 @@ instance HasCategory Category where
     C.Subshell -> "subshell command"
     C.ConditionalAssignment -> "conditional assignment"
     C.Yield -> "yield statement"
+    C.Until -> "until statement"
 
 instance HasField fields Category => HasCategory (SyntaxTerm leaf fields) where
   toCategoryName = toCategoryName . category . extract

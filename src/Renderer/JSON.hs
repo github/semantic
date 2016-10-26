@@ -85,14 +85,12 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.VarDecl decl -> [ "variableDeclaration" .= decl ]
   S.VarAssignment id value -> [ "varIdentifier" .= id ] <> [ "value" .= value ]
   S.MathAssignment id value -> [ "mathIdentifier" .= id ] <> [ "value" .= value ]
-  S.ConditionalAssignment id value -> [ "conditionalIdentifier" .= id ] <> [ "value" .= value ]
   S.Ternary expr cases -> [ "ternaryExpression" .= expr ] <> [ "cases" .= cases ]
   S.Operator syntaxes -> [ "operatorSyntaxes" .= syntaxes ]
   S.SubscriptAccess id property -> [ "subscriptId" .= id ] <> [ "property" .= property ]
   S.Object pairs -> childrenFields pairs
   S.Pair a b -> childrenFields [a, b]
   S.Return expr -> [ "returnExpression" .= expr ]
-  S.Yield expr -> [ "yieldExpression" .= expr ]
   S.Constructor expr -> [ "constructorExpression" .= expr ]
   S.Comment _ -> []
   S.Commented comments child -> childrenFields (comments <> maybeToList child)
@@ -105,6 +103,9 @@ termFields info syntax = "range" .= characterRange info : "category" .= category
   S.Module identifier definitions-> [ "moduleIdentifier" .= identifier ] <> [ "definitions" .= definitions ]
   S.Import identifier expr -> [ "importIdentifier" .= identifier ] <> [ "importStatements" .= expr ]
   S.Export identifier expr -> [ "exportIdentifier" .= identifier ] <> [ "exportStatements" .= expr ]
+  S.ConditionalAssignment id value -> [ "conditionalIdentifier" .= id ] <> [ "value" .= value ]
+  S.Yield expr -> [ "yieldExpression" .= expr ]
+  S.Until expr body -> [ "untilExpr" .= expr ]  <> [ "untilBody" .= body ]
   where childrenFields c = [ "children" .= c ]
 
 patchFields :: (KeyValue kv, HasField fields Category, HasField fields Range) => SplitPatch (SyntaxTerm leaf fields) -> [kv]

@@ -164,6 +164,20 @@
         "insert": "yield foo",
         "replacement": "yield",
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/yield.json"
+      },
+      {
+        "syntax": "while",
+        "repoFilePath": "while.rb",
+        "insert": "while foo do\nend\nfoo while run",
+        "replacement": "while foo\n  bar\nend",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/while.json"
+      },
+      {
+        "syntax": "until",
+        "repoFilePath": "until.rb",
+        "insert": "until foo do\nend\nfoo until done",
+        "replacement": "until foo\n  bar\nend",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/until.json"
       }
     ]
   }

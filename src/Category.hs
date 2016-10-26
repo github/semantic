@@ -122,6 +122,8 @@ data Category
   | ConditionalAssignment
   -- | A yield statement.
   | Yield
+  -- | An until expression.
+  | Until
   deriving (Eq, Generic, Ord, Show)
 
 -- Instances
@@ -180,6 +182,7 @@ instance Arbitrary Category where
     , pure Subshell
     , pure ConditionalAssignment
     , pure Yield
+    , pure Until
     , Other <$> arbitrary
     ]
 

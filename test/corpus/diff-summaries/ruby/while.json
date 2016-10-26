@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-bitwise-operator-insert-test",
+    "testCaseDescription": "ruby-while-insert-test",
     "expectedResult": {
         "changes": {
-            "bitwise-operator.rb": [
+            "while.rb": [
                 {
                     "span": {
                         "insert": {
@@ -11,27 +11,12 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                6
+                                2,
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'a | b' bitwise operator"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a >> b' bitwise operator"
+                    "summary": "Added the 'foo' while statement"
                 },
                 {
                     "span": {
@@ -42,28 +27,28 @@
                             ],
                             "end": [
                                 3,
-                                6
+                                14
                             ]
                         }
                     },
-                    "summary": "Added the 'a ^ b' bitwise operator"
+                    "summary": "Added the 'run' while statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "bitwise-operator.rb"
+        "while.rb"
     ],
-    "sha1": "a847285255523b2f12866a9edb22ad1f63293e54",
+    "sha1": "be1c1b085e88545406e186efe90d434bd23adf65",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5fdcd994ec65cbc656cf7cc9d40787208500e999"
+    "sha2": "3d304a766de2d77facdf678c747a425bcf8e374c"
 }
 ,{
-    "testCaseDescription": "ruby-bitwise-operator-replacement-insert-test",
+    "testCaseDescription": "ruby-while-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "bitwise-operator.rb": [
+            "while.rb": [
                 {
                     "span": {
                         "insert": {
@@ -72,42 +57,12 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a & b' bitwise operator"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a << b' bitwise operator"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
                                 3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                6
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'a | b' bitwise operator"
+                    "summary": "Added the 'foo' while statement"
                 },
                 {
                     "span": {
@@ -117,135 +72,226 @@
                                 1
                             ],
                             "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'foo' while statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'run' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while.rb"
+    ],
+    "sha1": "3d304a766de2d77facdf678c747a425bcf8e374c",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "e72f7ed4a1048f2b423011d7c0e0d38c0991d708"
+}
+,{
+    "testCaseDescription": "ruby-while-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "while.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'run' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while.rb"
+    ],
+    "sha1": "e72f7ed4a1048f2b423011d7c0e0d38c0991d708",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "3bd7fc7838f843578c793dc2b03c01a0691f18d1"
+}
+,{
+    "testCaseDescription": "ruby-while-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "while.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                2,
+                                3
+                            ],
+                            "end": [
+                                2,
+                                6
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'bar' identifier"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                3,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'run' while statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "while.rb"
+    ],
+    "sha1": "3bd7fc7838f843578c793dc2b03c01a0691f18d1",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "895766b520264089cca6a8dd11c8494af1a7e37a"
+}
+,{
+    "testCaseDescription": "ruby-while-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "while.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'foo' while statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
                                 4,
-                                7
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'a >> b' bitwise operator"
+                    "summary": "Deleted the 'foo' while statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                14
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'run' while statement"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                5,
+                                4,
                                 1
                             ],
                             "end": [
-                                5,
-                                6
+                                6,
+                                4
                             ]
                         }
                     },
-                    "summary": "Added the 'a ^ b' bitwise operator"
+                    "summary": "Added the 'foo' while statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "bitwise-operator.rb"
+        "while.rb"
     ],
-    "sha1": "5fdcd994ec65cbc656cf7cc9d40787208500e999",
+    "sha1": "895766b520264089cca6a8dd11c8494af1a7e37a",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1f97faed5eb93153a90f250f6ccdb3b7cf5e3da4"
+    "sha2": "3027f2bd415ad7524ac1b12865fca61387e8811d"
 }
 ,{
-    "testCaseDescription": "ruby-bitwise-operator-delete-insert-test",
+    "testCaseDescription": "ruby-while-delete-test",
     "expectedResult": {
         "changes": {
-            "bitwise-operator.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'a | b' bitwise operator"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "bitwise-operator.rb"
-    ],
-    "sha1": "1f97faed5eb93153a90f250f6ccdb3b7cf5e3da4",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "528d4ea121aa4df38981a5c6ecc8fe933aa01ae0"
-}
-,{
-    "testCaseDescription": "ruby-bitwise-operator-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "bitwise-operator.rb": [
+            "while.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a | b' bitwise operator"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "bitwise-operator.rb"
-    ],
-    "sha1": "528d4ea121aa4df38981a5c6ecc8fe933aa01ae0",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b3c59614e88e6b175e198eb6800db4d97856d1af"
-}
-,{
-    "testCaseDescription": "ruby-bitwise-operator-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "bitwise-operator.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a & b' bitwise operator"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
                                 1
                             ],
                             "end": [
                                 2,
-                                7
+                                4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a << b' bitwise operator"
+                    "summary": "Deleted the 'foo' while statement"
                 },
                 {
                     "span": {
@@ -256,127 +302,51 @@
                             ],
                             "end": [
                                 3,
-                                6
+                                14
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a | b' bitwise operator"
+                    "summary": "Deleted the 'run' while statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "bitwise-operator.rb"
+        "while.rb"
     ],
-    "sha1": "b3c59614e88e6b175e198eb6800db4d97856d1af",
+    "sha1": "3027f2bd415ad7524ac1b12865fca61387e8811d",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ca791f749ebda7db0c5f26312ca92920667d05c5"
+    "sha2": "fdb1c9535eaa5b5f9e242248ae4cbbc633864971"
 }
 ,{
-    "testCaseDescription": "ruby-bitwise-operator-delete-test",
+    "testCaseDescription": "ruby-while-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "bitwise-operator.rb": [
+            "while.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a | b' bitwise operator"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a >> b' bitwise operator"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
                                 1
                             ],
                             "end": [
                                 3,
-                                6
+                                4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'a ^ b' bitwise operator"
+                    "summary": "Deleted the 'foo' while statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "bitwise-operator.rb"
+        "while.rb"
     ],
-    "sha1": "ca791f749ebda7db0c5f26312ca92920667d05c5",
+    "sha1": "fdb1c9535eaa5b5f9e242248ae4cbbc633864971",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b446ed8b312c076ef9bf01144e8c17c9f6891432"
-}
-,{
-    "testCaseDescription": "ruby-bitwise-operator-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "bitwise-operator.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a & b' bitwise operator"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                7
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'a << b' bitwise operator"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "bitwise-operator.rb"
-    ],
-    "sha1": "b446ed8b312c076ef9bf01144e8c17c9f6891432",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5036f0b3423bc672f1aff35b244665a17dc2dad9"
+    "sha2": "b3019463f3d9fbf1c167e5587fbdac3d3b4409ad"
 }]

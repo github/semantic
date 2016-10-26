@@ -55,9 +55,9 @@
     "filePaths": [
         "pseudo_variables.rb"
     ],
-    "sha1": "50818b1f0b8c8c2dc06dfb04a65d425fed793372",
+    "sha1": "6c3a0c55d0c6af41ea654538747a31447b4aa162",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a64ded3a6f763e6c457155b0d9377309137736a9"
+    "sha2": "3916d7909a1c0a60c177bd2f6f3dbb11515d7868"
 }
 ,{
     "testCaseDescription": "ruby-pseudo_variables-replacement-insert-test",
@@ -161,9 +161,9 @@
     "filePaths": [
         "pseudo_variables.rb"
     ],
-    "sha1": "a64ded3a6f763e6c457155b0d9377309137736a9",
+    "sha1": "3916d7909a1c0a60c177bd2f6f3dbb11515d7868",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "682a9d2ad30753739cc3fad8e09b2a22b8c05d06"
+    "sha2": "c1b6a8ba54d849c09c32cc3e4fabb96fbf050e58"
 }
 ,{
     "testCaseDescription": "ruby-pseudo_variables-delete-insert-test",
@@ -261,9 +261,9 @@
     "filePaths": [
         "pseudo_variables.rb"
     ],
-    "sha1": "682a9d2ad30753739cc3fad8e09b2a22b8c05d06",
+    "sha1": "c1b6a8ba54d849c09c32cc3e4fabb96fbf050e58",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1fbd5cf0f04a6bfd3ba601f53a4ce4b25add920d"
+    "sha2": "edaa3ed6b1c70da9ff7b83afd30ba3275f6792d7"
 }
 ,{
     "testCaseDescription": "ruby-pseudo_variables-replacement-test",
@@ -361,9 +361,9 @@
     "filePaths": [
         "pseudo_variables.rb"
     ],
-    "sha1": "1fbd5cf0f04a6bfd3ba601f53a4ce4b25add920d",
+    "sha1": "edaa3ed6b1c70da9ff7b83afd30ba3275f6792d7",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b889920f7501f410843dd7a002e2bb6fe9c11378"
+    "sha2": "598079c1fe0ad5b82ff54a3bcd3a767333b074db"
 }
 ,{
     "testCaseDescription": "ruby-pseudo_variables-delete-replacement-test",
@@ -512,9 +512,9 @@
     "filePaths": [
         "pseudo_variables.rb"
     ],
-    "sha1": "b889920f7501f410843dd7a002e2bb6fe9c11378",
+    "sha1": "598079c1fe0ad5b82ff54a3bcd3a767333b074db",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6726aa12f169a535c9040daacb85352b2e9d03a5"
+    "sha2": "da6a794da4858065b9de4792a1386120a2c149ad"
 }
 ,{
     "testCaseDescription": "ruby-pseudo_variables-delete-test",
@@ -573,9 +573,9 @@
     "filePaths": [
         "pseudo_variables.rb"
     ],
-    "sha1": "6726aa12f169a535c9040daacb85352b2e9d03a5",
+    "sha1": "da6a794da4858065b9de4792a1386120a2c149ad",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "285e61dbd12ab5d4e8a619f32ca3b35a80ab107a"
+    "sha2": "109681c2fba1c03f945dae68fde85a266205a3ff"
 }
 ,{
     "testCaseDescription": "ruby-pseudo_variables-delete-rest-test",
@@ -634,7 +634,7 @@
     "filePaths": [
         "pseudo_variables.rb"
     ],
-    "sha1": "285e61dbd12ab5d4e8a619f32ca3b35a80ab107a",
+    "sha1": "109681c2fba1c03f945dae68fde85a266205a3ff",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "5f04037dc58e65a9717a9c9f7f829d96c6801e86"
+    "sha2": "999c49ddf94ec81e5f622445db2c28e89c29be41"
 }]

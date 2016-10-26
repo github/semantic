@@ -40,6 +40,12 @@ termConstructor source sourceSpan name range children
     ("method_declaration", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
     ("method_declaration", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
     ("return_statement", _) -> S.Return (listToMaybe children)
+    ("until_modifier", [ lhs, condition ]) -> S.Until condition (Just lhs)
+    ("until_statement", [ expr, body ]) -> S.Until expr (Just body)
+    ("until_statement", [ expr ]) -> S.Until expr Nothing
+    ("while_modifier", [ lhs, condition ]) -> S.While condition (Just lhs)
+    ("while_statement", [ expr, body ]) -> S.While expr (Just body)
+    ("while_statement", [ expr ]) -> S.While expr Nothing
     ("yield", _) -> S.Yield (listToMaybe children)
     _ | name `elem` ["boolean_and", "boolean_or", "bitwise_or", "bitwise_and", "shift", "relational", "comparison"]
       -> S.Operator children
@@ -84,5 +90,9 @@ categoryForRubyName = \case
   "string" -> StringLiteral
   "subshell" -> Subshell
   "symbol" -> SymbolLiteral
+  "until_modifier" -> Until
+  "until_statement" -> Until
+  "while_modifier" -> While
+  "while_statement" -> While
   "yield" -> Yield
   s -> Other s

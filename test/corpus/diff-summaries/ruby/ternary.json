@@ -25,9 +25,9 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "279db06fb4c7847ecafcd8cda4ea46d4613e25b7",
+    "sha1": "5036f0b3423bc672f1aff35b244665a17dc2dad9",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "67784bd6010976a3bbb484f13c113d64c2df36e1"
+    "sha2": "58c4614af75bcb1e2e7fb4910df026331a599115"
 }
 ,{
     "testCaseDescription": "ruby-ternary-replacement-insert-test",
@@ -68,9 +68,9 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "67784bd6010976a3bbb484f13c113d64c2df36e1",
+    "sha1": "58c4614af75bcb1e2e7fb4910df026331a599115",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3e365f7aaa13dd5c93ae7c0352b1081a9c49d0a7"
+    "sha2": "66eff045b64ea62d03c6a1b9b7366fbdd1e63d00"
 }
 ,{
     "testCaseDescription": "ruby-ternary-delete-insert-test",
@@ -111,9 +111,9 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "3e365f7aaa13dd5c93ae7c0352b1081a9c49d0a7",
+    "sha1": "66eff045b64ea62d03c6a1b9b7366fbdd1e63d00",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "9c9deeb3a60bd9cf763a60c789f54f326ee99f08"
+    "sha2": "0fed0fc3629c1aeb382a0d3ad450c4944c03ee0e"
 }
 ,{
     "testCaseDescription": "ruby-ternary-replacement-test",
@@ -154,9 +154,9 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "9c9deeb3a60bd9cf763a60c789f54f326ee99f08",
+    "sha1": "0fed0fc3629c1aeb382a0d3ad450c4944c03ee0e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "26007b128511147daed250b41158549e1d27631a"
+    "sha2": "630585462752fa18618550b8976c8b96c140e3f8"
 }
 ,{
     "testCaseDescription": "ruby-ternary-delete-replacement-test",
@@ -197,9 +197,9 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "26007b128511147daed250b41158549e1d27631a",
+    "sha1": "630585462752fa18618550b8976c8b96c140e3f8",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fc6e4ba387f179b95a336ead0bb8148d9c86dcec"
+    "sha2": "253a68ae184ba377e3e34503fa6d33168df67ed5"
 }
 ,{
     "testCaseDescription": "ruby-ternary-delete-test",
@@ -208,30 +208,18 @@
             "ternary.rb": [
                 {
                     "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    1,
-                                    26
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    1
-                                ],
-                                "end": [
-                                    2,
-                                    1
-                                ]
-                            }
-                        ]
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                1,
+                                26
+                            ]
+                        }
                     },
-                    "summary": "Replaced the 'condition' ternary expression with the 'if condition then case 1 else case2\n' at line 1, column 1 - line 2, column 1"
+                    "summary": "Deleted the 'condition' ternary expression"
                 }
             ]
         },
@@ -240,9 +228,9 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "fc6e4ba387f179b95a336ead0bb8148d9c86dcec",
+    "sha1": "253a68ae184ba377e3e34503fa6d33168df67ed5",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8074610181409e835411b12a17e136e7f378331f"
+    "sha2": "258e0667eb64ea5cccbd290a11b83ff05fb57fa2"
 }
 ,{
     "testCaseDescription": "ruby-ternary-delete-rest-test",
@@ -271,7 +259,7 @@
     "filePaths": [
         "ternary.rb"
     ],
-    "sha1": "8074610181409e835411b12a17e136e7f378331f",
+    "sha1": "258e0667eb64ea5cccbd290a11b83ff05fb57fa2",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "594f2f2b8f5dd265329c5911e66866f120934461"
+    "sha2": "862d6fb62b501d39f4d4446fe100c241eeb473e3"
 }]
