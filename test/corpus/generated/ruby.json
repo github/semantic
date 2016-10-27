@@ -49,8 +49,8 @@
       {
         "syntax": "delimiter",
         "repoFilePath": "delimiter.rb",
-        "insert": "%q=a=\n%q<a<b>c>\n%=a=\n%Q=a=\n%<a<b>c>\n%Q<a<b>c>",
-        "replacement": "%q!b!\n%q{d{e}f}\n%!b!\n%Q!b!\n%{d{e}f}\n%Q{d{e}f}",
+        "insert": "%q#a#\n%q<a<b>c>\n%#a#\n%Q#a#\n%<a<b>c>\n%Q<a<b>c>",
+        "replacement": "%q/b/\n%q{d{e}f}\n%/b/\n%Q/b/\n%{d{e}f}\n%Q{d{e}f}",
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/delimiter.json"
       },
       {
