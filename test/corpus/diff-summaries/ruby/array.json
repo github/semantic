@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-multiple_assignments-insert-test",
+    "testCaseDescription": "ruby-array-insert-test",
     "expectedResult": {
         "changes": {
-            "multiple_assignments.rb": [
+            "array.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,28 +12,28 @@
                             ],
                             "end": [
                                 1,
-                                21
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'x(…, y, z, 20, 30)' function call"
+                    "summary": "Added the '[ 1, 2, 3]' array"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "multiple_assignments.rb"
+        "array.rb"
     ],
-    "sha1": "956eb07c54e32e9a4185988494b5bf6a73a01aac",
+    "sha1": "f87f3eb05b333eef2a3237d0c2dcacd396272ca3",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "34df18211d4c4cbdef75e29908ba423bcd87f1ad"
+    "sha2": "5fb9b3f96cc17eea28d9caf2ed099b8703247748"
 }
 ,{
-    "testCaseDescription": "ruby-multiple_assignments-replacement-insert-test",
+    "testCaseDescription": "ruby-array-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "multiple_assignments.rb": [
+            "array.rb": [
                 {
                     "span": {
                         "insert": {
@@ -43,11 +43,11 @@
                             ],
                             "end": [
                                 1,
-                                21
+                                16
                             ]
                         }
                     },
-                    "summary": "Added the 'x(…, 40)' function call"
+                    "summary": "Added the '['a', 'b', 'c']' array"
                 },
                 {
                     "span": {
@@ -58,197 +58,79 @@
                             ],
                             "end": [
                                 2,
-                                21
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the 'x(…, y, z, 20, 30)' function call"
+                    "summary": "Added the '[ 1, 2, 3]' array"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "multiple_assignments.rb"
+        "array.rb"
     ],
-    "sha1": "34df18211d4c4cbdef75e29908ba423bcd87f1ad",
+    "sha1": "5fb9b3f96cc17eea28d9caf2ed099b8703247748",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "fc6068fb45ed6e9f88553c955ff9f6d2bb8325d8"
+    "sha2": "f6ca0f12e815c207024e831388e1930ca72fc56f"
 }
 ,{
-    "testCaseDescription": "ruby-multiple_assignments-delete-insert-test",
+    "testCaseDescription": "ruby-array-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "multiple_assignments.rb": [
+            "array.rb": [
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                1,
-                                4
-                            ],
-                            "end": [
-                                1,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'y' identifier in the x(…, y, z, 20, 30) function call"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    2
-                                ],
-                                "end": [
-                                    1,
-                                    3
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    7
-                                ],
-                                "end": [
-                                    1,
-                                    13
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced the ',' at line 1, column 2 - line 1, column 3 with the 'z' assignment in the x(…, y, z, 20, 30) function call"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                15
-                            ],
-                            "end": [
-                                1,
-                                17
-                            ]
-                        }
-                    },
-                    "summary": "Added '20' in the x(…, y, z, 20, 30) function call"
-                },
-                {
-                    "span": {
-                        "replace": [
-                            {
-                                "start": [
-                                    1,
-                                    19
-                                ],
-                                "end": [
-                                    1,
-                                    21
-                                ]
-                            },
-                            {
-                                "start": [
-                                    1,
-                                    19
-                                ],
-                                "end": [
-                                    1,
-                                    21
-                                ]
-                            }
-                        ]
-                    },
-                    "summary": "Replaced '40' with '30' in the x(…, y, z, 20, 30) function call"
-                }
-            ]
-        },
-        "errors": {
-            "multiple_assignments.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                2
-                            ],
-                            "end": [
                                 1,
                                 3
-                            ]
-                        }
-                    },
-                    "summary": "Added the ',' at line 1, column 2 - line 1, column 3 in the x(…, y, z, 20, 30) function call"
-                }
-            ]
-        }
-    },
-    "filePaths": [
-        "multiple_assignments.rb"
-    ],
-    "sha1": "fc6068fb45ed6e9f88553c955ff9f6d2bb8325d8",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b893fadcf1063c6cced2415bfde393da91bf2f3f"
-}
-,{
-    "testCaseDescription": "ruby-multiple_assignments-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "multiple_assignments.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
+                            ],
+                            "end": [
                                 1,
                                 4
-                            ],
-                            "end": [
-                                1,
-                                5
                             ]
                         }
                     },
-                    "summary": "Added the 'y' identifier in the x(…, 40) function call"
+                    "summary": "Added '1'"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 1,
-                                8
+                                6
                             ],
                             "end": [
                                 1,
-                                17
+                                7
                             ]
                         }
                     },
-                    "summary": "Added the 'aVariable' identifier in the x(…, 40) function call"
+                    "summary": "Added '2'"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 1,
-                                19
+                                9
                             ],
                             "end": [
                                 1,
-                                21
+                                10
                             ]
                         }
                     },
-                    "summary": "Added '40' in the x(…, 40) function call"
+                    "summary": "Added '3'"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 1,
-                                4
+                                2
                             ],
                             "end": [
                                 1,
@@ -256,7 +138,7 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'y' identifier in the x(…, 40) function call"
+                    "summary": "Deleted the 'a' string"
                 },
                 {
                     "span": {
@@ -267,46 +149,43 @@
                             ],
                             "end": [
                                 1,
-                                13
+                                10
                             ]
                         }
                     },
-                    "summary": "Deleted the 'z' assignment in the x(…, 40) function call"
+                    "summary": "Deleted the 'b' string"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
+                                1,
+                                12
+                            ],
+                            "end": [
                                 1,
                                 15
-                            ],
-                            "end": [
-                                1,
-                                17
                             ]
                         }
                     },
-                    "summary": "Deleted '20' in the x(…, 40) function call"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                19
-                            ],
-                            "end": [
-                                1,
-                                21
-                            ]
-                        }
-                    },
-                    "summary": "Deleted '30' in the x(…, 40) function call"
+                    "summary": "Deleted the 'c' string"
                 }
             ]
         },
-        "errors": {
-            "multiple_assignments.rb": [
+        "errors": {}
+    },
+    "filePaths": [
+        "array.rb"
+    ],
+    "sha1": "f6ca0f12e815c207024e831388e1930ca72fc56f",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "0afd2c3d4f6045080be33c216d9c79735880d2cb"
+}
+,{
+    "testCaseDescription": "ruby-array-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "array.rb": [
                 {
                     "span": {
                         "insert": {
@@ -316,42 +195,103 @@
                             ],
                             "end": [
                                 1,
-                                3
+                                5
                             ]
                         }
                     },
-                    "summary": "Added the ',' at line 1, column 2 - line 1, column 3 in the x(…, 40) function call"
+                    "summary": "Added the 'a' string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                7
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' string"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                12
+                            ],
+                            "end": [
+                                1,
+                                15
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'c' string"
                 },
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 1,
-                                2
+                                3
                             ],
                             "end": [
                                 1,
-                                3
+                                4
                             ]
                         }
                     },
-                    "summary": "Deleted the ',' at line 1, column 2 - line 1, column 3 in the x(…, 40) function call"
+                    "summary": "Deleted '1'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                6
+                            ],
+                            "end": [
+                                1,
+                                7
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '2'"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                9
+                            ],
+                            "end": [
+                                1,
+                                10
+                            ]
+                        }
+                    },
+                    "summary": "Deleted '3'"
                 }
             ]
-        }
+        },
+        "errors": {}
     },
     "filePaths": [
-        "multiple_assignments.rb"
+        "array.rb"
     ],
-    "sha1": "b893fadcf1063c6cced2415bfde393da91bf2f3f",
+    "sha1": "0afd2c3d4f6045080be33c216d9c79735880d2cb",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "78948845d5231b1339cce3d01874be7d4d116c2c"
+    "sha2": "6d35a4124b9ae97cc296dd3a0da2bf685fa7fe9b"
 }
 ,{
-    "testCaseDescription": "ruby-multiple_assignments-delete-replacement-test",
+    "testCaseDescription": "ruby-array-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "multiple_assignments.rb": [
+            "array.rb": [
                 {
                     "span": {
                         "delete": {
@@ -361,11 +301,11 @@
                             ],
                             "end": [
                                 1,
-                                21
+                                16
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x(…, 40)' function call"
+                    "summary": "Deleted the '['a', 'b', 'c']' array"
                 },
                 {
                     "span": {
@@ -376,11 +316,11 @@
                             ],
                             "end": [
                                 2,
-                                21
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x(…, y, z, 20, 30)' function call"
+                    "summary": "Deleted the '[ 1, 2, 3]' array"
                 },
                 {
                     "span": {
@@ -391,28 +331,28 @@
                             ],
                             "end": [
                                 2,
-                                21
+                                16
                             ]
                         }
                     },
-                    "summary": "Added the 'x(…, 40)' function call"
+                    "summary": "Added the '['a', 'b', 'c']' array"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "multiple_assignments.rb"
+        "array.rb"
     ],
-    "sha1": "78948845d5231b1339cce3d01874be7d4d116c2c",
+    "sha1": "6d35a4124b9ae97cc296dd3a0da2bf685fa7fe9b",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a4f4f62c6ea7a39d5336c7c7efa133ceb23124da"
+    "sha2": "44fcb9b9046fbdb868724f8e44b78130bac0198a"
 }
 ,{
-    "testCaseDescription": "ruby-multiple_assignments-delete-test",
+    "testCaseDescription": "ruby-array-delete-test",
     "expectedResult": {
         "changes": {
-            "multiple_assignments.rb": [
+            "array.rb": [
                 {
                     "span": {
                         "delete": {
@@ -422,28 +362,28 @@
                             ],
                             "end": [
                                 1,
-                                21
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x(…, y, z, 20, 30)' function call"
+                    "summary": "Deleted the '[ 1, 2, 3]' array"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "multiple_assignments.rb"
+        "array.rb"
     ],
-    "sha1": "a4f4f62c6ea7a39d5336c7c7efa133ceb23124da",
+    "sha1": "44fcb9b9046fbdb868724f8e44b78130bac0198a",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7c12e33416b5315b17508133ec38648146bb3326"
+    "sha2": "8164fe2f3e3b3daad087ff2e186e458c27abc409"
 }
 ,{
-    "testCaseDescription": "ruby-multiple_assignments-delete-rest-test",
+    "testCaseDescription": "ruby-array-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "multiple_assignments.rb": [
+            "array.rb": [
                 {
                     "span": {
                         "delete": {
@@ -453,20 +393,20 @@
                             ],
                             "end": [
                                 1,
-                                21
+                                16
                             ]
                         }
                     },
-                    "summary": "Deleted the 'x(…, 40)' function call"
+                    "summary": "Deleted the '['a', 'b', 'c']' array"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "multiple_assignments.rb"
+        "array.rb"
     ],
-    "sha1": "7c12e33416b5315b17508133ec38648146bb3326",
+    "sha1": "8164fe2f3e3b3daad087ff2e186e458c27abc409",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "85491985da6d2c41d11f422f66046b630d4d58ae"
+    "sha2": "cb9b58c794e5724f7731e47719c9efa3457e976a"
 }]

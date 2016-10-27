@@ -213,6 +213,20 @@
         "insert": "/^(foo|bar[^_])$/i",
         "replacement": "%r/a/\n%r<a<b>c>",
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/regex.json"
+      },
+      {
+        "syntax": "array",
+        "repoFilePath": "array.rb",
+        "insert": "[ 1, 2, 3]",
+        "replacement": "['a', 'b', 'c']",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/array.json"
+      },
+      {
+        "syntax": "percent-array",
+        "repoFilePath": "percent-array.rb",
+        "insert": "%w(one two)",
+        "replacement": "%W(one #{b} three)",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/percent-array.json"
       }
     ]
   }

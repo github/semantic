@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-return-insert-test",
+    "testCaseDescription": "ruby-percent-array-insert-test",
     "expectedResult": {
         "changes": {
-            "return.rb": [
+            "percent-array.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,28 +12,28 @@
                             ],
                             "end": [
                                 1,
-                                11
+                                12
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' return statement"
+                    "summary": "Added the '%w(one two)' array"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "return.rb"
+        "percent-array.rb"
     ],
-    "sha1": "e566c926cb6fdae28f844e54091a6c6c1d3593ef",
+    "sha1": "6c1e786f4cc806d59623928c2c0102672630dd71",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "4b53e0179468c88a406f58a1dc0f1a9b06c11caf"
+    "sha2": "f53df84049039ee79729f269ded454cef22950b2"
 }
 ,{
-    "testCaseDescription": "ruby-return-replacement-insert-test",
+    "testCaseDescription": "ruby-percent-array-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "return.rb": [
+            "percent-array.rb": [
                 {
                     "span": {
                         "insert": {
@@ -43,11 +43,11 @@
                             ],
                             "end": [
                                 1,
-                                7
+                                19
                             ]
                         }
                     },
-                    "summary": "Added the 'empty' return statement"
+                    "summary": "Added the '%W(one #{b} three)' array"
                 },
                 {
                     "span": {
@@ -58,65 +58,34 @@
                             ],
                             "end": [
                                 2,
-                                11
+                                12
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' return statement"
+                    "summary": "Added the '%w(one two)' array"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "return.rb"
+        "percent-array.rb"
     ],
-    "sha1": "4b53e0179468c88a406f58a1dc0f1a9b06c11caf",
+    "sha1": "f53df84049039ee79729f269ded454cef22950b2",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "842085ae07e905237b80f063c62ff6cd43c1cbc3"
+    "sha2": "d0238042443d440e7adfc32eb9ac8c0eb1788783"
 }
 ,{
-    "testCaseDescription": "ruby-return-delete-insert-test",
+    "testCaseDescription": "ruby-percent-array-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "return.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                8
-                            ],
-                            "end": [
-                                1,
-                                11
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' identifier"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "return.rb"
-    ],
-    "sha1": "842085ae07e905237b80f063c62ff6cd43c1cbc3",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "46e2b60b24c3363bb84e618a74fc30ebd665d97c"
-}
-,{
-    "testCaseDescription": "ruby-return-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "return.rb": [
+            "percent-array.rb": [
                 {
                     "span": {
                         "delete": {
                             "start": [
                                 1,
-                                8
+                                10
                             ],
                             "end": [
                                 1,
@@ -124,24 +93,55 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' identifier"
+                    "summary": "Deleted the 'b' identifier"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "return.rb"
+        "percent-array.rb"
     ],
-    "sha1": "46e2b60b24c3363bb84e618a74fc30ebd665d97c",
+    "sha1": "d0238042443d440e7adfc32eb9ac8c0eb1788783",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d1a4af669d83f10c2ecfa96bf50e43d70f9984c2"
+    "sha2": "100541fc4aec35627e63b9994349143fa6a5cd4d"
 }
 ,{
-    "testCaseDescription": "ruby-return-delete-replacement-test",
+    "testCaseDescription": "ruby-percent-array-replacement-test",
     "expectedResult": {
         "changes": {
-            "return.rb": [
+            "percent-array.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                10
+                            ],
+                            "end": [
+                                1,
+                                11
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'b' identifier"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "percent-array.rb"
+    ],
+    "sha1": "100541fc4aec35627e63b9994349143fa6a5cd4d",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "2035c25bcb83e9627d94c89ecee1108cfcba784a"
+}
+,{
+    "testCaseDescription": "ruby-percent-array-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "percent-array.rb": [
                 {
                     "span": {
                         "delete": {
@@ -151,11 +151,11 @@
                             ],
                             "end": [
                                 1,
-                                7
+                                19
                             ]
                         }
                     },
-                    "summary": "Deleted the 'empty' return statement"
+                    "summary": "Deleted the '%W(one #{b} three)' array"
                 },
                 {
                     "span": {
@@ -166,11 +166,11 @@
                             ],
                             "end": [
                                 2,
-                                11
+                                12
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' return statement"
+                    "summary": "Deleted the '%w(one two)' array"
                 },
                 {
                     "span": {
@@ -181,28 +181,28 @@
                             ],
                             "end": [
                                 2,
-                                7
+                                19
                             ]
                         }
                     },
-                    "summary": "Added the 'empty' return statement"
+                    "summary": "Added the '%W(one #{b} three)' array"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "return.rb"
+        "percent-array.rb"
     ],
-    "sha1": "d1a4af669d83f10c2ecfa96bf50e43d70f9984c2",
+    "sha1": "2035c25bcb83e9627d94c89ecee1108cfcba784a",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "147b547c8c4b98725603ae23f82398879704a06f"
+    "sha2": "4de5734bf0c9432f6802003b8475daf6dbe0be5e"
 }
 ,{
-    "testCaseDescription": "ruby-return-delete-test",
+    "testCaseDescription": "ruby-percent-array-delete-test",
     "expectedResult": {
         "changes": {
-            "return.rb": [
+            "percent-array.rb": [
                 {
                     "span": {
                         "delete": {
@@ -212,28 +212,28 @@
                             ],
                             "end": [
                                 1,
-                                11
+                                12
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' return statement"
+                    "summary": "Deleted the '%w(one two)' array"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "return.rb"
+        "percent-array.rb"
     ],
-    "sha1": "147b547c8c4b98725603ae23f82398879704a06f",
+    "sha1": "4de5734bf0c9432f6802003b8475daf6dbe0be5e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "72725bf7e825562d7ca0034ea8a6d3f5276bf2e2"
+    "sha2": "3b5337cd8d68b1abf1d112f6f0d4d987368d26b2"
 }
 ,{
-    "testCaseDescription": "ruby-return-delete-rest-test",
+    "testCaseDescription": "ruby-percent-array-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "return.rb": [
+            "percent-array.rb": [
                 {
                     "span": {
                         "delete": {
@@ -243,20 +243,20 @@
                             ],
                             "end": [
                                 1,
-                                7
+                                19
                             ]
                         }
                     },
-                    "summary": "Deleted the 'empty' return statement"
+                    "summary": "Deleted the '%W(one #{b} three)' array"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "return.rb"
+        "percent-array.rb"
     ],
-    "sha1": "72725bf7e825562d7ca0034ea8a6d3f5276bf2e2",
+    "sha1": "3b5337cd8d68b1abf1d112f6f0d4d987368d26b2",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ae5cac351e4f7b2f08ab1e380760c93a675accac"
+    "sha2": "8d85edad8d716d5f589ae20e2bc1269d5200fc89"
 }]
