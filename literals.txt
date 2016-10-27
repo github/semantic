@@ -1,5 +1,22 @@
 ===============
-string literal
+string literal insert
+===============
+
++"bar"
+
+---
+
+@@ summary
+Added the "foo" string
+
+@@ patch
++"bar"
+
+@ json
+{}
+
+===============
+string literal replace
 ===============
 
 -"foo"
@@ -8,6 +25,11 @@ string literal
 ---
 
 @@ summary
-Added the "foo" string
 Replaced the "foo" string with the "bar" string
-Deleted the "bar" string
+
+@@ patch
+-"foo"
++"bar"
+
+@@ json
+{}
