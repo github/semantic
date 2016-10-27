@@ -40,9 +40,9 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "f22a8157f0f617aeb90ab8f5c4a8f898d6d0a0cc",
+    "sha1": "3faf6b4a5390ba8aad1fdb3f70df3957c60fb478",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c76964cc194717b798f02552ab6bc1738c9b3d92"
+    "sha2": "cc12f9fdcde163bcb399ca3c113803130b53cfb1"
 }
 ,{
     "testCaseDescription": "ruby-while-replacement-insert-test",
@@ -101,9 +101,9 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "c76964cc194717b798f02552ab6bc1738c9b3d92",
+    "sha1": "cc12f9fdcde163bcb399ca3c113803130b53cfb1",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d9caf8ff2e9d95da6e86fa5a4a3da0ca4341436e"
+    "sha2": "fb6ef89e4824dbdd1d984111815fe9e245cb6fb0"
 }
 ,{
     "testCaseDescription": "ruby-while-delete-insert-test",
@@ -147,9 +147,9 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "d9caf8ff2e9d95da6e86fa5a4a3da0ca4341436e",
+    "sha1": "fb6ef89e4824dbdd1d984111815fe9e245cb6fb0",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7224179916ba5e30b2040cf78883da08d1d524fd"
+    "sha2": "b0c3cf0e6d042a0c7a69d2b9494f72bdb42a6304"
 }
 ,{
     "testCaseDescription": "ruby-while-replacement-test",
@@ -193,9 +193,9 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "7224179916ba5e30b2040cf78883da08d1d524fd",
+    "sha1": "b0c3cf0e6d042a0c7a69d2b9494f72bdb42a6304",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7970c0207d835c7adee93af5b9630a724639e3c0"
+    "sha2": "06f91003d2e38ea31895a7e8ba82df962f20b0b4"
 }
 ,{
     "testCaseDescription": "ruby-while-delete-replacement-test",
@@ -269,9 +269,9 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "7970c0207d835c7adee93af5b9630a724639e3c0",
+    "sha1": "06f91003d2e38ea31895a7e8ba82df962f20b0b4",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "89a4ac8609e2f86178e2c7ffe2ba6529d5b30e37"
+    "sha2": "bf34d750737f7521279dd295e9627c16ca77dc1e"
 }
 ,{
     "testCaseDescription": "ruby-while-delete-test",
@@ -315,9 +315,9 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "89a4ac8609e2f86178e2c7ffe2ba6529d5b30e37",
+    "sha1": "bf34d750737f7521279dd295e9627c16ca77dc1e",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "95cf370a3cb2e7e63945b06acea6881597bdd9fd"
+    "sha2": "92a41549b0ffd8d6f9509840a185e7d566ad6c31"
 }
 ,{
     "testCaseDescription": "ruby-while-delete-rest-test",
@@ -346,7 +346,7 @@
     "filePaths": [
         "while.rb"
     ],
-    "sha1": "95cf370a3cb2e7e63945b06acea6881597bdd9fd",
+    "sha1": "92a41549b0ffd8d6f9509840a185e7d566ad6c31",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7f816bd2c30f5843efb27bc574c872359bd7b5be"
+    "sha2": "ede2d0505ee561764e289f1285a594c5366f8b18"
 }]

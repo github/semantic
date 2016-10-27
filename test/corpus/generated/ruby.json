@@ -227,6 +227,20 @@
         "insert": "%w(one two)",
         "replacement": "%W(one #{b} three)",
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/percent-array.json"
+      },
+      {
+        "syntax": "lambda-dash-rocket",
+        "repoFilePath": "lambda-dash-rocket.rb",
+        "insert": "-> (a, b, c) {\n  1\n  2\n}",
+        "replacement": "-> { foo }",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/lambda-dash-rocket.json"
+      },
+      {
+        "syntax": "lambda",
+        "repoFilePath": "lambda.rb",
+        "insert": "lambda { foo }",
+        "replacement": "lambda { |x| x + 1 }",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/lambda.json"
       }
     ]
   }

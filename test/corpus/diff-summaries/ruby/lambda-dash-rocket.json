@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-subshell-insert-test",
+    "testCaseDescription": "ruby-lambda-dash-rocket-insert-test",
     "expectedResult": {
         "changes": {
-            "subshell.rb": [
+            "lambda-dash-rocket.rb": [
                 {
                     "span": {
                         "insert": {
@@ -11,29 +11,29 @@
                                 1
                             ],
                             "end": [
-                                1,
-                                9
+                                4,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the `ls -la` subshell command"
+                    "summary": "Added an anonymous(a, b, c) function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "subshell.rb"
+        "lambda-dash-rocket.rb"
     ],
-    "sha1": "9ed5e7ded29383b7a1114f6aa26e6531494ac206",
+    "sha1": "7cb451b01cb4c1eddde132bfd99cad662745a239",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "ef27f7bb64efe205e964cef79e2a6948df7e0ace"
+    "sha2": "a7b24e8c55b6a81f5c17db274eddcd7e123169e9"
 }
 ,{
-    "testCaseDescription": "ruby-subshell-replacement-insert-test",
+    "testCaseDescription": "ruby-lambda-dash-rocket-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "subshell.rb": [
+            "lambda-dash-rocket.rb": [
                 {
                     "span": {
                         "insert": {
@@ -43,11 +43,11 @@
                             ],
                             "end": [
                                 1,
-                                13
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the `git status` subshell command"
+                    "summary": "Added an anonymous() function"
                 },
                 {
                     "span": {
@@ -57,29 +57,29 @@
                                 1
                             ],
                             "end": [
-                                2,
-                                9
+                                5,
+                                2
                             ]
                         }
                     },
-                    "summary": "Added the `ls -la` subshell command"
+                    "summary": "Added an anonymous(a, b, c) function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "subshell.rb"
+        "lambda-dash-rocket.rb"
     ],
-    "sha1": "ef27f7bb64efe205e964cef79e2a6948df7e0ace",
+    "sha1": "a7b24e8c55b6a81f5c17db274eddcd7e123169e9",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8af10915e6f8a9e6e450811f5ef6ba85c5f597bf"
+    "sha2": "a81e2ee0fccf03fd464546c3b3ff80b95fed51e1"
 }
 ,{
-    "testCaseDescription": "ruby-subshell-delete-insert-test",
+    "testCaseDescription": "ruby-lambda-dash-rocket-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "subshell.rb": [
+            "lambda-dash-rocket.rb": [
                 {
                     "span": {
                         "replace": [
@@ -90,7 +90,7 @@
                                 ],
                                 "end": [
                                     1,
-                                    13
+                                    11
                                 ]
                             },
                             {
@@ -99,30 +99,30 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    9
+                                    4,
+                                    2
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the `git status` subshell command with the `ls -la` subshell command"
+                    "summary": "Replaced an anonymous() function with an anonymous(a, b, c) function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "subshell.rb"
+        "lambda-dash-rocket.rb"
     ],
-    "sha1": "8af10915e6f8a9e6e450811f5ef6ba85c5f597bf",
+    "sha1": "a81e2ee0fccf03fd464546c3b3ff80b95fed51e1",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7a86ea9206a7ca91d828c470cbe4a7b7d9b526d2"
+    "sha2": "305c4e2f71a9e5a3cc718c7297ec80c95c79d5d2"
 }
 ,{
-    "testCaseDescription": "ruby-subshell-replacement-test",
+    "testCaseDescription": "ruby-lambda-dash-rocket-replacement-test",
     "expectedResult": {
         "changes": {
-            "subshell.rb": [
+            "lambda-dash-rocket.rb": [
                 {
                     "span": {
                         "replace": [
@@ -132,8 +132,8 @@
                                     1
                                 ],
                                 "end": [
-                                    1,
-                                    9
+                                    4,
+                                    2
                                 ]
                             },
                             {
@@ -143,29 +143,29 @@
                                 ],
                                 "end": [
                                     1,
-                                    13
+                                    11
                                 ]
                             }
                         ]
                     },
-                    "summary": "Replaced the `ls -la` subshell command with the `git status` subshell command"
+                    "summary": "Replaced an anonymous(a, b, c) function with an anonymous() function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "subshell.rb"
+        "lambda-dash-rocket.rb"
     ],
-    "sha1": "7a86ea9206a7ca91d828c470cbe4a7b7d9b526d2",
+    "sha1": "305c4e2f71a9e5a3cc718c7297ec80c95c79d5d2",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "35fee662d38093a5c6228ade976a3424d5774a3c"
+    "sha2": "f53337b8307d26cf90601e72486f969501b36758"
 }
 ,{
-    "testCaseDescription": "ruby-subshell-delete-replacement-test",
+    "testCaseDescription": "ruby-lambda-dash-rocket-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "subshell.rb": [
+            "lambda-dash-rocket.rb": [
                 {
                     "span": {
                         "delete": {
@@ -175,11 +175,11 @@
                             ],
                             "end": [
                                 1,
-                                13
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the `git status` subshell command"
+                    "summary": "Deleted an anonymous() function"
                 },
                 {
                     "span": {
@@ -189,44 +189,75 @@
                                 1
                             ],
                             "end": [
-                                2,
-                                9
+                                5,
+                                2
                             ]
                         }
                     },
-                    "summary": "Deleted the `ls -la` subshell command"
+                    "summary": "Deleted an anonymous(a, b, c) function"
                 },
                 {
                     "span": {
                         "insert": {
                             "start": [
-                                2,
+                                5,
                                 1
                             ],
                             "end": [
-                                2,
-                                13
+                                5,
+                                11
                             ]
                         }
                     },
-                    "summary": "Added the `git status` subshell command"
+                    "summary": "Added an anonymous() function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "subshell.rb"
+        "lambda-dash-rocket.rb"
     ],
-    "sha1": "35fee662d38093a5c6228ade976a3424d5774a3c",
+    "sha1": "f53337b8307d26cf90601e72486f969501b36758",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c1018edaff59cce3abc72aebe363280e8aafcd59"
+    "sha2": "303643460149af98f21f33fdfbfaac05918c5185"
 }
 ,{
-    "testCaseDescription": "ruby-subshell-delete-test",
+    "testCaseDescription": "ruby-lambda-dash-rocket-delete-test",
     "expectedResult": {
         "changes": {
-            "subshell.rb": [
+            "lambda-dash-rocket.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                4,
+                                2
+                            ]
+                        }
+                    },
+                    "summary": "Deleted an anonymous(a, b, c) function"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "lambda-dash-rocket.rb"
+    ],
+    "sha1": "303643460149af98f21f33fdfbfaac05918c5185",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "8325bbcfefda0c2836a9c1ceaa101d5051ace4d2"
+}
+,{
+    "testCaseDescription": "ruby-lambda-dash-rocket-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "lambda-dash-rocket.rb": [
                 {
                     "span": {
                         "delete": {
@@ -236,51 +267,20 @@
                             ],
                             "end": [
                                 1,
-                                9
+                                11
                             ]
                         }
                     },
-                    "summary": "Deleted the `ls -la` subshell command"
+                    "summary": "Deleted an anonymous() function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "subshell.rb"
+        "lambda-dash-rocket.rb"
     ],
-    "sha1": "c1018edaff59cce3abc72aebe363280e8aafcd59",
+    "sha1": "8325bbcfefda0c2836a9c1ceaa101d5051ace4d2",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "63184da5e22aea8ebe2f9b4eaec1ca27efd289a7"
-}
-,{
-    "testCaseDescription": "ruby-subshell-delete-rest-test",
-    "expectedResult": {
-        "changes": {
-            "subshell.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                1,
-                                13
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the `git status` subshell command"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "subshell.rb"
-    ],
-    "sha1": "63184da5e22aea8ebe2f9b4eaec1ca27efd289a7",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0c5adf2d41bac7223c2036085974b4b2e877759a"
+    "sha2": "b36980733a81ff31f4ed514bb037ca7eb4ffa959"
 }]

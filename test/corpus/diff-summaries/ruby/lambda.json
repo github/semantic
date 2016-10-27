@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-percent-array-insert-test",
+    "testCaseDescription": "ruby-lambda-insert-test",
     "expectedResult": {
         "changes": {
-            "percent-array.rb": [
+            "lambda.rb": [
                 {
                     "span": {
                         "insert": {
@@ -12,28 +12,28 @@
                             ],
                             "end": [
                                 1,
-                                12
+                                15
                             ]
                         }
                     },
-                    "summary": "Added the '%w(one two)' array"
+                    "summary": "Added an anonymous() function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "percent-array.rb"
+        "lambda.rb"
     ],
-    "sha1": "5fc3f6d7b885446c581e6ec0df77e57a3028c9a0",
+    "sha1": "b36980733a81ff31f4ed514bb037ca7eb4ffa959",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8505796837ab1d2f40ec7d147c7bd5fed09a9261"
+    "sha2": "ddc93877468436184df3851a2560b3a52426dcc3"
 }
 ,{
-    "testCaseDescription": "ruby-percent-array-replacement-insert-test",
+    "testCaseDescription": "ruby-lambda-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "percent-array.rb": [
+            "lambda.rb": [
                 {
                     "span": {
                         "insert": {
@@ -43,11 +43,11 @@
                             ],
                             "end": [
                                 1,
-                                19
+                                21
                             ]
                         }
                     },
-                    "summary": "Added the '%W(one #{b} three)' array"
+                    "summary": "Added an anonymous(x) function"
                 },
                 {
                     "span": {
@@ -58,90 +58,114 @@
                             ],
                             "end": [
                                 2,
-                                12
+                                15
                             ]
                         }
                     },
-                    "summary": "Added the '%w(one two)' array"
+                    "summary": "Added an anonymous() function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "percent-array.rb"
+        "lambda.rb"
     ],
-    "sha1": "8505796837ab1d2f40ec7d147c7bd5fed09a9261",
+    "sha1": "ddc93877468436184df3851a2560b3a52426dcc3",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "123b2fbf89cd6475d2bf836f3b7abc82852051be"
+    "sha2": "9c873297e8e7aa034e6c4e3beea264c3be2a1382"
 }
 ,{
-    "testCaseDescription": "ruby-percent-array-delete-insert-test",
+    "testCaseDescription": "ruby-lambda-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "percent-array.rb": [
+            "lambda.rb": [
                 {
                     "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                10
-                            ],
-                            "end": [
-                                1,
-                                11
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Deleted the 'b' identifier"
+                    "summary": "Replaced an anonymous(x) function with an anonymous() function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "percent-array.rb"
+        "lambda.rb"
     ],
-    "sha1": "123b2fbf89cd6475d2bf836f3b7abc82852051be",
+    "sha1": "9c873297e8e7aa034e6c4e3beea264c3be2a1382",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b764fd6ed9e4a4d46d0420493d2281782ff18a4c"
+    "sha2": "ba3cc098f6ca15243568f8fc29fd398980a724f4"
 }
 ,{
-    "testCaseDescription": "ruby-percent-array-replacement-test",
+    "testCaseDescription": "ruby-lambda-replacement-test",
     "expectedResult": {
         "changes": {
-            "percent-array.rb": [
+            "lambda.rb": [
                 {
                     "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                10
-                            ],
-                            "end": [
-                                1,
-                                11
-                            ]
-                        }
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    15
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    1,
+                                    21
+                                ]
+                            }
+                        ]
                     },
-                    "summary": "Added the 'b' identifier"
+                    "summary": "Replaced an anonymous() function with an anonymous(x) function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "percent-array.rb"
+        "lambda.rb"
     ],
-    "sha1": "b764fd6ed9e4a4d46d0420493d2281782ff18a4c",
+    "sha1": "ba3cc098f6ca15243568f8fc29fd398980a724f4",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "a953618d4d76fbfd5b1dcb51a145a3fb82819f52"
+    "sha2": "229035a27d27aa8f40b93a192a7646a477da71be"
 }
 ,{
-    "testCaseDescription": "ruby-percent-array-delete-replacement-test",
+    "testCaseDescription": "ruby-lambda-delete-replacement-test",
     "expectedResult": {
         "changes": {
-            "percent-array.rb": [
+            "lambda.rb": [
                 {
                     "span": {
                         "delete": {
@@ -151,11 +175,11 @@
                             ],
                             "end": [
                                 1,
-                                19
+                                21
                             ]
                         }
                     },
-                    "summary": "Deleted the '%W(one #{b} three)' array"
+                    "summary": "Deleted an anonymous(x) function"
                 },
                 {
                     "span": {
@@ -166,11 +190,11 @@
                             ],
                             "end": [
                                 2,
-                                12
+                                15
                             ]
                         }
                     },
-                    "summary": "Deleted the '%w(one two)' array"
+                    "summary": "Deleted an anonymous() function"
                 },
                 {
                     "span": {
@@ -181,28 +205,28 @@
                             ],
                             "end": [
                                 2,
-                                19
+                                21
                             ]
                         }
                     },
-                    "summary": "Added the '%W(one #{b} three)' array"
+                    "summary": "Added an anonymous(x) function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "percent-array.rb"
+        "lambda.rb"
     ],
-    "sha1": "a953618d4d76fbfd5b1dcb51a145a3fb82819f52",
+    "sha1": "229035a27d27aa8f40b93a192a7646a477da71be",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b871b3ab846bfaf958024dc6c1f4f5ca371b5e43"
+    "sha2": "bf3d7c49bfef739f7db38b21a5a79134956e98e6"
 }
 ,{
-    "testCaseDescription": "ruby-percent-array-delete-test",
+    "testCaseDescription": "ruby-lambda-delete-test",
     "expectedResult": {
         "changes": {
-            "percent-array.rb": [
+            "lambda.rb": [
                 {
                     "span": {
                         "delete": {
@@ -212,28 +236,28 @@
                             ],
                             "end": [
                                 1,
-                                12
+                                15
                             ]
                         }
                     },
-                    "summary": "Deleted the '%w(one two)' array"
+                    "summary": "Deleted an anonymous() function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "percent-array.rb"
+        "lambda.rb"
     ],
-    "sha1": "b871b3ab846bfaf958024dc6c1f4f5ca371b5e43",
+    "sha1": "bf3d7c49bfef739f7db38b21a5a79134956e98e6",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "52dd4d7e1acaa7e955ea0cd8efa548bbd523a9e0"
+    "sha2": "96f9c1fa9b0995575497448241599c0e4a351e91"
 }
 ,{
-    "testCaseDescription": "ruby-percent-array-delete-rest-test",
+    "testCaseDescription": "ruby-lambda-delete-rest-test",
     "expectedResult": {
         "changes": {
-            "percent-array.rb": [
+            "lambda.rb": [
                 {
                     "span": {
                         "delete": {
@@ -243,20 +267,20 @@
                             ],
                             "end": [
                                 1,
-                                19
+                                21
                             ]
                         }
                     },
-                    "summary": "Deleted the '%W(one #{b} three)' array"
+                    "summary": "Deleted an anonymous(x) function"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "percent-array.rb"
+        "lambda.rb"
     ],
-    "sha1": "52dd4d7e1acaa7e955ea0cd8efa548bbd523a9e0",
+    "sha1": "96f9c1fa9b0995575497448241599c0e4a351e91",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "7cb451b01cb4c1eddde132bfd99cad662745a239"
+    "sha2": "f679bf7edf87bd0fca0ebb80668a5a7bfb841337"
 }]

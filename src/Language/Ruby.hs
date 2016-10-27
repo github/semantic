@@ -12,6 +12,9 @@ import Term
 operators :: [Text]
 operators = ["and", "boolean_and", "or", "boolean_or", "bitwise_or", "bitwise_and", "shift", "relational", "comparison"]
 
+functions :: [Text]
+functions = [ "lambda_literal", "lambda_expression" ]
+
 termConstructor
   :: Source Char -- ^ The source that the term occurs within.
   -> IO SourceSpan -- ^ The span that the term occupies. This is passed in 'IO' to guarantee some access constraints & encourage its use only when needed (improving performance).
@@ -55,6 +58,10 @@ termConstructor source sourceSpan name range children
     ("while_statement", [ expr ]) -> S.While expr Nothing
     ("yield", _) -> S.Yield (listToMaybe children)
     _ | name `elem` operators -> S.Operator children
+    _ | name `elem` functions -> case children of
+          [ body ] -> S.AnonymousFunction [] [body]
+          ( params : body ) -> S.AnonymousFunction (toList (unwrap params)) body
+          _ -> S.Indexed children
     (_, []) -> S.Leaf . toText $ slice range source
     _  -> S.Indexed children
   where
@@ -83,6 +90,7 @@ categoryForRubyName = \case
   "float" -> NumberLiteral
   "formal_parameters" -> Params
   "function_call" -> FunctionCall
+  "function" -> Function
   "hash" -> Object
   "identifier" -> Identifier
   "if_modifier" -> If

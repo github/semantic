@@ -76,9 +76,9 @@ termConstructor source sourceSpan name range children
     _ | name `elem` forStatements, Just (exprs, body) <- unsnoc children -> S.For exprs body
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
-          [ body ] -> S.AnonymousFunction [] body
-          [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) body
-          [ id, params, body ] -> S.Function id (toList (unwrap params)) body
+          [ body ] -> S.AnonymousFunction [] [body]
+          [ params, body ] -> S.AnonymousFunction (toList (unwrap params)) [body]
+          [ id, params, body ] -> S.Function id (toList (unwrap params)) [body]
           _ -> S.Indexed children
     (_, []) -> S.Leaf . toText $ slice range source
     _ -> S.Indexed children
