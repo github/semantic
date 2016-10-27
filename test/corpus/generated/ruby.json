@@ -152,6 +152,13 @@
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/class.json"
       },
       {
+        "syntax": "module",
+        "repoFilePath": "module.rb",
+        "insert": "module Foo\n  class Bar\n    def self.test; end\nend\nend",
+        "replacement": "class Bar::Foo\nend",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/module.json"
+      },
+      {
         "syntax": "return",
         "repoFilePath": "return.rb",
         "insert": "return foo",

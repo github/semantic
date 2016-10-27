@@ -345,7 +345,7 @@ instance HasCategory Category where
     C.If -> "if statement"
     C.CommaOperator -> "comma operator"
     C.Empty -> "empty statement"
-    C.Module -> "module statement"
+    C.Module -> "module"
     C.Import -> "import statement"
     C.Export -> "export statement"
     C.Interpolation -> "interpolation"

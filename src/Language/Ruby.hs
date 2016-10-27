@@ -47,6 +47,7 @@ termConstructor source sourceSpan name range children
     ("member_access", [ base, property ]) -> S.MemberAccess base property
     ("method_declaration", [ identifier, params, exprs ]) -> S.Method identifier (toList (unwrap params)) (toList (unwrap exprs))
     ("method_declaration", [ identifier, exprs ]) -> S.Method identifier [] (toList (unwrap exprs))
+    ("module_declaration", identifier : body ) -> S.Module identifier body
     ("return_statement", _) -> S.Return (listToMaybe children)
     ("unless_modifier", [ lhs, condition ]) -> S.Unless condition [lhs]
     ("unless_statement", expr : rest ) -> S.Unless expr rest
@@ -102,6 +103,7 @@ categoryForRubyName = \case
   "math_assignment" -> MathAssignment
   "member_access" -> MemberAccess
   "method_declaration" -> Method
+  "module_declaration"  -> Module
   "nil" -> Identifier
   "or" -> BooleanOperator
   "program" -> Program

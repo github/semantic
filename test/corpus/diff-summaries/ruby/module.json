@@ -1,74 +1,13 @@
 [{
-    "testCaseDescription": "ruby-until-insert-test",
+    "testCaseDescription": "ruby-module-insert-test",
     "expectedResult": {
         "changes": {
-            "until.rb": [
+            "module.rb": [
                 {
                     "span": {
                         "insert": {
                             "start": [
                                 1,
-                                1
-                            ],
-                            "end": [
-                                2,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' until statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'done' until statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "until.rb"
-    ],
-    "sha1": "7c027cf669e76e79e5439807d1a998e3ba000672",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "31af854bf62b91b4ff8f56d5a4ab33529334663c"
-}
-,{
-    "testCaseDescription": "ruby-until-replacement-insert-test",
-    "expectedResult": {
-        "changes": {
-            "until.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' until statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
                                 1
                             ],
                             "end": [
@@ -77,151 +16,75 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' until statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'done' until statement"
+                    "summary": "Added the 'Foo' module"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "until.rb"
+        "module.rb"
     ],
-    "sha1": "31af854bf62b91b4ff8f56d5a4ab33529334663c",
+    "sha1": "ed9247897e16cd69ebad6028847af00df20f0e7d",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "94fff86a17ac86af9cc29c1307c61138a4845e03"
+    "sha2": "cd7f298bed8debb2e94a651edbc644cb36d7c10f"
 }
 ,{
-    "testCaseDescription": "ruby-until-delete-insert-test",
+    "testCaseDescription": "ruby-module-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "until.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                2,
-                                3
-                            ],
-                            "end": [
-                                2,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'bar' identifier"
-                },
+            "module.rb": [
                 {
                     "span": {
                         "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'done' until statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "until.rb"
-    ],
-    "sha1": "94fff86a17ac86af9cc29c1307c61138a4845e03",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "84b3989a3ddcf0e8a28f57539575008ede0c7bc0"
-}
-,{
-    "testCaseDescription": "ruby-until-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "until.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                2,
-                                3
-                            ],
-                            "end": [
-                                2,
-                                6
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'bar' identifier"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'done' until statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "until.rb"
-    ],
-    "sha1": "84b3989a3ddcf0e8a28f57539575008ede0c7bc0",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "d543b5dbb82e7e862e0236cfdf9fe36f8198c32d"
-}
-,{
-    "testCaseDescription": "ruby-until-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "until.rb": [
-                {
-                    "span": {
-                        "delete": {
                             "start": [
                                 1,
                                 1
                             ],
                             "end": [
-                                3,
+                                2,
                                 4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' until statement"
+                    "summary": "Added the 'Bar::' class"
                 },
                 {
                     "span": {
-                        "delete": {
+                        "insert": {
                             "start": [
-                                4,
+                                3,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Foo' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "module.rb"
+    ],
+    "sha1": "cd7f298bed8debb2e94a651edbc644cb36d7c10f",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "629c3f6f43fd28dc947987f824387f2603462f3b"
+}
+,{
+    "testCaseDescription": "ruby-module-delete-insert-test",
+    "expectedResult": {
+        "changes": {
+            "module.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
                                 1
                             ],
                             "end": [
@@ -230,54 +93,8 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' until statement"
+                    "summary": "Added the 'Foo' module"
                 },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                6,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                15
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'done' until statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                4,
-                                1
-                            ],
-                            "end": [
-                                6,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' until statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "until.rb"
-    ],
-    "sha1": "d543b5dbb82e7e862e0236cfdf9fe36f8198c32d",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b2b489453b52669e244881e5f559934b8009ea3a"
-}
-,{
-    "testCaseDescription": "ruby-until-delete-test",
-    "expectedResult": {
-        "changes": {
-            "until.rb": [
                 {
                     "span": {
                         "delete": {
@@ -291,7 +108,84 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' until statement"
+                    "summary": "Deleted the 'Bar::' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "module.rb"
+    ],
+    "sha1": "629c3f6f43fd28dc947987f824387f2603462f3b",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "11a01102b820c5ea179542dbed5bb40d7a18b08e"
+}
+,{
+    "testCaseDescription": "ruby-module-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "module.rb": [
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Bar::' class"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                5,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Foo' module"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "module.rb"
+    ],
+    "sha1": "11a01102b820c5ea179542dbed5bb40d7a18b08e",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "8dfd95ab4140ed713d3f8db3d17c5094c6d53182"
+}
+,{
+    "testCaseDescription": "ruby-module-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "module.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Bar::' class"
                 },
                 {
                     "span": {
@@ -301,29 +195,44 @@
                                 1
                             ],
                             "end": [
-                                3,
-                                15
+                                7,
+                                4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'done' until statement"
+                    "summary": "Deleted the 'Foo' module"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                6,
+                                1
+                            ],
+                            "end": [
+                                7,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'Bar::' class"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "until.rb"
+        "module.rb"
     ],
-    "sha1": "b2b489453b52669e244881e5f559934b8009ea3a",
+    "sha1": "8dfd95ab4140ed713d3f8db3d17c5094c6d53182",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "950322e82a161bf2deecf347e945829ed6464762"
+    "sha2": "786d175e7f9b08d2bf48d6adcc60951a51114861"
 }
 ,{
-    "testCaseDescription": "ruby-until-delete-rest-test",
+    "testCaseDescription": "ruby-module-delete-test",
     "expectedResult": {
         "changes": {
-            "until.rb": [
+            "module.rb": [
                 {
                     "span": {
                         "delete": {
@@ -332,21 +241,52 @@
                                 1
                             ],
                             "end": [
-                                3,
+                                5,
                                 4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' until statement"
+                    "summary": "Deleted the 'Foo' module"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "until.rb"
+        "module.rb"
     ],
-    "sha1": "950322e82a161bf2deecf347e945829ed6464762",
+    "sha1": "786d175e7f9b08d2bf48d6adcc60951a51114861",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "0522110452860c1fbab3a97d2b7ca5ce760401a9"
+    "sha2": "8dd62513dc964890d300f18b584a928abdd165e7"
+}
+,{
+    "testCaseDescription": "ruby-module-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "module.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                2,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'Bar::' class"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "module.rb"
+    ],
+    "sha1": "8dd62513dc964890d300f18b584a928abdd165e7",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "12e4f5002e49ac9481b44ca93f12499e29fa4d24"
 }]
