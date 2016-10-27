@@ -241,6 +241,13 @@
         "insert": "lambda { foo }",
         "replacement": "lambda { |x| x + 1 }",
         "testCaseFilePath": "test/corpus/diff-summaries/ruby/lambda.json"
+      },
+      {
+        "syntax": "for",
+        "repoFilePath": "for.rb",
+        "insert": "for x in y\n  f\nend",
+        "replacement": "for i in [1,2,3] do\n  print i\nend",
+        "testCaseFilePath": "test/corpus/diff-summaries/ruby/for.json"
       }
     ]
   }

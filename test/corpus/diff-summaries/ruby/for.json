@@ -1,8 +1,8 @@
 [{
-    "testCaseDescription": "ruby-case-statement-insert-test",
+    "testCaseDescription": "ruby-for-insert-test",
     "expectedResult": {
         "changes": {
-            "case-statement.rb": [
+            "for.rb": [
                 {
                     "span": {
                         "insert": {
@@ -16,24 +16,24 @@
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' switch statement"
+                    "summary": "Added the 'x in y' for statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-statement.rb"
+        "for.rb"
     ],
-    "sha1": "35accad1a4b301d625ef28d0d0c69d6795c4d147",
+    "sha1": "f98ffefc4f6e1479e9babc4aeb6603b43f96bd92",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "df03af0efdff40177306000083b93d21696cec80"
+    "sha2": "e3e49ade62b9d3eab98ff7b6b05dab3040d1df25"
 }
 ,{
-    "testCaseDescription": "ruby-case-statement-replacement-insert-test",
+    "testCaseDescription": "ruby-for-replacement-insert-test",
     "expectedResult": {
         "changes": {
-            "case-statement.rb": [
+            "for.rb": [
                 {
                     "span": {
                         "insert": {
@@ -42,135 +42,12 @@
                                 1
                             ],
                             "end": [
-                                4,
+                                3,
                                 4
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' switch statement"
-                },
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'foo' switch statement"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "case-statement.rb"
-    ],
-    "sha1": "df03af0efdff40177306000083b93d21696cec80",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b31d7a1ea49802b7613a09d51519bbac745e3780"
-}
-,{
-    "testCaseDescription": "ruby-case-statement-delete-insert-test",
-    "expectedResult": {
-        "changes": {
-            "case-statement.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'else' else_block"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "case-statement.rb"
-    ],
-    "sha1": "b31d7a1ea49802b7613a09d51519bbac745e3780",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "b01abbf52d4948e272d4803ce3d7a22017866c33"
-}
-,{
-    "testCaseDescription": "ruby-case-statement-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "case-statement.rb": [
-                {
-                    "span": {
-                        "insert": {
-                            "start": [
-                                3,
-                                1
-                            ],
-                            "end": [
-                                3,
-                                5
-                            ]
-                        }
-                    },
-                    "summary": "Added the 'else' else_block"
-                }
-            ]
-        },
-        "errors": {}
-    },
-    "filePaths": [
-        "case-statement.rb"
-    ],
-    "sha1": "b01abbf52d4948e272d4803ce3d7a22017866c33",
-    "gitDir": "test/corpus/repos/ruby",
-    "sha2": "1c31a1e046d9f215e5f9754569b94e77e4f5192d"
-}
-,{
-    "testCaseDescription": "ruby-case-statement-delete-replacement-test",
-    "expectedResult": {
-        "changes": {
-            "case-statement.rb": [
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                1,
-                                1
-                            ],
-                            "end": [
-                                4,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'foo' switch statement"
-                },
-                {
-                    "span": {
-                        "delete": {
-                            "start": [
-                                5,
-                                1
-                            ],
-                            "end": [
-                                7,
-                                4
-                            ]
-                        }
-                    },
-                    "summary": "Deleted the 'foo' switch statement"
+                    "summary": "Added the 'i in [1,2,3]' for statement"
                 },
                 {
                     "span": {
@@ -180,29 +57,115 @@
                                 1
                             ],
                             "end": [
-                                7,
+                                6,
                                 4
                             ]
                         }
                     },
-                    "summary": "Added the 'foo' switch statement"
+                    "summary": "Added the 'x in y' for statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-statement.rb"
+        "for.rb"
     ],
-    "sha1": "1c31a1e046d9f215e5f9754569b94e77e4f5192d",
+    "sha1": "e3e49ade62b9d3eab98ff7b6b05dab3040d1df25",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "048f0cb3731aca931f55e7c5c087b0c7a3ce8c99"
+    "sha2": "e780ec910b232443684c1b566939430e6b74001a"
 }
 ,{
-    "testCaseDescription": "ruby-case-statement-delete-test",
+    "testCaseDescription": "ruby-for-delete-insert-test",
     "expectedResult": {
         "changes": {
-            "case-statement.rb": [
+            "for.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'i in [1,2,3]' for statement with the 'x in y' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for.rb"
+    ],
+    "sha1": "e780ec910b232443684c1b566939430e6b74001a",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "6bab2e7507a99a61fd3b465113210e5f685c4ee6"
+}
+,{
+    "testCaseDescription": "ruby-for-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for.rb": [
+                {
+                    "span": {
+                        "replace": [
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    4
+                                ]
+                            },
+                            {
+                                "start": [
+                                    1,
+                                    1
+                                ],
+                                "end": [
+                                    3,
+                                    4
+                                ]
+                            }
+                        ]
+                    },
+                    "summary": "Replaced the 'x in y' for statement with the 'i in [1,2,3]' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for.rb"
+    ],
+    "sha1": "6bab2e7507a99a61fd3b465113210e5f685c4ee6",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "6afc14710e97d00d714bd28945d674871f3635a8"
+}
+,{
+    "testCaseDescription": "ruby-for-delete-replacement-test",
+    "expectedResult": {
+        "changes": {
+            "for.rb": [
                 {
                     "span": {
                         "delete": {
@@ -216,24 +179,54 @@
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' switch statement"
+                    "summary": "Deleted the 'i in [1,2,3]' for statement"
+                },
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'x in y' for statement"
+                },
+                {
+                    "span": {
+                        "insert": {
+                            "start": [
+                                4,
+                                1
+                            ],
+                            "end": [
+                                6,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Added the 'i in [1,2,3]' for statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-statement.rb"
+        "for.rb"
     ],
-    "sha1": "048f0cb3731aca931f55e7c5c087b0c7a3ce8c99",
+    "sha1": "6afc14710e97d00d714bd28945d674871f3635a8",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "73b872846a4b0bd5457d0816b155576a4662a176"
+    "sha2": "b3cda7c34fb9b911b8e4b7aed76bc65548d8a944"
 }
 ,{
-    "testCaseDescription": "ruby-case-statement-delete-rest-test",
+    "testCaseDescription": "ruby-for-delete-test",
     "expectedResult": {
         "changes": {
-            "case-statement.rb": [
+            "for.rb": [
                 {
                     "span": {
                         "delete": {
@@ -242,21 +235,52 @@
                                 1
                             ],
                             "end": [
-                                4,
+                                3,
                                 4
                             ]
                         }
                     },
-                    "summary": "Deleted the 'foo' switch statement"
+                    "summary": "Deleted the 'x in y' for statement"
                 }
             ]
         },
         "errors": {}
     },
     "filePaths": [
-        "case-statement.rb"
+        "for.rb"
     ],
-    "sha1": "73b872846a4b0bd5457d0816b155576a4662a176",
+    "sha1": "b3cda7c34fb9b911b8e4b7aed76bc65548d8a944",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "42fee992f61ffc77eb911ecdf9bdb753015fe704"
+    "sha2": "8d1d7c23d2195d6482cedeae176c7bd75fb8f703"
+}
+,{
+    "testCaseDescription": "ruby-for-delete-rest-test",
+    "expectedResult": {
+        "changes": {
+            "for.rb": [
+                {
+                    "span": {
+                        "delete": {
+                            "start": [
+                                1,
+                                1
+                            ],
+                            "end": [
+                                3,
+                                4
+                            ]
+                        }
+                    },
+                    "summary": "Deleted the 'i in [1,2,3]' for statement"
+                }
+            ]
+        },
+        "errors": {}
+    },
+    "filePaths": [
+        "for.rb"
+    ],
+    "sha1": "8d1d7c23d2195d6482cedeae176c7bd75fb8f703",
+    "gitDir": "test/corpus/repos/ruby",
+    "sha2": "09a0c42b5ca283bcf37028cd916f12b3d621f02e"
 }]

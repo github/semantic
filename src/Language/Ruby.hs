@@ -57,6 +57,7 @@ termConstructor source sourceSpan name range children
     ("while_statement", [ expr, body ]) -> S.While expr (Just body)
     ("while_statement", [ expr ]) -> S.While expr Nothing
     ("yield", _) -> S.Yield (listToMaybe children)
+    ("for_statement", lhs : expr : rest ) -> S.For [lhs, expr] rest
     _ | name `elem` operators -> S.Operator children
     _ | name `elem` functions -> case children of
           [ body ] -> S.AnonymousFunction [] [body]
@@ -88,6 +89,7 @@ categoryForRubyName = \case
   "conditional" -> Ternary
   "ERROR" -> Error
   "float" -> NumberLiteral
+  "for_statement" -> For
   "formal_parameters" -> Params
   "function_call" -> FunctionCall
   "function" -> Function

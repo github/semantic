@@ -7,9 +7,9 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "7bd77d454342c73398af2de8c18672a6a027c356",
+    "sha1": "ca91a937c9fac7c0f9e3c175122066116aa8d56a",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "6371671661267bac2629aa005ba12182aea1fb1b"
+    "sha2": "af274248b4cebb9e971c8dd9b69f056623b6ea4b"
 }
 ,{
     "testCaseDescription": "ruby-comment-replacement-insert-test",
@@ -20,9 +20,9 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "6371671661267bac2629aa005ba12182aea1fb1b",
+    "sha1": "af274248b4cebb9e971c8dd9b69f056623b6ea4b",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "f393e34a4b36f7001ccb07c729fdd524fcf8d796"
+    "sha2": "94db75553f3a748ef14855b5bd4f4eef3d111f28"
 }
 ,{
     "testCaseDescription": "ruby-comment-delete-insert-test",
@@ -33,9 +33,9 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "f393e34a4b36f7001ccb07c729fdd524fcf8d796",
+    "sha1": "94db75553f3a748ef14855b5bd4f4eef3d111f28",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8283c032484e0f89fcb43ddc031d8ecce15ffec8"
+    "sha2": "d94c1988499ad024d023bf93a4dcb75aa9644941"
 }
 ,{
     "testCaseDescription": "ruby-comment-replacement-test",
@@ -46,9 +46,9 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "8283c032484e0f89fcb43ddc031d8ecce15ffec8",
+    "sha1": "d94c1988499ad024d023bf93a4dcb75aa9644941",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "8334ccbaf0e51af069aaee4a06f6cb74a77e6276"
+    "sha2": "2dc2145f0528705bdf1a20fd68d3b9fa2e746f89"
 }
 ,{
     "testCaseDescription": "ruby-comment-delete-replacement-test",
@@ -59,9 +59,9 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "8334ccbaf0e51af069aaee4a06f6cb74a77e6276",
+    "sha1": "2dc2145f0528705bdf1a20fd68d3b9fa2e746f89",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "02f6f6c50d808fb7398df6bfb6697cf8e7c132ec"
+    "sha2": "d9313de538626e69dd7c9aeac5263cdab064de4c"
 }
 ,{
     "testCaseDescription": "ruby-comment-delete-test",
@@ -72,9 +72,9 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "02f6f6c50d808fb7398df6bfb6697cf8e7c132ec",
+    "sha1": "d9313de538626e69dd7c9aeac5263cdab064de4c",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "3fd0e72c9144b415be553af1d9edd6e20cb42fe1"
+    "sha2": "c078f21f484dbc75aa7e440ebf9b9c8e541b45b5"
 }
 ,{
     "testCaseDescription": "ruby-comment-delete-rest-test",
@@ -85,7 +85,7 @@
     "filePaths": [
         "comment.rb"
     ],
-    "sha1": "3fd0e72c9144b415be553af1d9edd6e20cb42fe1",
+    "sha1": "c078f21f484dbc75aa7e440ebf9b9c8e541b45b5",
     "gitDir": "test/corpus/repos/ruby",
-    "sha2": "c3e52a2eca6408e04b75857f2aae45c4246b8161"
+    "sha2": "721178a4e6915cfe5e5d55a8e56a5a343dda363b"
 }]

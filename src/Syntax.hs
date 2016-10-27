@@ -57,7 +57,8 @@ data Syntax a f
   -- | A term preceded or followed by any number of comments.
   | Commented [f] (Maybe f)
   | Error [f]
-  | For [f] f
+  -- | A for statement has a list of expressions to setup the iteration and then a list of expressions in the body.
+  | For [f] [f]
   | DoWhile { doWhileBody :: f, doWhileExpr :: f }
   | While { whileExpr :: f, whileBody :: Maybe f }
   | Return (Maybe f)
