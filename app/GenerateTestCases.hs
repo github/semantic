@@ -191,7 +191,6 @@ data GenerateEff a where
   GenerateSummaries' :: Arguments -> GenerateEff ExpectedResult
   GenerateJSON' :: Arguments -> GenerateEff ExpectedResult
 
--- args :: FilePath -> String -> String -> [String] -> R.Format -> Arguments
 generateSummaries' :: FilePath -> String -> String -> FilePath -> Eff '[GenerateEff] ExpectedResult
 generateSummaries' repoPath beforeSha afterSha repoFilePath = send $ GenerateSummaries' (args repoPath beforeSha afterSha [repoFilePath] R.Summary)
 
