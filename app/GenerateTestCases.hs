@@ -114,66 +114,70 @@ runAddSubmodule repoUrl repoPath = do
 -- | Also appends the JSONTestCases generated to the test case file defined by
 -- | the syntaxes.
 runCommitsAndTestCasesGeneration :: GeneratorArgs -> JSONMetaRepo -> IO ()
-runCommitsAndTestCasesGeneration opts JSONMetaRepo{..} =
+runCommitsAndTestCasesGeneration opts metaRepo@JSONMetaRepo{..} =
   for_ syntaxes generate
-    where generate :: JSONMetaSyntax -> IO ()
-          generate metaSyntax = do
-            _ <- runInitialCommitForSyntax repoPath metaSyntax
-            runSetupTestCaseFile metaSyntax
-            runCommitAndTestCaseGeneration opts language repoPath metaSyntax
-            runCloseTestCaseFile metaSyntax
+    where
+      generate :: JSONMetaSyntax -> IO ()
+      generate metaSyntax = do
+        _ <- runInitialCommitForSyntax metaRepo metaSyntax
+        runSetupTestCaseFile $ testCaseFilePath metaSyntax
+        runCommitAndTestCaseGeneration opts metaRepo metaSyntax (testCaseFilePath metaSyntax)
+        runCloseTestCaseFile $ testCaseFilePath metaSyntax
+      testCaseFilePath :: JSONMetaSyntax -> FilePath
+      testCaseFilePath JSONMetaSyntax{..} = testCaseDirName <> "/" <> language <> "/" <> syntax <> ".json"
 
 -- | For a syntax, we want the initial commit to be an empty file.
 -- | This function performs a touch and commits the empty file.
-runInitialCommitForSyntax :: FilePath -> JSONMetaSyntax -> IO ()
-runInitialCommitForSyntax repoPath JSONMetaSyntax{..} = do
+runInitialCommitForSyntax :: JSONMetaRepo -> JSONMetaSyntax -> IO ()
+runInitialCommitForSyntax JSONMetaRepo{..} JSONMetaSyntax{..} = do
   Prelude.putStrLn $ "Generating initial commit for " <> syntax <> " syntax."
-  result <- try . executeCommand repoPath $ touchCommand repoFilePath <> commitCommand syntax "Initial commit"
+  result <- try . executeCommand repoPath $ touchCommand (syntax <> fileExt) <> commitCommand syntax "Initial commit"
   case ( result :: Either Prelude.IOError String) of
-    Left error -> Prelude.putStrLn $ "Initializing the " <> repoFilePath <> " failed with: " <> show error <> ". " <> "Possible reason: file already initialized. \nProceeding to the next step."
+    Left error -> Prelude.putStrLn $ "Initializing the " <> syntax <> fileExt <> " failed with: " <> show error <> ". " <> "Possible reason: file already initialized. \nProceeding to the next step."
     Right _ -> pure ()
 
 -- | Initializes the test case file where JSONTestCase examples are written to.
 -- | This manually inserts a "[" to open a JSON array.
-runSetupTestCaseFile :: JSONMetaSyntax -> IO ()
-runSetupTestCaseFile metaSyntax = do
-  Prelude.putStrLn $ "Opening " <> testCaseFilePath metaSyntax
-  DL.writeFile (testCaseFilePath metaSyntax) "["
+runSetupTestCaseFile :: FilePath -> IO ()
+runSetupTestCaseFile testCaseFilePath = do
+  Prelude.putStrLn $ "Opening " <> testCaseFilePath
+  DL.writeFile testCaseFilePath "["
 
 -- | For each command constructed for a given metaSyntax, execute the system commands.
-runCommitAndTestCaseGeneration :: GeneratorArgs -> String -> FilePath -> JSONMetaSyntax -> IO ()
-runCommitAndTestCaseGeneration opts language repoPath metaSyntax@JSONMetaSyntax{..} =
-   traverse_ (runGenerateCommitAndTestCase opts language repoPath) (commands metaSyntax)
+runCommitAndTestCaseGeneration :: GeneratorArgs -> JSONMetaRepo -> JSONMetaSyntax -> FilePath -> IO ()
+runCommitAndTestCaseGeneration opts metaRepo metaSyntax testCaseFilePath =
+   traverse_ (runGenerateCommitAndTestCase opts metaRepo testCaseFilePath) (commands metaRepo metaSyntax)
 
+-- | Converts a list of Output to a list of Renderer.Summary Map values
 maybeMapSummary :: [R.Output] -> [Maybe (Map Text (Map Text [Value]))]
 maybeMapSummary = fmap $ \case
     R.SummaryOutput output -> Just output
     _ -> Nothing
 
+-- | Converst a list of Output to a list of Renderer.JSON values
 maybeMapJSON :: [R.Output] -> [Maybe (Map Text Value)]
 maybeMapJSON = fmap $ \case
   R.JSONOutput output -> Just output
   _ -> Nothing
 
-
 -- | This function represents the heart of the test case generation. It keeps track of
 -- | the git shas prior to running a command, fetches the git sha after a command, so that
 -- | JSONTestCase objects can be created. Finally, it appends the created JSONTestCase
 -- | object to the test case file.
-runGenerateCommitAndTestCase :: GeneratorArgs -> String -> FilePath -> (JSONMetaSyntax, String, String, String) -> IO ()
-runGenerateCommitAndTestCase opts language repoPath (JSONMetaSyntax{..}, description, seperator, command) = do
+runGenerateCommitAndTestCase :: GeneratorArgs -> JSONMetaRepo -> FilePath -> (JSONMetaSyntax, String, String, String) -> IO ()
+runGenerateCommitAndTestCase opts JSONMetaRepo{..} testCaseFilePath (JSONMetaSyntax{..}, description, seperator, command) = do
   Prelude.putStrLn $ "Executing " <> syntax <> " " <> description <> " commit."
 
   beforeSha <- executeCommand repoPath getLastCommitShaCommand
   _ <- executeCommand repoPath command
   afterSha <- executeCommand repoPath getLastCommitShaCommand
 
-  expectedResult' <- runExpectedResultGenerator repoPath beforeSha afterSha repoFilePath opts
+  expectedResult' <- runExpectedResultGenerator repoPath beforeSha afterSha (syntax <> fileExt) opts
 
   let jsonTestCase = encodePretty JSONTestCase {
     gitDir = extractGitDir repoPath,
     testCaseDescription = language <> "-" <> syntax <> "-" <> description <> "-" <> "test",
-    filePaths = [repoFilePath],
+    filePaths = [syntax <> fileExt],
     sha1 = beforeSha,
     sha2 = afterSha,
     expectedResult = expectedResult'
@@ -199,17 +203,17 @@ generateJSON' repoPath beforeSha afterSha repoFilePath = send $ GenerateJSON' (a
 run :: Eff '[GenerateEff] ExpectedResult -> IO ExpectedResult
 run (Val x) = pure x
 run (E u queue) = case decompose u of
-  (Right (GenerateSummaries' args)) -> generateSummaries args >> Main.run (apply queue EmptyResult)
-  (Right (GenerateJSON' args)) -> generateJSON args >> Main.run (apply queue EmptyResult)
-  (Left _) -> pure EmptyResult
+  (Right (GenerateSummaries' args)) -> generateSummaries args >>= \s -> Main.run (apply queue s)
+  (Right (GenerateJSON' args)) -> generateJSON args >>= \s -> Main.run (apply queue s)
+  (Left _) -> pure $ EmptyResult ""
 
 runExpectedResultGenerator :: FilePath -> String -> String -> FilePath -> GeneratorArgs -> IO ExpectedResult
 runExpectedResultGenerator repoPath beforeSha afterSha repoFilePath GeneratorArgs{..} =
   case generateFormat of
     GenerateSummaries -> Main.run $ generateSummaries' repoPath beforeSha afterSha repoFilePath
     GenerateJSON -> Main.run $ generateJSON' repoPath beforeSha afterSha repoFilePath
-    GenerateAll -> pure EmptyResult
-    _ -> pure EmptyResult
+    GenerateAll -> pure $ EmptyResult ""
+    _ -> pure $ EmptyResult ""
 
 generateSummaries :: Arguments -> IO ExpectedResult -- (Map Text [Value], Map Text [Value])
 generateSummaries args@Arguments{..} = do
@@ -230,8 +234,8 @@ generateJSON args = do
 
 -- | Commands represent the various combination of patches (insert, delete, replacement)
 -- | for a given syntax.
-commands :: JSONMetaSyntax -> [(JSONMetaSyntax, String, String, String)]
-commands metaSyntax@JSONMetaSyntax{..} =
+commands :: JSONMetaRepo -> JSONMetaSyntax -> [(JSONMetaSyntax, String, String, String)]
+commands JSONMetaRepo{..} metaSyntax@JSONMetaSyntax{..} =
   [ (metaSyntax, "insert", commaSeperator, fileWriteCommand repoFilePath insert <> commitCommand syntax "insert")
   , (metaSyntax, "replacement-insert", commaSeperator, fileWriteCommand repoFilePath (Prologue.intercalate "\n" [replacement, insert, insert]) <> commitCommand syntax "replacement + insert + insert")
   , (metaSyntax, "delete-insert", commaSeperator, fileWriteCommand repoFilePath (Prologue.intercalate "\n" [insert, insert, insert]) <> commitCommand syntax "delete + insert")
@@ -242,6 +246,7 @@ commands metaSyntax@JSONMetaSyntax{..} =
   ]
   where commaSeperator = "\n,"
         spaceSeperator = ""
+        repoFilePath = syntax <> fileExt
 
 -- | Attempts to pull from the git repository's remote repository.
 -- | If the pull fails, the exception is caught and continues to the next step.
@@ -274,10 +279,10 @@ runPushGitRemote repoPath = do
     Right _ -> Prelude.putStrLn "Successfully updated git remote."
 
 -- | Closes the JSON array and closes the test case file.
-runCloseTestCaseFile :: JSONMetaSyntax -> IO ()
-runCloseTestCaseFile metaSyntax = do
-  Prelude.putStrLn $ "Closing " <> testCaseFilePath metaSyntax
-  DL.appendFile (testCaseFilePath metaSyntax) "]\n"
+runCloseTestCaseFile :: FilePath -> IO ()
+runCloseTestCaseFile testCaseFilePath = do
+  Prelude.putStrLn $ "Closing " <> testCaseFilePath
+  DL.appendFile testCaseFilePath "]\n"
 
 initializeRepoCommand :: String -> String
 initializeRepoCommand repoUrl = "rm -rf *; rm -rf .git; git init .; git remote add origin " <> repoUrl <> ";"
