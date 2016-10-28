@@ -1,4 +1,4 @@
-module SemanticGitDiffSpec where
+module IntegrationFormatSpec where
 
 import Arguments
 import Data.Aeson

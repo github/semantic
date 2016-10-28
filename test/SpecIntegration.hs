@@ -1,9 +1,9 @@
 module Main where
 
 import Prologue
-import qualified SemanticGitDiffSpec
+import qualified IntegrationFormatSpec
 import Test.Hspec
 
 main :: IO ()
 main = hspec $ parallel $ do
-  describe "DiffSummaries" SemanticGitDiffSpec.spec
+  describe "Integration Format Specs" IntegrationFormatSpec.spec

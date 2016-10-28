@@ -184,7 +184,7 @@ test-suite integration-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             SpecIntegration.hs
-  other-modules:       SemanticGitDiffSpec
+  other-modules:       IntegrationFormatSpec
                      , JSONTestCase
   build-depends:       base
                      , aeson
